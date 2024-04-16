@@ -28,6 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -44,6 +45,8 @@ import java.util.jar.JarFile;
  * A JUnit test for checking if restarting DFS preserves integrity.
  */
 public class TestRestartDFS {
+
+
 
   @Test
   public void testLoadEverything() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -219,29 +222,129 @@ public class TestRestartDFS {
  **/
   }
 
+  @Test
+  public void testClassLoad() throws IOException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    // Load different version of Hadoop classes
+    String version = System.getProperty("upgrade.version", "3.5.0-SNAPSHOT");
+    ClassLoader cl = createClassLoader(version);
+    // cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+    createCluster(cl, 4, false);
+  }
+
+  public void createCluster(ClassLoader child, int numNode, boolean format) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, IOException {
+    Class<?> configClass = child.loadClass("org.apache.hadoop.conf.Configuration");
+    Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+    Class<?> miniClusterClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster");
+
+    // location of the configuration class
+    System.out.println("Load class org.apache.hadoop.conf.Configuration from: " + configClass.getProtectionDomain().getCodeSource().getLocation());
+    System.out.println("Load class org.apache.hadoop.hdfs.MiniDFSCluster$Builder from: " + builderClass.getProtectionDomain().getCodeSource().getLocation());
+
+    Constructor<?>[] configConstructors = configClass.getConstructors();
+    // get the first constructor
+    Constructor<?> configConstructor = null;
+    for (Constructor<?> constructor : configConstructors) {
+      if (constructor.getParameterCount() == 0) {
+        configConstructor = constructor;
+        break;
+      }
+    }
+
+    // create an instance of Configuration
+    Object conf = configConstructor.newInstance();
+    // call conf.set function with key and value
+    Method setMethod = configClass.getMethod("set", String.class, String.class);
+    setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+
+
+    // list all constructors from builderClass
+    System.out.println("Printing constructors from builderClass:");
+    Constructor<?>[] constructors = builderClass.getConstructors();
+    Constructor<?> builderConstructor = null;
+    // get the constructor with one parameter
+    for (Constructor<?> constructor : constructors) {
+      if (constructor.getParameterCount() == 1) {
+        builderConstructor = constructor;
+        break;
+      }
+    }
+
+    Object builder = builderConstructor.newInstance(conf);
+    System.out.println("Builder created successfully: " + builder);
+    Method numDataNodesMethod = builderClass.getMethod("numDataNodes", int.class);
+    numDataNodesMethod.invoke(builder, numNode);
+    Method formatMethod = builderClass.getMethod("format", boolean.class);
+    formatMethod.invoke(builder, false);
+    Method buildMethod = builderClass.getMethod("build");
+    Object cluster = buildMethod.invoke(builder);
+
+    System.out.println("MiniDFSCluster instance created successfully: " + cluster);
+
+    // invoke the getFileSystem method
+    Method getFileSystemMethod = miniClusterClass.getMethod("getFileSystem");
+    Object fs = getFileSystemMethod.invoke(cluster);
+    System.out.println("FileSystem created successfully: " + fs);
+
+  }
+
   /**
    * Load different version of Hadoop classes.
    */
-  private ClassLoader loadHadoop(String version) throws MalformedURLException {
-    System.out.println("Loading Hadoop classes from version " + version);
+  public ClassLoader createClassLoader(String version) throws MalformedURLException, FileNotFoundException {
+    // print classpath
+    System.out.println("Printing classpath:");
+    System.out.println(System.getProperty("java.class.path"));
+    // remove existing hadoop-common from classpath
+    System.setProperty("java.class.path", System.getProperty("java.class.path").replace("/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.5.0-SNAPSHOT/hadoop-common-3.5.0-SNAPSHOT.jar", "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/" + version + "/hadoop-common-" + version +".jar"));
+    // remove     // /Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/test-classes:/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/classes
+    System.setProperty("java.class.path", System.getProperty("java.class.path").replace("/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/test-classes:/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/classes:", ""));
+    // print classpath again
+    System.out.println("Printing classpath after removing hadoop-common-3.5.0-SNAPSHOT.jar:");
+    System.out.println(System.getProperty("java.class.path"));
 
-    File hdfsJar = new File("/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.5.0-SNAPSHOT/hadoop-hdfs-3.5.0-SNAPSHOT-tests.jar");
-    File commonJar = new File("/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.5.0-SNAPSHOT/hadoop-common-3.5.0-SNAPSHOT.jar");
-    //File hdfsJar = new File(System.getProperty("user.home") + "/.m2/repository/org/apache/hadoop/hadoop-hdfs/" + version + "/hadoop-hdfs-" + version + "-tests.jar");
-    //File commonJar = new File(System.getProperty("user.home") + "/.m2/repository/org/apache/hadoop/hadoop-common/" + version + "/hadoop-common-" + version + ".jar");
-    if (!hdfsJar.exists()){
-      System.out.println("Hadoop HDFS jar not found: " + hdfsJar.getAbsolutePath());
-      return null;
+
+    String commonPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/" + version + "/hadoop-common-" + version + ".jar";
+    String hdfsTestPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/" + version + "/hadoop-hdfs-" + version + "-tests.jar";
+    String hdfsPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/" + version + "/hadoop-hdfs-" + version + ".jar";
+    File myJar = new File(commonPath);
+    File hdfsJar = new File(hdfsPath);
+    File hdfsTestJar = new File(hdfsTestPath);
+
+    // create a URL list with the jar file
+    //URL[] urls = {myJar.toURI().toURL(), hdfsJar.toURI().toURL(), hdfsTestJar.toURI().toURL(), htraceCoreJar.toURI().toURL(), htraceCore4Jar.toURI().toURL(), htraceCore42Jar.toURI().toURL()};
+    URL[] urls = {myJar.toURI().toURL(), hdfsJar.toURI().toURL(), hdfsTestJar.toURI().toURL()};
+    // iterate java.class.path and add them to the URL list
+    String[] classpath = System.getProperty("java.class.path").split(":");
+    for (String path : classpath) {
+      urls = Arrays.copyOf(urls, urls.length + 1);
+      urls[urls.length - 1] = new File(path).toURI().toURL();
     }
-    if (!commonJar.exists()){
-      System.out.println("Hadoop Common jar not found: " + commonJar.getAbsolutePath());
-      return null;
+    System.out.println("Printing everything from the URL list:");
+    for (URL url : urls) {
+      System.out.println(url.getFile());
     }
 
-    URL[] urls = {hdfsJar.toURI().toURL(), commonJar.toURI().toURL()};
-    //return new URLClassLoader(urls, getClass().getClassLoader());
-    return new URLClassLoader(urls, null);
-    //return getClass().getClassLoader();
+    // read from classpath.txt, the file has only one line, split by :
+    File file = new File("/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/classpath.txt");
+    Scanner scanner = new Scanner(file);
+    String pathToJar = scanner.nextLine();
+    String[] paths = pathToJar.split(":");
+    List<URL> fileURLs = new ArrayList<>();
+    for (String path : paths) {
+      if (!path.contains("hadoop-common")) {
+        fileURLs.add(new File(path).toURI().toURL());
+      }
+    }
+
+    // merge fileURLs and urls as the final list, there could be duplicates and only unique URLs are kept
+    Set<URL> urlSet = new HashSet<>();
+    urlSet.addAll(Arrays.asList(urls));
+    urlSet.addAll(fileURLs);
+    urls = urlSet.toArray(new URL[0]);
+
+    URLClassLoader child = new URLClassLoader(urls, getClass().getClassLoader().getParent());
+    Thread.currentThread().setContextClassLoader(child);
+    return child;
   }
 
   /**
@@ -295,6 +398,7 @@ public class TestRestartDFS {
 
   @Test
   public void testCreateDifferentMiniCluster() {
+/**
     try {
       // Load different version of Hadoop classes
       ClassLoader cl = loadHadoop("3.3.1");
@@ -327,7 +431,7 @@ public class TestRestartDFS {
 
     } catch (Exception e) {
       e.printStackTrace();
-    }
+    }**/
   }
 
   public void runTests(Configuration conf, boolean serviceTest) throws Exception {
