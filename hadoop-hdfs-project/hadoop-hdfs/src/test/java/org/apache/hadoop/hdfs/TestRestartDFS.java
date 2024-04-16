@@ -87,6 +87,8 @@ public class TestRestartDFS {
             urls,
             null
     );
+    Thread.currentThread().setContextClassLoader(child);
+
 /**    List<URL> urls = Arrays.asList(((URLClassLoader) child).getURLs());
     System.out.println("Printing everything from the child class loader:");
     for (URL url : urls) {
@@ -115,6 +117,9 @@ public class TestRestartDFS {
 
     // create an instance of Configuration
     Object conf = configConstructor.newInstance();
+    // call conf.set function with key and value
+    Method setMethod = configClass.getMethod("set", String.class, String.class);
+    setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
 
 
     // list all constructors from builderClass
