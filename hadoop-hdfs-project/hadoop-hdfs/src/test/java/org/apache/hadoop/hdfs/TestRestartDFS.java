@@ -30,14 +30,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -48,11 +47,12 @@ public class TestRestartDFS {
 
   @Test
   public void testLoadEverything() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    String version = "3.3.6";
     // print classpath
     System.out.println("Printing classpath:");
     System.out.println(System.getProperty("java.class.path"));
     // remove existing hadoop-common from classpath
-    System.setProperty("java.class.path", System.getProperty("java.class.path").replace("/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.5.0-SNAPSHOT/hadoop-common-3.5.0-SNAPSHOT.jar", "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.3.1/hadoop-common-3.3.1.jar"));
+    System.setProperty("java.class.path", System.getProperty("java.class.path").replace("/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.5.0-SNAPSHOT/hadoop-common-3.5.0-SNAPSHOT.jar", "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/" + version + "/hadoop-common-" + version +".jar"));
     // remove     // /Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/test-classes:/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/classes
     System.setProperty("java.class.path", System.getProperty("java.class.path").replace("/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/test-classes:/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/target/classes:", ""));
     // print classpath again
@@ -60,14 +60,21 @@ public class TestRestartDFS {
     System.out.println(System.getProperty("java.class.path"));
 
 
-    String commonPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/3.3.1/hadoop-common-3.3.1.jar";
-    String hdfsTestPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.3.1/hadoop-hdfs-3.3.1-tests.jar";
-    String hdfsPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.3.1/hadoop-hdfs-3.3.1.jar";
+    String commonPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-common/" + version + "/hadoop-common-" + version + ".jar";
+    String hdfsTestPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/" + version + "/hadoop-hdfs-" + version + "-tests.jar";
+    String hdfsPath = "/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/" + version + "/hadoop-hdfs-" + version + ".jar";
+    String htraceCorePath = "/Users/allenwang/.m2/repository/org/apache/htrace/htrace-core/3.1.0-incubating/htrace-core-3.1.0-incubating.jar";
+    String htraceCore4Path = "/Users/allenwang/.m2/repository/org/apache/htrace/htrace-core4/4.1.0-incubating/htrace-core4-4.1.0-incubating.jar";
+    String htraceCore42Path = "/Users/allenwang/.m2/repository/org/apache/htrace/htrace-core4/4.0.1-incubating/htrace-core4-4.0.1-incubating.jar";
     File myJar = new File(commonPath);
     File hdfsJar = new File(hdfsPath);
     File hdfsTestJar = new File(hdfsTestPath);
+    File htraceCoreJar = new File(htraceCorePath);
+    File htraceCore4Jar = new File(htraceCore4Path);
+    File htraceCore42Jar = new File(htraceCore42Path);
+
     // create a URL list with the jar file
-    URL[] urls = {myJar.toURI().toURL(), hdfsJar.toURI().toURL(), hdfsTestJar.toURI().toURL()};
+    URL[] urls = {myJar.toURI().toURL(), hdfsJar.toURI().toURL(), hdfsTestJar.toURI().toURL(), htraceCoreJar.toURI().toURL(), htraceCore4Jar.toURI().toURL(), htraceCore42Jar.toURI().toURL()};
     // iterate java.class.path and add them to the URL list
     String[] classpath = System.getProperty("java.class.path").split(":");
     for (String path : classpath) {
@@ -79,13 +86,31 @@ public class TestRestartDFS {
       System.out.println(url.getFile());
     }
 
+    // read from classpath.txt, the file has only one line, split by :
+    File file = new File("/Users/allenwang/Documents/xlab/cross-system/hadoop/hadoop-hdfs-project/hadoop-hdfs/classpath.txt");
+    Scanner scanner = new Scanner(file);
+    String pathToJar = scanner.nextLine();
+    String[] paths = pathToJar.split(":");
+    List<URL> fileURLs = new ArrayList<>();
+    for (String path : paths) {
+      if (!path.contains("hadoop-common")) {
+        fileURLs.add(new File(path).toURI().toURL());
+      }
+    }
+
+    // merge fileURLs and urls as the final list, there could be duplicates and only unique URLs are kept
+    Set<URL> urlSet = new HashSet<>();
+    urlSet.addAll(Arrays.asList(urls));
+    urlSet.addAll(fileURLs);
+    urls = urlSet.toArray(new URL[0]);
+
     URLClassLoader child = new URLClassLoader(
             //new URL[] {myJar.toURI().toURL()},
             //new URL[] {myJar.toURI().toURL(), hdfsJar.toURI().toURL()},
             // new URL = myJar + hdfsJar + java.class.path
             //new URL[] {myJar.toURI().toURL(), hdfsJar.toURI().toURL(), new URL("jar:file:" + System.getProperty("java.class.path"))},
             urls,
-            null
+            getClass().getClassLoader().getParent()
     );
     Thread.currentThread().setContextClassLoader(child);
 
@@ -100,6 +125,7 @@ public class TestRestartDFS {
     // load configuration class with classLoader
     Class<?> configClass = child.loadClass("org.apache.hadoop.conf.Configuration");
     Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+    Class<?> cls = child.loadClass("org.apache.hadoop.util.Lists");
 
     // location of the configuration class
     System.out.println("Load class org.apache.hadoop.conf.Configuration from: " + configClass.getProtectionDomain().getCodeSource().getLocation());
