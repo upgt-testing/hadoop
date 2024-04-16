@@ -47,7 +47,7 @@ public class TestRestartDFS {
 
   @Test
   public void testLoadEverything() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    String version = "3.3.6";
+    String version = System.getProperty("upgrade.version", "3.5.0-SNAPSHOT");
     // print classpath
     System.out.println("Printing classpath:");
     System.out.println(System.getProperty("java.class.path"));
@@ -163,9 +163,9 @@ public class TestRestartDFS {
     Object builder = builderConstructor.newInstance(conf);
     System.out.println("Builder created successfully: " + builder);
     Method numDataNodesMethod = builderClass.getMethod("numDataNodes", int.class);
-    numDataNodesMethod.invoke(builder, 1);
-    Method formatMethod = builderClass.getMethod("format", boolean.class);
-    formatMethod.invoke(builder, false);
+    numDataNodesMethod.invoke(builder, 4);
+    //Method formatMethod = builderClass.getMethod("format", boolean.class);
+    //formatMethod.invoke(builder, false);
     Method buildMethod = builderClass.getMethod("build");
     Object cluster = buildMethod.invoke(builder);
     System.out.println("MiniDFSCluster instance created successfully: " + cluster);
