@@ -2,13 +2,10 @@ package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.DockerImageName;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -20,39 +17,60 @@ import java.util.List;
 public class DockerHDFSCluster implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(DockerHDFSCluster.class);
 
-    private Configuration conf;
-    private Network network;
-    private List<GenericContainer<?>> dataNodes = new ArrayList<>();
-    private List<GenericContainer<?>> nameNodes = new ArrayList<>();
-    private boolean waitSafeMode = true;
+    /** Whether to enable debug logging. */
+    private final boolean DEBUG = Boolean.getBoolean("DEBUG_DOCKER");
+    /** The configuration. */
+    private final Configuration conf;
+    /** The network for the docker containers. */
+    private final Network network;
+    /** The list of datanodes. */
+    private final List<GenericContainer<?>> dataNodes = new ArrayList<>();
+    /** The nameNode */
+    private GenericContainer<?> nameNode;
 
+    /**
+     * Create a new DockerHDFSCluster with default configuration.
+     */
+    public DockerHDFSCluster() {
+        this(new Configuration());
+    }
+
+    /**
+     * Create a new DockerHDFSCluster with the given configuration.
+     * @param conf the configuration
+     */
     public DockerHDFSCluster(Configuration conf) {
         this.conf = conf;
         this.network = Network.builder().build();
     }
 
-    public void startCluster(int numNode) throws IOException {
-        int numDataNodes = numNode - 1;
-        startNameNodes();
-        startDataNodes(numDataNodes);
-        // sleep for a while to allow the cluster to start
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Interrupted while waiting for the cluster to start", e);
+    /**
+     * Start the cluster with one namenode and the given number of data nodes.
+     * @param numDataNode the number of data nodes
+     * @throws IOException if an error occurs starting the cluster
+     */
+    public void startCluster(int numDataNode) throws IOException {
+        this.nameNode = startNameNode();
+        if (!nameNode.isRunning()) {
+            throw new RuntimeException("NameNode is not running");
         }
-        waitClusterUp();
+        startDataNodes(numDataNode);
+        if (!checkDataNodesRunning()) {
+            throw new RuntimeException("Not all nodes are running");
+        }
     }
 
-    // We only allow one NameNode for now
-    public GenericContainer<?> startNameNodes() throws IOException {
-        //Network network = Network.builder().build();
+
+    /**
+     * Start the NameNode.
+     * @return the NameNode container
+     */
+    public GenericContainer<?> startNameNode() {
         List<String> portBindings = new ArrayList<>();
         portBindings.add("50070:50070");
-        GenericContainer<?> namenode;
+        GenericContainer<?> nameNode;
         try {
-            namenode = new GenericContainer<>("hadoop:3.3.6")
+            nameNode = new GenericContainer<>("hadoop:3.3.6")
                     .withNetwork(network)
                     .withNetworkAliases("namenode")
                     .withEnv("CLUSTER_NAME", "hdfs-cluster")
@@ -62,22 +80,23 @@ public class DockerHDFSCluster implements Closeable {
                     .withExposedPorts(9000, 50070)
                     .withAccessToHost(true);
 
-            namenode.setPortBindings(portBindings);
-            namenode.start();
-
-            try {
+            nameNode.setPortBindings(portBindings);
+            nameNode.start();
+            if (DEBUG) {
+                System.out.println("[SHUAI-DEBUG] NameNode started");
                 Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
             }
-            return namenode;
+            return nameNode;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to start NameNode", e);
         }
-        return null;
     }
 
+    /**
+     * Start a data node with the given node ID.
+     * @param nodeID the data node ID
+     * @return the data node container
+     */
     public GenericContainer<?> startDataNode(String nodeID) {
         GenericContainer<?> datanode;
         try {
@@ -91,82 +110,69 @@ public class DockerHDFSCluster implements Closeable {
                     .withAccessToHost(true);
 
             datanode.start();
-            System.out.println("Datanode started");
-            Thread.sleep(5000);
+            if (DEBUG) {
+                System.out.println("[SHUAI-DEBUG] DataNode_" + nodeID + " started");
+                Thread.sleep(5000);
+            }
             return datanode;
         }catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to start DataNode_" + nodeID, e);
         }
-        return null;
     }
 
-
+    /**
+     * Start the given number of data nodes.
+     * @param numDataNodes the number of data nodes
+     * @throws IOException if an error occurs starting the data nodes
+     */
     private void startDataNodes(int numDataNodes) throws IOException {
         for (int i = 0; i < numDataNodes; i++) {
-            GenericContainer<?> dnContainer = new GenericContainer<>(DockerImageName.parse("hadoop:3.3.6"))
-                    .withNetwork(network)
-                    .withNetworkAliases("datanode-" + i)
-                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
-                    .withEnv("DATANODE_ID", String.valueOf(i))
-                    .withCommand("bash", "-c", "hdfs datanode")
-                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()));
-                    //.withExposedPorts(50010, 50075, 50020);
-            dnContainer.start();
+            GenericContainer<?> dnContainer = startDataNode(String.valueOf(i));
             dataNodes.add(dnContainer);
         }
     }
 
-    public void waitClusterUp() throws IOException {
-        for (GenericContainer<?> nnContainer : nameNodes) {
-            waitNameNodeUp(nnContainer);
-        }
+    /**
+     * Check if all data nodes are running.
+     * @return true if all data nodes are running
+     */
+    private boolean checkDataNodesRunning() {
         for (GenericContainer<?> dnContainer : dataNodes) {
-            waitDataNodeUp(dnContainer);
-        }
-    }
-
-    private void waitNameNodeUp(GenericContainer<?> nnContainer) throws IOException {
-        while (!nnContainer.isRunning()) {
-            try {
-                LOG.warn("Waiting for NameNode to start...");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Interrupted while waiting for NameNode to start", e);
+            if (!dnContainer.isRunning()) {
+                return false;
             }
         }
+        return true;
     }
 
-    private void waitDataNodeUp(GenericContainer<?> dnContainer) throws IOException {
-        while (!dnContainer.isRunning()) {
-            try {
-                LOG.warn("Waiting for DataNode to start...");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Interrupted while waiting for DataNode to start", e);
-            }
-        }
-    }
 
+    /**
+     * Shut down the cluster.
+     */
     public void shutdown() {
-        for (GenericContainer<?> nnContainer : nameNodes) {
-            nnContainer.stop();
-        }
+        // first shut down all data nodes
         for (GenericContainer<?> dnContainer : dataNodes) {
             dnContainer.stop();
         }
+        // then shut down the name node
+        nameNode.stop();
+        // finally shut down the network
         network.close();
     }
 
 
     @Override
     public void close() {
-        //shutdown();
+        shutdown();
     }
 
+    /**
+     * Get the file system.
+     * @return the file system
+     * @throws IOException if an error occurs getting the file system
+     * @throws URISyntaxException if an error occurs getting the file system
+     */
     public FileSystem getFileSystem() throws IOException, URISyntaxException {
-        return FileSystem.get(new URI("hdfs://" + nameNodes.get(0).getHost() + ":9000"), conf);
+        return FileSystem.get(new URI("hdfs://" + nameNode.getHost() + ":9000"), conf);
     }
-
 }

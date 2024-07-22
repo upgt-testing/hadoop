@@ -1,6 +1,5 @@
 package org.apache.hadoop.hdfs;
 
-import org.apache.hadoop.DockerHDFSClusterTest;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -14,10 +13,21 @@ import java.util.List;
  */
 public class DockerTest {
     @Test
+    public void testStartDockerCluster() {
+        try {
+            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
+            dockerHDFSCluster.startCluster(2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
     public void testStartNameNodeFromCluster() {
          try {
              DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-             GenericContainer<?> namenode = dockerHDFSCluster.startNameNodes();
+             GenericContainer<?> namenode = dockerHDFSCluster.startNameNode();
              GenericContainer<?> datanode1 = dockerHDFSCluster.startDataNode("1");
              GenericContainer<?> datanode2 = dockerHDFSCluster.startDataNode("2");
          } catch (Exception e) {
