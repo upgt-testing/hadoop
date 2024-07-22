@@ -23,6 +23,42 @@ public class DockerTest {
          }
     }
 
+    public GenericContainer<?> createDataNode(Network network, int ID) {
+        List<String> dataNodePortBindings = new ArrayList<>();
+        //dataNodePortBindings.add("50010:50010");
+        //dataNodePortBindings.add("50075:50075");
+        //dataNodePortBindings.add("50020:50020");
+        // now let's start a datanode
+        GenericContainer<?> datanode;
+        try {
+            datanode = new GenericContainer<>("hadoop:3.3.6")
+                    .withNetwork(network)
+                    .withNetworkAliases("datanode" + ID)
+                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
+                    .withEnv("DATANODE_ID", String.valueOf(ID))
+                    .withCommand("bash", "-c", "hdfs datanode")
+                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
+                    //.withExposedPorts(50010, 50075, 50020)
+                    .withAccessToHost(true);
+
+            //datanode.setPortBindings(dataNodePortBindings);
+            datanode.start();
+            System.out.println("Datanode started");
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
+            }
+            return datanode;
+            //System.out.println("Datanode stopped");
+            //datanode.stop();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Test
     public void testStartNameNode() {
         Network network = Network.builder().build();
@@ -58,35 +94,11 @@ public class DockerTest {
                 throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
             }
 
+            GenericContainer<?> datanode = createDataNode(network, 1);
+            GenericContainer<?> datanode2 = createDataNode(network, 2);
 
-            List<String> dataNodePortBindings = new ArrayList<>();
-            dataNodePortBindings.add("50010:50010");
-            dataNodePortBindings.add("50075:50075");
-            dataNodePortBindings.add("50020:50020");
-            // now let's start a datanode
-            try (GenericContainer<?> datanode = new GenericContainer<>("hadoop:3.3.6")
-                    .withNetwork(network)
-                    .withNetworkAliases("datanode")
-                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
-                    .withEnv("DATANODE_ID", "0")
-                    .withCommand("bash", "-c", "hdfs datanode")
-                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
-                    //.withExposedPorts(50010, 50075, 50020)
-                    .withAccessToHost(true)
-            ) {
-                datanode.setPortBindings(dataNodePortBindings);
-                datanode.start();
-                System.out.println("Datanode started");
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
-                }
-                System.out.println("Datanode stopped");
-                datanode.stop();
-            }
-
+            datanode.stop();
+            datanode2.stop();
             System.out.println("Namenode stopped");
             namenode.stop();
         }
