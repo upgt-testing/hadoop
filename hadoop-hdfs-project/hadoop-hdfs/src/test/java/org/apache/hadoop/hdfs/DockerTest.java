@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.DockerHDFSClusterTest;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -12,7 +14,17 @@ import java.util.List;
  */
 public class DockerTest {
     @Test
-    public void testHadoopNamenode() {
+    public void testStartNameNodeFromCluster() {
+         try {
+             DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
+             dockerHDFSCluster.startNameNodes();
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+    }
+
+    @Test
+    public void testStartNameNode() {
         Network network = Network.builder().build();
         List<String> portBindings = new ArrayList<>();
         portBindings.add("50070:50070");
@@ -23,6 +35,7 @@ public class DockerTest {
                 .withEnv("NAMENODE_ID", "0")
                 .withCommand("bash", "-c", "hdfs namenode -format && hdfs namenode")
                 .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
+                .withExposedPorts(9000, 50070)
                 .withAccessToHost(true)
                 ) {
             namenode.setPortBindings(portBindings);
