@@ -26,8 +26,10 @@ public class DockerTest {
     @Test
     public void testStartNameNode() {
         Network network = Network.builder().build();
-        List<String> portBindings = new ArrayList<>();
-        portBindings.add("50070:50070");
+        List<String> nameNodePortBindings = new ArrayList<>();
+        nameNodePortBindings.add("50070:50070");
+        nameNodePortBindings.add("9000:9000");
+        nameNodePortBindings.add("9870:9870");
         try (GenericContainer<?> namenode = new GenericContainer<>("hadoop:3.3.6")
                 .withNetwork(network)
                 .withNetworkAliases("namenode")
@@ -38,7 +40,7 @@ public class DockerTest {
                 .withExposedPorts(9000, 50070)
                 .withAccessToHost(true)
                 ) {
-            namenode.setPortBindings(portBindings);
+            namenode.setPortBindings(nameNodePortBindings);
             namenode.start();
 
             // Get the mapped port for Namenode web interface
@@ -56,7 +58,36 @@ public class DockerTest {
                 throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
             }
 
-            
+
+            List<String> dataNodePortBindings = new ArrayList<>();
+            dataNodePortBindings.add("50010:50010");
+            dataNodePortBindings.add("50075:50075");
+            dataNodePortBindings.add("50020:50020");
+            // now let's start a datanode
+            try (GenericContainer<?> datanode = new GenericContainer<>("hadoop:3.3.6")
+                    .withNetwork(network)
+                    .withNetworkAliases("datanode")
+                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
+                    .withEnv("DATANODE_ID", "0")
+                    .withCommand("bash", "-c", "hdfs datanode")
+                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
+                    //.withExposedPorts(50010, 50075, 50020)
+                    .withAccessToHost(true)
+            ) {
+                datanode.setPortBindings(dataNodePortBindings);
+                datanode.start();
+                System.out.println("Datanode started");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
+                }
+                System.out.println("Datanode stopped");
+                datanode.stop();
+            }
+
+            System.out.println("Namenode stopped");
             namenode.stop();
         }
     }
