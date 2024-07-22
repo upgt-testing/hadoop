@@ -17,7 +17,9 @@ public class DockerTest {
     public void testStartNameNodeFromCluster() {
          try {
              DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-             dockerHDFSCluster.startNameNodes();
+             GenericContainer<?> namenode = dockerHDFSCluster.startNameNodes();
+             GenericContainer<?> datanode1 = dockerHDFSCluster.startDataNode("1");
+             GenericContainer<?> datanode2 = dockerHDFSCluster.startDataNode("2");
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -45,7 +47,7 @@ public class DockerTest {
             datanode.start();
             System.out.println("Datanode started");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
@@ -88,7 +90,7 @@ public class DockerTest {
 
             // Add your test logic here to interact with the Namenode web interface
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted while waiting for the cluster to start", e);

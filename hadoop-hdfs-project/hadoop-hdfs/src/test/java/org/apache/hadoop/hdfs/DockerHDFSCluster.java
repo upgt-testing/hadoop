@@ -37,7 +37,7 @@ public class DockerHDFSCluster implements Closeable {
         startDataNodes(numDataNodes);
         // sleep for a while to allow the cluster to start
         try {
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted while waiting for the cluster to start", e);
@@ -46,43 +46,60 @@ public class DockerHDFSCluster implements Closeable {
     }
 
     // We only allow one NameNode for now
-    public void startNameNodes() throws IOException {
+    public GenericContainer<?> startNameNodes() throws IOException {
         //Network network = Network.builder().build();
         List<String> portBindings = new ArrayList<>();
         portBindings.add("50070:50070");
-        try (GenericContainer<?> namenode = new GenericContainer<>("hadoop:3.3.6")
-                .withNetwork(network)
-                .withNetworkAliases("namenode")
-                .withEnv("CLUSTER_NAME", "hdfs-cluster")
-                .withEnv("NAMENODE_ID", "0")
-                .withCommand("bash", "-c", "hdfs namenode -format && hdfs namenode")
-                .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
-                .withExposedPorts(9000, 50070)
-                .withAccessToHost(true)
-        ) {
+        GenericContainer<?> namenode;
+        try {
+            namenode = new GenericContainer<>("hadoop:3.3.6")
+                    .withNetwork(network)
+                    .withNetworkAliases("namenode")
+                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
+                    .withEnv("NAMENODE_ID", "0")
+                    .withCommand("bash", "-c", "hdfs namenode -format && hdfs namenode")
+                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
+                    .withExposedPorts(9000, 50070)
+                    .withAccessToHost(true);
+
             namenode.setPortBindings(portBindings);
             namenode.start();
 
-            // Get the mapped port for Namenode web interface
-            //Integer mappedPort = namenode.getMappedPort(50070);
-
-            // Access the Namenode web interface
-            //String address = "http://" + namenode.getHost() + ":" + mappedPort;
-            //System.out.println("Now the namenode web interface is accessible at: " + address);
-
-            // Add your test logic here to interact with the Namenode web interface
             try {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted while waiting for the cluster to start", e);
             }
-
-
-            namenode.stop();
-
+            return namenode;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;
     }
+
+    public GenericContainer<?> startDataNode(String nodeID) {
+        GenericContainer<?> datanode;
+        try {
+            datanode = new GenericContainer<>("hadoop:3.3.6")
+                    .withNetwork(network)
+                    .withNetworkAliases("datanode_" + nodeID)
+                    .withEnv("CLUSTER_NAME", "hdfs-cluster")
+                    .withEnv("DATANODE_ID_", nodeID)
+                    .withCommand("bash", "-c", "hdfs datanode")
+                    .withLogConsumer(outputFrame -> System.out.print(outputFrame.getUtf8String()))
+                    .withAccessToHost(true);
+
+            datanode.start();
+            System.out.println("Datanode started");
+            Thread.sleep(5000);
+            return datanode;
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     private void startDataNodes(int numDataNodes) throws IOException {
         for (int i = 0; i < numDataNodes; i++) {
@@ -145,7 +162,7 @@ public class DockerHDFSCluster implements Closeable {
 
     @Override
     public void close() {
-        shutdown();
+        //shutdown();
     }
 
     public FileSystem getFileSystem() throws IOException, URISyntaxException {
