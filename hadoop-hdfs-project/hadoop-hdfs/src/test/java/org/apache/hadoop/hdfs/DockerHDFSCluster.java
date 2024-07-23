@@ -2,6 +2,7 @@ package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -13,6 +14,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 public class DockerHDFSCluster implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(DockerHDFSCluster.class);
@@ -68,6 +71,7 @@ public class DockerHDFSCluster implements Closeable {
     public GenericContainer<?> startNameNode() {
         List<String> portBindings = new ArrayList<>();
         portBindings.add("50070:50070");
+        portBindings.add("9000:9000");
         GenericContainer<?> nameNode;
         try {
             nameNode = new GenericContainer<>("hadoop:3.3.6")
@@ -82,8 +86,16 @@ public class DockerHDFSCluster implements Closeable {
 
             nameNode.setPortBindings(portBindings);
             nameNode.start();
+
+            String nameNodeHost = nameNode.getHost();
+            Integer nameNodePort = nameNode.getMappedPort(9000);
+            conf.set("fs.defaultFS", "hdfs://" + nameNodeHost + ":" + nameNodePort);
+            conf.set("dfs.namenode.rpc-address", nameNodeHost + ":" + nameNodePort);
+            conf.set("dfs.namenode.http-address", nameNodeHost + ":" + nameNode.getMappedPort(50070));
+
             if (DEBUG) {
                 System.out.println("[SHUAI-DEBUG] NameNode started");
+                System.out.println("[SHUAI-DEBUG] NameNode host: " + nameNodeHost);
                 Thread.sleep(5000);
             }
             return nameNode;
@@ -173,6 +185,8 @@ public class DockerHDFSCluster implements Closeable {
      * @throws URISyntaxException if an error occurs getting the file system
      */
     public FileSystem getFileSystem() throws IOException, URISyntaxException {
+        System.setProperty("HADOOP_USER_NAME", "root");
+        UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("root"));
         return FileSystem.get(new URI("hdfs://" + nameNode.getHost() + ":9000"), conf);
     }
 }

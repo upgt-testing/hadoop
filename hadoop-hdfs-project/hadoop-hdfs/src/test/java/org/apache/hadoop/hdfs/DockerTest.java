@@ -1,10 +1,18 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +20,56 @@ import java.util.List;
  * Author: Shuai Wang
  */
 public class DockerTest {
+    @Test
+    public void testFileSystem() {
+        try {
+            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
+            dockerHDFSCluster.startCluster(2);
+
+            FileSystem fs = dockerHDFSCluster.getFileSystem();
+            // check whether the file system is functional
+            System.out.println("FileSystem URI: " + fs.getUri());
+            System.out.println("Home directory: " + fs.getHomeDirectory());
+            System.out.println("Working directory: " + fs.getWorkingDirectory());
+
+            Path newDir = new Path("/new_directory");
+            fs.mkdirs(newDir);
+
+            // create a new file in the new directory
+            Path newFile = new Path("/new_directory/new_file");
+            try (OutputStream os = fs.create(newFile)) {
+                os.write("UIUC".getBytes());
+            }
+
+            // list and print the content of the new directory
+            System.out.println("Content of /new_directory:");
+            for (FileStatus p : fs.listStatus(newDir)) {
+                System.out.println(p.getPath());
+            }
+
+            // read the content of the new file
+            try (InputStream is = fs.open(newFile);
+                 BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                System.out.println("Content of /new_directory/new_file:");
+                while ((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+            }
+
+            // delete the new file
+            fs.delete(newFile, false);
+            // delete the new directory
+            fs.delete(newDir, false);
+
+            // close the file system
+            fs.close();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create file system", e);
+        }
+    }
+
     @Test
     public void testStartDockerCluster() {
         try {
