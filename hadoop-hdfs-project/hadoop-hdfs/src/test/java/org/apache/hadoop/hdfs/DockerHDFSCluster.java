@@ -2,6 +2,9 @@ package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.hdfs.protocol.HdfsConstants;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -35,7 +38,7 @@ public class DockerHDFSCluster implements Closeable {
 
     public static class Builder {
         private Configuration conf;
-        private String dockerImageVersion;
+        private String dockerImageVersion = "hadoop:3.3.5";
         private int numDataNodes = 1;
 
         public Builder(Configuration conf) {
@@ -287,11 +290,27 @@ public class DockerHDFSCluster implements Closeable {
      * @return the file system
      * @throws RuntimeException if an error occurs getting the file system
      */
-    public FileSystem getFileSystem() {
+    public DistributedFileSystem getFileSystem() {
         try {
-            return FileSystem.get(new URI("hdfs://localhost:9000"), conf);
+            return (DistributedFileSystem) FileSystem.get(new URI("hdfs://localhost:9000"), conf);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file system", e);
+        }
+    }
+
+    public DistributedFileSystem getDistributedFileSystem() {
+        return (DistributedFileSystem) getFileSystem();
+    }
+
+    public DFSClient getDFSClient() {
+        return getDistributedFileSystem().getClient();
+    }
+
+    public int getLiveDataNodeCount() {
+        try {
+            return getDFSClient().datanodeReport(HdfsConstants.DatanodeReportType.LIVE).length;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get the number of live data nodes", e);
         }
     }
 }

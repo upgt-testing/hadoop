@@ -20,8 +20,8 @@ public class TestCloseDocker {
         Configuration conf = new Configuration();
         //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
         //        .build();
-        DockerHDFSCluster cluster = new DockerHDFSCluster.Builder(conf).
-                numDataNodes(1).startDockerImageVersion("hadoop:3.3.5").build();   // <-------- First modification
+        DockerHDFSCluster cluster = new DockerHDFSCluster.Builder(conf)     // <-------- First modification
+                .build();
 
         try {
             final byte[] data = "foo".getBytes();
