@@ -6,12 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -265,7 +265,7 @@ public class DockerHDFSCluster implements Closeable {
     /**
      * Shut down the cluster.
      */
-    public void shutdownCluster() {
+    public void shutdown() {
         // first shut down all data nodes
         for (GenericContainer<?> dnContainer : dataNodes.values()) {
             dnContainer.stop();
@@ -279,16 +279,19 @@ public class DockerHDFSCluster implements Closeable {
 
     @Override
     public void close() {
-        shutdownCluster();
+        shutdown();
     }
 
     /**
      * Get the file system.
      * @return the file system
-     * @throws IOException if an error occurs getting the file system
-     * @throws URISyntaxException if an error occurs getting the file system
+     * @throws RuntimeException if an error occurs getting the file system
      */
-    public FileSystem getFileSystem() throws IOException, URISyntaxException {
-        return FileSystem.get(new URI("hdfs://localhost:9000"), conf);
+    public FileSystem getFileSystem() {
+        try {
+            return FileSystem.get(new URI("hdfs://localhost:9000"), conf);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException("Failed to get the file system", e);
+        }
     }
 }
