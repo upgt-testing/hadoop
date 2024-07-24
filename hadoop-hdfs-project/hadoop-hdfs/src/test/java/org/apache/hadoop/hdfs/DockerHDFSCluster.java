@@ -33,35 +33,58 @@ public class DockerHDFSCluster implements Closeable {
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
-    /**
-     * Create a new DockerHDFSCluster with default configuration.
-     */
-    public DockerHDFSCluster() {
-        this(new Configuration());
+    public static class Builder {
+        private Configuration conf;
+        private String dockerImageVersion;
+        private int numDataNodes = 1;
+
+        public Builder(Configuration conf) {
+            this.conf = conf;
+            // Use localhost and datanode hostname to make sure the Java client
+            // can talk to the Hadoop cluster through the Docker network bridge
+            this.conf.set("fs.defaultFS", "hdfs://localhost:9000");
+            this.conf.setBoolean("dfs.client.use.datanode.hostname", true);
+            System.setProperty("HADOOP_USER_NAME", "root");
+            //TODO: maybe think about to put all the necessary configurations
+            // here to overwrite the default configurations
+        }
+
+        public Builder startDockerImageVersion(String dockerImageVersion) {
+            this.dockerImageVersion = dockerImageVersion;
+            return this;
+        }
+
+        public Builder numDataNodes(int numDataNodes) {
+            this.numDataNodes = numDataNodes;
+            return this;
+        }
+
+        public DockerHDFSCluster build() {
+            return new DockerHDFSCluster(this);
+        }
     }
 
-    /**
-     * Create a new DockerHDFSCluster with the given configuration.
-     * @param config the configuration
-     */
-    public DockerHDFSCluster(Configuration config) {
-        this.conf = config;
 
-        // Use localhost and datanode hostname to make sure the Java client
-        // can talk to the Hadoop cluster through the Docker network bridge
-        this.conf.set("fs.defaultFS", "hdfs://localhost:9000");
-        this.conf.setBoolean("dfs.client.use.datanode.hostname", true);
-        System.setProperty("HADOOP_USER_NAME", "root");
-
+    public DockerHDFSCluster(Builder builder) {
+        this.conf = builder.conf;
         this.network = Network.builder().build();
+        if (builder.dockerImageVersion == null) {
+            throw new IllegalArgumentException("StartUp Docker image version is not set");
+        }
+        try {
+            startCluster(builder.dockerImageVersion, builder.numDataNodes);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to start the cluster", e);
+        }
     }
+
 
     /**
      * Start the cluster with one namenode and the given number of data nodes.
      * @param numDataNode the number of data nodes
      * @throws IOException if an error occurs starting the cluster
      */
-    public void startCluster(String dockerImageVersion, int numDataNode) throws IOException {
+    private void startCluster(String dockerImageVersion, int numDataNode) throws IOException {
         this.nameNode = startNameNode();
         if (!nameNode.isRunning()) {
             throw new RuntimeException("NameNode is not running");

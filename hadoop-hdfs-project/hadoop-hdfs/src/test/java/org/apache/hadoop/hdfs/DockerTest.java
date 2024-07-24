@@ -26,8 +26,12 @@ public class DockerTest {
         try {
             String startVersion = System.getProperty("startVersion");
             String upgradeVersion = System.getProperty("upgradeVersion");
-            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster();
-            dockerHDFSCluster.startCluster(startVersion, 1);
+            DockerHDFSCluster dockerHDFSCluster =
+                    new DockerHDFSCluster.Builder(new Configuration())
+                            .numDataNodes(1)
+                            .startDockerImageVersion(startVersion)
+                            .build();
+
 
             FileSystem fs = dockerHDFSCluster.getFileSystem();
             // check whether the file system is functional
@@ -39,8 +43,12 @@ public class DockerTest {
             Path newDir = new Path(dir);
             fs.mkdirs(newDir);
 
+            System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
+            Thread.sleep(10000);
             // The datanode index starts from 0
             dockerHDFSCluster.upgradeDataNode(upgradeVersion, 0);
+            System.out.println("After upgrade, you have 10 seconds to check the current datanode version");
+            Thread.sleep(10000);
 
             // list and print the content of the new directory
             System.out.println("Content of" + dir);
@@ -84,8 +92,7 @@ public class DockerTest {
     @Test
     public void testStartDockerCluster() {
         try {
-            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-            dockerHDFSCluster.startCluster("hadoop:3.3.5", 2);
+            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster.Builder(new Configuration()).numDataNodes(2).startDockerImageVersion("hadoop:3.3.5").build();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,10 +102,7 @@ public class DockerTest {
     @Test
     public void testStartNameNodeFromCluster() {
          try {
-             DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-             GenericContainer<?> namenode = dockerHDFSCluster.startNameNode();
-             GenericContainer<?> datanode1 = dockerHDFSCluster.startDataNode("hadoop:3.3.6", 0);
-             GenericContainer<?> datanode2 = dockerHDFSCluster.startDataNode("hadoop:3.3.6", 1);
+             DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster.Builder(new Configuration()).numDataNodes(2).startDockerImageVersion("hadoop:3.3.5").build();
          } catch (Exception e) {
              e.printStackTrace();
          }
