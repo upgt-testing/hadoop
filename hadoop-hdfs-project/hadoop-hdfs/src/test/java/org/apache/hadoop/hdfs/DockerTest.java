@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,10 @@ public class DockerTest {
     @Test
     public void testFileSystem() {
         try {
-            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-            dockerHDFSCluster.startCluster(2);
+            String startVersion = System.getProperty("startVersion");
+            String upgradeVersion = System.getProperty("upgradeVersion");
+            DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster();
+            dockerHDFSCluster.startCluster(startVersion, 1);
 
             FileSystem fs = dockerHDFSCluster.getFileSystem();
             // check whether the file system is functional
@@ -32,36 +35,44 @@ public class DockerTest {
             System.out.println("Home directory: " + fs.getHomeDirectory());
             System.out.println("Working directory: " + fs.getWorkingDirectory());
 
-            Path newDir = new Path("/new_directory");
+            String dir = "/test-dir-2222";
+            Path newDir = new Path(dir);
             fs.mkdirs(newDir);
 
-            // create a new file in the new directory
-            Path newFile = new Path("/new_directory/new_file");
-            try (OutputStream os = fs.create(newFile)) {
-                os.write("UIUC".getBytes());
-            }
+            // The datanode index starts from 0
+            dockerHDFSCluster.upgradeDataNode(upgradeVersion, 0);
 
             // list and print the content of the new directory
-            System.out.println("Content of /new_directory:");
+            System.out.println("Content of" + dir);
             for (FileStatus p : fs.listStatus(newDir)) {
                 System.out.println(p.getPath());
+                // read this
+                Path filePath = p.getPath();
+                try (InputStream is = fs.open(filePath);
+                     BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                    String line;
+                    System.out.println("Content of " + filePath);
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
             }
 
+
+             // create a new file in the new directory
+             Path newFile = new Path(dir + "/new_file");
+             try (OutputStream os = fs.create(newFile)) {
+                 os.write("UIUC".getBytes());
+             }
             // read the content of the new file
             try (InputStream is = fs.open(newFile);
                  BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
                 String line;
-                System.out.println("Content of /new_directory/new_file:");
+                System.out.println("Content of new_file:");
                 while ((line = br.readLine()) != null) {
                     System.out.println(line);
                 }
             }
-
-            // delete the new file
-            fs.delete(newFile, false);
-            // delete the new directory
-            fs.delete(newDir, false);
-
             // close the file system
             fs.close();
 
@@ -74,7 +85,7 @@ public class DockerTest {
     public void testStartDockerCluster() {
         try {
             DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
-            dockerHDFSCluster.startCluster(2);
+            dockerHDFSCluster.startCluster("hadoop:3.3.5", 2);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,8 +97,8 @@ public class DockerTest {
          try {
              DockerHDFSCluster dockerHDFSCluster = new DockerHDFSCluster(new Configuration());
              GenericContainer<?> namenode = dockerHDFSCluster.startNameNode();
-             GenericContainer<?> datanode1 = dockerHDFSCluster.startDataNode("1");
-             GenericContainer<?> datanode2 = dockerHDFSCluster.startDataNode("2");
+             GenericContainer<?> datanode1 = dockerHDFSCluster.startDataNode("hadoop:3.3.6", 0);
+             GenericContainer<?> datanode2 = dockerHDFSCluster.startDataNode("hadoop:3.3.6", 1);
          } catch (Exception e) {
              e.printStackTrace();
          }
