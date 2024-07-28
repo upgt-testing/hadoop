@@ -88,7 +88,7 @@ public class DockerHDFSCluster implements Closeable {
      * @throws IOException if an error occurs starting the cluster
      */
     private void startCluster(String dockerImageVersion, int numDataNode) throws IOException {
-        this.nameNode = startNameNode();
+        this.nameNode = startNameNode(dockerImageVersion);
         if (!nameNode.isRunning()) {
             throw new RuntimeException("NameNode is not running");
         }
@@ -102,7 +102,7 @@ public class DockerHDFSCluster implements Closeable {
      * Start the NameNode.
      * @return the NameNode container
      */
-    public GenericContainer<?> startNameNode() {
+    public GenericContainer<?> startNameNode(String dockerImageVersion) {
         // bind port 9000 and 50070 to the same port on the host for namenode
         List<String> portBindings = new ArrayList<>();
         for (int port : nameNodePorts) {
@@ -111,7 +111,7 @@ public class DockerHDFSCluster implements Closeable {
 
         GenericContainer<?> nameNode;
         try {
-            nameNode = new GenericContainer<>("hadoop:3.3.6")
+            nameNode = new GenericContainer<>(dockerImageVersion)
                     .withNetwork(network)
                     .withNetworkAliases("namenode")
                     .withEnv("CLUSTER_NAME", "hdfs-cluster")
@@ -229,6 +229,11 @@ public class DockerHDFSCluster implements Closeable {
      * @param newDockerImageVersion the new Docker image version
      */
     public void upgradeDataNode(String newDockerImageVersion, int nodeID) {
+        if (DEBUG) {
+            int sleepTime = System.getProperty("sleepTime") == null ? 10000 : Integer.parseInt(System.getProperty("sleepTime"));
+            System.out.println("Before upgrade, you have" + sleepTime + " ms to check the current datanode version");
+            sleepForDebug(sleepTime);
+        }
         if (!dataNodes.containsKey(nodeID)) {
             throw new RuntimeException("DataNode_" + nodeID + " is not running");
         }
@@ -237,6 +242,11 @@ public class DockerHDFSCluster implements Closeable {
         }
         GenericContainer<?> dataNode = startDataNode(newDockerImageVersion, nodeID);
         dataNodes.put(nodeID, dataNode);
+        if (DEBUG) {
+            int sleepTime = System.getProperty("sleepTime") == null ? 10000 : Integer.parseInt(System.getProperty("sleepTime"));
+            System.out.println("After upgrade, you have" + sleepTime + " ms to check the current datanode version");
+            sleepForDebug(sleepTime);
+        }
     }
 
     /**
@@ -311,6 +321,15 @@ public class DockerHDFSCluster implements Closeable {
             return getDFSClient().datanodeReport(HdfsConstants.DatanodeReportType.LIVE).length;
         } catch (IOException e) {
             throw new RuntimeException("Failed to get the number of live data nodes", e);
+        }
+    }
+
+    private void sleepForDebug(int sleepTime) {
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while sleeping for the cluster", e);
         }
     }
 }

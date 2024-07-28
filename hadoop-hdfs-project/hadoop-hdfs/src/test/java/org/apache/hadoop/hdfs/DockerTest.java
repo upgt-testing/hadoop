@@ -24,12 +24,22 @@ public class DockerTest {
     @Test
     public void testFileSystem() {
         try {
-            String startVersion = System.getProperty("startVersion");
-            String upgradeVersion = System.getProperty("upgradeVersion");
+            String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
+            String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
+
+            /**
             DockerHDFSCluster dockerHDFSCluster =
                     new DockerHDFSCluster.Builder(new Configuration())
                             .numDataNodes(1)
                             .startDockerImageVersion(startVersion)
+                            .build();
+
+             */
+
+            MiniDockerDFSCluster dockerHDFSCluster =
+                    new MiniDockerDFSCluster.Builder(new Configuration())
+                            .startDockerImageVersion(startVersion)
+                            .numDataNodes(1)
                             .build();
 
 
@@ -46,7 +56,7 @@ public class DockerTest {
             System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
             // The datanode index starts from 0
-            dockerHDFSCluster.upgradeDataNode(upgradeVersion, 0);
+            dockerHDFSCluster.getCluster().upgradeFirstWorkerNode(upgradeVersion);
             System.out.println("After upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
 
