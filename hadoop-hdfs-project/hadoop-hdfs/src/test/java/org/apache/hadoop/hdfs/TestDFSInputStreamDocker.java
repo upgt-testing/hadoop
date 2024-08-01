@@ -72,6 +72,9 @@ public class TestDFSInputStreamDocker {
         FSDataOutputStream fout = fs.create(file);
         fout.write(fileContent);
         fout.close();
+
+        cluster.upgradeDataNode("hadoop:3.3.6", 0);   // <--- upgrade the datanode to the specified version
+
         Random random = new Random();
         for (int i = 3; i < 18; i++) {
             DFSInputStream fin = client.open("/testfile");

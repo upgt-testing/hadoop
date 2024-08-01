@@ -4,15 +4,17 @@ import edu.illinois.NodeRole;
 import edu.illinois.UpgradableClusterException;
 import edu.illinois.docker.DockerCluster;
 import edu.illinois.docker.DockerNode;
+import edu.illinois.util.CommonUtil;
+import edu.illinois.util.config.HadoopXMLModifier;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,7 +23,7 @@ import java.util.*;
 
 
 public class MiniDockerDFSCluster implements Closeable {
-    private static final Logger LOG = LoggerFactory.getLogger(DockerHDFSCluster.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MiniDockerDFSCluster.class);
 
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
@@ -29,8 +31,6 @@ public class MiniDockerDFSCluster implements Closeable {
     private final DockerCluster cluster;
     /** The configuration. */
     private final Configuration conf;
-    /** The network for the docker containers. */
-    private final Network network;
     /** The list of datanodes. */
     private final Map<Integer, DockerNode> dataNodes = new HashMap();
     /** The nameNode */
@@ -66,38 +66,35 @@ public class MiniDockerDFSCluster implements Closeable {
 
 
     public MiniDockerDFSCluster(Builder builder) {
-        this.conf = builder.conf;
-        this.network = Network.builder().build();
-        String[] nameNodeCommand = {"bash", "-c", "hdfs namenode -format && hdfs namenode"};
         cluster = new DockerCluster();
-        //withNode(NodeRole.MASTER, builder.dockerImageVersion, nameNodeCommand, Arrays.asList(9000, 50070), new HashMap<>(), 5000, new HashMap<>());
         try {
-            // bind port 9000 and 50070 to the same port on the host for namenode
-            Map<Integer, Integer> boundPorts = new HashMap<>();
-            for (int port : nameNodePorts) {
-                boundPorts.put(port, port);
-            }
-            nameNode = cluster.createNode(NodeRole.MASTER, builder.dockerImageVersion, new String[]{"namenode"}, nameNodeCommand, nameNodePorts, boundPorts, 5000, new HashMap<>());
+            nameNode = cluster.nodeBuilder(builder.dockerImageVersion)
+                    .withNodeRole(NodeRole.MASTER)
+                    .withNetworkAliases("namenode")
+                    .withCommand(CommonUtil.getBashCommand("hdfs namenode -format && hdfs namenode"))
+                    .withExposedPorts(nameNodePorts.toArray(new Integer[0]))
+                    .withBoundPorts(bindPorts(nameNodePorts, 0))
+                    .withStartWaitTime(5000)
+                    .withEnv(new HashMap<>());
             for (int i = 0; i < builder.numDataNodes; i++) {
-                String[] dataNodeCommand = {"bash", "-c", "bash modify_hdfs_site.sh " + i + " && hdfs datanode"};
-                Map<Integer, Integer> boundPortsDataNode = new HashMap<>();
-                // binds the port of the "dataNodePorts + nodeID" to the same port on the host
-                // for example, for nodeID = 1, bind 50011:50011, 50076:50076, 50021:50021
-                for (int port : dataNodePorts) {
-                    int targetPort = port + i;
-                    boundPortsDataNode.put(targetPort, targetPort);
-                }
-                DockerNode dataNode = cluster.createNode(NodeRole.WORKER, builder.dockerImageVersion, new String[]{"datanode_" + i}, dataNodeCommand, dataNodePorts, boundPortsDataNode, 5000, new HashMap<>());
+                DockerNode dataNode = cluster.nodeBuilder(builder.dockerImageVersion)
+                        .withNodeRole(NodeRole.WORKER)
+                        .withNetworkAliases("datanode_" + i)
+                        .withCommand(CommonUtil.getBashCommand("bash modify_hdfs_site.sh " + i + " && hdfs datanode"))
+                        .withExposedPorts(dataNodePorts.toArray(new Integer[0]))
+                        .withBoundPorts(bindPorts(dataNodePorts, i))
+                        .withStartWaitTime(5000)
+                        .withEnv(new HashMap<>());
                 dataNodes.put(i, dataNode);
             }
             cluster.start();
 
-
-            String nameNodeAddress = "hdfs://" + nameNode.getIp() + ":" + nameNode.getMappedPort(9000);
-            System.out.println("NameNode address: " + nameNodeAddress);
+            this.conf = builder.conf;
+            String nameNodeAddress = "hdfs://" + nameNode.getHost() + ":" + nameNode.getMappedPort(9000);
+            this.conf.set("fs.defaultFS", nameNodeAddress);
+            LOG.info("Launching the MiniDockerDFSCluster with the NameNode address: {}", nameNodeAddress);
             // Use localhost and datanode hostname to make sure the Java client
             // can talk to the Hadoop cluster through the Docker network bridge
-            this.conf.set("fs.defaultFS", nameNodeAddress);
             this.conf.setBoolean("dfs.client.use.datanode.hostname", true);
             System.setProperty("HADOOP_USER_NAME", "root");
             //TODO: maybe think about to put all the necessary configurations
@@ -128,7 +125,7 @@ public class MiniDockerDFSCluster implements Closeable {
     public DistributedFileSystem getFileSystem() {
         try {
             String fsURI = conf.get("fs.defaultFS");
-            System.out.println("Accessing the file system at " + fsURI);
+            //System.out.println("Accessing the file system at " + fsURI);
             return (DistributedFileSystem) FileSystem.get(new URI(fsURI), conf);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file system", e);
@@ -158,5 +155,27 @@ public class MiniDockerDFSCluster implements Closeable {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while sleeping for the cluster", e);
         }
+    }
+
+    private List<String> bindPorts(List<Integer> ports, int nodeID) {
+        List<String> boundPorts = new LinkedList<>();
+        for (int port : ports) {
+            int targetPort = port + nodeID;
+            boundPorts.add(targetPort + ":" + targetPort);
+        }
+        return boundPorts;
+    }
+
+    public File updateConfigFile(String filePath, Map<String, String> configMap) throws IOException {
+        File originalConfigFile = new File(filePath);
+        File newConfigFile = new File(originalConfigFile.getParent() + "/temp_" + originalConfigFile.getName());
+        HadoopXMLModifier.appendPropertiesToFile(originalConfigFile, newConfigFile, configMap);
+        return newConfigFile;
+    }
+
+    public void updateConfigToAllNodes(String fileName, Map<String, String> configMap) throws IOException {
+        String originalFileName = new File(fileName).getName();
+        File newConfigFile = updateConfigFile(fileName, configMap);
+        cluster.copyFileToAllNodes(newConfigFile.getAbsolutePath(), "/opt/hadoop/etc/hadoop/" + originalFileName);
     }
 }

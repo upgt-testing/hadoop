@@ -5,6 +5,8 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -15,18 +17,41 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: Shuai Wang
  */
 public class DockerTest {
+    String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
+    String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
+    Map<String, String> configMap = new HashMap<>();
+
+
+    @Test
+    public void testConfigurationChange() {
+
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt("dfs.replication", 3);
+        configMap.put("dfs.replication", "3");
+        MiniDockerDFSCluster dockerHDFSCluster =
+                new MiniDockerDFSCluster.Builder(new Configuration())
+                        .startDockerImageVersion(startVersion)
+                        .numDataNodes(1)
+                        .build();
+        try {
+            dockerHDFSCluster.updateConfigToAllNodes("docker/hdfs-site.xml", configMap);
+            System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update configuration", e);
+        }
+    }
+
     @Test
     public void testFileSystem() {
         try {
-            String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
-            String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
-
             /**
             DockerHDFSCluster dockerHDFSCluster =
                     new DockerHDFSCluster.Builder(new Configuration())
