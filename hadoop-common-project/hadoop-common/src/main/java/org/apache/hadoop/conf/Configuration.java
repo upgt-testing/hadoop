@@ -83,6 +83,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import edu.illinois.util.config.ConfigTracker;
 import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
@@ -1429,6 +1430,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     }
     getOverlay().setProperty(name, value);
     getProps().setProperty(name, value);
+    ConfigTracker.addSetParam(name, value);
     String newSource = (source == null ? "programmatically" : source);
 
     if (!isDeprecated(name)) {
@@ -1439,6 +1441,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
           if(!n.equals(name)) {
             getOverlay().setProperty(n, value);
             getProps().setProperty(n, value);
+            ConfigTracker.addSetParam(n, value);
             putIntoUpdatingResource(n, new String[] {newSource});
           }
         }
@@ -1450,6 +1453,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
       for(String n : names) {
         getOverlay().setProperty(n, value);
         getProps().setProperty(n, value);
+        ConfigTracker.addSetParam(n, value);
         putIntoUpdatingResource(n, new String[] {altSource});
       }
     }
@@ -1486,6 +1490,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     for(String n: names) {
       getOverlay().remove(n);
       getProps().remove(n);
+      ConfigTracker.removeSetParam(n);
     }
   }
 
