@@ -26,8 +26,6 @@ import java.util.Map;
  * Author: Shuai Wang
  */
 public class DockerTest {
-    String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
-    String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
 
     @Before
     public void setup() {
@@ -43,7 +41,6 @@ public class DockerTest {
 
         MiniDockerDFSCluster dockerHDFSCluster =
                 new MiniDockerDFSCluster.Builder(new Configuration())
-                        .startDockerImageVersion(startVersion)
                         .numDataNodes(1)
                         .build();
         try {
@@ -71,7 +68,6 @@ public class DockerTest {
 
             MiniDockerDFSCluster dockerHDFSCluster =
                     new MiniDockerDFSCluster.Builder(new Configuration())
-                            .startDockerImageVersion(startVersion)
                             .numDataNodes(1)
                             .build();
 

@@ -26,8 +26,11 @@ do
 	exit 1
     fi
 
-    echo "mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE > logs/${test}-$START_VERSION-$END_VERSION-$SKIP_UPGRADE.log"
-    mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE > logs/${test}-$START_VERSION-$END_VERSION-$SKIP_UPGRADE.log
+    PURE_START_VERSION="${START_VERSION/shuaiwang516\/}"
+    PURE_END_VERSION="${END_VERSION/shuaiwang516\/}"
+
+    echo "mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE |& tee $LOGS_DIR/${test}-$PURE_START_VERSION-$PURE_END_VERSION-$SKIP_UPGRADE.log"
+    mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE |& tee $LOGS_DIR/${test}-$PURE_START_VERSION-$PURE_END_VERSION-$SKIP_UPGRADE.log
 
 
 done

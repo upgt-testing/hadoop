@@ -6,11 +6,11 @@ SKIP_UPGRADE=$2
 
 # List of versions
 versions=(
-  "2.10.2"
-  "3.2.4"
-  "3.3.5"
-  "3.3.6"
-  "3.4.0"
+  "hadoop:2.10.2"
+  "hadoop:3.2.4"
+  "hadoop:3.3.5"
+  "hadoop:3.3.6"
+  "hadoop:3.4.0"
 )
 
 # check TEST_LIST_FILE and SKIP_UPGRADE are not empty
