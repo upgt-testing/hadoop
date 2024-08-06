@@ -17,31 +17,36 @@
  */
 package org.apache.hadoop.hdfs;
 
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.ClosedChannelException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 
-public class TestClose {
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.ClosedChannelException;
 
+import static org.junit.Assert.fail;
+
+public class TestClose {
   @Test
   public void testWriteAfterClose() throws IOException {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
-        .build();
-    
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //        .build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)     // <-------- First modification
+            .build();
+
     try {
       final byte[] data = "foo".getBytes();
-      
-      FileSystem fs = FileSystem.get(conf);
+
+      //FileSystem fs = FileSystem.get(conf);                          // <--------- Second modification
+      FileSystem fs = cluster.getFileSystem();
       OutputStream out = fs.create(new Path("/test"));
-      
+
+      // The datanode index starts from 0
+      cluster.upgradeDatanode(0);
+
       out.write(data);
       out.close();
       try {
@@ -59,5 +64,4 @@ public class TestClose {
       }
     }
   }
-  
 }

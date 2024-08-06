@@ -69,7 +69,7 @@ public class TestRead {
     GenericTestUtils.setLogLevel(DFSClient.LOG, Level.WARN);
   }
 
-  private void testEOF(MiniDFSCluster cluster, int fileLength) throws IOException {
+  private void testEOF(MiniDockerDFSCluster cluster, int fileLength) throws IOException {
     FileSystem fs = cluster.getFileSystem();
     Path path = new Path("testEOF." + fileLength);
     DFSTestUtil.createFile(fs, path, fileLength, (short)1, 0xBEEFBEEF);
@@ -77,6 +77,7 @@ public class TestRead {
     ByteBuffer empty = ByteBuffer.allocate(0);
     // A read into an empty bytebuffer at the beginning of the file gives 0.
     Assert.assertEquals(0, fis.read(empty));
+    cluster.upgradeDatanode(0);
     fis.seek(fileLength);
     // A read into an empty bytebuffer at the end of the file gives -1.
     Assert.assertEquals(-1, fis.read(empty));
@@ -95,8 +96,10 @@ public class TestRead {
     try {
       final Configuration conf = testContext.newConfiguration();
       conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-      MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
-          .format(true).build();
+      //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      //    .format(true).build();
+      MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
+              .format(true).build();
       testEOF(cluster, 1);
       testEOF(cluster, 14);
       testEOF(cluster, 10000);
@@ -110,8 +113,10 @@ public class TestRead {
   public void testEOFWithRemoteBlockReader() throws Exception {
     final Configuration conf = new Configuration();
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
-        .format(true).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    //    .format(true).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
+            .format(true).build();
     testEOF(cluster, 1);
     testEOF(cluster, 14);
     testEOF(cluster, 10000);   
@@ -126,10 +131,13 @@ public class TestRead {
   @Test(timeout=60000)
   public void testReadReservedPath() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).
-        numDataNodes(1).format(true).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).
+    //    numDataNodes(1).format(true).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
+            .numDataNodes(1).format(true).build();
     try {
       FileSystem fs = cluster.getFileSystem();
+      cluster.upgradeDatanode(0);
       fs.open(new Path("/.reserved/.inodes/file"));
       Assert.fail("Open a non existing file should fail.");
     } catch (FileNotFoundException e) {
@@ -145,8 +153,10 @@ public class TestRead {
     conf.set(DFSConfigKeys.DFS_DATANODE_FSDATASET_FACTORY_KEY,
         DelayedSimulatedFSDataset.Factory.class.getName());
 
-    final MiniDFSCluster cluster = new MiniDFSCluster
-        .Builder(conf).numDataNodes(1).build();
+    //final MiniDFSCluster cluster = new MiniDFSCluster
+    //    .Builder(conf).numDataNodes(1).build();
+    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster
+            .Builder(conf).numDataNodes(1).build();
     final DistributedFileSystem fs = cluster.getFileSystem();
     try {
       cluster.waitActive();
@@ -155,6 +165,7 @@ public class TestRead {
 
       final FSDataInputStream in = fs.open(file);
       AtomicBoolean readInterrupted = new AtomicBoolean(false);
+      cluster.upgradeDatanode(0);
       final Thread reader = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -257,7 +268,7 @@ public class TestRead {
       }
     }).when(injector).fetchFromDatanodeException();
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
     DistributedFileSystem fileSys = cluster.getFileSystem();
     DFSClient dfsClient = fileSys.getClient();
     DFSInputStream input = null;
@@ -268,6 +279,7 @@ public class TestRead {
 
       byte[] buffer = new byte[FILE_SIZE];
       input = dfsClient.open(file.toString());
+      cluster.upgradeDatanode(0);
       input.read(buffer, 0, FILE_SIZE);
       assertEquals(ioExceptions, StringUtils.countMatches(dfsClientLog.getOutput(),
           "Retry with the current or next available datanode."));
@@ -305,7 +317,8 @@ public class TestRead {
       }
     }).when(injector).fetchFromDatanodeException();
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
     DistributedFileSystem fileSys = cluster.getFileSystem();
     DFSClient dfsClient = fileSys.getClient();
     DFSInputStream input = null;
@@ -316,6 +329,7 @@ public class TestRead {
 
       byte[] buffer = new byte[FILE_SIZE];
       input = dfsClient.open(file.toString());
+      cluster.upgradeDatanode(0);
       input.read(buffer, 0, FILE_SIZE);
       fail();
     } catch (BlockMissingException e) {

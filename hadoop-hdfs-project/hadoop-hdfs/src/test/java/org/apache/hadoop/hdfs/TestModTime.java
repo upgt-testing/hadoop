@@ -70,7 +70,9 @@ public class TestModTime {
   public void testModTime() throws IOException {
     Configuration conf = new HdfsConfiguration();
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //                                           .numDataNodes(numDatanodes).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes).build();
     cluster.waitActive();
     InetSocketAddress addr = new InetSocketAddress("localhost", 
@@ -142,6 +144,7 @@ public class TestModTime {
      //
      stat = fileSys.getFileStatus(dir1);
      assertTrue(stat.getModificationTime() != mdir1);
+     cluster.upgradeDatanode(0);
      mdir1 = stat.getModificationTime();
 
      stat = fileSys.getFileStatus(dir2);
@@ -184,16 +187,18 @@ public class TestModTime {
   @Test
   public void testModTimePersistsAfterRestart() throws IOException {
     final long sleepTime = 10; // 10 milliseconds
-    MiniDFSCluster cluster = null;
+    //MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FileSystem fs = null;
     Configuration conf = new HdfsConfiguration();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       fs = cluster.getFileSystem();
       Path testPath = new Path("/test");
       
       // Open a file, and get its initial modification time.
       OutputStream out = fs.create(testPath);
+      cluster.upgradeDatanode(0);
       long initialModTime = fs.getFileStatus(testPath).getModificationTime();
       assertTrue(initialModTime > 0);
       

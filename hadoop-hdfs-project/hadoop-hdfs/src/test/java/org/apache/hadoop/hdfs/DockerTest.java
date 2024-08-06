@@ -1,5 +1,6 @@
 package org.apache.hadoop.hdfs;
 
+import edu.illinois.util.config.ConfigTracker;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,23 +28,30 @@ import java.util.Map;
 public class DockerTest {
     String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
     String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
-    Map<String, String> configMap = new HashMap<>();
 
+    @Before
+    public void setup() {
+        ConfigTracker.clearSetParams();
+    }
 
     @Test
     public void testConfigurationChange() {
 
         Configuration conf = new HdfsConfiguration();
         conf.setInt("dfs.replication", 3);
-        configMap.put("dfs.replication", "3");
+        conf.set("this-is-fake", "fake-value");
+
         MiniDockerDFSCluster dockerHDFSCluster =
                 new MiniDockerDFSCluster.Builder(new Configuration())
                         .startDockerImageVersion(startVersion)
                         .numDataNodes(1)
                         .build();
         try {
-            dockerHDFSCluster.updateConfigToAllNodes("docker/hdfs-site.xml", configMap);
-            System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
+            dockerHDFSCluster.getCluster().getNode(0).
+                    execInContainer("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml");
+            dockerHDFSCluster.getCluster().getNode(1).
+                    execInContainer("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml");
+            dockerHDFSCluster.close();
         } catch (Exception e) {
             throw new RuntimeException("Failed to update configuration", e);
         }
@@ -81,7 +89,7 @@ public class DockerTest {
             System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
             // The datanode index starts from 0
-            dockerHDFSCluster.getCluster().upgradeFirstWorkerNode(upgradeVersion);
+            dockerHDFSCluster.upgradeDatanode(0);
             System.out.println("After upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
 
@@ -118,6 +126,7 @@ public class DockerTest {
             }
             // close the file system
             fs.close();
+            dockerHDFSCluster.close();
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to create file system", e);

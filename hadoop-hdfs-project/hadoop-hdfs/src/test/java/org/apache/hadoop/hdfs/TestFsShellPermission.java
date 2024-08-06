@@ -243,10 +243,12 @@ public class TestFsShellPermission {
   @Test
   public void testDelete() throws Exception {
     Configuration conf = null;
-    MiniDFSCluster cluster = null;
+    //MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       conf = new Configuration();
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      //cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
 
       String nnUri = FileSystem.getDefaultUri(conf).toString();
       FileSystem fs = FileSystem.get(URI.create(nnUri), conf);
@@ -257,7 +259,7 @@ public class TestFsShellPermission {
       ta.add(genRmrEmptyDirWithReadPerm());
       ta.add(genRmrEmptyDirWithNoPerm());
       ta.add(genRmrfEmptyDirWithNoPerm());
-
+      cluster.upgradeDatanode(0);
       // Add non-empty dir tests
       ta.add(genRmrNonEmptyDirWithReadPerm());
       ta.add(genRmrNonEmptyDirWithNoPerm());
@@ -270,6 +272,7 @@ public class TestFsShellPermission {
       // Run all tests
       for(TestDeleteHelper t : ta) {
         t.execute(conf,  fs);
+        cluster.upgradeDatanode(0);
       }
     } finally {
       if (cluster != null) { cluster.shutdown(); }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -56,7 +57,8 @@ public class TestGlobPaths {
 
   }
 
-  static private MiniDFSCluster dfsCluster;
+  //static private MiniDFSCluster dfsCluster;
+  static private MiniDockerDFSCluster dfsCluster;
   static private FileSystem fs;
   static private FileSystem privilegedFs;
   static private FileContext fc;
@@ -68,7 +70,8 @@ public class TestGlobPaths {
   @BeforeClass
   public static void setUp() throws Exception {
     final Configuration conf = new HdfsConfiguration();
-    dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    //dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    dfsCluster = new MiniDockerDFSCluster.Builder(conf).build();
 
     privilegedFs = FileSystem.get(conf);
     privilegedFc = FileContext.getFileContext(conf);
@@ -99,6 +102,7 @@ public class TestGlobPaths {
     Path fNormal = new Path(d1, "f1");
     Path fWithCR = new Path(d1, "f1\r");
     fs.mkdirs(d1);
+    dfsCluster.upgradeDatanode(0);
     fs.createNewFile(fNormal);
     fs.createNewFile(fWithCR);
     statuses = fs.globStatus(new Path(d1, "f1*"));
@@ -162,7 +166,7 @@ public class TestGlobPaths {
     fs.createNewFile(f3311);
     Path d4 = new Path(USER_DIR, "dir4");
     fs.mkdirs(d4);
-
+    dfsCluster.upgradeDatanode(0);
     /*
      * basic 
      */
@@ -423,7 +427,7 @@ public class TestGlobPaths {
     
     status = fs.globStatus(new Path(USER_DIR, "*"), falseFilter);
     checkStatus(status);
-
+    dfsCluster.upgradeDatanode(0);
     status = fs.globStatus(new Path("/x/*"), falseFilter);
     checkStatus(status);
 
@@ -458,6 +462,7 @@ public class TestGlobPaths {
       String[] files = new String[] { USER_DIR + "/a", USER_DIR + "/a/b" };
       Path[] matchedPath = prepareTesting(USER_DIR + "/*/*", files,
           new RegexPathFilter("^.*" + Pattern.quote(USER_DIR) + "/a/b"));
+      dfsCluster.upgradeDatanode(0);
       assertEquals(1, matchedPath.length);
       assertEquals(path[1], matchedPath[0]);
     } finally {
@@ -472,6 +477,7 @@ public class TestGlobPaths {
                                       USER_DIR + "/c", USER_DIR + "/c/b", };
       Path[] matchedPath = prepareTesting(USER_DIR + "/*/b", files,
           new RegexPathFilter("^.*" + Pattern.quote(USER_DIR) + "/a/b"));
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[1]);
     } finally {
@@ -484,6 +490,7 @@ public class TestGlobPaths {
     try {
       String [] files = new String[] {USER_DIR+"/a2c", USER_DIR+"/abc.d"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/abc.d", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[1]);
     } finally {
@@ -499,6 +506,7 @@ public class TestGlobPaths {
     try {
       String [] files = new String[] {USER_DIR+"/ab\\[c.d"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/ab\\[c.d", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[0]);
     } finally {
@@ -512,6 +520,7 @@ public class TestGlobPaths {
       String [] files = new String[] { USER_DIR+"/abc", USER_DIR+"/a2c",
                                        USER_DIR+"/a.c", USER_DIR+"/abcd"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a?c", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[2]);
       assertEquals(matchedPath[1], path[1]);
@@ -527,6 +536,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a", USER_DIR+"/abc",
                                       USER_DIR+"/abc.p", USER_DIR+"/bacd"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a*", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[1]);
@@ -542,6 +552,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a.", USER_DIR+"/a.txt",
                                      USER_DIR+"/a.old.java", USER_DIR+"/.java"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a.*", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[2]);
@@ -557,6 +568,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a.txt.x", USER_DIR+"/ax",
                                       USER_DIR+"/ab37x", USER_DIR+"/bacd"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a*x", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[2]);
@@ -573,6 +585,7 @@ public class TestGlobPaths {
                                       USER_DIR+"/dir2/file2", 
                                        USER_DIR+"/dir3/file1"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/*/file1", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 2);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[2]);
@@ -587,6 +600,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/dir1/file1", 
                                       USER_DIR+"/file1"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/*/file1", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[0]);
     } finally {
@@ -600,6 +614,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a.c", USER_DIR+"/a.cpp",
                                       USER_DIR+"/a.hlp", USER_DIR+"/a.hxy"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a.[ch]??", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[1]);
       assertEquals(matchedPath[1], path[2]);
@@ -615,6 +630,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a.d", USER_DIR+"/a.e",
                                       USER_DIR+"/a.f", USER_DIR+"/a.h"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a.[d-fm]", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[1]);
@@ -630,6 +646,7 @@ public class TestGlobPaths {
       String [] files = new String[] {USER_DIR+"/a.d", USER_DIR+"/a.e",
                                       USER_DIR+"/a.0", USER_DIR+"/a.h"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/a.[^a-cg-z0-9]", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 2);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[1]);
@@ -644,6 +661,7 @@ public class TestGlobPaths {
       String [] files = new String[] {"/user/aa/a.c", "/user/bb/a.cpp",
                                       "/user1/cc/b.hlp", "/user/dd/a.hxy"};
       Path[] matchedPath = prepareTesting("/use?/*/a.[ch]{lp,xy}", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[3]);
     } finally {
@@ -660,6 +678,7 @@ public class TestGlobPaths {
       files = new String[] { USER_DIR+"/a.abcxx", USER_DIR+"/a.abxy",
                              USER_DIR+"/a.hlp", USER_DIR+"/a.jhyy"};
       matchedPath = prepareTesting(USER_DIR+"/a.{abc,jh}??", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 2);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[3]);
@@ -671,6 +690,7 @@ public class TestGlobPaths {
       files = new String[] { USER_DIR+"/a.abcxx", USER_DIR+"/a.abdxy",
                              USER_DIR+"/a.hlp", USER_DIR+"/a.jhyy" };
       matchedPath = prepareTesting(USER_DIR+"/a.{ab{c,d},jh}??", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 3);
       assertEquals(matchedPath[0], path[0]);
       assertEquals(matchedPath[1], path[1]);
@@ -741,6 +761,7 @@ public class TestGlobPaths {
       boolean hasException = false;
       try {
         prepareTesting(USER_DIR+"}{bc", files);
+        dfsCluster.upgradeDatanode(0);
       } catch (IOException e) {
         assertTrue(e.getMessage().startsWith("Illegal file pattern:") );
         hasException = true;
@@ -757,6 +778,7 @@ public class TestGlobPaths {
     try {
       String[] files = new String[] {USER_DIR+"/($.|+)bc", USER_DIR+"/abc"};
       Path[] matchedPath = prepareTesting(USER_DIR+"/($.|+)*", files);
+      dfsCluster.upgradeDatanode(0);
       assertEquals(matchedPath.length, 1);
       assertEquals(matchedPath[0], path[0]);
     } finally {
@@ -1315,6 +1337,7 @@ public class TestGlobPaths {
     Assert.assertTrue(fs.mkdirs(new Path(base, "d")));
     Assert.assertTrue(fs.mkdirs(new Path(base, "b")));
     fs.deleteOnExit(base);
+    dfsCluster.upgradeDatanode(0);
     FileStatus[] status = fs.globStatus(new Path(base, "*"));
     ArrayList list = new ArrayList();
     for (FileStatus f: status) {

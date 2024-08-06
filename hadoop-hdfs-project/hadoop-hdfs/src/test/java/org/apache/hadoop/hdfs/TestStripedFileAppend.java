@@ -63,7 +63,8 @@ public class TestStripedFileAppend {
   private static final int BLOCK_GROUP_SIZE = BLOCK_SIZE * NUM_DATA_BLOCKS;
   private static final Random RANDOM = new Random();
 
-  private MiniDFSCluster cluster;
+  //private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem dfs;
   private Path dir = new Path("/TestFileAppendStriped");
   private HdfsConfiguration conf = new HdfsConfiguration();
@@ -71,7 +72,8 @@ public class TestStripedFileAppend {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
+    //cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
     dfs.mkdirs(dir);
@@ -110,6 +112,7 @@ public class TestStripedFileAppend {
       out.close();
     }
     expected = Arrays.copyOf(expected, fileLength);
+    cluster.upgradeDatanode(0);
     LocatedBlocks lbs =
         dfs.getClient().getLocatedBlocks(file.toString(), 0L, Long.MAX_VALUE);
     assertEquals(totalSplit, lbs.getLocatedBlocks().size());
@@ -131,6 +134,7 @@ public class TestStripedFileAppend {
     // Append file
     try {
       out = dfs.append(file, EnumSet.of(CreateFlag.APPEND), 4096, null);
+      cluster.upgradeDatanode(0);
       out.write("testAppendWithoutNewBlock".getBytes());
       fail("Should throw unsupported operation");
     } catch (Exception e) {

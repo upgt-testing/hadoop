@@ -128,7 +128,10 @@ public class TestFSOutputSummer {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BYTES_PER_CHECKSUM);
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, checksumType);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //                                           .numDataNodes(NUM_OF_DATANODES)
+    //                                           .build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(NUM_OF_DATANODES)
                                                .build();
     fileSys = cluster.getFileSystem();
@@ -137,6 +140,7 @@ public class TestFSOutputSummer {
       Random rand = new Random(seed);
       rand.nextBytes(expected);
       writeFile1(file);
+      cluster.upgradeDatanode(0);
       writeFile2(file);
       writeFile3(file);
     } finally {
@@ -151,7 +155,10 @@ public class TestFSOutputSummer {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BYTES_PER_CHECKSUM);
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, "NULL");
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //                                           .numDataNodes(NUM_OF_DATANODES)
+    //                                           .build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(NUM_OF_DATANODES)
                                                .build();
     fileSys = cluster.getFileSystem();
@@ -159,6 +166,7 @@ public class TestFSOutputSummer {
       Path file = new Path("try.dat");
       Random rand = new Random(seed);
       rand.nextBytes(expected);
+      cluster.upgradeDatanode(0);
       writeFile1(file);
     } finally {
       fileSys.close();

@@ -34,6 +34,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.AfterClass;
@@ -46,7 +47,8 @@ import static org.junit.Assert.fail;
 
 public class TestViewFsHdfs extends ViewFsBaseTest {
 
-  private static MiniDFSCluster cluster;
+  //private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static final HdfsConfiguration CONF = new HdfsConfiguration();
   private static FileContext fc;
   
@@ -63,9 +65,11 @@ public class TestViewFsHdfs extends ViewFsBaseTest {
     CONF.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    //cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
-    fc = FileContext.getFileContext(cluster.getURI(0), CONF);
+    //fc = FileContext.getFileContext(cluster.getURI(0), CONF);
+    fc = FileContext.getFileContext();
     Path defaultWorkingDirectory = fc.makeQualified( new Path("/user/" + 
         UserGroupInformation.getCurrentUser().getShortUserName()));
     fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
@@ -123,7 +127,7 @@ public class TestViewFsHdfs extends ViewFsBaseTest {
         return null;
       }
     });
-
+    cluster.upgradeDatanode(0);
     // Try creating a directory with the file context created by a different ugi
     // Though we are running the mkdir with the current user context, the
     // target filesystem will be instantiated by the ugi with which the
@@ -153,7 +157,7 @@ public class TestViewFsHdfs extends ViewFsBaseTest {
         return null;
       }
     });
-
+    cluster.upgradeDatanode(1);
     // Although we are running with current user context, and current user
     // context does not have write permission, we are able to create the
     // directory as its using ugi of user1 which has write permission.

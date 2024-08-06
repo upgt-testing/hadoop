@@ -235,6 +235,11 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
       <version>1.20.0</version>
     </dependency>
     <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgradable-cluster</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
       <version>5.7.0</version>
@@ -248,10 +253,14 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-<!--          <useSystemClassLoader>false</useSystemClassLoader>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.apache.hadoop:hadoop-hdfs</classpathDependencyExclude>
-          </classpathDependencyExcludes> -->
+	  <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+          <parallel>none</parallel>
+	  
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <useFile>false</useFile>
+          <printSummary>true</printSummary>
+	  
           <systemPropertyVariables>
             <runningWithNative>${runningWithNative}</runningWithNative>
           </systemPropertyVariables>
@@ -466,6 +475,14 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
           </filesets>
         </configuration>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>9</source>
+                <target>9</target>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
 

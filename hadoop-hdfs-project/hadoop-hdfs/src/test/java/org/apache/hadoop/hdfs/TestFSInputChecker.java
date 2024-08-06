@@ -57,6 +57,8 @@ public class TestFSInputChecker {
   FSDataInputStream stm;
   final Random rand = new Random(seed);
 
+  MiniDockerDFSCluster cluster = null;
+
   /* create a file */
   private void writeFile(FileSystem fileSys, Path name) throws IOException {
     // create and write a file that contains three blocks of data
@@ -244,6 +246,7 @@ public class TestFSInputChecker {
 
       stm = fileSys.open(file);
       checkReadAndGetPos();
+      cluster.upgradeDatanode(0);
       checkSeek();
       checkSkip();
       //checkMark
@@ -273,8 +276,9 @@ public class TestFSInputChecker {
 
     InputStream in = fileSys.open(file);
     IOUtils.readFully(in, buf, 0, buf.length);
+    cluster.upgradeDatanode(0);
     in.close();
-    
+
     // check .crc corruption
     checkFileCorruption(fileSys, file, crcFile);
     fileSys.delete(file, true);
@@ -323,7 +327,8 @@ public class TestFSInputChecker {
     rand.nextBytes(expected);
 
     // test DFS
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       testChecker(fileSys, true);
@@ -355,6 +360,7 @@ public class TestFSInputChecker {
         file,
         fileSys.getConf().getInt(
             CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, 4096));
+    cluster.upgradeDatanode(0);
     checkSeekAndRead();
     stm.close();
     cleanupFile(fileSys, file);

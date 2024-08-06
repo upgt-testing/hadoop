@@ -31,13 +31,15 @@ import org.apache.hadoop.fs.crypto.CryptoFSDataOutputStream;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
 public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
-  private static MiniDFSCluster dfsCluster;
+  //private static MiniDFSCluster dfsCluster;
+    private static MiniDockerDFSCluster dfsCluster;
   private static FileSystem fs;
   private static int pathCount = 0;
   private static Path path;
@@ -46,7 +48,8 @@ public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
   @BeforeClass
   public static void init() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    //dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    dfsCluster = new MiniDockerDFSCluster.Builder(conf).build();
     dfsCluster.waitClusterUp();
     fs = dfsCluster.getFileSystem();
     codec = CryptoCodec.getInstance(conf);
@@ -78,6 +81,7 @@ public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
   @Override
   protected OutputStream getOutputStream(int bufferSize, byte[] key, byte[] iv)
       throws IOException {
+    dfsCluster.upgradeDatanode(0);
     return new CryptoFSDataOutputStream(fs.create(file), codec, bufferSize,
         key, iv);
   }
@@ -85,6 +89,7 @@ public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
   @Override
   protected InputStream getInputStream(int bufferSize, byte[] key, byte[] iv)
       throws IOException {
+    dfsCluster.upgradeDatanode(0);
     return new CryptoFSDataInputStream(fs.open(file), codec, bufferSize, key,
         iv);
   }

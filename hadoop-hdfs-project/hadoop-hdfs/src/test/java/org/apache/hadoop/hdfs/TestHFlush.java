@@ -104,8 +104,10 @@ public class TestHFlush {
   @Test
   public void hSyncUpdateLength_00() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
-        2).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
+//        2).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2)
+            .build();
     DistributedFileSystem fileSystem =
         cluster.getFileSystem();
     
@@ -116,6 +118,7 @@ public class TestHFlush {
       System.out.println("Created file " + path.toString());
       ((DFSOutputStream) stm.getWrappedStream()).hsync(EnumSet
           .of(SyncFlag.UPDATE_LENGTH));
+      cluster.upgradeDatanode(0);
       long currentFileLength = fileSystem.getFileStatus(path).getLen();
       assertEquals(0L, currentFileLength);
       stm.close();
@@ -133,8 +136,10 @@ public class TestHFlush {
     final int preferredBlockSize = 1024;
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, preferredBlockSize);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
-        .build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+    //    .build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2)
+            .build();
     DistributedFileSystem fileSystem = cluster.getFileSystem();
     FSDataOutputStream stm = null;
     try {
@@ -151,6 +156,7 @@ public class TestHFlush {
 
       // write a block and call hsync(end_block) at the block boundary
       stm.write(new byte[preferredBlockSize]);
+      cluster.upgradeDatanode(0);
       ((DFSOutputStream) stm.getWrappedStream()).hsync(EnumSet
           .of(SyncFlag.END_BLOCK));
       currentFileLength = fileSystem.getFileStatus(path).getLen();
@@ -305,8 +311,9 @@ public class TestHFlush {
     final int SECTIONS = 10;
 
     fileContent = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
-                                               .numDataNodes(replicas).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+      //                                         .numDataNodes(replicas).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(replicas).build();
     // Make sure we work with DFS in order to utilize all its functionality
     DistributedFileSystem fileSystem = cluster.getFileSystem();
 
@@ -348,6 +355,7 @@ public class TestHFlush {
         byte [] toRead = new byte[tenth];
         byte [] expected = new byte[tenth];
         System.arraycopy(fileContent, tenth * i, expected, 0, tenth);
+        cluster.upgradeDatanode(0);
         // Open the same file for read. Need to create new reader after every write operation(!)
         is = fileSystem.open(path);
         is.seek(tenth * i);
@@ -393,7 +401,8 @@ public class TestHFlush {
     final Path p = new Path("/pipelineHeartbeat/foo");
     System.out.println("p=" + p);
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
 
@@ -411,7 +420,7 @@ public class TestHFlush {
       Thread.sleep(timeout);
       stm.write(fileContents, 1, 1);
       stm.hflush();
-
+      cluster.upgradeDatanode(0);
       stm.write(fileContents, 2, 1);
       Thread.sleep(timeout);
       stm.hflush();
@@ -443,7 +452,8 @@ public class TestHFlush {
 
     System.out.println("p=" + p);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
 
@@ -454,6 +464,7 @@ public class TestHFlush {
       Thread.currentThread().interrupt();
       try {
         stm.hflush();
+        cluster.upgradeDatanode(0);
         // If we made it past the hflush(), then that means that the ack made it back
         // from the pipeline before we got to the wait() call. In that case we should
         // still have interrupted status.

@@ -29,6 +29,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.Time;
 import org.apache.hadoop.util.Tool;
@@ -149,7 +150,7 @@ public class TestLoadGenerator extends Configured implements Tool {
     writer.write(FILE_STRUCTURE_SECOND_LINE+"\n");
     writer.close();
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(3).build();
     cluster.waitActive();
     
     try {
@@ -214,7 +215,8 @@ public class TestLoadGenerator extends Configured implements Tool {
       args[ELAPSED_TIME] = "-1";
       assertEquals(-1, lg.run(args));
       args[ELAPSED_TIME] = oldArg;
-      
+
+      cluster.upgradeDatanode(0);
       // test scripted operation
       // Test with good script
       FileWriter fw = new FileWriter(scriptFile1);

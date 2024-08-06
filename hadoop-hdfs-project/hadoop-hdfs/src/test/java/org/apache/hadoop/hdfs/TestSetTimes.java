@@ -97,7 +97,7 @@ public class TestSetTimes {
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -140,6 +140,7 @@ public class TestSetTimes {
 
       // check setting negative value for atime and mtime.
       fileSys.setTimes(file1, -2, -2);
+      cluster.upgradeDatanode(0);
       // The values shouldn't change.
       stat = fileSys.getFileStatus(file1);
       assertEquals(mtime1, stat.getModificationTime());
@@ -199,9 +200,12 @@ public class TestSetTimes {
       // shutdown cluster and restart
       cluster.shutdown();
       try {Thread.sleep(2*MAX_IDLE_TIME);} catch (InterruptedException e) {}
-      cluster = new MiniDFSCluster.Builder(conf).nameNodePort(nnport)
-                                                .format(false)
-                                                .build();
+      //cluster = new MiniDockerDFSCluster.Builder(conf).nameNodePort(nnport)
+      //                                          .format(false)
+      //                                          .build();
+      cluster = new MiniDockerDFSCluster.Builder(conf)//.nameNodePort(nnport)
+                                                  .format(false)
+                                                  .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
 
@@ -238,7 +242,10 @@ public class TestSetTimes {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 1000);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //                                           .numDataNodes(numDatanodes)
+    //                                           .build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -268,6 +275,7 @@ public class TestSetTimes {
       System.out.println("Closed file.");
       FileStatus statAfterClose = fileSys.getFileStatus(file1);
       long mtimeAfterClose = statAfterClose.getModificationTime();
+      cluster.upgradeDatanode(0);
       String mdateAfterClose = dateForm.format(new Date(mtimeAfterClose));
       System.out.println("mtime on " + file1 + " after close is "
                   + mdateAfterClose + " (" + mtimeAfterClose + ")");
@@ -297,6 +305,7 @@ public class TestSetTimes {
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
       .numDataNodes(0)
       .build();
+    // TODO: do not know how to get Namesystem
     ReentrantReadWriteLock spyLock = NameNodeAdapter.spyOnFsLock(cluster.getNamesystem());
     try {
       // Create empty file in the FSN.

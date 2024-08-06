@@ -89,13 +89,15 @@ public class TestSmallBlock {
       SimulatedFSDataset.setFactory(conf);
     }
     conf.set(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, "1");
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     DistributedFileSystem fileSys = cluster.getFileSystem();
     try {
       Path file1 = new Path("/smallblocktest.dat");
       DFSTestUtil.createFile(fileSys, file1, fileSize, fileSize, blockSize,
           (short) 1, seed);
       checkFile(fileSys, file1);
+      cluster.upgradeDatanode(0);
       cleanupFile(fileSys, file1);
     } finally {
       fileSys.close();

@@ -17,13 +17,10 @@
  */
 package org.apache.hadoop.fs;
 
+import org.apache.hadoop.hdfs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.PeerCache;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.Assert;
@@ -60,10 +57,12 @@ public class TestUnbuffer {
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY,
         100000000L);
 
-    MiniDFSCluster cluster = null;
+    //MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FSDataInputStream stream = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      //cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       DistributedFileSystem dfs = (DistributedFileSystem)
           FileSystem.newInstance(conf);
       final Path TEST_PATH = new Path("/test1");
@@ -81,6 +80,7 @@ public class TestUnbuffer {
       // Unbuffer should clear the block reader and return the socket to the
       // cache.
       stream.unbuffer();
+      cluster.upgradeDatanode(0);
       stream.seek(2);
       Assert.assertEquals(1, cache.size());
       int b2 = stream.read();
@@ -106,10 +106,12 @@ public class TestUnbuffer {
     final int NUM_OPENS = 500;
     Configuration conf = new Configuration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-    MiniDFSCluster cluster = null;
+    //MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      //cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       DistributedFileSystem dfs = cluster.getFileSystem();
       final Path TEST_PATH = new Path("/testFile");
       DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short)1, 1);
@@ -118,6 +120,9 @@ public class TestUnbuffer {
         streams[i] = dfs.open(TEST_PATH);
         LOG.info("opening file " + i + "...");
         Assert.assertTrue(-1 != streams[i].read());
+        if (i == 0) {
+          cluster.upgradeDatanode(0);
+        }
         streams[i].unbuffer();
       }
     } finally {
