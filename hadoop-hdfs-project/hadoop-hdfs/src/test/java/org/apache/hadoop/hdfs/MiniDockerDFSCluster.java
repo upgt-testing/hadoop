@@ -222,7 +222,11 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     public void upgradeDatanode(int index) {
-        dataNodes.get(index).upgradeTo(upgradeVersion);
+        if (dataNodes.containsKey(index)) {
+            dataNodes.get(index).upgradeTo(upgradeVersion);
+        } else{
+            LOG.warn("There is no datanode at index {}, skip the upgrade", index);
+        }
     }
 
     public void waitActive() {
