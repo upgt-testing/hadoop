@@ -44,7 +44,7 @@ public class MiniDockerDFSCluster implements Closeable {
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
-    String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
+    //String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
     String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
 
     private final Map<String, String> defaultCoreSite = Map.of(
@@ -174,7 +174,7 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public static class Builder {
         private Configuration conf;
-        private String dockerImageVersion = "hadoop:3.3.5"; // default version of the Hadoop Docker image
+        private String dockerImageVersion = System.getProperty("startVersion", "hadoop:3.3.5"); // default version is 3.3.5
         private int numDataNodes = 1; // default number of data nodes is 1
 
         public Builder(Configuration conf) {
