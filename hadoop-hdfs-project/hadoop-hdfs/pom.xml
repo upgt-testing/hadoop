@@ -32,9 +32,27 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <properties>
     <hadoop.component>hdfs</hadoop.component>
     <is.hadoop.component>true</is.hadoop.component>
+    <enforcer.skip>true</enforcer.skip>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgradable-cluster</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.20.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.7.0</version>
+      <scope>test</scope>
+    </dependency>
+    
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-auth</artifactId>
@@ -219,10 +237,29 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <build>
     <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+	      <compilerArguments>
+		<Xmaxerrs>100000</Xmaxerrs>
+	      </compilerArguments>
+            </configuration>
+        </plugin>
+	
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+	  
+	  <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+          <parallel>none</parallel>
+
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <useFile>false</useFile>
+          <printSummary>true</printSummary>
+	  
           <systemPropertyVariables>
             <runningWithNative>${runningWithNative}</runningWithNative>
           </systemPropertyVariables>
