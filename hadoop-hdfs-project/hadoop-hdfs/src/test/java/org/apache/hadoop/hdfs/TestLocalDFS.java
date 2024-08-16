@@ -69,7 +69,7 @@ public class TestLocalDFS {
   @Test(timeout=20000)
   public void testWorkingDirectory() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
@@ -85,8 +85,8 @@ public class TestLocalDFS {
       cleanupFile(fileSys, new Path(subdir1, file1.toString()));
       Path subdir2 = new Path("else");
       fileSys.setWorkingDirectory(subdir2);
-      cluster.upgradeDatanode(0);
       writeFile(fileSys, file1);
+      cluster.upgradeDatanode(0);
       readFile(fileSys, file1);
       cleanupFile(fileSys, new Path(new Path(subdir1, subdir2.toString()),
                                     file1.toString()));
@@ -114,16 +114,16 @@ public class TestLocalDFS {
     Configuration conf = new HdfsConfiguration();
     for (final String homeBase : homeBases) {
       conf.set(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY, homeBase);
-      //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+      //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
       MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
       FileSystem fileSys = cluster.getFileSystem();
       try {    
         // test home directory
         Path home = 
             fileSys.makeQualified(
-                new Path(homeBase + "/" + getUserName(fileSys))); 
-        Path fsHome = fileSys.getHomeDirectory();
+                new Path(homeBase + "/" + getUserName(fileSys)));
         cluster.upgradeDatanode(0);
+        Path fsHome = fileSys.getHomeDirectory();
         assertEquals(home, fsHome);
       } finally {
         fileSys.close();

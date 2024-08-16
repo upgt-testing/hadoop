@@ -177,7 +177,7 @@ public class TestLargeBlock {
     final long fileSize = blockSize + 1L;
 
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
             .numDataNodes(numDatanodes).build();
     FileSystem fs = cluster.getFileSystem();
     try {
@@ -196,14 +196,14 @@ public class TestLargeBlock {
       // write to file
       writeFile(stm, fileSize);
       LOG.info("File " + file1 + " written to.");
-
+      cluster.upgradeDatanode(0);
       // close file
       stm.close();
       LOG.info("File " + file1 + " closed.");
 
       // Make sure a client can read it
       checkFullFile(fs, file1, fileSize);
-
+      cluster.upgradeDatanode(0);
       // verify that file size has changed
       long len = fs.getFileStatus(file1).getLen();
       assertTrue(file1 + " should be of size " +  fileSize +

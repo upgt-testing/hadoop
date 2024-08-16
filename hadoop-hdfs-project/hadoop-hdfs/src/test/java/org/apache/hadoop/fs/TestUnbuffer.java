@@ -57,11 +57,11 @@ public class TestUnbuffer {
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY,
         100000000L);
 
-    //MiniDFSCluster cluster = null;
+    //MiniDockerDFSCluster cluster = null;
     MiniDockerDFSCluster cluster = null;
     FSDataInputStream stream = null;
     try {
-      //cluster = new MiniDFSCluster.Builder(conf).build();
+      //cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster = new MiniDockerDFSCluster.Builder(conf).build();
       DistributedFileSystem dfs = (DistributedFileSystem)
           FileSystem.newInstance(conf);
@@ -106,11 +106,11 @@ public class TestUnbuffer {
     final int NUM_OPENS = 500;
     Configuration conf = new Configuration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-    //MiniDFSCluster cluster = null;
+    //MiniDockerDFSCluster cluster = null;
     MiniDockerDFSCluster cluster = null;
     FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
     try {
-      //cluster = new MiniDFSCluster.Builder(conf).build();
+      //cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster = new MiniDockerDFSCluster.Builder(conf).build();
       DistributedFileSystem dfs = cluster.getFileSystem();
       final Path TEST_PATH = new Path("/testFile");

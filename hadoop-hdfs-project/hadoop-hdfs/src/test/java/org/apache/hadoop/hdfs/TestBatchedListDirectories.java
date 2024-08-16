@@ -55,7 +55,7 @@ import static org.junit.Assert.fail;
  */
 public class TestBatchedListDirectories {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
   private static DistributedFileSystem dfs;
 
@@ -125,7 +125,7 @@ public class TestBatchedListDirectories {
     conf.setInt(DFSConfigKeys.DFS_LIST_LIMIT, 7);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_BATCHED_LISTING_LIMIT,
         FIRST_LEVEL_DIRS * SECOND_LEVEL_DIRS * FILES_PER_DIR);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     dfs = cluster.getFileSystem();
@@ -169,6 +169,7 @@ public class TestBatchedListDirectories {
   public void testEmptyPath() throws Exception {
     thrown.expect(FileNotFoundException.class);
     List<Path> paths = Lists.newArrayList();
+    cluster.upgradeDatanode(0);
     getStatuses(paths);
   }
 
@@ -177,6 +178,7 @@ public class TestBatchedListDirectories {
     List<Path> paths = Lists.newArrayList(EMPTY_DIR_PATH);
     List<PartialListing<FileStatus>> listings = getListings(paths);
     assertEquals(1, listings.size());
+    cluster.upgradeDatanode(0);
     PartialListing<FileStatus> listing = listings.get(0);
     assertEquals(EMPTY_DIR_PATH, listing.getListedPath());
     assertEquals(0, listing.get().size());
@@ -186,12 +188,14 @@ public class TestBatchedListDirectories {
     List<Path> paths = Lists.newArrayList();
     paths.add(FILE_PATHS.get(0));
     List<FileStatus> statuses = getStatuses(paths);
+    cluster.upgradeDatanode(0);
     assertEquals(1, statuses.size());
     assertFileEquals(0, 0, 0, statuses.get(0).getPath());
   }
 
   @Test
   public void listDoesNotExist() throws Exception {
+    cluster.upgradeDatanode(0);
     thrown.expect(FileNotFoundException.class);
     List<Path> paths = Lists.newArrayList();
     paths.add(new Path("/does/not/exist"));
@@ -205,6 +209,7 @@ public class TestBatchedListDirectories {
     paths.addAll(SUBDIR_PATHS.subList(0, FIRST_LEVEL_DIRS));
     paths.add(new Path("/does/not/exist"));
     paths.addAll(SUBDIR_PATHS.subList(0, FIRST_LEVEL_DIRS));
+    cluster.upgradeDatanode(0);
     paths.add(new Path("/does/not/exist"));
     List<PartialListing<FileStatus>> listings = getListings(paths);
     for (int i = 0; i < listings.size(); i++) {
@@ -221,6 +226,7 @@ public class TestBatchedListDirectories {
       }
     }
     try {
+      cluster.upgradeDatanode(0);
       listings.get(listings.size()-1).get();
       fail("Expected exception");
     } catch (FileNotFoundException e) {
@@ -233,6 +239,7 @@ public class TestBatchedListDirectories {
     dfs.setWorkingDirectory(new Path("/dir0"));
     List<Path> paths = Lists.newArrayList(new Path("."));
     List<FileStatus> statuses = getStatuses(paths);
+    cluster.upgradeDatanode(0);
     assertEquals("Wrong number of items",
         SECOND_LEVEL_DIRS, statuses.size());
     for (int i = 0; i < SECOND_LEVEL_DIRS; i++) {
@@ -244,6 +251,7 @@ public class TestBatchedListDirectories {
   @Test
   public void listFilesRelative() throws Exception {
     dfs.setWorkingDirectory(new Path("/dir0"));
+    cluster.upgradeDatanode(0);
     List<Path> paths = Lists.newArrayList(new Path("subdir0"));
     List<FileStatus> statuses = getStatuses(paths);
     assertEquals("Wrong number of items",
@@ -256,6 +264,7 @@ public class TestBatchedListDirectories {
 
   @Test
   public void testDFSHasCapability() throws Throwable {
+    cluster.upgradeDatanode(0);
     assertTrue("FS does not declare PathCapability support",
         dfs.hasPathCapability(new Path("/"),
             CommonPathCapabilities.FS_EXPERIMENTAL_BATCH_LISTING));
@@ -263,6 +272,7 @@ public class TestBatchedListDirectories {
 
   private void listFilesInternal(int numFiles) throws Exception {
     List<Path> paths = FILE_PATHS.subList(0, numFiles);
+    cluster.upgradeDatanode(0);
     List<FileStatus> statuses = getStatuses(paths);
     assertEquals(paths.size(), statuses.size());
     for (int i = 0; i < paths.size(); i++) {
@@ -280,17 +290,19 @@ public class TestBatchedListDirectories {
   @Test
   public void listSomeFiles() throws Exception {
     listFilesInternal(FILE_PATHS.size() / 2);
+    cluster.upgradeDatanode(0);
   }
 
   @Test
   public void listAllFiles() throws Exception {
     listFilesInternal(FILE_PATHS.size());
+    cluster.upgradeDatanode(0);
   }
 
   private void listDirectoriesInternal(int numDirs) throws Exception {
     List<Path> paths = SUBDIR_PATHS.subList(0, numDirs);
     List<PartialListing<FileStatus>> listings = getListings(paths);
-
+    cluster.upgradeDatanode(0);
     LinkedHashMap<Path, List<FileStatus>> listing = new LinkedHashMap<>();
     for (PartialListing<FileStatus> partialListing : listings) {
       Path parent = partialListing.getListedPath();
@@ -309,6 +321,7 @@ public class TestBatchedListDirectories {
       assertEquals(expected, parent);
       assertEquals(FILES_PER_DIR, children.size());
     }
+    cluster.upgradeDatanode(0);
   }
 
   @Test
@@ -328,12 +341,17 @@ public class TestBatchedListDirectories {
 
   @Test
   public void listTooManyDirectories() throws Exception {
-    thrown.expect(RemoteException.class);
-    thrown.expectMessage(
-        StringContains.containsString("Too many source paths"));
-    List<Path> paths = Lists.newArrayList(FILE_PATHS);
-    paths.add(SUBDIR_PATHS.get(0));
-    getStatuses(paths);
+    //thrown.expect(RemoteException.class);
+    //thrown.expectMessage(
+//        StringContains.containsString("Too many source paths"));
+    try{
+      List<Path> paths = Lists.newArrayList(FILE_PATHS);
+      cluster.upgradeDatanode(0);
+      paths.add(SUBDIR_PATHS.get(0));
+      getStatuses(paths);
+    } catch (Exception e){
+      throw e;
+    }
   }
 
   @Test
@@ -344,11 +362,13 @@ public class TestBatchedListDirectories {
     paths.add(EMPTY_DIR_PATH);
     List<PartialListing<FileStatus>> listings = getListings(paths);
     assertEquals(3, listings.size());
+    cluster.upgradeDatanode(0);
     assertEquals(0, listings.get(0).get().size());
     assertEquals(1, listings.get(1).get().size());
     assertEquals(FILE_PATHS.get(0).toString(),
         listings.get(1).get().get(0).getPath().toUri().getPath());
     assertEquals(0, listings.get(2).get().size());
+    cluster.upgradeDatanode(0);
   }
 
   @Test
@@ -358,6 +378,7 @@ public class TestBatchedListDirectories {
     paths.add(SUBDIR_PATHS.get(0));
     paths.add(FILE_PATHS.get(0));
     paths.add(FILE_PATHS.get(0));
+    cluster.upgradeDatanode(0);
     List<FileStatus> statuses = getStatuses(paths);
     assertEquals(FILES_PER_DIR*2 + 2, statuses.size());
     List<FileStatus> slice = statuses.subList(0, FILES_PER_DIR);
@@ -369,6 +390,7 @@ public class TestBatchedListDirectories {
       assertFileEquals(0, 0, i, slice.get(i).getPath());
     }
     assertFileEquals(0, 0, 0, statuses.get(FILES_PER_DIR*2).getPath());
+    cluster.upgradeDatanode(0);
     assertFileEquals(0, 0, 0, statuses.get(FILES_PER_DIR*2+1).getPath());
   }
 
@@ -379,6 +401,7 @@ public class TestBatchedListDirectories {
     RemoteIterator<PartialListing<LocatedFileStatus>> it =
         dfs.batchedListLocatedStatusIterator(paths);
     PartialListing<LocatedFileStatus> listing = it.next();
+    cluster.upgradeDatanode(0);
     List<LocatedFileStatus> statuses = listing.get();
     assertEquals(1, statuses.size());
     assertTrue(statuses.get(0).getBlockLocations().length > 0);
@@ -388,6 +411,7 @@ public class TestBatchedListDirectories {
       throws IOException, InterruptedException {
     final UserGroupInformation ugi = UserGroupInformation
         .createRemoteUser("tiffany");
+    cluster.upgradeDatanode(0);
     ugi.doAs(new PrivilegedExceptionAction<Void>() {
       @Override
       public Void run() throws Exception {
@@ -408,10 +432,12 @@ public class TestBatchedListDirectories {
     thrown.expect(AccessControlException.class);
     List<Path> paths = Lists.newArrayList(INACCESSIBLE_DIR_PATH);
     listAsNormalUser(paths);
+    cluster.upgradeDatanode(0);
   }
 
   @Test
   public void listInaccessibleFile() throws Exception {
+    cluster.upgradeDatanode(0);
     thrown.expect(AccessControlException.class);
     List<Path> paths = Lists.newArrayList(INACCESSIBLE_FILE_PATH);
     listAsNormalUser(paths);

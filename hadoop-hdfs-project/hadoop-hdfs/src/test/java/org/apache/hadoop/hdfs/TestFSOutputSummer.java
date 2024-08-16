@@ -128,7 +128,7 @@ public class TestFSOutputSummer {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BYTES_PER_CHECKSUM);
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, checksumType);
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
     //                                           .numDataNodes(NUM_OF_DATANODES)
     //                                           .build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
@@ -140,8 +140,8 @@ public class TestFSOutputSummer {
       Random rand = new Random(seed);
       rand.nextBytes(expected);
       writeFile1(file);
-      cluster.upgradeDatanode(0);
       writeFile2(file);
+      cluster.upgradeDatanode(0);
       writeFile3(file);
     } finally {
       fileSys.close();
@@ -155,7 +155,7 @@ public class TestFSOutputSummer {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BYTES_PER_CHECKSUM);
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, "NULL");
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
     //                                           .numDataNodes(NUM_OF_DATANODES)
     //                                           .build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)

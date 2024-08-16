@@ -35,7 +35,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.web.WebHdfsConstants;
 import org.apache.hadoop.hdfs.web.WebHdfsTestUtil;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
@@ -100,7 +100,7 @@ public class TestAuditLogs {
   static final String fileName = "/srcdat";
 
   DFSTestUtil util;
-  MiniDFSCluster cluster;
+  MiniDockerDFSCluster cluster;
   FileSystem fs;
   String fnames[];
   Configuration conf;
@@ -117,7 +117,7 @@ public class TestAuditLogs {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_EDITS_ASYNC_LOGGING, useAsyncEdits);
     util = new DFSTestUtil.Builder().setName("TestAuditAllowed").
         setNumFiles(20).build();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).build();
     fs = cluster.getFileSystem();
     util.createFiles(fs, fileName);
 
@@ -165,6 +165,7 @@ public class TestAuditLogs {
 
     InputStream istream = userfs.open(file);
     int val = istream.read();
+    cluster.upgradeDatanode(0);
     istream.close();
     verifySuccessCommandsAuditLogs(2, fnames[0], "cmd=open");
     assertTrue("failed to read from file", val >= 0);
@@ -177,6 +178,7 @@ public class TestAuditLogs {
     FileSystem userfs = DFSTestUtil.getFileSystemAs(userGroupInfo, conf);
 
     FileStatus st = userfs.getFileStatus(file);
+    cluster.upgradeDatanode(0);
     verifySuccessCommandsAuditLogs(2, fnames[0], "cmd=getfileinfo");
     assertTrue("failed to stat file", st != null && st.isFile());
   }
@@ -188,6 +190,7 @@ public class TestAuditLogs {
     FileSystem userfs = DFSTestUtil.getFileSystemAs(userGroupInfo, conf);
 
     fs.setPermission(file, new FsPermission((short)0600));
+    cluster.upgradeDatanode(0);
     fs.setOwner(file, "root", null);
 
     try {
@@ -209,6 +212,7 @@ public class TestAuditLogs {
 
     WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(userGroupInfo, conf, WebHdfsConstants.WEBHDFS_SCHEME);
     InputStream istream = webfs.open(file);
+    cluster.upgradeDatanode(0);
     int val = istream.read();
     istream.close();
 
@@ -225,6 +229,7 @@ public class TestAuditLogs {
     fs.setOwner(file, "root", null);
 
     WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(userGroupInfo, conf, WebHdfsConstants.WEBHDFS_SCHEME);
+    cluster.upgradeDatanode(0);
     FileStatus st = webfs.getFileStatus(file);
 
     verifySuccessCommandsAuditLogs(2, fnames[0], "cmd=getfileinfo");
@@ -242,6 +247,7 @@ public class TestAuditLogs {
     try {
       WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(userGroupInfo, conf, WebHdfsConstants.WEBHDFS_SCHEME);
       InputStream istream = webfs.open(file);
+      cluster.upgradeDatanode(0);
       int val = istream.read();
       fail("open+read must not succeed, got " + val);
     } catch(AccessControlException E) {
@@ -256,6 +262,7 @@ public class TestAuditLogs {
     final Path file = new Path(fnames[0]);
 
     fs.setPermission(file, new FsPermission((short)0644));
+    cluster.upgradeDatanode(0);
     fs.setOwner(file, "root", null);
 
     WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(userGroupInfo, conf, WebHdfsConstants.WEBHDFS_SCHEME);
@@ -269,6 +276,7 @@ public class TestAuditLogs {
   public void testAuditCharacterEscape() throws Exception {
     final Path file = new Path("foo" + "\r\n" + "bar");
     fs.create(file);
+    cluster.upgradeDatanode(0);
     verifySuccessCommandsAuditLogs(1, "foo", "cmd=create");
   }
 

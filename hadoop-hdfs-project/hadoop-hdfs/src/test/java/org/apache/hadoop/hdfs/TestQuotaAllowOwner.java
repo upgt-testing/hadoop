@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQuotaAllowOwner {
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem dfs;
 
   @BeforeClass
@@ -59,7 +59,7 @@ public class TestQuotaAllowOwner {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
   }
@@ -104,7 +104,7 @@ public class TestQuotaAllowOwner {
       TestQuota.runCommand(userAdmin, args2, false);
       args2 = new String[]{"-setSpaceQuota", "64", subDir};
       TestQuota.runCommand(userAdmin, args2, false);
-
+      cluster.upgradeDatanode(0);
       ContentSummary c = dfs.getContentSummary(new Path(subDir));
       assertEquals("Not same with setting quota",
           5, c.getQuota());
@@ -134,7 +134,7 @@ public class TestQuotaAllowOwner {
     final String subDir = parentDir + "/subdir";
 
     createDirssAndSetOwner(parentDir, subDir, userName, groupName);
-
+    cluster.upgradeDatanode(0);
     UserGroupInformation ugi2 = UserGroupInformation.createUserForTesting(
         userName,  new String[]{groupName});
     ugi2.doAs((PrivilegedExceptionAction<Object>) () -> {
@@ -177,6 +177,7 @@ public class TestQuotaAllowOwner {
       TestQuota.runCommand(userAdmin, args2, true);
       return null;
     });
+    cluster.upgradeDatanode(0);
   }
 
   /**
@@ -193,6 +194,7 @@ public class TestQuotaAllowOwner {
 
     createDirssAndSetOwner(parentDir, subDir, userName, groupName);
 
+    cluster.upgradeDatanode(0);
     UserGroupInformation ugi = UserGroupInformation.createUserForTesting(
         userOther, new String[]{groupName});
     ugi.doAs((PrivilegedExceptionAction<Object>) () -> {
@@ -225,6 +227,7 @@ public class TestQuotaAllowOwner {
 
       createDirssAndSetOwner(parentDir, subDir, userName, groupName);
 
+      cluster.upgradeDatanode(0);
       UserGroupInformation ugi = UserGroupInformation.createUserForTesting(
           userName, new String[]{groupName});
       ugi.doAs((PrivilegedExceptionAction<Object>) () -> {

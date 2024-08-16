@@ -178,6 +178,7 @@ public class MiniDockerDFSCluster implements Closeable {
         private int numDataNodes = 1; // default number of data nodes is 1
 
         public Builder(Configuration conf) {
+            //TODO: here actually we have to sync this configurations with the docker cluster configuration
             this.conf = conf;
         }
 
@@ -203,6 +204,9 @@ public class MiniDockerDFSCluster implements Closeable {
 
 
     public MiniDockerDFSCluster(Builder builder) {
+        // Re-enable symlinks for tests, see HADOOP-10020 and HADOOP-10052
+        FileSystem.enableSymlinks();
+
         this.conf = builder.conf;
         cluster = new DockerCluster();
         List<File> configFiles = generateConfigFiles();

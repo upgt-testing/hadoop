@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.ipc.RefreshHandler;
 
@@ -37,13 +37,13 @@ import org.junit.AfterClass;
 import org.mockito.Mockito;
 
 /**
- * Before all tests, a MiniDFSCluster is spun up.
+ * Before all tests, a MiniDockerDFSCluster is spun up.
  * Before each test, mock refresh handlers are created and registered.
  * After each test, the mock handlers are unregistered.
  * After all tests, the cluster is spun down.
  */
 public class TestGenericRefresh {
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration config;
 
   private static RefreshHandler firstHandler;
@@ -55,7 +55,7 @@ public class TestGenericRefresh {
     config.set("hadoop.security.authorization", "true");
 
     FileSystem.setDefaultUri(config, "hdfs://localhost:0");
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDockerDFSCluster.Builder(config).build();
     cluster.waitActive();
   }
 
@@ -94,12 +94,14 @@ public class TestGenericRefresh {
     DFSAdmin admin = new DFSAdmin(config);
     String [] args = new String[]{"-refresh", "nn"};
     int exitCode = admin.run(args);
+    cluster.upgradeDatanode(0);
     assertEquals("DFSAdmin should fail due to bad args", -1, exitCode);
   }
 
   @Test
   public void testInvalidIdentifier() throws Exception {
     DFSAdmin admin = new DFSAdmin(config);
+    cluster.upgradeDatanode(0);
     String [] args = new String[]{"-refresh", "localhost:" + 
         cluster.getNameNodePort(), "unregisteredIdentity"};
     int exitCode = admin.run(args);
@@ -108,6 +110,7 @@ public class TestGenericRefresh {
 
   @Test
   public void testValidIdentifier() throws Exception {
+    cluster.upgradeDatanode(0);
     DFSAdmin admin = new DFSAdmin(config);
     String[] args = new String[]{"-refresh",
         "localhost:" + cluster.getNameNodePort(), "firstHandler"};
@@ -115,6 +118,7 @@ public class TestGenericRefresh {
     assertEquals("DFSAdmin should succeed", 0, exitCode);
 
     Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[]{});
+    cluster.upgradeDatanode(0);
     // Second handler was never called
     Mockito.verify(secondHandler, Mockito.never())
       .handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
@@ -130,6 +134,7 @@ public class TestGenericRefresh {
 
     exitCode = admin.run(new String[]{"-refresh", "localhost:" +
         cluster.getNameNodePort(), "secondHandler", "one", "two"});
+    cluster.upgradeDatanode(0);
     assertEquals("DFSAdmin should now return 3", 3, exitCode);
 
     Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[]{"one"});
@@ -142,6 +147,7 @@ public class TestGenericRefresh {
 
     // And now this should fail
     DFSAdmin admin = new DFSAdmin(config);
+    cluster.upgradeDatanode(0);
     String[] args = new String[]{"-refresh", "localhost:" +
         cluster.getNameNodePort(), "firstHandler"};
     int exitCode = admin.run(args);
@@ -152,6 +158,7 @@ public class TestGenericRefresh {
   public void testUnregistrationReturnValue() {
     RefreshHandler mockHandler = Mockito.mock(RefreshHandler.class);
     RefreshRegistry.defaultRegistry().register("test", mockHandler);
+    cluster.upgradeDatanode(0);
     boolean ret = RefreshRegistry.defaultRegistry().unregister("test", mockHandler);
     assertTrue(ret);
   }
@@ -162,6 +169,7 @@ public class TestGenericRefresh {
     RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
 
     // this should trigger both
+    cluster.upgradeDatanode(0);
     DFSAdmin admin = new DFSAdmin(config);
     String[] args = new String[]{"-refresh", "localhost:" +
         cluster.getNameNodePort(), "sharedId", "one"};
@@ -189,7 +197,7 @@ public class TestGenericRefresh {
     // Then registered to the same ID
     RefreshRegistry.defaultRegistry().register("shared", handlerOne);
     RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
-
+    cluster.upgradeDatanode(0);
     // We refresh both
     DFSAdmin admin = new DFSAdmin(config);
     String[] args = new String[]{"-refresh", "localhost:" +
@@ -214,7 +222,7 @@ public class TestGenericRefresh {
     RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
     Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
       .thenThrow(new RuntimeException("More Exceptions"));
-
+    cluster.upgradeDatanode(0);
     RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
     RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
 

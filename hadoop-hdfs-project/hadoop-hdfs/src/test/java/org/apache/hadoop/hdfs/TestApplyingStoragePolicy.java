@@ -36,13 +36,13 @@ public class TestApplyingStoragePolicy {
   private static final int SIZE = 128;
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem fs;
 
   @Before
   public void clusterSetUp() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPL).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
   }
@@ -69,6 +69,7 @@ public class TestApplyingStoragePolicy {
 
     final BlockStoragePolicySuite suite = BlockStoragePolicySuite
         .createDefaultSuite();
+    cluster.upgradeDatanode(0);
     final BlockStoragePolicy hot = suite.getPolicy("HOT");
 
     /*
@@ -104,6 +105,7 @@ public class TestApplyingStoragePolicy {
      */
     fs.setStoragePolicy(foo, warm.getName());
     fs.setStoragePolicy(bar, cold.getName());
+    cluster.upgradeDatanode(0);
     fs.setStoragePolicy(wow, hot.getName());
     try {
       fs.setStoragePolicy(fooz, warm.getName());
@@ -169,6 +171,7 @@ public class TestApplyingStoragePolicy {
     fs.setStoragePolicy(bar, cold.getName());
     fs.setStoragePolicy(wow, hot.getName());
     try {
+      cluster.upgradeDatanode(0);
       fs.setStoragePolicy(fooz, warm.getName());
     } catch (Exception e) {
       assertTrue(e instanceof FileNotFoundException);
@@ -247,6 +250,7 @@ public class TestApplyingStoragePolicy {
      * test: set storage policy
      */
     fs.setStoragePolicy(foo, warm.getName());
+    cluster.upgradeDatanode(0);
     fs.setStoragePolicy(bar, cold.getName());
     try {
       fs.setStoragePolicy(fooz, warm.getName());

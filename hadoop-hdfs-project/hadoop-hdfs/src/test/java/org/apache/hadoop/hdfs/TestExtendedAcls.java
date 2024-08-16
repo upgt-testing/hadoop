@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExtendedAcls {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
 
   private static final short REPLICATION = 3;
@@ -69,7 +69,7 @@ public class TestExtendedAcls {
   public static void setup() throws IOException {
     conf = new Configuration();
     conf.setBoolean(DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
@@ -117,6 +117,7 @@ public class TestExtendedAcls {
 
     // create sub file
     Path childFile = new Path(parent, "childFile");
+    cluster.upgradeDatanode(0);
     hdfs.create(childFile).close();
     // the sub file should have the default acls
     AclEntry[] childFileExpectedAcl = new AclEntry[] {
@@ -170,6 +171,7 @@ public class TestExtendedAcls {
         aclEntry(ACCESS, USER, "foo", ALL),
         aclEntry(ACCESS, GROUP, READ_EXECUTE)
     };
+    cluster.upgradeDatanode(0);
     AclStatus childFileAcl = hdfs.getAclStatus(childFile);
     assertArrayEquals(
         childFileExpectedAcl, childFileAcl.getEntries().toArray());
@@ -234,7 +236,7 @@ public class TestExtendedAcls {
     };
     AclStatus childDirAcl = hdfs.getAclStatus(childDir);
     assertArrayEquals(childDirExpectedAcl, childDirAcl.getEntries().toArray());
-
+    cluster.upgradeDatanode(0);
     Path childFile = new Path(parent, "childFile");
     hdfs.create(childFile).close();
     // sub file should only have the default acl inherited
@@ -278,6 +280,7 @@ public class TestExtendedAcls {
 
     Path childDir = new Path(parent, "childDir");
     hdfs.mkdirs(childDir);
+    cluster.upgradeDatanode(0);
     hdfs.modifyAclEntries(childDir, aclsChild);
     // child dir should inherit the default acls from parent, plus bar group
     AclEntry[] childDirExpectedAcl = new AclEntry[] {
@@ -307,6 +310,7 @@ public class TestExtendedAcls {
 
     Path childFile = new Path(childDir, "childFile");
     hdfs.create(childFile).close();
+    cluster.upgradeDatanode(0);
     hdfs.setPermission(childFile, new FsPermission((short)0640));
     // child dir/child file allows foo user and bar group to access
     AclEntry[] childFileExpectedAcl = new AclEntry[] {
@@ -378,6 +382,7 @@ public class TestExtendedAcls {
     List<AclEntry> newAclsChild = Lists.newArrayList(
         aclEntry(DEFAULT, GROUP, "bar", NONE)
     );
+    cluster.upgradeDatanode(0);
     hdfs.modifyAclEntries(childDir, newAclsChild);
     AclEntry[] childDirExpectedAcl = new AclEntry[] {
         aclEntry(ACCESS, USER, "foo", ALL),
@@ -413,7 +418,7 @@ public class TestExtendedAcls {
     assertTrue(tryAccess(parentFile, "barUser", new String[]{"bar"}, READ));
     // parent file should be accessible for foo user
     assertTrue(tryAccess(parentFile, "foo", new String[]{"fooGroup"}, READ));
-
+    cluster.upgradeDatanode(0);
     hdfs.delete(parent, true);
   }
 

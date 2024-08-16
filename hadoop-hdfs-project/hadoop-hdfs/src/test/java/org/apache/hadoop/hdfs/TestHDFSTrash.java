@@ -48,7 +48,7 @@ public class TestHDFSTrash {
 
   public static final Logger LOG = LoggerFactory.getLogger(TestHDFSTrash.class);
 
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
   private static FileSystem fs;
   private static Configuration conf = new HdfsConfiguration();
 
@@ -67,7 +67,7 @@ public class TestHDFSTrash {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     fs = FileSystem.get(conf);
 
     superUser = UserGroupInformation.getCurrentUser();
@@ -108,6 +108,7 @@ public class TestHDFSTrash {
     Configuration config = fileSystem.getConf();
     config.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY,
         fileSystem.getUri().toString());
+    cluster.upgradeDatanode(0);
     TestTrash.trashNonDefaultFS(config);
   }
 
@@ -138,6 +139,7 @@ public class TestHDFSTrash {
     // login as user1, move something to trash
     // verify user1 can remove its own trash dir
     fs = DFSTestUtil.login(fs, testConf, user1);
+    cluster.upgradeDatanode(0);
     fs.mkdirs(user1Tmp);
     Trash u1Trash = getPerUserTrash(user1, fs, testConf);
     Path u1t = u1Trash.getCurrentTrashDir(user1Tmp);
@@ -152,6 +154,7 @@ public class TestHDFSTrash {
 
     // login as user2, move something to trash
     fs = DFSTestUtil.login(fs, testConf, user2);
+    cluster.upgradeDatanode(0);
     fs.mkdirs(user2Tmp);
     Trash u2Trash = getPerUserTrash(user2, fs, testConf);
     u2Trash.moveToTrash(user2Tmp);
@@ -160,6 +163,7 @@ public class TestHDFSTrash {
     try {
       // user1 should not be able to remove user2's trash dir
       fs = DFSTestUtil.login(fs, testConf, user1);
+      cluster.upgradeDatanode(0);
       fs.delete(u2t, true);
       fail(String.format("%s should not be able to remove %s trash directory",
               USER1_NAME, USER2_NAME));

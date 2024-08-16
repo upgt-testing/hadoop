@@ -81,7 +81,7 @@ public class TestFileAppend2 {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       { // test appending to a file.
@@ -103,6 +103,7 @@ public class TestFileAppend2 {
         System.out.println("Writing " + mid + " bytes to file " + file1);
         stm = fs.append(file1);
         stm.write(fileContents, mid, mid2-mid);
+        cluster.upgradeDatanode(0);
         stm.close();
         System.out.println("Wrote and Closed second part of file.");
   
@@ -117,6 +118,7 @@ public class TestFileAppend2 {
         stm.write(fileContents, mid2, AppendTestUtil.FILE_SIZE - mid2);
         System.out.println("Written second part of file");
         stm.close();
+        cluster.upgradeDatanode(0);
         System.out.println("Wrote and Closed second part of file.");
   
         // verify that entire file is good
@@ -162,6 +164,7 @@ public class TestFileAppend2 {
         Path dir = new Path(root, getClass().getSimpleName());
         Path foo = new Path(dir, "foo.dat");
         FSDataOutputStream out = null;
+        cluster.upgradeDatanode(0);
         int offset = 0;
         try {
           out = fs.create(foo);
@@ -230,7 +233,7 @@ public class TestFileAppend2 {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     try {
       { // test appending to a file.
@@ -258,6 +261,7 @@ public class TestFileAppend2 {
         // write the remainder of the file
         stm = fs.append(file1,
             EnumSet.of(CreateFlag.APPEND, CreateFlag.NEW_BLOCK), 4096, null);
+        cluster.upgradeDatanode(0);
         // ensure getPos is set to reflect existing size of the file
         assertTrue(stm.getPos() > 0);
         System.out.println("Writing " + (AppendTestUtil.FILE_SIZE - mid2) +
@@ -286,8 +290,10 @@ public class TestFileAppend2 {
       { // test appending to an non-existing file.
         FSDataOutputStream out = null;
         try {
+          cluster.upgradeDatanode(0);
           out = fs.append(new Path("/non-existing.dat"),
               EnumSet.of(CreateFlag.APPEND, CreateFlag.NEW_BLOCK), 4096, null);
+
           fail("Expected to have FileNotFoundException");
         } catch(java.io.FileNotFoundException fnfe) {
           System.out.println("Good: got " + fnfe);
@@ -353,6 +359,7 @@ public class TestFileAppend2 {
         // try append, should fail
         out = null;
         try {
+          cluster.upgradeDatanode(0);
           out = fs.append(foo,
               EnumSet.of(CreateFlag.APPEND, CreateFlag.NEW_BLOCK), 4096, null);
           fail("Expected to have AccessControlException");
@@ -374,10 +381,10 @@ public class TestFileAppend2 {
   //
   class Workload extends Thread {
     private final int id;
-    private final MiniDFSCluster cluster;
+    private final MiniDockerDFSCluster cluster;
     private final boolean appendToNewBlock;
 
-    Workload(MiniDFSCluster cluster, int threadIndex, boolean append2) {
+    Workload(MiniDockerDFSCluster cluster, int threadIndex, boolean append2) {
       id = threadIndex;
       this.cluster = cluster;
       this.appendToNewBlock = append2;
@@ -486,7 +493,7 @@ public class TestFileAppend2 {
     conf.setInt(HdfsClientConfigKeys.DFS_DATANODE_SOCKET_WRITE_TIMEOUT_KEY, 30000);
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -504,7 +511,7 @@ public class TestFileAppend2 {
         stm.close();
         testFiles.add(testFile);
       }
-
+      cluster.upgradeDatanode(0);
       // Create threads and make them run workload concurrently.
       workload = new Workload[numThreads];
       for (int i = 0; i < numThreads; i++) {
@@ -550,7 +557,7 @@ public class TestFileAppend2 {
   @Test
   public void testAppendLessThanChecksumChunk() throws Exception {
     final byte[] buf = new byte[1024];
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster
         .Builder(new HdfsConfiguration()).numDataNodes(1).build();
     cluster.waitActive();
 
@@ -561,13 +568,14 @@ public class TestFileAppend2 {
 
       FSDataOutputStream out = fs.create(p);
       out.write(buf, 0, len1);
+      cluster.upgradeDatanode(0);
       out.close();
 
       out = fs.append(p);
       out.write(buf, 0, len2);
       // flush but leave open
       out.hflush();
-
+      cluster.upgradeDatanode(0);
       // read data to verify the replica's content and checksum are correct
       FSDataInputStream in = fs.open(p);
       final int length = in.read(0, buf, 0, len1 + len2);

@@ -63,7 +63,7 @@ public class TestStripedFileAppend {
   private static final int BLOCK_GROUP_SIZE = BLOCK_SIZE * NUM_DATA_BLOCKS;
   private static final Random RANDOM = new Random();
 
-  //private MiniDFSCluster cluster;
+  //private MiniDockerDFSCluster cluster;
   private MiniDockerDFSCluster cluster;
   private DistributedFileSystem dfs;
   private Path dir = new Path("/TestFileAppendStriped");
@@ -72,7 +72,7 @@ public class TestStripedFileAppend {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    //cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
+    //cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
     cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
@@ -98,6 +98,9 @@ public class TestStripedFileAppend {
         StripedFileTestUtil.generateBytes(BLOCK_GROUP_SIZE * totalSplit);
 
     Path file = new Path(dir, "testAppendToNewBlock");
+    for (int i = 0; i < NUM_DN; i++) {
+      cluster.upgradeDatanode(i);
+    }
     FSDataOutputStream out;
     for (int split = 0; split < totalSplit; split++) {
       if (split == 0) {
@@ -112,7 +115,6 @@ public class TestStripedFileAppend {
       out.close();
     }
     expected = Arrays.copyOf(expected, fileLength);
-    cluster.upgradeDatanode(0);
     LocatedBlocks lbs =
         dfs.getClient().getLocatedBlocks(file.toString(), 0L, Long.MAX_VALUE);
     assertEquals(totalSplit, lbs.getLocatedBlocks().size());

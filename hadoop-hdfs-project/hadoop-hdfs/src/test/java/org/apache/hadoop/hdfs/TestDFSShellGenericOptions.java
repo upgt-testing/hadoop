@@ -36,16 +36,19 @@ public class TestDFSShellGenericOptions {
   @Test
   public void testDFSCommand() throws IOException {
     String namenode = null;
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       namenode = FileSystem.getDefaultUri(conf).toString();
       String [] args = new String[4];
       args[2] = "-mkdir";
       args[3] = "/data";
+      cluster.upgradeDatanode(0);
       testFsOption(args, namenode);
+      cluster.upgradeDatanode(0);
       testConfOption(args, namenode);
+      cluster.upgradeDatanode(0);
       testPropertyOption(args, namenode);
     } finally {
       if (cluster != null) { cluster.shutdown(); }

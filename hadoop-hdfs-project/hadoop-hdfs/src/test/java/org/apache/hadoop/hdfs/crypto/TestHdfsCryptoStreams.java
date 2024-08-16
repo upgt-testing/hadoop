@@ -30,7 +30,7 @@ import org.apache.hadoop.fs.crypto.CryptoFSDataInputStream;
 import org.apache.hadoop.fs.crypto.CryptoFSDataOutputStream;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
-  //private static MiniDFSCluster dfsCluster;
+  //private static MiniDockerDFSCluster dfsCluster;
     private static MiniDockerDFSCluster dfsCluster;
   private static FileSystem fs;
   private static int pathCount = 0;
@@ -48,7 +48,7 @@ public class TestHdfsCryptoStreams extends CryptoStreamsTestBase {
   @BeforeClass
   public static void init() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    //dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    //dfsCluster = new MiniDockerDFSCluster.Builder(conf).build();
     dfsCluster = new MiniDockerDFSCluster.Builder(conf).build();
     dfsCluster.waitClusterUp();
     fs = dfsCluster.getFileSystem();

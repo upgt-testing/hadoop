@@ -42,7 +42,7 @@ import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.util.ToolRunner;
 
 public class TestSnapshotFileLength {
@@ -52,7 +52,7 @@ public class TestSnapshotFileLength {
   private static final int BLOCKSIZE = 1024;
 
   private static final Configuration conf = new Configuration();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem hdfs;
 
   private final Path dir = new Path("/TestSnapshotFileLength");
@@ -64,7 +64,7 @@ public class TestSnapshotFileLength {
   public void setUp() throws Exception {
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, BLOCKSIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
                                               .build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
@@ -98,6 +98,7 @@ public class TestSnapshotFileLength {
     // Create and write a file.
     Path file1 = new Path(sub, file1Name);
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, 0, BLOCKSIZE, REPLICATION, SEED);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.appendFile(hdfs, file1, origLen);
 
     // Create a snapshot on the parent directory.
@@ -128,6 +129,7 @@ public class TestSnapshotFileLength {
         hdfs.getFileChecksum(file1snap1), is(snapChksum1));
     try {
       AppendTestUtil.write(out, 0, toAppend);
+      cluster.upgradeDatanode(0);
       out.hflush();
       // Test reading from snapshot of file that is open for append
       byte[] dataFromSnapshot = DFSTestUtil.readFileBuffer(hdfs, file1snap1);
@@ -159,6 +161,7 @@ public class TestSnapshotFileLength {
 
     // Make sure we can only read up to the snapshot length.
     bytesRead = fis.read(0, buffer, 0, buffer.length);
+    cluster.upgradeDatanode(0);
     assertThat(bytesRead, is(origLen));
     fis.close();
 
@@ -203,6 +206,7 @@ public class TestSnapshotFileLength {
     Path file1snap1 =
         SnapshotTestHelper.getSnapshotPath(sub, snapshot1, file1Name);
     fis = hdfs.open(file1snap1);
+    cluster.upgradeDatanode(0);
     fileStatus = hdfs.getFileStatus(file1snap1);
     assertEquals(fileStatus.getLen(), BLOCKSIZE);
     // Make sure we can only read up to the snapshot length.
@@ -220,6 +224,7 @@ public class TestSnapshotFileLength {
     try {
       ToolRunner.run(conf, shell, new String[] { "-cat",
       "/TestSnapshotFileLength/sub1/.snapshot/snapshot1/file1" });
+      cluster.upgradeDatanode(0);
       assertEquals("Unexpected # bytes from -cat", BLOCKSIZE, bao.size());
     } finally {
       System.setOut(outBackup);

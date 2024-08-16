@@ -40,7 +40,7 @@ public class TestAppendDifferentChecksum {
 
   // run the randomized test for 5 seconds
   private static final long RANDOM_TEST_RUNTIME = 5000;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static FileSystem fs; 
   
 
@@ -49,7 +49,7 @@ public class TestAppendDifferentChecksum {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
     conf.set("fs.hdfs.impl.disable.cache", "true");
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(1)
       .build();
     fs = cluster.getFileSystem();
@@ -74,6 +74,7 @@ public class TestAppendDifferentChecksum {
     FileSystem fsWithBigChunk = createFsWithChecksum("CRC32", 1024);
     Path p = new Path("/testSwitchChunkSize");
     appendWithTwoFs(p, fsWithSmallChunk, fsWithBigChunk);
+    cluster.upgradeDatanode(0);
     AppendTestUtil.check(fsWithSmallChunk, p, SEGMENT_LENGTH * 2);
     AppendTestUtil.check(fsWithBigChunk, p, SEGMENT_LENGTH * 2);
   }
@@ -85,6 +86,7 @@ public class TestAppendDifferentChecksum {
   @Test
   public void testSwitchAlgorithms() throws IOException {
     FileSystem fsWithCrc32 = createFsWithChecksum("CRC32", 512);
+    cluster.upgradeDatanode(0);
     FileSystem fsWithCrc32C = createFsWithChecksum("CRC32C", 512);
     
     Path p = new Path("/testSwitchAlgorithms");
@@ -112,7 +114,7 @@ public class TestAppendDifferentChecksum {
     
     // Create empty to start
     IOUtils.closeStream(fsWithCrc32.create(p));
-    
+
     long st = Time.now();
     int len = 0;
     while (Time.now() - st < RANDOM_TEST_RUNTIME) {
@@ -126,7 +128,7 @@ public class TestAppendDifferentChecksum {
       }
       len += thisLen;
     }
-    
+    cluster.upgradeDatanode(0);
     AppendTestUtil.check(fsWithCrc32, p, len);
     AppendTestUtil.check(fsWithCrc32C, p, len);
   }

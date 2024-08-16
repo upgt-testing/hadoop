@@ -20,7 +20,7 @@ package org.apache.hadoop.hdfs.server.namenode.snapshot;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,7 +39,7 @@ public class TestRenameWithOrderedSnapshotDeletion {
   private final Path snapshottableDir
       = new Path("/" + getClass().getSimpleName());
   private DistributedFileSystem hdfs;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   @Before
   public void setUp() throws Exception {
@@ -47,7 +47,7 @@ public class TestRenameWithOrderedSnapshotDeletion {
     conf.setBoolean(DFS_NAMENODE_SNAPSHOT_DELETION_ORDERED, true);
     conf.setBoolean(DFS_NAMENODE_SNAPSHOT_TRASHROOT_ENABLED, true);
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
   }
@@ -75,6 +75,7 @@ public class TestRenameWithOrderedSnapshotDeletion {
     hdfs.mkdirs(dir2);
     hdfs.mkdirs(sub0);
     DFSTestUtil.createFile(hdfs, file1, 0, (short) 1, 0);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.createFile(hdfs, file2, 0, (short) 1, 0);
     hdfs.allowSnapshot(snapshottableDir);
     // rename from non snapshottable dir to snapshottable dir should fail

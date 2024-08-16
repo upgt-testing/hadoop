@@ -41,7 +41,7 @@ public class TestFileCreationDelete {
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
     // create cluster
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = null;
     try {
       cluster.waitActive();
@@ -55,6 +55,7 @@ public class TestFileCreationDelete {
           + "Created file " + file1);
       TestFileCreation.writeFile(stm1, 1000);
       stm1.hflush();
+      cluster.upgradeDatanode(0);
 
       // create file2.
       Path file2 = new Path("/file2");
@@ -62,6 +63,7 @@ public class TestFileCreationDelete {
       System.out.println("testFileCreationDeleteParent: "
           + "Created file " + file2);
       TestFileCreation.writeFile(stm2, 1000);
+      cluster.upgradeDatanode(0);
       stm2.hflush();
 
       // rm dir
@@ -71,17 +73,17 @@ public class TestFileCreationDelete {
       // This ensures that leases are persisted in fsimage.
       cluster.shutdown();
       try {Thread.sleep(2*MAX_IDLE_TIME);} catch (InterruptedException e) {}
-      cluster = new MiniDFSCluster.Builder(conf).format(false).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).format(false).build();
       cluster.waitActive();
 
       // restart cluster yet again. This triggers the code to read in
       // persistent leases from fsimage.
       cluster.shutdown();
       try {Thread.sleep(5000);} catch (InterruptedException e) {}
-      cluster = new MiniDFSCluster.Builder(conf).format(false).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).format(false).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
-
+      cluster.upgradeDatanode(0);
       assertTrue(!fs.exists(file1));
       assertTrue(fs.exists(file2));
     } finally {

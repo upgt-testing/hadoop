@@ -21,7 +21,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_TXNS_
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -33,7 +33,7 @@ import java.lang.management.ManagementFactory;
 
 public class TestSecondaryWebUi {
   
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static SecondaryNameNode snn;
   private static final Configuration conf = new Configuration();
   
@@ -42,7 +42,7 @@ public class TestSecondaryWebUi {
     conf.set(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,
         "0.0.0.0:0");
     conf.setLong(DFS_NAMENODE_CHECKPOINT_TXNS_KEY, 500);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
         .build();
     cluster.waitActive();
     
@@ -67,7 +67,7 @@ public class TestSecondaryWebUi {
     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
     ObjectName mxbeanName = new ObjectName(
             "Hadoop:service=SecondaryNameNode,name=SecondaryNameNodeInfo");
-
+    cluster.upgradeDatanode(0);
     String[] checkpointDir = (String[]) mbs.getAttribute(mxbeanName,
             "CheckpointDirectories");
     Assert.assertArrayEquals(checkpointDir, snn.getCheckpointDirectories());

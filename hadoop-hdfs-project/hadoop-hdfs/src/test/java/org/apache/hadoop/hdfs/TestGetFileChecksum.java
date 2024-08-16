@@ -35,14 +35,14 @@ public class TestGetFileChecksum {
   private static final short REPLICATION = 3;
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem dfs;
 
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
@@ -66,7 +66,7 @@ public class TestGetFileChecksum {
       DFSTestUtil.appendFile(dfs, foo, appendLength);
       fc[i + 1] = dfs.getFileChecksum(foo);
     }
-
+    cluster.upgradeDatanode(0);
     for (int i = 0; i < appendRounds + 1; i++) {
       FileChecksum checksum = dfs.getFileChecksum(foo, appendLength * (i+1));
       Assert.assertTrue(checksum.equals(fc[i]));
@@ -78,6 +78,7 @@ public class TestGetFileChecksum {
     try {
       FSDataOutputStream file = dfs.create(new Path("/testFile"));
       file.write("Performance Testing".getBytes());
+      cluster.upgradeDatanode(0);
       dfs.getFileChecksum(new Path("/testFile"));
       fail("getFileChecksum should fail for files "
           + "with blocks under construction");

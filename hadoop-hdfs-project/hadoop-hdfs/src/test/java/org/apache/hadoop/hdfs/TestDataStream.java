@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestDataStream {
-  static MiniDFSCluster cluster;
+  static MiniDockerDFSCluster cluster;
   static int PACKET_SIZE = 1024;
 
   @BeforeClass
@@ -43,7 +43,7 @@ public class TestDataStream {
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SLOW_IO_WARNING_THRESHOLD_KEY,
         10000);
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 60000);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
   }
 
   @Test(timeout = 60000)
@@ -70,8 +70,8 @@ public class TestDataStream {
     
     //Wait for capturing logs in busy cluster
     Thread.sleep(5 * 1000);
-
     out.close();
+    cluster.upgradeDatanode(0);
     logs.stopCapturing();
     GenericTestUtils.assertDoesNotMatch(logs.getOutput(),
         "Slow ReadProcessor read fields for block");

@@ -58,14 +58,14 @@ public class TestHdfsAdmin {
   private static final int SIZE = 128;
   private static final int OPEN_FILES_BATCH_SIZE = 5;
   private final Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   @Before
   public void setUpCluster() throws IOException {
     conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_LIST_OPENFILES_NUM_RESPONSES,
         OPEN_FILES_BATCH_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
   }
   
@@ -94,7 +94,7 @@ public class TestHdfsAdmin {
       dfsAdmin.setSpaceQuota(TEST_PATH, 10);
       assertEquals(-1, fs.getContentSummary(TEST_PATH).getQuota());
       assertEquals(10, fs.getContentSummary(TEST_PATH).getSpaceQuota());
-      
+      cluster.upgradeDatanode(0);
       dfsAdmin.setQuota(TEST_PATH, 10);
       assertEquals(10, fs.getContentSummary(TEST_PATH).getQuota());
       assertEquals(10, fs.getContentSummary(TEST_PATH).getSpaceQuota());
@@ -145,7 +145,7 @@ public class TestHdfsAdmin {
     hdfsAdmin.setStoragePolicy(foo, warm.getName());
     hdfsAdmin.setStoragePolicy(bar, cold.getName());
     hdfsAdmin.setStoragePolicy(wow, hot.getName());
-
+    cluster.upgradeDatanode(0);
     /*
      * test: get storage policy after set
      */
@@ -166,7 +166,7 @@ public class TestHdfsAdmin {
     assertEquals(hdfsAdmin.getStoragePolicy(foo), hot);
     assertEquals(hdfsAdmin.getStoragePolicy(bar), hot);
     assertEquals(hdfsAdmin.getStoragePolicy(wow), hot);
-
+    cluster.upgradeDatanode(0);
     /*
      * test: get all storage policies
      */
@@ -209,10 +209,10 @@ public class TestHdfsAdmin {
     conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
         getKeyProviderURI());
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
     hdfsAdmin = new HdfsAdmin(FileSystem.getDefaultUri(conf), conf);
-
+    cluster.upgradeDatanode(0);
     Assert.assertNotNull("should not return null for an encrypted cluster",
         hdfsAdmin.getKeyProvider());
   }
@@ -231,6 +231,7 @@ public class TestHdfsAdmin {
       DFSTestUtil.createFile(fs, filePath, SIZE, REPL, 0);
       closedFileSet.add(filePath);
     }
+    cluster.upgradeDatanode(0);
     verifyOpenFiles(closedFileSet, openFileMap);
     // Verify again with the old listOpenFiles(EnumSet<>) API
     // Just to verify old API's validity
@@ -247,7 +248,7 @@ public class TestHdfsAdmin {
     openFileMap.putAll(
         DFSTestUtil.createOpenFiles(fs, "open-file-2", 10));
     verifyOpenFiles(closedFileSet, openFileMap);
-
+    cluster.upgradeDatanode(0);
     while(openFileMap.size() > 0) {
       closedFileSet.addAll(DFSTestUtil.closeOpenFiles(openFileMap, 1));
       verifyOpenFiles(closedFileSet, openFileMap);

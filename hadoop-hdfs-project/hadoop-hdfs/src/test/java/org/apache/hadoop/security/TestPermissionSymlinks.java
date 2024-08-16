@@ -44,7 +44,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,7 +66,7 @@ public class TestPermissionSymlinks {
   private static final Path link = new Path(linkParent, "link");
   private static final Path target = new Path(targetParent, "target");
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static FileSystem fs;
   private static FileSystemTestWrapper wrapper;
   
@@ -75,7 +75,7 @@ public class TestPermissionSymlinks {
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     conf.set(FsPermission.UMASK_LABEL, "000");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     wrapper = new FileSystemTestWrapper(fs);
@@ -150,6 +150,7 @@ public class TestPermissionSymlinks {
       user.doAs(new PrivilegedExceptionAction<Object>() {
         @Override
         public Object run() throws IOException {
+          cluster.upgradeDatanode(0);
           FileContext myfc = FileContext.getFileContext(conf);
           myfc.delete(link, false);
           return null;
@@ -168,6 +169,7 @@ public class TestPermissionSymlinks {
       @Override
       public Object run() throws IOException {
         FileContext myfc = FileContext.getFileContext(conf);
+        cluster.upgradeDatanode(0);
         myfc.delete(link, false);
         return null;
       }
@@ -202,6 +204,7 @@ public class TestPermissionSymlinks {
         public Object run() throws IOException {
           FileContext myfc = FileContext.getFileContext(conf);
           myfc.open(link).read();
+          cluster.upgradeDatanode(0);
           return null;
         }
       });
@@ -238,6 +241,7 @@ public class TestPermissionSymlinks {
         assertEquals("Expected link's FileStatus path to match link!",
             link.makeQualified(fs.getUri(), fs.getWorkingDirectory()), stat.getPath());
         Path linkTarget = myfc.getLinkTarget(link);
+        cluster.upgradeDatanode(0);
         assertEquals("Expected link's target to match target!",
             target, linkTarget);
         return null;
@@ -275,6 +279,7 @@ public class TestPermissionSymlinks {
         // First FileContext
         FileContext myfc = FileContext.getFileContext(conf);
         Path newlink = new Path(linkParent, "newlink");
+        cluster.upgradeDatanode(0);
         myfc.rename(link, newlink, Rename.NONE);
         Path linkTarget = myfc.getLinkTarget(newlink);
         assertEquals("Expected link's target to match target!",
@@ -310,6 +315,7 @@ public class TestPermissionSymlinks {
           FileContext myfc = FileContext.getFileContext(conf);
           Path newlink = new Path(targetParent, "newlink");
           myfc.rename(link, newlink, Rename.NONE);
+          cluster.upgradeDatanode(0);
           return null;
         }
       });
@@ -351,6 +357,7 @@ public class TestPermissionSymlinks {
       public Object run() throws IOException {
         // First FileContext
         FileSystem myfs = FileSystem.get(conf);
+        cluster.upgradeDatanode(0);
         Path newlink = new Path(linkParent, "newlink");
         myfs.rename(link, newlink);
         Path linkTarget = myfs.getLinkTarget(newlink);
@@ -385,6 +392,7 @@ public class TestPermissionSymlinks {
         @Override
         public Object run() throws IOException {
           FileSystem myfs = FileSystem.get(conf);
+          cluster.upgradeDatanode(0);
           Path newlink = new Path(targetParent, "newlink");
           myfs.rename(link, newlink);
           return null;
@@ -414,6 +422,7 @@ public class TestPermissionSymlinks {
     // Path to targetChild via symlink
     myfc.access(link, FsAction.WRITE);
     try {
+      cluster.upgradeDatanode(0);
       myfc.access(link, FsAction.ALL);
       fail("The access call should have failed.");
     } catch (AccessControlException e) {

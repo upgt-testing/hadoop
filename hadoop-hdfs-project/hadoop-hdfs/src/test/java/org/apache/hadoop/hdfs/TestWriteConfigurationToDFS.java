@@ -36,7 +36,7 @@ public class TestWriteConfigurationToDFS {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
     System.out.println("Setting conf in: " + System.identityHashCode(conf));
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     FileSystem fs = null;
     OutputStream os = null;
     try {
@@ -48,6 +48,7 @@ public class TestWriteConfigurationToDFS {
         longString.append("hello");
       } // 500KB
       conf.set("foobar", longString.toString());
+      cluster.upgradeDatanode(0);
       conf.writeXml(os);
       os.close();
       os = null;

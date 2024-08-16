@@ -96,7 +96,7 @@ public class TestRead {
     try {
       final Configuration conf = testContext.newConfiguration();
       conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-      //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
       //    .format(true).build();
       MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
               .format(true).build();
@@ -113,7 +113,7 @@ public class TestRead {
   public void testEOFWithRemoteBlockReader() throws Exception {
     final Configuration conf = new Configuration();
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
     //    .format(true).build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
             .format(true).build();
@@ -131,7 +131,7 @@ public class TestRead {
   @Test(timeout=60000)
   public void testReadReservedPath() throws Exception {
     Configuration conf = new Configuration();
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).
     //    numDataNodes(1).format(true).build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
             .numDataNodes(1).format(true).build();
@@ -153,7 +153,7 @@ public class TestRead {
     conf.set(DFSConfigKeys.DFS_DATANODE_FSDATASET_FACTORY_KEY,
         DelayedSimulatedFSDataset.Factory.class.getName());
 
-    //final MiniDFSCluster cluster = new MiniDFSCluster
+    //final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster
     //    .Builder(conf).numDataNodes(1).build();
     final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster
             .Builder(conf).numDataNodes(1).build();
@@ -317,7 +317,7 @@ public class TestRead {
       }
     }).when(injector).fetchFromDatanodeException();
 
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).format(true).build();
     DistributedFileSystem fileSys = cluster.getFileSystem();
     DFSClient dfsClient = fileSys.getClient();

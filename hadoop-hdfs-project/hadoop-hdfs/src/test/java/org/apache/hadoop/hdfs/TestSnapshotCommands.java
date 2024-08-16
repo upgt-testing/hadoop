@@ -39,14 +39,14 @@ import org.junit.Test;
 public class TestSnapshotCommands {
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem fs;
   
   @BeforeClass
   public static void clusterSetUp() throws IOException {
     conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_MAX_LIMIT, 3);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
   }
@@ -90,6 +90,7 @@ public class TestSnapshotCommands {
         "Allowing snapshot " + "on /sub1 succeeded", conf);
     // allow normal dir success
     DFSTestUtil.FsShellRun("-mkdir /sub2", conf);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.DFSAdminRun("-allowSnapshot /sub2", 0,
         "Allowing snapshot " + "on /sub2 succeeded", conf);
     // allow non-exists dir failed
@@ -110,6 +111,7 @@ public class TestSnapshotCommands {
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot", 0, "/sub1/.snapshot/sn0", conf);
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot", 0, "/sub1/.snapshot/sn1", conf);
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot/sn0", 0, "/sub1/.snapshot/sn0/sub1sub1", conf);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot/sn0", 0, "/sub1/.snapshot/sn0/sub1sub2", conf);
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot/sn1", 0, "/sub1/.snapshot/sn1/sub1sub1", conf);
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot/sn1", 0, "/sub1/.snapshot/sn1/sub1sub3", conf);
@@ -123,6 +125,7 @@ public class TestSnapshotCommands {
     // test createSnapshot
     DFSTestUtil.FsShellRun("-createSnapshot /sub3 sn0", 0,
         "Created snapshot /sub3/.snapshot/sn0", conf);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.FsShellRun("-createSnapshot /sub3 sn1", 0,
         "Created snapshot /sub3/.snapshot/sn1", conf);
     DFSTestUtil.FsShellRun("-createSnapshot /sub3 sn2", 0,
@@ -139,6 +142,7 @@ public class TestSnapshotCommands {
     DFSTestUtil.FsShellRun("-mkdir /.snapshot", 1, "File exists", conf);
     DFSTestUtil.FsShellRun("-mkdir /sub1/.snapshot", 1, "File exists", conf);
     // mkdir -p ignore reserved name check if dir already exists
+    cluster.upgradeDatanode(0);
     DFSTestUtil.FsShellRun("-mkdir -p /sub1/.snapshot", conf);
     DFSTestUtil.FsShellRun("-mkdir -p /sub1/sub1sub1/.snapshot", 1, "mkdir: \".snapshot\" is a reserved name.", conf);
   }
@@ -152,6 +156,7 @@ public class TestSnapshotCommands {
     DFSTestUtil.FsShellRun("-ls /sub1/.snapshot/sn.rename", 0, "/sub1/.snapshot/sn.rename/sub1sub2", conf);
 
     //try renaming from a non-existing snapshot
+    cluster.upgradeDatanode(0);
     DFSTestUtil.FsShellRun("-renameSnapshot /sub1 sn.nonexist sn.rename", 1,
         "renameSnapshot: The snapshot sn.nonexist does not exist for directory /sub1", conf);
 
@@ -172,6 +177,7 @@ public class TestSnapshotCommands {
   public void testDeleteSnapshot() throws Exception {
     DFSTestUtil.FsShellRun("-createSnapshot /sub1 sn1", conf);
     DFSTestUtil.FsShellRun("-deleteSnapshot /sub1 sn1", conf);
+    cluster.upgradeDatanode(0);
     DFSTestUtil.FsShellRun("-deleteSnapshot /sub1 sn1", 1,
         "deleteSnapshot: Cannot delete snapshot sn1 from path /sub1: the snapshot does not exist.", conf);
   }
@@ -187,6 +193,7 @@ public class TestSnapshotCommands {
     DFSTestUtil.DFSAdminRun("-disallowSnapshot /sub1", 0,
         "Disallowing snapshot on /sub1 succeeded", conf);
     // Idempotent test
+    cluster.upgradeDatanode(0);
     DFSTestUtil.DFSAdminRun("-disallowSnapshot /sub1", 0,
         "Disallowing snapshot on /sub1 succeeded", conf);
     // now it can be deleted
@@ -211,6 +218,7 @@ public class TestSnapshotCommands {
         .createFile(fs, new Path(fs.getUri() + "/Fully/QPath/File2"), 1024,
             (short) 1, 100);
     DFSTestUtil.FsShellRun("-createSnapshot " + path + " sn2", config);
+    cluster.upgradeDatanode(0);
     // verify the snapshotdiff using api and command line
     SnapshotDiffReport report =
         fs.getSnapshotDiffReport(new Path(path), "sn1", "sn2");
@@ -243,6 +251,7 @@ public class TestSnapshotCommands {
     DFSTestUtil.FsShellRun("-createSnapshot " + snapDirPath + " sn2", config);
 
     // verify the snapshot diff using api and command line
+    cluster.upgradeDatanode(0);
     SnapshotDiffReport report_s1_s2 =
         fs.getSnapshotDiffReport(snapDirPath, "sn1", "sn2");
     DFSTestUtil.toolRun(new SnapshotDiff(config), snapDir +

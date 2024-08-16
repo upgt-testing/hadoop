@@ -37,7 +37,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.web.resources.ExceptionHandler;
 import org.apache.hadoop.hdfs.web.resources.GetOpParam;
 import org.apache.hadoop.hdfs.web.resources.HttpOpParam;
@@ -55,7 +55,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
     GenericTestUtils.setLogLevel(ExceptionHandler.LOG, Level.TRACE);
   }
 
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
   private static Path defaultWorkingDirectory;
   private static FileSystem fileSystem;
   
@@ -73,7 +73,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
     final Configuration conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
       cluster.waitActive();
 
       //change root permission to 777
@@ -128,6 +128,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
     Assert.assertTrue(exists(fSys, catPath));
 
     fSys.concat(catPath, paths);
+    cluster.upgradeDatanode(0);
 
     Assert.assertFalse(exists(fSys, paths[0]));
     Assert.assertFalse(exists(fSys, paths[1]));
@@ -149,6 +150,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
     createFile(fSys, file, data, blockSize, repl);
 
     final int newLength = blockSize;
+    cluster.upgradeDatanode(0);
 
     boolean isReady = fSys.truncate(file, newLength);
 
@@ -194,6 +196,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
     };
     final HttpURLConnection spyConn = spy(conn);
     doReturn(myIn).when(spyConn).getInputStream();
+    cluster.upgradeDatanode(0);
 
     try {
       Assert.assertFalse(closedInputStream);
@@ -223,6 +226,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
       // expected
     }
     try {
+      cluster.upgradeDatanode(0);
       Assert.assertFalse(exists(fSys, testSubDir));
     } catch(AccessControlException e) {
       // also okay for HDFS.

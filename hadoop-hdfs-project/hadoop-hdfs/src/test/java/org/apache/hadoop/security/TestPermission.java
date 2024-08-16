@@ -42,7 +42,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.util.StringUtils;
 import org.junit.Test;
 
@@ -138,11 +138,11 @@ public class TestPermission {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
     conf.set(FsPermission.UMASK_LABEL, "000");
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
       fs = FileSystem.get(conf);
       FsPermission rootPerm = checkPermission(fs, "/", null);
@@ -154,6 +154,7 @@ public class TestPermission {
       checkPermission(fs, "/a1", dirPerm);
       checkPermission(fs, "/a1/a2", dirPerm);
       checkPermission(fs, "/a1/a2/a3", dirPerm);
+
 
       dirPerm = new FsPermission((short)0123);
       FsPermission permission = FsPermission.createImmutable(
@@ -175,6 +176,7 @@ public class TestPermission {
       checkPermission(fs, "/b1/b2/b3.txt", filePerm);
       
       conf.set(FsPermission.UMASK_LABEL, "022");
+      cluster.upgradeDatanode(0);
       permission = 
         FsPermission.createImmutable((short)0666);
       FileSystem.mkdirs(fs, new Path("/c1"), new FsPermission(permission));
@@ -200,7 +202,7 @@ public class TestPermission {
   public void testFilePermission() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     try {
@@ -214,7 +216,7 @@ public class TestPermission {
       catch(java.io.FileNotFoundException e) {
         LOG.info("GOOD: got " + e);
       }
-      
+
       // make sure nn can take user specified permission (with default fs
       // permission umask applied)
       FSDataOutputStream out = nnfs.create(CHILD_FILE1, new FsPermission(
@@ -234,6 +236,7 @@ public class TestPermission {
       assertTrue(status.getPermission().toString().equals("rw-r--r--"));
       byte data[] = new byte[FILE_LEN];
       RAN.nextBytes(data);
+      cluster.upgradeDatanode(0);
       out.write(data);
       out.close();
       nnfs.setPermission(CHILD_FILE1, new FsPermission("700"));

@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.SafeModeAction;
 import org.apache.hadoop.fs.XAttrSetFlag;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -42,7 +42,7 @@ import org.junit.Test;
  */
 public class TestFSImageWithXAttr {
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   
   //xattrs
   private static final String name1 = "user.a1";
@@ -57,7 +57,7 @@ public class TestFSImageWithXAttr {
   public static void setUp() throws IOException {
     conf = new Configuration();
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_XATTRS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
   }
 
@@ -88,6 +88,7 @@ public class TestFSImageWithXAttr {
     fs.setXAttr(path, name1, newValue1, EnumSet.of(XAttrSetFlag.REPLACE));
     
     restart(fs, persistNamespace);
+    cluster.upgradeDatanode(0);
     
     xattrs = fs.getXAttrs(path);
     Assert.assertEquals(xattrs.size(), 3);

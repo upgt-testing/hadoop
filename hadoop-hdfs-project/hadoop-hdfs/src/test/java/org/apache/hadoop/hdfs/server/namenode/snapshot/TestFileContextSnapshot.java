@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.SnapshotException;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
@@ -41,7 +41,7 @@ public class TestFileContextSnapshot {
   private static final int BLOCKSIZE = 1024;
   private static final long SEED = 0;
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileContext fileContext;
   private DistributedFileSystem dfs;
 
@@ -53,7 +53,7 @@ public class TestFileContextSnapshot {
   public void setUp() throws Exception {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
 
@@ -85,6 +85,7 @@ public class TestFileContextSnapshot {
 
     // allow snapshot on dir
     dfs.allowSnapshot(snapRootPath);
+    cluster.upgradeDatanode(0);
     Path ssPath = fileContext.createSnapshot(snapRootPath, "s1");
     assertTrue("Failed to create snapshot", dfs.exists(ssPath));
     fileContext.deleteSnapshot(snapRootPath, "s1");
@@ -110,7 +111,7 @@ public class TestFileContextSnapshot {
     assertFalse("Old snapshot still exists after rename!", dfs.exists(ssPath));
     Path snapshotRoot = SnapshotTestHelper.getSnapshotRoot(snapRootPath, "s2");
     ssPath = new Path(snapshotRoot, filePath.getName());
-
+    cluster.upgradeDatanode(0);
     // Instead, <sub1>/.snapshot/s2/file1 should exist
     assertTrue("Snapshot doesn't exists!", dfs.exists(ssPath));
     FileStatus statusAfterRename = dfs.getFileStatus(ssPath);

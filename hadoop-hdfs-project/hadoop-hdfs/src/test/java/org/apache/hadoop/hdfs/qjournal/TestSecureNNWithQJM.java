@@ -47,7 +47,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.http.HttpServer2;
 import org.apache.hadoop.io.IOUtils;
@@ -78,7 +78,7 @@ public class TestSecureNNWithQJM {
   private static String sslConfDir;
   private static MiniKdc kdc;
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private HdfsConfiguration conf;
   private FileSystem fs;
   private MiniJournalCluster mjc;
@@ -200,6 +200,7 @@ public class TestSecureNNWithQJM {
     restartNameNode();
 
     assertTrue(fs.exists(TEST_PATH));
+    cluster.upgradeDatanode(0);
     assertTrue(fs.mkdirs(TEST_PATH_2));
 
     // Restart the NN again and make sure both edits are persisted.
@@ -230,7 +231,7 @@ public class TestSecureNNWithQJM {
     mjc.waitActive();
     conf.set(DFS_NAMENODE_EDITS_DIR_KEY,
       mjc.getQuorumJournalURI("myjournal").toString());
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
       .build();
     cluster.waitActive();
     fs = cluster.getFileSystem();

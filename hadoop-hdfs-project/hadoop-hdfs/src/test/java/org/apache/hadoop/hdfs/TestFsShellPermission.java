@@ -35,7 +35,7 @@ import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
 
@@ -93,13 +93,14 @@ public class TestFsShellPermission {
     fs.delete(new Path(topdir), true);
   }
 
-  static String execCmd(FsShell shell, final String[] args) throws Exception {
+  static String execCmd(MiniDockerDFSCluster cluster, FsShell shell, final String[] args) throws Exception {
     ByteArrayOutputStream baout = new ByteArrayOutputStream();
     PrintStream out = new PrintStream(baout, true);
     PrintStream old = System.out;
     int ret;
     try {
       System.setOut(out);
+      cluster.upgradeDatanode(0);
       ret = shell.run(args);
       out.close();
     } finally {
@@ -143,7 +144,7 @@ public class TestFsShellPermission {
       userUgi = createUGI(doAsUser, doAsGroup);
     }
 
-    public void execute(Configuration conf, FileSystem fs) throws Exception {
+    public void execute(MiniDockerDFSCluster cluster, Configuration conf, FileSystem fs) throws Exception {
       fs.mkdirs(new Path(TEST_ROOT));
 
       createFiles(fs, TEST_ROOT, fileEntries);
@@ -156,7 +157,7 @@ public class TestFsShellPermission {
       final String[] cmdOpts = tmpArray.toArray(new String[tmpArray.size()]);
       userUgi.doAs(new PrivilegedExceptionAction<String>() {
         public String run() throws Exception {
-          return execCmd(fsShell, cmdOpts);
+          return execCmd(cluster, fsShell, cmdOpts);
         }
       });
 
@@ -243,11 +244,11 @@ public class TestFsShellPermission {
   @Test
   public void testDelete() throws Exception {
     Configuration conf = null;
-    //MiniDFSCluster cluster = null;
+    //MiniDockerDFSCluster cluster = null;
     MiniDockerDFSCluster cluster = null;
     try {
       conf = new Configuration();
-      //cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      //cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
       cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
 
       String nnUri = FileSystem.getDefaultUri(conf).toString();
@@ -259,7 +260,7 @@ public class TestFsShellPermission {
       ta.add(genRmrEmptyDirWithReadPerm());
       ta.add(genRmrEmptyDirWithNoPerm());
       ta.add(genRmrfEmptyDirWithNoPerm());
-      cluster.upgradeDatanode(0);
+      //cluster.upgradeDatanode(0);
       // Add non-empty dir tests
       ta.add(genRmrNonEmptyDirWithReadPerm());
       ta.add(genRmrNonEmptyDirWithNoPerm());
@@ -271,8 +272,8 @@ public class TestFsShellPermission {
 
       // Run all tests
       for(TestDeleteHelper t : ta) {
-        t.execute(conf,  fs);
-        cluster.upgradeDatanode(0);
+        t.execute(cluster, conf,  fs);
+        //cluster.upgradeDatanode(0);
       }
     } finally {
       if (cluster != null) { cluster.shutdown(); }

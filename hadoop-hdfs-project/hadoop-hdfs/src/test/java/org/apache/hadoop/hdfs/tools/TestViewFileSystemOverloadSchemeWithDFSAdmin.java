@@ -39,7 +39,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.viewfs.ViewFileSystemOverloadScheme;
 import org.apache.hadoop.fs.viewfs.ViewFsTestSetup;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.Lists;
 import org.apache.hadoop.util.ToolRunner;
@@ -56,7 +56,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private Configuration conf = null;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private URI defaultFSURI;
   private File localTargetDir;
   private static final String TEST_ROOT_DIR = PathUtils
@@ -69,7 +69,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
   private static final PrintStream OLD_ERR = System.err;
 
   /**
-   * Sets up the configurations and starts the MiniDFSCluster.
+   * Sets up the configurations and starts the MiniDockerDFSCluster.
    */
   @Before
   public void startCluster() throws IOException {
@@ -81,7 +81,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
     conf.set(String.format(
         FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
         HDFS_SCHEME), DistributedFileSystem.class.getName());
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
     defaultFSURI =
         URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
@@ -160,6 +160,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
     int ret = ToolRunner.run(dfsAdmin,
         new String[] {"-fs", defaultFSURI.toString(), "-safemode", "enter" });
     assertEquals(0, ret);
+    cluster.upgradeDatanode(0);
     redirectStream();
     ret = ToolRunner.run(dfsAdmin,
         new String[] {"-fs", defaultFSURI.toString(), "-saveNamespace" });
@@ -189,6 +190,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
     ret = ToolRunner.run(dfsAdmin, new String[] {"-saveNamespace" });
     assertOutMsg("Save namespace successful", 0);
     assertEquals(0, ret);
+    cluster.upgradeDatanode(0);
     ret = ToolRunner.run(dfsAdmin, new String[] {"-safemode", "leave" });
     assertEquals(0, ret);
   }
@@ -205,6 +207,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
         new String[] {hdfsTargetPath.toUri().toString()}, conf);
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
     redirectStream();
+    cluster.upgradeDatanode(0);
     int ret = ToolRunner.run(dfsAdmin,
         new String[] {"-fs", wrongFsUri, "-safemode", "enter" });
     assertEquals(-1, ret);
@@ -216,6 +219,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
    */
   @Test
   public void testSafeModeShouldFailOnLocalTargetFS() throws Exception {
+    cluster.upgradeDatanode(0);
     addMountLinks(defaultFSURI.getHost(), new String[] {LOCAL_FOLDER },
         new String[] {localTargetDir.toURI().toString() }, conf);
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
@@ -239,6 +243,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
     try {
       redirectStream();
+      cluster.upgradeDatanode(0);
       int ret = ToolRunner.run(dfsAdmin,
           new String[] {"-fs", defaultFSURI.toString(), "-safemode", "get"});
       assertOutMsg("Safe mode is OFF", 0);
@@ -265,6 +270,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
         new String[] {"-fs", defaultFSURI.toString(), "-allowSnapshot", "/" });
     assertOutMsg("Allowing snapshot on / succeeded", 0);
     assertEquals(0, ret);
+    cluster.upgradeDatanode(0);
     ret = ToolRunner.run(dfsAdmin, new String[] {"-fs",
         defaultFSURI.toString(), "-disallowSnapshot", "/" });
     assertOutMsg("Disallowing snapshot on / succeeded", 1);
@@ -282,6 +288,7 @@ public class TestViewFileSystemOverloadSchemeWithDFSAdmin {
         new String[] {hdfsTargetPath.toUri().toString(),
             localTargetDir.toURI().toString() },
         conf);
+    cluster.upgradeDatanode(0);
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
     redirectStream();
     int ret = ToolRunner.run(dfsAdmin,

@@ -46,7 +46,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AppendTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.hdfs.web.resources.NamenodeAddressParam;
 import org.apache.hadoop.io.IOUtils;
@@ -59,14 +59,14 @@ import org.junit.Test;
 
 public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
   private static final Configuration conf = new Configuration();
-  private static final MiniDFSCluster cluster;
+  private static final MiniDockerDFSCluster cluster;
   private String defaultWorkingDirectory;
   
   private UserGroupInformation ugi;
 
   static {
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
       cluster.waitActive();
 
       //change root permission to 777
@@ -113,6 +113,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
     Path testSubDir = path("/test/hadoop/file/subdir");
     try {
       fs.mkdirs(testSubDir);
+      cluster.upgradeDatanode(0);
       fail("Should throw IOException.");
     } catch (IOException e) {
       // expected
@@ -143,6 +144,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
   public void testGetFileBlockLocations() throws IOException {
     final String f = "/test/testGetFileBlockLocations";
     createFile(path(f));
+    cluster.upgradeDatanode(0);
     final BlockLocation[] computed = fs.getFileBlockLocations(new Path(f), 0L, 1L);
     final BlockLocation[] expected = cluster.getFileSystem().getFileBlockLocations(
         new Path(f), 0L, 1L);
@@ -178,6 +180,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
     WebHdfsFileSystem.LOG.info("replaced = " + replaced);
 
     //connect with the replaced URL.
+    cluster.upgradeDatanode(0);
     final HttpURLConnection conn = (HttpURLConnection)replaced.openConnection();
     conn.setRequestMethod(op.getType().toString());
     conn.connect();
@@ -197,6 +200,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
     //open it as a file, should get FileNotFoundException 
     try {
       fs.open(p).read();
+      cluster.upgradeDatanode(0);
       fail("Expected FileNotFoundException was not thrown");
     } catch(FileNotFoundException fnfe) {
       WebHdfsFileSystem.LOG.info("This is expected.", fnfe);
@@ -223,6 +227,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
     new Random().nextBytes(mydata);
 
     final Path p = new Path(dir, "file");
+    cluster.upgradeDatanode(0);
     FSDataOutputStream out = fs.create(p, false, 4096, (short)3, 1L << 17);
     out.write(mydata, 0, mydata.length);
     out.close();
@@ -271,6 +276,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
 
     final WebHdfsFileSystem webhdfs = (WebHdfsFileSystem)fs;
     final URL url = webhdfs.toUrl(GetOpParam.Op.NULL, root);
+    cluster.upgradeDatanode(0);
     WebHdfsFileSystem.LOG.info("null url=" + url);
     Assert.assertTrue(url.toString().contains("v1"));
 
@@ -332,7 +338,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
       conn.setRequestMethod(op.getType().toString());
       conn.setDoOutput(op.getDoOutput());
       conn.setInstanceFollowRedirects(true);
-
+      cluster.upgradeDatanode(0);
       // Expect OK response and Content-Length header equal to actual length.
       assertEquals(HttpServletResponse.SC_OK, conn.getResponseCode());
       assertEquals(String.valueOf(content.length()), conn.getHeaderField(
@@ -378,6 +384,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
       content.length())), new OffsetParam(1L));
     HttpURLConnection conn = null;
     InputStream is = null;
+    cluster.upgradeDatanode(0);
     try {
       conn = (HttpURLConnection)url.openConnection();
       conn.setRequestMethod(op.getType().toString());
@@ -434,6 +441,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
     }
 
     {//test set owner with empty parameters
+      cluster.upgradeDatanode(0);
       final URL url = webhdfs.toUrl(PutOpParam.Op.SETOWNER, dir);
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.connect();
@@ -496,7 +504,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
       final int j = redirect.indexOf("&", i);
       String modified = redirect.substring(0, i - 1) + redirect.substring(j);
       WebHdfsFileSystem.LOG.info("modified = " + modified);
-
+      cluster.upgradeDatanode(0);
       //connect to datanode
       conn = (HttpURLConnection)new URL(modified).openConnection();
       conn.setRequestMethod(op.getType().toString());
@@ -587,6 +595,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
       conn.setDoOutput(op.getDoOutput());
       conn.connect();
       assertEquals(HttpServletResponse.SC_CREATED, conn.getResponseCode());
+      cluster.upgradeDatanode(0);
     }
   }
 
@@ -611,6 +620,7 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
 
       Path badPath = new Path("/bad");
       try {
+        cluster.upgradeDatanode(0);
         fs.access(badPath, FsAction.READ);
         fail("The access call should have failed");
       } catch (FileNotFoundException e) {

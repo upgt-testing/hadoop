@@ -32,7 +32,7 @@ public class TestClose {
   @Test
   public void testWriteAfterClose() throws IOException {
     Configuration conf = new Configuration();
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
     //        .build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)     // <-------- First modification
             .build();
@@ -44,13 +44,18 @@ public class TestClose {
       FileSystem fs = cluster.getFileSystem();
       OutputStream out = fs.create(new Path("/test"));
 
+      out.write(data);
+
       // The datanode index starts from 0
       cluster.upgradeDatanode(0);
 
-      out.write(data);
       out.close();
       try {
         // Should fail.
+
+        // The datanode index starts from 0
+        cluster.upgradeDatanode(0);
+
         out.write(data);
         fail("Should not have been able to write more data after file is closed.");
       } catch (ClosedChannelException cce) {

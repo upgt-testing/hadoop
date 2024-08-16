@@ -49,8 +49,8 @@ public class TestErasureCodingAddConfig {
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_EC_POLICIES_USERPOLICIES_ALLOWED_KEY,
         false);
-    //try (MiniDFSCluster cluster =
-    //    new MiniDFSCluster.Builder(conf).numDataNodes(0).build()) {
+    //try (MiniDockerDFSCluster cluster =
+    //    new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build()) {
     try (MiniDockerDFSCluster cluster =
         new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build()) {
       cluster.waitActive();
@@ -74,8 +74,8 @@ public class TestErasureCodingAddConfig {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_EC_POLICIES_USERPOLICIES_ALLOWED_KEY, true);
-    //try (MiniDFSCluster cluster =
-    //    new MiniDFSCluster.Builder(conf).numDataNodes(0).build()) {
+    //try (MiniDockerDFSCluster cluster =
+    //    new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build()) {
     try (MiniDockerDFSCluster cluster =
         new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build()) {
       DistributedFileSystem fs = cluster.getFileSystem();

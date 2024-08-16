@@ -55,7 +55,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
   public static final Logger LOG = LoggerFactory.getLogger(TestPermission.class);
 
   private HdfsConfiguration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem dfs;
 
   private String configKey;
@@ -97,7 +97,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
     conf.setBoolean(DFS_NAMENODE_SEND_QOP_ENABLED, true);
     conf.set(HADOOP_RPC_PROTECTION, this.configKey);
     cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     HdfsConfiguration clientConf = new HdfsConfiguration(conf);
@@ -128,6 +128,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
 
     LocatedBlock lb = client.namenode.addBlock(src, clientName, null, null,
         HdfsConstants.GRANDFATHER_INODE_ID, null, null);
+    cluster.upgradeDatanode(0);
     byte[] secret = lb.getBlockToken().decodeIdentifier().getHandshakeMsg();
     assertEquals(this.qopValue, new String(secret));
   }
@@ -149,7 +150,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
 
     LastBlockWithStatus lastBlock = client.namenode.append(src, clientName,
         new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND)));
-
+    cluster.upgradeDatanode(0);
     byte[] secret = lastBlock.getLastBlock().getBlockToken()
         .decodeIdentifier().getHandshakeMsg();
     assertEquals(this.qopValue, new String(secret));
@@ -164,6 +165,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
     // if the file is empty, there will be no blocks returned. Write something
     // so that getBlockLocations actually returns some block.
     out.write(0);
+    cluster.upgradeDatanode(0);
     out.close();
 
     FileStatus status = dfs.getFileStatus(path);

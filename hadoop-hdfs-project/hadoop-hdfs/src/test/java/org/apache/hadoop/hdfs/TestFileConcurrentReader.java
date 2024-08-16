@@ -73,7 +73,7 @@ public class TestFileConcurrentReader {
   private static final int DEFAULT_WRITE_SIZE = 1024 + 1;
   private static final int SMALL_WRITE_SIZE = 61;
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fileSystem;
 
 
@@ -95,7 +95,7 @@ public class TestFileConcurrentReader {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
     fileSystem = cluster.getFileSystem();
   }
@@ -163,7 +163,7 @@ public class TestFileConcurrentReader {
     // write partial block and sync
     int partialBlockSize = blockSize / 2;
     writeFileAndSync(stm, partialBlockSize);
-
+    cluster.upgradeDatanode(0);
     // Make sure a client can read it before it is closed
     checkCanRead(fileSystem, file1, partialBlockSize);
 
@@ -192,7 +192,7 @@ public class TestFileConcurrentReader {
     final int partialBlockSize = bytesPerChecksum - 1;
 
     writeFileAndSync(stm, partialBlockSize);
-
+    cluster.upgradeDatanode(0);
     // Make sure a client can read it before it is closed
     checkCanRead(fileSystem, file1, partialBlockSize);
 
@@ -269,6 +269,7 @@ public class TestFileConcurrentReader {
 
     try {
       writer.join();
+      cluster.upgradeDatanode(0);
       opener.join();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();

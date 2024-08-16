@@ -36,7 +36,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
 import org.apache.hadoop.io.Text;
@@ -123,7 +123,7 @@ public class TestDelegationTokenFetcher {
   @Test
   public void testDelegationTokenWithoutRenewerViaRPC() throws Exception {
     conf.setBoolean(DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0)
         .build();
     try {
       cluster.waitActive();
@@ -134,6 +134,7 @@ public class TestDelegationTokenFetcher {
       p = localFileSystem.makeQualified(p);
       DelegationTokenFetcher.saveDelegationToken(conf, fs, null, p);
       Credentials creds = Credentials.readTokenStorageFile(p, conf);
+      cluster.upgradeDatanode(0);
       Iterator<Token<?>> itr = creds.getAllTokens().iterator();
       assertTrue("token not exist error", itr.hasNext());
       final Token token = itr.next();
@@ -152,6 +153,7 @@ public class TestDelegationTokenFetcher {
           DelegationTokenFetcher.printTokensToString(conf, p, true));
 
       try {
+        cluster.upgradeDatanode(0);
         // Without renewer renewal of token should fail.
         DelegationTokenFetcher.renewTokens(conf, p);
         fail("Should have failed to renew");

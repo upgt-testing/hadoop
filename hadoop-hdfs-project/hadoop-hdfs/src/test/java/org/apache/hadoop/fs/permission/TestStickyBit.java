@@ -40,7 +40,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -60,7 +60,7 @@ public class TestStickyBit {
     UserGroupInformation.createUserForTesting("rose", new String[] {"powellestates"});
   static final Logger LOG = LoggerFactory.getLogger(TestStickyBit.class);
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
   private static FileSystem hdfs;
   private static FileSystem hdfsAsUser1;
@@ -75,7 +75,7 @@ public class TestStickyBit {
   }
 
   private static void initCluster(boolean format) throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(format)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(format)
       .build();
     hdfs = cluster.getFileSystem();
     assertTrue(hdfs instanceof DistributedFileSystem);
@@ -215,7 +215,7 @@ public class TestStickyBit {
 
     hdfs.mkdirs(p);
     confirmSettingAndGetting(hdfs, p, baseDir);
-
+    cluster.upgradeDatanode(0);
     baseDir = new Path("/tennant");
     hdfs.mkdirs(baseDir);
     p = new Path(baseDir, "contemporary");
@@ -260,7 +260,7 @@ public class TestStickyBit {
     hdfs.setPermission(p, new FsPermission((short) 01777));
     applyAcl(p);
     confirmDeletingFiles(conf, p);
-
+    cluster.upgradeDatanode(0);
     baseDir = new Path("/smith");
     hdfs.mkdirs(baseDir);
     p = new Path(baseDir, "scissorsisters");
@@ -296,6 +296,7 @@ public class TestStickyBit {
       applyAcl(tmpPath);
     }
     hdfs.setPermission(tmpPath2, new FsPermission((short) 01777));
+    cluster.upgradeDatanode(0);
     if (useAcl) {
       applyAcl(tmpPath2);
     }
@@ -341,7 +342,7 @@ public class TestStickyBit {
 
     assertTrue(hdfs.exists(sbSet));
     assertTrue(hdfs.getFileStatus(sbSet).getPermission().getStickyBit());
-
+    cluster.upgradeDatanode(0);
     assertTrue(hdfs.exists(sbNotSpecified));
     assertFalse(hdfs.getFileStatus(sbNotSpecified).getPermission()
         .getStickyBit());
@@ -381,6 +382,7 @@ public class TestStickyBit {
         hdfs.getFileStatus(sbOmittedTestDir).getPermission().getStickyBit());
 
     // Resetting sticky bit explicitly on sbExplicitTestDir and verification
+    cluster.upgradeDatanode(0);
     hdfs.setPermission(sbExplicitTestDir, new FsPermission((short) 00777));
     LOG.info("Dir: {}, permission: {}", sbExplicitTestDir.getName(),
             hdfs.getFileStatus(sbExplicitTestDir).getPermission());
@@ -419,7 +421,7 @@ public class TestStickyBit {
 
     assertTrue(hdfs.exists(sbSet));
     assertTrue(hdfs.getFileStatus(sbSet).getPermission().getStickyBit());
-
+    cluster.upgradeDatanode(0);
     assertTrue(hdfs.exists(sbNotSpecified));
     assertFalse(hdfs.getFileStatus(sbNotSpecified).getPermission()
         .getStickyBit());
@@ -442,7 +444,7 @@ public class TestStickyBit {
     // Create a file protected by sticky bit
     writeFile(hdfsAsUser1, file);
     hdfs.setPermission(file, new FsPermission((short) 0666));
-
+    cluster.upgradeDatanode(0);
     try {
       hdfsAsUser2.delete(tmp, true);
       fail("Non-owner can not delete a file protected by sticky bit"
@@ -473,6 +475,7 @@ public class TestStickyBit {
     hdfsAsUser1.setPermission(dir, new FsPermission((short) 0777));
 
     // Create a file in dir
+    cluster.upgradeDatanode(0);
     writeFile(hdfsAsUser1, file);
     hdfs.setPermission(file, new FsPermission((short) 0666));
 

@@ -118,7 +118,7 @@ public class TestSeekBug {
   @Test
   public void testSeekBugDFS() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       Path file1 = new Path("seektest.dat");
@@ -127,6 +127,7 @@ public class TestSeekBug {
           fileSys.getDefaultReplication(file1), seed);
       seekReadFile(fileSys, file1);
       smallReadSeek(fileSys, file1);
+      cluster.upgradeDatanode(0);
       cleanupFile(fileSys, file1);
     } finally {
       fileSys.close();
@@ -141,7 +142,7 @@ public class TestSeekBug {
   @Test (expected=IOException.class)
   public void testNegativeSeek() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       Path seekFile = new Path("seekboundaries.dat");
@@ -156,6 +157,7 @@ public class TestSeekBug {
       FSDataInputStream stream = fs.open(seekFile);
       // Perform "safe seek" (expected to pass)
       stream.seek(65536);
+      cluster.upgradeDatanode(0);
       assertEquals(65536, stream.getPos());
       // expect IOE for this call
       stream.seek(-73);
@@ -172,7 +174,7 @@ public class TestSeekBug {
   @Test (expected=IOException.class)
   public void testSeekPastFileSize() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       Path seekFile = new Path("seekboundaries.dat");
@@ -188,6 +190,7 @@ public class TestSeekBug {
       // Perform "safe seek" (expected to pass)
       stream.seek(65536);
       assertEquals(65536, stream.getPos());
+      cluster.upgradeDatanode(0);
       // expect IOE for this call
       stream.seek(ONEMB + ONEMB + ONEMB);
     } finally {

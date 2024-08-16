@@ -22,7 +22,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.ipc.RemoteException;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class TestSnapshotNameWithInvalidCharacters {
   private static final int BLOCKSIZE = 1024;
 
   private static final Configuration conf = new Configuration();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem hdfs;
 
   private final Path dir1 = new Path("/");
@@ -44,7 +44,7 @@ public class TestSnapshotNameWithInvalidCharacters {
 
   @Before
   public void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
                                               .build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
@@ -63,7 +63,7 @@ public class TestSnapshotNameWithInvalidCharacters {
 
     Path file1 = new Path(dir1,file1Name);
     DFSTestUtil.createFile(hdfs,file1, BLOCKSIZE,REPLICATION,SEED);
-
+    cluster.upgradeDatanode(0);
     hdfs.allowSnapshot(dir1);
     try {
         hdfs.createSnapshot(dir1, snapshot1);
@@ -77,6 +77,7 @@ public class TestSnapshotNameWithInvalidCharacters {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, SEED);
 
     hdfs.allowSnapshot(dir1);
+    cluster.upgradeDatanode(0);
     try {
         hdfs.createSnapshot(dir1, snapshot2);
     } catch (RemoteException e) {

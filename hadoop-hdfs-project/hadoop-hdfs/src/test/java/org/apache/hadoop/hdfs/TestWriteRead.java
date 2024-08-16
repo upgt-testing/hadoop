@@ -52,7 +52,7 @@ public class TestWriteRead {
   int chunkSizeOption = 10000;
   int loopOption = 10;
 
-  //private MiniDFSCluster cluster;
+  //private MiniDockerDFSCluster cluster;
   private MiniDockerDFSCluster cluster;
   private Configuration conf; // = new HdfsConfiguration();
   private FileSystem mfs; // = cluster.getFileSystem();
@@ -76,7 +76,7 @@ public class TestWriteRead {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize); // 100K
                                                               // blocksize
 
-    //cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    //cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 

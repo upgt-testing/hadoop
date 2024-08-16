@@ -127,12 +127,12 @@ public class TestRestartDFS {
 //    URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), null);
     // load configuration class with classLoader
     Class<?> configClass = child.loadClass("org.apache.hadoop.conf.Configuration");
-    Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+    Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder");
     Class<?> cls = child.loadClass("org.apache.hadoop.util.Lists");
 
     // location of the configuration class
     System.out.println("Load class org.apache.hadoop.conf.Configuration from: " + configClass.getProtectionDomain().getCodeSource().getLocation());
-    System.out.println("Load class org.apache.hadoop.hdfs.MiniDFSCluster$Builder from: " + builderClass.getProtectionDomain().getCodeSource().getLocation());
+    System.out.println("Load class org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder from: " + builderClass.getProtectionDomain().getCodeSource().getLocation());
 
     Constructor<?>[] configConstructors = configClass.getConstructors();
     // get the first constructor
@@ -171,10 +171,10 @@ public class TestRestartDFS {
     //formatMethod.invoke(builder, false);
     Method buildMethod = builderClass.getMethod("build");
     Object cluster = buildMethod.invoke(builder);
-    System.out.println("MiniDFSCluster instance created successfully: " + cluster);
+    System.out.println("MiniDockerDFSCluster instance created successfully: " + cluster);
     // There are two constructors
-    // public org.apache.hadoop.hdfs.MiniDFSCluster$Builder(org.apache.hadoop.conf.Configuration)
-    //public org.apache.hadoop.hdfs.MiniDFSCluster$Builder(org.apache.hadoop.conf.Configuration,java.io.File)
+    // public org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder(org.apache.hadoop.conf.Configuration)
+    //public org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder(org.apache.hadoop.conf.Configuration,java.io.File)
 
 
 
@@ -192,7 +192,7 @@ public class TestRestartDFS {
     Method formatMethod = builderClass.getMethod("format", boolean.class);
     formatMethod.invoke(builder, false);  // or false depending on your test setup
 
-    // Build the MiniDFSCluster instance using the build method
+    // Build the MiniDockerDFSCluster instance using the build method
     Method buildMethod = builderClass.getMethod("build");
 
 **/
@@ -213,7 +213,7 @@ public class TestRestartDFS {
       String className = je.getName().substring(0,je.getName().length()-6);
       className = className.replace('/', '.');
       Class c = cl.loadClass(className);
-      if (c.getName().contains("MiniDFSCluster")) {
+      if (c.getName().contains("MiniDockerDFSCluster")) {
         URL location = c.getProtectionDomain().getCodeSource().getLocation();
         System.out.print("Found class: " + c.getName());
         System.out.println("Loaded from: " + location);
@@ -227,18 +227,18 @@ public class TestRestartDFS {
     // Load different version of Hadoop classes
     String version = System.getProperty("upgrade.version", "3.5.0-SNAPSHOT");
     ClassLoader cl = createClassLoader(version);
-    // cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+    // cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
     createCluster(cl, 4, false);
   }
 
   public void createCluster(ClassLoader child, int numNode, boolean format) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, IOException {
     Class<?> configClass = child.loadClass("org.apache.hadoop.conf.Configuration");
-    Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
-    Class<?> miniClusterClass = child.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster");
+    Class<?> builderClass = child.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder");
+    Class<?> miniClusterClass = child.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster");
 
     // location of the configuration class
     System.out.println("Load class org.apache.hadoop.conf.Configuration from: " + configClass.getProtectionDomain().getCodeSource().getLocation());
-    System.out.println("Load class org.apache.hadoop.hdfs.MiniDFSCluster$Builder from: " + builderClass.getProtectionDomain().getCodeSource().getLocation());
+    System.out.println("Load class org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder from: " + builderClass.getProtectionDomain().getCodeSource().getLocation());
 
     Constructor<?>[] configConstructors = configClass.getConstructors();
     // get the first constructor
@@ -278,7 +278,7 @@ public class TestRestartDFS {
     Method buildMethod = builderClass.getMethod("build");
     Object cluster = buildMethod.invoke(builder);
 
-    System.out.println("MiniDFSCluster instance created successfully: " + cluster);
+    System.out.println("MiniDockerDFSCluster instance created successfully: " + cluster);
 
     // invoke the getFileSystem method
     Method getFileSystemMethod = miniClusterClass.getMethod("getFileSystem");
@@ -348,9 +348,9 @@ public class TestRestartDFS {
   }
 
   /**
-   * Create a MiniDFSCluster instance.
+   * Create a MiniDockerDFSCluster instance.
    */
-  private Object createMiniDFSCluster(Configuration conf, int numDataNodes, boolean format, ClassLoader cl) throws Exception {
+  private Object createMiniDockerDFSCluster(Configuration conf, int numDataNodes, boolean format, ClassLoader cl) throws Exception {
 
     // This class loader is used for loading shared dependencies
     ClassLoader sharedClassLoader = getClass().getClassLoader();
@@ -369,7 +369,7 @@ public class TestRestartDFS {
     }
 
     // Load the Builder class dynamically
-    Class<?> builderClass = cl.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+    Class<?> builderClass = cl.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder");
 
     // Obtain the constructor that takes a Configuration object
     Constructor<?> builderConstructor = builderClass.getConstructor(Configuration.class);
@@ -384,7 +384,7 @@ public class TestRestartDFS {
     Method formatMethod = builderClass.getMethod("format", boolean.class);
     formatMethod.invoke(builder, format);  // or false depending on your test setup
 
-    // Build the MiniDFSCluster instance using the build method
+    // Build the MiniDockerDFSCluster instance using the build method
     Method buildMethod = builderClass.getMethod("build");
     return buildMethod.invoke(builder);
   }
@@ -392,7 +392,7 @@ public class TestRestartDFS {
   @Test
   public void simpleTest() {
     Configuration conf = new Configuration();
-    MiniDFSCluster.Builder builder = new MiniDFSCluster.Builder(conf);
+    MiniDockerDFSCluster.Builder builder = new MiniDockerDFSCluster.Builder(conf);
     System.out.println("Builder created successfully: " + builder);
   }
 
@@ -402,32 +402,32 @@ public class TestRestartDFS {
     try {
       // Load different version of Hadoop classes
       ClassLoader cl = loadHadoop("3.3.1");
-      // check whether class loader has org.apache.hadoop.hdfs.MiniDFSCluster$Builder
+      // check whether class loader has org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder
       try {
           assert cl != null;
-          cl.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+          cl.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder");
       } catch (ClassNotFoundException e) {
-          System.out.println("org.apache.hadoop.hdfs.MiniDFSCluster$Builder not found in class loader");
+          System.out.println("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder not found in class loader");
           return;
       }
 
       // Load different version of Hadoop classes
       ClassLoader cl2 = loadHadoop("3.3.3");
-      // check whether class loader has org.apache.hadoop.hdfs.MiniDFSCluster$Builder
+      // check whether class loader has org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder
       try {
           assert cl2 != null;
-          cl2.loadClass("org.apache.hadoop.hdfs.MiniDFSCluster$Builder");
+          cl2.loadClass("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder");
       } catch (ClassNotFoundException e) {
-          System.out.println("org.apache.hadoop.hdfs.MiniDFSCluster$Builder not found in class loader");
+          System.out.println("org.apache.hadoop.hdfs.MiniDockerDFSCluster$Builder not found in class loader");
           return;
       }
 
-      // Create a MiniDFSCluster instance
+      // Create a MiniDockerDFSCluster instance
       Configuration conf = new Configuration();
-      Object cluster = createMiniDFSCluster(conf, 1, true, cl);
-      System.out.println("MiniDFSCluster instance with version 3.3.1 created.");
-      Object cluster2 = createMiniDFSCluster(conf, 2, false, cl2);
-      System.out.println("MiniDFSCluster instance with version 3.3.3 created.");
+      Object cluster = createMiniDockerDFSCluster(conf, 1, true, cl);
+      System.out.println("MiniDockerDFSCluster instance with version 3.3.1 created.");
+      Object cluster2 = createMiniDockerDFSCluster(conf, 2, false, cl2);
+      System.out.println("MiniDockerDFSCluster instance with version 3.3.3 created.");
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -435,7 +435,7 @@ public class TestRestartDFS {
   }
 
   public void runTests(Configuration conf, boolean serviceTest) throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     DFSTestUtil files = new DFSTestUtil.Builder().setName("TestRestartDFS").
         setNumFiles(20).build();
 
@@ -452,7 +452,7 @@ public class TestRestartDFS {
         conf.set(DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
                  "localhost:0");
       }
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).build();
       FileSystem fs = cluster.getFileSystem();
       files.createFiles(fs, dir);
 
@@ -471,7 +471,7 @@ public class TestRestartDFS {
                  "localhost:0");
       }
       // Here we restart the MiniDFScluster without formatting namenode
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(false).build(); 
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build(); 
       FileSystem fs = cluster.getFileSystem();
       assertTrue("Filesystem corrupted after restart.",
                  files.checkFiles(fs, dir));
@@ -495,7 +495,7 @@ public class TestRestartDFS {
       }
       // This is a second restart to check that after the first restart
       // the image written in parallel to both places did not get corrupted
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
       FileSystem fs = cluster.getFileSystem();
       assertTrue("Filesystem corrupted after restart.",
                  files.checkFiles(fs, dir));

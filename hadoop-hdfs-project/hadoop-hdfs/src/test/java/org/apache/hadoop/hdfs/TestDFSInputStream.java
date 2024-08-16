@@ -60,7 +60,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public class TestDFSInputStream {
-  private void testSkipInner(MiniDockerDFSCluster cluster) throws IOException {  // <--- Just simply change MiniDFSCluster to DockerHDFSCluster
+  private void testSkipInner(MiniDockerDFSCluster cluster) throws IOException {  // <--- Just simply change MiniDockerDFSCluster to DockerHDFSCluster
     DistributedFileSystem fs = cluster.getDistributedFileSystem();
     DFSClient client = fs.dfs;
     Path file = new Path("/testfile");
@@ -71,9 +71,9 @@ public class TestDFSInputStream {
     }
     FSDataOutputStream fout = fs.create(file);
     fout.write(fileContent);
+    cluster.upgradeDatanode(0);
     fout.close();
 
-    cluster.upgradeDatanode(0);
 
     Random random = new Random();
     for (int i = 3; i < 18; i++) {
@@ -99,8 +99,8 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSkipWithRemoteBlockReader() throws IOException {
     Configuration conf = new Configuration();
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDockerDFSCluster to DockerHDFSCluster
     try {
       testSkipInner(cluster);
     } finally {
@@ -111,8 +111,8 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSkipWithRemoteBlockReader2() throws IOException {
     Configuration conf = new Configuration();
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDockerDFSCluster to DockerHDFSCluster
     try {
       testSkipInner(cluster);
     } finally {
@@ -130,8 +130,8 @@ public class TestDFSInputStream {
     conf.set(DFSConfigKeys.DFS_DOMAIN_SOCKET_PATH_KEY,
             new File(sockDir.getDir(),
                     "TestShortCircuitLocalRead._PORT.sock").getAbsolutePath());
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();   // <--- Change MiniDockerDFSCluster to DockerHDFSCluster
     try {
       DFSInputStream.tcpReadsDisabledForTesting = true;
       testSkipInner(cluster);
@@ -145,9 +145,9 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSeekToNewSource() throws IOException {
     Configuration conf = new Configuration();
-    //MiniDFSCluster cluster =
-    //        new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster =
+    //        new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
     DistributedFileSystem fs = cluster.getFileSystem();
     Path path = new Path("/testfile");
     DFSTestUtil.createFile(fs, path, 1024, (short) 3, 0);
@@ -171,9 +171,9 @@ public class TestDFSInputStream {
   public void testOpenInfo() throws IOException {
     Configuration conf = new Configuration();
     conf.setInt(Retry.TIMES_GET_LAST_BLOCK_LENGTH_KEY, 0);
-    //MiniDFSCluster cluster =
-    //        new MiniDFSCluster.Builder(conf).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster =
+    //        new MiniDockerDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
     //cluster.waitActive();
     try {
       DistributedFileSystem fs = cluster.getDistributedFileSystem();
@@ -211,8 +211,8 @@ public class TestDFSInputStream {
           throws IOException, InterruptedException {
     Configuration conf = new Configuration();
     conf.set(HdfsClientConfigKeys.DFS_CHECKSUM_TYPE_KEY, "NULL");
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
     //cluster.waitActive();
     try {
       DistributedFileSystem fs = cluster.getDistributedFileSystem();
@@ -251,10 +251,10 @@ public class TestDFSInputStream {
   public void testReadWithPreferredCachingReplica() throws IOException {
     Configuration conf = new Configuration();
     conf.setBoolean(DFS_CLIENT_READ_USE_CACHE_PRIORITY, true);
-    //MiniDFSCluster cluster =
-    //        new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    //MiniDockerDFSCluster cluster =
+    //        new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     //cluster.waitActive();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
     DistributedFileSystem fs = null;
     Path filePath = new Path("/testReadPreferredCachingReplica");
     try {
@@ -282,9 +282,9 @@ public class TestDFSInputStream {
   public void testReadWithoutPreferredCachingReplica() throws IOException {
     Configuration conf = new Configuration();
     conf.setBoolean(DFS_CLIENT_READ_USE_CACHE_PRIORITY, false);
-    //MiniDFSCluster cluster =
-    //        new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    //MiniDockerDFSCluster cluster =
+    //        new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
     //cluster.waitActive();
     DistributedFileSystem fs = null;
     Path filePath = new Path("/testReadWithoutPreferredCachingReplica");
@@ -321,8 +321,8 @@ public class TestDFSInputStream {
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, 516);
     DFSClientFaultInjector oldFaultInjector = DFSClientFaultInjector.get();
     FSDataOutputStream out = null;
-    //try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build()) {
-    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build()) {  // <-- Change MiniDFSCluster to DockerHDFSCluster
+    //try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build()) {
+    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build()) {  // <-- Change MiniDockerDFSCluster to DockerHDFSCluster
       //cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
 
@@ -368,6 +368,7 @@ public class TestDFSInputStream {
         byte[] buf = new byte[bufLen];
         // Seek the offset to 1024 and which should be in the range (0, fileSize).
         in.seek(1024);
+        cluster.upgradeDatanode(0);
         int read = in.read(buf, 0, bufLen);
         assertEquals(1024, read);
       }

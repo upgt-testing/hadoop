@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod;
 import static org.apache.hadoop.security.SecurityUtilTestHelper.isExternalKdcRunning;
@@ -40,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This test brings up a MiniDFSCluster with 1 NameNode and 0
+ * This test brings up a MiniDockerDFSCluster with 1 NameNode and 0
  * DataNodes with kerberos authentication enabled using user-specified
  * KDC, principals, and keytabs.
  *
@@ -54,7 +54,7 @@ import org.junit.Test;
  *   user.keytab
  */
 public class TestSecureNameNodeWithExternalKdc {
-  final static private int NUM_OF_DATANODES = 0;
+  final static private int NUM_OF_DATANODES = 1;
 
   @Before
   public void testExternalKdcRunning() {
@@ -64,7 +64,7 @@ public class TestSecureNameNodeWithExternalKdc {
 
   @Test
   public void testSecureNameNode() throws IOException, InterruptedException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       String nnPrincipal =
         System.getProperty("dfs.namenode.kerberos.principal");
@@ -84,9 +84,9 @@ public class TestSecureNameNodeWithExternalKdc {
           nnSpnegoPrincipal);
       conf.set(DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY, nnKeyTab);
 
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES)
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES)
           .build();
-      final MiniDFSCluster clusterRef = cluster;
+      final MiniDockerDFSCluster clusterRef = cluster;
       cluster.waitActive();
       FileSystem fsForCurrentUser = cluster.getFileSystem();
       fsForCurrentUser.mkdirs(new Path("/tmp"));
@@ -98,7 +98,7 @@ public class TestSecureNameNodeWithExternalKdc {
       String userKeyTab = System.getProperty("user.keytab");
       assertNotNull("User principal was not specified", userPrincipal);
       assertNotNull("User keytab was not specified", userKeyTab);
-
+      cluster.upgradeDatanode(0);
       UserGroupInformation ugi = UserGroupInformation
           .loginUserFromKeytabAndReturnUGI(userPrincipal, userKeyTab);
       FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {

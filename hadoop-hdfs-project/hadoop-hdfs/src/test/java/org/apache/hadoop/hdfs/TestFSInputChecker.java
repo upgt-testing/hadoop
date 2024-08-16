@@ -327,7 +327,7 @@ public class TestFSInputChecker {
     rand.nextBytes(expected);
 
     // test DFS
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {

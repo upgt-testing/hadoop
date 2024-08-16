@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.security.authorize.DefaultImpersonationProvider;
@@ -60,7 +60,7 @@ import org.junit.Test;
 public class TestRefreshUserMappings {
   private static final Logger LOG = LoggerFactory.getLogger(
       TestRefreshUserMappings.class);
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   Configuration config;
   private static final long groupRefreshTimeoutSec = 1;
   private String tempResource = null;
@@ -110,7 +110,7 @@ public class TestRefreshUserMappings {
     Groups.getUserToGroupsMappingService(config);
     
     FileSystem.setDefaultUri(config, "hdfs://localhost:" + "0");
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDockerDFSCluster.Builder(config).build();
     cluster.waitActive();
 
     GenericTestUtils.setLogLevel(Groups.LOG, Level.DEBUG);
@@ -146,7 +146,7 @@ public class TestRefreshUserMappings {
     for(int i=0; i<g2.size(); i++) {
       assertEquals("Should be same group ", g1.get(i), g2.get(i));
     }
-
+    cluster.upgradeDatanode(0);
     // Test refresh command
     admin.run(args);
     LOG.debug("Third attempt(after refresh command), should be different:");
@@ -206,7 +206,7 @@ public class TestRefreshUserMappings {
     
     when(ugi1.getUserName()).thenReturn("userL1");
     when(ugi2.getUserName()).thenReturn("userL2");
-
+    cluster.upgradeDatanode(0);
     // set groups for users
     when(ugi1.getGroups()).thenReturn(groupNames1);
     when(ugi2.getGroups()).thenReturn(groupNames2);
@@ -223,6 +223,7 @@ public class TestRefreshUserMappings {
       System.err.println("auth for " + ugi1.getUserName() + " failed");
     }
     try {
+      cluster.upgradeDatanode(0);
       ProxyUsers.authorize(ugi2, "127.0.0.1");
       System.err.println("auth for " + ugi2.getUserName() + " succeeded");
       // expected

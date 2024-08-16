@@ -124,14 +124,14 @@ public class TestMultiThreadedHflush {
   
   private void doTestMultipleHflushers(int repl) throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(repl)
         .build();
 
     FileSystem fs = cluster.getFileSystem();
     Path p = new Path("/multiple-hflushers.dat");
     try {
-      doMultithreadedWrites(conf, p, NUM_THREADS, WRITE_SIZE,
+      doMultithreadedWrites(cluster, conf, p, NUM_THREADS, WRITE_SIZE,
           NUM_WRITES_PER_THREAD, repl);
       System.out.println("Latency quantiles (in microseconds):\n" +
           quantiles);
@@ -151,7 +151,7 @@ public class TestMultiThreadedHflush {
   @Test
   public void testHflushWhileClosing() throws Throwable {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     Path p = new Path("/hflush-and-close.dat");
 
@@ -183,6 +183,7 @@ public class TestMultiThreadedHflush {
         flushers.add(flusher);
       }
 
+      cluster.upgradeDatanode(0);
       // Write some data
       for (int i = 0; i < 10000; i++) {
         stm.write(1);
@@ -209,7 +210,7 @@ public class TestMultiThreadedHflush {
   }
 
   public void doMultithreadedWrites(
-      Configuration conf, Path p, int numThreads, int bufferSize, int numWrites,
+      MiniDockerDFSCluster cluster, Configuration conf, Path p, int numThreads, int bufferSize, int numWrites,
       int replication) throws Exception {
     initBuffer(bufferSize);
 
@@ -222,6 +223,7 @@ public class TestMultiThreadedHflush {
     // some empty flushes first.
     stm.hflush();
     stm.hflush();
+    cluster.upgradeDatanode(0);
     stm.write(1);
     stm.hflush();
     stm.hflush();
@@ -249,7 +251,7 @@ public class TestMultiThreadedHflush {
   }
 
   public static void main(String args[]) throws Exception {
-    System.exit(ToolRunner.run(new CLIBenchmark(), args));
+    //System.exit(ToolRunner.run(new CLIBenchmark(), args));
   }
   
   private static class CLIBenchmark extends Configured implements Tool {
@@ -276,8 +278,8 @@ public class TestMultiThreadedHflush {
           DFSConfigKeys.DFS_REPLICATION_DEFAULT);
       
       StopWatch sw = new StopWatch().start();
-      test.doMultithreadedWrites(conf, p, numThreads, writeSize, numWrites,
-          replication);
+      //test.doMultithreadedWrites(conf, p, numThreads, writeSize, numWrites,
+          //replication);
       sw.stop();
   
       System.out.println("Finished in " + sw.now(TimeUnit.MILLISECONDS) + "ms");

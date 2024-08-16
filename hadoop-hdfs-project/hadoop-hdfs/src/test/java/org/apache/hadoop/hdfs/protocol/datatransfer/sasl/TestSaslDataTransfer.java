@@ -43,7 +43,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.net.Peer;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
@@ -70,7 +70,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
   private static final int NUM_BLOCKS = 3;
   private static final Path PATH  = new Path("/file1");
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fs;
 
   @Rule
@@ -204,6 +204,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
       DFSTestUtil.readFile(fs, PATH).getBytes(StandardCharsets.UTF_8));
     BlockLocation[] blockLocations = fs.getFileBlockLocations(PATH, 0,
       Long.MAX_VALUE);
+    cluster.upgradeDatanode(0);
     assertNotNull(blockLocations);
     assertEquals(NUM_BLOCKS, blockLocations.length);
     for (BlockLocation blockLocation: blockLocations) {
@@ -219,7 +220,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
    * @throws IOException if there is an I/O error
    */
   private void startCluster(HdfsConfiguration conf) throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
 
@@ -250,6 +251,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
       serverSocket = new ServerSocket(0, -1);
       socket = new Socket(serverSocket.getInetAddress(),
         serverSocket.getLocalPort());
+      cluster.upgradeDatanode(0);
       Peer peer = DFSUtilClient.peerFromSocketAndKey(saslClient, socket,
           dataEncKeyFactory, new Token(), fakeDatanodeId, 1);
       peer.close();
@@ -289,6 +291,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
         conf, DataTransferSaslUtil.getSaslPropertiesResolver(conf),
         trustedChannelResolver, fallbackToSimpleAuth);
 
+    cluster.upgradeDatanode(0);
     ServerSocket serverSocket = null;
     Socket socket = null;
     DataEncryptionKeyFactory dataEncryptionKeyFactory = null;
@@ -340,6 +343,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
 
     ServerSocket serverSocket = null;
     Socket socket = null;
+
     DataEncryptionKeyFactory dataEncryptionKeyFactory = null;
     try {
       serverSocket = new ServerSocket(10002, 10);
@@ -349,7 +353,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
       dataEncryptionKeyFactory = mock(DataEncryptionKeyFactory.class);
       Mockito.when(dataEncryptionKeyFactory.newDataEncryptionKey())
           .thenThrow(new IOException("Encryption enabled"));
-
+      cluster.upgradeDatanode(0);
       saslClient.socketSend(socket, null, null, dataEncryptionKeyFactory,
           null, null);
 
@@ -383,6 +387,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
           }
         };
 
+    cluster.upgradeDatanode(0);
     SaslDataTransferClient saslClient = new SaslDataTransferClient(
         conf, DataTransferSaslUtil.getSaslPropertiesResolver(conf),
         trustedChannelResolver, fallbackToSimpleAuth);

@@ -70,7 +70,7 @@ public class TestModTime {
   public void testModTime() throws IOException {
     Configuration conf = new HdfsConfiguration();
 
-    //MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    //MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
     //                                           .numDataNodes(numDatanodes).build();
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes).build();
@@ -94,6 +94,7 @@ public class TestModTime {
      Path file1 = new Path(dir1, "test1.dat");
      DFSTestUtil.createFile(fileSys, file1, fileSize, fileSize, blockSize,
          (short) replicas, seed);
+     cluster.upgradeDatanode(0);
      FileStatus stat = fileSys.getFileStatus(file1);
      long mtime1 = stat.getModificationTime();
      assertTrue(mtime1 != 0);
@@ -126,6 +127,7 @@ public class TestModTime {
      System.out.println("Creating testdir2 " + dir2);
      assertTrue(fileSys.mkdirs(dir2));
      stat = fileSys.getFileStatus(dir2);
+     cluster.upgradeDatanode(0);
      long mdir2 = stat.getModificationTime();
      //
      // rename file1 from testdir into testdir2
@@ -168,6 +170,7 @@ public class TestModTime {
      mdir2 = stat.getModificationTime();
 
      cleanupFile(fileSys, file2);
+     cluster.upgradeDatanode(0);
      cleanupFile(fileSys, dir1);
      cleanupFile(fileSys, dir2);
     } catch (IOException e) {
@@ -187,7 +190,7 @@ public class TestModTime {
   @Test
   public void testModTimePersistsAfterRestart() throws IOException {
     final long sleepTime = 10; // 10 milliseconds
-    //MiniDFSCluster cluster = null;
+    //MiniDockerDFSCluster cluster = null;
     MiniDockerDFSCluster cluster = null;
     FileSystem fs = null;
     Configuration conf = new HdfsConfiguration();

@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class TestSnapRootDescendantDiff {
   private final Path sub1 = new Path(dir, "sub1");
 
   protected Configuration conf;
-  protected MiniDFSCluster cluster;
+  protected MiniDockerDFSCluster cluster;
   protected DistributedFileSystem hdfs;
   private final Map<Path, Integer> snapshotNumberMap = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class TestSnapRootDescendantDiff {
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_DIFF_ALLOW_SNAP_ROOT_DESCENDANT,
         false);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3)
         .format(true).build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
@@ -99,6 +99,7 @@ public class TestSnapRootDescendantDiff {
     Path subsubsub1 = new Path(subsub1, "subsubsub1");
     hdfs.mkdirs(subsubsub1);
     modifyAndCreateSnapshot(getSnapRootDir(), new Path[]{getSnapRootDir()});
+    cluster.upgradeDatanode(0);
     modifyAndCreateSnapshot(subsubsub1, new Path[]{getSnapRootDir()});
 
     try {

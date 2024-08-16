@@ -39,7 +39,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -53,7 +53,7 @@ public class TestViewFsFileStatusHdfs {
   static final String someFile = "/hdfstmp/someFileForTestGetFileChecksum";
 
   private static final FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static final Configuration CONF = new Configuration();
   private static FileSystem fHdfs;
@@ -62,7 +62,7 @@ public class TestViewFsFileStatusHdfs {
   @BeforeClass
   public static void clusterSetupAtBegining() throws IOException,
       LoginException, URISyntaxException {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     fHdfs = cluster.getFileSystem();
     defaultWorkingDirectory = fHdfs.makeQualified( new Path("/user/" + 
@@ -86,6 +86,7 @@ public class TestViewFsFileStatusHdfs {
     // check serialization/deserialization
     DataOutputBuffer dob = new DataOutputBuffer();
     stat.write(dob);
+    cluster.upgradeDatanode(0);
     DataInputBuffer dib = new DataInputBuffer();
     dib.reset(dob.getData(), 0, dob.getLength());
     FileStatus deSer = new FileStatus();
@@ -106,6 +107,7 @@ public class TestViewFsFileStatusHdfs {
     FileChecksum hdfsCheckSum = fHdfs.getFileChecksum(
       new Path(someFile));
     // Get checksum of different file in HDFS
+      cluster.upgradeDatanode(0);
     FileChecksum otherHdfsFileCheckSum = fHdfs.getFileChecksum(
       new Path(someFile+"other"));
     // Checksums of the same file (got through HDFS and ViewFS should be same)
