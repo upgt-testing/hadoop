@@ -13,6 +13,8 @@ versions=(
   "hadoop:3.4.0"
 )
 
+echo "TEST_LIST_FILE=$TEST_LIST_FILE, SKIP_UPGRADE=$SKIP_UPGRADE"
+
 # check TEST_LIST_FILE and SKIP_UPGRADE are not empty
 if [ -z "$TEST_LIST_FILE" ] || [ -z "$SKIP_UPGRADE" ]; then
   echo "Usage: $0 <TEST_LIST_FILE> <SKIP_UPGRADE>"

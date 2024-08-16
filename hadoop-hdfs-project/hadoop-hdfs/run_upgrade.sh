@@ -13,7 +13,7 @@ fi
 LOGS_DIR="logs"
 # if LOGS_DIR directory does not exist, create it
 if [ ! -d "$LOGS_DIR" ]; then
-    mkdir logs
+    mkdir $LOGS_DIR
 fi
 
 
@@ -26,11 +26,8 @@ do
 	exit 1
     fi
 
-    PURE_START_VERSION="${START_VERSION/shuaiwang516\/}"
-    PURE_END_VERSION="${END_VERSION/shuaiwang516\/}"
-
-    echo "mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE |& tee $LOGS_DIR/${test}-$PURE_START_VERSION-$PURE_END_VERSION-$SKIP_UPGRADE.log"
-    mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE |& tee $LOGS_DIR/${test}-$PURE_START_VERSION-$PURE_END_VERSION-$SKIP_UPGRADE.log
+    echo "mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE 2>&1 | tee $LOGS_DIR/${test}-$START_VERSION-$END_VERSION-$SKIP_UPGRADE.log"
+    mvn surefire:test -Dtest=${test} -DstartVersion=${START_VERSION} -DupgradeVersion=${END_VERSION} -Dupgradable.cluster.skip_upgrade=$SKIP_UPGRADE 2>&1 | tee $LOGS_DIR/${test}-$START_VERSION-$END_VERSION-$SKIP_UPGRADE.log
 
 
 done
