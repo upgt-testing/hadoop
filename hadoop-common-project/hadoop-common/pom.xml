@@ -39,6 +39,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgradable-cluster</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.hadoop.thirdparty</groupId>
       <artifactId>hadoop-shaded-protobuf_3_21</artifactId>
     </dependency>
