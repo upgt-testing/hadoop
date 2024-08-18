@@ -353,6 +353,8 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
 	  <compilerArguments>
 	    <Xmaxerrs>100000</Xmaxerrs>
 	  </compilerArguments>
