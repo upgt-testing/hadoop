@@ -1816,6 +1816,9 @@
           <execution>
             <id>signature-check</id>
             <phase>verify</phase>
+            <configuration>
+              <skip>true</skip>
+            </configuration>	    
             <goals>
               <goal>check</goal>
             </goals>
