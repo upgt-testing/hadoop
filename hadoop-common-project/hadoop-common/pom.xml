@@ -40,6 +40,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgradable-cluster</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-annotations</artifactId>
       <scope>compile</scope>
@@ -369,6 +374,17 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <compilerArguments>
+            <Xmaxerrs>100000</Xmaxerrs>
+          </compilerArguments>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>

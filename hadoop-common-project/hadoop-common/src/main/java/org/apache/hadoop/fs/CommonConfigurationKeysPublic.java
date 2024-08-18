@@ -67,7 +67,8 @@ public class CommonConfigurationKeysPublic {
    */
   public static final String  FS_DEFAULT_NAME_KEY = "fs.defaultFS";
   /** Default value for FS_DEFAULT_NAME_KEY */
-  public static final String  FS_DEFAULT_NAME_DEFAULT = "file:///";
+  //public static final String  FS_DEFAULT_NAME_DEFAULT = "file:///";
+  public static final String  FS_DEFAULT_NAME_DEFAULT = "hdfs://localhost:9000";
   /**
    * @see
    * <a href="{@docRoot}/../hadoop-project-dist/hadoop-common/core-default.xml">
