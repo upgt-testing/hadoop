@@ -34,12 +34,12 @@ public class TestListFilesInDFS extends TestListFiles {
   }
 
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
 
   @BeforeClass
   public static void testSetUp() throws Exception {
     setTestPaths(new Path("/tmp/TestListFilesInDFS"));
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     fs = cluster.getFileSystem();
     fs.delete(TEST_DIR, true);
   }

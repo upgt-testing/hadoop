@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.viewfs.ViewFileSystemOverloadScheme;
 import org.apache.hadoop.fs.viewfs.ViewFsTestSetup;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.After;
@@ -56,7 +56,7 @@ public class TestViewFileSystemOverloadSchemeWithFSCommands {
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private Configuration conf = null;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private URI defaultFSURI;
   private File localTargetDir;
   private static final String TEST_ROOT_DIR = PathUtils
@@ -69,7 +69,7 @@ public class TestViewFileSystemOverloadSchemeWithFSCommands {
   private static final PrintStream OLD_ERR = System.err;
 
   /**
-   * Sets up the configurations and starts the MiniDFSCluster.
+   * Sets up the configurations and starts the MiniDockerDFSCluster.
    */
   @Before
   public void startCluster() throws IOException {
@@ -81,7 +81,7 @@ public class TestViewFileSystemOverloadSchemeWithFSCommands {
     conf.set(String.format(
         FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
         HDFS_SCHEME), DistributedFileSystem.class.getName());
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
     defaultFSURI =
         URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));

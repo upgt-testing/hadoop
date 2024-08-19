@@ -39,7 +39,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -53,7 +53,7 @@ public class TestViewFsFileStatusHdfs {
   static final String someFile = "/hdfstmp/someFileForTestGetFileChecksum";
 
   private static final FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static final Configuration CONF = new Configuration();
   private static FileSystem fHdfs;
@@ -62,7 +62,7 @@ public class TestViewFsFileStatusHdfs {
   @BeforeClass
   public static void clusterSetupAtBegining() throws IOException,
       LoginException, URISyntaxException {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     fHdfs = cluster.getFileSystem();
     defaultWorkingDirectory = fHdfs.makeQualified( new Path("/user/" + 

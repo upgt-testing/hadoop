@@ -45,7 +45,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AppendTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.hdfs.web.resources.NamenodeAddressParam;
 import org.apache.hadoop.io.IOUtils;
@@ -58,14 +58,14 @@ import org.junit.Test;
 
 public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
   private static final Configuration conf = new Configuration();
-  private static final MiniDFSCluster cluster;
+  private static final MiniDockerDFSCluster cluster;
   private String defaultWorkingDirectory;
   
   private UserGroupInformation ugi;
 
   static {
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
       cluster.waitActive();
 
       //change root permission to 777

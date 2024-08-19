@@ -72,7 +72,7 @@ public class TestFileConcurrentReader {
   private static final int DEFAULT_WRITE_SIZE = 1024 + 1;
   private static final int SMALL_WRITE_SIZE = 61;
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fileSystem;
 
 
@@ -94,7 +94,7 @@ public class TestFileConcurrentReader {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
     fileSystem = cluster.getFileSystem();
   }

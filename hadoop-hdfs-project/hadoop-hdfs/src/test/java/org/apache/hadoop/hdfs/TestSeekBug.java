@@ -119,7 +119,7 @@ public class TestSeekBug {
   @Test
   public void testSeekBugDFS() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       Path file1 = new Path("seektest.dat");
@@ -142,7 +142,7 @@ public class TestSeekBug {
   @Test (expected=IOException.class)
   public void testNegativeSeek() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       Path seekFile = new Path("seekboundaries.dat");
@@ -173,7 +173,7 @@ public class TestSeekBug {
   @Test (expected=IOException.class)
   public void testSeekPastFileSize() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       Path seekFile = new Path("seekboundaries.dat");

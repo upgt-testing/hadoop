@@ -30,7 +30,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.unix.DomainSocket;
@@ -44,7 +44,7 @@ import org.junit.Test;
 
 public class TestTracingShortCircuitLocalRead {
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem dfs;
   private static TemporarySocketDirectory sockDir;
   static final Path TEST_PATH = new Path("testShortCircuitTraceHooks");
@@ -79,7 +79,7 @@ public class TestTracingShortCircuitLocalRead {
         new File(sockDir.getDir(),
             "testShortCircuitTraceHooks._PORT.sock").getAbsolutePath());
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, "CRC32C");
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     dfs = cluster.getFileSystem();

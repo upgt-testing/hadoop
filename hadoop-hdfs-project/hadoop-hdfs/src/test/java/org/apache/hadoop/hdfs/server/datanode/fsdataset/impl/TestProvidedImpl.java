@@ -55,7 +55,7 @@ import org.apache.hadoop.fs.PathHandle;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -616,7 +616,7 @@ public class TestProvidedImpl {
   public void testProvidedReplicaWithPathHandle() throws Exception {
 
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitActive();
 
     DistributedFileSystem fs = cluster.getFileSystem();

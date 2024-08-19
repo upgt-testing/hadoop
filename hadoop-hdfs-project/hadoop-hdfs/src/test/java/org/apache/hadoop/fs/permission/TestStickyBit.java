@@ -40,7 +40,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -60,7 +60,7 @@ public class TestStickyBit {
     UserGroupInformation.createUserForTesting("rose", new String[] {"powellestates"});
   static final Logger LOG = LoggerFactory.getLogger(TestStickyBit.class);
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
   private static FileSystem hdfs;
   private static FileSystem hdfsAsUser1;
@@ -75,7 +75,7 @@ public class TestStickyBit {
   }
 
   private static void initCluster(boolean format) throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).format(format)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(format)
       .build();
     hdfs = cluster.getFileSystem();
     assertTrue(hdfs instanceof DistributedFileSystem);

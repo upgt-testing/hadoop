@@ -59,14 +59,14 @@ public class TestHdfsAdmin {
   private static final int SIZE = 128;
   private static final int OPEN_FILES_BATCH_SIZE = 5;
   private final Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   @Before
   public void setUpCluster() throws IOException {
     conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_LIST_OPENFILES_NUM_RESPONSES,
         OPEN_FILES_BATCH_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
   }
   
@@ -210,7 +210,7 @@ public class TestHdfsAdmin {
     conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
         getKeyProviderURI());
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
     hdfsAdmin = new HdfsAdmin(FileSystem.getDefaultUri(conf), conf);
 

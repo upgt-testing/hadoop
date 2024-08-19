@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.junit.Test;
 
@@ -80,8 +80,8 @@ public class TestDataNodeInitStorage {
 
     // Start a cluster so that SimulatedFsDatasetVerifier constructor is
     // invoked.
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster =
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     cluster.shutdown();
   }

@@ -34,7 +34,7 @@ public class TestClose {
   @Test
   public void testWriteAfterClose() throws IOException {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .build();
     
     try {

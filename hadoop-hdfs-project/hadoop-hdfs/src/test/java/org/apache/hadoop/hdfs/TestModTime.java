@@ -72,7 +72,7 @@ public class TestModTime {
   public void testModTime() throws IOException {
     Configuration conf = new HdfsConfiguration();
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes).build();
     cluster.waitActive();
     InetSocketAddress addr = new InetSocketAddress("localhost", 
@@ -186,11 +186,11 @@ public class TestModTime {
   @Test
   public void testModTimePersistsAfterRestart() throws IOException {
     final long sleepTime = 10; // 10 milliseconds
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FileSystem fs = null;
     Configuration conf = new HdfsConfiguration();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       fs = cluster.getFileSystem();
       Path testPath = new Path("/test");
       
