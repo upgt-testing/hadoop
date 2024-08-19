@@ -81,7 +81,7 @@ public class TestDFSPermission {
   final private static Path NON_EXISTENT_FILE = new Path("/NonExistentFile");
 
   private FileSystem fs;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private static final Random r;
 
   static {
@@ -117,7 +117,7 @@ public class TestDFSPermission {
 
   @Before
   public void setUp() throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
   

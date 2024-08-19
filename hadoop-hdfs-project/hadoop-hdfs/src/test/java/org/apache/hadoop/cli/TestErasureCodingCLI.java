@@ -23,7 +23,7 @@ import org.apache.hadoop.cli.util.CLICommandErasureCodingCli;
 import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 
 public class TestErasureCodingCLI extends CLITestHelper {
   private final int NUM_OF_DATANODES = 3;
-  private MiniDFSCluster dfsCluster = null;
+  private MiniDockerDFSCluster dfsCluster = null;
   private DistributedFileSystem fs = null;
   private String namenode = null;
 
@@ -44,7 +44,7 @@ public class TestErasureCodingCLI extends CLITestHelper {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    dfsCluster = new MiniDFSCluster.Builder(conf)
+    dfsCluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES).build();
     dfsCluster.waitClusterUp();
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");

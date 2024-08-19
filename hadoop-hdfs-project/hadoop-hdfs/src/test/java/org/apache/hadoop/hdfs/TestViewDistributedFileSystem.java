@@ -57,9 +57,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testOpenWithPathHandle() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
       FileSystem fileSys = cluster.getFileSystem();
       Path openTestPath = new Path("/testOpen");
       fileSys.create(openTestPath).close();
@@ -76,9 +76,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Override
   public void testEmptyDelegationToken() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       ConfigUtil.addLinkFallback(conf, defaultUri.getHost(), defaultUri);
@@ -95,9 +95,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testRenameWithOptions() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback",

@@ -47,19 +47,21 @@ public class MiniDockerDFSCluster implements Closeable {
     //String startVersion = System.getProperty("startVersion", "hadoop:3.3.5");
     String upgradeVersion = System.getProperty("upgradeVersion", "hadoop:3.3.6");
 
-    private final Map<String, String> defaultCoreSite = Map.of(
-            "fs.defaultFS", "hdfs://0.0.0.0:9000"
-    );
-    private final Map<String, String> defaultHDFSSite = Map.of(
-            "dfs.namenode.rpc-address", "namenode:9000",
-            "dfs.namenode.http-address", "namenode:50070",
-            "dfs.datanode.address", "0.0.0.0:50010",
-            "dfs.datanode.http.address", "0.0.0.0:50075",
-            "dfs.datanode.ipc.address", "0.0.0.0:50020",
-            "dfs.datanode.hostname", "localhost",
-            "hadoop.security.authentication", "simple",
-            "dfs.namenode.fs-limits.min-block-size", "0"
-    );
+    private static final Map<String, String> defaultCoreSite = new LinkedHashMap<>();
+    private static final Map<String, String> defaultHDFSSite = new LinkedHashMap<>();
+
+    static {
+        defaultCoreSite.put("fs.defaultFS", "hdfs://0.0.0.0:9000");
+
+        defaultHDFSSite.put("dfs.namenode.rpc-address", "namenode:9000");
+        defaultHDFSSite.put("dfs.namenode.http-address", "namenode:50070");
+        defaultHDFSSite.put("dfs.datanode.address", "0.0.0.0:50010");
+        defaultHDFSSite.put("dfs.datanode.http.address", "0.0.0.0:50075");
+        defaultHDFSSite.put("dfs.datanode.ipc.address", "0.0.0.0:50020");
+        defaultHDFSSite.put("dfs.datanode.hostname", "localhost");
+        defaultHDFSSite.put("hadoop.security.authentication", "simple");
+        defaultHDFSSite.put("dfs.namenode.fs-limits.min-block-size", "0");
+    }
 
     private List<File> generateConfigFiles() {
 

@@ -41,7 +41,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.web.WebHdfsConstants;
 import org.apache.hadoop.hdfs.web.WebHdfsTestUtil;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
@@ -104,7 +104,7 @@ public class TestAuditLogs {
   static final String fileName = "/srcdat";
 
   DFSTestUtil util;
-  MiniDFSCluster cluster;
+  MiniDockerDFSCluster cluster;
   FileSystem fs;
   String fnames[];
   Configuration conf;
@@ -123,7 +123,7 @@ public class TestAuditLogs {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_EDITS_ASYNC_LOGGING, useAsyncEdits);
     util = new DFSTestUtil.Builder().setName("TestAuditAllowed").
         setNumFiles(20).build();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).build();
     fs = cluster.getFileSystem();
     util.createFiles(fs, fileName);
 

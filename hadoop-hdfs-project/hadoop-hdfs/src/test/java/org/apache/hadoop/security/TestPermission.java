@@ -42,7 +42,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.util.StringUtils;
 import org.junit.Test;
 
@@ -138,11 +138,11 @@ public class TestPermission {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
     conf.set(FsPermission.UMASK_LABEL, "000");
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
       fs = FileSystem.get(conf);
       FsPermission rootPerm = checkPermission(fs, "/", null);
@@ -200,7 +200,7 @@ public class TestPermission {
   public void testFilePermission() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     try {

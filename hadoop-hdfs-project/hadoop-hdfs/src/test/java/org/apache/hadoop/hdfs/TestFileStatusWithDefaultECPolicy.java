@@ -38,7 +38,7 @@ import org.junit.rules.Timeout;
  * This test ensures the statuses of EC files with the default policy.
  */
 public class TestFileStatusWithDefaultECPolicy {
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private DFSClient client;
 
@@ -49,7 +49,7 @@ public class TestFileStatusWithDefaultECPolicy {
   public void before() throws IOException {
     HdfsConfiguration conf = new HdfsConfiguration();
     cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     client = fs.getClient();

@@ -21,13 +21,13 @@ import org.apache.hadoop.cli.util.CLICommand;
 import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestAclCLI extends CLITestHelperDFS {
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private FileSystem fs = null;
   private String namenode = null;
   private String username = null;
@@ -43,7 +43,7 @@ public class TestAclCLI extends CLITestHelperDFS {
   public void setUp() throws Exception {
     super.setUp();
     initConf();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     fs = cluster.getFileSystem();
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
     username = System.getProperty("user.name");
