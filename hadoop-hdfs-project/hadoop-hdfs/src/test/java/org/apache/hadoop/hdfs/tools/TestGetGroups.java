@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.tools.GetGroupsTestBase;
 import org.apache.hadoop.util.Tool;
 import org.junit.After;
@@ -32,12 +32,12 @@ import org.junit.Before;
  */
 public class TestGetGroups extends GetGroupsTestBase {
   
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   @Before
   public void setUpNameNode() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
   }
   
   @After

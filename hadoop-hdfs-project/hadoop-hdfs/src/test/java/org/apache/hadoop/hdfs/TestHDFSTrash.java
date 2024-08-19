@@ -48,7 +48,7 @@ public class TestHDFSTrash {
 
   public static final Logger LOG = LoggerFactory.getLogger(TestHDFSTrash.class);
 
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
   private static FileSystem fs;
   private static Configuration conf = new HdfsConfiguration();
 
@@ -67,7 +67,7 @@ public class TestHDFSTrash {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     fs = FileSystem.get(conf);
 
     superUser = UserGroupInformation.getCurrentUser();

@@ -61,7 +61,7 @@ public class TestDFSStripedOutputStream {
   private int dataBlocks;
   private int parityBlocks;
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private Configuration conf;
   private int cellSize;
@@ -98,7 +98,7 @@ public class TestDFSStripedOutputStream {
           CodecUtil.IO_ERASURECODE_CODEC_RS_RAWCODERS_KEY,
           NativeRSRawErasureCoderFactory.CODER_NAME);
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
     fs = cluster.getFileSystem();
     DFSTestUtil.enableAllECPolicies(fs);
     fs.getClient().setErasureCodingPolicy("/", ecPolicy.getName());

@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExtendedAcls {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
 
   private static final short REPLICATION = 3;
@@ -69,7 +69,7 @@ public class TestExtendedAcls {
   public static void setup() throws IOException {
     conf = new Configuration();
     conf.setBoolean(DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();

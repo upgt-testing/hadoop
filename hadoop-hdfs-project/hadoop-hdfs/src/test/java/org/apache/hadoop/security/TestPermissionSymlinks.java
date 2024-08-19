@@ -44,7 +44,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,7 +66,7 @@ public class TestPermissionSymlinks {
   private static final Path link = new Path(linkParent, "link");
   private static final Path target = new Path(targetParent, "target");
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static FileSystem fs;
   private static FileSystemTestWrapper wrapper;
   
@@ -75,7 +75,7 @@ public class TestPermissionSymlinks {
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     conf.set(FsPermission.UMASK_LABEL, "000");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     wrapper = new FileSystemTestWrapper(fs);
