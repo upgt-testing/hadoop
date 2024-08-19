@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
@@ -55,7 +55,7 @@ public class TestFSNamesystemLockReport {
   }
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fs;
   private UserGroupInformation userGroupInfo;
   private GenericTestUtils.LogCapturer logs;
@@ -70,7 +70,7 @@ public class TestFSNamesystemLockReport {
     conf.setLong(DFS_NAMENODE_WRITE_LOCK_REPORTING_THRESHOLD_MS_KEY, 0);
     conf.setLong(DFS_LOCK_SUPPRESS_WARNING_INTERVAL_KEY, 0);
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).build();
     fs = cluster.getFileSystem();
 
     userGroupInfo = UserGroupInformation.createUserForTesting("bob",

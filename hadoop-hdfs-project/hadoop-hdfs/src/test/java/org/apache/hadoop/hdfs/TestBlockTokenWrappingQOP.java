@@ -55,7 +55,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
   public static final Logger LOG = LoggerFactory.getLogger(TestPermission.class);
 
   private HdfsConfiguration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem dfs;
 
   private String configKey;
@@ -97,7 +97,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
     conf.setBoolean(DFS_NAMENODE_SEND_QOP_ENABLED, true);
     conf.set(HADOOP_RPC_PROTECTION, this.configKey);
     cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     HdfsConfiguration clientConf = new HdfsConfiguration(conf);

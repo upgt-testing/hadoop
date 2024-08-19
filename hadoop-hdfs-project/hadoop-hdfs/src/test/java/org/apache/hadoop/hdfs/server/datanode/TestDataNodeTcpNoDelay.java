@@ -30,7 +30,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.net.StandardSocketFactory;
@@ -79,8 +79,8 @@ public class TestDataNodeTcpNoDelay {
 
     SocketFactory defaultFactory = NetUtils.getDefaultSocketFactory(testConf);
     LOG.info("Socket factory is " + defaultFactory.getClass().getName());
-    MiniDFSCluster dfsCluster =
-        new MiniDFSCluster.Builder(testConf).numDataNodes(3).build();
+    MiniDockerDFSCluster dfsCluster =
+        new MiniDockerDFSCluster.Builder(testConf).numDataNodes(3).build();
     dfsCluster.waitActive();
 
     DistributedFileSystem dfs = dfsCluster.getFileSystem();
@@ -107,8 +107,8 @@ public class TestDataNodeTcpNoDelay {
 
     SocketFactory defaultFactory = NetUtils.getDefaultSocketFactory(testConf);
     LOG.info("Socket factory is " + defaultFactory.getClass().getName());
-    MiniDFSCluster dfsCluster =
-        new MiniDFSCluster.Builder(testConf).numDataNodes(3).build();
+    MiniDockerDFSCluster dfsCluster =
+        new MiniDockerDFSCluster.Builder(testConf).numDataNodes(3).build();
     dfsCluster.waitActive();
 
     DistributedFileSystem dfs = dfsCluster.getFileSystem();

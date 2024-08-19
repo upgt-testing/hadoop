@@ -104,7 +104,7 @@ public class TestHFlush {
   @Test
   public void hSyncUpdateLength_00() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(
         2).build();
     DistributedFileSystem fileSystem =
         cluster.getFileSystem();
@@ -133,7 +133,7 @@ public class TestHFlush {
     final int preferredBlockSize = 1024;
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, preferredBlockSize);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2)
         .build();
     DistributedFileSystem fileSystem = cluster.getFileSystem();
     FSDataOutputStream stm = null;
@@ -305,7 +305,7 @@ public class TestHFlush {
     final int SECTIONS = 10;
 
     fileContent = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
                                                .numDataNodes(replicas).build();
     // Make sure we work with DFS in order to utilize all its functionality
     DistributedFileSystem fileSystem = cluster.getFileSystem();
@@ -393,7 +393,7 @@ public class TestHFlush {
     final Path p = new Path("/pipelineHeartbeat/foo");
     System.out.println("p=" + p);
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
 
@@ -443,7 +443,7 @@ public class TestHFlush {
 
     System.out.println("p=" + p);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
 

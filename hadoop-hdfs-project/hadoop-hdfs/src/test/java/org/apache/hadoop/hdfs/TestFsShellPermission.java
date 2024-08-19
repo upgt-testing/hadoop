@@ -35,7 +35,7 @@ import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
 
@@ -243,10 +243,10 @@ public class TestFsShellPermission {
   @Test
   public void testDelete() throws Exception {
     Configuration conf = null;
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       conf = new Configuration();
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
 
       String nnUri = FileSystem.getDefaultUri(conf).toString();
       FileSystem fs = FileSystem.get(URI.create(nnUri), conf);

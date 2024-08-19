@@ -69,7 +69,7 @@ public class TestLocalDFS {
   @Test(timeout=20000)
   public void testWorkingDirectory() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       Path orig_path = fileSys.getWorkingDirectory();
@@ -112,7 +112,7 @@ public class TestLocalDFS {
     Configuration conf = new HdfsConfiguration();
     for (final String homeBase : homeBases) {
       conf.set(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY, homeBase);
-      MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+      MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
       FileSystem fileSys = cluster.getFileSystem();
       try {    
         // test home directory

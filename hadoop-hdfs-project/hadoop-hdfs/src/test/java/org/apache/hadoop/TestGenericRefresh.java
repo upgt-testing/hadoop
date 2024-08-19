@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.ipc.RefreshHandler;
 
@@ -37,13 +37,13 @@ import org.junit.AfterClass;
 import org.mockito.Mockito;
 
 /**
- * Before all tests, a MiniDFSCluster is spun up.
+ * Before all tests, a MiniDockerDFSCluster is spun up.
  * Before each test, mock refresh handlers are created and registered.
  * After each test, the mock handlers are unregistered.
  * After all tests, the cluster is spun down.
  */
 public class TestGenericRefresh {
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration config;
 
   private static RefreshHandler firstHandler;
@@ -55,7 +55,7 @@ public class TestGenericRefresh {
     config.set("hadoop.security.authorization", "true");
 
     FileSystem.setDefaultUri(config, "hdfs://localhost:0");
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDockerDFSCluster.Builder(config).build();
     cluster.waitActive();
   }
 

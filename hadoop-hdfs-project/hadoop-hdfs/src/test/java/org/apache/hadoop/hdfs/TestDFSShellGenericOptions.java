@@ -36,10 +36,10 @@ public class TestDFSShellGenericOptions {
   @Test
   public void testDFSCommand() throws IOException {
     String namenode = null;
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       namenode = FileSystem.getDefaultUri(conf).toString();
       String [] args = new String[4];
       args[2] = "-mkdir";
