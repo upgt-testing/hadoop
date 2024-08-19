@@ -19,7 +19,6 @@ package org.apache.hadoop.hdfs.tools;
 
 import java.io.IOException;
 import java.io.PrintStream;
-
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.tools.GetGroupsTestBase;
@@ -31,26 +30,25 @@ import org.junit.Before;
  * Tests for the HDFS implementation of {@link GetGroups}
  */
 public class TestGetGroups extends GetGroupsTestBase {
-  
-  private MiniDockerDFSCluster cluster;
 
-  @Before
-  public void setUpNameNode() throws IOException {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
-  }
-  
-  @After
-  public void tearDownNameNode() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private MiniDockerDFSCluster cluster;
+
+    @Before
+    public void setUpNameNode() throws IOException {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
     }
-  }
 
-  @Override
-  protected Tool getTool(PrintStream o) {
-    return new GetGroups(conf, o);
-  }
+    @After
+    public void tearDownNameNode() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
+    @Override
+    protected Tool getTool(PrintStream o) {
+        return new GetGroups(conf, o);
+    }
 }
