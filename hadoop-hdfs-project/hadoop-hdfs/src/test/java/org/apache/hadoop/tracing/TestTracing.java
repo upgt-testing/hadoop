@@ -30,7 +30,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsTracer;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.htrace.core.Sampler;
 import org.apache.htrace.core.Span;
@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestTracing {
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem dfs;
 
   private Tracer prevTracer;
@@ -212,7 +212,7 @@ public class TestTracing {
 
   @Before
   public void startCluster() throws IOException {
-    cluster = new MiniDFSCluster.Builder(NO_TRACING_CONF)
+    cluster = new MiniDockerDFSCluster.Builder(NO_TRACING_CONF)
         .numDataNodes(3)
         .build();
     cluster.waitActive();

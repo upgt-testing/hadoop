@@ -81,7 +81,7 @@ public interface FsDatasetTestUtils {
   /**
    * A replica to be corrupted.
    *
-   * It is safe to corrupt this replica even if the MiniDFSCluster is shutdown.
+   * It is safe to corrupt this replica even if the MiniDockerDFSCluster is shutdown.
    */
   interface MaterializedReplica {
 
@@ -232,7 +232,7 @@ public interface FsDatasetTestUtils {
 
   /**
    * @return The default value of number of data dirs per DataNode in
-   * MiniDFSCluster.
+   * MiniDockerDFSCluster.
    */
   int getDefaultNumOfDataDirs();
 

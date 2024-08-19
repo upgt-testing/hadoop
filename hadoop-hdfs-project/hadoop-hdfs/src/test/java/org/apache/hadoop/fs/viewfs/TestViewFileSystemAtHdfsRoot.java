@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,7 +39,7 @@ import org.junit.BeforeClass;
  */
 public class TestViewFileSystemAtHdfsRoot extends ViewFileSystemBaseTest {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static final Configuration CONF = new Configuration();
   private static FileSystem fHdfs;
   
@@ -55,7 +55,7 @@ public class TestViewFileSystemAtHdfsRoot extends ViewFileSystemBaseTest {
     CONF.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
     
-    cluster = new MiniDFSCluster.Builder(CONF)
+    cluster = new MiniDockerDFSCluster.Builder(CONF)
       .numDataNodes(2)
       .build();
     cluster.waitClusterUp();

@@ -40,7 +40,7 @@ public class TestAppendDifferentChecksum {
 
   // run the randomized test for 5 seconds
   private static final long RANDOM_TEST_RUNTIME = 5000;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static FileSystem fs; 
   
 
@@ -49,7 +49,7 @@ public class TestAppendDifferentChecksum {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
     conf.set("fs.hdfs.impl.disable.cache", "true");
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(1)
       .build();
     fs = cluster.getFileSystem();

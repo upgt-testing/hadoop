@@ -39,13 +39,13 @@ import org.junit.Test;
 public class TestSnapshotCommands {
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem fs;
   
   @BeforeClass
   public static void clusterSetUp() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
   }

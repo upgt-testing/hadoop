@@ -43,7 +43,7 @@ import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DFSInputStream;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.server.common.JspHelper;
 import org.apache.hadoop.net.NetUtils;
 import org.junit.Test;
@@ -212,7 +212,7 @@ public class TestStreamFile {
   public void testDoGetShouldWriteTheFileContentIntoServletOutputStream()
       throws Exception {
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(1)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1)
         .build();
     try {
       Path testFile = createFile();
@@ -242,7 +242,7 @@ public class TestStreamFile {
   public void testDoGetShouldCloseTheDFSInputStreamIfResponseGetOutPutStreamThrowsAnyException()
       throws Exception {
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(1)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1)
         .build();
     try {
       Path testFile = createFile();
@@ -269,7 +269,7 @@ public class TestStreamFile {
     }
   }
 
-  private void setUpForDoGetTest(MiniDFSCluster cluster, Path testFile) {
+  private void setUpForDoGetTest(MiniDockerDFSCluster cluster, Path testFile) {
 
     Mockito.doReturn(CONF).when(mockServletContext).getAttribute(
         JspHelper.CURRENT_CONF);
