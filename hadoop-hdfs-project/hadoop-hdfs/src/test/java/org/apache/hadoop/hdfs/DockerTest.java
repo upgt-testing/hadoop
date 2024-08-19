@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,29 +34,21 @@ public class DockerTest {
     @Test
     public void testFileSystem() {
         try {
-            MiniDockerDFSCluster dockerHDFSCluster =
-                    new MiniDockerDFSCluster.Builder(new Configuration())
-                            .numDataNodes(1)
-                            .build();
-
-
+            MiniDockerDFSCluster dockerHDFSCluster = new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
             FileSystem fs = dockerHDFSCluster.getFileSystem();
             // check whether the file system is functional
             System.out.println("FileSystem URI: " + fs.getUri());
             System.out.println("Home directory: " + fs.getHomeDirectory());
             System.out.println("Working directory: " + fs.getWorkingDirectory());
-
             String dir = "/test-dir-2222";
             Path newDir = new Path(dir);
             fs.mkdirs(newDir);
-
             System.out.println("Before upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
             // The datanode index starts from 0
             dockerHDFSCluster.upgradeDatanode(0);
             System.out.println("After upgrade, you have 10 seconds to check the current datanode version");
             Thread.sleep(10000);
-
             // list and print the content of the new directory
             System.out.println("Content of" + dir);
             for (FileStatus p : fs.listStatus(newDir)) {
@@ -65,7 +56,7 @@ public class DockerTest {
                 // read this
                 Path filePath = p.getPath();
                 try (InputStream is = fs.open(filePath);
-                     BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
                     String line;
                     System.out.println("Content of " + filePath);
                     while ((line = br.readLine()) != null) {
@@ -73,16 +64,14 @@ public class DockerTest {
                     }
                 }
             }
-
-
-             // create a new file in the new directory
-             Path newFile = new Path(dir + "/new_file");
-             try (OutputStream os = fs.create(newFile)) {
-                 os.write("UIUC".getBytes());
-             }
+            // create a new file in the new directory
+            Path newFile = new Path(dir + "/new_file");
+            try (OutputStream os = fs.create(newFile)) {
+                os.write("UIUC".getBytes());
+            }
             // read the content of the new file
             try (InputStream is = fs.open(newFile);
-                 BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
                 String line;
                 System.out.println("Content of new_file:");
                 while ((line = br.readLine()) != null) {
@@ -92,7 +81,6 @@ public class DockerTest {
             // close the file system
             fs.close();
             dockerHDFSCluster.close();
-
         } catch (Exception e) {
             throw new RuntimeException("Failed to create file system", e);
         }

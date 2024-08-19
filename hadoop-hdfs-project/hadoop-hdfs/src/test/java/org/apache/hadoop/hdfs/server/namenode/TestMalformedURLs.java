@@ -15,46 +15,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import static org.junit.Assert.assertNotEquals;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestMalformedURLs {
-  private MiniDockerDFSCluster cluster;
-  Configuration config;
 
-  @Before
-  public void setUp() throws Exception {
-    Configuration.addDefaultResource("hdfs-site.malformed.xml");
-    config = new Configuration();
-  }
+    private MiniDockerDFSCluster cluster;
 
-  @Test
-  public void testTryStartingCluster() throws Exception {
-    // if we are able to start the cluster, it means
-    // that we were able to read the configuration
-    // correctly.
+    Configuration config;
 
-    assertNotEquals(config.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY),
-      config.getTrimmed(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY));
-    cluster = new MiniDockerDFSCluster.Builder(config).build();
-    cluster.waitActive();
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    @Before
+    public void setUp() throws Exception {
+        Configuration.addDefaultResource("hdfs-site.malformed.xml");
+        config = new Configuration();
     }
-  }
+
+    @Test
+    public void testTryStartingCluster() throws Exception {
+        // if we are able to start the cluster, it means
+        // that we were able to read the configuration
+        // correctly.
+        assertNotEquals(config.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY), config.getTrimmed(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY));
+        cluster = new MiniDockerDFSCluster.Builder(config).build();
+        cluster.upgradeDatanode(0);
+        cluster.waitActive();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 }
