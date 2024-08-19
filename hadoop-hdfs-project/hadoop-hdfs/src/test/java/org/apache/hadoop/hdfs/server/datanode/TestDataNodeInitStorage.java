@@ -15,11 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import java.io.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -34,51 +32,48 @@ import org.junit.Test;
  * FsDataSet initialization.
  */
 public class TestDataNodeInitStorage {
-  public static final Logger LOG =
-      LoggerFactory.getLogger(TestDataNodeInitStorage.class);
 
-  static private class SimulatedFsDatasetVerifier extends SimulatedFSDataset {
-    static class Factory extends FsDatasetSpi.Factory<SimulatedFSDataset> {
-      @Override
-      public SimulatedFsDatasetVerifier newInstance(
-          DataNode datanode, DataStorage storage,
-          Configuration conf) throws IOException {
-        return new SimulatedFsDatasetVerifier(storage, conf);
-      }
+    public static final Logger LOG = LoggerFactory.getLogger(TestDataNodeInitStorage.class);
 
-      @Override
-      public boolean isSimulated() {
-        return true;
-      }
+    static private class SimulatedFsDatasetVerifier extends SimulatedFSDataset {
+
+        static class Factory extends FsDatasetSpi.Factory<SimulatedFSDataset> {
+
+            @Override
+            public SimulatedFsDatasetVerifier newInstance(DataNode datanode, DataStorage storage, Configuration conf) throws IOException {
+                return new SimulatedFsDatasetVerifier(storage, conf);
+            }
+
+            @Override
+            public boolean isSimulated() {
+                return true;
+            }
+        }
+
+        public static void setFactory(Configuration conf) {
+            conf.set(DFSConfigKeys.DFS_DATANODE_FSDATASET_FACTORY_KEY, Factory.class.getName());
+        }
+
+        // This constructor does the actual verification by ensuring that
+        // the DatanodeUuid is initialized.
+        public SimulatedFsDatasetVerifier(DataStorage storage, Configuration conf) {
+            super(storage, conf);
+            LOG.info("Assigned DatanodeUuid is " + storage.getDatanodeUuid());
+            assert (storage.getDatanodeUuid() != null);
+            assert (storage.getDatanodeUuid().length() != 0);
+        }
     }
 
-    public static void setFactory(Configuration conf) {
-      conf.set(DFSConfigKeys.DFS_DATANODE_FSDATASET_FACTORY_KEY,
-               Factory.class.getName());
+    @Test
+    public void testDataNodeInitStorage() throws Throwable {
+        // Create configuration to use SimulatedFsDatasetVerifier#Factory.
+        Configuration conf = new HdfsConfiguration();
+        SimulatedFsDatasetVerifier.setFactory(conf);
+        // Start a cluster so that SimulatedFsDatasetVerifier constructor is
+        // invoked.
+        MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+        cluster.upgradeDatanode(0);
+        cluster.waitActive();
+        cluster.shutdown();
     }
-
-    // This constructor does the actual verification by ensuring that
-    // the DatanodeUuid is initialized.
-    public SimulatedFsDatasetVerifier(DataStorage storage, Configuration conf) {
-      super(storage, conf);
-      LOG.info("Assigned DatanodeUuid is " + storage.getDatanodeUuid());
-      assert(storage.getDatanodeUuid() != null);
-      assert(storage.getDatanodeUuid().length() != 0);
-    }
-  }
-
-
-  @Test (timeout = 60000)
-  public void testDataNodeInitStorage() throws Throwable {
-    // Create configuration to use SimulatedFsDatasetVerifier#Factory.
-    Configuration conf = new HdfsConfiguration();
-    SimulatedFsDatasetVerifier.setFactory(conf);
-
-    // Start a cluster so that SimulatedFsDatasetVerifier constructor is
-    // invoked.
-    MiniDockerDFSCluster cluster =
-        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    cluster.shutdown();
-  }
 }

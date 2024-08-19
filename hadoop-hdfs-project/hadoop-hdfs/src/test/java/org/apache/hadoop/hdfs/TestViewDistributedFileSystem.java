@@ -28,94 +28,86 @@ import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.test.Whitebox;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.io.IOException;
 import java.net.URI;
 
-public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
-  @Override
-  HdfsConfiguration getTestConfiguration() {
-    HdfsConfiguration conf = super.getTestConfiguration();
-    conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());
-    return conf;
-  }
+public class TestViewDistributedFileSystem extends TestDistributedFileSystem {
 
-  @Override
-  public void testStatistics() throws IOException {
-    FileSystem.getStatistics(HdfsConstants.HDFS_URI_SCHEME,
-        ViewDistributedFileSystem.class).reset();
-    @SuppressWarnings("unchecked")
-    ThreadLocal<FileSystem.Statistics.StatisticsData> data =
-        (ThreadLocal<FileSystem.Statistics.StatisticsData>) Whitebox
-            .getInternalState(FileSystem
-                .getStatistics(HdfsConstants.HDFS_URI_SCHEME,
-                    ViewDistributedFileSystem.class), "threadData");
-    data.set(null);
-    super.testStatistics();
-  }
-
-  @Test
-  public void testOpenWithPathHandle() throws Exception {
-    Configuration conf = getTestConfiguration();
-    MiniDockerDFSCluster cluster = null;
-    try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-      FileSystem fileSys = cluster.getFileSystem();
-      Path openTestPath = new Path("/testOpen");
-      fileSys.create(openTestPath).close();
-      PathHandle pathHandle =
-          fileSys.getPathHandle(fileSys.getFileStatus(openTestPath));
-      fileSys.open(pathHandle, 1024).close();
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Override
+    HdfsConfiguration getTestConfiguration() {
+        HdfsConfiguration conf = super.getTestConfiguration();
+        conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());
+        return conf;
     }
-  }
 
-  @Override
-  public void testEmptyDelegationToken() throws IOException {
-    Configuration conf = getTestConfiguration();
-    MiniDockerDFSCluster cluster = null;
-    try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
-      URI defaultUri =
-          URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-      ConfigUtil.addLinkFallback(conf, defaultUri.getHost(), defaultUri);
-      try (FileSystem fileSys = FileSystem.get(conf)) {
-        fileSys.getDelegationToken("");
-      }
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Override
+    public void testStatistics() throws IOException {
+        FileSystem.getStatistics(HdfsConstants.HDFS_URI_SCHEME, ViewDistributedFileSystem.class).reset();
+        @SuppressWarnings("unchecked")
+        ThreadLocal<FileSystem.Statistics.StatisticsData> data = (ThreadLocal<FileSystem.Statistics.StatisticsData>) Whitebox.getInternalState(FileSystem.getStatistics(HdfsConstants.HDFS_URI_SCHEME, ViewDistributedFileSystem.class), "threadData");
+        data.set(null);
+        super.testStatistics();
     }
-  }
 
-  @Test
-  public void testRenameWithOptions() throws IOException {
-    Configuration conf = getTestConfiguration();
-    MiniDockerDFSCluster cluster = null;
-    try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
-      URI defaultUri =
-          URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-      conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback",
-          defaultUri.toString());
-      conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, 30000);
-      try (ViewDistributedFileSystem fileSystem =
-          (ViewDistributedFileSystem) FileSystem.get(conf)) {
-        final Path testDir = new Path("/test");
-        final Path renameDir = new Path("/testRename");
-        fileSystem.mkdirs(testDir);
-        fileSystem.rename(testDir, renameDir, Options.Rename.TO_TRASH);
-        Assert.assertTrue(fileSystem.exists(renameDir));
-        Assert.assertFalse(fileSystem.exists(testDir));
-      }
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Test
+    public void testOpenWithPathHandle() throws Exception {
+        Configuration conf = getTestConfiguration();
+        MiniDockerDFSCluster cluster = null;
+        try {
+            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+            FileSystem fileSys = cluster.getFileSystem();
+            Path openTestPath = new Path("/testOpen");
+            fileSys.create(openTestPath).close();
+            cluster.upgradeDatanode(0);
+            PathHandle pathHandle = fileSys.getPathHandle(fileSys.getFileStatus(openTestPath));
+            fileSys.open(pathHandle, 1024).close();
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
+
+    @Override
+    public void testEmptyDelegationToken() throws IOException {
+        Configuration conf = getTestConfiguration();
+        MiniDockerDFSCluster cluster = null;
+        try {
+            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
+            URI defaultUri = URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+            ConfigUtil.addLinkFallback(conf, defaultUri.getHost(), defaultUri);
+            try (FileSystem fileSys = FileSystem.get(conf)) {
+                fileSys.getDelegationToken("");
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testRenameWithOptions() throws IOException {
+        Configuration conf = getTestConfiguration();
+        MiniDockerDFSCluster cluster = null;
+        try {
+            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
+            URI defaultUri = URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+            conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback", defaultUri.toString());
+            cluster.upgradeDatanode(0);
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, 30000);
+            try (ViewDistributedFileSystem fileSystem = (ViewDistributedFileSystem) FileSystem.get(conf)) {
+                final Path testDir = new Path("/test");
+                final Path renameDir = new Path("/testRename");
+                fileSystem.mkdirs(testDir);
+                fileSystem.rename(testDir, renameDir, Options.Rename.TO_TRASH);
+                Assert.assertTrue(fileSystem.exists(renameDir));
+                Assert.assertFalse(fileSystem.exists(testDir));
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 }
