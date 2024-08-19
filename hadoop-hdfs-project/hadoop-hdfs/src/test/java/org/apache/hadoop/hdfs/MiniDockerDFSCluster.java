@@ -224,13 +224,13 @@ public class MiniDockerDFSCluster implements Closeable {
                     .withStartWaitTime(5000)
                     .withConfigFile(configFiles.get(0).getAbsolutePath(), "/opt/hadoop/etc/hadoop/hdfs-site.xml", new HashMap<>())
                     .withConfigFile(configFiles.get(1).getAbsolutePath(), "/opt/hadoop/etc/hadoop/core-site.xml", new HashMap<>())
-                    .withLogConsumer(outputFrame -> {
-                        try {
-                            Files.write(nnNodeLog.toPath(), outputFrame.getBytes());
-                        } catch (IOException e) {
-                            throw new RuntimeException("Failed to write the log to the file", e);
-                        }
-                    })
+                    // .withLogConsumer(outputFrame -> {
+                    //     try {
+                    //         Files.write(nnNodeLog.toPath(), outputFrame.getBytes());
+                    //     } catch (IOException e) {
+                    //         throw new RuntimeException("Failed to write the log to the file", e);
+                    //     }
+                    // })
                     .withEnv(new HashMap<>());
             for (int i = 0; i < builder.numDataNodes; i++) {
                 DockerNode dataNode = cluster.nodeBuilder(builder.dockerImageVersion)
