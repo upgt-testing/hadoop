@@ -19,10 +19,8 @@ package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.Random;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
@@ -39,86 +37,85 @@ import org.junit.Test;
  * smaller than the default buffer size of 4K.
  */
 public class TestSmallBlock {
-  static final long seed = 0xDEADBEEFL;
-  static final int blockSize = 1;
-  static final int fileSize = 20;
-  boolean simulatedStorage = false;
 
-  private void writeFile(FileSystem fileSys, Path name) throws IOException {
-    // create and write a file that contains three blocks of data
-    FSDataOutputStream stm = fileSys.create(name, true, fileSys.getConf()
-        .getInt(CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, 4096),
-        (short) 1, blockSize);
-    byte[] buffer = new byte[fileSize];
-    Random rand = new Random(seed);
-    rand.nextBytes(buffer);
-    stm.write(buffer);
-    stm.close();
-  }
-  
-  private void checkAndEraseData(byte[] actual, int from, byte[] expected, String message) {
-    for (int idx = 0; idx < actual.length; idx++) {
-      assertEquals(message+" byte "+(from+idx)+" differs. expected "+
-                        expected[from+idx]+" actual "+actual[idx],
-                        actual[idx], expected[from+idx]);
-      actual[idx] = 0;
+    static final long seed = 0xDEADBEEFL;
+
+    static final int blockSize = 1;
+
+    static final int fileSize = 20;
+
+    boolean simulatedStorage = false;
+
+    private void writeFile(FileSystem fileSys, Path name) throws IOException {
+        // create and write a file that contains three blocks of data
+        FSDataOutputStream stm = fileSys.create(name, true, fileSys.getConf().getInt(CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, 4096), (short) 1, blockSize);
+        byte[] buffer = new byte[fileSize];
+        Random rand = new Random(seed);
+        rand.nextBytes(buffer);
+        stm.write(buffer);
+        stm.close();
     }
-  }
-  
-  private void checkFile(DistributedFileSystem fileSys, Path name)
-      throws IOException {
-    BlockLocation[] locations = fileSys.getFileBlockLocations(
-        fileSys.getFileStatus(name), 0, fileSize);
-    assertEquals("Number of blocks", fileSize, locations.length);
-    FSDataInputStream stm = fileSys.open(name);
-    byte[] expected = new byte[fileSize];
-    if (simulatedStorage) {
-      LocatedBlocks lbs = fileSys.getClient().getLocatedBlocks(name.toString(),
-          0, fileSize);
-      DFSTestUtil.fillExpectedBuf(lbs, expected);
-    } else {
-      Random rand = new Random(seed);
-      rand.nextBytes(expected);
+
+    private void checkAndEraseData(byte[] actual, int from, byte[] expected, String message) {
+        for (int idx = 0; idx < actual.length; idx++) {
+            assertEquals(message + " byte " + (from + idx) + " differs. expected " + expected[from + idx] + " actual " + actual[idx], actual[idx], expected[from + idx]);
+            actual[idx] = 0;
+        }
     }
-    // do a sanity check. Read the file
-    byte[] actual = new byte[fileSize];
-    stm.readFully(0, actual);
-    checkAndEraseData(actual, 0, expected, "Read Sanity Test");
-    stm.close();
-  }
-  
-  private void cleanupFile(FileSystem fileSys, Path name) throws IOException {
-    assertTrue(fileSys.exists(name));
-    fileSys.delete(name, true);
-    assertTrue(!fileSys.exists(name));
-  }
-  
-  /**
-   * Tests small block size in in DFS.
-   */
-  @Test
-  public void testSmallBlock() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    if (simulatedStorage) {
-      SimulatedFSDataset.setFactory(conf);
+
+    private void checkFile(DistributedFileSystem fileSys, Path name) throws IOException {
+        BlockLocation[] locations = fileSys.getFileBlockLocations(fileSys.getFileStatus(name), 0, fileSize);
+        assertEquals("Number of blocks", fileSize, locations.length);
+        FSDataInputStream stm = fileSys.open(name);
+        byte[] expected = new byte[fileSize];
+        if (simulatedStorage) {
+            LocatedBlocks lbs = fileSys.getClient().getLocatedBlocks(name.toString(), 0, fileSize);
+            DFSTestUtil.fillExpectedBuf(lbs, expected);
+        } else {
+            Random rand = new Random(seed);
+            rand.nextBytes(expected);
+        }
+        // do a sanity check. Read the file
+        byte[] actual = new byte[fileSize];
+        stm.readFully(0, actual);
+        checkAndEraseData(actual, 0, expected, "Read Sanity Test");
+        stm.close();
     }
-    conf.set(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, "1");
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
-    DistributedFileSystem fileSys = cluster.getFileSystem();
-    try {
-      Path file1 = new Path("/smallblocktest.dat");
-      writeFile(fileSys, file1);
-      checkFile(fileSys, file1);
-      cleanupFile(fileSys, file1);
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
+
+    private void cleanupFile(FileSystem fileSys, Path name) throws IOException {
+        assertTrue(fileSys.exists(name));
+        fileSys.delete(name, true);
+        assertTrue(!fileSys.exists(name));
     }
-  }
-  @Test
-  public void testSmallBlockSimulatedStorage() throws IOException {
-    simulatedStorage = true;
-    testSmallBlock();
-    simulatedStorage = false;
-  }
+
+    /**
+     * Tests small block size in in DFS.
+     */
+    @Test
+    public void testSmallBlock() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        if (simulatedStorage) {
+            SimulatedFSDataset.setFactory(conf);
+        }
+        conf.set(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, "1");
+        MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
+        DistributedFileSystem fileSys = cluster.getFileSystem();
+        try {
+            Path file1 = new Path("/smallblocktest.dat");
+            writeFile(fileSys, file1);
+            checkFile(fileSys, file1);
+            cluster.upgradeDatanode(0);
+            cleanupFile(fileSys, file1);
+        } finally {
+            fileSys.close();
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testSmallBlockSimulatedStorage() throws IOException {
+        simulatedStorage = true;
+        testSmallBlock();
+        simulatedStorage = false;
+    }
 }

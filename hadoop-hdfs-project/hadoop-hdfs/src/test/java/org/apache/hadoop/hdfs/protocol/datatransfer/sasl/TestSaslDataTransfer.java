@@ -23,13 +23,11 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.IGNORE_SECURE_PORTS_FOR_TESTI
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileSystem;
@@ -59,190 +57,181 @@ import org.junit.rules.Timeout;
 
 public class TestSaslDataTransfer extends SaslDataTransferTestCase {
 
-  private static final int BLOCK_SIZE = 4096;
-  private static final int NUM_BLOCKS = 3;
-  private static final Path PATH  = new Path("/file1");
+    private static final int BLOCK_SIZE = 4096;
 
-  private MiniDockerDFSCluster cluster;
-  private FileSystem fs;
+    private static final int NUM_BLOCKS = 3;
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+    private static final Path PATH = new Path("/file1");
 
-  @Rule
-  public Timeout timeout = new Timeout(60000);
+    private MiniDockerDFSCluster cluster;
 
-  @After
-  public void shutdown() {
-    IOUtils.cleanup(null, fs);
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private FileSystem fs;
 
-  @Test
-  public void testAuthentication() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig(
-      "authentication,integrity,privacy");
-    startCluster(clusterConf);
-    HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
-    clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
-    doTest(clientConf);
-  }
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-  @Test
-  public void testIntegrity() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig(
-      "authentication,integrity,privacy");
-    startCluster(clusterConf);
-    HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
-    clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "integrity");
-    doTest(clientConf);
-  }
+    @Rule
+    public Timeout timeout = new Timeout(60000);
 
-  @Test
-  public void testPrivacy() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig(
-      "authentication,integrity,privacy");
-    startCluster(clusterConf);
-    HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
-    clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "privacy");
-    doTest(clientConf);
-  }
-
-  @Test
-  public void testClientAndServerDoNotHaveCommonQop() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig("privacy");
-    startCluster(clusterConf);
-    HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
-    clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
-    exception.expect(IOException.class);
-    exception.expectMessage("could only be replicated to 0 nodes");
-    doTest(clientConf);
-  }
-
-  @Test
-  public void testServerSaslNoClientSasl() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig(
-      "authentication,integrity,privacy");
-    // Set short retry timeouts so this test runs faster
-    clusterConf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-    startCluster(clusterConf);
-    HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
-    clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "");
-
-    LogCapturer logs = GenericTestUtils.LogCapturer.captureLogs(
-        LogFactory.getLog(DataNode.class));
-    try {
-      doTest(clientConf);
-      Assert.fail("Should fail if SASL data transfer protection is not " +
-          "configured or not supported in client");
-    } catch (IOException e) {
-      GenericTestUtils.assertMatches(e.getMessage(), 
-          "could only be replicated to 0 nodes");
-    } finally {
-      logs.stopCapturing();
-    }
-
-    GenericTestUtils.assertMatches(logs.getOutput(),
-        "Failed to read expected SASL data transfer protection " +
-        "handshake from client at");
-  }
-
-  @Test
-  public void testDataNodeAbortsIfNoSasl() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig("");
-    exception.expect(RuntimeException.class);
-    exception.expectMessage("Cannot start secure DataNode");
-    startCluster(clusterConf);
-  }
-
-  @Test
-  public void testDataNodeAbortsIfNotHttpsOnly() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig("authentication");
-    clusterConf.set(DFS_HTTP_POLICY_KEY,
-      HttpConfig.Policy.HTTP_AND_HTTPS.name());
-    exception.expect(RuntimeException.class);
-    exception.expectMessage("Cannot start secure DataNode");
-    startCluster(clusterConf);
-  }
-
-  @Test
-  public void testNoSaslAndSecurePortsIgnored() throws Exception {
-    HdfsConfiguration clusterConf = createSecureConfig("");
-    clusterConf.setBoolean(IGNORE_SECURE_PORTS_FOR_TESTING_KEY, true);
-    startCluster(clusterConf);
-    doTest(clusterConf);
-  }
-
-  /**
-   * Tests DataTransferProtocol with the given client configuration.
-   *
-   * @param conf client configuration
-   * @throws IOException if there is an I/O error
-   */
-  private void doTest(HdfsConfiguration conf) throws IOException {
-    fs = FileSystem.get(cluster.getURI(), conf);
-    FileSystemTestHelper.createFile(fs, PATH, NUM_BLOCKS, BLOCK_SIZE);
-    assertArrayEquals(FileSystemTestHelper.getFileData(NUM_BLOCKS, BLOCK_SIZE),
-      DFSTestUtil.readFile(fs, PATH).getBytes("UTF-8"));
-    BlockLocation[] blockLocations = fs.getFileBlockLocations(PATH, 0,
-      Long.MAX_VALUE);
-    assertNotNull(blockLocations);
-    assertEquals(NUM_BLOCKS, blockLocations.length);
-    for (BlockLocation blockLocation: blockLocations) {
-      assertNotNull(blockLocation.getHosts());
-      assertEquals(3, blockLocation.getHosts().length);
-    }
-  }
-
-  /**
-   * Starts a cluster with the given configuration.
-   *
-   * @param conf cluster configuration
-   * @throws IOException if there is an I/O error
-   */
-  private void startCluster(HdfsConfiguration conf) throws IOException {
-    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
-    cluster.waitActive();
-  }
-
-  /**
-   * Verifies that peerFromSocketAndKey honors socket read timeouts.
-   */
-  @Test(timeout=60000)
-  public void TestPeerFromSocketAndKeyReadTimeout() throws Exception {
-    HdfsConfiguration conf = createSecureConfig(
-        "authentication,integrity,privacy");
-    AtomicBoolean fallbackToSimpleAuth = new AtomicBoolean(false);
-    SaslDataTransferClient saslClient = new SaslDataTransferClient(
-        conf, DataTransferSaslUtil.getSaslPropertiesResolver(conf),
-        TrustedChannelResolver.getInstance(conf), fallbackToSimpleAuth);
-    DatanodeID fakeDatanodeId = new DatanodeID("127.0.0.1", "localhost",
-        "beefbeef-beef-beef-beef-beefbeefbeef", 1, 2, 3, 4);
-    DataEncryptionKeyFactory dataEncKeyFactory =
-      new DataEncryptionKeyFactory() {
-        @Override
-        public DataEncryptionKey newDataEncryptionKey() {
-          return new DataEncryptionKey(123, "456", new byte[8],
-              new byte[8], 1234567, "fakeAlgorithm");
+    @After
+    public void shutdown() {
+        IOUtils.cleanup(null, fs);
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
         }
-      };
-    ServerSocket serverSocket = null;
-    Socket socket = null;
-    try {
-      serverSocket = new ServerSocket(0, -1);
-      socket = new Socket(serverSocket.getInetAddress(),
-        serverSocket.getLocalPort());
-      Peer peer = DFSUtilClient.peerFromSocketAndKey(saslClient, socket,
-          dataEncKeyFactory, new Token(), fakeDatanodeId, 1);
-      peer.close();
-      Assert.fail("Expected DFSClient#peerFromSocketAndKey to time out.");
-    } catch (SocketTimeoutException e) {
-      GenericTestUtils.assertExceptionContains("Read timed out", e);
-    } finally {
-      IOUtils.cleanup(null, socket, serverSocket);
     }
-  }
+
+    @Test
+    public void testAuthentication() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("authentication,integrity,privacy");
+        startCluster(clusterConf);
+        HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
+        cluster.upgradeDatanode(0);
+        clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
+        doTest(clientConf);
+    }
+
+    @Test
+    public void testIntegrity() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("authentication,integrity,privacy");
+        startCluster(clusterConf);
+        HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
+        cluster.upgradeDatanode(0);
+        clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "integrity");
+        doTest(clientConf);
+    }
+
+    @Test
+    public void testPrivacy() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("authentication,integrity,privacy");
+        startCluster(clusterConf);
+        HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
+        cluster.upgradeDatanode(0);
+        clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "privacy");
+        doTest(clientConf);
+    }
+
+    @Test
+    public void testClientAndServerDoNotHaveCommonQop() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("privacy");
+        startCluster(clusterConf);
+        HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
+        clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
+        cluster.upgradeDatanode(0);
+        exception.expect(IOException.class);
+        exception.expectMessage("could only be replicated to 0 nodes");
+        doTest(clientConf);
+    }
+
+    @Test
+    public void testServerSaslNoClientSasl() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("authentication,integrity,privacy");
+        // Set short retry timeouts so this test runs faster
+        clusterConf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+        startCluster(clusterConf);
+        HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
+        clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "");
+        LogCapturer logs = GenericTestUtils.LogCapturer.captureLogs(LogFactory.getLog(DataNode.class));
+        try {
+            doTest(clientConf);
+            Assert.fail("Should fail if SASL data transfer protection is not " + "configured or not supported in client");
+            cluster.upgradeDatanode(0);
+        } catch (IOException e) {
+            GenericTestUtils.assertMatches(e.getMessage(), "could only be replicated to 0 nodes");
+        } finally {
+            logs.stopCapturing();
+        }
+        GenericTestUtils.assertMatches(logs.getOutput(), "Failed to read expected SASL data transfer protection " + "handshake from client at");
+    }
+
+    @Test
+    public void testDataNodeAbortsIfNoSasl() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Cannot start secure DataNode");
+        cluster.upgradeDatanode(0);
+        startCluster(clusterConf);
+    }
+
+    @Test
+    public void testDataNodeAbortsIfNotHttpsOnly() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("authentication");
+        clusterConf.set(DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTP_AND_HTTPS.name());
+        exception.expect(RuntimeException.class);
+        cluster.upgradeDatanode(0);
+        exception.expectMessage("Cannot start secure DataNode");
+        startCluster(clusterConf);
+    }
+
+    @Test
+    public void testNoSaslAndSecurePortsIgnored() throws Exception {
+        HdfsConfiguration clusterConf = createSecureConfig("");
+        clusterConf.setBoolean(IGNORE_SECURE_PORTS_FOR_TESTING_KEY, true);
+        startCluster(clusterConf);
+        cluster.upgradeDatanode(0);
+        doTest(clusterConf);
+    }
+
+    /**
+     * Tests DataTransferProtocol with the given client configuration.
+     *
+     * @param conf client configuration
+     * @throws IOException if there is an I/O error
+     */
+    private void doTest(HdfsConfiguration conf) throws IOException {
+        fs = FileSystem.get(cluster.getURI(), conf);
+        FileSystemTestHelper.createFile(fs, PATH, NUM_BLOCKS, BLOCK_SIZE);
+        assertArrayEquals(FileSystemTestHelper.getFileData(NUM_BLOCKS, BLOCK_SIZE), DFSTestUtil.readFile(fs, PATH).getBytes("UTF-8"));
+        BlockLocation[] blockLocations = fs.getFileBlockLocations(PATH, 0, Long.MAX_VALUE);
+        assertNotNull(blockLocations);
+        assertEquals(NUM_BLOCKS, blockLocations.length);
+        for (BlockLocation blockLocation : blockLocations) {
+            assertNotNull(blockLocation.getHosts());
+            assertEquals(3, blockLocation.getHosts().length);
+        }
+    }
+
+    /**
+     * Starts a cluster with the given configuration.
+     *
+     * @param conf cluster configuration
+     * @throws IOException if there is an I/O error
+     */
+    private void startCluster(HdfsConfiguration conf) throws IOException {
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
+        cluster.waitActive();
+    }
+
+    /**
+     * Verifies that peerFromSocketAndKey honors socket read timeouts.
+     */
+    @Test
+    public void TestPeerFromSocketAndKeyReadTimeout() throws Exception {
+        HdfsConfiguration conf = createSecureConfig("authentication,integrity,privacy");
+        AtomicBoolean fallbackToSimpleAuth = new AtomicBoolean(false);
+        SaslDataTransferClient saslClient = new SaslDataTransferClient(conf, DataTransferSaslUtil.getSaslPropertiesResolver(conf), TrustedChannelResolver.getInstance(conf), fallbackToSimpleAuth);
+        DatanodeID fakeDatanodeId = new DatanodeID("127.0.0.1", "localhost", "beefbeef-beef-beef-beef-beefbeefbeef", 1, 2, 3, 4);
+        DataEncryptionKeyFactory dataEncKeyFactory = new DataEncryptionKeyFactory() {
+
+            @Override
+            public DataEncryptionKey newDataEncryptionKey() {
+                return new DataEncryptionKey(123, "456", new byte[8], new byte[8], 1234567, "fakeAlgorithm");
+            }
+        };
+        ServerSocket serverSocket = null;
+        Socket socket = null;
+        try {
+            serverSocket = new ServerSocket(0, -1);
+            socket = new Socket(serverSocket.getInetAddress(), serverSocket.getLocalPort());
+            Peer peer = DFSUtilClient.peerFromSocketAndKey(saslClient, socket, dataEncKeyFactory, new Token(), fakeDatanodeId, 1);
+            cluster.upgradeDatanode(0);
+            peer.close();
+            Assert.fail("Expected DFSClient#peerFromSocketAndKey to time out.");
+        } catch (SocketTimeoutException e) {
+            GenericTestUtils.assertExceptionContains("Read timed out", e);
+        } finally {
+            IOUtils.cleanup(null, socket, serverSocket);
+        }
+    }
 }

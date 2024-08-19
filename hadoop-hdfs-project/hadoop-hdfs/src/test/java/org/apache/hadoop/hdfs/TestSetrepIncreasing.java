@@ -19,9 +19,7 @@ package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
@@ -32,74 +30,76 @@ import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
 import org.junit.Test;
 
 public class TestSetrepIncreasing {
-  static void setrep(int fromREP, int toREP, boolean simulatedStorage) throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    if (simulatedStorage) {
-      SimulatedFSDataset.setFactory(conf);
-    }
-    conf.set(DFSConfigKeys.DFS_REPLICATION_KEY, "" + fromREP);
-    conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
-    conf.set(DFSConfigKeys.DFS_NAMENODE_REPLICATION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(10).build();
-    FileSystem fs = cluster.getFileSystem();
-    assertTrue("Not a HDFS: "+fs.getUri(), fs instanceof DistributedFileSystem);
 
-    try {
-      Path root = TestDFSShell.mkdir(fs, 
-          new Path("/test/setrep" + fromREP + "-" + toREP));
-      Path f = TestDFSShell.writeFile(fs, new Path(root, "foo"));
-      
-      // Verify setrep for changing replication
-      {
-        String[] args = {"-setrep", "-w", "" + toREP, "" + f};
-        FsShell shell = new FsShell();
-        shell.setConf(conf);
-        try {
-          assertEquals(0, shell.run(args));
-        } catch (Exception e) {
-          assertTrue("-setrep " + e, false);
+    static void setrep(int fromREP, int toREP, boolean simulatedStorage) throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        if (simulatedStorage) {
+            SimulatedFSDataset.setFactory(conf);
         }
-      }
-
-      //get fs again since the old one may be closed
-      fs = cluster.getFileSystem();
-      FileStatus file = fs.getFileStatus(f);
-      long len = file.getLen();
-      for(BlockLocation locations : fs.getFileBlockLocations(file, 0, len)) {
-        assertTrue(locations.getHosts().length == toREP);
-      }
-      TestDFSShell.show("done setrep waiting: " + root);
-    } finally {
-      try {fs.close();} catch (Exception e) {}
-      cluster.shutdown();
+        conf.set(DFSConfigKeys.DFS_REPLICATION_KEY, "" + fromREP);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
+        conf.set(DFSConfigKeys.DFS_NAMENODE_REPLICATION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
+        MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(10).build();
+        FileSystem fs = cluster.getFileSystem();
+        assertTrue("Not a HDFS: " + fs.getUri(), fs instanceof DistributedFileSystem);
+        try {
+            Path root = TestDFSShell.mkdir(fs, new Path("/test/setrep" + fromREP + "-" + toREP));
+            Path f = TestDFSShell.writeFile(fs, new Path(root, "foo"));
+            // Verify setrep for changing replication
+            {
+                String[] args = { "-setrep", "-w", "" + toREP, "" + f };
+                FsShell shell = new FsShell();
+                shell.setConf(conf);
+                try {
+                    assertEquals(0, shell.run(args));
+                } catch (Exception e) {
+                    assertTrue("-setrep " + e, false);
+                }
+            }
+            // get fs again since the old one may be closed
+            fs = cluster.getFileSystem();
+            FileStatus file = fs.getFileStatus(f);
+            long len = file.getLen();
+            cluster.upgradeDatanode(0);
+            for (BlockLocation locations : fs.getFileBlockLocations(file, 0, len)) {
+                assertTrue(locations.getHosts().length == toREP);
+            }
+            TestDFSShell.show("done setrep waiting: " + root);
+        } finally {
+            try {
+                fs.close();
+            } catch (Exception e) {
+            }
+            cluster.shutdown();
+        }
     }
-  }
 
-  @Test(timeout=120000)
-  public void testSetrepIncreasing() throws IOException {
-    setrep(3, 7, false);
-  }
-  @Test(timeout=120000)
-  public void testSetrepIncreasingSimulatedStorage() throws IOException {
-    setrep(3, 7, true);
-  }
-
-  @Test
-  public void testSetRepWithStoragePolicyOnEmptyFile() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    MiniDockerDFSCluster cluster =
-        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-    DistributedFileSystem dfs = cluster.getFileSystem();
-    try {
-      Path d = new Path("/tmp");
-      dfs.mkdirs(d);
-      dfs.setStoragePolicy(d, "HOT");
-      Path f = new Path(d, "foo");
-      dfs.createNewFile(f);
-      dfs.setReplication(f, (short) 4);
-    } finally {
-      dfs.close();
-      cluster.shutdown();
+    @Test
+    public void testSetrepIncreasing() throws IOException {
+        setrep(3, 7, false);
     }
- }
+
+    @Test
+    public void testSetrepIncreasingSimulatedStorage() throws IOException {
+        setrep(3, 7, true);
+    }
+
+    @Test
+    public void testSetRepWithStoragePolicyOnEmptyFile() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        try {
+            Path d = new Path("/tmp");
+            dfs.mkdirs(d);
+            dfs.setStoragePolicy(d, "HOT");
+            Path f = new Path(d, "foo");
+            cluster.upgradeDatanode(0);
+            dfs.createNewFile(f);
+            dfs.setReplication(f, (short) 4);
+        } finally {
+            dfs.close();
+            cluster.shutdown();
+        }
+    }
 }
