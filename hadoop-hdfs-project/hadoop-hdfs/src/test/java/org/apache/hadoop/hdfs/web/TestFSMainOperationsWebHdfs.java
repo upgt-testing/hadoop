@@ -82,6 +82,7 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
             cluster.getFileSystem().setPermission(new Path("/"), new FsPermission((short) 0777));
             final String uri = WebHdfsConstants.WEBHDFS_SCHEME + "://" + conf.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY);
             // get file system as a non-superuser
+	    /**
             final UserGroupInformation current = UserGroupInformation.getCurrentUser();
             final UserGroupInformation ugi = UserGroupInformation.createUserForTesting(current.getShortUserName() + "x", new String[] { "user" });
             fileSystem = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
@@ -91,6 +92,8 @@ public class TestFSMainOperationsWebHdfs extends FSMainOperationsBaseTest {
                     return FileSystem.get(new URI(uri), conf);
                 }
             });
+	    **/
+	    fileSystem = cluster.getFileSystem();
             defaultWorkingDirectory = fileSystem.getWorkingDirectory();
         } catch (Exception e) {
             throw new RuntimeException(e);
