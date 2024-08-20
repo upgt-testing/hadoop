@@ -78,7 +78,8 @@ public class TestWebHdfsFileSystemContract extends FileSystemContractBaseTest {
         // get file system as a non-superuser
         final UserGroupInformation current = UserGroupInformation.getCurrentUser();
         ugi = UserGroupInformation.createUserForTesting(current.getShortUserName() + "x", new String[] { "user" });
-        fs = WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, conf, WebHdfsConstants.WEBHDFS_SCHEME);
+        //fs = WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, conf, WebHdfsConstants.WEBHDFS_SCHEME);
+	fs = cluster.getFileSystem();
         defaultWorkingDirectory = fs.getWorkingDirectory().toUri().getPath();
     }
 
