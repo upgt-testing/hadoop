@@ -378,7 +378,28 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public void upgradeDatanode(int index) {
         if (dataNodes.containsKey(index)) {
-            dataNodes.get(index).upgradeTo(upgradeVersion);
+            //dataNodes.get(index).upgradeTo(upgradeVersion);
+            // TODO: This is for test only -- instead of launch a new container, we just stop the datanode process and restart it
+            DockerNode dataNode = dataNodes.get(index);
+            try {
+                dataNode.execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'hdfs datanode' | awk '{print $2}')"));
+                LOG.info("Kill the datanode process at index {}", index);
+                Thread.sleep(5000);
+                // create a new thread and call dataNode.execInContainer("hdfs datanode") to restart the datanode
+                new Thread(() -> {
+                    try {
+                        LOG.info("Restart the datanode process at index {} in a new Thread.", index);
+                        dataNode.execInContainer(CommonUtil.getBashCommand("hdfs datanode"));
+                    } catch (InterruptedException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
+                Thread.sleep(5000);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         } else{
             LOG.warn("There is no datanode at index {}, skip the upgrade", index);
         }
