@@ -192,10 +192,10 @@ public class TestHdfsAdmin {
         shutDownCluster();
         Configuration conf = new Configuration();
         conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH, getKeyProviderURI());
-        cluster.upgradeDatanode(0);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
         cluster.waitActive();
         hdfsAdmin = new HdfsAdmin(FileSystem.getDefaultUri(conf), conf);
+        cluster.upgradeDatanode(0);
         Assert.assertNotNull("should not return null for an encrypted cluster", hdfsAdmin.getKeyProvider());
     }
 

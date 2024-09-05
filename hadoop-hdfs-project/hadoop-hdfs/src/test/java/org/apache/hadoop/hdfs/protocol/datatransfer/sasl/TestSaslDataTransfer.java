@@ -156,8 +156,8 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
         HdfsConfiguration clusterConf = createSecureConfig("");
         exception.expect(RuntimeException.class);
         exception.expectMessage("Cannot start secure DataNode");
-        cluster.upgradeDatanode(0);
         startCluster(clusterConf);
+        cluster.upgradeDatanode(0);
     }
 
     @Test
