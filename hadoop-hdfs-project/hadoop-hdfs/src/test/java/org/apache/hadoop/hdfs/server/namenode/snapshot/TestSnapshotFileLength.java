@@ -71,7 +71,7 @@ public class TestSnapshotFileLength {
         conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BLOCKSIZE);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
         cluster.waitActive();
-        hdfs = cluster.getFileSystem();
+        hdfs = cluster.getDistributedFileSystem();
     }
 
     @After

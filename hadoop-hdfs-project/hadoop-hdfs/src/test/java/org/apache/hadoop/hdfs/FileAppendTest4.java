@@ -70,7 +70,7 @@ public class FileAppendTest4 {
         conf = new HdfsConfiguration();
         init(conf);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
-        fs = cluster.getFileSystem();
+        fs = cluster.getDistributedFileSystem();
     }
 
     @AfterClass

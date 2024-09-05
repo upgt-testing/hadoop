@@ -69,7 +69,7 @@ public class TestExtendedAcls {
         conf.setBoolean(DFS_NAMENODE_ACLS_ENABLED_KEY, true);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
         cluster.waitActive();
-        hdfs = cluster.getFileSystem();
+        hdfs = cluster.getDistributedFileSystem();
     }
 
     @AfterClass

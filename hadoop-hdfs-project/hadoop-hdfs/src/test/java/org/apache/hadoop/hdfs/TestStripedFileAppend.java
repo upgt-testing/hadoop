@@ -79,7 +79,7 @@ public class TestStripedFileAppend {
         conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
         cluster.waitActive();
-        dfs = cluster.getFileSystem();
+        dfs = cluster.getDistributedFileSystem();
         dfs.mkdirs(dir);
         dfs.setErasureCodingPolicy(dir, null);
     }

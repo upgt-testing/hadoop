@@ -77,7 +77,7 @@ public class TestDataNodeTcpNoDelay {
         LOG.info("Socket factory is " + defaultFactory.getClass().getName());
         MiniDockerDFSCluster dfsCluster = new MiniDockerDFSCluster.Builder(testConf).numDataNodes(3).build();
         dfsCluster.waitActive();
-        DistributedFileSystem dfs = dfsCluster.getFileSystem();
+        DistributedFileSystem dfs = dfsCluster.getDistributedFileSystem();
         try {
             createData(dfs);
             transferBlock(dfs);
@@ -100,7 +100,7 @@ public class TestDataNodeTcpNoDelay {
         LOG.info("Socket factory is " + defaultFactory.getClass().getName());
         MiniDockerDFSCluster dfsCluster = new MiniDockerDFSCluster.Builder(testConf).numDataNodes(3).build();
         dfsCluster.waitActive();
-        DistributedFileSystem dfs = dfsCluster.getFileSystem();
+        DistributedFileSystem dfs = dfsCluster.getDistributedFileSystem();
         try {
             createData(dfs);
             transferBlock(dfs);

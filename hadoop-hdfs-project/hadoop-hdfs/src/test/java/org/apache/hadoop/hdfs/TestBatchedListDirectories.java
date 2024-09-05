@@ -128,7 +128,7 @@ public class TestBatchedListDirectories {
         conf.setInt(DFSConfigKeys.DFS_LIST_LIMIT, 7);
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_BATCHED_LISTING_LIMIT, FIRST_LEVEL_DIRS * SECOND_LEVEL_DIRS * FILES_PER_DIR);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-        dfs = cluster.getFileSystem();
+        dfs = cluster.getDistributedFileSystem();
         loadData();
     }
 

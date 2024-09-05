@@ -51,7 +51,7 @@ public class TestErasureCodingCLI extends CLITestHelper {
         dfsCluster.waitClusterUp();
         namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
         username = System.getProperty("user.name");
-        fs = dfsCluster.getFileSystem();
+        fs = dfsCluster.getDistributedFileSystem();
         fs.enableErasureCodingPolicy("RS-6-3-1024k");
         fs.enableErasureCodingPolicy("RS-3-2-1024k");
         fs.enableErasureCodingPolicy("XOR-2-1-1024k");

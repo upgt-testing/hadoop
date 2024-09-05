@@ -214,7 +214,7 @@ public class TestFileAppend2 {
         conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
         fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
-        DistributedFileSystem fs = cluster.getFileSystem();
+        DistributedFileSystem fs = cluster.getDistributedFileSystem();
         try {
             {
                 // test appending to a file.
@@ -370,7 +370,7 @@ public class TestFileAppend2 {
                 long len = 0;
                 int sizeToAppend = 0;
                 try {
-                    DistributedFileSystem fs = cluster.getFileSystem();
+                    DistributedFileSystem fs = cluster.getDistributedFileSystem();
                     // add a random number of bytes to file
                     len = fs.getFileStatus(testfile).getLen();
                     // if file is already full, then pick another file
@@ -489,7 +489,7 @@ public class TestFileAppend2 {
         final byte[] buf = new byte[1024];
         final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(new HdfsConfiguration()).numDataNodes(1).build();
         cluster.waitActive();
-        try (DistributedFileSystem fs = cluster.getFileSystem()) {
+        try (DistributedFileSystem fs = cluster.getDistributedFileSystem()) {
             final int len1 = 200;
             final int len2 = 300;
             final Path p = new Path("/foo");

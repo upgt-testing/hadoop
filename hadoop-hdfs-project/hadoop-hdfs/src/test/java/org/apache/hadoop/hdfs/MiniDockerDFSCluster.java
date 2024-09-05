@@ -309,11 +309,11 @@ public class MiniDockerDFSCluster implements Closeable {
      * @return the file system
      * @throws RuntimeException if an error occurs getting the file system
      */
-    public DistributedFileSystem getFileSystem() {
+    public FileSystem getFileSystem() {
         try {
             String fsURI = conf.get("fs.defaultFS");
             //System.out.println("Accessing the file system at " + fsURI);
-            return (DistributedFileSystem) FileSystem.get(new URI(fsURI), conf);
+            return FileSystem.get(new URI(fsURI), conf);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file system", e);
         }
@@ -377,6 +377,10 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     public void upgradeDatanode(int index) {
+        if (UpgradableClusterConfig.SKIP_UPGRADE) {
+            LOG.info("Skip the upgrade of the datanode at index {}", index);
+            return;
+        }
         if (dataNodes.containsKey(index)) {
             //dataNodes.get(index).upgradeTo(upgradeVersion);
             // TODO: This is for test only -- instead of launch a new container, we just stop the datanode process and restart it

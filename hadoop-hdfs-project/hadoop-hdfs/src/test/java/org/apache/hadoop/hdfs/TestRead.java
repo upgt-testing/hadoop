@@ -117,7 +117,7 @@ public class TestRead {
         final Configuration conf = new HdfsConfiguration();
         conf.set(DFSConfigKeys.DFS_DATANODE_FSDATASET_FACTORY_KEY, DelayedSimulatedFSDataset.Factory.class.getName());
         final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-        final DistributedFileSystem fs = cluster.getFileSystem();
+        final DistributedFileSystem fs = cluster.getDistributedFileSystem();
         try {
             cluster.waitActive();
             final Path file = new Path("/foo");

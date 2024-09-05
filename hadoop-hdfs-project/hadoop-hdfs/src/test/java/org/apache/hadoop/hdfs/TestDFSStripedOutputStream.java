@@ -100,7 +100,7 @@ public class TestDFSStripedOutputStream {
             conf.set(CodecUtil.IO_ERASURECODE_CODEC_RS_RAWCODERS_KEY, NativeRSRawErasureCoderFactory.CODER_NAME);
         }
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
-        fs = cluster.getFileSystem();
+        fs = cluster.getDistributedFileSystem();
         DFSTestUtil.enableAllECPolicies(fs);
         fs.getClient().setErasureCodingPolicy("/", ecPolicy.getName());
     }

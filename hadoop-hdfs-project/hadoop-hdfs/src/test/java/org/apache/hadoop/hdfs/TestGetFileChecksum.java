@@ -46,7 +46,7 @@ public class TestGetFileChecksum {
         conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
         cluster.waitActive();
-        dfs = cluster.getFileSystem();
+        dfs = cluster.getDistributedFileSystem();
     }
 
     @After

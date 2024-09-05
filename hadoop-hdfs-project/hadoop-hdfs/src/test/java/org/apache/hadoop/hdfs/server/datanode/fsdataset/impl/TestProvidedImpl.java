@@ -524,7 +524,7 @@ public class TestProvidedImpl {
         Configuration conf = new Configuration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         cluster.waitActive();
-        DistributedFileSystem fs = cluster.getFileSystem();
+        DistributedFileSystem fs = cluster.getDistributedFileSystem();
         // generate random data
         int chunkSize = 512;
         Random r = new Random(12345L);

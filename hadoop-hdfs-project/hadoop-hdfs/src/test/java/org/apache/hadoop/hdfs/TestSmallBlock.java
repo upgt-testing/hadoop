@@ -87,7 +87,7 @@ public class TestSmallBlock {
         }
         conf.set(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, "1");
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
-        DistributedFileSystem fileSys = cluster.getFileSystem();
+        DistributedFileSystem fileSys = cluster.getDistributedFileSystem();
         try {
             Path file1 = new Path("/smallblocktest.dat");
             DFSTestUtil.createFile(fileSys, file1, fileSize, fileSize, blockSize, (short) 1, seed);

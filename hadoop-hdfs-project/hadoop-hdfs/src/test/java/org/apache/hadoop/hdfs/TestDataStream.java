@@ -51,7 +51,7 @@ public class TestDataStream {
         byte[] toWrite = new byte[PACKET_SIZE];
         new Random(1).nextBytes(toWrite);
         final Path path = new Path("/file1");
-        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final DistributedFileSystem dfs = cluster.getDistributedFileSystem();
         FSDataOutputStream out = null;
         out = dfs.create(path, false);
         out.write(toWrite);

@@ -75,7 +75,7 @@ public class TestFSImageWithXAttr {
 
     private void testXAttr(boolean persistNamespace) throws IOException {
         Path path = new Path("/p");
-        DistributedFileSystem fs = cluster.getFileSystem();
+        DistributedFileSystem fs = cluster.getDistributedFileSystem();
         fs.create(path).close();
         fs.setXAttr(path, name1, value1, EnumSet.of(XAttrSetFlag.CREATE));
         fs.setXAttr(path, name2, value2, EnumSet.of(XAttrSetFlag.CREATE));

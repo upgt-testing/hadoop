@@ -101,7 +101,7 @@ public class TestHFlush {
     public void hSyncUpdateLength_00() throws IOException {
         Configuration conf = new HdfsConfiguration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
-        DistributedFileSystem fileSystem = cluster.getFileSystem();
+        DistributedFileSystem fileSystem = cluster.getDistributedFileSystem();
         try {
             Path path = new Path(fName);
             FSDataOutputStream stm = fileSystem.create(path, true, 4096, (short) 2, AppendTestUtil.BLOCK_SIZE);
@@ -126,7 +126,7 @@ public class TestHFlush {
         Configuration conf = new HdfsConfiguration();
         conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, preferredBlockSize);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
-        DistributedFileSystem fileSystem = cluster.getFileSystem();
+        DistributedFileSystem fileSystem = cluster.getDistributedFileSystem();
         FSDataOutputStream stm = null;
         try {
             Path path = new Path("/" + fName);
@@ -276,7 +276,7 @@ public class TestHFlush {
         fileContent = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(replicas).build();
         // Make sure we work with DFS in order to utilize all its functionality
-        DistributedFileSystem fileSystem = cluster.getFileSystem();
+        DistributedFileSystem fileSystem = cluster.getDistributedFileSystem();
         FSDataInputStream is;
         try {
             Path path = new Path(fileName);
@@ -349,7 +349,7 @@ public class TestHFlush {
         System.out.println("p=" + p);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
         try {
-            DistributedFileSystem fs = cluster.getFileSystem();
+            DistributedFileSystem fs = cluster.getDistributedFileSystem();
             byte[] fileContents = AppendTestUtil.initBuffer(fileLen);
             // create a new file.
             FSDataOutputStream stm = AppendTestUtil.createFile(fs, p, DATANODE_NUM);
@@ -389,7 +389,7 @@ public class TestHFlush {
         System.out.println("p=" + p);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
         try {
-            DistributedFileSystem fs = cluster.getFileSystem();
+            DistributedFileSystem fs = cluster.getDistributedFileSystem();
             // create a new file.
             FSDataOutputStream stm = AppendTestUtil.createFile(fs, p, DATANODE_NUM);
             stm.write(fileContents, 0, 2);

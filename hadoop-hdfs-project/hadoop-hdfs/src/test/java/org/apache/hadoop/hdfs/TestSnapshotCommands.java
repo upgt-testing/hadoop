@@ -47,7 +47,7 @@ public class TestSnapshotCommands {
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_MAX_LIMIT, 3);
         cluster = new MiniDockerDFSCluster.Builder(conf).build();
         cluster.waitActive();
-        fs = cluster.getFileSystem();
+        fs = cluster.getDistributedFileSystem();
     }
 
     @AfterClass

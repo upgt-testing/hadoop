@@ -102,7 +102,7 @@ public class TestUnbuffer {
         FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).build();
-            DistributedFileSystem dfs = cluster.getFileSystem();
+            DistributedFileSystem dfs = cluster.getDistributedFileSystem();
             final Path TEST_PATH = new Path("/testFile");
             cluster.upgradeDatanode(0);
             DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short) 1, 1);

@@ -113,7 +113,7 @@ public class TestDelegationTokenFetcher {
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
         try {
             cluster.waitActive();
-            DistributedFileSystem fs = cluster.getFileSystem();
+            DistributedFileSystem fs = cluster.getDistributedFileSystem();
             // Should be able to fetch token without renewer.
             LocalFileSystem localFileSystem = FileSystem.getLocal(conf);
             Path p = new Path(f.getRoot().getAbsolutePath(), tokenFile);

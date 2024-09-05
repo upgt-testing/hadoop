@@ -60,7 +60,7 @@ public class TestQuotaAllowOwner {
         }
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
         cluster.waitActive();
-        dfs = cluster.getFileSystem();
+        dfs = cluster.getDistributedFileSystem();
     }
 
     private void createDirssAndSetOwner(String parentDir, String subDir, String owner, String group) throws Exception {

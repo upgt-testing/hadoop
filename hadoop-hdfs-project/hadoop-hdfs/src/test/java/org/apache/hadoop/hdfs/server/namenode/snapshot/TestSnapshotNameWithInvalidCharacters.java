@@ -53,7 +53,7 @@ public class TestSnapshotNameWithInvalidCharacters {
     public void setUp() throws Exception {
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
         cluster.waitActive();
-        hdfs = cluster.getFileSystem();
+        hdfs = cluster.getDistributedFileSystem();
     }
 
     @After

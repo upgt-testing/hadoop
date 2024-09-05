@@ -46,7 +46,7 @@ public class TestApplyingStoragePolicy {
         conf = new HdfsConfiguration();
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPL).build();
         cluster.waitActive();
-        fs = cluster.getFileSystem();
+        fs = cluster.getDistributedFileSystem();
     }
 
     @After

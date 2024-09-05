@@ -51,7 +51,7 @@ public class TestFileStatusWithDefaultECPolicy {
         HdfsConfiguration conf = new HdfsConfiguration();
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
         cluster.waitActive();
-        fs = cluster.getFileSystem();
+        fs = cluster.getDistributedFileSystem();
         client = fs.getClient();
         fs.enableErasureCodingPolicy(getEcPolicy().getName());
     }
