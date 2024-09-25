@@ -40,7 +40,7 @@ public class MiniDockerDFSCluster implements Closeable {
     /** The nameNode */
     private DockerNode nameNode;
     private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070);
-    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50020);
+    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
@@ -57,7 +57,7 @@ public class MiniDockerDFSCluster implements Closeable {
         defaultHDFSSite.put("dfs.namenode.http-address", "namenode:50070");
         defaultHDFSSite.put("dfs.datanode.address", "0.0.0.0:50010");
         defaultHDFSSite.put("dfs.datanode.http.address", "0.0.0.0:50075");
-        defaultHDFSSite.put("dfs.datanode.ipc.address", "0.0.0.0:50020");
+        defaultHDFSSite.put("dfs.datanode.ipc.address", "0.0.0.0:50040");
         defaultHDFSSite.put("dfs.datanode.hostname", "localhost");
         defaultHDFSSite.put("hadoop.security.authentication", "simple");
         defaultHDFSSite.put("dfs.namenode.fs-limits.min-block-size", "0");
@@ -132,7 +132,7 @@ public class MiniDockerDFSCluster implements Closeable {
         // parse the dnNodeLog and search for key word:
         // (1) INFO datanode.DataNode: Opened streaming server at /0.0.0.0:50010
         // (2) INFO web.DatanodeHttpServer: Listening HTTP traffic on /0.0.0.0:50075
-        // (3) INFO datanode.DataNode: Opened IPC server at /0.0.0.0:50020
+        // (3) INFO datanode.DataNode: Opened IPC server at /0.0.0.0:50040
 
         List<Integer> ports = new ArrayList<>();
         Map<String, Integer> portMap = new HashMap<>();
