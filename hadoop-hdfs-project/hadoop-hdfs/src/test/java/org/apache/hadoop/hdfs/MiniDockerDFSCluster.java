@@ -14,16 +14,17 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.Container;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.nio.file.Files.readAllBytes;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -40,7 +41,7 @@ public class MiniDockerDFSCluster implements Closeable {
     /** The nameNode */
     private DockerNode nameNode;
     private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070);
-    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50020);
+    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
@@ -57,7 +58,7 @@ public class MiniDockerDFSCluster implements Closeable {
         defaultHDFSSite.put("dfs.namenode.http-address", "namenode:50070");
         defaultHDFSSite.put("dfs.datanode.address", "0.0.0.0:50010");
         defaultHDFSSite.put("dfs.datanode.http.address", "0.0.0.0:50075");
-        defaultHDFSSite.put("dfs.datanode.ipc.address", "0.0.0.0:50020");
+        defaultHDFSSite.put("dfs.datanode.ipc.address", "0.0.0.0:50040");
         defaultHDFSSite.put("dfs.datanode.hostname", "localhost");
         defaultHDFSSite.put("hadoop.security.authentication", "simple");
         defaultHDFSSite.put("dfs.namenode.fs-limits.min-block-size", "0");
@@ -132,7 +133,7 @@ public class MiniDockerDFSCluster implements Closeable {
         // parse the dnNodeLog and search for key word:
         // (1) INFO datanode.DataNode: Opened streaming server at /0.0.0.0:50010
         // (2) INFO web.DatanodeHttpServer: Listening HTTP traffic on /0.0.0.0:50075
-        // (3) INFO datanode.DataNode: Opened IPC server at /0.0.0.0:50020
+        // (3) INFO datanode.DataNode: Opened IPC server at /0.0.0.0:50040
 
         List<Integer> ports = new ArrayList<>();
         Map<String, Integer> portMap = new HashMap<>();
@@ -217,8 +218,8 @@ public class MiniDockerDFSCluster implements Closeable {
             nameNode = cluster.nodeBuilder(builder.dockerImageVersion)
                     .withNodeRole(NodeRole.MASTER)
                     .withNetworkAliases("namenode")
-                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && hdfs namenode -format && hdfs namenode"))
-                    .withExposedPorts(nameNodePorts.toArray(new Integer[0]))
+                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && bash loop.sh"))
+                    //.withExposedPorts(nameNodePorts.toArray(new Integer[0]))
                     .withBoundPorts(bindPorts(nameNodePorts, 0))
                     //.waitingFor(Wait.forLogMessage("INFO blockmanagement.CacheReplicationMonitor: Starting CacheReplicationMonitor with interval", 1))
                     .withStartWaitTime(5000)
@@ -232,21 +233,53 @@ public class MiniDockerDFSCluster implements Closeable {
                     //     }
                     // })
                     .withEnv(new HashMap<>());
+            nameNode.start();
+            new Thread(() -> {
+                try {
+                    LOG.info("Start the namenode in a new Thread.");
+                    nameNode.execInContainer(CommonUtil.getBashCommand("bash start_namenode.sh >> namenode.log 2>&1"));
+                } catch (InterruptedException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+            Thread.sleep(5000);
+            nameNode.setExposedPorts(nameNodePorts);
+
             for (int i = 0; i < builder.numDataNodes; i++) {
                 DockerNode dataNode = cluster.nodeBuilder(builder.dockerImageVersion)
                         .withNodeRole(NodeRole.WORKER)
                         .withNetworkAliases("datanode_" + i)
-                        .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && bash modify_hdfs_site.sh " + i + " && hdfs datanode"))
-                        .withExposedPorts(exposedPorts(dataNodePorts, i))
+                        //.withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && bash modify_hdfs_site.sh " + i + " && bash start_datanode.sh"))
+                        .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && bash loop.sh"))
+                        //.withExposedPorts(exposedPortsArray(dataNodePorts, i))
                         .withBoundPorts(bindPorts(dataNodePorts, i))
                         .withConfigFile(configFiles.get(0).getAbsolutePath(), "/opt/hadoop/etc/hadoop/hdfs-site.xml", new HashMap<>())
                         .withConfigFile(configFiles.get(1).getAbsolutePath(), "/opt/hadoop/etc/hadoop/core-site.xml", new HashMap<>())
                         .withStartWaitTime(5000)
                         .withEnv(new HashMap<>());
                 dataNodes.put(i, dataNode);
+                dataNode.start();
+                int finalI = i;
+                new Thread(() -> {
+                    try {
+                        LOG.info("Start the datanode in a new Thread.");
+                        dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
+                    } catch (InterruptedException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
+                Thread.sleep(5000);
+                dataNode.setExposedPorts(exposedPortsList(dataNodePorts, i));
             }
-            cluster.start();
+            //cluster.start();
 
+            /**
+            for (int i = 0; i < builder.numDataNodes; i++) {
+                DockerNode dataNode = dataNodes.get(i);
+                dataNode.execInContainer(CommonUtil.getBashCommand(" bash modify_hdfs_site.sh " + i + " && bash start_datanode.sh"));
+                Thread.sleep(5000);
+                dataNode.setExposedPorts(Arrays.stream(exposedPorts(dataNodePorts, i)).collect(Collectors.toList()));
+            }**/
 
             /**
             // TODO: here we need a logic to parse the namenode address
@@ -275,6 +308,8 @@ public class MiniDockerDFSCluster implements Closeable {
             // here to overwrite the default configurations
         } catch (UpgradableClusterException e) {
             throw new RuntimeException("Failed to start the cluster", e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -285,8 +320,26 @@ public class MiniDockerDFSCluster implements Closeable {
     @Override
     public void close() {
         try {
+            // print all the logs
+            // first print the namenode log
+            String randomUUID = UUID.randomUUID().toString();
+            LOG.info("Print the logs of the namenode");
+            File namenodeLog = new File("./namenode" + randomUUID + ".log");
+            nameNode.copyFileFromContainer("namenode.log", namenodeLog.getAbsolutePath());
+            LOG.info(new String(readAllBytes(namenodeLog.toPath())));
+            namenodeLog.delete();
+
+            // then print the datanodes logs
+            LOG.info("Print the logs of the datanodes");
+            for (int i = 0; i < dataNodes.size(); i++) {
+                LOG.info("Print the logs of the datanode at index {}", i);
+                File datanodeLog = new File("./datanode_" + i + randomUUID + ".log");
+                dataNodes.get(i).copyFileFromContainer("datanode_" + i + ".log", datanodeLog.getAbsolutePath());
+                LOG.info(new String(readAllBytes(datanodeLog.toPath())));
+                datanodeLog.delete();
+            }
             cluster.stop();
-        } catch (UpgradableClusterException e) {
+        } catch (UpgradableClusterException | IOException e) {
             throw new RuntimeException("Failed to stop the cluster", e);
         }
     }
@@ -344,15 +397,18 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
-    private Integer[] exposedPorts(List<Integer> dataNodePorts, int nodeId) {
+    private Integer[] exposedPortsArray(List<Integer> dataNodePorts, int nodeId) {
+        return exposedPortsList(dataNodePorts, nodeId).toArray(new Integer[0]);
+    }
+
+    private List<Integer> exposedPortsList(List<Integer> dataNodePorts, int nodeId) {
         List<Integer> exposedPorts = new LinkedList<>();
         for (int port : dataNodePorts) {
             int targetPort = port + nodeId;
             exposedPorts.add(targetPort);
         }
-        return exposedPorts.toArray(new Integer[0]);
+        return exposedPorts;
     }
-
 
     private List<String> bindPorts(List<Integer> ports, int nodeID) {
         List<String> boundPorts = new LinkedList<>();
@@ -386,15 +442,17 @@ public class MiniDockerDFSCluster implements Closeable {
             // TODO: This is for test only -- instead of launch a new container, we just stop the datanode process and restart it
             DockerNode dataNode = dataNodes.get(index);
             try {
-                dataNode.execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'hdfs datanode' | awk '{print $2}')"));
+                dataNode.execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'proc_datanode' | grep -v \"grep\" | awk '{print $2}')"));
                 LOG.info("Kill the datanode process at index {}", index);
                 Thread.sleep(5000);
                 // create a new thread and call dataNode.execInContainer("hdfs datanode") to restart the datanode
+                int finalI = index;
                 new Thread(() -> {
                     try {
-                        LOG.info("Restart the datanode process at index {} in a new Thread.", index);
-                        dataNode.execInContainer(CommonUtil.getBashCommand("hdfs datanode"));
+                        LOG.info("Restart the datanode process at index {} in a new Thread.", finalI);
+                        dataNode.execInContainer(CommonUtil.getBashCommand("bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
                     } catch (InterruptedException | IOException e) {
+                        LOG.info("Failed to restart the datanode process due to {}", e.getMessage());
                         throw new RuntimeException(e);
                     }
                 }).start();
@@ -435,6 +493,28 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     public void restartNameNode() {
-        cluster.getMasterNode().restart();
+        //cluster.getMasterNode().restart();
+
+        try {
+            DockerNode nameNode = cluster.getMasterNode();
+            Container.ExecResult res = nameNode.execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'namenode' | grep -v \"grep\" | awk '{print $2}')"));
+            LOG.info(res.toString());
+            LOG.info("Kill the namenode process");
+            Thread.sleep(5000);
+            // create a new thread and call dataNode.execInContainer("hdfs datanode") to restart the datanode
+            new Thread(() -> {
+                try {
+                    LOG.info("Restart the namenode process in a new Thread.");
+                    nameNode.execInContainer(CommonUtil.getBashCommand("bash start_namenode.sh >> namenode.log 2>&1"));
+                } catch (InterruptedException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+            Thread.sleep(5000);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
