@@ -218,7 +218,7 @@ public class MiniDockerDFSCluster implements Closeable {
             nameNode = cluster.nodeBuilder(builder.dockerImageVersion)
                     .withNodeRole(NodeRole.MASTER)
                     .withNetworkAliases("namenode")
-                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && bash loop.sh"))
+                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && hdfs namenode -format && bash loop.sh"))
                     //.withExposedPorts(nameNodePorts.toArray(new Integer[0]))
                     .withBoundPorts(bindPorts(nameNodePorts, 0))
                     //.waitingFor(Wait.forLogMessage("INFO blockmanagement.CacheReplicationMonitor: Starting CacheReplicationMonitor with interval", 1))
@@ -322,6 +322,7 @@ public class MiniDockerDFSCluster implements Closeable {
         try {
             // print all the logs
             // first print the namenode log
+            /**
             String randomUUID = UUID.randomUUID().toString();
             LOG.info("Print the logs of the namenode");
             File namenodeLog = new File("./namenode" + randomUUID + ".log");
@@ -338,8 +339,9 @@ public class MiniDockerDFSCluster implements Closeable {
                 LOG.info(new String(readAllBytes(datanodeLog.toPath())));
                 datanodeLog.delete();
             }
+             **/
             cluster.stop();
-        } catch (UpgradableClusterException | IOException e) {
+        } catch (UpgradableClusterException e) {
             throw new RuntimeException("Failed to stop the cluster", e);
         }
     }
@@ -456,7 +458,7 @@ public class MiniDockerDFSCluster implements Closeable {
                         throw new RuntimeException(e);
                     }
                 }).start();
-                Thread.sleep(5000);
+                Thread.sleep(10000);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
@@ -500,7 +502,7 @@ public class MiniDockerDFSCluster implements Closeable {
             Container.ExecResult res = nameNode.execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'namenode' | grep -v \"grep\" | awk '{print $2}')"));
             LOG.info(res.toString());
             LOG.info("Kill the namenode process");
-            Thread.sleep(5000);
+            Thread.sleep(10000);
             // create a new thread and call dataNode.execInContainer("hdfs datanode") to restart the datanode
             new Thread(() -> {
                 try {
@@ -510,7 +512,7 @@ public class MiniDockerDFSCluster implements Closeable {
                     throw new RuntimeException(e);
                 }
             }).start();
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
