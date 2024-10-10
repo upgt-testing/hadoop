@@ -29,6 +29,8 @@ import org.apache.hadoop.classification.InterfaceStability;
 @InterfaceStability.Stable
 public interface NameNodeStatusMXBean {
 
+  public void fakePrintMXBean();
+
   /**
    * Gets the NameNode role.
    *

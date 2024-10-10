@@ -38,7 +38,37 @@ public class DockerTest {
     }
 
     @Test
+    public void testMXBeanRMI() {
+        MiniDockerDFSCluster dockerHDFSCluster = new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
+        String host = "localhost"; // Updated to 'localhost'
+        int port = 9090;
+
+        // Create a JMX service URL
+        String urlString = String.format(
+                "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi",
+                host, port
+        );
+        try {
+            JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+            Map<String, Object> env = new HashMap<>();
+
+            // Connect to the JMX server
+            JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceURL, env);
+            MBeanServerConnection mbs = jmxConnector.getMBeanServerConnection();
+            ObjectName mxbeanName = new ObjectName(
+                    "Hadoop:service=NameNode,name=NameNodeStatus");
+            // call fakePrintMXBean
+            mbs.invoke(mxbeanName, "fakePrintMXBean", new Object[]{}, new String[]{});
+            System.out.println("fakePrintMXBean called");
+            dockerHDFSCluster.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create JMX connection", e);
+        }
+    }
+
+    @Test
     public void testMXBean() {
+        MiniDockerDFSCluster dockerHDFSCluster = new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
         String host = "localhost"; // Updated to 'localhost'
         int port = 9090;
 
@@ -61,6 +91,7 @@ public class DockerTest {
             String nnRole = (String)mbs.getAttribute(mxbeanName, "NNRole");
             //Assert.assertEquals(nn.getNNRole(), nnRole);
             System.out.println("NNRole: " + nnRole);
+            dockerHDFSCluster.close();
         } catch (Exception e) {
             throw new RuntimeException("Failed to create JMX connection", e);
         }

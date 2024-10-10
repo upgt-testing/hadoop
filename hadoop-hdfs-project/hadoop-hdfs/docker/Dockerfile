@@ -17,6 +17,9 @@ RUN wget -q https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop
     mv /opt/hadoop-$HADOOP_VERSION /opt/hadoop && \
     rm hadoop-$HADOOP_VERSION.tar.gz
 
+RUN rm /opt/hadoop/share/hadoop/hdfs/hadoop-hdfs-3.3.5.jar
+COPY hadoop-hdfs-3.3.5.jar /opt/hadoop/share/hadoop/hdfs/hadoop-hdfs-3.3.5.jar
+
 # Add Hadoop configuration files
 COPY core-site.xml $HADOOP_CONF_DIR/core-site.xml
 COPY hdfs-site.xml $HADOOP_CONF_DIR/raw-hdfs-site.xml

@@ -390,6 +390,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
 
   private final String contextFieldSeparator;
 
+  public void fakePrintMXBean() {
+    LOG.info("This is from my fake printMXBean");
+    System.out.println("This is from my fake printMXBean");
+  }
+
   boolean isAuditEnabled() {
     return (!isDefaultAuditLogger || auditLog.isInfoEnabled())
         && !auditLoggers.isEmpty();

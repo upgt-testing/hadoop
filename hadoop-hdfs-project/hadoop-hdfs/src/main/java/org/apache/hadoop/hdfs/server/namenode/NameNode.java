@@ -248,6 +248,11 @@ public class NameNode extends ReconfigurableBase implements
     HdfsConfiguration.init();
   }
 
+  @Override
+  public void fakePrintMXBean() {
+    getNamesystem().fakePrintMXBean();
+  }
+
   private InMemoryLevelDBAliasMapServer levelDBAliasMapServer;
 
   /**

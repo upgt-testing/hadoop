@@ -71,6 +71,11 @@ import org.apache.hadoop.thirdparty.com.google.common.cache.LoadingCache;
 public class NamenodeBeanMetrics
     implements FSNamesystemMBean, NameNodeMXBean, NameNodeStatusMXBean {
 
+  @Override
+  public void fakePrintMXBean() {
+    throw new UnsupportedOperationException("fakePrintMXBean is not supported in NamenodeBeanMetrics class");
+  }
+
   private static final Logger LOG =
       LoggerFactory.getLogger(NamenodeBeanMetrics.class);
 
