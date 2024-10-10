@@ -12,10 +12,15 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
 
+import javax.management.*;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -23,8 +28,6 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.nio.file.Files.readAllBytes;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -40,7 +43,7 @@ public class MiniDockerDFSCluster implements Closeable {
     private final Map<Integer, DockerNode> dataNodes = new LinkedHashMap<>();
     /** The nameNode */
     private DockerNode nameNode;
-    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070);
+    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, 9090); // 9090 is the MXBean port
     private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
@@ -218,7 +221,8 @@ public class MiniDockerDFSCluster implements Closeable {
             nameNode = cluster.nodeBuilder(builder.dockerImageVersion)
                     .withNodeRole(NodeRole.MASTER)
                     .withNetworkAliases("namenode")
-                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && hdfs namenode -format && bash loop.sh"))
+                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && " +
+                            "bash modify_hdfs_env.sh && hdfs namenode -format && bash loop.sh"))
                     //.withExposedPorts(nameNodePorts.toArray(new Integer[0]))
                     .withBoundPorts(bindPorts(nameNodePorts, 0))
                     //.waitingFor(Wait.forLogMessage("INFO blockmanagement.CacheReplicationMonitor: Starting CacheReplicationMonitor with interval", 1))
@@ -272,6 +276,12 @@ public class MiniDockerDFSCluster implements Closeable {
                 dataNode.setExposedPorts(exposedPortsList(dataNodePorts, i));
             }
             //cluster.start();
+
+            try {
+                connectMXBean();
+            } catch (IOException | MalformedObjectNameException | ReflectionException | AttributeNotFoundException | InstanceNotFoundException | MBeanException e) {
+                throw new RuntimeException("Failed to connect to the MXBean", e);
+            }
 
             /**
             for (int i = 0; i < builder.numDataNodes; i++) {
@@ -519,4 +529,43 @@ public class MiniDockerDFSCluster implements Closeable {
             throw new RuntimeException(e);
         }
     }
+
+
+
+    // Start from here to create the MXBean for the MiniDockerDFSCluster
+    // Connect the MXBean
+    public void connectMXBean() throws IOException, MalformedObjectNameException, ReflectionException, AttributeNotFoundException, InstanceNotFoundException, MBeanException {
+        String host = "localhost"; // Updated to 'localhost'
+        int port = 9090;
+
+        // Create a JMX service URL
+        String urlString = String.format(
+                "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi",
+                host, port
+        );
+        JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+        Map<String, Object> env = new HashMap<>();
+
+        // Connect to the JMX server
+        JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceURL, env);
+        MBeanServerConnection mbs = jmxConnector.getMBeanServerConnection();
+        ObjectName mxbeanName = new ObjectName(
+                "Hadoop:service=NameNode,name=NameNodeStatus");
+
+        // Get attribute "NNRole"
+        String nnRole = (String)mbs.getAttribute(mxbeanName, "NNRole");
+        //Assert.assertEquals(nn.getNNRole(), nnRole);
+        System.out.println("NNRole: " + nnRole);
+
+        // Get attribute "State"
+        String state = (String)mbs.getAttribute(mxbeanName, "State");
+        //Assert.assertEquals(nn.getState(), state);
+        System.out.println("State: " + state);
+
+        // Get attribute "HostAndPort"
+        String hostAndPort = (String)mbs.getAttribute(mxbeanName, "HostAndPort");
+        //Assert.assertEquals(nn.getHostAndPort(), hostAndPort);
+        System.out.println("HostAndPort: " + hostAndPort);
+    }
+
 }

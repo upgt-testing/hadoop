@@ -11,6 +11,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,6 +35,35 @@ public class DockerTest {
     @Before
     public void setup() {
         ConfigTracker.clearSetParams();
+    }
+
+    @Test
+    public void testMXBean() {
+        String host = "localhost"; // Updated to 'localhost'
+        int port = 9090;
+
+        // Create a JMX service URL
+        String urlString = String.format(
+                "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi",
+                host, port
+        );
+        try {
+            JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+            Map<String, Object> env = new HashMap<>();
+
+            // Connect to the JMX server
+            JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceURL, env);
+            MBeanServerConnection mbs = jmxConnector.getMBeanServerConnection();
+            ObjectName mxbeanName = new ObjectName(
+                    "Hadoop:service=NameNode,name=NameNodeStatus");
+
+            // Get attribute "NNRole"
+            String nnRole = (String)mbs.getAttribute(mxbeanName, "NNRole");
+            //Assert.assertEquals(nn.getNNRole(), nnRole);
+            System.out.println("NNRole: " + nnRole);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create JMX connection", e);
+        }
     }
 
     @Test
