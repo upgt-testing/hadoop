@@ -1,0 +1,26 @@
+<configuration>
+    <property>
+        <name>dfs.namenode.rpc-address</name>
+        <value>namenode:9000</value>
+    </property>
+    <property>
+        <name>dfs.namenode.http-address</name>
+        <value>namenode:50070</value>
+    </property>
+    <property>
+        <name>dfs.datanode.address</name>
+        <value>0.0.0.0:50010</value>
+    </property>
+    <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:50075</value>
+    </property>
+    <property>
+        <name>dfs.datanode.ipc.address</name>
+        <value>0.0.0.0:50040</value>
+    </property>
+        <property>
+        <name>dfs.datanode.hostname</name>
+        <value>localhost</value>
+    </property>
+</configuration>
