@@ -43,7 +43,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclStatus;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.server.namenode.FSImageTestUtil;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
@@ -78,7 +78,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Maps;
 public class TestOfflineImageViewerForAcl {
 
   private static final Logger LOG =
-      LoggerFactory.getLogger(TestOfflineImageViewerForAcl.class);
+          LoggerFactory.getLogger(TestOfflineImageViewerForAcl.class);
 
   private static File originalFsimage = null;
 
@@ -93,13 +93,13 @@ public class TestOfflineImageViewerForAcl {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     try {
       Configuration conf = new Configuration();
       conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
-      DistributedFileSystem hdfs = cluster.getDistributedFileSystem();
+      DistributedFileSystem hdfs = cluster.getFileSystem();
 
       // Create a reasonable namespace with ACLs
       Path dir = new Path("/dirWithNoAcl");
@@ -109,10 +109,10 @@ public class TestOfflineImageViewerForAcl {
       dir = new Path("/dirWithDefaultAcl");
       hdfs.mkdirs(dir);
       hdfs.setAcl(dir, Lists.newArrayList(
-          aclEntry(DEFAULT, USER, ALL),
-          aclEntry(DEFAULT, USER, "foo", ALL),
-          aclEntry(DEFAULT, GROUP, READ_EXECUTE),
-          aclEntry(DEFAULT, OTHER, NONE)));
+              aclEntry(DEFAULT, USER, ALL),
+              aclEntry(DEFAULT, USER, "foo", ALL),
+              aclEntry(DEFAULT, GROUP, READ_EXECUTE),
+              aclEntry(DEFAULT, OTHER, NONE)));
       writtenAcls.put(dir.toString(), hdfs.getAclStatus(dir));
 
       Path file = new Path("/noAcl");
@@ -126,10 +126,10 @@ public class TestOfflineImageViewerForAcl {
       o.write(23);
       o.close();
       hdfs.setAcl(file, Lists.newArrayList(
-          aclEntry(ACCESS, USER, READ_WRITE),
-          aclEntry(ACCESS, USER, "foo", READ),
-          aclEntry(ACCESS, GROUP, READ),
-          aclEntry(ACCESS, OTHER, NONE)));
+              aclEntry(ACCESS, USER, READ_WRITE),
+              aclEntry(ACCESS, USER, "foo", READ),
+              aclEntry(ACCESS, GROUP, READ),
+              aclEntry(ACCESS, OTHER, NONE)));
       writtenAcls.put(file.toString(), hdfs.getAclStatus(file));
 
       file = new Path("/withSeveralAcls");
@@ -137,12 +137,12 @@ public class TestOfflineImageViewerForAcl {
       o.write(23);
       o.close();
       hdfs.setAcl(file, Lists.newArrayList(
-          aclEntry(ACCESS, USER, READ_WRITE),
-          aclEntry(ACCESS, USER, "foo", READ_WRITE),
-          aclEntry(ACCESS, USER, "bar", READ),
-          aclEntry(ACCESS, GROUP, READ),
-          aclEntry(ACCESS, GROUP, "group", READ),
-          aclEntry(ACCESS, OTHER, NONE)));
+              aclEntry(ACCESS, USER, READ_WRITE),
+              aclEntry(ACCESS, USER, "foo", READ_WRITE),
+              aclEntry(ACCESS, USER, "bar", READ),
+              aclEntry(ACCESS, GROUP, READ),
+              aclEntry(ACCESS, GROUP, "group", READ),
+              aclEntry(ACCESS, OTHER, NONE)));
       writtenAcls.put(file.toString(), hdfs.getAclStatus(file));
 
       // Write results to the fsimage file
@@ -151,7 +151,7 @@ public class TestOfflineImageViewerForAcl {
 
       // Determine the location of the fsimage file
       originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil
-          .getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
+              .getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
       if (originalFsimage == null) {
         throw new RuntimeException("Didn't generate or can't find fsimage");
       }
@@ -172,7 +172,7 @@ public class TestOfflineImageViewerForAcl {
   @Test
   public void testWebImageViewerForAcl() throws Exception {
     WebImageViewer viewer = new WebImageViewer(
-        NetUtils.createSocketAddr("localhost:0"));
+            NetUtils.createSocketAddr("localhost:0"));
     try {
       viewer.initServer(originalFsimage.getAbsolutePath());
       int port = viewer.getPort();
@@ -204,12 +204,12 @@ public class TestOfflineImageViewerForAcl {
 
       // GETACLSTATUS operation to a invalid path
       URL url = new URL("http://localhost:" + port +
-          "/webhdfs/v1/invalid/?op=GETACLSTATUS");
+              "/webhdfs/v1/invalid/?op=GETACLSTATUS");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
       connection.connect();
       assertEquals(HttpURLConnection.HTTP_NOT_FOUND,
-          connection.getResponseCode());
+              connection.getResponseCode());
     } finally {
       // shutdown the viewer
       viewer.close();
@@ -235,15 +235,15 @@ public class TestOfflineImageViewerForAcl {
 
     try (PrintStream o = new PrintStream(output)) {
       PBImageDelimitedTextWriter v =
-          new PBImageDelimitedTextWriter(o, DELIMITER, "");  // run in memory.
+              new PBImageDelimitedTextWriter(o, DELIMITER, "");  // run in memory.
       v.visit(new RandomAccessFile(originalFsimage, "r"));
     }
 
     try (
-        ByteArrayInputStream input =
-            new ByteArrayInputStream(output.toByteArray());
-        BufferedReader reader =
-            new BufferedReader(new InputStreamReader(input))) {
+            ByteArrayInputStream input =
+                    new ByteArrayInputStream(output.toByteArray());
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(input))) {
       String line;
       boolean header = true;
       while ((line = reader.readLine()) != null) {

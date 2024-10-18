@@ -33,7 +33,7 @@ import javax.management.ObjectName;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.metrics2.impl.ConfigBuilder;
 import org.apache.hadoop.metrics2.impl.TestMetricsConfig;
 import org.junit.Test;
@@ -59,17 +59,17 @@ public class TestFSNamesystemMBean {
         // Metrics that belong to "FSNamesystem", these are metrics that
         // come from hadoop metrics framework for the class FSNamesystem.
         ObjectName mxbeanNamefsn = new ObjectName(
-            "Hadoop:service=NameNode,name=FSNamesystem");
+                "Hadoop:service=NameNode,name=FSNamesystem");
 
         // Metrics that belong to "FSNamesystemState".
         // These are metrics that FSNamesystem registers directly with MBeanServer.
         ObjectName mxbeanNameFsns = new ObjectName(
-            "Hadoop:service=NameNode,name=FSNamesystemState");
+                "Hadoop:service=NameNode,name=FSNamesystemState");
 
         // Metrics that belong to "NameNodeInfo".
         // These are metrics that FSNamesystem registers directly with MBeanServer.
         ObjectName mxbeanNameNni = new ObjectName(
-            "Hadoop:service=NameNode,name=NameNodeInfo");
+                "Hadoop:service=NameNode,name=NameNodeInfo");
 
         final Set<ObjectName> mbeans = new HashSet<ObjectName>();
         mbeans.add(mxbeanNamefsn);
@@ -92,38 +92,38 @@ public class TestFSNamesystemMBean {
   @Test
   public void test() throws Exception {
     Configuration conf = new Configuration();
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
 
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
       FSNamesystem fsn = cluster.getNameNode().namesystem;
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
-          "Hadoop:service=NameNode,name=FSNamesystemState");
+              "Hadoop:service=NameNode,name=FSNamesystemState");
 
       String snapshotStats = (String) (mbs.getAttribute(mxbeanName,
-          "SnapshotStats"));
+              "SnapshotStats"));
 
       @SuppressWarnings("unchecked")
       Map<String, Object> stat = (Map<String, Object>) JSON
-          .parse(snapshotStats);
+              .parse(snapshotStats);
 
       assertTrue(stat.containsKey("SnapshottableDirectories")
-          && (Long) stat.get("SnapshottableDirectories") == fsn
+              && (Long) stat.get("SnapshottableDirectories") == fsn
               .getNumSnapshottableDirs());
       assertTrue(stat.containsKey("Snapshots")
-          && (Long) stat.get("Snapshots") == fsn.getNumSnapshots());
+              && (Long) stat.get("Snapshots") == fsn.getNumSnapshots());
 
       Object pendingDeletionBlocks = mbs.getAttribute(mxbeanName,
-        "PendingDeletionBlocks");
+              "PendingDeletionBlocks");
       assertNotNull(pendingDeletionBlocks);
       assertTrue(pendingDeletionBlocks instanceof Long);
 
       Object encryptionZones = mbs.getAttribute(mxbeanName,
-          "NumEncryptionZones");
+              "NumEncryptionZones");
       assertNotNull(encryptionZones);
       assertTrue(encryptionZones instanceof Integer);
     } finally {
@@ -138,14 +138,14 @@ public class TestFSNamesystemMBean {
   @Test
   public void testWithFSNamesystemWriteLock() throws Exception {
     Configuration conf = new Configuration();
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     FSNamesystem fsn = null;
 
     int jmxCachePeriod = 1;
     new ConfigBuilder().add("namenode.period", jmxCachePeriod)
-        .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
+            .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
       fsn = cluster.getNameNode().namesystem;
@@ -156,7 +156,7 @@ public class TestFSNamesystemMBean {
       client.start();
       client.join(20000);
       assertTrue("JMX calls are blocked when FSNamesystem's writerlock" +
-          "is owned by another thread", client.succeeded);
+              "is owned by another thread", client.succeeded);
       client.interrupt();
     } finally {
       if (fsn != null && fsn.hasWriteLock()) {
@@ -175,10 +175,10 @@ public class TestFSNamesystemMBean {
     Configuration conf = new Configuration();
     int jmxCachePeriod = 1;
     new ConfigBuilder().add("namenode.period", jmxCachePeriod)
-        .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
-    MiniDockerDFSCluster cluster = null;
+            .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
+    MiniDFSCluster cluster = null;
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
       synchronized (cluster.getNameNode().getFSImage().getEditLog()) {
         Thread.sleep(jmxCachePeriod * 1000);
@@ -186,7 +186,7 @@ public class TestFSNamesystemMBean {
         client.start();
         client.join(20000);
         assertTrue("JMX calls are blocked when FSEditLog" +
-            " is synchronized by another thread", client.succeeded);
+                " is synchronized by another thread", client.succeeded);
         client.interrupt();
       }
     } finally {
@@ -199,13 +199,13 @@ public class TestFSNamesystemMBean {
   @Test(timeout = 120000)
   public void testFsEditLogMetrics() throws Exception {
     final Configuration conf = new Configuration();
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanNameFs =
-          new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+              new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
 
       FileSystem fs = cluster.getFileSystem();
       final int NUM_OPS = 10;
@@ -216,7 +216,7 @@ public class TestFSNamesystemMBean {
 
       long syncCount = (long) mbs.getAttribute(mxbeanNameFs, "TotalSyncCount");
       String syncTimes =
-          (String) mbs.getAttribute(mxbeanNameFs, "TotalSyncTimes");
+              (String) mbs.getAttribute(mxbeanNameFs, "TotalSyncTimes");
       assertTrue(syncCount > 0);
       assertNotNull(syncTimes);
     } finally {
