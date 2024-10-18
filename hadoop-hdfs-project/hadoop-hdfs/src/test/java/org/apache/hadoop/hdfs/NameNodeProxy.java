@@ -1806,7 +1806,7 @@ public class NameNodeProxy extends ReconfigurableBase implements
 
     @Override
     public String fetchHostAndPort() {
-        return (String) invokeRMI("fecthHostAndPort", new Object[]{}, new String[]{});
+        return (String) invokeRMI("fetchHostAndPort", new Object[]{}, new String[]{});
     }
 
     @Override // NameNodeStatusMXBean
