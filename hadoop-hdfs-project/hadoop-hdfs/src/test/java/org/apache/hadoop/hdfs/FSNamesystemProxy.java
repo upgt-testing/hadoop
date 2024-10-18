@@ -21,6 +21,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -223,6 +224,11 @@ public class FSNamesystemProxy implements Namesystem, FSNamesystemMBean,
     @Override
     public String getEnteringMaintenanceNodes() {
         return (String) invokeRMI("getEnteringMaintenanceNodes", new Object[]{}, new String[]{});
+    }
+
+    @Override
+    public void fetchProvider_createKey_flush(String keyName, byte[] keyData) throws NoSuchAlgorithmException, IOException {
+        invokeRMI("fetchProvider_createKey_flush", new Object[]{keyName, keyData}, new String[]{String.class.getName(), byte[].class.getName()});
     }
 
     @Override

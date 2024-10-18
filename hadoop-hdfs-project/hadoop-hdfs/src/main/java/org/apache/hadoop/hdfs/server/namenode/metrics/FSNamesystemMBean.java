@@ -20,6 +20,7 @@ package org.apache.hadoop.hdfs.server.namenode.metrics;
 import org.apache.hadoop.classification.InterfaceAudience;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * 
@@ -41,7 +42,7 @@ import java.io.IOException;
 public interface FSNamesystemMBean {
 
 
-
+  public void fetchProvider_createKey_flush(String keyName, byte[] keyData) throws NoSuchAlgorithmException, IOException;
   public String fetchClusterId();
   public void provider_deleteKey(String key) throws IOException;
   public void blockManagerClear();

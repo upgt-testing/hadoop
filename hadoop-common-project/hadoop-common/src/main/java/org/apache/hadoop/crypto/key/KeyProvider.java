@@ -18,12 +18,7 @@
 
 package org.apache.hadoop.crypto.key;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -335,7 +330,9 @@ public abstract class KeyProvider implements Closeable {
   /**
    * Options when creating key objects.
    */
-  public static class Options {
+  public static class Options implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String cipher;
     private int bitLength;
     private String description;
@@ -565,6 +562,20 @@ public abstract class KeyProvider implements Closeable {
    */
   public KeyVersion createKey(String name, Options options)
       throws NoSuchAlgorithmException, IOException {
+    byte[] material = generateKey(options.getBitLength(), options.getCipher());
+    return createKey(name, material, options);
+  }
+
+  public KeyVersion createKeyAndFlush(String name, byte[] optionsBytes)
+          throws NoSuchAlgorithmException, IOException {
+    // Deserialize the options from the byte array
+    Options options;
+    try (ByteArrayInputStream bis = new ByteArrayInputStream(optionsBytes);
+         ObjectInputStream ois = new ObjectInputStream(bis)) {
+       options = (Options) ois.readObject();
+    } catch (ClassNotFoundException e) {
+      throw new IOException("Error deserializing options", e);
+    }
     byte[] material = generateKey(options.getBitLength(), options.getCipher());
     return createKey(name, material, options);
   }

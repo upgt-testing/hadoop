@@ -22,6 +22,7 @@ import static org.apache.hadoop.util.Time.now;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,6 +75,11 @@ import org.apache.hadoop.thirdparty.com.google.common.cache.LoadingCache;
 public class NamenodeBeanMetrics
     implements FSNamesystemMBean, NameNodeMXBean, NameNodeStatusMXBean {
 
+
+  @Override
+  public void fetchProvider_createKey_flush(String keyName, byte[] keyData) throws NoSuchAlgorithmException, IOException {
+    throw new UnsupportedOperationException("fetchProvider_createKey_flush is not supported in NamenodeBeanMetrics class");
+  }
 
   @Override
   public String fetchClusterId() {

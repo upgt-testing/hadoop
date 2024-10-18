@@ -6644,6 +6644,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   @Override
+  public void fetchProvider_createKey_flush(String keyName, byte[] keyData) throws NoSuchAlgorithmException, IOException {
+    getProvider().createKeyAndFlush(keyName, keyData);
+  }
+
+  @Override
   public String fetchClusterId() {
     return getClusterId();
   }

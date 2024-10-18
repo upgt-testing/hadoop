@@ -17,17 +17,13 @@
  */
 package org.apache.hadoop.hdfs;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
+
+import org.apache.hadoop.crypto.key.KeyProvider;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +82,7 @@ public class TestAclsEndToEnd {
 
   private MiniKMS miniKMS;
   private File kmsDir;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @BeforeClass
@@ -196,10 +192,10 @@ public class TestAclsEndToEnd {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
 
-    MiniDFSCluster.Builder clusterBuilder = new MiniDFSCluster.Builder(conf);
+    MiniDockerDFSCluster.Builder clusterBuilder = new MiniDockerDFSCluster.Builder(conf);
 
     cluster = clusterBuilder.numDataNodes(1).format(resetDfs).build();
-    fs = cluster.getFileSystem();
+    fs = cluster.getDistributedFileSystem();
   }
 
   /**
@@ -1529,13 +1525,35 @@ public class TestAclsEndToEnd {
       @Override
       public void execute() throws IOException {
         try {
-          DFSTestUtil.createKey(key, cluster, conf);
+          //DFSTestUtil.createKey(key, cluster, conf);
+          createKey(key, cluster,conf);
         } catch (NoSuchAlgorithmException ex) {
           throw new IOException(ex);
         }
       }
     });
   }
+
+  public static void createKey(String keyName, MiniDockerDFSCluster cluster,
+                               Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeProxy nn = cluster.getNameNode();
+
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    byte[] optionsBytes;
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+         ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+      oos.writeObject(options);
+       optionsBytes = bos.toByteArray();
+    }
+    nn.getNamesystem().fetchProvider_createKey_flush(keyName, optionsBytes);
+    //KeyProvider provider = nn.getNamesystem().getProvider();
+    //provider.createKey(keyName, options);
+    //provider.flush();
+  }
+
 
   /**
    * Create a zone as the specified user.
@@ -1551,7 +1569,7 @@ public class TestAclsEndToEnd {
     return doUserOp(ugi, new UserOp() {
       @Override
       public void execute() throws IOException {
-        cluster.getFileSystem().createEncryptionZone(zone, key);
+        cluster.getDistributedFileSystem().createEncryptionZone(zone, key);
       }
     });
   }
@@ -1615,7 +1633,7 @@ public class TestAclsEndToEnd {
     return doUserOp(ugi, new UserOp() {
       @Override
       public void execute() throws IOException {
-        cluster.getNameNode().getNamesystem().getProvider().deleteKey(key);
+        cluster.getNameNode().getNamesystem().provider_deleteKey(key);
       }
     });
   }
