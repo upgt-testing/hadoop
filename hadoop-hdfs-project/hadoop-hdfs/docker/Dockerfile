@@ -11,9 +11,12 @@ ENV HADOOP_HOME=/opt/hadoop
 ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ENV PATH=$PATH:$HADOOP_HOME/bin
 
+# COPY the local hadoop-$HADOOP_VERSION.tar.gz to the root directory of the container
+COPY hadoop-$HADOOP_VERSION.tar.gz /hadoop-$HADOOP_VERSION.tar.gz
+
 # Download and install Hadoop
-RUN wget -q https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
-    tar -xzf hadoop-$HADOOP_VERSION.tar.gz -C /opt && \
+#RUN wget -q https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+RUN tar -xzf hadoop-$HADOOP_VERSION.tar.gz -C /opt && \
     mv /opt/hadoop-$HADOOP_VERSION /opt/hadoop && \
     rm hadoop-$HADOOP_VERSION.tar.gz
 

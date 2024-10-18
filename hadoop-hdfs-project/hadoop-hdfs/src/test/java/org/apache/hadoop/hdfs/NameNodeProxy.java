@@ -284,7 +284,9 @@ public class NameNodeProxy extends ReconfigurableBase implements
 
     @Override
     public String fetchHttpsAddressHostAndPort() {
-        return (String) invokeRMI("fetchHttpsAddressHostAndPort", new Object[]{}, new String[]{});
+        String res = (String) invokeRMI("fetchHttpsAddressHostAndPort", new Object[]{}, new String[]{});
+        res = res.replace("namenode", "localhost");
+        return res;
     }
 
     public InetSocketAddress getServiceRpcAddress() {
@@ -1233,12 +1235,16 @@ public class NameNodeProxy extends ReconfigurableBase implements
 
     @Override
     public String fetchHttpAddress() {
-        return (String) invokeRMI("fetchHttpAddress", new Object[]{}, new String[]{});
+        String res = (String) invokeRMI("fetchHttpAddress", new Object[]{}, new String[]{});
+        res = res.replace("namenode", "localhost");
+        return res;
     }
 
     @Override
     public String fetchHttpsAddress() {
-        return (String) invokeRMI("fetchHttpsAddress", new Object[]{}, new String[]{});
+        String res = (String) invokeRMI("fetchHttpsAddress", new Object[]{}, new String[]{});
+        res = res.replace("namenode", "localhost");
+        return res;
     }
 
 
@@ -1806,7 +1812,9 @@ public class NameNodeProxy extends ReconfigurableBase implements
 
     @Override
     public String fetchHostAndPort() {
-        return (String) invokeRMI("fetchHostAndPort", new Object[]{}, new String[]{});
+        String res = (String) invokeRMI("fetchHostAndPort", new Object[]{}, new String[]{});
+        res = res.replace("namenode", "localhost");
+        return res;
     }
 
     @Override // NameNodeStatusMXBean
