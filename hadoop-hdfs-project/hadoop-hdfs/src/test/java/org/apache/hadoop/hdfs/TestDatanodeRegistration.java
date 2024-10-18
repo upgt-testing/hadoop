@@ -153,7 +153,7 @@ public class TestDatanodeRegistration {
         fail("Never got a heartbeat from restarted datanode.");
       }
 
-      int realIpcPort = cluster.getDataNodes().get(0).getIpcPort();
+      int realIpcPort = cluster.getDataNodes().get(0).fetchIpcPort();
       // Now make sure the reported IPC port is the correct one.
       assertEquals(realIpcPort, report[0].getIpcPort());
     } finally {

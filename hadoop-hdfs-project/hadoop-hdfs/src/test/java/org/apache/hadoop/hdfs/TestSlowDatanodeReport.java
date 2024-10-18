@@ -75,7 +75,7 @@ public class TestSlowDatanodeReport {
     DataNode slowNode = dataNodes.get(1);
     OutlierMetrics outlierMetrics = new OutlierMetrics(1.245, 2.69375, 4.5667, 15.5);
     dataNodes.get(0).getPeerMetrics().setTestOutliers(
-        ImmutableMap.of(slowNode.getDatanodeHostname() + ":" + slowNode.getIpcPort(),
+        ImmutableMap.of(slowNode.getDatanodeHostname() + ":" + slowNode.fetchIpcPort(),
             outlierMetrics));
     DistributedFileSystem distributedFileSystem = cluster.getFileSystem();
     Assert.assertEquals(3, distributedFileSystem.getDataNodeStats().length);
@@ -105,10 +105,10 @@ public class TestSlowDatanodeReport {
     OutlierMetrics outlierMetrics1 = new OutlierMetrics(2.498237, 19.2495, 23.568204, 14.5);
     OutlierMetrics outlierMetrics2 = new OutlierMetrics(3.2535, 22.4945, 44.5667, 18.7);
     dataNodes.get(0).getPeerMetrics().setTestOutliers(ImmutableMap.of(
-        dataNodes.get(1).getDatanodeHostname() + ":" + dataNodes.get(1).getIpcPort(),
+        dataNodes.get(1).getDatanodeHostname() + ":" + dataNodes.get(1).fetchIpcPort(),
         outlierMetrics1));
     dataNodes.get(1).getPeerMetrics().setTestOutliers(ImmutableMap.of(
-        dataNodes.get(2).getDatanodeHostname() + ":" + dataNodes.get(2).getIpcPort(),
+        dataNodes.get(2).getDatanodeHostname() + ":" + dataNodes.get(2).fetchIpcPort(),
         outlierMetrics2));
     DistributedFileSystem distributedFileSystem = cluster.getFileSystem();
     Assert.assertEquals(3, distributedFileSystem.getDataNodeStats().length);

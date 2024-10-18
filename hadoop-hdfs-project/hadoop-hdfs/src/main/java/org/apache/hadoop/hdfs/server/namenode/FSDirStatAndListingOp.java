@@ -50,7 +50,7 @@ import java.util.EnumSet;
 
 import static org.apache.hadoop.util.Time.now;
 
-class FSDirStatAndListingOp {
+public class FSDirStatAndListingOp {
   static DirectoryListing getListingInt(FSDirectory fsd, FSPermissionChecker pc,
       final String srcArg, byte[] startAfter, boolean needLocation)
       throws IOException {

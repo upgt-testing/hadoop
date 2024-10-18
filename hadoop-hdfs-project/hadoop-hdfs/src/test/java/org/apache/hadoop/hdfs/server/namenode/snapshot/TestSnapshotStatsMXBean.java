@@ -31,6 +31,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.Test;
 
 public class TestSnapshotStatsMXBean {
@@ -41,15 +42,15 @@ public class TestSnapshotStatsMXBean {
   @Test
   public void testSnapshotStatsMXBeanInfo() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     String pathName = "/snapshot";
     Path path = new Path(pathName);
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
-      SnapshotManager sm = cluster.getNamesystem().getSnapshotManager();
+      //SnapshotManager sm = cluster.getNamesystem().getSnapshotManager();
       DistributedFileSystem dfs = (DistributedFileSystem) cluster.getFileSystem();
       dfs.mkdirs(path);
       dfs.allowSnapshot(path);
@@ -63,11 +64,13 @@ public class TestSnapshotStatsMXBean {
           (CompositeData[]) mbs.getAttribute(
               mxbeanName, "SnapshottableDirectories");
       int numDirectories = Array.getLength(directories);
-      assertEquals(sm.getNumSnapshottableDirs(), numDirectories);
+      //assertEquals(sm.getNumSnapshottableDirs(), numDirectories);
+      assertEquals(cluster.getNamesystem().getSnapshotManagerGetNumSnapshottableDirs(), numDirectories);
       CompositeData[] snapshots =
           (CompositeData[]) mbs.getAttribute(mxbeanName, "Snapshots");
       int numSnapshots = Array.getLength(snapshots);
-      assertEquals(sm.getNumSnapshots(), numSnapshots);
+      //assertEquals(sm.getNumSnapshots(), numSnapshots);
+        assertEquals(cluster.getNamesystem().getSnapshotManagerGetNumSnapshots(), numSnapshots);
 
       CompositeData d = (CompositeData) Array.get(directories, 0);
       CompositeData s = (CompositeData) Array.get(snapshots, 0);

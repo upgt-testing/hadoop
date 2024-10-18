@@ -240,7 +240,7 @@ public class ClientDatanodeProtocolServerSideTranslatorPB implements
 
   @Override
   public GetBalancerBandwidthResponseProto getBalancerBandwidth(
-      RpcController controller, GetBalancerBandwidthRequestProto request)
+          RpcController controller, GetBalancerBandwidthRequestProto request)
       throws ServiceException {
     long bandwidth;
     try {

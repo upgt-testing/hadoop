@@ -42,6 +42,8 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBER
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
+
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.metrics2.MetricsSystem;
 import org.apache.hadoop.minikdc.MiniKdc;
@@ -69,7 +71,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
   private static String hdfsPrincipal;
   private static String hdfsKeytab;
   private static String spnegoPrincipal;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private UserGroupInformation sink = null;
 
   /**
@@ -108,7 +110,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
     RollingFileSystemSink.hasFlushed = false;
     RollingFileSystemSink.suppliedConf = conf;
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
         .build();
     cluster.waitActive();
     createDirectoriesSecurely();
@@ -149,7 +151,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
   @Test
   public void testWithSecureHDFS() throws Exception {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp/test";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp/test";
     final MetricsSystem ms =
         initMetricsSystem(path, true, false, true);
 
@@ -171,7 +173,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
   @Test
   public void testMissingPropertiesWithSecureHDFS() throws Exception {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp/test";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp/test";
 
     initMetricsSystem(path, true, false);
 

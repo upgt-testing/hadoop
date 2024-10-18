@@ -86,7 +86,7 @@ public class BackupNode extends NameNode {
   /** Checkpoint manager */
   Checkpointer checkpointManager;
   
-  BackupNode(Configuration conf, NamenodeRole role) throws IOException {
+  public BackupNode(Configuration conf, NamenodeRole role) throws IOException {
     super(conf, role);
   }
 

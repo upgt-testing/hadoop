@@ -20,6 +20,7 @@ package org.apache.hadoop.hdfs.server.datanode;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -31,7 +32,19 @@ import java.util.Map;
 @InterfaceAudience.Private
 @InterfaceStability.Stable
 public interface DataNodeMXBean {
-  
+
+  public int fetchXferPort();
+  public String fetchMetricsName();
+  public long fetchFSDatasetGetCacheUsed();
+  public long fetchFSDatasetGetNumBlocksCached();
+  public int fetchInfoPort();
+  public int fetchXferServerGetPeerServerGetReceiveBufferSize() throws IOException;
+  public long fetchFSDatasetGetDfsUsed() throws IOException;
+  public String fetchIPCServerListenerAddressHostName();
+  public int fetchIpcPort();
+  public long fetchBalancerBandwidth() throws IOException;
+  public boolean fetchBpOsIsAlive(int index);
+  public boolean fetchBpOsIsInitialized(int index);
   /**
    * Gets the version of Hadoop.
    * 

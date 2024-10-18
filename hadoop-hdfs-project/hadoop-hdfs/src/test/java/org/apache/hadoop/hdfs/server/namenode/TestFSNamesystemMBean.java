@@ -33,7 +33,7 @@ import javax.management.ObjectName;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.metrics2.impl.ConfigBuilder;
 import org.apache.hadoop.metrics2.impl.TestMetricsConfig;
 import org.junit.Test;
@@ -92,10 +92,10 @@ public class TestFSNamesystemMBean {
   @Test
   public void test() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
       FSNamesystem fsn = cluster.getNameNode().namesystem;
@@ -138,14 +138,14 @@ public class TestFSNamesystemMBean {
   @Test
   public void testWithFSNamesystemWriteLock() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     FSNamesystem fsn = null;
 
     int jmxCachePeriod = 1;
     new ConfigBuilder().add("namenode.period", jmxCachePeriod)
         .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
       fsn = cluster.getNameNode().namesystem;
@@ -176,9 +176,9 @@ public class TestFSNamesystemMBean {
     int jmxCachePeriod = 1;
     new ConfigBuilder().add("namenode.period", jmxCachePeriod)
         .save(TestMetricsConfig.getTestFilename("hadoop-metrics2-namenode"));
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
       synchronized (cluster.getNameNode().getFSImage().getEditLog()) {
         Thread.sleep(jmxCachePeriod * 1000);
@@ -199,9 +199,9 @@ public class TestFSNamesystemMBean {
   @Test(timeout = 120000)
   public void testFsEditLogMetrics() throws Exception {
     final Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanNameFs =

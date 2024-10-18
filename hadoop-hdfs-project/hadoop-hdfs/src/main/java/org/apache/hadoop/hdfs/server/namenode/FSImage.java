@@ -158,9 +158,9 @@ public class FSImage implements Closeable {
    * @param editsDirs Directories the editlog can be stored in.
    * @throws IOException if directories are invalid.
    */
-  protected FSImage(Configuration conf,
-                    Collection<URI> imageDirs,
-                    List<URI> editsDirs)
+  public FSImage(Configuration conf,
+                 Collection<URI> imageDirs,
+                 List<URI> editsDirs)
       throws IOException {
     this.conf = conf;
 
@@ -175,7 +175,7 @@ public class FSImage implements Closeable {
     FSImageFormatProtobuf.initParallelLoad(conf);
   }
  
-  void format(FSNamesystem fsn, String clusterId, boolean force)
+  public void format(FSNamesystem fsn, String clusterId, boolean force)
       throws IOException {
     long fileCount = fsn.getFilesTotal();
     // Expect 1 file, which is the root inode
@@ -202,7 +202,7 @@ public class FSImage implements Closeable {
    * @return true if formatting should proceed
    * @throws IOException if some storage cannot be accessed
    */
-  boolean confirmFormat(boolean force, boolean interactive) throws IOException {
+  public boolean confirmFormat(boolean force, boolean interactive) throws IOException {
     List<FormatConfirmable> confirms = Lists.newArrayList();
     for (StorageDirectory sd : storage.dirIterable(null)) {
       confirms.add(sd);
@@ -221,8 +221,8 @@ public class FSImage implements Closeable {
    * @throws IOException
    * @return true if the image needs to be saved or false otherwise
    */
-  boolean recoverTransitionRead(StartupOption startOpt, FSNamesystem target,
-      MetaRecoveryContext recovery)
+  public boolean recoverTransitionRead(StartupOption startOpt, FSNamesystem target,
+                                       MetaRecoveryContext recovery)
       throws IOException {
     assert startOpt != StartupOption.FORMAT : 
       "NameNode formatting should be performed before reading the image";
@@ -516,7 +516,7 @@ public class FSImage implements Closeable {
     }
   }
 
-  void doRollback(FSNamesystem fsns) throws IOException {
+  public void doRollback(FSNamesystem fsns) throws IOException {
     // Rollback is allowed only if there is 
     // a previous fs states in at least one of the storage directories.
     // Directories that don't have previous state do not rollback

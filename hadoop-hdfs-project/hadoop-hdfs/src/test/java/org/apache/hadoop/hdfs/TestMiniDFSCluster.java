@@ -396,18 +396,18 @@ public class TestMiniDFSCluster {
       miniDfsCluster.waitActive();
 
       assertEquals(httpPorts[0],
-          miniDfsCluster.getDataNode(ipcPorts[0]).getInfoPort());
+          miniDfsCluster.getDataNode(ipcPorts[0]).fetchInfoPort());
       assertEquals(httpPorts[1],
-          miniDfsCluster.getDataNode(ipcPorts[1]).getInfoPort());
+          miniDfsCluster.getDataNode(ipcPorts[1]).fetchInfoPort());
       assertEquals(httpPorts[2],
-          miniDfsCluster.getDataNode(ipcPorts[2]).getInfoPort());
+          miniDfsCluster.getDataNode(ipcPorts[2]).fetchInfoPort());
 
       assertEquals(ipcPorts[0],
-          miniDfsCluster.getDataNode(ipcPorts[0]).getIpcPort());
+          miniDfsCluster.getDataNode(ipcPorts[0]).fetchIpcPort());
       assertEquals(ipcPorts[1],
-          miniDfsCluster.getDataNode(ipcPorts[1]).getIpcPort());
+          miniDfsCluster.getDataNode(ipcPorts[1]).fetchIpcPort());
       assertEquals(ipcPorts[2],
-          miniDfsCluster.getDataNode(ipcPorts[2]).getIpcPort());
+          miniDfsCluster.getDataNode(ipcPorts[2]).fetchIpcPort());
     }
   }
 

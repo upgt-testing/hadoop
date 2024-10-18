@@ -45,7 +45,7 @@ import org.slf4j.Logger;
  * for requests from clients or other DataNodes. This small server does not use
  * the Hadoop IPC mechanism.
  */
-class DataXceiverServer implements Runnable {
+public class DataXceiverServer implements Runnable {
   public static final Logger LOG = DataNode.LOG;
 
   /**
@@ -166,7 +166,7 @@ class DataXceiverServer implements Runnable {
     }
   }
 
-  final BlockBalanceThrottler balanceThrottler;
+  public final BlockBalanceThrottler balanceThrottler;
 
   private final DataTransferThrottler transferThrottler;
 
@@ -179,8 +179,8 @@ class DataXceiverServer implements Runnable {
    */
   final long estimateBlockSize;
 
-  DataXceiverServer(PeerServer peerServer, Configuration conf,
-      DataNode datanode) {
+  public DataXceiverServer(PeerServer peerServer, Configuration conf,
+                           DataNode datanode) {
     this.peerServer = peerServer;
     this.datanode = datanode;
 
@@ -295,7 +295,7 @@ class DataXceiverServer implements Runnable {
     closeAllPeers();
   }
 
-  void kill() {
+  public void kill() {
     assert (datanode.shouldRun == false || datanode.shutdownForUpgrade) :
       "shoudRun should be set to false or restarting should be true"
       + " before killing";

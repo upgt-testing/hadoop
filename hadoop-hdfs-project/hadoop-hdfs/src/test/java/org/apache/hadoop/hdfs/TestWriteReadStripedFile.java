@@ -27,7 +27,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.web.WebHdfsConstants;
 import org.apache.hadoop.hdfs.web.WebHdfsTestUtil;
 import org.apache.hadoop.ipc.RemoteException;
@@ -58,7 +57,7 @@ public class TestWriteReadStripedFile {
   private final int blockSize = stripesPerBlock * cellSize;
   private final int blockGroupSize = blockSize * dataBlocks;
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private Configuration conf = new HdfsConfiguration();
 
@@ -75,11 +74,11 @@ public class TestWriteReadStripedFile {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
-    fs = cluster.getFileSystem();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    fs = cluster.getDistributedFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());
     fs.mkdirs(new Path("/ec"));
-    cluster.getFileSystem().getClient().setErasureCodingPolicy("/ec",
+    cluster.getDistributedFileSystem().getClient().setErasureCodingPolicy("/ec",
         ecPolicy.getName());
   }
 
@@ -243,8 +242,9 @@ public class TestWriteReadStripedFile {
     BlockLocation[] locs = fs.getFileBlockLocations(path, 0, cellSize);
     if (locs != null && locs.length > 0) {
       String name = (locs[0].getNames())[failedDNIdx];
-      for (DataNode dn : cluster.getDataNodes()) {
-        int port = dn.getXferPort();
+      for (DataNodeProxy dn : cluster.getDataNodes()) {
+        int port = dn.fetchXferPort();
+        System.out.println("==============> I got the port from RMI: " + port);
         if (name.contains(Integer.toString(port))) {
           dn.shutdown();
           break;

@@ -69,8 +69,8 @@ public class NameNodeHttpServer {
   public static final String STARTUP_PROGRESS_ATTRIBUTE_KEY = "startup.progress";
   public static final String ALIASMAP_ATTRIBUTE_KEY = "name.system.aliasmap";
 
-  NameNodeHttpServer(Configuration conf, NameNode nn,
-      InetSocketAddress bindAddress) {
+  public NameNodeHttpServer(Configuration conf, NameNode nn,
+                            InetSocketAddress bindAddress) {
     this.conf = conf;
     this.nn = nn;
     this.bindAddress = bindAddress;
@@ -114,7 +114,7 @@ public class NameNodeHttpServer {
    * for information related to the different configuration options and
    * Http Policy is decided.
    */
-  void start() throws IOException {
+  public void start() throws IOException {
     HttpConfig.Policy policy = DFSUtil.getHttpPolicy(conf);
     final String infoHost = bindAddress.getHostName();
 
@@ -192,17 +192,17 @@ public class NameNodeHttpServer {
     }
   }
 
-  void stop() throws Exception {
+  public void stop() throws Exception {
     if (httpServer != null) {
       httpServer.stop();
     }
   }
 
-  InetSocketAddress getHttpAddress() {
+  public InetSocketAddress getHttpAddress() {
     return httpAddress;
   }
 
-  InetSocketAddress getHttpsAddress() {
+  public InetSocketAddress getHttpsAddress() {
     return httpsAddress;
   }
 
@@ -211,7 +211,7 @@ public class NameNodeHttpServer {
    * 
    * @param fsImage FSImage to set
    */
-  void setFSImage(FSImage fsImage) {
+  public void setFSImage(FSImage fsImage) {
     httpServer.setAttribute(FSIMAGE_ATTRIBUTE_KEY, fsImage);
   }
 
@@ -220,7 +220,7 @@ public class NameNodeHttpServer {
    * 
    * @param nameNodeAddress InetSocketAddress to set
    */
-  void setNameNodeAddress(InetSocketAddress nameNodeAddress) {
+  public void setNameNodeAddress(InetSocketAddress nameNodeAddress) {
     httpServer.setAttribute(NAMENODE_ADDRESS_ATTRIBUTE_KEY,
         NetUtils.getConnectAddress(nameNodeAddress));
   }
@@ -230,7 +230,7 @@ public class NameNodeHttpServer {
    * 
    * @param prog StartupProgress to set
    */
-  void setStartupProgress(StartupProgress prog) {
+  public void setStartupProgress(StartupProgress prog) {
     httpServer.setAttribute(STARTUP_PROGRESS_ATTRIBUTE_KEY, prog);
   }
 
@@ -239,7 +239,7 @@ public class NameNodeHttpServer {
    *
    * @param aliasMap the alias map used.
    */
-  void setAliasMap(InMemoryAliasMap aliasMap) {
+  public void setAliasMap(InMemoryAliasMap aliasMap) {
     httpServer.setAttribute(ALIASMAP_ATTRIBUTE_KEY, aliasMap);
   }
 

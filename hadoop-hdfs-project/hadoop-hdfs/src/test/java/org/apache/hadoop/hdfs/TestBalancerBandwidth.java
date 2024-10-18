@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.ToolRunner;
@@ -58,21 +57,23 @@ public class TestBalancerBandwidth {
         DEFAULT_BANDWIDTH);
 
     /* Create and start cluster */
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES).build()) {
       cluster.waitActive();
 
-      DistributedFileSystem fs = cluster.getFileSystem();
+      DistributedFileSystem fs = cluster.getDistributedFileSystem();
 
-      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      ArrayList<DataNodeProxy> datanodes = cluster.getDataNodes();
       // Ensure value from the configuration is reflected in the datanodes.
-      assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(0).getBalancerBandwidth());
-      assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(1).getBalancerBandwidth());
+      assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(0).fetchBalancerBandwidth());
+      assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(1).fetchBalancerBandwidth());
       DFSAdmin admin = new DFSAdmin(conf);
-      String dn1Address = datanodes.get(0).ipcServer.getListenerAddress()
-          .getHostName() + ":" + datanodes.get(0).getIpcPort();
-      String dn2Address = datanodes.get(1).ipcServer.getListenerAddress()
-          .getHostName() + ":" + datanodes.get(1).getIpcPort();
+      //String dn1Address = datanodes.get(0).ipcServer.getListenerAddress()
+      //    .getHostName() + ":" + datanodes.get(0).getIpcPort();
+      String dn1Address = datanodes.get(0).fetchIPCServerListenerAddressHostName() + ":" + datanodes.get(0).fetchIpcPort();
+      //String dn2Address = datanodes.get(1).ipcServer.getListenerAddress()
+      //    .getHostName() + ":" + datanodes.get(1).getIpcPort();
+        String dn2Address = datanodes.get(1).fetchIPCServerListenerAddressHostName() + ":" + datanodes.get(1).fetchIpcPort();
 
       // verifies the dfsadmin command execution
       String[] args = new String[] { "-getBalancerBandwidth", dn1Address };
@@ -113,13 +114,13 @@ public class TestBalancerBandwidth {
     }
   }
 
-  private void verifyBalancerBandwidth(final ArrayList<DataNode> datanodes,
+  private void verifyBalancerBandwidth(final ArrayList<DataNodeProxy> datanodes,
       final long newBandwidth) throws TimeoutException, InterruptedException {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
       @Override
       public Boolean get() {
-        return (long) datanodes.get(0).getBalancerBandwidth() == newBandwidth
-            && (long) datanodes.get(1).getBalancerBandwidth() == newBandwidth;
+        return (long) datanodes.get(0).fetchBalancerBandwidth() == newBandwidth
+            && (long) datanodes.get(1).fetchBalancerBandwidth() == newBandwidth;
       }
     }, 100, 60 * 1000);
   }

@@ -26,9 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Options.Rename;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.protocol.SnapshottableDirectoryStatus;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -47,18 +45,18 @@ public class TestSnapshottableDirListing {
   private final Path dir2 = new Path("/TestSnapshot2");
   
   Configuration conf;
-  MiniDFSCluster cluster;
-  FSNamesystem fsn;
+  MiniDockerDFSCluster cluster;
+  FSNamesystemProxy fsn;
   DistributedFileSystem hdfs;
   
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
     fsn = cluster.getNamesystem();
-    hdfs = cluster.getFileSystem();
+    hdfs = cluster.getDistributedFileSystem();
     hdfs.mkdirs(dir1);
     hdfs.mkdirs(dir2);
   }
@@ -76,7 +74,8 @@ public class TestSnapshottableDirListing {
    */
   @Test (timeout=60000)
   public void testListSnapshottableDir() throws Exception {
-    cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    //cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    cluster.getNamesystem().getSnapshotManagerAndSetAllowNestedSnapshots(true);
 
     // Initially there is no snapshottable directories in the system
     SnapshottableDirectoryStatus[] dirs = hdfs.getSnapshottableDirListing();
@@ -174,7 +173,8 @@ public class TestSnapshottableDirListing {
    */
   @Test (timeout=60000)
   public void testListWithDifferentUser() throws Exception {
-    cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    //cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    cluster.getNamesystem().getSnapshotManagerAndSetAllowNestedSnapshots(true);
 
     // first make dir1 and dir2 snapshottable
     hdfs.allowSnapshot(dir1);

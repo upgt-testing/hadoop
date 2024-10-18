@@ -39,6 +39,7 @@ import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeFile;
 import org.apache.hadoop.http.HttpServer2;
 import org.apache.hadoop.http.HttpServerFunctionalTest;
@@ -62,7 +63,7 @@ public class TestTransferFsImage {
   @Test
   public void testClientSideException() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(0).build();
     NNStorage mockStorage = Mockito.mock(NNStorage.class);
     List<File> localPath = Collections.singletonList(

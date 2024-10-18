@@ -23,7 +23,8 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
 
-import java.util.Set;
+import java.util.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.HadoopIllegalArgumentException;
@@ -109,12 +110,6 @@ import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.TreeSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -249,8 +244,37 @@ public class NameNode extends ReconfigurableBase implements
   }
 
   @Override
-  public void fakePrintMXBean() {
+  public int fakePrintMXBean() {
     getNamesystem().fakePrintMXBean();
+    return 1;
+  }
+
+  @Override
+  public String fetchHttpAddress() {
+    return httpServer.getHttpAddress().getHostName() + ":"
+        + httpServer.getHttpAddress().getPort();
+  }
+
+  @Override
+  public String fetchHttpsAddress() {
+    return httpServer.getHttpsAddress().getHostName() + ":"
+        + httpServer.getHttpsAddress().getPort();
+  }
+
+  @Override
+  public boolean fetchSecurityEnabled() {
+    return isSecurityEnabled();
+  }
+
+  @Override
+  public String fetchHostAndPort() {
+    return getHostAndPort();
+  }
+
+  @Override
+  public String fetchHttpsAddressHostAndPort() {
+    InetSocketAddress addr = getHttpsAddress();
+    return addr.getHostName() + ":" + addr.getPort();
   }
 
   private InMemoryLevelDBAliasMapServer levelDBAliasMapServer;
@@ -474,6 +498,12 @@ public class NameNode extends ReconfigurableBase implements
   public NamenodeProtocols getRpcServer() {
     return rpcServer;
   }
+
+  /**
+   * public NamenodeProtocolsWrapper getRpcServer() {
+   *     return a string "signature of the class + ID"
+   * }
+   */
 
   @VisibleForTesting
   public HttpServer2 getHttpServer() {
@@ -1662,7 +1692,7 @@ public class NameNode extends ReconfigurableBase implements
                                           StartupOption.REGULAR.toString()));
   }
 
-  private static void doRecovery(StartupOption startOpt, Configuration conf)
+  public static void doRecovery(StartupOption startOpt, Configuration conf)
       throws IOException {
     String nsId = DFSUtil.getNamenodeNameServiceId(conf);
     String namenodeId = HAUtil.getNameNodeId(conf, nsId);
@@ -1943,7 +1973,7 @@ public class NameNode extends ReconfigurableBase implements
     return ret;
   }
 
-  synchronized HAServiceState getServiceState() {
+  public synchronized HAServiceState getServiceState() {
     if (state == null) {
       return HAServiceState.INITIALIZING;
     }
@@ -2186,8 +2216,10 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
+    LOG.info("Invoke reconfigureProperty for " + property + " to " + newVal);
+    System.out.println("Invoke reconfigureProperty for " + property + " to " + newVal);
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();
 

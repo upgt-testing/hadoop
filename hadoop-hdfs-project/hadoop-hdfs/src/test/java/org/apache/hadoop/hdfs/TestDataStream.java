@@ -42,7 +42,11 @@ public class TestDataStream {
         conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, PACKET_SIZE);
         conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SLOW_IO_WARNING_THRESHOLD_KEY, 10000);
         conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 60000);
-        cluster = new MiniDockerDFSCluster.Builder(conf).build();
+        conf.setInt("dfs.client.block.write.retry.count", 10);
+        conf.setInt("dfs.client.block.write.locateFollowingBlock.retries", 5);
+        conf.setInt("dfs.replication", 2);
+        conf.set("dfs.client.block.write.replace-datanode-on-failure.policy", "ALWAYS");
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     }
 
     @Test
@@ -53,7 +57,8 @@ public class TestDataStream {
         final Path path = new Path("/file1");
         final DistributedFileSystem dfs = cluster.getDistributedFileSystem();
         FSDataOutputStream out = null;
-        out = dfs.create(path, false);
+        final short repl = 2;
+        out = dfs.create(path, repl);
         out.write(toWrite);
         out.write(toWrite);
         out.hflush();

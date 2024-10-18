@@ -19,6 +19,8 @@ package org.apache.hadoop.hdfs.server.namenode.metrics;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 
+import java.io.IOException;
+
 /**
  * 
  * This Interface defines the methods to get the status of a the FSNamesystem of
@@ -37,6 +39,27 @@ import org.apache.hadoop.classification.InterfaceAudience;
  */
 @InterfaceAudience.Private
 public interface FSNamesystemMBean {
+
+
+
+  public String fetchClusterId();
+  public void provider_deleteKey(String key) throws IOException;
+  public void blockManagerClear();
+  public long blockGrpIdGeneratorGetCurrentValue();
+  public void blockGrpIdGeneratorSetCurrentValue(long newValue);
+  public void blockGrpIdGeneratorSkipTo(long newValue);
+
+  public int getSnapshotManagerGetNumSnapshottableDirs();
+  public int getSnapshotManagerGetNumSnapshots();
+
+  public void getSnapshotManagerAndSetAllowNestedSnapshots(boolean allowNestedSnapshots);
+
+  public long getTotalInodes();
+
+  public void enterSafeMode(boolean resourcesLow) throws IOException;
+
+  public boolean saveNamespace(long txid, long imageTxId) throws IOException;
+
 
   /**
    * The state of the file system: Safemode or Operational

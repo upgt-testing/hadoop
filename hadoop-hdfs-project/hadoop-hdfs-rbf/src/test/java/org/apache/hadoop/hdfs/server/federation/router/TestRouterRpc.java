@@ -1879,7 +1879,7 @@ public class TestRouterRpc {
     routerProtocol.setBalancerBandwidth(newBandwidth);
     ArrayList<DataNode> datanodes = cluster.getCluster().getDataNodes();
     GenericTestUtils.waitFor(() ->  {
-      return datanodes.get(0).getBalancerBandwidth() == newBandwidth;
+      return datanodes.get(0).fetchBalancerBandwidth() == newBandwidth;
     }, 100, 60 * 1000);
   }
 

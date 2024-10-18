@@ -98,19 +98,19 @@ public class DNConf {
   final boolean syncBehindWritesInBackground;
   final boolean dropCacheBehindReads;
   final boolean syncOnClose;
-  final boolean encryptDataTransfer;
+  public final boolean encryptDataTransfer;
   final boolean connectToDnViaHostname;
   final boolean overwriteDownstreamDerivedQOP;
   private final boolean pmemCacheRecoveryEnabled;
 
-  final long readaheadLength;
+  public final long readaheadLength;
   final long heartBeatInterval;
   private final long lifelineIntervalMs;
   volatile long blockReportInterval;
   volatile long blockReportSplitThreshold;
-  volatile boolean peerStatsEnabled;
-  volatile boolean diskStatsEnabled;
-  volatile long outliersReportIntervalMs;
+  public volatile boolean peerStatsEnabled;
+  public volatile boolean diskStatsEnabled;
+  public volatile long outliersReportIntervalMs;
   final long ibrInterval;
   volatile long initialBlockReportDelayMs;
   volatile long cacheReportInterval;
@@ -477,7 +477,7 @@ public class DNConf {
     return processCommandsThresholdMs;
   }
 
-  void setBlockReportInterval(long intervalMs) {
+  public void setBlockReportInterval(long intervalMs) {
     Preconditions.checkArgument(intervalMs > 0,
         DFS_BLOCKREPORT_INTERVAL_MSEC_KEY + " should be larger than 0");
     blockReportInterval = intervalMs;
@@ -487,7 +487,7 @@ public class DNConf {
     return blockReportInterval;
   }
 
-  void setCacheReportInterval(long intervalMs) {
+  public void setCacheReportInterval(long intervalMs) {
     Preconditions.checkArgument(intervalMs > 0,
         DFS_CACHEREPORT_INTERVAL_MSEC_KEY + " should be larger than 0");
     cacheReportInterval = intervalMs;
@@ -497,18 +497,18 @@ public class DNConf {
     return cacheReportInterval;
   }
 
-  void setBlockReportSplitThreshold(long threshold) {
+  public void setBlockReportSplitThreshold(long threshold) {
     Preconditions.checkArgument(threshold >= 0,
         DFS_BLOCKREPORT_SPLIT_THRESHOLD_KEY + " should be larger than or equal to 0");
     blockReportSplitThreshold = threshold;
   }
 
-  void setInitBRDelayMs(String delayMs) {
+  public void setInitBRDelayMs(String delayMs) {
     dn.getConf().set(DFS_BLOCKREPORT_INITIAL_DELAY_KEY, delayMs);
     initBlockReportDelay();
   }
 
-  void setPeerStatsEnabled(boolean enablePeerStats) {
+  public void setPeerStatsEnabled(boolean enablePeerStats) {
     peerStatsEnabled = enablePeerStats;
   }
 

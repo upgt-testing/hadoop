@@ -65,8 +65,8 @@ public final class NameNodeUtils {
    */
   @VisibleForTesting
   @Nullable
-  static String getClientNamenodeAddress(
-      Configuration conf, @Nullable String nsId) {
+  public static String getClientNamenodeAddress(
+          Configuration conf, @Nullable String nsId) {
     final Collection<String> nameservices =
         DFSUtilClient.getNameServiceIds(conf);
 

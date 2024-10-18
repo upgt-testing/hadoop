@@ -29,10 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.UnresolvedLinkException;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.SnapshotException;
 import org.apache.hadoop.hdfs.server.namenode.EditLogFileOutputStream;
@@ -63,15 +60,15 @@ public class TestNestedSnapshots {
   private static final long BLOCKSIZE = 1024;
   
   private static final Configuration conf = new Configuration();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem hdfs;
   
   @Before
   public void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
-    hdfs = cluster.getFileSystem();
+    hdfs = cluster.getDistributedFileSystem();
   }
 
   @After
@@ -90,7 +87,8 @@ public class TestNestedSnapshots {
    */
   @Test (timeout=300000)
   public void testNestedSnapshots() throws Exception {
-    cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    //cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    cluster.getNamesystem().getSnapshotManagerAndSetAllowNestedSnapshots(true);
 
     final Path foo = new Path("/testNestedSnapshots/foo");
     final Path bar = new Path(foo, "bar");
@@ -136,7 +134,8 @@ public class TestNestedSnapshots {
     hdfs.disallowSnapshot(foo);
     
     //test disallow nested snapshots
-    cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(false);
+    //cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(false);
+    cluster.getNamesystem().getSnapshotManagerAndSetAllowNestedSnapshots(true);
     try {
       hdfs.allowSnapshot(rootPath);
       Assert.fail();
@@ -178,7 +177,7 @@ public class TestNestedSnapshots {
   }
 
   private static void print(String message) throws UnresolvedLinkException {
-    SnapshotTestHelper.dumpTree(message, cluster);
+    //SnapshotTestHelper.dumpTree(message, cluster);
   }
 
   private static void assertFile(Path s1, Path s2, Path file,
@@ -307,7 +306,8 @@ public class TestNestedSnapshots {
    */
   @Test
   public void testDisallowNestedSnapshottableDir() throws Exception {
-    cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    //cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
+    cluster.getNamesystem().getSnapshotManagerAndSetAllowNestedSnapshots(true);
 
     final Path dir = new Path("/dir");
     final Path sub = new Path(dir, "sub");

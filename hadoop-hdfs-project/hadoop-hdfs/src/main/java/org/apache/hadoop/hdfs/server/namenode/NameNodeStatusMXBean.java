@@ -19,6 +19,7 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hadoop.conf.ReconfigurationException;
 
 /**
  * This is the JMX management interface for NameNode status information.
@@ -29,8 +30,15 @@ import org.apache.hadoop.classification.InterfaceStability;
 @InterfaceStability.Stable
 public interface NameNodeStatusMXBean {
 
-  public void fakePrintMXBean();
+  public int fakePrintMXBean();
 
+
+  public String fetchHttpAddress();
+  public String fetchHttpsAddress();
+  public boolean fetchSecurityEnabled();
+  public String fetchHostAndPort();
+  public String fetchHttpsAddressHostAndPort();
+  public String reconfigurePropertyImpl(String property, String newVal) throws ReconfigurationException;
   /**
    * Gets the NameNode role.
    *

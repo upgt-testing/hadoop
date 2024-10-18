@@ -540,7 +540,7 @@ public class TestClientProtocolForPipelineRecovery {
         ArrayList<DataNode> dataNodes = cluster.getDataNodes();
         int indexToShutdown = 0;
         for (int i = 0; i < dataNodes.size(); i++) {
-          if (dataNodes.get(i).getIpcPort() == node.getIpcPort()) {
+          if (dataNodes.get(i).fetchIpcPort() == node.getIpcPort()) {
             indexToShutdown = i;
             break;
           }

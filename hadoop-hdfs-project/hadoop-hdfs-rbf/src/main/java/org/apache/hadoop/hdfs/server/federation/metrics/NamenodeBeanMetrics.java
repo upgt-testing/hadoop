@@ -21,6 +21,7 @@ import static org.apache.hadoop.util.Time.now;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ReconfigurationException;
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
@@ -53,6 +55,7 @@ import org.apache.hadoop.hdfs.server.federation.store.protocol.GetNamespaceInfoR
 import org.apache.hadoop.hdfs.server.namenode.NameNodeMXBean;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeStatusMXBean;
 import org.apache.hadoop.hdfs.server.namenode.metrics.FSNamesystemMBean;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.ipc.StandbyException;
 import org.apache.hadoop.metrics2.util.MBeans;
 import org.apache.hadoop.net.NetUtils;
@@ -71,9 +74,121 @@ import org.apache.hadoop.thirdparty.com.google.common.cache.LoadingCache;
 public class NamenodeBeanMetrics
     implements FSNamesystemMBean, NameNodeMXBean, NameNodeStatusMXBean {
 
+
   @Override
-  public void fakePrintMXBean() {
-    throw new UnsupportedOperationException("fakePrintMXBean is not supported in NamenodeBeanMetrics class");
+  public String fetchClusterId() {
+    return "This method is not supported yet.";
+  }
+
+  @Override
+  public void provider_deleteKey(String key) throws IOException {
+    throw new UnsupportedOperationException("provider_deleteKey is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public void blockManagerClear() {
+    throw new UnsupportedOperationException("blockManagerClear is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public long blockGrpIdGeneratorGetCurrentValue() {
+    throw new UnsupportedOperationException("blockGrpIdGeneratorGetCurrentValue is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public void blockGrpIdGeneratorSetCurrentValue(long newValue) {
+    throw new UnsupportedOperationException("blockGrpIdGeneratorSetCurrentValue is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public void blockGrpIdGeneratorSkipTo(long newValue) {
+    throw new UnsupportedOperationException("blockGrpIdGeneratorSkipTo is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public int getSnapshotManagerGetNumSnapshottableDirs() {
+    throw new UnsupportedOperationException("getSnapshotManagerGetNumSnapshottableDirs is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public int getSnapshotManagerGetNumSnapshots() {
+    throw new UnsupportedOperationException("getSnapshotManagerGetNumSnapshots is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public void getSnapshotManagerAndSetAllowNestedSnapshots(boolean allowNestedSnapshots) {
+    throw new UnsupportedOperationException("getSnapshotManagerAndSetAllowNestedSnapshots is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public long getTotalInodes() {
+    throw new UnsupportedOperationException("getTotalInodes is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public void enterSafeMode(boolean resourcesLow) {
+    throw new UnsupportedOperationException("enterSafeMode is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public boolean saveNamespace(long txid, long imageTxId) {
+    throw new UnsupportedOperationException("saveNamespace is not supported in NamenodeBeanMetrics class");
+  }
+
+  @Override
+  public int fakePrintMXBean() {
+    return -1;
+  }
+
+  @Override
+  public String fetchHttpAddress() {
+    return "";
+  }
+
+  @Override
+  public String fetchHttpsAddress() {
+    return "";
+  }
+
+  @Override
+  public boolean fetchSecurityEnabled() {
+    return false;
+  }
+
+  @Override
+  public String fetchHostAndPort() {
+    return "Not supported";
+  }
+
+  @Override
+  public String fetchHttpsAddressHostAndPort() {
+    return "Not supported";
+  }
+
+  public Map<String, Object> getServiceRpcAddressProxy() {
+    throw new UnsupportedOperationException("getServiceRpcAddressProxy is not supported in NamenodeBeanMetrics class");
+  }
+
+  public NamenodeProtocols getRpcServer() {
+    throw new UnsupportedOperationException("getRpcServer is not supported in NamenodeBeanMetrics class");
+  }
+
+  public InetSocketAddress getHttpAddress() {
+    throw new UnsupportedOperationException("getHttpAddress is not supported in NamenodeBeanMetrics class");
+  }
+
+  public InetSocketAddress getHttpsAddress() {
+    throw new UnsupportedOperationException("getHttpsAddress is not supported in NamenodeBeanMetrics class");
+  }
+
+  public InetSocketAddress getServiceRpcAddress() {
+    throw new UnsupportedOperationException("getServiceRpcAddress is not supported in NamenodeBeanMetrics class");
+  }
+
+
+  @Override
+  public String reconfigurePropertyImpl(String property, String newVal) throws ReconfigurationException {
+    return "";
   }
 
   private static final Logger LOG =

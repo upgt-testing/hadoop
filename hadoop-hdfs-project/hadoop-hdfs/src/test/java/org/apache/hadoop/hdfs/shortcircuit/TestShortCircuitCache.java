@@ -981,9 +981,9 @@ public class TestShortCircuitCache {
       DataNode dn1 = cluster.getDataNodes().get(1);
 
       DomainPeer peer0 = new DomainPeer(DomainSocket.connect(new File(
-          sockDir.getDir(), testName + "." + dn0.getXferPort()).getAbsolutePath()));
+          sockDir.getDir(), testName + "." + dn0.fetchXferPort()).getAbsolutePath()));
       DomainPeer peer1 = new DomainPeer(DomainSocket.connect(new File(
-          sockDir.getDir(), testName + "." + dn1.getXferPort()).getAbsolutePath()));
+          sockDir.getDir(), testName + "." + dn1.fetchXferPort()).getAbsolutePath()));
 
       final DatanodeInfo dnInfo0 = new DatanodeInfo.DatanodeInfoBuilder()
           .setNodeID(dn0.getDatanodeId()).build();

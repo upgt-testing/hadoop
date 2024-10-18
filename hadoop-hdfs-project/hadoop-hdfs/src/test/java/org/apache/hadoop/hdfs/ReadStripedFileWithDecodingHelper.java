@@ -99,7 +99,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
     String name = (locs[0].getNames())[0];
     int dnIndex = 0;
     for (DataNode dn : cluster.getDataNodes()) {
-      int port = dn.getXferPort();
+      int port = dn.fetchXferPort();
       if (name.contains(Integer.toString(port))) {
         return dnIndex;
       }
@@ -167,7 +167,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
     for (int failedDnIdx = 0; failedDnIdx < dnFailureNum; failedDnIdx++) {
       String name = (locs[0].getNames())[failedDnIdx];
       for (DataNode dn : cluster.getDataNodes()) {
-        int port = dn.getXferPort();
+        int port = dn.fetchXferPort();
         if (name.contains(Integer.toString(port))) {
           dn.shutdown();
         }

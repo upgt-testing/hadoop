@@ -397,7 +397,7 @@ public class LeaseManager {
     }
   }
 
-  synchronized void removeAllLeases() {
+  public synchronized void removeAllLeases() {
     leasesById.clear();
     leases.clear();
   }
@@ -443,7 +443,7 @@ public class LeaseManager {
    * checks in.  If the client dies and allows its lease to
    * expire, all the corresponding locks can be released.
    *************************************************************/
-  class Lease {
+  public class Lease {
     private final String holder;
     private long lastUpdate;
     private final HashSet<Long> files = new HashSet<>();

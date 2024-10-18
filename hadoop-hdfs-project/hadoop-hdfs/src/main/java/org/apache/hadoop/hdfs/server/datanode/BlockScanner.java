@@ -307,7 +307,7 @@ public class BlockScanner {
    *
    * @param bpid        The block pool id to enable scanning for.
    */
-  synchronized void enableBlockPoolId(String bpid) {
+  public synchronized void enableBlockPoolId(String bpid) {
     Preconditions.checkNotNull(bpid);
     for (VolumeScanner scanner : scanners.values()) {
       scanner.enableBlockPoolId(bpid);
@@ -319,7 +319,7 @@ public class BlockScanner {
    *
    * @param bpid        The block pool id to disable scanning for.
    */
-  synchronized void disableBlockPoolId(String bpid) {
+  public synchronized void disableBlockPoolId(String bpid) {
     Preconditions.checkNotNull(bpid);
     for (VolumeScanner scanner : scanners.values()) {
       scanner.disableBlockPoolId(bpid);
@@ -354,7 +354,7 @@ public class BlockScanner {
    *                      is being stored.
    * @param block         The block's ID and block pool id.
    */
-  synchronized void markSuspectBlock(String storageId, ExtendedBlock block) {
+  public synchronized void markSuspectBlock(String storageId, ExtendedBlock block) {
     if (!isEnabled()) {
       LOG.debug("Not scanning suspicious block {} on {}, because the block " +
           "scanner is disabled.", block, storageId);

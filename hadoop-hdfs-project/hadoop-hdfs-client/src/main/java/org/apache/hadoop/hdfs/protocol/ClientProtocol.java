@@ -808,6 +808,15 @@ public interface ClientProtocol {
   long[] getStats() throws IOException;
 
   /**
+   * long[] getStats(String RpcString) throws IOException {
+       // use RpcString to find the RpcServer object; ---> happens remotely
+       // RpcServer server = find(RpcString);  --> find() happens in namenode;
+                                               --> HashMap<String, RpcServer> servers;
+       // return server.getStats();
+   * }
+   */
+
+  /**
    * Get statistics pertaining to blocks of type {@link BlockType#CONTIGUOUS}
    * in the filesystem.
    */

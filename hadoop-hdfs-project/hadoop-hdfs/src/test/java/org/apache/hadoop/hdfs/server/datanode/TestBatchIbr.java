@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure;
 import org.apache.hadoop.metrics2.MetricsRecordBuilder;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -108,9 +108,9 @@ public class TestBatchIbr {
     final Random ran = new Random();
 
     final Configuration conf = newConf(ibrInterval);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_DATANODES).build();
-    final DistributedFileSystem dfs = cluster.getFileSystem();
+    final DistributedFileSystem dfs = cluster.getDistributedFileSystem();
 
     try {
       final String dirPathString = "/dir";
@@ -176,7 +176,7 @@ public class TestBatchIbr {
           + ", BLOCK_SIZE=" + BLOCK_SIZE
           + ", NUM_THREADS=" + NUM_THREADS
           + ", NUM_DATANODES=" + NUM_DATANODES);
-      logIbrCounts(cluster.getDataNodes());
+      //logIbrCounts(cluster.getDataNodes());
     } finally {
       executor.shutdown();
       cluster.shutdown();

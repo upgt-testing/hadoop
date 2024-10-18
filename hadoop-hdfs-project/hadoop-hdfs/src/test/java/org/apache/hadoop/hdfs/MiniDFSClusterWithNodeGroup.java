@@ -186,7 +186,7 @@ public class MiniDFSClusterWithNodeGroup extends MiniDFSCluster {
         }
       }
       dn.runDatanodeDaemon();
-      dataNodes.add(new DataNodeProperties(dn, newconf, dnArgs, secureResources, dn.getIpcPort()));
+      dataNodes.add(new DataNodeProperties(dn, newconf, dnArgs, secureResources, dn.fetchIpcPort()));
       dns[i - curDatanodesNum] = dn;
     }
     curDatanodesNum += numDataNodes;

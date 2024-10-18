@@ -2350,7 +2350,7 @@ public class TestFsck {
     Map<Integer, Integer> dnIndices = new HashMap<>();
     ArrayList<DataNode> dnList = cluster.getDataNodes();
     for (int i = 0; i < totalSize; i++) {
-      dnIndices.put(dnList.get(i).getIpcPort(), i);
+      dnIndices.put(dnList.get(i).fetchIpcPort(), i);
     }
 
     // create file

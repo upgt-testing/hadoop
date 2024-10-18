@@ -37,7 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * datanode volumes.
  */
 @InterfaceAudience.Private
-class ProfilingFileIoEvents {
+public class ProfilingFileIoEvents {
   static final Logger LOG =
       LoggerFactory.getLogger(ProfilingFileIoEvents.class);
 

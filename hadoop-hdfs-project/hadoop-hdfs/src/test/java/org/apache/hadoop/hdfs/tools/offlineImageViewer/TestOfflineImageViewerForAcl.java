@@ -43,7 +43,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclStatus;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.server.namenode.FSImageTestUtil;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
@@ -93,13 +93,13 @@ public class TestOfflineImageViewerForAcl {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       Configuration conf = new Configuration();
       conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
-      DistributedFileSystem hdfs = cluster.getFileSystem();
+      DistributedFileSystem hdfs = cluster.getDistributedFileSystem();
 
       // Create a reasonable namespace with ACLs
       Path dir = new Path("/dirWithNoAcl");

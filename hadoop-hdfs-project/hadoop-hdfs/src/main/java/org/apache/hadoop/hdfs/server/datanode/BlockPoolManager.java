@@ -42,7 +42,7 @@ import org.slf4j.Logger;
  * objects must be done via APIs in this class.
  */
 @InterfaceAudience.Private
-class BlockPoolManager {
+public class BlockPoolManager {
   private static final Logger LOG = DataNode.LOG;
   
   private final Map<String, BPOfferService> bpByNameserviceId =
@@ -57,11 +57,11 @@ class BlockPoolManager {
   //This lock is used only to ensure exclusion of refreshNamenodes
   private final Object refreshNamenodesLock = new Object();
   
-  BlockPoolManager(DataNode dn) {
+  public BlockPoolManager(DataNode dn) {
     this.dn = dn;
   }
   
-  synchronized void addBlockPool(BPOfferService bpos) {
+  public synchronized void addBlockPool(BPOfferService bpos) {
     Preconditions.checkArgument(offerServices.contains(bpos),
         "Unknown BPOS: %s", bpos);
     if (bpos.getBlockPoolId() == null) {
@@ -77,15 +77,15 @@ class BlockPoolManager {
    *
    * Caution: The BPOfferService returned could be shutdown any time.
    */
-  synchronized List<BPOfferService> getAllNamenodeThreads() {
+  public synchronized List<BPOfferService> getAllNamenodeThreads() {
     return Collections.unmodifiableList(offerServices);
   }
       
-  synchronized BPOfferService get(String bpid) {
+  public synchronized BPOfferService get(String bpid) {
     return bpByBlockPoolId.get(bpid);
   }
   
-  synchronized void remove(BPOfferService t) {
+  public synchronized void remove(BPOfferService t) {
     offerServices.remove(t);
     if (t.hasBlockPoolId()) {
       // It's possible that the block pool never successfully registered
@@ -109,7 +109,7 @@ class BlockPoolManager {
     }
   }
   
-  void shutDownAll(List<BPOfferService> bposList) throws InterruptedException {
+  public void shutDownAll(List<BPOfferService> bposList) throws InterruptedException {
     for (BPOfferService bpos : bposList) {
       bpos.stop(); //interrupts the threads
     }
@@ -119,7 +119,7 @@ class BlockPoolManager {
     }
   }
   
-  synchronized void startAll() throws IOException {
+  public synchronized void startAll() throws IOException {
     try {
       UserGroupInformation.getLoginUser().doAs(
           new PrivilegedExceptionAction<Object>() {
@@ -138,13 +138,13 @@ class BlockPoolManager {
     }
   }
   
-  void joinAll() {
+  public void joinAll() {
     for (BPOfferService bpos: this.getAllNamenodeThreads()) {
       bpos.join();
     }
   }
   
-  void refreshNamenodes(Configuration conf)
+  public void refreshNamenodes(Configuration conf)
       throws IOException {
     LOG.info("Refresh request received for nameservices: " +
         conf.get(DFSConfigKeys.DFS_NAMESERVICES));

@@ -152,7 +152,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 @InterfaceStability.Unstable
 public abstract class FSEditLogOp {
   public final FSEditLogOpCodes opCode;
-  long txid;
+  public long txid;
   byte[] rpcClientId;
   int rpcCallId;
 

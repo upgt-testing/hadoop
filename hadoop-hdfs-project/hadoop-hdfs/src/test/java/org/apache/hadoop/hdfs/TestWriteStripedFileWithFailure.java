@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -36,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestWriteStripedFileWithFailure {
   public static final Logger LOG = LoggerFactory
       .getLogger(TestWriteStripedFileWithFailure.class);
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fs;
   private Configuration conf = new HdfsConfiguration();
 
@@ -57,8 +58,8 @@ public class TestWriteStripedFileWithFailure {
 
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
-    cluster.getFileSystem().getClient().setErasureCodingPolicy("/",
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster.getDistributedFileSystem().getClient().setErasureCodingPolicy("/",
         StripedFileTestUtil.getDefaultECPolicy().getName());
     fs = cluster.getFileSystem();
   }
@@ -141,7 +142,7 @@ public class TestWriteStripedFileWithFailure {
       final int i = pos.getAndIncrement();
       if (i == killPos) {
         for(int failedDn : failedDataNodes) {
-          StripedFileTestUtil.killDatanode(cluster, stripedOut, failedDn, pos);
+          killDatanode(cluster, stripedOut, failedDn, pos);
         }
       }
       write(out, i);
@@ -173,5 +174,18 @@ public class TestWriteStripedFileWithFailure {
     } catch (IOException e) {
       throw new IOException("Failed at i=" + i, e);
     }
+  }
+
+
+  static void killDatanode(MiniDockerDFSCluster cluster, DFSStripedOutputStream out,
+                           final int dnIndex, final AtomicInteger pos) {
+    /**
+    final StripedDataStreamer s = out.getStripedDataStreamer(dnIndex);
+    final DatanodeInfo datanode = getDatanodes(s);
+    assert datanode != null;
+    LOG.info("killDatanode " + dnIndex + ": " + datanode + ", pos=" + pos);
+    cluster.stopDataNode(datanode.getXferAddr());
+     **/
+    cluster.getDataNodes().get(dnIndex).shutdown();
   }
 }

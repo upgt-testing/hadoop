@@ -243,7 +243,7 @@ public class FSEditLog implements LogsPurgeable {
    * @param storage Storage object used by namenode
    * @param editsDirs List of journals to use
    */
-  FSEditLog(Configuration conf, NNStorage storage, List<URI> editsDirs) {
+  public FSEditLog(Configuration conf, NNStorage storage, List<URI> editsDirs) {
     isSyncRunning = false;
     this.conf = conf;
     this.storage = storage;
@@ -389,7 +389,7 @@ public class FSEditLog implements LogsPurgeable {
   /**
    * Shutdown the file store.
    */
-  synchronized void close() {
+  public synchronized void close() {
     if (state == State.CLOSED) {
       LOG.debug("Closing log when already closed");
       return;
@@ -422,7 +422,7 @@ public class FSEditLog implements LogsPurgeable {
    * File-based journals are skipped, since they are formatted by the
    * Storage format code.
    */
-  synchronized void formatNonFileJournals(NamespaceInfo nsInfo, boolean force)
+  public synchronized void formatNonFileJournals(NamespaceInfo nsInfo, boolean force)
       throws IOException {
     Preconditions.checkState(state == State.BETWEEN_LOG_SEGMENTS,
         "Bad state: %s", state);
@@ -456,7 +456,7 @@ public class FSEditLog implements LogsPurgeable {
    * edit stream's automatic sync policy (e.g. when the buffer is full, or
    * if a time interval has elapsed).
    */
-  void logEdit(final FSEditLogOp op) {
+  public void logEdit(final FSEditLogOp op) {
     boolean needsSync = false;
     synchronized (this) {
       assert isOpenForWrite() :
@@ -592,7 +592,7 @@ public class FSEditLog implements LogsPurgeable {
   /**
    * Set the transaction ID to use for the next transaction written.
    */
-  synchronized void setNextTxId(long nextTxId) {
+  public synchronized void setNextTxId(long nextTxId) {
     Preconditions.checkArgument(synctxid <= txid &&
        nextTxId >= txid,
        "May not decrease txid." +
@@ -1647,7 +1647,7 @@ public class FSEditLog implements LogsPurgeable {
   /**
    * Run recovery on all journals to recover any unclosed segments
    */
-  synchronized void recoverUnclosedStreams() {
+  public synchronized void recoverUnclosedStreams() {
     Preconditions.checkState(
         state == State.BETWEEN_LOG_SEGMENTS,
         "May not recover segments - wrong state: %s", state);
@@ -1810,7 +1810,7 @@ public class FSEditLog implements LogsPurgeable {
    * Close all the streams in a collection
    * @param streams The list of streams to close
    */
-  static void closeAllStreams(Iterable<EditLogInputStream> streams) {
+  public static void closeAllStreams(Iterable<EditLogInputStream> streams) {
     for (EditLogInputStream s : streams) {
       IOUtils.closeStream(s);
     }

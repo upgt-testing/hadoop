@@ -153,7 +153,7 @@ public class TestReadStripedFileWithMissingBlocks {
       for (int failedDNIdx : datanodes) {
         String name = (locs[0].getNames())[failedDNIdx];
         for (DataNode dn : cluster.getDataNodes()) {
-          int port = dn.getXferPort();
+          int port = dn.fetchXferPort();
           if (name.contains(Integer.toString(port))) {
             dn.shutdown();
             cluster.setDataNodeDead(dn.getDatanodeId());

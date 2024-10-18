@@ -5,26 +5,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,32 +28,22 @@ public class DockerTest {
     }
 
     @Test
-    public void testMXBeanRMI() {
+    public void testMXBeanRMI() throws IOException {
         MiniDockerDFSCluster dockerHDFSCluster = new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
-        String host = "localhost"; // Updated to 'localhost'
-        int port = 9090;
-
-        // Create a JMX service URL
-        String urlString = String.format(
-                "service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi",
-                host, port
-        );
-        try {
-            JMXServiceURL serviceURL = new JMXServiceURL(urlString);
-            Map<String, Object> env = new HashMap<>();
-
-            // Connect to the JMX server
-            JMXConnector jmxConnector = JMXConnectorFactory.connect(serviceURL, env);
-            MBeanServerConnection mbs = jmxConnector.getMBeanServerConnection();
-            ObjectName mxbeanName = new ObjectName(
-                    "Hadoop:service=NameNode,name=NameNodeStatus");
-            // call fakePrintMXBean
-            mbs.invoke(mxbeanName, "fakePrintMXBean", new Object[]{}, new String[]{});
-            System.out.println("fakePrintMXBean called");
-            dockerHDFSCluster.close();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create JMX connection", e);
-        }
+        int res = dockerHDFSCluster.getNameNode().fakePrintMXBean();
+        System.out.println("Call function fakePrintMXBean and the Result: " + res);
+        int res2 = dockerHDFSCluster.getDataNodes().get(0).fetchInfoPort();
+        System.out.println("Call function getIpcPort and the Result: " + res2);
+        System.out.println("fetch X fer Port " + dockerHDFSCluster.getDataNodes().get(0).fetchXferPort());
+        System.out.println("metrics name " + dockerHDFSCluster.getDataNodes().get(0).fetchMetricsName());
+        System.out.println("get cache used " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDatasetGetCacheUsed());
+        System.out.println("get num block cached " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDatasetGetNumBlocksCached());
+        System.out.println("get info port " + dockerHDFSCluster.getDataNodes().get(0).fetchInfoPort());
+        System.out.println("receive buffer size " + dockerHDFSCluster.getDataNodes().get(0).fetchXferServerGetPeerServerGetReceiveBufferSize());
+        System.out.println("FSDatasetGetDfsUsed " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDatasetGetDfsUsed());
+        System.out.println("AddressHostName " + dockerHDFSCluster.getDataNodes().get(0).fetchIPCServerListenerAddressHostName());
+        System.out.println("fetch IPC Port " + dockerHDFSCluster.getDataNodes().get(0).fetchIpcPort());
+        System.out.println("balancer bandwidth " + dockerHDFSCluster.getDataNodes().get(0).fetchBalancerBandwidth());
     }
 
     @Test

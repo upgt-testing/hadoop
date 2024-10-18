@@ -26,9 +26,9 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.metrics2.MetricsException;
 import org.apache.hadoop.metrics2.MetricsSystem;
-import org.apache.hadoop.metrics2.sink.RollingFileSystemSinkTestBase.MyMetrics1;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import static org.junit.Assert.fail;
 public class TestRollingFileSystemSinkWithHdfs
     extends RollingFileSystemSinkTestBase {
   private static final int  NUM_DATANODES = 4;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   /**
    * Create a {@link MiniDFSCluster} instance with four nodes.  The
@@ -57,7 +57,7 @@ public class TestRollingFileSystemSinkWithHdfs
 
     // It appears that since HDFS-265, append is always enabled.
     cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES).build();
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES).build();
 
     // Also clear sink flags
     RollingFileSystemSink.hasFlushed = false;
@@ -80,7 +80,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testWrite() throws Exception {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, false, true);
 
     assertMetricsContents(doWriteTest(ms, path, 1));
@@ -94,7 +94,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testAppend() throws Exception {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
 
     assertExtraContents(doAppendTest(path, false, true, 1));
   }
@@ -107,7 +107,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testSilentAppend() throws Exception {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
 
     assertExtraContents(doAppendTest(path, true, true, 1));
   }
@@ -120,7 +120,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testNoAppend() throws Exception {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
 
     assertMetricsContents(doAppendTest(path, false, false, 2));
   }
@@ -133,7 +133,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testSilentOverwrite() throws Exception {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
 
     assertMetricsContents(doAppendTest(path, true, false, 2));
   }
@@ -146,7 +146,7 @@ public class TestRollingFileSystemSinkWithHdfs
   @Test
   public void testFailedWrite() throws IOException {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, false, false);
 
     new MyMetrics1().registerWith(ms);
@@ -174,7 +174,7 @@ public class TestRollingFileSystemSinkWithHdfs
   @Test
   public void testFailedClose() throws IOException {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, false, false);
 
     new MyMetrics1().registerWith(ms);
@@ -205,7 +205,7 @@ public class TestRollingFileSystemSinkWithHdfs
   @Test
   public void testSilentFailedWrite() throws IOException, InterruptedException {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, true, false);
 
     new MyMetrics1().registerWith(ms);
@@ -234,7 +234,7 @@ public class TestRollingFileSystemSinkWithHdfs
   @Test
   public void testSilentFailedClose() throws IOException {
     final String path =
-        "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+        "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, true, false);
 
     new MyMetrics1().registerWith(ms);
@@ -268,7 +268,7 @@ public class TestRollingFileSystemSinkWithHdfs
     // metrics log is written
     RollingFileSystemSink.forceFlush = true;
 
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
     MetricsSystem ms = initMetricsSystem(path, true, false, false);
 
     new MyMetrics1().registerWith(ms);
@@ -320,7 +320,7 @@ public class TestRollingFileSystemSinkWithHdfs
    */
   @Test
   public void testInitWithNoHDFS() {
-    String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
+    String path = "hdfs://" + cluster.getNameNode().fetchHostAndPort() + "/tmp";
 
     shutdownHdfs();
     MockSink.errored = false;

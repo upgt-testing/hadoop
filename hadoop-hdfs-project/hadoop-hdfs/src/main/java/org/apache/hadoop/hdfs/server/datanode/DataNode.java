@@ -1878,8 +1878,8 @@ public class DataNode extends ReconfigurableBase
 
     DatanodeID dnId = new DatanodeID(
         streamingAddr.getAddress().getHostAddress(), hostName, 
-        storage.getDatanodeUuid(), getXferPort(), getInfoPort(),
-            infoSecurePort, getIpcPort());
+        storage.getDatanodeUuid(), fetchXferPort(), fetchInfoPort(),
+            infoSecurePort, fetchIpcPort());
     return new DatanodeRegistration(dnId, storageInfo, 
         new ExportedBlockKeys(), VersionInfo.getVersion());
   }
@@ -2093,7 +2093,7 @@ public class DataNode extends ReconfigurableBase
   }
   
   @VisibleForTesting
-  public int getXferPort() {
+  public int fetchXferPort() {
     return streamingAddr.getPort();
   }
 
@@ -2107,7 +2107,7 @@ public class DataNode extends ReconfigurableBase
    */
   public String getDisplayName() {
     // NB: our DatanodeID may not be set yet
-    return hostName + ":" + getXferPort();
+    return hostName + ":" + fetchXferPort();
   }
 
   /**
@@ -2121,10 +2121,25 @@ public class DataNode extends ReconfigurableBase
     return streamingAddr;
   }
 
+  @Override
+  public int fetchXferServerGetPeerServerGetReceiveBufferSize() throws IOException {
+    return getXferServer().getPeerServer().getReceiveBufferSize();
+  }
+
+  @Override
+  public long fetchFSDatasetGetDfsUsed() throws IOException {
+    return getFSDataset().getDfsUsed();
+  }
+
+  @Override
+  public String fetchIPCServerListenerAddressHostName() {
+    return ipcServer.getListenerAddress().getHostName();
+  }
+
   /**
    * @return the datanode's IPC port
    */
-  public int getIpcPort() {
+  public int fetchIpcPort() {
     return ipcServer.getListenerAddress().getPort();
   }
   
@@ -3102,7 +3117,7 @@ public class DataNode extends ReconfigurableBase
     return dn;
   }
 
-  void join() {
+  public void join() {
     while (shouldRun) {
       try {
         blockPoolManager.joinAll();
@@ -3404,7 +3419,7 @@ public class DataNode extends ReconfigurableBase
     storage.finalizeUpgrade(blockPoolId);
   }
 
-  static InetSocketAddress getStreamingAddr(Configuration conf) {
+  public static InetSocketAddress getStreamingAddr(Configuration conf) {
     return NetUtils.createSocketAddr(
         conf.getTrimmed(DFS_DATANODE_ADDRESS_KEY, DFS_DATANODE_ADDRESS_DEFAULT));
   }
@@ -3412,6 +3427,16 @@ public class DataNode extends ReconfigurableBase
   @Override // DataNodeMXBean
   public String getSoftwareVersion() {
     return VersionInfo.getVersion();
+  }
+
+  @Override
+  public boolean fetchBpOsIsAlive(int index) {
+    return getAllBpOs().get(index).isAlive();
+  }
+
+  @Override
+  public boolean fetchBpOsIsInitialized(int index) {
+    return getAllBpOs().get(index).isInitialized();
   }
 
   @Override // DataNodeMXBean
@@ -3447,10 +3472,25 @@ public class DataNode extends ReconfigurableBase
     return VersionInfo.getRevision();
   }
 
+  @Override
+  public String fetchMetricsName() {
+    return getMetrics().name();
+  }
+
+  @Override
+  public long fetchFSDatasetGetCacheUsed() {
+    return getFSDataset().getCacheUsed();
+  }
+
+  @Override
+  public long fetchFSDatasetGetNumBlocksCached() {
+    return getFSDataset().getNumBlocksCached();
+  }
+
   /**
    * @return the datanode's http port
    */
-  public int getInfoPort() {
+  public int fetchInfoPort() {
     return infoPort;
   }
 
@@ -3648,6 +3688,11 @@ public class DataNode extends ReconfigurableBase
     }
   }
 
+  @Override
+  public long getBalancerBandwidth() throws IOException {
+    return fetchBalancerBandwidth();
+  }
+
   /**
    * @param addr rpc address of the namenode
    * @return true if the datanode is connected to a NameNode at the
@@ -3703,7 +3748,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @Override // ClientDatanodeProtocol
-  public long getBalancerBandwidth() {
+  public long fetchBalancerBandwidth() {
     DataXceiverServer dxcs =
                        (DataXceiverServer) this.dataXceiverServer.getRunnable();
     return dxcs.balanceThrottler.getBandwidth();

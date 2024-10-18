@@ -314,7 +314,7 @@ public class FSDirectory implements Closeable {
     CREATE_LINK;
   };
 
-  FSDirectory(FSNamesystem ns, Configuration conf) throws IOException {
+  public FSDirectory(FSNamesystem ns, Configuration conf) throws IOException {
     this.inodeId = new INodeId();
     rootDir = createRoot(ns);
     inodeMap = INodeMap.newInstance(rootDir);
@@ -484,7 +484,7 @@ public class FSDirectory implements Closeable {
    * @param cTime CTime of the file system
    * @return Array of HdfsFileStatus
    */
-  void createReservedStatuses(long cTime) {
+  public void createReservedStatuses(long cTime) {
     HdfsFileStatus inodes = new HdfsFileStatus.Builder()
         .isdir(true)
         .mtime(cTime)
@@ -558,7 +558,7 @@ public class FSDirectory implements Closeable {
    * @param protectedDirsString
    *          comma separated list of protected directories
    */
-  String setProtectedDirectories(String protectedDirsString) {
+  public String setProtectedDirectories(String protectedDirsString) {
     if (protectedDirsString == null) {
       protectedDirectories = new TreeSet<>();
     } else {
@@ -647,7 +647,7 @@ public class FSDirectory implements Closeable {
   @Override
   public void close() throws IOException {}
 
-  void markNameCacheInitialized() {
+  public void markNameCacheInitialized() {
     writeLock();
     try {
       nameCache.initialized();
@@ -1573,7 +1573,7 @@ public class FSDirectory implements Closeable {
   /**
    * Reset the entire namespace tree.
    */
-  void reset() {
+  public void reset() {
     writeLock();
     try {
       rootDir = createRoot(getFSNamesystem());

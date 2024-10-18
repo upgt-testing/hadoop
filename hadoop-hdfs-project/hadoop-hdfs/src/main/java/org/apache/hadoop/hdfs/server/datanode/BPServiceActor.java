@@ -88,10 +88,10 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
  * </ul>
  */
 @InterfaceAudience.Private
-class BPServiceActor implements Runnable {
+public class BPServiceActor implements Runnable {
   
   static final Logger LOG = DataNode.LOG;
-  final InetSocketAddress nnAddr;
+  public final InetSocketAddress nnAddr;
   HAServiceState state;
 
   final BPOfferService bpos;
@@ -163,7 +163,7 @@ class BPServiceActor implements Runnable {
     return ibrManager;
   }
 
-  boolean isAlive() {
+  public boolean isAlive() {
     if (!shouldServiceRun || !bpThread.isAlive()) {
       return false;
     }
@@ -180,7 +180,7 @@ class BPServiceActor implements Runnable {
     return bpos.toString() + " service to " + nnAddr;
   }
   
-  InetSocketAddress getNNSocketAddress() {
+  public InetSocketAddress getNNSocketAddress() {
     return nnAddr;
   }
 
@@ -188,7 +188,7 @@ class BPServiceActor implements Runnable {
     return NetUtils.getHostPortString(getNNSocketAddress());
   }
 
-  Map<String, String> getActorInfoMap() {
+  public Map<String, String> getActorInfoMap() {
     final Map<String, String> info = new HashMap<String, String>();
     info.put("NamenodeAddress", getNameNodeAddress());
     info.put("BlockPoolID", bpos.getBlockPoolId());
@@ -933,7 +933,7 @@ class BPServiceActor implements Runnable {
     }
   }
 
-  void triggerBlockReport(BlockReportOptions options) {
+  public void triggerBlockReport(BlockReportOptions options) {
     if (options.isIncremental()) {
       LOG.info(bpos.toString() + ": scheduling an incremental block report " +
          "to namenode: " + nnAddr + ".");
@@ -974,7 +974,7 @@ class BPServiceActor implements Runnable {
     }
   }
 
-  Scheduler getScheduler() {
+  public Scheduler getScheduler() {
     return scheduler;
   }
 
@@ -1112,7 +1112,7 @@ class BPServiceActor implements Runnable {
    * Utility class that wraps the timestamp computations for scheduling
    * heartbeats and block reports.
    */
-  static class Scheduler {
+  public static class Scheduler {
     // nextBlockReportTime and nextHeartbeatTime may be assigned/read
     // by testing threads (through BPServiceActor#triggerXXX), while also
     // assigned/read by the actor thread.
@@ -1304,13 +1304,13 @@ class BPServiceActor implements Runnable {
       return this.blockReportIntervalMs;
     }
 
-    void setBlockReportIntervalMs(long intervalMs) {
+    public void setBlockReportIntervalMs(long intervalMs) {
       Preconditions.checkArgument(intervalMs > 0,
           DFS_BLOCKREPORT_INTERVAL_MSEC_KEY + " should be larger than 0");
       this.blockReportIntervalMs = intervalMs;
     }
 
-    void setOutliersReportIntervalMs(long intervalMs) {
+    public void setOutliersReportIntervalMs(long intervalMs) {
       Preconditions.checkArgument(intervalMs > 0,
           DFS_DATANODE_OUTLIERS_REPORT_INTERVAL_KEY + " should be larger than 0");
       this.outliersReportIntervalMs = intervalMs;

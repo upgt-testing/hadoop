@@ -165,6 +165,9 @@ public class TestDecommission extends AdminStatesBaseTest {
       throws InterruptedException, IOException {
     // Do the stats check over 10 heartbeats
     for (int i = 0; i < 10; i++) {
+      /**
+       String RpcString = namenode.getRpcServer();
+       **/
       long[] newStats = namenode.getRpcServer().getStats();
 
       // For decommissioning nodes, ensure capacity of the DN and dfsUsed
@@ -1282,7 +1285,7 @@ public class TestDecommission extends AdminStatesBaseTest {
 
     // Use a non-empty include file with our registration name.
     // It should work.
-    int dnPort = getCluster().getDataNodes().get(0).getXferPort();
+    int dnPort = getCluster().getDataNodes().get(0).fetchXferPort();
     initIncludeHost(registrationName + ":" + dnPort);
     refreshNodes(0);
     getCluster().restartDataNode(0);

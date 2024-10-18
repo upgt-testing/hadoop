@@ -218,7 +218,7 @@ public class TestAclsEndToEnd {
 
   /**
    * Return a new {@link Configuration} with KMS ACLs appropriate to pass the
-   * full ACL test in {@link #doFullAclTest()} set.
+   * full ACL test in {@link #doFullAclTest()} set.z
    *
    * @param hdfsUgi the hdfs user
    * @param keyadminUgi the keyadmin user

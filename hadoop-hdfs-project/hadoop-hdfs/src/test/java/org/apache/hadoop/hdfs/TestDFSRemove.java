@@ -26,8 +26,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
 import org.junit.Test;
 
 public class TestDFSRemove {
@@ -46,10 +44,11 @@ public class TestDFSRemove {
     a_out.close();
   }
   
-  static long getTotalDfsUsed(MiniDFSCluster cluster) throws IOException {
+  static long getTotalDfsUsed(MiniDockerDFSCluster cluster) throws IOException {
     long total = 0;
-    for(DataNode node : cluster.getDataNodes()) {
-      total += DataNodeTestUtils.getFSDataset(node).getDfsUsed();
+    for(DataNodeProxy node : cluster.getDataNodes()) {
+      //total += DataNodeTestUtils.getFSDataset(node).getDfsUsed();
+      total += node.fetchFSDatasetGetDfsUsed();
     }
     return total;
   }
@@ -57,7 +56,7 @@ public class TestDFSRemove {
   @Test
   public void testRemove() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     try {
       FileSystem fs = cluster.getFileSystem();
       assertTrue(fs.mkdirs(dir));

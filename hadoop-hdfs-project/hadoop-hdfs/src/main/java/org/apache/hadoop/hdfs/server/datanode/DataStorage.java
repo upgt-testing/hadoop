@@ -108,7 +108,7 @@ public class DataStorage extends Storage {
       = Collections.synchronizedMap(new HashMap<String, BlockPoolSliceStorage>());
 
 
-  DataStorage() {
+  public DataStorage() {
     super(NodeType.DATA_NODE);
     trashEnabledBpids = Collections.newSetFromMap(
         new ConcurrentHashMap<String, Boolean>());
@@ -502,8 +502,8 @@ public class DataStorage extends Storage {
    * @param storageLocations a set of storage directories to be removed.
    * @throws IOException if I/O error when unlocking storage directory.
    */
-  synchronized void removeVolumes(
-      final Collection<StorageLocation> storageLocations)
+  public synchronized void removeVolumes(
+          final Collection<StorageLocation> storageLocations)
       throws IOException {
     if (storageLocations.isEmpty()) {
       return;
@@ -1005,7 +1005,7 @@ public class DataStorage extends Storage {
    * This also empties trash created during rolling upgrade and disables
    * trash functionality.
    */
-  void finalizeUpgrade(String bpID) throws IOException {
+  public void finalizeUpgrade(String bpID) throws IOException {
     // To handle finalizing a snapshot taken at datanode level while
     // upgrading to federation, if datanode level snapshot previous exists, 
     // then finalize it. Else finalize the corresponding BP.
@@ -1410,7 +1410,7 @@ public class DataStorage extends Storage {
     return bpStorage;
   }
 
-  synchronized void removeBlockPoolStorage(String bpId) {
+  public synchronized void removeBlockPoolStorage(String bpId) {
     bpStorageMap.remove(bpId);
   }
 

@@ -24,6 +24,8 @@ import org.apache.hadoop.hdfs.security.token.block.BlockTokenSelector;
 import org.apache.hadoop.ipc.ProtocolInfo;
 import org.apache.hadoop.security.KerberosInfo;
 import org.apache.hadoop.security.token.TokenInfo;
+import org.apache.hadoop.thirdparty.protobuf.RpcController;
+import org.apache.hadoop.thirdparty.protobuf.ServiceException;
 
 @KerberosInfo(
     serverPrincipal = HdfsClientConfigKeys.DFS_DATANODE_KERBEROS_PRINCIPAL_KEY)
@@ -34,4 +36,7 @@ import org.apache.hadoop.security.token.TokenInfo;
 @InterfaceAudience.Private
 public interface ClientDatanodeProtocolPB extends
     ClientDatanodeProtocolService.BlockingInterface {
+    GetBalancerBandwidthResponseProto getBalancerBandwidth(
+            RpcController controller, GetBalancerBandwidthRequestProto request)
+        throws ServiceException;
 }

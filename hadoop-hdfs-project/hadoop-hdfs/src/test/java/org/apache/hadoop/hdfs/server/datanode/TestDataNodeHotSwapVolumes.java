@@ -869,7 +869,7 @@ public class TestDataNodeHotSwapVolumes {
     int xferPort = Integer.parseInt(dataNodeName.split(":")[1]);
     DataNode dn = null;
     for (DataNode dataNode : cluster.getDataNodes()) {
-      if (dataNode.getXferPort() == xferPort) {
+      if (dataNode.fetchXferPort() == xferPort) {
         dn = dataNode;
         break;
       }

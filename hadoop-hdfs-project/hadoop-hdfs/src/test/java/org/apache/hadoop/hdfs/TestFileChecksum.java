@@ -658,7 +658,7 @@ public class TestFileChecksum {
 
     int idx = 0;
     for (DataNode dn : cluster.getDataNodes()) {
-      if (dn.getInfoPort() == chosenDn.getInfoPort()) {
+      if (dn.fetchInfoPort() == chosenDn.getInfoPort()) {
         return idx;
       }
       idx++;

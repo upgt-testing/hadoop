@@ -18,10 +18,7 @@
 package org.apache.hadoop.hdfs.server.datanode.web;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.http.HttpServer2;
 import org.junit.After;
 import org.junit.Assert;
@@ -38,7 +35,7 @@ import java.net.URL;
  */
 public class TestDatanodeHttpXFrame {
 
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -78,23 +75,23 @@ public class TestDatanodeHttpXFrame {
     cluster = createCluster(false, "Hadoop");
   }
 
-  private static MiniDFSCluster createCluster(boolean enabled, String
+  private static MiniDockerDFSCluster createCluster(boolean enabled, String
       value) throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_XFRAME_OPTION_ENABLED, enabled);
     if (value != null) {
       conf.set(DFSConfigKeys.DFS_XFRAME_OPTION_VALUE, value);
     }
-    MiniDFSCluster dfsCluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster dfsCluster =
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     dfsCluster.waitActive();
     return dfsCluster;
   }
 
-  private static HttpURLConnection getConn(MiniDFSCluster dfsCluster)
+  private static HttpURLConnection getConn(MiniDockerDFSCluster dfsCluster)
       throws IOException {
-    DataNode datanode = dfsCluster.getDataNodes().get(0);
-    URL newURL = new URL("http://localhost:" + datanode.getInfoPort());
+    DataNodeProxy datanode = dfsCluster.getDataNodes().get(0);
+    URL newURL = new URL("http://localhost:" + datanode.fetchInfoPort());
     HttpURLConnection conn = (HttpURLConnection) newURL.openConnection();
     conn.connect();
     return conn;

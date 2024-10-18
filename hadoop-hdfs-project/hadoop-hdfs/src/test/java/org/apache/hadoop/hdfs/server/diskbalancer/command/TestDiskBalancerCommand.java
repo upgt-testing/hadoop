@@ -831,7 +831,7 @@ public class TestDiskBalancerCommand {
       miniDFSCluster.waitActive();
       DataNode dataNode = miniDFSCluster.getDataNodes().get(0);
       final String queryArg = String.format("-query localhost:%d", dataNode
-          .getIpcPort());
+          .fetchIpcPort());
       final String cmdLine = String.format("hdfs diskbalancer %s",
           queryArg);
       runCommand(cmdLine);

@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -63,7 +64,7 @@ public class TestDataNodeMetricsLogger {
   static final Logger LOG =
       LoggerFactory.getLogger(TestDataNodeMetricsLogger.class);
 
-  private static final String DATA_DIR = MiniDFSCluster.getBaseDirectory()
+  private static final String DATA_DIR = MiniDockerDFSCluster.getBaseDirectory()
       + "data";
 
   private final static InetSocketAddress NN_ADDR = new InetSocketAddress(

@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * It also maintains the state about which of the NNs is considered active.
  */
 @InterfaceAudience.Private
-class BPOfferService {
+public class BPOfferService {
   static final Logger LOG = DataNode.LOG;
   
   /**
@@ -69,7 +69,7 @@ class BPOfferService {
    * This is assigned after the second phase of the
    * handshake.
    */
-  volatile DatanodeRegistration bpRegistration;
+  public volatile DatanodeRegistration bpRegistration;
 
   private final String nameserviceId;
   private volatile String bpId;
@@ -175,7 +175,7 @@ class BPOfferService {
   /**
    * @return true if the service has registered with at least one NameNode.
    */
-  boolean isInitialized() {
+  public boolean isInitialized() {
     return bpRegistration != null;
   }
   
@@ -183,7 +183,7 @@ class BPOfferService {
    * @return true if there is at least one actor thread running which is
    * talking to a NameNode.
    */
-  boolean isAlive() {
+  public boolean isAlive() {
     for (BPServiceActor actor : bpServices) {
       if (actor.isAlive()) {
         return true;
@@ -223,15 +223,15 @@ class BPOfferService {
     }
   }
 
-  String getBlockPoolId() {
+  public String getBlockPoolId() {
     return getBlockPoolId(false);
   }
 
-  boolean hasBlockPoolId() {
+  public boolean hasBlockPoolId() {
     return getBlockPoolId(true) != null;
   }
 
-  NamespaceInfo getNamespaceInfo() {
+  public NamespaceInfo getNamespaceInfo() {
     readLock();
     try {
       return bpNSInfo;
@@ -287,8 +287,8 @@ class BPOfferService {
     }
   }
   
-  void reportBadBlocks(ExtendedBlock block,
-                       String storageUuid, StorageType storageType) {
+  public void reportBadBlocks(ExtendedBlock block,
+                              String storageUuid, StorageType storageType) {
     checkBlock(block);
     for (BPServiceActor actor : bpServices) {
       ReportBadBlockAction rbbAction = new ReportBadBlockAction
@@ -302,18 +302,18 @@ class BPOfferService {
    * till namenode is informed before responding with success to the
    * client? For now we don't.
    */
-  void notifyNamenodeReceivedBlock(ExtendedBlock block, String delHint,
-      String storageUuid, boolean isOnTransientStorage) {
+  public void notifyNamenodeReceivedBlock(ExtendedBlock block, String delHint,
+                                          String storageUuid, boolean isOnTransientStorage) {
     notifyNamenodeBlock(block, BlockStatus.RECEIVED_BLOCK, delHint,
         storageUuid, isOnTransientStorage);
   }
 
-  void notifyNamenodeReceivingBlock(ExtendedBlock block, String storageUuid) {
+  public void notifyNamenodeReceivingBlock(ExtendedBlock block, String storageUuid) {
     notifyNamenodeBlock(block, BlockStatus.RECEIVING_BLOCK, null, storageUuid,
         false);
   }
 
-  void notifyNamenodeDeletedBlock(ExtendedBlock block, String storageUuid) {
+  public void notifyNamenodeDeletedBlock(ExtendedBlock block, String storageUuid) {
     notifyNamenodeBlock(block, BlockStatus.DELETED_BLOCK, null, storageUuid,
         false);
   }
@@ -484,7 +484,7 @@ class BPOfferService {
   /**
    * Called by the DN to report an error to the NNs.
    */
-  void trySendErrorReport(int errCode, String errMsg) {
+  public void trySendErrorReport(int errCode, String errMsg) {
     for (BPServiceActor actor : bpServices) {
       ErrorReportAction errorReportAction = new ErrorReportAction 
           (errCode, errMsg);
@@ -496,7 +496,7 @@ class BPOfferService {
    * Ask each of the actors to schedule a block report after
    * the specified delay.
    */
-  void scheduleBlockReport(long delay) {
+  public void scheduleBlockReport(long delay) {
     for (BPServiceActor actor : bpServices) {
       actor.getScheduler().scheduleBlockReport(delay, false);
     }
@@ -505,7 +505,7 @@ class BPOfferService {
   /**
    * Ask each of the actors to report a bad block hosted on another DN.
    */
-  void reportRemoteBadBlock(DatanodeInfo dnInfo, ExtendedBlock block) {
+  public void reportRemoteBadBlock(DatanodeInfo dnInfo, ExtendedBlock block) {
     for (BPServiceActor actor : bpServices) {
       try {
         actor.reportRemoteBadBlock(dnInfo, block);
@@ -534,7 +534,7 @@ class BPOfferService {
   }
 
   @VisibleForTesting
-  List<BPServiceActor> getBPServiceActors() {
+  public List<BPServiceActor> getBPServiceActors() {
     return Lists.newArrayList(bpServices);
   }
   

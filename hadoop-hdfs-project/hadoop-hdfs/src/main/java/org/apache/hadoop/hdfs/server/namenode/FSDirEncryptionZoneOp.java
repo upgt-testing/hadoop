@@ -63,7 +63,7 @@ import static org.apache.hadoop.util.Time.monotonicNow;
 /**
  * Helper class to perform encryption zone operation.
  */
-final class FSDirEncryptionZoneOp {
+public final class FSDirEncryptionZoneOp {
 
   /**
    * Private constructor for preventing FSDirEncryptionZoneOp object creation.
@@ -666,7 +666,7 @@ final class FSDirEncryptionZoneOp {
     }
   }
 
-  static class EncryptionKeyInfo {
+  public static class EncryptionKeyInfo {
     final CryptoProtocolVersion protocolVersion;
     final CipherSuite suite;
     final String ezKeyName;

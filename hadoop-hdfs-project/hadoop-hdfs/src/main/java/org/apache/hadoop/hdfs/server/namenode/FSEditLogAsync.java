@@ -118,7 +118,7 @@ class FSEditLogAsync extends FSEditLog implements Runnable {
   }
 
   @Override
-  void logEdit(final FSEditLogOp op) {
+  public void logEdit(final FSEditLogOp op) {
     assert isOpenForWrite();
 
     Edit edit = getEditInstance(op);

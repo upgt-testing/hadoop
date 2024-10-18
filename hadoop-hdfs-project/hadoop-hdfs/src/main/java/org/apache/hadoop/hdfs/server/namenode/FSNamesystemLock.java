@@ -63,7 +63,7 @@ import static org.apache.hadoop.log.LogThrottlingHelper.LogAction;
  * {@link MutableRatesWithAggregation}. However since threads are re-used
  * between operations this should not generally be an issue.
  */
-class FSNamesystemLock {
+public class FSNamesystemLock {
   @VisibleForTesting
   protected ReentrantReadWriteLock coarseLock;
 
@@ -128,8 +128,8 @@ class FSNamesystemLock {
 
   private static final String OVERALL_METRIC_NAME = "Overall";
 
-  FSNamesystemLock(Configuration conf,
-      MutableRatesWithAggregation detailedHoldTimeMetrics) {
+  public FSNamesystemLock(Configuration conf,
+                          MutableRatesWithAggregation detailedHoldTimeMetrics) {
     this(conf, detailedHoldTimeMetrics, new Timer());
   }
 

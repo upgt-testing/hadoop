@@ -100,7 +100,7 @@ import org.slf4j.Logger;
  *  "LastPacketInBlock" set to true or with a zero length. If there is 
  *  no checksum error, it replies to DataNode with OP_STATUS_CHECKSUM_OK.
  */
-class BlockSender implements java.io.Closeable {
+public class BlockSender implements java.io.Closeable {
   static final Logger LOG = DataNode.LOG;
   static final Log ClientTraceLog = DataNode.ClientTraceLog;
   private static final boolean is32Bit = 

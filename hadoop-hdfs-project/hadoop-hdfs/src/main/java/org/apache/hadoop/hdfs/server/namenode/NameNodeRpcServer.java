@@ -582,7 +582,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
   /**
    * Start client and service RPC servers.
    */
-  void start() {
+  public void start() {
     clientRpcServer.start();
     if (serviceRpcServer != null) {
       serviceRpcServer.start();      
@@ -595,7 +595,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
   /**
    * Wait until the RPC servers have shutdown.
    */
-  void join() throws InterruptedException {
+  public void join() throws InterruptedException {
     clientRpcServer.join();
     if (serviceRpcServer != null) {
       serviceRpcServer.join();      
@@ -608,7 +608,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
   /**
    * Stop client and service RPC servers.
    */
-  void stop() {
+  public void stop() {
     if (clientRpcServer != null) {
       clientRpcServer.stop();
     }
@@ -624,7 +624,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
     return lifelineRPCAddress;
   }
 
-  InetSocketAddress getServiceRpcAddress() {
+  public InetSocketAddress getServiceRpcAddress() {
     return serviceRPCAddress;
   }
 

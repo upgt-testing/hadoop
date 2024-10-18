@@ -244,7 +244,7 @@ public class CacheManager {
    * Resets all tracked directives and pools. Called during 2NN checkpointing to
    * reset FSNamesystem state. See {@link FSNamesystem#clear()}.
    */
-  void clear() {
+  public void clear() {
     directivesById.clear();
     directivesByPath.clear();
     cachePools.clear();

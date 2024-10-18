@@ -66,7 +66,7 @@ public class TestIsMethodSupported {
     nnAddress = cluster.getNameNode().getNameNodeAddress();
     DataNode dn = cluster.getDataNodes().get(0);
     dnAddress = new InetSocketAddress(dn.getDatanodeId().getIpAddr(),
-                                      dn.getIpcPort());
+                                      dn.fetchIpcPort());
   }
 
   @AfterClass

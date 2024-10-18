@@ -53,7 +53,7 @@ public class TestDFSMkdirs {
    */
   @Test
   public void testDFSMkdirs() throws IOException {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       // First create a new directory with mkdirs
@@ -91,8 +91,8 @@ public class TestDFSMkdirs {
   @Test
   public void testMkdir() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
-    DistributedFileSystem dfs = cluster.getFileSystem();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
+    DistributedFileSystem dfs = cluster.getDistributedFileSystem();
     try {
       // Create a dir in root dir, should succeed
       assertTrue(dfs.mkdir(new Path("/mkdir-" + Time.now()),
@@ -135,9 +135,9 @@ public class TestDFSMkdirs {
    */
   @Test
   public void testMkdirRpcNonCanonicalPath() throws IOException {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
     try {
-      NamenodeProtocols nnrpc = cluster.getNameNodeRpc();
+      NamenodeProtocols nnrpc = cluster.getNameNode().getRpcServer();
       
       for (String pathStr : NON_CANONICAL_PATHS) {
         try {

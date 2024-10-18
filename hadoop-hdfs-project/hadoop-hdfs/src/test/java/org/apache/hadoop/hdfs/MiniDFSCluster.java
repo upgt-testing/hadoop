@@ -1831,7 +1831,7 @@ public class MiniDFSCluster implements AutoCloseable {
       }
       dn.runDatanodeDaemon();
       dataNodes.add(new DataNodeProperties(dn, newconf, dnArgs,
-          secureResources, dn.getIpcPort()));
+          secureResources, dn.fetchIpcPort()));
       dns[i - curDatanodesNum] = dn;
     }
     this.numDataNodes += numDataNodes;
@@ -2550,7 +2550,7 @@ public class MiniDFSCluster implements AutoCloseable {
         newconf,
         args,
         secureResources,
-        newDn.getIpcPort());
+        newDn.fetchIpcPort());
     dataNodes.add(dnp);
     numDataNodes++;
 

@@ -4891,7 +4891,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * This will save current namespace into fsimage file and empty edits file.
    * Requires superuser privilege and safe mode.
    */
-  boolean saveNamespace(final long timeWindow, final long txGap)
+  public boolean saveNamespace(final long timeWindow, final long txGap)
       throws IOException {
     String operationName = "saveNamespace";
     checkOperation(OperationCategory.UNCHECKED);
@@ -5066,11 +5066,59 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     return !isInManualOrResourceLowSafeMode() && blockManager.isInSafeMode();
   }
 
+  @Override
+  public void provider_deleteKey(String key) throws IOException {
+    getProvider().deleteKey(key);
+  }
+
+  @Override
+  public void blockManagerClear() {
+    this.getBlockManager().clear();
+  }
+
+  @Override
+  public long blockGrpIdGeneratorGetCurrentValue() {
+    return this.getBlockManager()
+            .getBlockIdManager().getBlockGroupIdGenerator().getCurrentValue();
+  }
+
+  @Override
+  public void blockGrpIdGeneratorSetCurrentValue(long newValue) {
+    this.getBlockManager()
+            .getBlockIdManager().getBlockGroupIdGenerator().setCurrentValue(newValue);
+  }
+
+  @Override
+  public void blockGrpIdGeneratorSkipTo(long newValue) {
+    this.getBlockManager()
+            .getBlockIdManager().getBlockGroupIdGenerator().skipTo(newValue);
+  }
+
+  @Override
+  public int getSnapshotManagerGetNumSnapshottableDirs() {
+    return getSnapshotManager().getNumSnapshottableDirs();
+  }
+
+  @Override
+  public int getSnapshotManagerGetNumSnapshots() {
+    return getSnapshotManager().getNumSnapshots();
+  }
+
+  @Override
+  public void getSnapshotManagerAndSetAllowNestedSnapshots(boolean allowNestedSnapshots) {
+    this.snapshotManager.setAllowNestedSnapshots(allowNestedSnapshots);
+  }
+
+  @Override
+  public long getTotalInodes() {
+    return this.dir.totalInodes();
+  }
+
   /**
    * Enter safe mode. If resourcesLow is false, then we assume it is manual
    * @throws IOException
    */
-  void enterSafeMode(boolean resourcesLow) throws IOException {
+  public void enterSafeMode(boolean resourcesLow) throws IOException {
     writeLock();
     try {
       // Stop the secret manager, since rolling the master key would
@@ -6593,6 +6641,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
 
   private long getDfsUsed(DatanodeDescriptor alivenode) {
     return alivenode.getDfsUsed();
+  }
+
+  @Override
+  public String fetchClusterId() {
+    return getClusterId();
   }
 
   @Override  // NameNodeMXBean

@@ -23,27 +23,24 @@ import static org.junit.Assume.assumeTrue;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.EnumSet;
+import java.util.function.Supplier;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.ReadOption;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.CacheDirectiveInfo;
 import org.apache.hadoop.hdfs.protocol.CachePoolInfo;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetCache;
 import org.apache.hadoop.io.nativeio.NativeIO;
 import org.apache.hadoop.io.nativeio.NativeIO.POSIX.CacheManipulator;
 import org.apache.hadoop.io.nativeio.NativeIO.POSIX.NoMlockCacheManipulator;
 import org.apache.hadoop.net.unix.DomainSocket;
 import org.apache.hadoop.net.unix.TemporarySocketDirectory;
+import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.NativeCodeLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -110,10 +107,10 @@ public class TestFsDatasetCacheRevocation {
         1800000L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = null;
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
-    DistributedFileSystem dfs = cluster.getFileSystem();
+    DistributedFileSystem dfs = cluster.getDistributedFileSystem();
 
     // Create and cache a file.
     final String testFile = "/test_file";
@@ -123,8 +120,9 @@ public class TestFsDatasetCacheRevocation {
     long cacheDirectiveId = dfs
         .addCacheDirective(new CacheDirectiveInfo.Builder().setPool("pool")
             .setPath(new Path(testFile)).setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
-    DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    //FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    //DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    verifyExpectedCacheUsage(BLOCK_SIZE, 1, cluster.getDataNodes().get(0));
 
     // Mmap the file.
     FSDataInputStream in = dfs.open(new Path(testFile));
@@ -134,11 +132,13 @@ public class TestFsDatasetCacheRevocation {
     // Attempt to uncache file.  The file should still be cached.
     dfs.removeCacheDirective(cacheDirectiveId);
     Thread.sleep(500);
-    DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    //DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    verifyExpectedCacheUsage(BLOCK_SIZE, 1, cluster.getDataNodes().get(0));
 
     // Un-mmap the file.  The file should be uncached after this.
     in.releaseBuffer(buf);
-    DFSTestUtil.verifyExpectedCacheUsage(0, 0, fsd);
+    //DFSTestUtil.verifyExpectedCacheUsage(0, 0, fsd);
+    verifyExpectedCacheUsage(0, 0, cluster.getDataNodes().get(0));
 
     // Cleanup
     in.close();
@@ -160,10 +160,10 @@ public class TestFsDatasetCacheRevocation {
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_TIMEOUT_MS, 250L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = null;
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
-    DistributedFileSystem dfs = cluster.getFileSystem();
+    DistributedFileSystem dfs = cluster.getDistributedFileSystem();
 
     // Create and cache a file.
     final String testFile = "/test_file2";
@@ -174,8 +174,9 @@ public class TestFsDatasetCacheRevocation {
         dfs.addCacheDirective(new CacheDirectiveInfo.Builder().
             setPool("pool").setPath(new Path(testFile)).
             setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
-    DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    //FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    //DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
+    verifyExpectedCacheUsage(BLOCK_SIZE, 1, cluster.getDataNodes().get(0));
 
     // Mmap the file.
     FSDataInputStream in = dfs.open(new Path(testFile));
@@ -187,11 +188,49 @@ public class TestFsDatasetCacheRevocation {
     dfs.removeCacheDirective(cacheDirectiveId);
     LOG.info("finished removing cache directive {}", cacheDirectiveId);
     Thread.sleep(1000);
-    DFSTestUtil.verifyExpectedCacheUsage(0, 0, fsd);
+    //DFSTestUtil.verifyExpectedCacheUsage(0, 0, fsd);
+    verifyExpectedCacheUsage(0, 0, cluster.getDataNodes().get(0));
 
     // Cleanup
     in.releaseBuffer(buf);
     in.close();
     cluster.shutdown();
   }
+
+
+  /**
+   * Blocks until cache usage hits the expected new value.
+   */
+  public static long verifyExpectedCacheUsage(final long expectedCacheUsed,
+                                              final long expectedBlocks, final DataNodeProxy dataNodeProxy) throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      private int tries = 0;
+
+      @Override
+      public Boolean get() {
+        long curCacheUsed = dataNodeProxy.fetchFSDatasetGetCacheUsed();//fsd.getCacheUsed();
+        long curBlocks = dataNodeProxy.fetchFSDatasetGetNumBlocksCached();//fsd.getNumBlocksCached();
+        if ((curCacheUsed != expectedCacheUsed) ||
+                (curBlocks != expectedBlocks)) {
+          if (tries++ > 10) {
+            LOG.info("verifyExpectedCacheUsage: have " +
+                    curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                    curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                    "memlock limit = " +
+                    NativeIO.POSIX.getCacheManipulator().getMemlockLimit() +
+                    ".  Waiting...");
+          }
+          return false;
+        }
+        LOG.info("verifyExpectedCacheUsage: got " +
+                curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                "memlock limit = " +
+                NativeIO.POSIX.getCacheManipulator().getMemlockLimit());
+        return true;
+      }
+    }, 100, 120000);
+    return expectedCacheUsed;
+  }
+
 }

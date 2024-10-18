@@ -323,7 +323,7 @@ public class DirectoryScanner implements Runnable {
    * Start the scanner. The scanner will run every
    * {@link DFSConfigKeys#DFS_DATANODE_DIRECTORYSCAN_INTERVAL_KEY} seconds.
    */
-  void start() {
+  public void start() {
     shouldRun.set(true);
     long firstScanTime = ThreadLocalRandom.current().nextLong(scanPeriodMsecs);
 
@@ -389,7 +389,7 @@ public class DirectoryScanner implements Runnable {
    * threads to exit. If a thread does not exit in that time period, it is left
    * running, and an error is logged.
    */
-  void shutdown() {
+  public void shutdown() {
     LOG.info("Shutdown has been called");
     if (!shouldRun.getAndSet(false)) {
       LOG.warn("Shutdown has been called, but periodic scanner not started");

@@ -11,8 +11,9 @@ import edu.illinois.util.config.HadoopXMLModifier;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
-import org.junit.Assert;
+import org.apache.hadoop.test.GenericTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -33,6 +34,8 @@ import java.util.regex.Pattern;
 public class MiniDockerDFSCluster implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(MiniDockerDFSCluster.class);
 
+    private static final int NN_TYPE = 0;
+    private static final int DN_TYPE = 1;
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
     /** The upgradable cluster */
@@ -43,8 +46,13 @@ public class MiniDockerDFSCluster implements Closeable {
     private final Map<Integer, DockerNode> dataNodes = new LinkedHashMap<>();
     /** The nameNode */
     private DockerNode nameNode;
-    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, 9090); // 9090 is the MXBean port
-    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
+    private NameNodeProxy nn;
+    private FSNamesystemProxy fsn;
+    private final ArrayList<DataNodeProxy> dataNodeProxies = new ArrayList<>();
+    private final int NNMXBeanPort = 9090;
+    private final int DNMXBeanPort = 9100;
+    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, NNMXBeanPort); // 9090 is the MXBean port
+    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040, DNMXBeanPort);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
@@ -222,7 +230,7 @@ public class MiniDockerDFSCluster implements Closeable {
                     .withNodeRole(NodeRole.MASTER)
                     .withNetworkAliases("namenode")
                     .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && " +
-                            "bash modify_hdfs_env.sh && hdfs namenode -format && bash loop.sh"))
+                            "bash modify_hdfs_env.sh " + NNMXBeanPort + " " + NN_TYPE + " && hdfs namenode -format && bash loop.sh"))
                     //.withExposedPorts(nameNodePorts.toArray(new Integer[0]))
                     .withBoundPorts(bindPorts(nameNodePorts, 0))
                     //.waitingFor(Wait.forLogMessage("INFO blockmanagement.CacheReplicationMonitor: Starting CacheReplicationMonitor with interval", 1))
@@ -267,15 +275,29 @@ public class MiniDockerDFSCluster implements Closeable {
                 new Thread(() -> {
                     try {
                         LOG.info("Start the datanode in a new Thread.");
-                        dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
+                        dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_env.sh "
+                                + (DNMXBeanPort + finalI) + " " +  DN_TYPE + " && bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
                     } catch (InterruptedException | IOException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
                 Thread.sleep(5000);
                 dataNode.setExposedPorts(exposedPortsList(dataNodePorts, i));
+                dataNodeProxies.add(new DataNodeProxy(dataNode, "localhost", DNMXBeanPort + i));
             }
+
+            String nameNodeAddress = "hdfs://" + nameNode.getHost() + ":" + nameNode.getMappedPort(9000);
+            this.conf.set("fs.defaultFS", nameNodeAddress);
+
+            // Use localhost and datanode hostname to make sure the Java client
+            // can talk to the Hadoop cluster through the Docker network bridge
+            this.conf.setBoolean("dfs.client.use.datanode.hostname", true);
+            System.setProperty("HADOOP_USER_NAME", "root");
+            //TODO: maybe think about to put all the necessary configurations
+            // here to overwrite the default configurations
+
             //cluster.start();
+            createBaseDir();
 
             try {
                 connectMXBean();
@@ -305,17 +327,6 @@ public class MiniDockerDFSCluster implements Closeable {
 
              **/
 
-
-
-            String nameNodeAddress = "hdfs://" + nameNode.getHost() + ":" + nameNode.getMappedPort(9000);
-            this.conf.set("fs.defaultFS", nameNodeAddress);
-
-            // Use localhost and datanode hostname to make sure the Java client
-            // can talk to the Hadoop cluster through the Docker network bridge
-            this.conf.setBoolean("dfs.client.use.datanode.hostname", true);
-            System.setProperty("HADOOP_USER_NAME", "root");
-            //TODO: maybe think about to put all the necessary configurations
-            // here to overwrite the default configurations
         } catch (UpgradableClusterException e) {
             throw new RuntimeException("Failed to start the cluster", e);
         } catch (InterruptedException e) {
@@ -378,6 +389,7 @@ public class MiniDockerDFSCluster implements Closeable {
         try {
             String fsURI = conf.get("fs.defaultFS");
             //System.out.println("Accessing the file system at " + fsURI);
+            LOG.info("Accessing the file system at {}", fsURI);
             return FileSystem.get(new URI(fsURI), conf);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file system", e);
@@ -469,6 +481,7 @@ public class MiniDockerDFSCluster implements Closeable {
                     }
                 }).start();
                 Thread.sleep(10000);
+                createBaseDir();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
@@ -504,6 +517,12 @@ public class MiniDockerDFSCluster implements Closeable {
         return nameNode.getMappedPort(9000);
     }
 
+    public void restartNameNode(Boolean restart) {
+        if (restart) {
+            restartNameNode();
+        }
+    }
+
     public void restartNameNode() {
         //cluster.getMasterNode().restart();
 
@@ -523,6 +542,7 @@ public class MiniDockerDFSCluster implements Closeable {
                 }
             }).start();
             Thread.sleep(10000);
+            createBaseDir();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
@@ -530,13 +550,13 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
-
+    // ================= MXBean operations ======================//
 
     // Start from here to create the MXBean for the MiniDockerDFSCluster
     // Connect the MXBean
     public void connectMXBean() throws IOException, MalformedObjectNameException, ReflectionException, AttributeNotFoundException, InstanceNotFoundException, MBeanException {
         String host = "localhost"; // Updated to 'localhost'
-        int port = 9090;
+        int port = NNMXBeanPort;
 
         // Create a JMX service URL
         String urlString = String.format(
@@ -568,4 +588,68 @@ public class MiniDockerDFSCluster implements Closeable {
         System.out.println("HostAndPort: " + hostAndPort);
     }
 
+
+    // just return a proxy object for customized NameNode to do RMI with MXBean
+    public NameNodeProxy getNameNode() {
+        if (nn != null) {
+            return nn;
+        }
+        return new NameNodeProxy(null, null, null, "localhost", NNMXBeanPort);
+    }
+
+    public FSNamesystemProxy getNamesystem() {
+        if (fsn != null) {
+            return fsn;
+        }
+        return new FSNamesystemProxy("localhost", NNMXBeanPort);
+    }
+
+    /**
+     * Get the base directory for any DFS cluster whose configuration does
+     * not explicitly set it. This is done via
+     * {@link GenericTestUtils#getTestDir()}.
+     * @return a directory for use as a miniDFS filesystem.
+     */
+    public static String getBaseDirectory() {
+        //return GenericTestUtils.getTestDir("dfs").getAbsolutePath() + File.separator;
+        return "/data" + File.separator + "dfs" + File.separator;
+    }
+
+    /**
+     * Create the base directory for the DFS cluster for testing purpose
+     */
+    private void createBaseDir() {
+        DistributedFileSystem fs = getDistributedFileSystem();
+        Path baseDir = new Path(getBaseDirectory());
+        try {
+            if (!fs.exists(baseDir)) {
+                LOG.info("Creating the base directory for the DFS cluster: {}", baseDir);
+                if (fs.mkdirs(baseDir)) {
+                    //LOG.info("Successfully created the base directory for the DFS cluster: {}", baseDir);
+                    // print the absolute path of the base directory
+                    LOG.info("The absolute path of the base directory: {}", baseDir.toString());
+                } else {
+                    throw new RuntimeException("Failed to create the base directory for the DFS cluster: " + baseDir);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create the base directory", e);
+        }
+    }
+
+    /**
+     * @return Configuration of for the given namenode
+     */
+    public Configuration getConfiguration(int nnIndex) {
+        // TODO: We have to (1) sync the this.conf with actual cluster configuration;
+        // TODO: (2) Given each namenode, return its related configuration.
+        return this.conf;
+    }
+
+    /**
+     * Gets a list of the started DataNodes.  May be empty.
+     */
+    public ArrayList<DataNodeProxy> getDataNodes() {
+        return dataNodeProxies;
+    }
 }

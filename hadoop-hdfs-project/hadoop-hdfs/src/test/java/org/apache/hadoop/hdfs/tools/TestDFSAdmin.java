@@ -237,7 +237,7 @@ public class TestDFSAdmin {
       final String addr = String.format(
           "%s:%d",
           dn.getXferAddress().getHostString(),
-          dn.getIpcPort());
+          dn.fetchIpcPort());
       final int ret = ToolRunner.run(dfsAdmin,
           new String[]{"-getDatanodeInfo", addr});
       assertEquals(0, ret);
@@ -267,7 +267,7 @@ public class TestDFSAdmin {
     final String dnAddr = String.format(
         "%s:%d",
         dn.getXferAddress().getHostString(),
-        dn.getIpcPort());
+        dn.fetchIpcPort());
     final String nnAddr = nn.getHostAndPort();
     resetStream();
     final List<String> outs = Lists.newArrayList();
@@ -291,7 +291,7 @@ public class TestDFSAdmin {
       resetStream();
       final DataNode dn = cluster.getDataNodes().get(i);
       final String addr = String.format("%s:%d", dn.getXferAddress()
-          .getHostString(), dn.getIpcPort());
+          .getHostString(), dn.fetchIpcPort());
       final int ret = ToolRunner.run(dfsAdmin, new String[] {
           "-getVolumeReport", addr });
       assertEquals(0, ret);
@@ -315,7 +315,7 @@ public class TestDFSAdmin {
       // Connecting to Xfer port instead of IPC port will get
       // Datanode unreachable. java.io.EOFException
       final String dnDataAddr = datanode.getXferAddress().getHostString() + ":"
-          + datanode.getXferPort();
+          + datanode.fetchXferPort();
       resetStream();
       final List<String> outs = Lists.newArrayList();
       final int ret = ToolRunner.run(dfsAdmin,
@@ -331,7 +331,7 @@ public class TestDFSAdmin {
 
   @Test(timeout = 30000)
   public void testDataNodeGetReconfigurableProperties() throws IOException, InterruptedException {
-    final int port = datanode.getIpcPort();
+    final int port = datanode.fetchIpcPort();
     final String address = "localhost:" + port;
     final List<String> outs = Lists.newArrayList();
     final List<String> errs = Lists.newArrayList();
@@ -369,7 +369,7 @@ public class TestDFSAdmin {
     when(ru.parseChangedProperties(any(Configuration.class),
         any(Configuration.class))).thenReturn(changes);
 
-    final int port = datanode.getIpcPort();
+    final int port = datanode.fetchIpcPort();
     final String address = "localhost:" + port;
 
     assertThat(admin.startReconfiguration("datanode", address), is(0));

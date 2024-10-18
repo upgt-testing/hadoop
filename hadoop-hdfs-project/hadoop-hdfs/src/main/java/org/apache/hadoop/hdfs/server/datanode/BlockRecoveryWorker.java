@@ -61,7 +61,7 @@ public class BlockRecoveryWorker {
   private final Configuration conf;
   private final DNConf dnConf;
 
-  BlockRecoveryWorker(DataNode datanode) {
+  public BlockRecoveryWorker(DataNode datanode) {
     this.datanode = datanode;
     conf = datanode.getConf();
     dnConf = datanode.getDnConf();

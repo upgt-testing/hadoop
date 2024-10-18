@@ -54,7 +54,7 @@ public class TestRestartDFS {
             fs.setOwner(dirpath, null, dirstatus.getGroup() + "_XXX");
         } finally {
             if (cluster != null) {
-                cluster.shutdown();
+                //cluster.shutdown();
             }
         }
         try {
@@ -62,7 +62,11 @@ public class TestRestartDFS {
                 conf.set(DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY, "localhost:0");
             }
             // Here we restart the MiniDFScluster without formatting namenode
-            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+            //cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+            cluster.restartNameNode();
+            for(int i = 0; i < 4; i++) {
+                cluster.upgradeDatanode(i);
+            }
             FileSystem fs = cluster.getFileSystem();
             assertTrue("Filesystem corrupted after restart.", files.checkFiles(fs, dir));
             final FileStatus newrootstatus = fs.getFileStatus(rootpath);
@@ -76,7 +80,7 @@ public class TestRestartDFS {
             rootmtime = fs.getFileStatus(rootpath).getModificationTime();
         } finally {
             if (cluster != null) {
-                cluster.shutdown();
+                //cluster.shutdown();
             }
         }
         try {
@@ -85,7 +89,11 @@ public class TestRestartDFS {
             }
             // This is a second restart to check that after the first restart
             // the image written in parallel to both places did not get corrupted
-            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+            //cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).format(false).build();
+            cluster.restartNameNode();
+            for(int i = 0; i < 4; i++) {
+                cluster.upgradeDatanode(i);
+            }
             FileSystem fs = cluster.getFileSystem();
             assertTrue("Filesystem corrupted after restart.", files.checkFiles(fs, dir));
             final FileStatus newrootstatus = fs.getFileStatus(rootpath);

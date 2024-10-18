@@ -151,7 +151,7 @@ public class SnapshotManager implements SnapshotStatsMXBean {
   }
 
   /** Used in tests only */
-  void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
+  public void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
     this.allowNestedSnapshots = allowNestedSnapshots;
   }
 

@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
@@ -42,7 +42,7 @@ public class TestHttpsFileSystem {
   private static final String BASEDIR =
       GenericTestUtils.getTempPath(TestHttpsFileSystem.class.getSimpleName());
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
 
   private static String keystoresDir;
@@ -68,13 +68,14 @@ public class TestHttpsFileSystem {
     conf.set(DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
         KeyStoreTestUtil.getServerSSLConfigFileName());
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     OutputStream os = cluster.getFileSystem().create(new Path("/test"));
     os.write(23);
     os.close();
-    InetSocketAddress addr = cluster.getNameNode().getHttpsAddress();
-    nnAddr = NetUtils.getHostPortString(addr);
+    //InetSocketAddress addr = cluster.getNameNode().getHttpsAddress();
+    //nnAddr = NetUtils.getHostPortString(addr);
+    nnAddr = cluster.getNameNode().fetchHttpsAddressHostAndPort();
     conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
   }
 

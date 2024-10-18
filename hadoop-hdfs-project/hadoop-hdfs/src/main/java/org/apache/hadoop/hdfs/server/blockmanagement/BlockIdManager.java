@@ -321,7 +321,7 @@ public class BlockIdManager {
         HdfsServerConstants.BLOCK_GROUP_INDEX_MASK);
   }
 
-  SequentialBlockGroupIdGenerator getBlockGroupIdGenerator() {
+  public SequentialBlockGroupIdGenerator getBlockGroupIdGenerator() {
     return blockGroupIdGenerator;
   }
 }

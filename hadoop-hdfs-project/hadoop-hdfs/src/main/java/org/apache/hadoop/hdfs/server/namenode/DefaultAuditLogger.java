@@ -63,7 +63,7 @@ public abstract class DefaultAuditLogger extends HdfsAuditLogger {
    *
    * @param value true, enable CallerContext, otherwise false to disable it.
    */
-  void setCallerContextEnabled(final boolean value) {
+  public void setCallerContextEnabled(final boolean value) {
     isCallerContextEnabled = value;
   }
 
@@ -73,7 +73,7 @@ public abstract class DefaultAuditLogger extends HdfsAuditLogger {
    * @return true, if CallerContext is enabled, otherwise false, if it's
    *         disabled.
    */
-  boolean getCallerContextEnabled() {
+  public boolean getCallerContextEnabled() {
     return isCallerContextEnabled;
   }
 
