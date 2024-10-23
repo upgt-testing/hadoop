@@ -39,7 +39,7 @@ public interface DataNodeMXBean {
   public long fetchFSDatasetGetNumBlocksCached();
   public int fetchInfoPort();
   public int fetchXferServerGetPeerServerGetReceiveBufferSize() throws IOException;
-  public long fetchFSDatasetGetDfsUsed() throws IOException;
+  public long fetchFSDataset_getDfsUsed() throws IOException;
   public String fetchIPCServerListenerAddressHostName();
   public int fetchIpcPort();
   public long fetchBalancerBandwidth() throws IOException;

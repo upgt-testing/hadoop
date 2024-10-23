@@ -2127,7 +2127,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @Override
-  public long fetchFSDatasetGetDfsUsed() throws IOException {
+  public long fetchFSDataset_getDfsUsed() throws IOException {
     return getFSDataset().getDfsUsed();
   }
 

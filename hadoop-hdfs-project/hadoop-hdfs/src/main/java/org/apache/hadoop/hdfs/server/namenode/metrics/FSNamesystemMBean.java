@@ -52,7 +52,6 @@ public interface FSNamesystemMBean {
 
   public int getSnapshotManagerGetNumSnapshottableDirs();
   public int getSnapshotManagerGetNumSnapshots();
-
   public void getSnapshotManagerAndSetAllowNestedSnapshots(boolean allowNestedSnapshots);
 
   public long getTotalInodes();

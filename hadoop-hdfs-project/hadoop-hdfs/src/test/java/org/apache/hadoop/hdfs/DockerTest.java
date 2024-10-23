@@ -40,7 +40,7 @@ public class DockerTest {
         System.out.println("get num block cached " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDatasetGetNumBlocksCached());
         System.out.println("get info port " + dockerHDFSCluster.getDataNodes().get(0).fetchInfoPort());
         System.out.println("receive buffer size " + dockerHDFSCluster.getDataNodes().get(0).fetchXferServerGetPeerServerGetReceiveBufferSize());
-        System.out.println("FSDatasetGetDfsUsed " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDatasetGetDfsUsed());
+        System.out.println("FSDatasetGetDfsUsed " + dockerHDFSCluster.getDataNodes().get(0).fetchFSDataset_getDfsUsed());
         System.out.println("AddressHostName " + dockerHDFSCluster.getDataNodes().get(0).fetchIPCServerListenerAddressHostName());
         System.out.println("fetch IPC Port " + dockerHDFSCluster.getDataNodes().get(0).fetchIpcPort());
         System.out.println("balancer bandwidth " + dockerHDFSCluster.getDataNodes().get(0).fetchBalancerBandwidth());

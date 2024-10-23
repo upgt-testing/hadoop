@@ -2172,8 +2172,8 @@ public class DataNodeProxy extends ReconfigurableBase
     }
 
     @Override
-    public long fetchFSDatasetGetDfsUsed() throws IOException {
-        return (long) invokeRMI("fetchFSDatasetGetDfsUsed", new Object[]{}, new String[]{});
+    public long fetchFSDataset_getDfsUsed() throws IOException {
+        return (long) invokeRMI("fetchFSDataset_getDfsUsed", new Object[]{}, new String[]{});
     }
 
     @Override

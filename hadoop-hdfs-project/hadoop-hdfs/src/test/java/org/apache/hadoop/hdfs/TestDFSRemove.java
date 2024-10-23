@@ -48,7 +48,7 @@ public class TestDFSRemove {
     long total = 0;
     for(DataNodeProxy node : cluster.getDataNodes()) {
       //total += DataNodeTestUtils.getFSDataset(node).getDfsUsed();
-      total += node.fetchFSDatasetGetDfsUsed();
+      total += node.fetchFSDataset_getDfsUsed();
     }
     return total;
   }
