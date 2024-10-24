@@ -22,6 +22,7 @@ RUN tar -xzf hadoop-$HADOOP_VERSION.tar.gz -C /opt && \
 
 RUN rm /opt/hadoop/share/hadoop/hdfs/hadoop-hdfs-$HADOOP_VERSION.jar
 COPY hadoop-hdfs-$HADOOP_VERSION.jar /opt/hadoop/share/hadoop/hdfs/hadoop-hdfs-$HADOOP_VERSION.jar
+COPY hadoop-common-$HADOOP_VERSION.jar /opt/hadoop/share/hadoop/common/hadoop-common-$HADOOP_VERSION.jar
 
 
 # Add Hadoop configuration files

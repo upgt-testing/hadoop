@@ -1968,12 +1968,13 @@ public class NameNode extends ReconfigurableBase implements
     //Shuai: Also register my RMI here
     try {
       System.setProperty("java.rmi.server.hostname", "localhost"); // Replace with actual IP or hostname
-      //RemoteObject nnRemote = new RemoteObjectImpl(this);
-      //RmiUtils.registerRmiObject(this.getClass().getName(), nnRemote, 1099);
 
       NameNodeFake nnFake = new NameNodeFake();
       RemoteObject nnFakeRemote = new RemoteObjectImpl(nnFake);
       RmiUtils.registerRmiObject(NameNodeFake.class.getName(), nnFakeRemote, 1099);
+
+      RemoteObject nnRemote = new RemoteObjectImpl(this);
+      RmiUtils.registerRmiObject(this.getClass().getName(), nnRemote, 1099);
     } catch (RemoteException e) {
       throw new RuntimeException("Failed to register RMI for NameNode", e);
     }

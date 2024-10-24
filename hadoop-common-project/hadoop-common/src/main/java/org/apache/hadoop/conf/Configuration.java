@@ -25,17 +25,7 @@ import com.ctc.wstx.stax.WstxInputFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
-import java.io.BufferedInputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.JarURLConnection;
@@ -82,7 +72,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import edu.illinois.util.config.ConfigTracker;
 import org.apache.hadoop.thirdparty.com.google.common.base.Charsets;
 import org.apache.commons.collections.map.UnmodifiableMap;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -226,7 +215,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class Configuration implements Iterable<Map.Entry<String,String>>,
-                                      Writable {
+                                      Writable, Serializable {
   private static final Logger LOG =
       LoggerFactory.getLogger(Configuration.class);
 
@@ -244,7 +233,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   private boolean restrictSystemProps = restrictSystemPropsDefault;
   private boolean allowNullValueProperties = false;
 
-  private static class Resource {
+  private static class Resource implements Serializable {
     private final Object resource;
     private final String name;
     private final boolean restrictParser;
@@ -368,7 +357,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * that is being replaced. It also provides method to get the appropriate
    * warning message which can be logged whenever the deprecated key is used.
    */
-  private static class DeprecatedKeyInfo {
+  private static class DeprecatedKeyInfo implements Serializable{
     private final String[] newKeys;
     private final String customMessage;
     private final AtomicBoolean accessed = new AtomicBoolean(false);
@@ -423,7 +412,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   /**
    * A pending addition to the global set of deprecated keys.
    */
-  public static class DeprecationDelta {
+  public static class DeprecationDelta implements Serializable {
     private final String key;
     private final String[] newKeys;
     private final String customMessage;
@@ -463,7 +452,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *
    * DeprecationContext objects are immutable.
    */
-  private static class DeprecationContext {
+  private static class DeprecationContext implements Serializable {
     /**
      * Stores the deprecated keys, the new keys which replace the deprecated keys
      * and custom message(if any provided).
@@ -806,7 +795,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
 
   private Properties properties;
   private Properties overlay;
-  private ClassLoader classLoader;
+  private transient  ClassLoader classLoader;
   {
     classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader == null) {
@@ -1412,7 +1401,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     }
     getOverlay().setProperty(name, value);
     getProps().setProperty(name, value);
-    ConfigTracker.addSetParam(name, value);
     String newSource = (source == null ? "programmatically" : source);
 
     if (!isDeprecated(name)) {
@@ -1423,7 +1411,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
           if(!n.equals(name)) {
             getOverlay().setProperty(n, value);
             getProps().setProperty(n, value);
-            ConfigTracker.addSetParam(n, value);
             putIntoUpdatingResource(n, new String[] {newSource});
           }
         }
@@ -1435,7 +1422,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
       for(String n : names) {
         getOverlay().setProperty(n, value);
         getProps().setProperty(n, value);
-        ConfigTracker.addSetParam(n, value);
         putIntoUpdatingResource(n, new String[] {altSource});
       }
     }
@@ -1472,7 +1458,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     for(String n: names) {
       getOverlay().remove(n);
       getProps().remove(n);
-      ConfigTracker.removeSetParam(n);
     }
   }
 
@@ -3158,7 +3143,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * Parser to consume SAX stream of XML elements from a Configuration.
    */
   private class Parser {
-    private final XMLStreamReader2 reader;
+    private transient final XMLStreamReader2 reader;
     private final Resource wrapper;
     private final String name;
     private final String[] nameSingletonArray;
