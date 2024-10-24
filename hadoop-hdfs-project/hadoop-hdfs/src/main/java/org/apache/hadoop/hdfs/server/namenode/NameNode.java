@@ -17,12 +17,16 @@
  */
 package org.apache.hadoop.hdfs.server.namenode;
 
+import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.rmi.server.RemoteObjectImpl;
+import org.apache.hadoop.hdfs.rmi.RmiUtils;
 import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTesting;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1945,10 +1949,34 @@ public class NameNode extends ReconfigurableBase implements
     return state.getServiceState();
   }
 
+  public boolean testRMIPrint(String message) {
+    LOG.info("NameNode testRMIPrint: " + message);
+    System.out.println("NameNode testRMIPrint: " + message);
+    return true;
+  }
+
+  public void testRMIConf(Configuration conf) {
+    conf.set("test-key", "test-value");
+    LOG.info("NameNode testRMIConf: " + conf.get("test-key"));
+    System.out.println("NameNode testRMIObject: " + conf.get("test-key"));
+  }
+
   /**
    * Register NameNodeStatusMXBean
    */
   private void registerNNSMXBean() {
+    //Shuai: Also register my RMI here
+    try {
+      System.setProperty("java.rmi.server.hostname", "localhost"); // Replace with actual IP or hostname
+      //RemoteObject nnRemote = new RemoteObjectImpl(this);
+      //RmiUtils.registerRmiObject(this.getClass().getName(), nnRemote, 1099);
+
+      NameNodeFake nnFake = new NameNodeFake();
+      RemoteObject nnFakeRemote = new RemoteObjectImpl(nnFake);
+      RmiUtils.registerRmiObject(NameNodeFake.class.getName(), nnFakeRemote, 1099);
+    } catch (RemoteException e) {
+      throw new RuntimeException("Failed to register RMI for NameNode", e);
+    }
     nameNodeStatusBeanName = MBeans.register("NameNode", "NameNodeStatus", this);
   }
 

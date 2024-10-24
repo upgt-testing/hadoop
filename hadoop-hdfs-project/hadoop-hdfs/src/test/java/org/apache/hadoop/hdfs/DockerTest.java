@@ -1,10 +1,14 @@
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.rmi.client.DynamicProxyFactory;
 import edu.illinois.util.config.ConfigTracker;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeFake;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +31,33 @@ import java.util.Map;
  * Author: Shuai Wang
  */
 public class DockerTest {
+
+    @Test
+    public void testsRMI() {
+        try {
+            MiniDockerDFSCluster dockerHDFSCluster = new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
+            FileSystem fs = dockerHDFSCluster.getFileSystem();
+            System.setProperty("java.rmi.server.hostname", "localhost");
+            // Get the remote cluster object from the RMI registry
+            Registry registry = LocateRegistry.getRegistry(1099);
+            RemoteObject nameNodeFake = (RemoteObject) registry.lookup(NameNodeFake.class.getName());
+            nameNodeFake.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
+            NameNodeInterface namenodeFake = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNodeFake, NameNodeInterface.class);
+            namenodeFake.testRMIPrint("Hello RMI");
+            
+            RemoteObject nameNode = (RemoteObject) registry.lookup(NameNode.class.getName());
+            nameNode.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
+            // Create a dynamic proxy for the ClusterInterface
+            NameNodeInterface namenode = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNode, NameNodeInterface.class);
+            namenode.testRMIPrint("Hello RMI");
+            Configuration conf = new Configuration();
+            conf.set("fake-from-test", "fake-value");
+            namenode.testRMIConf(conf);
+            System.out.println("RMI test passed");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Before
     public void setup() {

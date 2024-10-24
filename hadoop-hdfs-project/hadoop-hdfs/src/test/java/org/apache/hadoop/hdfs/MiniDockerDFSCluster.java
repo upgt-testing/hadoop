@@ -40,7 +40,9 @@ public class MiniDockerDFSCluster implements Closeable {
     private final Map<Integer, DockerNode> dataNodes = new LinkedHashMap<>();
     /** The nameNode */
     private DockerNode nameNode;
-    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070);
+
+    private final int RMIPort = 1099;
+    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, RMIPort, 1100);
     private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
