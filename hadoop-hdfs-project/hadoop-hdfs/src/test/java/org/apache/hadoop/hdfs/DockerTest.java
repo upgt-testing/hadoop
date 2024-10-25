@@ -1,5 +1,6 @@
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
 import edu.illinois.util.config.ConfigTracker;

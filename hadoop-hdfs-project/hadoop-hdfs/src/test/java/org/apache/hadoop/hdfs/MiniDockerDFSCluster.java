@@ -20,6 +20,7 @@ import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 import java.io.*;
 import java.net.InetSocketAddress;
