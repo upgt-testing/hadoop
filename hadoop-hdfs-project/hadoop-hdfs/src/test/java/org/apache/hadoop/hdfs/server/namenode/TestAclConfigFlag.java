@@ -28,7 +28,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.AclException;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeProxy;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.io.IOUtils;
@@ -47,7 +49,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 public class TestAclConfigFlag {
   private static final Path PATH = new Path("/path");
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @Rule
@@ -161,10 +163,10 @@ public class TestAclConfigFlag {
       throws Exception {
     Configuration conf = new Configuration();
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, aclsEnabled);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).format(format)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).format(format)
       .build();
     cluster.waitActive();
-    fs = cluster.getFileSystem();
+    fs = cluster.getDistributedFileSystem();
   }
 
   /**
@@ -176,7 +178,7 @@ public class TestAclConfigFlag {
    */
   private void restart(boolean checkpoint, boolean aclsEnabled)
       throws Exception {
-    NameNode nameNode = cluster.getNameNode();
+    NameNodeProxy nameNode = cluster.getNameNode();
     if (checkpoint) {
       NameNodeAdapter.enterSafeMode(nameNode, false);
       NameNodeAdapter.saveNamespace(nameNode);

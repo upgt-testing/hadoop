@@ -59,7 +59,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.http.HttpConfig;
@@ -270,13 +270,13 @@ public class TestWebHdfsTokens {
   
   @Test
   public void testLazyTokenFetchForWebhdfs() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     UserGroupInformation ugi = null;
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
       initSecureConf(clusterConf);
 
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(1).build();
+      cluster = new MiniDockerDFSCluster.Builder(clusterConf).numDataNodes(1).build();
       cluster.waitActive();
 
       ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
@@ -284,12 +284,12 @@ public class TestWebHdfsTokens {
 
       //test with swebhdfs
       uri = DFSUtil.createUri(
-          "swebhdfs", cluster.getNameNode().getHttpsAddress());
+          "swebhdfs", cluster.getNameNode().getHttpsAddress().getHostName(), cluster.getNameNode().getHttpsAddress().getPort());
       validateLazyTokenFetch(ugi, clusterConf);
 
       //test with webhdfs
       uri = DFSUtil.createUri(
-          "webhdfs", cluster.getNameNode().getHttpAddress());
+          "webhdfs", cluster.getNameNode().getHttpAddress().getHostName(), cluster.getNameNode().getHttpAddress().getPort());
       validateLazyTokenFetch(ugi, clusterConf);
 
     } finally {
@@ -307,7 +307,7 @@ public class TestWebHdfsTokens {
   @Test
   public void testSetTokenServiceAndKind() throws Exception {
     initEnv();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
 
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -318,7 +318,7 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking s[ecurity is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(0).build();
+      cluster = new MiniDockerDFSCluster.Builder(clusterConf).numDataNodes(0).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem

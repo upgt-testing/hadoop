@@ -25,7 +25,8 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.remoteProxies.DataNodeProxy;
 import org.junit.Test;
 
 public class TestDataNodeTransferSocketSize {
@@ -36,10 +37,10 @@ public class TestDataNodeTransferSocketSize {
     conf.setInt(
       DFSConfigKeys.DFS_DATANODE_TRANSFER_SOCKET_RECV_BUFFER_SIZE_KEY, 4 * 1024);
     SimulatedFSDataset.setFactory(conf);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
-      DataNode datanode = datanodes.get(0);
+      List<DataNodeProxy> datanodes = cluster.getDataNodes();
+      DataNodeProxy datanode = datanodes.get(0);
       assertEquals("Receive buffer size should be 4K",
         4 * 1024, datanode.getXferServer().getPeerServer().getReceiveBufferSize());
     } finally {
@@ -55,10 +56,10 @@ public class TestDataNodeTransferSocketSize {
     conf.setInt(
       DFSConfigKeys.DFS_DATANODE_TRANSFER_SOCKET_RECV_BUFFER_SIZE_KEY, 0);
     SimulatedFSDataset.setFactory(conf);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
-      DataNode datanode = datanodes.get(0);
+      List<DataNodeProxy> datanodes = cluster.getDataNodes();
+      DataNodeProxy datanode = datanodes.get(0);
       assertTrue(
         "Receive buffer size should be a default value (determined by kernel)",
         datanode.getXferServer().getPeerServer().getReceiveBufferSize() > 0);

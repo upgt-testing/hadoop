@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.SnapshottableDirectoryStatus;
 import org.junit.After;
 import org.junit.Before;
@@ -49,17 +49,17 @@ public class TestSnapshotMetrics {
   private final Path file2 = new Path(sub1, "file2");
   
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem hdfs;
 
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(REPLICATION)
       .build();
     cluster.waitActive();
-    hdfs = cluster.getFileSystem();
+    hdfs = cluster.getDistributedFileSystem();
     
     DFSTestUtil.createFile(hdfs, file1, 1024, REPLICATION, seed);
     DFSTestUtil.createFile(hdfs, file2, 1024, REPLICATION, seed);

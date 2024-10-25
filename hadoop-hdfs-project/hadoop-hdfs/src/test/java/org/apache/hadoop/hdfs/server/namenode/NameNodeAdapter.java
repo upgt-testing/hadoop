@@ -18,6 +18,7 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeProxy;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.server.protocol.SlowDiskReports;
@@ -119,7 +120,17 @@ public class NameNodeAdapter {
       throws IOException {
     namenode.getNamesystem().enterSafeMode(resourcesLow);
   }
-  
+
+  public static void saveNamespace(NameNodeProxy namenode)
+          throws AccessControlException, IOException {
+    namenode.getNamesystem().saveNamespace(0, 0);
+  }
+
+  public static void enterSafeMode(NameNodeProxy namenode, boolean resourcesLow)
+          throws IOException {
+    namenode.getNamesystem().enterSafeMode(resourcesLow);
+  }
+
   public static void leaveSafeMode(NameNode namenode) {
     namenode.getNamesystem().leaveSafeMode(false);
   }

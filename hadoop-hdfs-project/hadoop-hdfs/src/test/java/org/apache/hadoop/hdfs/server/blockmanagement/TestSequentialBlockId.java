@@ -20,6 +20,8 @@ package org.apache.hadoop.hdfs.server.blockmanagement;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.hdfs.remoteProxies.FSNameSystemProxy;
+import org.apache.hadoop.hdfs.remoteProxies.SequentialBlockIdGeneratorProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +30,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -60,8 +62,8 @@ public class TestSequentialBlockId {
   public void testBlockIdGeneration() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster =
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
 
     try {
       cluster.waitActive();
@@ -96,13 +98,13 @@ public class TestSequentialBlockId {
   public void testTriggerBlockIdCollision() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster =
+        new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
 
     try {
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
-      FSNamesystem fsn = cluster.getNamesystem();
+      FSNameSystemProxy fsn = cluster.getNamesystem();
       final int blockCount = 10;
 
 
@@ -117,7 +119,7 @@ public class TestSequentialBlockId {
 
       // Rewind the block ID counter in the name system object. This will result
       // in block ID collisions when we try to allocate new blocks.
-      SequentialBlockIdGenerator blockIdGenerator = fsn.getBlockManager()
+      SequentialBlockIdGeneratorProxy blockIdGenerator = fsn.getBlockManager()
           .getBlockIdManager().getBlockIdGenerator();
       blockIdGenerator.setCurrentValue(blockIdGenerator.getCurrentValue() - 5);
 

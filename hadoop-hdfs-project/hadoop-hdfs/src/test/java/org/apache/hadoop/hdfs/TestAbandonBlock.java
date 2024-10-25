@@ -45,13 +45,13 @@ public class TestAbandonBlock {
   private static final Configuration CONF = new HdfsConfiguration();
   static final String FILE_NAME_PREFIX
       = "/" + TestAbandonBlock.class.getSimpleName() + "_"; 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @Before
   public void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
-    fs = cluster.getFileSystem();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
+    fs = cluster.getDistributedFileSystem();
     cluster.waitActive();
   }
 
@@ -119,7 +119,7 @@ public class TestAbandonBlock {
     }
 
     // Shutdown one datanode, causing the block abandonment.
-    cluster.getDataNodes().get(0).shutdown();
+    cluster.shutdownDataNode(0);
 
     // Close the file, new block will be allocated with 2MB pending size.
     try {

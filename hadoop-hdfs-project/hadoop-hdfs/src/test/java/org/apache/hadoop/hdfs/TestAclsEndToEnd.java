@@ -28,6 +28,11 @@ import java.io.Writer;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
+
+import org.apache.hadoop.crypto.key.KeyProvider;
+import org.apache.hadoop.hdfs.remoteProxies.KeyProviderProxy;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeProxy;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +91,7 @@ public class TestAclsEndToEnd {
 
   private MiniKMS miniKMS;
   private File kmsDir;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @BeforeClass
@@ -196,10 +201,10 @@ public class TestAclsEndToEnd {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
 
-    MiniDFSCluster.Builder clusterBuilder = new MiniDFSCluster.Builder(conf);
+    MiniDockerDFSCluster.Builder clusterBuilder = new MiniDockerDFSCluster.Builder(conf);
 
     cluster = clusterBuilder.numDataNodes(1).format(resetDfs).build();
-    fs = cluster.getFileSystem();
+    fs = cluster.getDistributedFileSystem();
   }
 
   /**
@@ -1529,12 +1534,24 @@ public class TestAclsEndToEnd {
       @Override
       public void execute() throws IOException {
         try {
-          DFSTestUtil.createKey(key, cluster, conf);
+          createKeyHelper(key, cluster, 0, conf);
         } catch (NoSuchAlgorithmException ex) {
           throw new IOException(ex);
         }
       }
     });
+  }
+
+  public static void createKeyHelper(String keyName, MiniDockerDFSCluster cluster,
+                               int idx, Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeProxy nn = cluster.getNameNode();
+    KeyProviderProxy provider = nn.getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    provider.createKey(keyName, options);
+    provider.flush();
   }
 
   /**
@@ -1551,7 +1568,7 @@ public class TestAclsEndToEnd {
     return doUserOp(ugi, new UserOp() {
       @Override
       public void execute() throws IOException {
-        cluster.getFileSystem().createEncryptionZone(zone, key);
+        cluster.getDistributedFileSystem().createEncryptionZone(zone, key);
       }
     });
   }

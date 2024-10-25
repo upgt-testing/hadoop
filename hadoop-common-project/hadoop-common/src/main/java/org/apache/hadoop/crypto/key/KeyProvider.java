@@ -18,12 +18,7 @@
 
 package org.apache.hadoop.crypto.key;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -335,7 +330,7 @@ public abstract class KeyProvider implements Closeable {
   /**
    * Options when creating key objects.
    */
-  public static class Options {
+  public static class Options implements Serializable {
     private String cipher;
     private int bitLength;
     private String description;

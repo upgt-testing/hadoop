@@ -72,6 +72,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.hadoop.hdfs.remoteProxies.FsDatasetSpiProxy;
 import org.apache.hadoop.thirdparty.com.google.common.base.Charsets;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
@@ -1657,6 +1658,38 @@ public class DFSTestUtil {
             curBlocks + "/" + expectedBlocks + " blocks cached. " +
             "memlock limit = " +
             NativeIO.POSIX.getCacheManipulator().getMemlockLimit());
+        return true;
+      }
+    }, 100, 120000);
+    return expectedCacheUsed;
+  }
+
+  public static long verifyExpectedCacheUsage(final long expectedCacheUsed,
+                                              final long expectedBlocks, final FsDatasetSpiProxy<?> fsd) throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      private int tries = 0;
+
+      @Override
+      public Boolean get() {
+        long curCacheUsed = fsd.getCacheUsed();
+        long curBlocks = fsd.getNumBlocksCached();
+        if ((curCacheUsed != expectedCacheUsed) ||
+                (curBlocks != expectedBlocks)) {
+          if (tries++ > 10) {
+            LOG.info("verifyExpectedCacheUsage: have " +
+                    curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                    curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                    "memlock limit = " +
+                    NativeIO.POSIX.getCacheManipulator().getMemlockLimit() +
+                    ".  Waiting...");
+          }
+          return false;
+        }
+        LOG.info("verifyExpectedCacheUsage: got " +
+                curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                "memlock limit = " +
+                NativeIO.POSIX.getCacheManipulator().getMemlockLimit());
         return true;
       }
     }, 100, 120000);

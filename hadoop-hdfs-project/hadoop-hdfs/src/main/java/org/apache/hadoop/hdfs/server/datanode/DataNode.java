@@ -2135,7 +2135,11 @@ public class DataNode extends ReconfigurableBase
   public int getIpcPort() {
     return ipcServer.getListenerAddress().getPort();
   }
-  
+
+  public String getIpcHostName() {
+    return ipcServer.getListenerAddress().getHostName();
+  }
+
   /**
    * get BP registration by blockPool id
    * @return BP registration object

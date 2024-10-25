@@ -40,7 +40,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.metrics2.MetricsSystem;
@@ -69,7 +69,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
   private static String hdfsPrincipal;
   private static String hdfsKeytab;
   private static String spnegoPrincipal;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private UserGroupInformation sink = null;
 
   /**
@@ -108,7 +108,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
     RollingFileSystemSink.hasFlushed = false;
     RollingFileSystemSink.suppliedConf = conf;
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
         .build();
     cluster.waitActive();
     createDirectoriesSecurely();

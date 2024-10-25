@@ -480,9 +480,7 @@ public class MiniDockerDFSCluster implements Closeable {
                     }
                 }).start();
                 Thread.sleep(10000);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         } else{
@@ -515,6 +513,12 @@ public class MiniDockerDFSCluster implements Closeable {
         return nameNode.getMappedPort(9000);
     }
 
+    public void restartNameNode(boolean restart) {
+        if (restart) {
+            restartNameNode();
+        }
+    }
+
     public void restartNameNode() {
         //cluster.getMasterNode().restart();
 
@@ -534,9 +538,7 @@ public class MiniDockerDFSCluster implements Closeable {
                 }
             }).start();
             Thread.sleep(10000);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -560,6 +562,10 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    public FSNameSystemProxy getNamesystem() {
+        return getFSNameSystem();
+    }
+
     public FSNameSystemProxy getFSNameSystem() {
         try {
             RemoteObject fsNameSystem = (RemoteObject) getNNRegistry().lookup(FSNamesystem.class.getName());
@@ -568,6 +574,8 @@ public class MiniDockerDFSCluster implements Closeable {
             throw new RuntimeException("Failed to get the FSNameSystem remote object through RMI", e);
         }
     }
+
+
 
     public DataNodeProxy getDataNode(int dnIndex) {
         try {
@@ -580,5 +588,19 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public ArrayList<DataNodeProxy> getDataNodes() {
         return dataNodeProxies;
+    }
+
+    public void shutdownDataNode(int index) {
+        if (dataNodes.containsKey(index)) {
+            try {
+                dataNodes.get(index).execInContainer(CommonUtil.getBashCommand("kill -9 $(ps aux | grep 'proc_datanode' | grep -v \"grep\" | awk '{print $2}')"));
+                LOG.info("Kill the datanode process at index {}", index);
+                Thread.sleep(5000);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else{
+            LOG.warn("There is no datanode at index {}, skip the shutdown", index);
+        }
     }
 }

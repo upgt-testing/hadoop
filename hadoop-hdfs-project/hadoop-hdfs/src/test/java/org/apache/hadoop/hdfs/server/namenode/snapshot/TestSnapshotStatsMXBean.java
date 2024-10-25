@@ -30,7 +30,8 @@ import javax.management.openmbean.CompositeData;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.remoteProxies.SnapshotManagerProxy;
 import org.junit.Test;
 
 public class TestSnapshotStatsMXBean {
@@ -41,15 +42,15 @@ public class TestSnapshotStatsMXBean {
   @Test
   public void testSnapshotStatsMXBeanInfo() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     String pathName = "/snapshot";
     Path path = new Path(pathName);
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
 
-      SnapshotManager sm = cluster.getNamesystem().getSnapshotManager();
+      SnapshotManagerProxy sm = cluster.getNamesystem().getSnapshotManager();
       DistributedFileSystem dfs = (DistributedFileSystem) cluster.getFileSystem();
       dfs.mkdirs(path);
       dfs.allowSnapshot(path);

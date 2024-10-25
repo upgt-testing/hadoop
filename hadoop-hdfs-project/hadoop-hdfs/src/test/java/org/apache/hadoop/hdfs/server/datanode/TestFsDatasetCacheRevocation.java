@@ -33,10 +33,11 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.CacheDirectiveInfo;
 import org.apache.hadoop.hdfs.protocol.CachePoolInfo;
+import org.apache.hadoop.hdfs.remoteProxies.FsDatasetSpiProxy;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetCache;
 import org.apache.hadoop.io.nativeio.NativeIO;
@@ -110,10 +111,10 @@ public class TestFsDatasetCacheRevocation {
         1800000L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = null;
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
-    DistributedFileSystem dfs = cluster.getFileSystem();
+    DistributedFileSystem dfs = cluster.getDistributedFileSystem();
 
     // Create and cache a file.
     final String testFile = "/test_file";
@@ -123,7 +124,7 @@ public class TestFsDatasetCacheRevocation {
     long cacheDirectiveId = dfs
         .addCacheDirective(new CacheDirectiveInfo.Builder().setPool("pool")
             .setPath(new Path(testFile)).setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    FsDatasetSpiProxy<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
     DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
 
     // Mmap the file.
@@ -160,10 +161,10 @@ public class TestFsDatasetCacheRevocation {
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_TIMEOUT_MS, 250L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = null;
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
-    DistributedFileSystem dfs = cluster.getFileSystem();
+    DistributedFileSystem dfs = cluster.getDistributedFileSystem();
 
     // Create and cache a file.
     final String testFile = "/test_file2";
@@ -174,7 +175,7 @@ public class TestFsDatasetCacheRevocation {
         dfs.addCacheDirective(new CacheDirectiveInfo.Builder().
             setPool("pool").setPath(new Path(testFile)).
             setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    FsDatasetSpiProxy<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
     DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
 
     // Mmap the file.

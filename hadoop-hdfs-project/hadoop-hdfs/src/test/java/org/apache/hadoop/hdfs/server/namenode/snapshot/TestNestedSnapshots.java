@@ -32,9 +32,11 @@ import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.SnapshotException;
+import org.apache.hadoop.hdfs.remoteProxies.FSDirectoryProxy;
+import org.apache.hadoop.hdfs.remoteProxies.INodeProxy;
 import org.apache.hadoop.hdfs.server.namenode.EditLogFileOutputStream;
 import org.apache.hadoop.hdfs.server.namenode.FSDirectory;
 import org.apache.hadoop.hdfs.server.namenode.INode;
@@ -63,15 +65,15 @@ public class TestNestedSnapshots {
   private static final long BLOCKSIZE = 1024;
   
   private static final Configuration conf = new Configuration();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem hdfs;
   
   @Before
   public void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
-    hdfs = cluster.getFileSystem();
+    hdfs = cluster.getDistributedFileSystem();
   }
 
   @After
@@ -178,7 +180,7 @@ public class TestNestedSnapshots {
   }
 
   private static void print(String message) throws UnresolvedLinkException {
-    SnapshotTestHelper.dumpTree(message, cluster);
+  //  SnapshotTestHelper.dumpTree(message, cluster);
   }
 
   private static void assertFile(Path s1, Path s2, Path file,
@@ -317,8 +319,8 @@ public class TestNestedSnapshots {
     final Path file = new Path(sub, "file");
     DFSTestUtil.createFile(hdfs, file, BLOCKSIZE, REPLICATION, SEED);
     
-    FSDirectory fsdir = cluster.getNamesystem().getFSDirectory();
-    INode subNode = fsdir.getINode(sub.toString());
+    FSDirectoryProxy fsdir = cluster.getNamesystem().getFSDirectory();
+    INodeProxy subNode = fsdir.getINode(sub.toString());
     assertTrue(subNode.asDirectory().isWithSnapshot());
     
     hdfs.allowSnapshot(sub);
