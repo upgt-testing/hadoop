@@ -2,43 +2,36 @@ package org.apache.hadoop.hdfs;
 
 // RemoteInterfaces.java
 
-interface ClusterInterface {
-    NameNodeInterface getNameNode(int idx) throws Exception;
-}
+
+import org.apache.hadoop.conf.Configuration;
 
 // Package-private interfaces
-interface NameNodeInterface {
-    FSNameSystemInterface getNamesystem() throws Exception;
-    KeyProviderInterface getKeyProvider() throws Exception;
+interface NameNodeProxy {
+    FSNameSystemProxy getNamesystem() throws Exception;
+    KeyProviderProxy getKeyProvider() throws Exception;
     boolean testRMIPrint(String message);
     void testRMIConf(org.apache.hadoop.conf.Configuration conf);
 }
 
-interface FSNameSystemInterface {
+interface FSNameSystemProxy {
     boolean testRMIPrint(String message);
-    ProviderInterface getProvider() throws Exception;
+    ProviderProxy getProvider() throws Exception;
 }
 
-interface DataNodeInterface {
+interface DataNodeProxy {
     boolean testRMIPrint(String message);
 }
 
-interface ProviderInterface {
-    void createKey(String keyName, OptionsInterface options) throws Exception;
+interface ProviderProxy {
+    void createKey(String keyName, OptionsProxy options) throws Exception;
     void flush() throws Exception;
 }
 
-interface KeyProviderInterface {
-    OptionsInterface options(Configuration conf) throws Exception;
+interface KeyProviderProxy {
+    OptionsProxy options(Configuration conf) throws Exception;
 }
 
-interface OptionsInterface {
+interface OptionsProxy {
     void setDescription(String description) throws Exception;
     void setBitLength(int bitLength) throws Exception;
 }
-
-// Configuration class (if needed)
-class Configuration {
-    // Configuration details
-}
-

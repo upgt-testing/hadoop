@@ -12,7 +12,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
-import org.apache.hadoop.hdfs.rmi.client.DynamicProxyFactory;
+import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -53,7 +53,7 @@ public class MiniDockerDFSCluster implements Closeable {
     private final int dnRMIConnectionPort = 1200;
     private final int dnRMIObjectPort = 1300;
 
-    private final ArrayList<DataNodeInterface> dataNodeProxies = new ArrayList<>();
+    private final ArrayList<DataNodeProxy> dataNodeProxies = new ArrayList<>();
 
     private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, nnRMIConnectionPort, nnRMIObjectPort);
     private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040, dnRMIConnectionPort, dnRMIObjectPort);
@@ -550,37 +550,34 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     //======================= RMI related object getter functions ========================
-    public NameNodeInterface getNameNode() {
+    public NameNodeProxy getNameNode() {
         try {
             RemoteObject nameNode = (RemoteObject) getNNRegistry().lookup(NameNode.class.getName());
-            NameNodeInterface namenode = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNode, NameNodeInterface.class);
-            return namenode;
+            return RemoteObjectProxy.newInstance(nameNode, NameNodeProxy.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the NameNode remote object through RMI", e);
         }
     }
 
-    public FSNameSystemInterface getFSNameSystem() {
+    public FSNameSystemProxy getFSNameSystem() {
         try {
             RemoteObject fsNameSystem = (RemoteObject) getNNRegistry().lookup(FSNamesystem.class.getName());
-            FSNameSystemInterface fsNameSystemInterface = (FSNameSystemInterface) DynamicProxyFactory.createProxy(fsNameSystem, FSNameSystemInterface.class);
-            return fsNameSystemInterface;
+            return RemoteObjectProxy.newInstance(fsNameSystem, FSNameSystemProxy.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the FSNameSystem remote object through RMI", e);
         }
     }
 
-    public DataNodeInterface getDataNode(int dnIndex) {
+    public DataNodeProxy getDataNode(int dnIndex) {
         try {
             RemoteObject dataNode = (RemoteObject) getDNRegistry(dnIndex).lookup(DataNode.class.getName());
-            DataNodeInterface dataNodeInterface = (DataNodeInterface) DynamicProxyFactory.createProxy(dataNode, DataNodeInterface.class);
-            return dataNodeInterface;
+            return RemoteObjectProxy.newInstance(dataNode, DataNodeProxy.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the DataNode remote object through RMI", e);
         }
     }
 
-    public ArrayList<DataNodeInterface> getDataNodes() {
+    public ArrayList<DataNodeProxy> getDataNodes() {
         return dataNodeProxies;
     }
 }

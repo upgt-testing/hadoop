@@ -96,6 +96,7 @@ public class RmiUtils {
 
     public static void registerCurrentRmiObject(String className, Object actualObj) {
         try {
+            System.setProperty("java.rmi.server.hostname", "localhost");
             // Shuai: Register RMI
             RemoteObject nnRemote = new RemoteObjectImpl(actualObj, RmiUtils.getRmiObjectPort());
             RmiUtils.registerRmiObject(className, nnRemote, RmiUtils.getRmiConnectionPort());
