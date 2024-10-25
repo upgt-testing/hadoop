@@ -12,6 +12,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
+import org.apache.hadoop.hdfs.rmi.client.DynamicProxyFactory;
+import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -20,11 +25,12 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.nio.file.Files.readAllBytes;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -41,9 +47,16 @@ public class MiniDockerDFSCluster implements Closeable {
     /** The nameNode */
     private DockerNode nameNode;
 
-    private final int RMIPort = 1099;
-    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, RMIPort, 1100);
-    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040);
+    private final int nnRMIConnectionPort = 1099;
+    private final int nnRMIObjectPort = 1100;
+
+    private final int dnRMIConnectionPort = 1200;
+    private final int dnRMIObjectPort = 1300;
+
+    private final ArrayList<DataNodeInterface> dataNodeProxies = new ArrayList<>();
+
+    private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, nnRMIConnectionPort, nnRMIObjectPort);
+    private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040, dnRMIConnectionPort, dnRMIObjectPort);
 
     private final String HDFS_SITE_MODIFIER = "modify_hdfs_site.sh";
 
@@ -220,7 +233,9 @@ public class MiniDockerDFSCluster implements Closeable {
             nameNode = cluster.nodeBuilder(builder.dockerImageVersion)
                     .withNodeRole(NodeRole.MASTER)
                     .withNetworkAliases("namenode")
-                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && hdfs namenode -format && bash loop.sh"))
+                    //.withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && hdfs namenode -format && bash loop.sh"))
+                    .withCommand(CommonUtil.getBashCommand("cat /opt/hadoop/etc/hadoop/hdfs-site.xml && cat /opt/hadoop/etc/hadoop/core-site.xml && " +
+                            "bash modify_hdfs_env.sh " + nnRMIConnectionPort + " " + nnRMIObjectPort + " && hdfs namenode -format && bash loop.sh"))
                     //.withExposedPorts(nameNodePorts.toArray(new Integer[0]))
                     .withBoundPorts(bindPorts(nameNodePorts, 0))
                     //.waitingFor(Wait.forLogMessage("INFO blockmanagement.CacheReplicationMonitor: Starting CacheReplicationMonitor with interval", 1))
@@ -265,13 +280,16 @@ public class MiniDockerDFSCluster implements Closeable {
                 new Thread(() -> {
                     try {
                         LOG.info("Start the datanode in a new Thread.");
-                        dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
+                        //dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
+                        dataNode.execInContainer(CommonUtil.getBashCommand("bash modify_hdfs_env.sh "
+                                + (dnRMIConnectionPort + finalI) + " " +  (dnRMIObjectPort + finalI) + " && bash modify_hdfs_site.sh " + finalI + " && bash start_datanode.sh >> datanode_" + finalI + ".log 2>&1"));
                     } catch (InterruptedException | IOException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
                 Thread.sleep(5000);
                 dataNode.setExposedPorts(exposedPortsList(dataNodePorts, i));
+                dataNodeProxies.add(getDataNode(i));
             }
             //cluster.start();
 
@@ -520,5 +538,49 @@ public class MiniDockerDFSCluster implements Closeable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    //======================= RMI related functions ========================
+    public Registry getNNRegistry() throws RemoteException {
+        return LocateRegistry.getRegistry(nnRMIConnectionPort);
+    }
+
+    public Registry getDNRegistry(int dnIndex) throws RemoteException {
+        return LocateRegistry.getRegistry(dnRMIConnectionPort + dnIndex);
+    }
+
+    //======================= RMI related object getter functions ========================
+    public NameNodeInterface getNameNode() {
+        try {
+            RemoteObject nameNode = (RemoteObject) getNNRegistry().lookup(NameNode.class.getName());
+            NameNodeInterface namenode = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNode, NameNodeInterface.class);
+            return namenode;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the NameNode remote object through RMI", e);
+        }
+    }
+
+    public FSNameSystemInterface getFSNameSystem() {
+        try {
+            RemoteObject fsNameSystem = (RemoteObject) getNNRegistry().lookup(FSNamesystem.class.getName());
+            FSNameSystemInterface fsNameSystemInterface = (FSNameSystemInterface) DynamicProxyFactory.createProxy(fsNameSystem, FSNameSystemInterface.class);
+            return fsNameSystemInterface;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the FSNameSystem remote object through RMI", e);
+        }
+    }
+
+    public DataNodeInterface getDataNode(int dnIndex) {
+        try {
+            RemoteObject dataNode = (RemoteObject) getDNRegistry(dnIndex).lookup(DataNode.class.getName());
+            DataNodeInterface dataNodeInterface = (DataNodeInterface) DynamicProxyFactory.createProxy(dataNode, DataNodeInterface.class);
+            return dataNodeInterface;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the DataNode remote object through RMI", e);
+        }
+    }
+
+    public ArrayList<DataNodeInterface> getDataNodes() {
+        return dataNodeProxies;
     }
 }

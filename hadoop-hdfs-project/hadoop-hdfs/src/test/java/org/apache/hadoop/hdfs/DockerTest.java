@@ -7,6 +7,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeFake;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -40,19 +42,47 @@ public class DockerTest {
             System.setProperty("java.rmi.server.hostname", "localhost");
             // Get the remote cluster object from the RMI registry
             Registry registry = LocateRegistry.getRegistry(1099);
+
+            // Fake NameNode
             RemoteObject nameNodeFake = (RemoteObject) registry.lookup(NameNodeFake.class.getName());
             nameNodeFake.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
             NameNodeInterface namenodeFake = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNodeFake, NameNodeInterface.class);
-            namenodeFake.testRMIPrint("Hello RMI");
-            
+            namenodeFake.testRMIPrint("Hello RMI from Fake NameNode");
+
+            // Actual NameNode
             RemoteObject nameNode = (RemoteObject) registry.lookup(NameNode.class.getName());
             nameNode.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
             // Create a dynamic proxy for the ClusterInterface
             NameNodeInterface namenode = (NameNodeInterface) DynamicProxyFactory.createProxy(nameNode, NameNodeInterface.class);
-            namenode.testRMIPrint("Hello RMI");
+            namenode.testRMIPrint("Hello RMI from NameNode");
             Configuration conf = new Configuration();
             conf.set("fake-from-test", "fake-value");
             namenode.testRMIConf(conf);
+
+            NameNodeInterface namenodeFromCluster = dockerHDFSCluster.getNameNode();
+            namenodeFromCluster.testRMIPrint("Hello RMI from NameNode in Cluster");
+            namenodeFromCluster.testRMIConf(conf);
+
+            // Actual FSNameSystem
+            RemoteObject fsNameSystem = (RemoteObject) registry.lookup(FSNamesystem.class.getName());
+            fsNameSystem.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
+            FSNameSystemInterface fsNameSystemInterface = (FSNameSystemInterface) DynamicProxyFactory.createProxy(fsNameSystem, FSNameSystemInterface.class);
+            fsNameSystemInterface.testRMIPrint("Hello RMI from FSNameSystem");
+
+            FSNameSystemInterface fsNameSystemFromCluster = dockerHDFSCluster.getFSNameSystem();
+            fsNameSystemFromCluster.testRMIPrint("Hello RMI from FSNameSystem in Cluster");
+
+            // Acutal DataNode
+            Registry registry2 = LocateRegistry.getRegistry(1200);
+            RemoteObject dataNode = (RemoteObject) registry2.lookup(DataNode.class.getName());
+            dataNode.invoke("testRMIPrint", new Class<?>[]{String.class}, new Object[]{"Hello RMI"});
+            DataNodeInterface dataNodeInterface = (DataNodeInterface) DynamicProxyFactory.createProxy(dataNode, DataNodeInterface.class);
+            dataNodeInterface.testRMIPrint("Hello RMI from DataNode");
+
+            DataNodeInterface dataNodeFromCluster = dockerHDFSCluster.getDataNode(0);
+            dataNodeFromCluster.testRMIPrint("Hello RMI from DataNode in Cluster");
+
+
             System.out.println("RMI test passed");
         } catch (Exception e) {
             e.printStackTrace();

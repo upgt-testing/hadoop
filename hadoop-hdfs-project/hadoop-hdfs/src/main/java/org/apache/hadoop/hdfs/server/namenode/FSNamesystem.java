@@ -112,6 +112,9 @@ import static org.apache.hadoop.ha.HAServiceProtocol.HAServiceState.OBSERVER;
 
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicyInfo;
 
+import org.apache.hadoop.hdfs.rmi.RmiUtils;
+import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.rmi.server.RemoteObjectImpl;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Maps;
 import org.apache.hadoop.thirdparty.protobuf.ByteString;
 import org.apache.hadoop.hdfs.protocol.BatchedDirectoryListing;
@@ -5471,6 +5474,13 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   private ObjectName namesystemMBeanName, replicatedBlocksMBeanName,
       ecBlockGroupsMBeanName, namenodeMXBeanName;
 
+
+  public boolean testRMIPrint(String message) {
+    LOG.info("FSNamesystem testRMIPrint: " + message);
+    System.out.println("FSNamesystem testRMIPrint: " + message);
+    return true;
+  }
+
   /**
    * Register following MBeans with their respective names.
    * FSNamesystemMBean:
@@ -5483,6 +5493,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   private void registerMBean() {
     // We can only implement one MXBean interface, so we keep the old one.
     try {
+      RmiUtils.registerCurrentRmiObject(this.getClass().getName(), this);
       StandardMBean namesystemBean = new StandardMBean(
           this, FSNamesystemMBean.class);
       StandardMBean replicaBean = new StandardMBean(

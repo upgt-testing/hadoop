@@ -1,6 +1,8 @@
 package org.apache.hadoop.hdfs.rmi.server;
 
 
+import org.apache.hadoop.hdfs.rmi.RmiUtils;
+
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -8,8 +10,8 @@ import java.rmi.server.UnicastRemoteObject;
 public class RemoteObjectImpl extends UnicastRemoteObject implements RemoteObject {
     private Object actualObject;
 
-    public RemoteObjectImpl(Object actualObject) throws RemoteException {
-        super(1100);
+    public RemoteObjectImpl(Object actualObject, int port) throws RemoteException {
+        super(port);
         this.actualObject = actualObject;
     }
 
@@ -24,7 +26,7 @@ public class RemoteObjectImpl extends UnicastRemoteObject implements RemoteObjec
 
             // If the result is a complex object, wrap it in a RemoteObjectImpl
             if (result != null && !isPrimitiveOrWrapper(result.getClass())) {
-                return new RemoteObjectImpl(result);
+                return new RemoteObjectImpl(result, RmiUtils.getRmiObjectPort());
             } else {
                 return result;
             }

@@ -8,14 +8,19 @@ interface ClusterInterface {
 
 // Package-private interfaces
 interface NameNodeInterface {
-    NameSystemInterface getNamesystem() throws Exception;
+    FSNameSystemInterface getNamesystem() throws Exception;
     KeyProviderInterface getKeyProvider() throws Exception;
     boolean testRMIPrint(String message);
     void testRMIConf(org.apache.hadoop.conf.Configuration conf);
 }
 
-interface NameSystemInterface {
+interface FSNameSystemInterface {
+    boolean testRMIPrint(String message);
     ProviderInterface getProvider() throws Exception;
+}
+
+interface DataNodeInterface {
+    boolean testRMIPrint(String message);
 }
 
 interface ProviderInterface {

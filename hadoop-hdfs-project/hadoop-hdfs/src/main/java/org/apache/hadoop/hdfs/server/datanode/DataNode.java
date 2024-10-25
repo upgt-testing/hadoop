@@ -150,6 +150,7 @@ import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.rmi.RmiUtils;
 import org.apache.hadoop.hdfs.server.datanode.checker.DatasetVolumeChecker;
 import org.apache.hadoop.hdfs.server.datanode.checker.StorageLocationChecker;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.BlockPoolSlice;
@@ -2082,8 +2083,15 @@ public class DataNode extends ReconfigurableBase
     return NetUtils.createSocketAddr(conf.getTrimmed(DFS_DATANODE_HTTP_ADDRESS_KEY,
         DFS_DATANODE_HTTP_ADDRESS_DEFAULT));
   }
+
+  public boolean testRMIPrint(String message) {
+    LOG.info("DataNode testRMIPrint: " + message);
+    System.out.println("DataNode testRMIPrint: " + message);
+    return true;
+  }
   
   private void registerMXBean() {
+    RmiUtils.registerCurrentRmiObject(this.getClass().getName(), this);
     dataNodeInfoBeanName = MBeans.register("DataNode", "DataNodeInfo", this);
   }
   

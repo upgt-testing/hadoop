@@ -1966,18 +1966,17 @@ public class NameNode extends ReconfigurableBase implements
    */
   private void registerNNSMXBean() {
     //Shuai: Also register my RMI here
-    try {
-      System.setProperty("java.rmi.server.hostname", "localhost"); // Replace with actual IP or hostname
 
-      NameNodeFake nnFake = new NameNodeFake();
-      RemoteObject nnFakeRemote = new RemoteObjectImpl(nnFake);
-      RmiUtils.registerRmiObject(NameNodeFake.class.getName(), nnFakeRemote, 1099);
+    //System.setProperty("java.rmi.server.hostname", "localhost"); // Replace with actual IP or hostname
+    NameNodeFake nnFake = new NameNodeFake();
+    RmiUtils.registerCurrentRmiObject(NameNodeFake.class.getName(), nnFake);
+    //RemoteObject nnFakeRemote = new RemoteObjectImpl(nnFake, RmiUtils.getRmiObjectPort());
+    //RmiUtils.registerRmiObject(NameNodeFake.class.getName(), nnFakeRemote, RmiUtils.getRmiConnectionPort());
 
-      RemoteObject nnRemote = new RemoteObjectImpl(this);
-      RmiUtils.registerRmiObject(this.getClass().getName(), nnRemote, 1099);
-    } catch (RemoteException e) {
-      throw new RuntimeException("Failed to register RMI for NameNode", e);
-    }
+    //RemoteObject nnRemote = new RemoteObjectImpl(this, RmiUtils.getRmiObjectPort());
+    //RmiUtils.registerRmiObject(this.getClass().getName(), nnRemote, RmiUtils.getRmiConnectionPort());
+    RmiUtils.registerCurrentRmiObject(this.getClass().getName(), this);
+
     nameNodeStatusBeanName = MBeans.register("NameNode", "NameNodeStatus", this);
   }
 
