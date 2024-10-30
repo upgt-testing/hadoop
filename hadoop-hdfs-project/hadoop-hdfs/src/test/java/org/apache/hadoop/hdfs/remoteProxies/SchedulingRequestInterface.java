@@ -2,7 +2,7 @@ package org.apache.hadoop.hdfs.remoteProxies;
 
 import java.util.*;
 import java.io.*;
-import org.apache.hadoop.yarn.service.api.records.PlacementConstraint;
+//import org.apache.hadoop.yarn.service.api.records.PlacementConstraint;
 
 public interface SchedulingRequestInterface {
 

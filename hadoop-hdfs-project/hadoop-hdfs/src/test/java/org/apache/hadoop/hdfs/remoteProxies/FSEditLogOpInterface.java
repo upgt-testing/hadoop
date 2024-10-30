@@ -5,7 +5,7 @@ import java.util.*;
 import java.io.*;
 
 import org.apache.hadoop.hdfs.util.XMLUtils;
-import org.apache.hadoop.mapred.nativetask.buffer.DataOutputStream;
+//import org.apache.hadoop.mapred.nativetask.buffer.DataOutputStream;
 
 public interface FSEditLogOpInterface {
 

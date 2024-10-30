@@ -1,17 +1,19 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+
 import java.util.*;
 import java.io.*;
 
 public interface LocatedBlocksInterface {
 
-    List<LocatedBlock> getLocatedBlocks();
+    List<LocatedBlockInterface> getLocatedBlocks();
 
-    LocatedBlock getLastLocatedBlock();
+    LocatedBlockInterface getLastLocatedBlock();
 
     boolean isLastBlockComplete();
 
-    LocatedBlock get(int index);
+    LocatedBlockInterface get(int index);
 
     int locatedBlockCount();
 

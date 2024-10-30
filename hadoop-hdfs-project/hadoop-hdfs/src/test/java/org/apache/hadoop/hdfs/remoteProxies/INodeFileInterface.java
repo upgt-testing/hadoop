@@ -3,6 +3,7 @@ package org.apache.hadoop.hdfs.remoteProxies;
 import java.util.*;
 import java.io.*;
 
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
 import org.apache.hadoop.hdfs.server.namenode.ContentSummaryComputationContext;
 import org.apache.hadoop.hdfs.server.namenode.INode;
 import org.apache.hadoop.hdfs.server.namenode.QuotaCounts;

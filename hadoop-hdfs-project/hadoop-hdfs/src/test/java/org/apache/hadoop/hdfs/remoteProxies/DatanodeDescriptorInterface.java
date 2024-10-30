@@ -3,17 +3,20 @@ package org.apache.hadoop.hdfs.remoteProxies;
 import java.util.*;
 import java.io.*;
 import org.apache.hadoop.hdfs.protocol.Block;
-import org.apache.hadoop.tools.dynamometer.blockgenerator.BlockInfo;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
+import org.apache.hadoop.hdfs.server.protocol.BlockECReconstructionCommand;
+//import org.apache.hadoop.tools.dynamometer.blockgenerator.BlockInfo;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 
 public interface DatanodeDescriptorInterface {
 
-    CachedBlocksList getPendingCached();
+    DatanodeDescriptor.CachedBlocksList getPendingCached();
 
-    CachedBlocksList getCached();
+    DatanodeDescriptor.CachedBlocksList getCached();
 
-    CachedBlocksList getPendingUncached();
+    DatanodeDescriptor.CachedBlocksList getPendingUncached();
 
     boolean isAlive();
 
@@ -23,13 +26,13 @@ public interface DatanodeDescriptorInterface {
 
     void setNeedKeyUpdate(boolean needKeyUpdate);
 
-    LeavingServiceStatus getLeavingServiceStatus();
+    DatanodeDescriptor.LeavingServiceStatus getLeavingServiceStatus();
 
     boolean isHeartbeatedSinceRegistration();
 
-    DatanodeStorageInfo getStorageInfo(String storageID);
+    DatanodeStorageInfoInterface getStorageInfo(String storageID);
 
-    DatanodeStorageInfo[] getStorageInfos();
+    DatanodeStorageInfoInterface[] getStorageInfos();
 
     EnumSet<StorageType> getStorageTypes();
 
@@ -51,15 +54,15 @@ public interface DatanodeDescriptorInterface {
 
     int getNumberOfReplicateBlocks();
 
-    List<BlockECReconstructionInfo> getErasureCodeCommand(int maxTransfers);
+    List<BlockECReconstructionCommand.BlockECReconstructionInfo> getErasureCodeCommand(int maxTransfers);
 
-    BlockInfo[] getLeaseRecoveryCommand(int maxTransfers);
+    BlockInfoInterface[] getLeaseRecoveryCommand(int maxTransfers);
 
-    Block[] getInvalidateBlocks(int maxblocks);
+    BlockInterface[] getInvalidateBlocks(int maxblocks);
 
     boolean containsInvalidateBlock(Block block);
 
-    DatanodeStorageInfo chooseStorage4Block(StorageType t, long blockSize);
+    DatanodeStorageInfoInterface chooseStorage4Block(StorageType t, long blockSize);
 
     int getBlocksScheduled(StorageType t);
 

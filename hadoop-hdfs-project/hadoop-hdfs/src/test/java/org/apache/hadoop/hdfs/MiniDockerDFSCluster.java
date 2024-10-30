@@ -54,7 +54,7 @@ public class MiniDockerDFSCluster implements Closeable {
     private final int dnRMIConnectionPort = 1200;
     private final int dnRMIObjectPort = 1300;
 
-    private final ArrayList<DataNodeProxy> dataNodeProxies = new ArrayList<>();
+    private final ArrayList<DataNodeInterface> dataNodeProxies = new ArrayList<>();
 
     private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, nnRMIConnectionPort, nnRMIObjectPort);
     private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040, dnRMIConnectionPort, dnRMIObjectPort);
@@ -551,34 +551,34 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     //======================= RMI related object getter functions ========================
-    public NameNodeProxy getNameNode() {
+    public NameNodeInterface getNameNode() {
         try {
             RemoteObject nameNode = (RemoteObject) getNNRegistry().lookup(NameNode.class.getName());
-            return RemoteObjectProxy.newInstance(nameNode, NameNodeProxy.class);
+            return RemoteObjectProxy.newInstance(nameNode, NameNodeInterface.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the NameNode remote object through RMI", e);
         }
     }
 
-    public FSNameSystemProxy getFSNameSystem() {
+    public FSNamesystemInterface getFSNameSystem() {
         try {
             RemoteObject fsNameSystem = (RemoteObject) getNNRegistry().lookup(FSNamesystem.class.getName());
-            return RemoteObjectProxy.newInstance(fsNameSystem, FSNameSystemProxy.class);
+            return RemoteObjectProxy.newInstance(fsNameSystem, FSNamesystemInterface.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the FSNameSystem remote object through RMI", e);
         }
     }
 
-    public DataNodeProxy getDataNode(int dnIndex) {
+    public DataNodeInterface getDataNode(int dnIndex) {
         try {
             RemoteObject dataNode = (RemoteObject) getDNRegistry(dnIndex).lookup(DataNode.class.getName());
-            return RemoteObjectProxy.newInstance(dataNode, DataNodeProxy.class);
+            return RemoteObjectProxy.newInstance(dataNode, DataNodeInterface.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get the DataNode remote object through RMI", e);
         }
     }
 
-    public ArrayList<DataNodeProxy> getDataNodes() {
+    public ArrayList<DataNodeInterface> getDataNodes() {
         return dataNodeProxies;
     }
 }
