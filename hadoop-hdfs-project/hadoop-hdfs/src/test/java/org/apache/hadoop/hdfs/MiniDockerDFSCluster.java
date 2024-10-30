@@ -560,6 +560,10 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    public FSNamesystemInterface getNamesystem() {
+        return getFSNameSystem();
+    }
+
     public FSNamesystemInterface getFSNameSystem() {
         try {
             RemoteObject fsNameSystem = (RemoteObject) getNNRegistry().lookup(FSNamesystem.class.getName());
