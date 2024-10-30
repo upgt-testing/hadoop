@@ -385,18 +385,18 @@ public class MiniDockerDFSCluster implements Closeable {
      * @return the file system
      * @throws RuntimeException if an error occurs getting the file system
      */
-    public FileSystem getFileSystem() {
+    public DistributedFileSystem getFileSystem() {
         try {
             String fsURI = conf.get("fs.defaultFS");
             //System.out.println("Accessing the file system at " + fsURI);
-            return FileSystem.get(new URI(fsURI), conf);
+            return (DistributedFileSystem) FileSystem.get(new URI(fsURI), conf);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file system", e);
         }
     }
 
     public DistributedFileSystem getDistributedFileSystem() {
-        return (DistributedFileSystem) getFileSystem();
+        return getFileSystem();
     }
 
     public DFSClient getDFSClient() {
