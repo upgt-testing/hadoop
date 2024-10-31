@@ -560,6 +560,10 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    public NamenodeProtocolsInterface getNameNodeRpc() {
+        return getNameNode().getRpcServer();
+    }
+
     public FSNamesystemInterface getNamesystem() {
         return getFSNameSystem();
     }
