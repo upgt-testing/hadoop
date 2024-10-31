@@ -10,7 +10,7 @@ import org.apache.hadoop.hdfs.server.protocol.BlockECReconstructionCommand;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 
-public interface DatanodeDescriptorInterface {
+public interface DatanodeDescriptorInterface extends DatanodeInfoInterface {
 
     DatanodeDescriptor.CachedBlocksList getPendingCached();
 
