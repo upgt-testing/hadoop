@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
@@ -33,7 +36,7 @@ public class TestDFSStripedOutputStreamUpdatePipeline {
 
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFS_BLOCK_SIZE_KEY, 1 * 1024 * 1024);
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(5).build()) {
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -70,7 +73,7 @@ public class TestDFSStripedOutputStreamUpdatePipeline {
   public void testECWriteHangWhenAddBlockWithException() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1 * 1024 * 1024);
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(3).build()) {
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();

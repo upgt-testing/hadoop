@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -211,7 +214,7 @@ public class StripedFileTestUtil {
     }
   }
 
-  static void killDatanode(MiniDFSCluster cluster, DFSStripedOutputStream out,
+  static void killDatanode(MiniDockerDFSCluster cluster, DFSStripedOutputStream out,
       final int dnIndex, final AtomicInteger pos) {
     final StripedDataStreamer s = out.getStripedDataStreamer(dnIndex);
     final DatanodeInfo datanode = getDatanodes(s);

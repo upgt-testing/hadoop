@@ -17,6 +17,9 @@
  */
 package org.apache.hadoop.hdfs;
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.DataOutputStream;
@@ -46,9 +49,9 @@ public class TestDFSRemove {
     a_out.close();
   }
   
-  static long getTotalDfsUsed(MiniDFSCluster cluster) throws IOException {
+  static long getTotalDfsUsed(MiniDockerDFSCluster cluster) throws IOException {
     long total = 0;
-    for(DataNode node : cluster.getDataNodes()) {
+    for(DataNodeInterface node : cluster.getDataNodes()) {
       total += DataNodeTestUtils.getFSDataset(node).getDfsUsed();
     }
     return total;
@@ -57,7 +60,7 @@ public class TestDFSRemove {
   @Test
   public void testRemove() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     try {
       FileSystem fs = cluster.getFileSystem();
       assertTrue(fs.mkdirs(dir));

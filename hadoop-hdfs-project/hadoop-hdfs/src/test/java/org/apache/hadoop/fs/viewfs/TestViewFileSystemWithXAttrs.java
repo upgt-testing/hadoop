@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsConstants;
@@ -40,7 +43,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestViewFileSystemWithXAttrs {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileSystem fHdfs;
   private static FileSystem fHdfs2;
@@ -59,7 +62,7 @@ public class TestViewFileSystemWithXAttrs {
 
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDockerDFSCluster.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2)
         .build();
@@ -110,7 +113,7 @@ public class TestViewFileSystemWithXAttrs {
 
   /**
    * Verify a ViewFileSystem wrapped over multiple federated NameNodes will
-   * dispatch the XAttr operations to the correct NameNode.
+   * dispatch the XAttr operations to the correct NameNodeInterface.
    */
   @Test
   public void testXAttrOnMountEntry() throws Exception {

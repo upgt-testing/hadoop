@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo.DatanodeInfoBuilder;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.log4j.Level;
@@ -88,15 +91,15 @@ public class TestDFSClientSocketSize {
   }
 
   private int getSendBufferSize(Configuration conf) throws IOException {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     try {
       cluster.waitActive();
-      LOG.info("MiniDFSCluster started.");
+      LOG.info("MiniDockerDFSCluster started.");
       try (Socket socket = DataStreamer.createSocketForPipeline(
           new DatanodeInfoBuilder()
-              .setNodeID(cluster.dataNodes.get(0).datanode.getDatanodeId())
+              .setNodeID(cluster.getDataNodes().get(0).getDatanodeId())
               .build(),
           1, cluster.getFileSystem().getClient())) {
         return socket.getSendBufferSize();

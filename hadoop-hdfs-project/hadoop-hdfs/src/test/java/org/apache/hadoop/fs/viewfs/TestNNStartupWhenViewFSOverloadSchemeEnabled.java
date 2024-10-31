@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -32,7 +35,7 @@ import org.junit.Test;
  * Tests that the NN startup is successful with ViewFSOverloadScheme.
  */
 public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private static final Configuration CONF = new Configuration();
@@ -54,12 +57,12 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
   }
 
   /**
-   * Tests that the HA mode NameNode startup is successful when
+   * Tests that the HA mode NameNodeInterface startup is successful when
    * ViewFSOverloadScheme configured.
    */
   @Test(timeout = 30000)
   public void testHANameNodeAndDataNodeStartup() throws Exception {
-    cluster = new MiniDFSCluster.Builder(CONF)
+    cluster = new MiniDockerDFSCluster.Builder(CONF)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
         .waitSafeMode(false).build();
     cluster.waitActive();
@@ -67,13 +70,13 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
   }
 
   /**
-   * Tests that the NameNode startup is successful when ViewFSOverloadScheme
+   * Tests that the NameNodeInterface startup is successful when ViewFSOverloadScheme
    * configured.
    */
   @Test(timeout = 30000)
   public void testNameNodeAndDataNodeStartup() throws Exception {
     cluster =
-        new MiniDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false)
+        new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false)
             .build();
     cluster.waitActive();
   }

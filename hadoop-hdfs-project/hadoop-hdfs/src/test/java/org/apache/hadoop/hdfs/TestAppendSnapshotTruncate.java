@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -60,7 +63,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
  */
 public class TestAppendSnapshotTruncate {
   static {
-    GenericTestUtils.setLogLevel(NameNode.stateChangeLog, Level.ALL);
+    GenericTestUtils.setLogLevel(NameNodeInterface.stateChangeLog, Level.ALL);
   }
   private static final Logger LOG =
       LoggerFactory.getLogger(TestAppendSnapshotTruncate.class);
@@ -75,7 +78,7 @@ public class TestAppendSnapshotTruncate {
   static final String[] EMPTY_STRINGS = {};
 
   static Configuration conf;
-  static MiniDFSCluster cluster;
+  static MiniDockerDFSCluster cluster;
   static DistributedFileSystem dfs;
 
   @BeforeClass
@@ -87,7 +90,7 @@ public class TestAppendSnapshotTruncate {
     conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, 1);
     conf.setBoolean(ReplaceDatanodeOnFailure.BEST_EFFORT_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .format(true)
         .numDataNodes(DATANODE_NUM)
         .waitSafeMode(true)

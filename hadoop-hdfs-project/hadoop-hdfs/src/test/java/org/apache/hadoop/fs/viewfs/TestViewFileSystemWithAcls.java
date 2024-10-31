@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
@@ -50,7 +53,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestViewFileSystemWithAcls {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileSystem fHdfs;
   private static FileSystem fHdfs2;
@@ -64,7 +67,7 @@ public class TestViewFileSystemWithAcls {
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
     clusterConf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDockerDFSCluster.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2)
         .build();
@@ -113,7 +116,7 @@ public class TestViewFileSystemWithAcls {
 
   /**
    * Verify a ViewFs wrapped over multiple federated NameNodes will
-   * dispatch the ACL operations to the correct NameNode.
+   * dispatch the ACL operations to the correct NameNodeInterface.
    */
   @Test
   public void testAclOnMountEntry() throws Exception {

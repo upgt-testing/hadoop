@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import static org.apache.hadoop.test.LambdaTestUtils.intercept;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -59,7 +62,7 @@ import org.slf4j.LoggerFactory;
 public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
 
   private static FileSystem fsDefault;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static final int NAME_SPACES_COUNT = 3;
   private static final int DATA_NODES_COUNT = 3;
   private static final int FS_INDEX_DEFAULT = 0;
@@ -85,7 +88,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
     SupportsBlocks = true;
     CONF.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(CONF)
+    cluster = new MiniDockerDFSCluster.Builder(CONF)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(
             NAME_SPACES_COUNT))
         .numDataNodes(DATA_NODES_COUNT)

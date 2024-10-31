@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.ByteArrayOutputStream;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -60,7 +63,7 @@ public class TestClientReportBadBlock {
 
   static final long BLOCK_SIZE = 64 * 1024;
   private static int buffersize;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem dfs;
   private static final int numDataNodes = 3;
   private static final Configuration conf = new HdfsConfiguration();
@@ -73,7 +76,7 @@ public class TestClientReportBadBlock {
     conf.setInt(DFSConfigKeys.DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, -1); 
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDataNodes)
         .build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
@@ -172,7 +175,7 @@ public class TestClientReportBadBlock {
       int replicaCount = 0;
       /*
        * The order of data nodes in LocatedBlock returned by name node is sorted 
-       * by NetworkToplology#pseudoSortByDistance. In current MiniDFSCluster, 
+       * by NetworkToplology#pseudoSortByDistance. In current MiniDockerDFSCluster, 
        * when LocatedBlock is returned, the sorting is based on a random order.
        * That is to say, the DFS client and simulated data nodes in mini DFS
        * cluster are considered not on the same host nor the same rack.
@@ -219,7 +222,7 @@ public class TestClientReportBadBlock {
     // corrupt some /all of the block replicas
     for (int i = 0; i < corruptBlockCount; i++) {
       DatanodeInfo dninfo = datanodeinfos[i];
-      final DataNode dn = cluster.getDataNode(dninfo.getIpcPort());
+      final DataNodeInterface dn = cluster.getDataNode(dninfo.getIpcPort());
       cluster.corruptReplica(dn, block);
       LOG.debug("Corrupted block " + block.getBlockName() + " on data node "
           + dninfo);

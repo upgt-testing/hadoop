@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.net.URI;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -127,7 +130,7 @@ public class TestBlockTokenWrappingQOP extends SaslDataTransferTestCase {
         final String src = "/testAppendWrappingQOP";
         final Path path = new Path(src);
         FSDataOutputStream out = dfs.create(path);
-        // NameNode append call returns a last block instance. If there is nothing
+        // NameNodeInterface append call returns a last block instance. If there is nothing
         // it returns as a null. So write something, so that lastBlock has
         // something
         out.write(0);

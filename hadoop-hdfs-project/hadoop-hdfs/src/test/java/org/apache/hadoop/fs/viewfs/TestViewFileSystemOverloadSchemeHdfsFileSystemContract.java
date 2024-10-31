@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT;
 import static org.junit.Assume.assumeTrue;
 
@@ -51,7 +54,7 @@ import org.junit.Test;
 public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract
     extends TestHDFSFileSystemContract {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static String defaultWorkingDirectory;
   private static Configuration conf = new HdfsConfiguration();
 
@@ -60,7 +63,7 @@ public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract
     final File basedir = GenericTestUtils.getRandomizedTestDir();
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
         FileSystemContractBaseTest.TEST_UMASK);
-    cluster = new MiniDFSCluster.Builder(conf, basedir)
+    cluster = new MiniDockerDFSCluster.Builder(conf, basedir)
         .numDataNodes(2)
         .build();
     defaultWorkingDirectory =

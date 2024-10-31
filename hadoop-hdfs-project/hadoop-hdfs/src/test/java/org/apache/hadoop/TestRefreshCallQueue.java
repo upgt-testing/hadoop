@@ -19,6 +19,9 @@
 package org.apache.hadoop;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -44,7 +47,7 @@ import org.junit.After;
 import org.junit.Test;
 
 public class TestRefreshCallQueue {
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private Configuration config;
   static int mockQueueConstructions;
   static int mockQueuePuts;
@@ -63,7 +66,7 @@ public class TestRefreshCallQueue {
 
       FileSystem.setDefaultUri(config, "hdfs://localhost:" + nnPort);
       try {
-        cluster = new MiniDFSCluster.Builder(config).nameNodePort(nnPort)
+        cluster = new MiniDockerDFSCluster.Builder(config).nameNodePort(nnPort)
             .build();
         cluster.waitActive();
         break;
@@ -73,7 +76,7 @@ public class TestRefreshCallQueue {
     }
     if (portRetries == 0) {
       // Bail if we get very unlucky with our choice of ports.
-      fail("Failed to pick an ephemeral port for the NameNode RPC server.");
+      fail("Failed to pick an ephemeral port for the NameNodeInterface RPC server.");
     }
   }
 

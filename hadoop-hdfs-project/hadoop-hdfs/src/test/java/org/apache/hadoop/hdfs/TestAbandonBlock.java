@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.fail;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.io.IOException;
 
@@ -45,12 +48,12 @@ public class TestAbandonBlock {
   private static final Configuration CONF = new HdfsConfiguration();
   static final String FILE_NAME_PREFIX
       = "/" + TestAbandonBlock.class.getSimpleName() + "_"; 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @Before
   public void setUp() throws Exception {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     fs = cluster.getFileSystem();
     cluster.waitActive();
   }

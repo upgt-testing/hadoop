@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.util.function.Supplier;
 import org.apache.hadoop.conf.Configuration;
@@ -43,7 +46,7 @@ import static org.junit.Assert.*;
  *
  */
 public class TestViewFileSystemWithTruncate {
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileSystem fHdfs;
   private FileSystem fsView;
@@ -55,7 +58,7 @@ public class TestViewFileSystemWithTruncate {
 
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDockerDFSCluster.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2).build();
     cluster.waitClusterUp();

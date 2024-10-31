@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SIZE_KEY;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -63,7 +66,7 @@ public class TestDFSInputStreamBlockLocations {
   private final long dfsInputLocationsTimeout = 60 * 60 * 1000L;
 
   private HdfsConfiguration conf;
-  private MiniDFSCluster dfsCluster;
+  private MiniDockerDFSCluster dfsCluster;
   private DFSClient dfsClient;
   private DistributedFileSystem fs;
   private Path filePath;
@@ -106,7 +109,7 @@ public class TestDFSInputStreamBlockLocations {
           dfsInputLocationsTimeout);
     }
     // start the cluster and create a DFSClient
-    dfsCluster = new MiniDFSCluster.Builder(conf)
+    dfsCluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_DATA_NODES).racks(RACKS).build();
     dfsCluster.waitActive();
     assertEquals(NUM_DATA_NODES, dfsCluster.getDataNodes().size());
@@ -166,7 +169,7 @@ public class TestDFSInputStreamBlockLocations {
       // are unresolved hosts.
       Map<String, InetSocketAddress> mockAddressCache = new HashMap<>();
       InetSocketAddress unresolved = InetSocketAddress.createUnresolved("www.google.com", 80);
-      for (DataNode dataNode : dfsCluster.getDataNodes()) {
+      for (DataNodeInterface dataNode : dfsCluster.getDataNodes()) {
         mockAddressCache.put(dataNode.getDatanodeUuid(), unresolved);
       }
 

@@ -19,6 +19,9 @@ package org.apache.hadoop.fs.viewfs;
 
 
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.IO_FILE_BUFFER_SIZE_DEFAULT;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.IO_FILE_BUFFER_SIZE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SIZE_KEY;
@@ -64,7 +67,7 @@ public class TestViewFsDefaultValue {
   static final String testFileDir = "/tmp/test/";
   static final String testFileName = testFileDir + "testFileStatusSerialziation";
   static final String NOT_IN_MOUNTPOINT_FILENAME = "/NotInMountpointFile";
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static final FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper(); 
   private static final Configuration CONF = new Configuration();
   private static FileSystem fHdfs;
@@ -85,7 +88,7 @@ public class TestViewFsDefaultValue {
     CONF.setInt(DFS_REPLICATION_KEY, DFS_REPLICATION_DEFAULT + 1);
     CONF.setInt(IO_FILE_BUFFER_SIZE_KEY, IO_FILE_BUFFER_SIZE_DEFAULT);
  
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(DFS_REPLICATION_DEFAULT + 1).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(DFS_REPLICATION_DEFAULT + 1).build();
     cluster.waitClusterUp();
     fHdfs = cluster.getFileSystem();
     fileSystemTestHelper.createFile(fHdfs, testFileName);

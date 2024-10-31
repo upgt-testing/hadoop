@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -49,10 +52,10 @@ import org.junit.Test;
 abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
 
   {
-    GenericTestUtils.setLogLevel(NameNode.stateChangeLog, Level.ALL);
+    GenericTestUtils.setLogLevel(NameNodeInterface.stateChangeLog, Level.ALL);
   }
 
-  protected static MiniDFSCluster cluster;
+  protected static MiniDockerDFSCluster cluster;
   protected static WebHdfsFileSystem webhdfs;
   protected static DistributedFileSystem dfs;
 
@@ -89,7 +92,7 @@ abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
     Configuration conf = new HdfsConfiguration();
     conf.set(FsPermission.UMASK_LABEL, "000");
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MAX_COMPONENT_LENGTH_KEY, 0);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     webhdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
     dfs = cluster.getFileSystem();
   }

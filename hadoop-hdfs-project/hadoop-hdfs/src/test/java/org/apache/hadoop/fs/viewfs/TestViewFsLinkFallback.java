@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import static org.apache.hadoop.fs.CreateFlag.CREATE;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -60,7 +63,7 @@ import org.junit.Test;
 public class TestViewFsLinkFallback {
   private static FileSystem fsDefault;
   private FileSystem fsTarget;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static URI viewFsDefaultClusterUri;
   private Path targetTestRoot;
 
@@ -74,7 +77,7 @@ public class TestViewFsLinkFallback {
     FileSystem[] fsHdfs = new FileSystem[nameSpacesCount];
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(
             nameSpacesCount))
         .numDataNodes(dataNodesCount)

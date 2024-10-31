@@ -19,6 +19,9 @@
 package org.apache.hadoop.cli;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -51,7 +54,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class TestCryptoAdminCLI extends CLITestHelperDFS {
-  protected MiniDFSCluster dfsCluster = null;
+  protected MiniDockerDFSCluster dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
   private static File tmpDir;
@@ -70,7 +73,7 @@ public class TestCryptoAdminCLI extends CLITestHelperDFS {
     conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
         JavaKeyStoreProvider.SCHEME_NAME + "://file" + jksPath.toUri());
 
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    dfsCluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     dfsCluster.waitClusterUp();
     createAKey("mykey", conf);
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
@@ -100,7 +103,7 @@ public class TestCryptoAdminCLI extends CLITestHelperDFS {
   /* Helper function to create a key in the Key Provider. */
   private void createAKey(String keyName, Configuration conf)
     throws NoSuchAlgorithmException, IOException {
-    final KeyProvider provider =
+    final KeyProviderCryptoExtensionInterface provider =
         dfsCluster.getNameNode().getNamesystem().getProvider();
     final KeyProvider.Options options = KeyProvider.options(conf);
     provider.createKey(keyName, options);

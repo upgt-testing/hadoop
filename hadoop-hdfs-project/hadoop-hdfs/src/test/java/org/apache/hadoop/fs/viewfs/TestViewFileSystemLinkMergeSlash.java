@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -54,7 +57,7 @@ import javax.security.auth.login.LoginException;
 public class TestViewFileSystemLinkMergeSlash extends ViewFileSystemBaseTest {
 
   private static FileSystem fsDefault;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static final int NAME_SPACES_COUNT = 3;
   private static final int DATA_NODES_COUNT = 3;
   private static final int FS_INDEX_DEFAULT = 0;
@@ -80,7 +83,7 @@ public class TestViewFileSystemLinkMergeSlash extends ViewFileSystemBaseTest {
     SupportsBlocks = true;
     CONF.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(CONF)
+    cluster = new MiniDockerDFSCluster.Builder(CONF)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(
             NAME_SPACES_COUNT))
         .numDataNodes(DATA_NODES_COUNT)

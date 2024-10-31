@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs;
 
 import org.apache.hadoop.hdfs.DFSConfigKeys;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -42,7 +45,7 @@ import static org.apache.hadoop.fs.FileContextTestHelper.getFileData;
 public class TestSWebHdfsFileContextMainOperations
     extends TestWebHdfsFileContextMainOperations {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static String keystoresDir;
   private static String sslConfDir;
@@ -80,7 +83,7 @@ public class TestSWebHdfsFileContextMainOperations
     CONF.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
     CONF.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
     CONF.set(SSLFactory.SSL_HOSTNAME_VERIFIER_KEY, "DEFAULT_AND_LOCALHOST");
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
 
     cluster.waitClusterUp();
     webhdfsUrl = new URI(SWebHdfs.SCHEME + "://" + cluster.getConfiguration(0)

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.BufferedReader;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -86,7 +89,7 @@ public class TestAclsEndToEnd {
 
   private MiniKMS miniKMS;
   private File kmsDir;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
 
   @BeforeClass
@@ -196,7 +199,7 @@ public class TestAclsEndToEnd {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
 
-    MiniDFSCluster.Builder clusterBuilder = new MiniDFSCluster.Builder(conf);
+    MiniDockerDFSCluster.Builder clusterBuilder = new MiniDockerDFSCluster.Builder(conf);
 
     cluster = clusterBuilder.numDataNodes(1).format(resetDfs).build();
     fs = cluster.getFileSystem();

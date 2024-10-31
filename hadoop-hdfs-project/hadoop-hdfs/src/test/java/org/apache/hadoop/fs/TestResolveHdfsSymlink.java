@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
@@ -50,14 +53,14 @@ import org.junit.Test;
  */
 public class TestResolveHdfsSymlink {
   private static final FileContextTestHelper helper = new FileContextTestHelper();
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
 
   @BeforeClass
   public static void setUp() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).build();
     cluster.waitActive();
 
   }

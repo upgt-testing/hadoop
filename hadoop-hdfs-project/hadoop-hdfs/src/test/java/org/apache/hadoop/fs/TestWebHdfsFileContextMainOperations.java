@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
@@ -47,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 public class TestWebHdfsFileContextMainOperations
     extends FileContextMainOperationsBaseTest {
 
-  protected static MiniDFSCluster cluster;
+  protected static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   protected static URI webhdfsUrl;
 
@@ -75,7 +78,7 @@ public class TestWebHdfsFileContextMainOperations
   public static void clusterSetupAtBeginning()
       throws IOException, LoginException, URISyntaxException {
 
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     webhdfsUrl = new URI(WebHdfs.SCHEME + "://" + cluster.getConfiguration(0)
         .get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY));

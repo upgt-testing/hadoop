@@ -7,8 +7,12 @@ import java.io.*;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.security.token.delegation.web.DelegationTokenIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface NameNodeInterface {
+    public static final Logger stateChangeLog =
+            LoggerFactory.getLogger("org.apache.hadoop.hdfs.StateChange");
 
     long getProtocolVersion(String protocol, long clientVersion);
 

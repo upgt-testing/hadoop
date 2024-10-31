@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,7 +75,7 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
       LoggerFactory.getLogger(TestViewFileSystemHdfs.class);
 
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static Path defaultWorkingDirectory2;
   private static final Configuration CONF = new Configuration();
@@ -107,7 +110,7 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
     
     cluster =
-        new MiniDFSCluster.Builder(CONF).nnTopology(
+        new MiniDockerDFSCluster.Builder(CONF).nnTopology(
                 MiniDFSNNTopology.simpleFederatedTopology(2))
             .numDataNodes(2)
             .build();

@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.URISyntaxException;
 
 import javax.security.auth.login.LoginException;
@@ -35,7 +38,7 @@ import org.junit.BeforeClass;
 public class TestFcHdfsCreateMkdir extends
                     FileContextCreateMkdirBaseTest {
   
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   
   @Override
@@ -48,7 +51,7 @@ public class TestFcHdfsCreateMkdir extends
   public static void clusterSetupAtBegining()
                                     throws IOException, LoginException, URISyntaxException  {
     Configuration conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     fc = FileContext.getFileContext(cluster.getURI(0), conf);
     defaultWorkingDirectory = fc.makeQualified( new Path("/user/" + 
         UserGroupInformation.getCurrentUser().getShortUserName()));

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -93,7 +96,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
       // shutdown few datanodes to avoid getting sufficient data blocks number
       // of datanodes
       int numDatanodes = dataNodes.size();
@@ -207,7 +210,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
       // shutdown few data nodes to avoid writing parity blocks
       int killDns = (parityBlocks - 1);
       int numDatanodes = dataNodes.size() - killDns;

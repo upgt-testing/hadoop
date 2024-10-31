@@ -18,6 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,7 +62,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme {
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private Configuration conf = null;
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
   private URI defaultFSURI;
   private File localTargetDir;
   private static final String TEST_ROOT_DIR = PathUtils
@@ -70,12 +73,12 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme {
   @BeforeClass
   public static void init() throws IOException {
     cluster =
-        new MiniDFSCluster.Builder(new Configuration()).numDataNodes(2).build();
+        new MiniDockerDFSCluster.Builder(new Configuration()).numDataNodes(2).build();
     cluster.waitClusterUp();
   }
 
   /**
-   * Sets up the configurations and starts the MiniDFSCluster.
+   * Sets up the configurations and starts the MiniDockerDFSCluster.
    */
   @Before
   public void setUp() throws IOException {

@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs;
 
 import static org.apache.hadoop.fs.FileContextTestHelper.exists;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -45,7 +48,7 @@ import org.junit.Test;
 
 public class TestHDFSFileContextMainOperations extends
     FileContextMainOperationsBaseTest {
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static final HdfsConfiguration CONF = new HdfsConfiguration();
   
@@ -57,7 +60,7 @@ public class TestHDFSFileContextMainOperations extends
   @BeforeClass
   public static void clusterSetupAtBegining() throws IOException,
       LoginException, URISyntaxException {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     URI uri0 = cluster.getURI(0);
     fc = FileContext.getFileContext(uri0, CONF);
@@ -71,7 +74,7 @@ public class TestHDFSFileContextMainOperations extends
       cluster.shutdown();
       cluster = null;
     }
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(1)
+    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1)
                                               .format(false).build();
     cluster.waitClusterUp();
     fc = FileContext.getFileContext(cluster.getURI(0), CONF);

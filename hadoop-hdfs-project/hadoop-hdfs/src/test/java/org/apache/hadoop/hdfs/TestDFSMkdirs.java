@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.*;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,7 +56,7 @@ public class TestDFSMkdirs {
    */
   @Test
   public void testDFSMkdirs() throws IOException {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     FileSystem fileSys = cluster.getFileSystem();
     try {
       // First create a new directory with mkdirs
@@ -91,7 +94,7 @@ public class TestDFSMkdirs {
   @Test
   public void testMkdir() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     DistributedFileSystem dfs = cluster.getFileSystem();
     try {
       // Create a dir in root dir, should succeed
@@ -135,9 +138,9 @@ public class TestDFSMkdirs {
    */
   @Test
   public void testMkdirRpcNonCanonicalPath() throws IOException {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
     try {
-      NamenodeProtocols nnrpc = cluster.getNameNodeRpc();
+      NamenodeProtocolsInterface nnrpc = cluster.getNameNodeRpc();
       
       for (String pathStr : NON_CANONICAL_PATHS) {
         try {

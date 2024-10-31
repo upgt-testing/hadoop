@@ -19,6 +19,9 @@
 package org.apache.hadoop.fs;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.URISyntaxException;
 
 import javax.security.auth.login.LoginException;
@@ -44,7 +47,7 @@ public class TestFcHdfsSetUMask {
   
   private static final FileContextTestHelper fileContextTestHelper =
       new FileContextTestHelper("/tmp/TestFcHdfsSetUMask");
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Path defaultWorkingDirectory;
   private static FileContext fc;
 
@@ -87,7 +90,7 @@ public class TestFcHdfsSetUMask {
     Configuration conf = new HdfsConfiguration();
     // set permissions very restrictive
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,  "077");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
     fc = FileContext.getFileContext(cluster.getURI(0), conf);
     defaultWorkingDirectory = fc.makeQualified( new Path("/user/" + 
         UserGroupInformation.getCurrentUser().getShortUserName()));

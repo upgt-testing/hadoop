@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -58,20 +61,22 @@ public class TestBalancerBandwidth {
         DEFAULT_BANDWIDTH);
 
     /* Create and start cluster */
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES).build()) {
       cluster.waitActive();
 
       DistributedFileSystem fs = cluster.getFileSystem();
 
-      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      ArrayList<DataNodeInterface> datanodes = cluster.getDataNodes();
       // Ensure value from the configuration is reflected in the datanodes.
       assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(0).getBalancerBandwidth());
       assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(1).getBalancerBandwidth());
       DFSAdmin admin = new DFSAdmin(conf);
-      String dn1Address = datanodes.get(0).ipcServer.getListenerAddress()
+      //String dn1Address = datanodes.get(0).ipcServer.getListenerAddress()
+      String dn1Address = datanodes.get(0).getXferAddress()
           .getHostName() + ":" + datanodes.get(0).getIpcPort();
-      String dn2Address = datanodes.get(1).ipcServer.getListenerAddress()
+      //String dn2Address = datanodes.get(1).ipcServer.getListenerAddress()
+      String dn2Address = datanodes.get(1).getXferAddress()
           .getHostName() + ":" + datanodes.get(1).getIpcPort();
 
       // verifies the dfsadmin command execution
@@ -113,7 +118,7 @@ public class TestBalancerBandwidth {
     }
   }
 
-  private void verifyBalancerBandwidth(final ArrayList<DataNode> datanodes,
+  private void verifyBalancerBandwidth(final ArrayList<DataNodeInterface> datanodes,
       final long newBandwidth) throws TimeoutException, InterruptedException {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
       @Override

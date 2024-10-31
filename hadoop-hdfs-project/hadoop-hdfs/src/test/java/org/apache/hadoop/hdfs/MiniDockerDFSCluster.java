@@ -26,6 +26,7 @@ import org.testcontainers.containers.Container;
 import org.apache.hadoop.hdfs.remoteProxies.*;
 
 import java.io.*;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,6 +64,7 @@ public class MiniDockerDFSCluster implements Closeable {
     private final int dnRMIObjectPort = 1300;
 
     private final ArrayList<DataNodeInterface> dataNodeProxies = new ArrayList<>();
+    private final ArrayList<NameNodeInterface> nameNodeProxies = new ArrayList<>();
 
     private final List<Integer> nameNodePorts = Arrays.asList(9000, 50070, nnRMIConnectionPort, nnRMIObjectPort);
     private final List<Integer> dataNodePorts = Arrays.asList(50010, 50075, 50040, dnRMIConnectionPort, dnRMIObjectPort);
@@ -237,6 +239,13 @@ public class MiniDockerDFSCluster implements Closeable {
         public Builder(Configuration conf) {
             //TODO: here actually we have to sync this configurations with the docker cluster configuration
             this.conf = conf;
+        }
+
+        public Builder(Configuration conf, File baseDir) {
+            this.conf = conf;
+            // TODO: here we have to set the base directory for the docker cluster
+            LOG.warn("The base directory in Builder is not implemented yet");
+            System.out.println("The base directory in Builder is not implemented yet");
         }
 
         public Builder startDockerImageVersion(String dockerImageVersion) {
@@ -556,6 +565,8 @@ public class MiniDockerDFSCluster implements Closeable {
             }).start();
             Thread.sleep(5000);
             nameNode.setExposedPorts(nameNodePorts);
+            // TODO: change this later when we have multiple namenodes
+            nameNodeProxies.add(getNameNode());
 
             for (int i = 0; i < builder.numDataNodes; i++) {
                 DockerNode dataNode = cluster.nodeBuilder(builder.dockerImageVersion)
@@ -632,6 +643,17 @@ public class MiniDockerDFSCluster implements Closeable {
         return cluster;
     }
 
+    public Configuration getConfiguration(int index) {
+        LOG.warn("getConfiguration is not implemented yet");
+        System.out.println("getConfiguration is not implemented yet");
+        return conf;
+    }
+
+    public void transitionToActive(int index) {
+        LOG.warn("transitionToActive is not implemented yet");
+        System.out.println("transitionToActive is not implemented yet");
+    }
+
     @Override
     public void close() {
         try {
@@ -672,6 +694,12 @@ public class MiniDockerDFSCluster implements Closeable {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to get the file context", e);
         }
+    }
+
+    public DistributedFileSystem getFileSystem(int idx) {
+        LOG.warn("The getFileSystem(int idx) function is not implemented yet.");
+        System.out.println("The getFileSystem(int idx) function is not implemented yet.");
+        return getFileSystem();
     }
 
     /**
@@ -784,7 +812,7 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
-    public void waitActive() {
+    public void waitActive() throws BindException {
         return;
     }
 
@@ -798,6 +826,12 @@ public class MiniDockerDFSCluster implements Closeable {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Failed to get the URI", e);
         }
+    }
+
+    public URI getURI(int index) {
+        LOG.warn("The getURI(int index) function is not implemented yet.");
+        System.out.println("The getURI(int index) function is not implemented yet.");
+        return getURI();
     }
 
     public InetSocketAddress getNameNodeHttpAddress() {
@@ -882,5 +916,35 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public ArrayList<DataNodeInterface> getDataNodes() {
         return dataNodeProxies;
+    }
+
+    public ArrayList<NameNodeInterface> getNameNodes() {
+        return nameNodeProxies;
+    }
+
+    public int getNumNameNodes() {
+        return nameNodeProxies.size();
+    }
+
+    public void shutdownNameNode(int idx) {
+        nameNodeProxies.get(idx).stop();
+    }
+
+    public void restartNameNode(int idx) {
+        LOG.warn("The restartNameNode(int idx) function is not implemented yet.");
+        System.out.println("The restartNameNode(int idx) function is not implemented yet.");
+        throw new UnsupportedOperationException("The restartNameNode(int idx) function is not implemented yet.");
+    }
+
+    public void shutdownNameNodes() {
+        for (NameNodeInterface nameNode : nameNodeProxies) {
+            nameNode.stop();
+        }
+    }
+
+    public void restartNameNodes() {
+        for (int i = 0; i < nameNodeProxies.size(); i++) {
+            restartNameNode(i);
+        }
     }
 }
