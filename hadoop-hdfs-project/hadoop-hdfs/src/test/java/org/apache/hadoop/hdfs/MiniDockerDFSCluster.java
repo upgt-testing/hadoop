@@ -11,10 +11,13 @@ import edu.illinois.util.config.HadoopXMLModifier;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
@@ -33,9 +36,14 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY;
+
 
 public class MiniDockerDFSCluster implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(MiniDockerDFSCluster.class);
+
+    // Changing this default may break some tests that assume it is 2.
+    private static final int DEFAULT_STORAGES_PER_DATANODE = 2;
 
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
@@ -195,6 +203,36 @@ public class MiniDockerDFSCluster implements Closeable {
         private Configuration conf;
         private String dockerImageVersion = System.getProperty("startVersion", "hadoop:3.3.5"); // default version is 3.3.5
         private int numDataNodes = 1; // default number of data nodes is 1
+        private int nameNodePort = 9000;
+        private int nameNodeHttpPort = 50070;
+        private int[] dnHttpPorts = null;
+        private int[] dnIpcPorts = null;
+        private StorageType[][] storageTypes = null;
+        private StorageType[] storageTypes1D = null;
+        private int storagesPerDatanode = DEFAULT_STORAGES_PER_DATANODE;
+        private boolean format = true;
+        private boolean manageNameDfsDirs = true;
+        private boolean manageNameDfsSharedDirs = true;
+        private boolean enableManagedDfsDirsRedundancy = true;
+        private boolean manageDataDfsDirs = true;
+        private HdfsServerConstants.StartupOption option = null;
+        private HdfsServerConstants.StartupOption dnOption = null;
+        private String[] racks = null;
+        private String [] hosts = null;
+        private long [] simulatedCapacities = null;
+        private long [][] storageCapacities = null;
+        private long [] storageCapacities1D = null;
+        private String clusterId = null;
+        private boolean waitSafeMode = true;
+        private boolean setupHostsFile = false;
+        private MiniDFSNNTopology nnTopology = null;
+        private boolean checkExitOnShutdown = true;
+        private boolean checkDataNodeAddrConfig = false;
+        private boolean checkDataNodeHostConfig = false;
+        private Configuration[] dnConfOverlays;
+        private boolean skipFsyncForTesting = true;
+        private boolean useConfiguredTopologyMappingClass = false;
+
 
         public Builder(Configuration conf) {
             //TODO: here actually we have to sync this configurations with the docker cluster configuration
@@ -206,21 +244,277 @@ public class MiniDockerDFSCluster implements Closeable {
             return this;
         }
 
+        /**
+         * Default: 1
+         */
         public Builder numDataNodes(int numDataNodes) {
             this.numDataNodes = numDataNodes;
-            return this;
-        }
-
-        public Builder format(boolean format) {
-            // TODO: follow mini cluster and implement this
             return this;
         }
 
         public MiniDockerDFSCluster build() {
             return new MiniDockerDFSCluster(this);
         }
-    }
 
+        // From original MiniDFSCluster
+
+        /**
+         * Default: 0
+         */
+        public Builder nameNodePort(int val) {
+            this.nameNodePort = val;
+            return this;
+        }
+
+        /**
+         * Default: 0
+         */
+        public Builder nameNodeHttpPort(int val) {
+            this.nameNodeHttpPort = val;
+            return this;
+        }
+
+        public Builder setDnHttpPorts(int... ports) {
+            this.dnHttpPorts = ports;
+            return this;
+        }
+
+        public Builder setDnIpcPorts(int... ports) {
+            this.dnIpcPorts = ports;
+            return this;
+        }
+
+        /**
+         * Default: DEFAULT_STORAGES_PER_DATANODE
+         */
+        public Builder storagesPerDatanode(int numStorages) {
+            this.storagesPerDatanode = numStorages;
+            return this;
+        }
+
+        /**
+         * Set the same storage type configuration for each datanode.
+         * If storageTypes is uninitialized or passed null then
+         * StorageType.DEFAULT is used.
+         */
+        public Builder storageTypes(StorageType[] types) {
+            this.storageTypes1D = types;
+            return this;
+        }
+
+        /**
+         * Set custom storage type configuration for each datanode.
+         * If storageTypes is uninitialized or passed null then
+         * StorageType.DEFAULT is used.
+         */
+        public Builder storageTypes(StorageType[][] types) {
+            this.storageTypes = types;
+            return this;
+        }
+
+        /**
+         * Set the same storage capacity configuration for each datanode.
+         * If storageTypes is uninitialized or passed null then
+         * StorageType.DEFAULT is used.
+         */
+        public Builder storageCapacities(long[] capacities) {
+            this.storageCapacities1D = capacities;
+            return this;
+        }
+
+        /**
+         * Set custom storage capacity configuration for each datanode.
+         * If storageCapacities is uninitialized or passed null then
+         * capacity is limited by available disk space.
+         */
+        public Builder storageCapacities(long[][] capacities) {
+            this.storageCapacities = capacities;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder format(boolean val) {
+            this.format = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder manageNameDfsDirs(boolean val) {
+            this.manageNameDfsDirs = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder manageNameDfsSharedDirs(boolean val) {
+            this.manageNameDfsSharedDirs = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder enableManagedDfsDirsRedundancy(boolean val) {
+            this.enableManagedDfsDirsRedundancy = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder manageDataDfsDirs(boolean val) {
+            this.manageDataDfsDirs = val;
+            return this;
+        }
+
+        /**
+         * Default: null
+         */
+        public Builder startupOption(HdfsServerConstants.StartupOption val) {
+            this.option = val;
+            return this;
+        }
+
+        /**
+         * Default: null
+         */
+        public Builder dnStartupOption(HdfsServerConstants.StartupOption val) {
+            this.dnOption = val;
+            return this;
+        }
+
+        /**
+         * Default: null
+         */
+        public Builder racks(String[] val) {
+            this.racks = val;
+            return this;
+        }
+
+        /**
+         * Default: null
+         */
+        public Builder hosts(String[] val) {
+            this.hosts = val;
+            return this;
+        }
+
+        /**
+         * Use SimulatedFSDataset and limit the capacity of each DN per
+         * the values passed in val.
+         *
+         * For limiting the capacity of volumes with real storage, see
+         * {@link FsVolumeImpl#setCapacityForTesting}
+         * Default: null
+         */
+        public Builder simulatedCapacities(long[] val) {
+            this.simulatedCapacities = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder waitSafeMode(boolean val) {
+            this.waitSafeMode = val;
+            return this;
+        }
+
+        /**
+         * Default: true
+         */
+        public Builder checkExitOnShutdown(boolean val) {
+            this.checkExitOnShutdown = val;
+            return this;
+        }
+
+        /**
+         * Default: false
+         */
+        public Builder checkDataNodeAddrConfig(boolean val) {
+            this.checkDataNodeAddrConfig = val;
+            return this;
+        }
+
+        /**
+         * Default: false
+         */
+        public Builder checkDataNodeHostConfig(boolean val) {
+            this.checkDataNodeHostConfig = val;
+            return this;
+        }
+
+        /**
+         * Default: null
+         */
+        public Builder clusterId(String cid) {
+            this.clusterId = cid;
+            return this;
+        }
+
+        /**
+         * Default: false
+         * When true the hosts file/include file for the cluster is setup
+         */
+        public Builder setupHostsFile(boolean val) {
+            this.setupHostsFile = val;
+            return this;
+        }
+
+        /**
+         * Default: a single namenode.
+         * See {@link MiniDFSNNTopology#simpleFederatedTopology(int)} to set up
+         * federated nameservices
+         */
+        public Builder nnTopology(MiniDFSNNTopology topology) {
+            this.nnTopology = topology;
+            return this;
+        }
+
+        /**
+         * Default: null
+         *
+         * An array of {@link Configuration} objects that will overlay the
+         * global MiniDFSCluster Configuration for the corresponding DataNode.
+         *
+         * Useful for setting specific per-DataNode configuration parameters.
+         */
+        public Builder dataNodeConfOverlays(Configuration[] dnConfOverlays) {
+            this.dnConfOverlays = dnConfOverlays;
+            return this;
+        }
+
+        /**
+         * Default: true
+         * When true, we skip fsync() calls for speed improvements.
+         */
+        public Builder skipFsyncForTesting(boolean val) {
+            this.skipFsyncForTesting = val;
+            return this;
+        }
+
+        public Builder useConfiguredTopologyMappingClass(
+                boolean useConfiguredTopologyMappingClass) {
+            this.useConfiguredTopologyMappingClass =
+                    useConfiguredTopologyMappingClass;
+            return this;
+        }
+
+        /**
+         * set the value of DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY in the config
+         * file.
+         */
+        public Builder setNNRedundancyConsiderLoad(final boolean val) {
+            conf.setBoolean(DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY, val);
+            return this;
+        }
+
+    }
 
     public MiniDockerDFSCluster(Builder builder) {
         // Re-enable symlinks for tests, see HADOOP-10020 and HADOOP-10052
