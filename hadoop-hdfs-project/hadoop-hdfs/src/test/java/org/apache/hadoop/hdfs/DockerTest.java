@@ -12,6 +12,7 @@ import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeFake;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,6 +42,7 @@ public class DockerTest {
             fsNameSystem.testRMIPrint("Hello RMI from FSNameSystem in Cluster");
              **/
             System.out.println("Get RMI test passed");
+            dockerHDFSCluster.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,6 +97,7 @@ public class DockerTest {
             DataNodeInterface dataNodeFromCluster = dockerHDFSCluster.getDataNode(0);
             dataNodeFromCluster.testRMIPrint("Hello RMI from DataNode in Cluster");
 
+            dockerHDFSCluster.shutdown();
 
             System.out.println("RMI test passed");
         } catch (Exception e) {
