@@ -20,6 +20,9 @@ package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Supplier;
+
+import org.apache.hadoop.hdfs.*;
+import org.apache.hadoop.hdfs.remoteProxies.DataNodeInterface;
 import org.apache.hadoop.hdfs.server.datanode.LocalReplica;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
@@ -35,12 +38,6 @@ import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
-import org.apache.hadoop.hdfs.BlockReader;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
@@ -1078,18 +1075,18 @@ public class TestFsDatasetImpl {
 
   @Test(timeout = 3000000)
   public void testBlockReadOpWhileMovingBlock() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
 
       // Setup cluster
       conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .numDataNodes(1)
           .storageTypes(new StorageType[]{StorageType.DISK, StorageType.DISK})
           .storagesPerDatanode(2)
           .build();
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeInterface dataNode = cluster.getDataNodes().get(0);
 
       // Create test file with ASCII data
       Path filePath = new Path("/tmp/testData");

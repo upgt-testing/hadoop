@@ -45,6 +45,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hdfs.remoteProxies.FSImageInterface;
+import org.apache.hadoop.hdfs.remoteProxies.FSNamesystemInterface;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -598,11 +601,22 @@ public abstract class FSImageTestUtil {
     return node.getFSImage();
   }
 
+  public static FSImageInterface getFSImage(NameNodeInterface node) {
+    return node.getFSImage();
+  }
+
   /**
    * get NameSpace quota.
    */
   public static long getNSQuota(FSNamesystem ns) {
     return ns.dir.rootDir.getQuotaCounts().getNameSpace();
+  }
+
+  /**
+   * get NameSpace quota.
+   */
+  public static long getNSQuota(FSNamesystemInterface ns) {
+    return ns.getFSDirectory().getRoot().getQuotaCounts().getNameSpace();
   }
   
   public static void assertNNFilesMatch(MiniDFSCluster cluster) throws Exception {

@@ -68,7 +68,7 @@ public class TestErasureCodingMultipleRacks {
     return StripedFileTestUtil.getDefaultECPolicy();
   }
 
-  private MiniDockerDFSCluster cluster;
+  private MiniDFSCluster cluster;
   private ErasureCodingPolicy ecPolicy;
   private Configuration conf;
   private DistributedFileSystem dfs;

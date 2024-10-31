@@ -29,7 +29,7 @@ import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 public final class FsDatasetImplTestUtilsFactory
     extends FsDatasetTestUtils.Factory<FsDatasetTestUtils> {
   @Override
-  public FsDatasetTestUtils newInstance(DataNodeInterface datanode) {
+  public FsDatasetTestUtils newInstance(DataNode datanode) {
     return new FsDatasetImplTestUtils(datanode);
   }
 

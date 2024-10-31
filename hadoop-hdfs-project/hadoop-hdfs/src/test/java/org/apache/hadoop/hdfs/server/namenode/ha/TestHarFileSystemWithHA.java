@@ -19,7 +19,7 @@ package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import java.io.IOException;
 import org.apache.hadoop.hdfs.remoteProxies.*;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -44,9 +44,9 @@ public class TestHarFileSystemWithHA {
   @Test
   public void testHarUriWithHaUriWithNoPort() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf)
+      cluster = new MiniDFSCluster.Builder(conf)
           .numDataNodes(1)
           .nnTopology(MiniDFSNNTopology.simpleHATopology())
           .build();

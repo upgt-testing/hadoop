@@ -18,6 +18,8 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertTrue;
+
+import org.apache.hadoop.crypto.key.KeyProvider;
 import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 
@@ -43,6 +45,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.Properties;
@@ -60,6 +63,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.client.CreateEncryptionZoneFlag;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.minikdc.MiniKdc;
@@ -269,9 +273,43 @@ public class TestSecureEncryptionZoneWithKMS {
 
     // Create a test key
     if (!testKeyCreated) {
-      DFSTestUtil.createKey(testKey, cluster, conf);
+      createKey(testKey, cluster, conf);
       testKeyCreated = true;
     }
+  }
+
+  /**
+   * Helper function to create a key in the Key Provider. Defaults
+   * to the first indexed NameNode's Key Provider.
+   *
+   * @param keyName The name of the key to create
+   * @param cluster The cluster to create it in
+   * @param conf Configuration to use
+   */
+  public static void createKey(String keyName, MiniDockerDFSCluster cluster,
+                               Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    createKey(keyName, cluster, 0, conf);
+  }
+
+  /**
+   * Helper function to create a key in the Key Provider.
+   *
+   * @param keyName The name of the key to create
+   * @param cluster The cluster to create it in
+   * @param idx The NameNode index
+   * @param conf Configuration to use
+   */
+  public static void createKey(String keyName, MiniDockerDFSCluster cluster,
+                               int idx, Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeInterface nn = cluster.getNameNode(idx);
+    KeyProviderCryptoExtensionInterface provider = nn.getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    provider.createKey(keyName, options);
+    provider.flush();
   }
 
   @After

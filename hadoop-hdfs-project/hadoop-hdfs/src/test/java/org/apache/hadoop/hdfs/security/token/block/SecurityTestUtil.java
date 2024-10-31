@@ -20,6 +20,7 @@ package org.apache.hadoop.hdfs.security.token.block;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hdfs.remoteProxies.BlockTokenSecretManagerInterface;
 import org.apache.hadoop.security.token.Token;
 
 /** Utilities for security tests */
@@ -39,6 +40,11 @@ public class SecurityTestUtil {
    */
   public static void setBlockTokenLifetime(BlockTokenSecretManager handler,
       long tokenLifetime) {
+    handler.setTokenLifetime(tokenLifetime);
+  }
+
+  public static void setBlockTokenLifetime(BlockTokenSecretManagerInterface handler,
+                                           long tokenLifetime) {
     handler.setTokenLifetime(tokenLifetime);
   }
 

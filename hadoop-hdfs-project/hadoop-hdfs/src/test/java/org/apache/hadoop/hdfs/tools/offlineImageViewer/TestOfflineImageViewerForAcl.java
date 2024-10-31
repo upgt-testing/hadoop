@@ -96,11 +96,11 @@ public class TestOfflineImageViewerForAcl {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     try {
       Configuration conf = new Configuration();
       conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
 

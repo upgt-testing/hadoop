@@ -186,7 +186,7 @@ public class TestLazyWriter extends LazyPersistTestCase {
       throws Exception {
     getClusterBuilder().build();
     final String METHOD_NAME = GenericTestUtils.getMethodName();
-    final DataNodeInterface dn = cluster.getDataNodes().get(0);
+    final DataNode dn = cluster.getDataNodes().get(0);
     FsDatasetTestUtil.stopLazyWriter(dn);
 
     Path path = new Path("/" + METHOD_NAME + ".dat");

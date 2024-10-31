@@ -209,7 +209,7 @@ public class FsDatasetImplTestUtils implements FsDatasetTestUtils {
     }
   }
 
-  public FsDatasetImplTestUtils(DataNodeInterface datanode) {
+  public FsDatasetImplTestUtils(DataNode datanode) {
     Preconditions.checkArgument(
         datanode.getFSDataset() instanceof FsDatasetImpl);
     dataset = (FsDatasetImpl) datanode.getFSDataset();

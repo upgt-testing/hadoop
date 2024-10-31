@@ -20,7 +20,7 @@ package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import org.apache.hadoop.hdfs.remoteProxies.*;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 
 
 import java.io.File;
@@ -84,11 +84,11 @@ public class TestFileAppendRestart {
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
 
     FSDataOutputStream stream = null;
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
       FileSystem fs = cluster.getFileSystem();
       File editLog =
         new File(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 0).get(0),
@@ -164,7 +164,7 @@ public class TestFileAppendRestart {
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
 
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
       .format(false)
       .manageDataDfsDirs(false)
       .manageNameDfsDirs(false)
@@ -188,10 +188,10 @@ public class TestFileAppendRestart {
   @Test
   public void testAppendWithPipelineRecovery() throws Exception {
     Configuration conf = new Configuration();
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     FSDataOutputStream out = null;
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).manageDataDfsDirs(true)
+      cluster = new MiniDFSCluster.Builder(conf).manageDataDfsDirs(true)
           .manageNameDfsDirs(true).numDataNodes(4)
           .racks(new String[] { "/rack1", "/rack1", "/rack2", "/rack2" })
           .build();

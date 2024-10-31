@@ -109,9 +109,9 @@ public class TestHostsFiles {
 
     // Two blocks and four racks
     String racks[] = {"/rack1", "/rack1", "/rack2", "/rack2"};
-    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
+    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
       .numDataNodes(racks.length).racks(racks).build();
-    final FSNamesystemInterface ns = cluster.getNameNode().getNamesystem();
+    final FSNamesystem ns = cluster.getNameNode().getNamesystem();
 
     try {
       // Create a file with one block

@@ -295,7 +295,7 @@ public class TestLazyPersistFiles extends LazyPersistTestCase {
     final int seed = 0xFADED;
     Path path = new Path("/" + methodName + ".Writer.File.dat");
 
-    DataNodeInterface dn = cluster.getDataNodes().get(0);
+    DataNode dn = cluster.getDataNodes().get(0);
     FsDatasetSpi.FsVolumeReferences volumes =
         DataNodeTestUtils.getFSDataset(dn).getFsVolumeReferences();
     int[] beforeCnts = new int[volumes.size()];

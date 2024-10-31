@@ -19,7 +19,6 @@ package org.apache.hadoop.hdfs.tools.offlineImageViewer;
 
 import static org.junit.Assert.assertEquals;
 import org.apache.hadoop.hdfs.remoteProxies.*;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,11 +63,11 @@ public class TestOfflineImageViewerForContentSummary {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     Configuration conf = new Configuration();
 
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
       Path parentDir = new Path("/parentDir");

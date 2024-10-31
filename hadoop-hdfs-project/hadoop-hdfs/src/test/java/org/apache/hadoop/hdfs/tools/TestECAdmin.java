@@ -102,7 +102,7 @@ public class TestECAdmin {
     final int numRacks = 3;
     final int expectedNumDataNodes = 9;
 
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
     int ret = runCommandWithParams("-verifyClusterSetup");
     assertEquals("Return value of the command is not successful", 2, ret);
     assertNotEnoughDataNodesMessage(RS_6_3, numDataNodes, expectedNumDataNodes);
@@ -115,7 +115,7 @@ public class TestECAdmin {
     final int numRacks = 3;
     final int expectedNumRacks = 4;
 
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     cluster.getFileSystem().enableErasureCodingPolicy(testPolicy);
     int ret = runCommandWithParams("-verifyClusterSetup");
@@ -130,7 +130,7 @@ public class TestECAdmin {
     final int numRacks = 2;
     final int expectedNumRacks = 3;
 
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     cluster.getFileSystem().enableErasureCodingPolicy(testPolicy);
     int ret = runCommandWithParams("-verifyClusterSetup");
@@ -145,7 +145,7 @@ public class TestECAdmin {
     final int numRacks = 2;
     final int expectedNumRacks = 3;
 
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     cluster.getFileSystem().enableErasureCodingPolicy(testPolicy);
     int ret = runCommandWithParams("-verifyClusterSetup");
@@ -155,7 +155,7 @@ public class TestECAdmin {
 
   @Test
   public void testRS63Good() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 9, 3, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, 9, 3, 0);
     int ret = runCommandWithParams("-verifyClusterSetup");
     assertEquals("Return value of the command is successful", 0, ret);
     assertTrue("Result of cluster topology verify " +
@@ -166,7 +166,7 @@ public class TestECAdmin {
 
   @Test
   public void testNoECEnabled() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 9, 3, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, 9, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     int ret = runCommandWithParams("-verifyClusterSetup");
     assertEquals("Return value of the command is successful", 0, ret);
@@ -182,7 +182,7 @@ public class TestECAdmin {
     final int numDataNodes = 5;
     final int numRacks = 2;
 
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     final int ret = runCommandWithParams("-enablePolicy", "-policy",
         testPolicy);
@@ -202,7 +202,7 @@ public class TestECAdmin {
   @Test
   public void testSuccessfulEnablePolicyMessage() throws Exception {
     final String testPolicy = RS_3_2;
-    cluster = DFSTestUtil.setupCluster(conf, 5, 3, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, 5, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     final int ret = runCommandWithParams("-enablePolicy", "-policy",
         testPolicy);
@@ -217,7 +217,7 @@ public class TestECAdmin {
 
   @Test
   public void testEnableNonExistentPolicyMessage() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 3, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, 5, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(RS_6_3);
     final int ret = runCommandWithParams("-enablePolicy", "-policy",
         "NonExistentPolicy");
@@ -234,7 +234,7 @@ public class TestECAdmin {
   public void testVerifyClusterSetupWithGivenPolicies() throws Exception {
     final int numDataNodes = 5;
     final int numRacks = 2;
-    cluster = DFSTestUtil.setupCluster(conf, numDataNodes, numRacks, 0);
+    cluster = DFSTestUtil.setupDockerCluster(conf, numDataNodes, numRacks, 0);
 
     int ret = runCommandWithParams("-verifyClusterSetup", "-policy", RS_3_2);
     assertEquals("Return value of the command is not successful", 2, ret);

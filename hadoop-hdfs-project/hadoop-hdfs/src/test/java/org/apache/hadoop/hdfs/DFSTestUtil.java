@@ -72,6 +72,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.hadoop.hdfs.remoteProxies.FsDatasetSpiInterface;
+import org.apache.hadoop.hdfs.remoteProxies.KeyProviderCryptoExtensionInterface;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeInterface;
 import org.apache.hadoop.thirdparty.com.google.common.base.Charsets;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
@@ -1663,6 +1666,39 @@ public class DFSTestUtil {
     return expectedCacheUsed;
   }
 
+  public static long verifyExpectedCacheUsage(final long expectedCacheUsed,
+                                              final long expectedBlocks, final FsDatasetSpiInterface fsd) throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      private int tries = 0;
+
+      @Override
+      public Boolean get() {
+        long curCacheUsed = fsd.getCacheUsed();
+        long curBlocks = fsd.getNumBlocksCached();
+        if ((curCacheUsed != expectedCacheUsed) ||
+                (curBlocks != expectedBlocks)) {
+          if (tries++ > 10) {
+            LOG.info("verifyExpectedCacheUsage: have " +
+                    curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                    curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                    "memlock limit = " +
+                    NativeIO.POSIX.getCacheManipulator().getMemlockLimit() +
+                    ".  Waiting...");
+          }
+          return false;
+        }
+        LOG.info("verifyExpectedCacheUsage: got " +
+                curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                "memlock limit = " +
+                NativeIO.POSIX.getCacheManipulator().getMemlockLimit());
+        return true;
+      }
+    }, 100, 120000);
+    return expectedCacheUsed;
+  }
+
+
   /**
    * Round a long value up to a multiple of a factor.
    *
@@ -1873,6 +1909,32 @@ public class DFSTestUtil {
       throws NoSuchAlgorithmException, IOException {
     NameNode nn = cluster.getNameNode(idx);
     KeyProvider provider = nn.getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    provider.createKey(keyName, options);
+    provider.flush();
+  }
+
+  public static void createKey(String keyName, MiniDockerDFSCluster cluster,
+                               Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    createKey(keyName, cluster, 0, conf);
+  }
+
+  /**
+   * Helper function to create a key in the Key Provider.
+   *
+   * @param keyName The name of the key to create
+   * @param cluster The cluster to create it in
+   * @param idx The NameNode index
+   * @param conf Configuration to use
+   */
+  public static void createKey(String keyName, MiniDockerDFSCluster cluster,
+                               int idx, Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeInterface nn = cluster.getNameNode(idx);
+    KeyProviderCryptoExtensionInterface provider = nn.getNamesystem().getProvider();
     final KeyProvider.Options options = KeyProvider.options(conf);
     options.setDescription(keyName);
     options.setBitLength(128);
@@ -2489,6 +2551,30 @@ public class DFSTestUtil {
         .numDataNodes(numDatanodes)
         .racks(racks)
         .build();
+    cluster.waitActive();
+    return cluster;
+  }
+
+  public static MiniDockerDFSCluster setupDockerCluster(final Configuration conf,
+                                            final int numDatanodes,
+                                            final int numRacks,
+                                            final int numSingleDnRacks)
+          throws Exception {
+    assert numDatanodes > numRacks;
+    assert numRacks > numSingleDnRacks;
+    assert numSingleDnRacks >= 0;
+    final String[] racks = new String[numDatanodes];
+    for (int i = 0; i < numSingleDnRacks; i++) {
+      racks[i] = "/rack" + i;
+    }
+    for (int i = numSingleDnRacks; i < numDatanodes; i++) {
+      racks[i] =
+              "/rack" + (numSingleDnRacks + (i % (numRacks - numSingleDnRacks)));
+    }
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
+            .numDataNodes(numDatanodes)
+            .racks(racks)
+            .build();
     cluster.waitActive();
     return cluster;
   }

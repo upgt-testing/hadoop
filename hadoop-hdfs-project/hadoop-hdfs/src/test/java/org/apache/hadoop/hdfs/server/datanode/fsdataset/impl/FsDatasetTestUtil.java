@@ -94,6 +94,15 @@ public class FsDatasetTestUtil {
   }
 
   /**
+   * Stop the lazy writer daemon that saves RAM disk files to persistent storage.
+   * @param dn
+   */
+  public static void stopLazyWriter(DataNode dn) {
+    FsDatasetImpl fsDataset = ((FsDatasetImpl) dn.getFSDataset());
+    ((FsDatasetImpl.LazyWriter) fsDataset.lazyWriter.getRunnable()).stop();
+  }
+
+  /**
    * Asserts that the storage lock file in the given directory has been
    * released.  This method works by trying to acquire the lock file itself.  If
    * locking fails here, then the main code must have failed to release it.

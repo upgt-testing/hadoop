@@ -12,12 +12,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.StorageType;
+import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
+import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataStorage;
+import org.apache.hadoop.hdfs.server.datanode.DatanodeUtil;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -58,6 +62,7 @@ public class MiniDockerDFSCluster implements Closeable {
             = DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + ".testing";
     public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
             = DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing";
+    protected final int storagesPerDatanode;
 
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
@@ -539,6 +544,7 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
     public MiniDockerDFSCluster(Builder builder) {
+        this.storagesPerDatanode = builder.storagesPerDatanode;
         // Re-enable symlinks for tests, see HADOOP-10020 and HADOOP-10052
         FileSystem.enableSymlinks();
 
@@ -698,6 +704,18 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public void shutdown() {
         close();
+    }
+
+    public void shutdown(boolean deleteBaseDir) {
+        LOG.warn("The shutdown(boolean deleteBaseDir) function is not implemented yet.");
+        System.out.println("The shutdown(boolean deleteBaseDir) function is not implemented yet.");
+        close();
+    }
+
+    public boolean restartDataNodes(boolean deleteBaseDir) {
+        LOG.warn("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
+        System.out.println("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
+        return true;
     }
 
     public FileContext getFileContext() {
@@ -987,6 +1005,110 @@ public class MiniDockerDFSCluster implements Closeable {
 
     public void stopDataNode(int idx) {
         dataNodes.get(idx).stop();
+    }
+
+    public boolean isClusterUp() {
+        return nameNode.isHealthy();
+    }
+
+    public static List<File> getAllBlockFiles(File storageDir) {
+        List<File> results = new ArrayList<File>();
+        File[] files = storageDir.listFiles();
+        if (files == null) {
+            return null;
+        }
+        for (File f : files) {
+            if (f.getName().startsWith(Block.BLOCK_FILE_PREFIX) &&
+                    !f.getName().endsWith(Block.METADATA_EXTENSION)) {
+                results.add(f);
+            } else if (f.isDirectory()) {
+                List<File> subdirResults = getAllBlockFiles(f);
+                if (subdirResults != null) {
+                    results.addAll(subdirResults);
+                }
+            }
+        }
+        return results;
+    }
+
+    public static String getDNCurrentDir(File storageDir) {
+        return storageDir + "/" + Storage.STORAGE_DIR_CURRENT + "/";
+    }
+
+    public static String getBPDir(File storageDir, String bpid) {
+        return getDNCurrentDir(storageDir) + bpid + "/";
+    }
+
+    public static String getBPDir(File storageDir, String bpid, String dirName) {
+        return getBPDir(storageDir, bpid) + dirName + "/";
+    }
+
+    public static File getFinalizedDir(File storageDir, String bpid) {
+        return new File(getBPDir(storageDir, bpid, Storage.STORAGE_DIR_CURRENT)
+                + DataStorage.STORAGE_DIR_FINALIZED );
+    }
+
+
+    public static File getBlockFile(File storageDir, ExtendedBlock blk) {
+        return new File(DatanodeUtil.idToBlockDir(getFinalizedDir(storageDir,
+                blk.getBlockPoolId()), blk.getBlockId()), blk.getBlockName());
+    }
+
+    /**
+     * Get all files related to a block from all the datanodes
+     * @param block block for which corresponding files are needed
+     */
+    public File[] getAllBlockFiles(ExtendedBlock block) {
+        if (dataNodes.size() == 0) return new File[0];
+        ArrayList<File> list = new ArrayList<File>();
+        for (int i=0; i < dataNodes.size(); i++) {
+            File blockFile = getBlockFile(i, block);
+            if (blockFile != null) {
+                list.add(blockFile);
+            }
+        }
+        return list.toArray(new File[list.size()]);
+    }
+
+    /**
+     * Get the block data file for a block from a given datanode
+     * @param dnIndex Index of the datanode to get block files for
+     * @param block block for which corresponding files are needed
+     */
+    public File getBlockFile(int dnIndex, ExtendedBlock block) {
+        // Check for block file in the two storage directories of the datanode
+        for (int i = 0; i <=1 ; i++) {
+            File storageDir = getStorageDir(dnIndex, i);
+            File blockFile = getBlockFile(storageDir, block);
+            if (blockFile.exists()) {
+                return blockFile;
+            }
+        }
+        return null;
+    }
+
+    public static String getBaseDirectory() {
+        return GenericTestUtils.getTestDir("dfs").getAbsolutePath()
+                + File.separator;
+    }
+
+    protected String determineDfsBaseDir() {
+        if (conf != null) {
+            final String dfsdir = conf.get(HDFS_MINIDFS_BASEDIR, null);
+            if (dfsdir != null) {
+                return dfsdir;
+            }
+        }
+        return getBaseDirectory();
+    }
+
+    private String getStorageDirPath(int dnIndex, int dirIndex) {
+        return "data/data" + (storagesPerDatanode * dnIndex + 1 + dirIndex);
+    }
+
+    public File getStorageDir(int dnIndex, int dirIndex) {
+        return new File(determineDfsBaseDir(),
+                getStorageDirPath(dnIndex, dirIndex));
     }
 
     public void stopDataNode(String addr) {

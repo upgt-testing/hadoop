@@ -71,11 +71,11 @@ public class TestOfflineImageViewerForXAttr {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDockerDFSCluster cluster = null;
+    MiniDFSCluster cluster = null;
     Configuration conf = new Configuration();
 
     try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSCluster.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
       // Create a name space with XAttributes

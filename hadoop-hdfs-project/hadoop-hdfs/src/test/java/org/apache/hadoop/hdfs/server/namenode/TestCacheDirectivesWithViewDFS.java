@@ -47,7 +47,7 @@ public class TestCacheDirectivesWithViewDFS extends TestCacheDirectives {
   }
 
   @Override
-  public DistributedFileSystem getDFS(MiniDockerDFSCluster cluster, int nnIdx)
+  public DistributedFileSystem getDFS(MiniDFSCluster cluster, int nnIdx)
       throws IOException {
     Configuration conf = cluster.getConfiguration(nnIdx);
     conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());

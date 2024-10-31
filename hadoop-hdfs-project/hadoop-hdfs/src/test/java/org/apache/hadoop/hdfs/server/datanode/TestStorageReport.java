@@ -58,14 +58,14 @@ public class TestStorageReport {
   private static final StorageType storageType = StorageType.SSD; // pick non-default.
 
   private static Configuration conf;
-  private MiniDockerDFSCluster cluster;
+  private MiniDFSCluster cluster;
   private DistributedFileSystem fs;
   static String bpid;
 
   @Before
   public void startUpCluster() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDockerDFSCluster.Builder(conf)
+    cluster = new MiniDFSCluster.Builder(conf)
         .numDataNodes(REPL_FACTOR)
         .storageTypes(new StorageType[] { storageType, storageType } )
         .build();
@@ -92,8 +92,8 @@ public class TestStorageReport {
     // Make sure we are not testing with the default type, that would not
     // be a very good test.
     assertNotSame(storageType, StorageType.DEFAULT);
-    NameNodeInterface nn = cluster.getNameNode();
-    DataNodeInterface dn = cluster.getDataNodes().get(0);
+    NameNode nn = cluster.getNameNode();
+    DataNode dn = cluster.getDataNodes().get(0);
 
     // Insert a spy object for the NN RPC.
     DatanodeProtocolClientSideTranslatorPB nnSpy =
