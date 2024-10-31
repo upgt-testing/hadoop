@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import static org.junit.Assert.fail;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -45,7 +48,7 @@ public class TestSnapRootDescendantDiff extends TestSnapshotDiffReport {
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_DIFF_ALLOW_SNAP_ROOT_DESCENDANT,
         false);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3)
         .format(true).build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();

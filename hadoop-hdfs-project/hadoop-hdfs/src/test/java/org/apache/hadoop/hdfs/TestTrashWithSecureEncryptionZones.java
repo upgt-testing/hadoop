@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.*;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -95,7 +98,7 @@ public class TestTrashWithSecureEncryptionZones {
   private static final Path CURRENT = new Path("Current");
 
   // MiniDFS
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static HdfsConfiguration conf;
   private static FileSystem fs;
   private static HdfsAdmin dfsAdmin;
@@ -210,7 +213,7 @@ public class TestTrashWithSecureEncryptionZones {
         .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
     conf = new HdfsConfiguration(baseConf);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .build();
     cluster.waitActive();
 

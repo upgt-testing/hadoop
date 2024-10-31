@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsDatasetImplTestUtils;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 /**
  * A factory for creating {@link FsDatasetImplTestUtils} objects.
@@ -26,7 +29,7 @@ import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsDatasetImplTestUt
 public final class FsDatasetImplTestUtilsFactory
     extends FsDatasetTestUtils.Factory<FsDatasetTestUtils> {
   @Override
-  public FsDatasetTestUtils newInstance(DataNode datanode) {
+  public FsDatasetTestUtils newInstance(DataNodeInterface datanode) {
     return new FsDatasetImplTestUtils(datanode);
   }
 

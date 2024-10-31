@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.qjournal;
 
 import static org.junit.Assert.*;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY;
@@ -199,7 +202,7 @@ public class TestSecureNNWithQJM {
     }
 
     /**
-     * Restarts the NameNode and obtains a new FileSystem.
+     * Restarts the NameNodeInterface and obtains a new FileSystem.
      *
      * @throws IOException if there is an I/O error
      */

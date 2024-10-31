@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
@@ -183,7 +186,7 @@ public class TestLazyWriter extends LazyPersistTestCase {
       throws Exception {
     getClusterBuilder().build();
     final String METHOD_NAME = GenericTestUtils.getMethodName();
-    final DataNode dn = cluster.getDataNodes().get(0);
+    final DataNodeInterface dn = cluster.getDataNodes().get(0);
     FsDatasetTestUtil.stopLazyWriter(dn);
 
     Path path = new Path("/" + METHOD_NAME + ".dat");

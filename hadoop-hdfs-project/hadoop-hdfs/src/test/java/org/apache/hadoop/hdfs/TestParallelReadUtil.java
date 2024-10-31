@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -57,7 +60,7 @@ public class TestParallelReadUtil {
   static {
     // The client-trace log ends up causing a lot of blocking threads
     // in this when it's being used as a performance benchmark.
-    LogManager.getLogger(DataNode.class.getName() + ".clienttrace")
+    LogManager.getLogger(DataNodeInterface.class.getName() + ".clienttrace")
       .setLevel(Level.WARN);
   }
 

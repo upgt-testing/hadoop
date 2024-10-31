@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.web;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -42,7 +45,7 @@ public class TestHttpsFileSystem {
   private static final String BASEDIR =
       GenericTestUtils.getTempPath(TestHttpsFileSystem.class.getSimpleName());
 
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static Configuration conf;
 
   private static String keystoresDir;
@@ -68,7 +71,7 @@ public class TestHttpsFileSystem {
     conf.set(DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
         KeyStoreTestUtil.getServerSSLConfigFileName());
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     OutputStream os = cluster.getFileSystem().create(new Path("/test"));
     os.write(23);

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.crypto.key.JavaKeyStoreProvider;
 import org.apache.hadoop.fs.*;
@@ -67,7 +70,7 @@ import static org.junit.Assert.*;
  */
 public class TestErasureCodingExerciseAPIs {
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private HdfsAdmin dfsAdmin;
   private FileSystemTestWrapper fsWrapper;
@@ -100,7 +103,7 @@ public class TestErasureCodingExerciseAPIs {
         keyProviderURI);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(conf).
+    cluster = new MiniDockerDFSCluster.Builder(conf).
         numDataNodes(ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits()).
         build();
     cluster.waitActive();

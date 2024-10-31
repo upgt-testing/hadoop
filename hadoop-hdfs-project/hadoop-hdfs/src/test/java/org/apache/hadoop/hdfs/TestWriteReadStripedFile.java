@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.slf4j.Logger;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.apache.hadoop.conf.Configuration;
@@ -58,7 +61,7 @@ public class TestWriteReadStripedFile {
   private final int blockSize = stripesPerBlock * cellSize;
   private final int blockGroupSize = blockSize * dataBlocks;
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private Configuration conf = new HdfsConfiguration();
 
@@ -75,7 +78,7 @@ public class TestWriteReadStripedFile {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
     fs = cluster.getFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());
     fs.mkdirs(new Path("/ec"));
@@ -217,7 +220,7 @@ public class TestWriteReadStripedFile {
 
     if (withDataNodeFailure) {
       int dnIndex = 1; // TODO: StripedFileTestUtil.random.nextInt(dataBlocks);
-      LOG.info("stop DataNode " + dnIndex);
+      LOG.info("stop DataNodeInterface " + dnIndex);
       stopDataNode(srcPath, dnIndex);
     }
 
@@ -243,7 +246,7 @@ public class TestWriteReadStripedFile {
     BlockLocation[] locs = fs.getFileBlockLocations(path, 0, cellSize);
     if (locs != null && locs.length > 0) {
       String name = (locs[0].getNames())[failedDNIdx];
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeInterface dn : cluster.getDataNodes()) {
         int port = dn.getXferPort();
         if (name.contains(Integer.toString(port))) {
           dn.shutdown();

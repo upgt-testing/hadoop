@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -54,8 +57,8 @@ import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link ObserverReadProxyProvider} under various configurations of
- * NameNode states. Mainly testing that the proxy provider picks the correct
- * NameNode to communicate with.
+ * NameNodeInterface states. Mainly testing that the proxy provider picks the correct
+ * NameNodeInterface to communicate with.
  */
 public class TestObserverReadProxyProvider {
 
@@ -349,7 +352,7 @@ public class TestObserverReadProxyProvider {
    * An {@link Answer} used for mocking of {@link ClientProtocol}.
    * Setting the state or unreachability of this
    * Answer will make the linked ClientProtocol respond as if it was
-   * communicating with a NameNode of the corresponding state. It is in Standby
+   * communicating with a NameNodeInterface of the corresponding state. It is in Standby
    * state by default.
    */
   private static class NameNodeAnswer {

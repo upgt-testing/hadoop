@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
@@ -60,7 +63,7 @@ public interface FsDatasetTestUtils {
     /**
      * Create a new instance of FsDatasetTestUtils.
      */
-    public abstract D newInstance(DataNode datanode);
+    public abstract D newInstance(DataNodeInterface datanode);
 
     /**
      * @return True for SimulatedFsDataset
@@ -71,9 +74,9 @@ public interface FsDatasetTestUtils {
 
     /**
      * Get the default number of data directories for underlying storage per
-     * DataNode.
+     * DataNodeInterface.
      *
-     * @return The default number of data dirs per DataNode.
+     * @return The default number of data dirs per DataNodeInterface.
      */
     abstract public int getDefaultNumOfDataDirs();
   }
@@ -231,13 +234,13 @@ public interface FsDatasetTestUtils {
   Replica fetchReplica(ExtendedBlock block);
 
   /**
-   * @return The default value of number of data dirs per DataNode in
+   * @return The default value of number of data dirs per DataNodeInterface in
    * MiniDockerDFSCluster.
    */
   int getDefaultNumOfDataDirs();
 
   /**
-   * Obtain the raw capacity of underlying storage per DataNode.
+   * Obtain the raw capacity of underlying storage per DataNodeInterface.
    */
   long getRawCapacity() throws IOException;
 

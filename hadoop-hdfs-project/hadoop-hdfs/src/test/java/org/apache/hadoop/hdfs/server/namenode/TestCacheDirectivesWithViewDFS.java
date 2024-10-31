@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.viewfs.ConfigUtil;
@@ -44,7 +47,7 @@ public class TestCacheDirectivesWithViewDFS extends TestCacheDirectives {
   }
 
   @Override
-  public DistributedFileSystem getDFS(MiniDFSCluster cluster, int nnIdx)
+  public DistributedFileSystem getDFS(MiniDockerDFSCluster cluster, int nnIdx)
       throws IOException {
     Configuration conf = cluster.getConfiguration(nnIdx);
     conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());

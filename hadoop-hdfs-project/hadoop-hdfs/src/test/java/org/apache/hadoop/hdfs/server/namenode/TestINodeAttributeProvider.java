@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,7 +56,7 @@ public class TestINodeAttributeProvider {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestINodeAttributeProvider.class);
 
-  private MiniDFSCluster miniDFS;
+  private MiniDockerDFSCluster miniDFS;
   private static final Set<String> CALLED = new HashSet<String>();
   private static final short HDFS_PERMISSION = 0777;
   private static final short PROVIDER_PERMISSION = 0770;
@@ -243,7 +246,7 @@ public class TestINodeAttributeProvider {
         DFSConfigKeys.DFS_NAMENODE_INODE_ATTRIBUTES_PROVIDER_BYPASS_USERS_KEY,
         " u2,, ,u3, ");
     EditLogFileOutputStream.setShouldSkipFsyncForTesting(true);
-    miniDFS = new MiniDFSCluster.Builder(conf).build();
+    miniDFS = new MiniDockerDFSCluster.Builder(conf).build();
   }
 
   @After

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
@@ -44,7 +47,7 @@ public class TestStoragePolicyPermissionSettings {
   private static final int SIZE = 128;
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem fs;
   private static BlockStoragePolicySuite suite;
   private static BlockStoragePolicy cold;
@@ -54,7 +57,7 @@ public class TestStoragePolicyPermissionSettings {
   @BeforeClass
   public static void clusterSetUp() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPL).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     suite = BlockStoragePolicySuite.createDefaultSuite();
@@ -79,7 +82,7 @@ public class TestStoragePolicyPermissionSettings {
 
   private void setFSNameSystemFinalField(String field, boolean value)
       throws NoSuchFieldException, IllegalAccessException {
-    Field f = FSNamesystem.class.getDeclaredField(field);
+    Field f = FSNamesystemInterface.class.getDeclaredField(field);
     f.setAccessible(true);
     Field modifiersField = Field.class.getDeclaredField("modifiers");
     modifiersField.setAccessible(true);

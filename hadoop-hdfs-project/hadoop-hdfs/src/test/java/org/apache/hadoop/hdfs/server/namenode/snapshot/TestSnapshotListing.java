@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -42,14 +45,14 @@ public class TestSnapshotListing {
   private final Path dir = new Path("/test.snapshot/dir");
   
   Configuration conf;
-  MiniDFSCluster cluster;
-  FSNamesystem fsn;
+  MiniDockerDFSCluster cluster;
+  FSNamesystemInterface fsn;
   DistributedFileSystem hdfs;
   
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
     fsn = cluster.getNamesystem();

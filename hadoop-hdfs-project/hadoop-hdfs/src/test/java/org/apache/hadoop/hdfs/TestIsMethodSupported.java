@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertFalse;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -54,17 +57,17 @@ import org.junit.Test;
  * isMethodSupported method in ProtocolMetaInterface.
  */
 public class TestIsMethodSupported {
-  private static MiniDFSCluster cluster = null;
+  private static MiniDockerDFSCluster cluster = null;
   private static final HdfsConfiguration conf = new HdfsConfiguration();
   private static InetSocketAddress nnAddress = null;
   private static InetSocketAddress dnAddress = null;
   
   @BeforeClass
   public static void setUp() throws Exception {
-    cluster = (new MiniDFSCluster.Builder(conf))
+    cluster = (new MiniDockerDFSCluster.Builder(conf))
         .numDataNodes(1).build();
     nnAddress = cluster.getNameNode().getNameNodeAddress();
-    DataNode dn = cluster.getDataNodes().get(0);
+    DataNodeInterface dn = cluster.getDataNodes().get(0);
     dnAddress = new InetSocketAddress(dn.getDatanodeId().getIpAddr(),
                                       dn.getIpcPort());
   }

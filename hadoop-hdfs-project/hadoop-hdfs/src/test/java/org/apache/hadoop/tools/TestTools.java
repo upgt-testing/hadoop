@@ -19,6 +19,9 @@
 package org.apache.hadoop.tools;
 
 import static org.junit.Assert.*;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.PipedInputStream;
@@ -70,7 +73,7 @@ public class TestTools {
   @Test  
   public void testJMXToolAdditionParameter() {
     String pattern = "key = -addition";
-    checkOutput(new String[] { "-service=NameNode", "-server=localhost",
+    checkOutput(new String[] { "-service=NameNodeInterface", "-server=localhost",
         "-addition" }, pattern, System.err, JMXGet.class);
   }
 

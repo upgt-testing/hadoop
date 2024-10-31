@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.balancer;
 
 import org.apache.hadoop.hdfs.DFSConfigKeys;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,7 +28,7 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 
 /**
- * The Balancer ensures that it disperses RPCs to the NameNode
+ * The Balancer ensures that it disperses RPCs to the NameNodeInterface
  * in order to avoid NN's RPC queue saturation.
  */
 public class TestBalancerRPCDelay {

@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
 
@@ -49,7 +52,7 @@ public class TestDatanodeLayoutUpgrade {
     conf.set(
         DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, GenericTestUtils.getTestDir(
             "dfs" + File.separator + "name").toURI().toString());
-    upgrade.upgradeAndVerify(new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    upgrade.upgradeAndVerify(new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
     .manageDataDfsDirs(false).manageNameDfsDirs(false), null);
   }
 
@@ -68,7 +71,7 @@ public class TestDatanodeLayoutUpgrade {
     conf.set(
         DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, GenericTestUtils.getTestDir(
             "dfs" + File.separator + "name").toURI().toString());
-    upgrade.upgradeAndVerify(new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    upgrade.upgradeAndVerify(new MiniDockerDFSCluster.Builder(conf).numDataNodes(1)
         .manageDataDfsDirs(false).manageNameDfsDirs(false), null);
   }
 }

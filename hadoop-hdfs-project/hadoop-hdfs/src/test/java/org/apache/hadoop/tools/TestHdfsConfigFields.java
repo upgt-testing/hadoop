@@ -19,6 +19,9 @@
 package org.apache.hadoop.tools;
 
 import java.util.HashSet;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import org.apache.hadoop.conf.TestConfigurationFieldsBase;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -117,7 +120,7 @@ public class TestHdfsConfigFields extends TestConfigurationFieldsBase {
     // Defined in org.apache.hadoop.fs.CommonConfigurationKeys
     xmlPropsToSkipCompare.add("hadoop.user.group.metrics.percentiles.intervals");
 
-    // Used oddly by DataNode to create new config String
+    // Used oddly by DataNodeInterface to create new config String
     xmlPropsToSkipCompare.add("hadoop.hdfs.configuration.version");
 
     // Some properties have moved to HdfsClientConfigKeys

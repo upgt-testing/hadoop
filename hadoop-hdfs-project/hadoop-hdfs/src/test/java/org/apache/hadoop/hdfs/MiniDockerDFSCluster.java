@@ -12,6 +12,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.StorageType;
+import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
@@ -20,6 +21,7 @@ import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.test.GenericTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -37,7 +39,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.*;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -45,6 +47,17 @@ public class MiniDockerDFSCluster implements Closeable {
 
     // Changing this default may break some tests that assume it is 2.
     private static final int DEFAULT_STORAGES_PER_DATANODE = 2;
+    public static final String PROP_TEST_BUILD_DATA =
+            GenericTestUtils.SYSPROP_TEST_DATA_DIR;
+    /** Configuration option to set the data dir: {@value} */
+    public static final String HDFS_MINIDFS_BASEDIR = "hdfs.minidfs.basedir";
+    /** Configuration option to set the provided data dir: {@value} */
+    public static final String HDFS_MINIDFS_BASEDIR_PROVIDED =
+            "hdfs.minidfs.basedir.provided";
+    public static final String  DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY
+            = DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + ".testing";
+    public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
+            = DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing";
 
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
@@ -888,6 +901,18 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    public NameNodeInterface getNameNode(int idx) {
+        LOG.warn("The getNameNode(int idx) always return the first NameNode for now.");
+        System.out.println("The getNameNode(int idx) always return the first NameNode for now.");
+        try {
+            RemoteObject nameNode = (RemoteObject) getNNRegistry().lookup(NameNode.class.getName());
+            return RemoteObjectProxy.newInstance(nameNode, NameNodeInterface.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get the NameNode remote object through RMI", e);
+        }
+    }
+
+
     public NamenodeProtocolsInterface getNameNodeRpc() {
         return getNameNode().getRpcServer();
     }
@@ -936,6 +961,12 @@ public class MiniDockerDFSCluster implements Closeable {
         throw new UnsupportedOperationException("The restartNameNode(int idx) function is not implemented yet.");
     }
 
+    public void restartNameNode(boolean restart) {
+        if (restart) {
+            restartNameNode();
+        }
+    }
+
     public void shutdownNameNodes() {
         for (NameNodeInterface nameNode : nameNodeProxies) {
             nameNode.stop();
@@ -946,5 +977,45 @@ public class MiniDockerDFSCluster implements Closeable {
         for (int i = 0; i < nameNodeProxies.size(); i++) {
             restartNameNode(i);
         }
+    }
+
+    public void stopDataNode(int idx) {
+        dataNodes.get(idx).stop();
+    }
+
+    public void stopDataNode(String addr) {
+        LOG.warn("The stopDataNode(String addr) function is not implemented yet.");
+        System.out.println("The stopDataNode(String addr) function is not implemented yet.");
+        throw new UnsupportedOperationException("The stopDataNode(String addr) function is not implemented yet.");
+    }
+
+    public int corruptBlockOnDataNodesByDeletingBlockFile(ExtendedBlock block) {
+        LOG.warn("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
+        System.out.println("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
+        throw new UnsupportedOperationException("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
+    }
+
+    public void corruptReplica(int i, ExtendedBlock blk) {
+        LOG.warn("The corruptReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The corruptReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The corruptReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+    public void corruptReplica(DataNodeInterface dn, ExtendedBlock blk) {
+        LOG.warn("The corruptReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The corruptReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The corruptReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+    public void triggerHeartbeats() {
+        LOG.warn("The triggerHeartbeats function is not implemented yet.");
+        System.out.println("The triggerHeartbeats function is not implemented yet.");
+        throw new UnsupportedOperationException("The triggerHeartbeats function is not implemented yet.");
+    }
+
+    public void triggerBlockReports() {
+        LOG.warn("The triggerBlockReports function is not implemented yet.");
+        System.out.println("The triggerBlockReports function is not implemented yet.");
+        throw new UnsupportedOperationException("The triggerBlockReports function is not implemented yet.");
     }
 }

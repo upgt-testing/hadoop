@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.protocol.datatransfer.sasl;
 
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HTTP_POLICY_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.IGNORE_SECURE_PORTS_FOR_TESTING_KEY;
 import static org.junit.Assert.assertArrayEquals;
@@ -138,7 +141,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
         startCluster(clusterConf);
         HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
         clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "");
-        LogCapturer logs = GenericTestUtils.LogCapturer.captureLogs(LoggerFactory.getLogger(DataNode.class));
+        LogCapturer logs = GenericTestUtils.LogCapturer.captureLogs(LoggerFactory.getLogger(DataNodeInterface.class));
         try {
             doTest(clientConf);
             Assert.fail("Should fail if SASL data transfer protection is not " + "configured or not supported in client");
@@ -155,7 +158,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
     public void testDataNodeAbortsIfNoSasl() throws Exception {
         HdfsConfiguration clusterConf = createSecureConfig("");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Cannot start secure DataNode");
+        exception.expectMessage("Cannot start secure DataNodeInterface");
         startCluster(clusterConf);
         cluster.upgradeDatanode(0);
     }
@@ -166,7 +169,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
         clusterConf.set(DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTP_AND_HTTPS.name());
         exception.expect(RuntimeException.class);
         cluster.upgradeDatanode(0);
-        exception.expectMessage("Cannot start secure DataNode");
+        exception.expectMessage("Cannot start secure DataNodeInterface");
         startCluster(clusterConf);
     }
 

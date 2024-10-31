@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +65,7 @@ public class TestSeveralNameNodes {
     harness.conf.setInt(HdfsClientConfigKeys.Failover.SLEEPTIME_MAX_KEY, 1000);
     harness.conf.setInt(HdfsClientConfigKeys.Failover.MAX_ATTEMPTS_KEY, 128);
 
-    final MiniDFSCluster cluster = harness.startCluster();
+    final MiniDockerDFSCluster cluster = harness.startCluster();
     try {
       cluster.waitActive();
       cluster.transitionToActive(0);

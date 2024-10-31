@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.net.InetSocketAddress;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.URI;
 import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
@@ -53,15 +56,15 @@ public class TestHAAuxiliaryPort {
             .addNN(new MiniDFSNNTopology.NNConf("nn1"))
             .addNN(new MiniDFSNNTopology.NNConf("nn2")));
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .nnTopology(topology)
         .numDataNodes(0)
         .build();
     cluster.transitionToActive(0);
     cluster.waitActive();
 
-    NameNode nn0 = cluster.getNameNode(0);
-    NameNode nn1 = cluster.getNameNode(1);
+    NameNodeInterface nn0 = cluster.getNameNode(0);
+    NameNodeInterface nn1 = cluster.getNameNode(1);
 
     // all the addresses below are valid nn0 addresses
     NameNodeRpcServer rpcServer0 = (NameNodeRpcServer)nn0.getRpcServer();

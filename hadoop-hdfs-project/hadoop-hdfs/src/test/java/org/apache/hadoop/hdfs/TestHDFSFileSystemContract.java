@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -33,7 +36,7 @@ import org.junit.Test;
 
 public class TestHDFSFileSystemContract extends FileSystemContractBaseTest {
   
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private String defaultWorkingDirectory;
 
   @Before
@@ -42,7 +45,7 @@ public class TestHDFSFileSystemContract extends FileSystemContractBaseTest {
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
         FileSystemContractBaseTest.TEST_UMASK);
     File basedir = GenericTestUtils.getRandomizedTestDir();
-    cluster = new MiniDFSCluster.Builder(conf, basedir).numDataNodes(2)
+    cluster = new MiniDockerDFSCluster.Builder(conf, basedir).numDataNodes(2)
         .build();
     fs = cluster.getFileSystem();
     defaultWorkingDirectory = "/user/" + 

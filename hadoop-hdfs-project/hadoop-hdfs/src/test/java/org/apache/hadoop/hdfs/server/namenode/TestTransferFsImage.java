@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -62,7 +65,7 @@ public class TestTransferFsImage {
   @Test
   public void testClientSideException() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(0).build();
     NNStorage mockStorage = Mockito.mock(NNStorage.class);
     List<File> localPath = Collections.singletonList(
@@ -93,7 +96,7 @@ public class TestTransferFsImage {
   @Test
   public void testClientSideExceptionOnJustOneDir() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(0).build();
     NNStorage mockStorage = Mockito.mock(NNStorage.class);
     List<File> localPaths = ImmutableList.of(

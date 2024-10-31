@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY;
 
 import java.io.IOException;
@@ -108,7 +111,7 @@ public class TestBatchIbr {
     final Random ran = new Random();
 
     final Configuration conf = newConf(ibrInterval);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(NUM_DATANODES).build();
     final DistributedFileSystem dfs = cluster.getFileSystem();
 
@@ -191,9 +194,9 @@ public class TestBatchIbr {
     return (ms/1000.0) + "s";
   }
 
-  static void logIbrCounts(List<DataNode> datanodes) {
+  static void logIbrCounts(List<DataNodeInterface> datanodes) {
     final String name = "IncrementalBlockReportsNumOps";
-    for(DataNode dn : datanodes) {
+    for(DataNodeInterface dn : datanodes) {
       final MetricsRecordBuilder m = MetricsAsserts.getMetrics(
           dn.getMetrics().name());
       final long ibr = MetricsAsserts.getLongCounter(name, m);

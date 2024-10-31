@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -36,17 +39,17 @@ public class TestStateTransitionFailure {
 
   /**
    * Ensure that a failure to fully transition to the active state causes a
-   * shutdown of the NameNode.
+   * shutdown of the NameNodeInterface.
    */
   @Test
   public void testFailureToTransitionCausesShutdown() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       Configuration conf = new Configuration();
       // Set an illegal value for the trash emptier interval. This will cause
       // the NN to fail to transition to the active state.
       conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .nnTopology(MiniDFSNNTopology.simpleHATopology())
           .numDataNodes(0)
           .checkExitOnShutdown(false)

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.util.EnumSet;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
@@ -114,7 +117,7 @@ public class TestFSImageWithXAttr {
     }
 
     /**
-     * Restart the NameNode, optionally saving a new checkpoint.
+     * Restart the NameNodeInterface, optionally saving a new checkpoint.
      *
      * @param fs DistributedFileSystem used for saving namespace
      * @param persistNamespace boolean true to save a new checkpoint

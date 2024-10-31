@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.tools.offlineImageViewer;
 
 import java.io.BufferedReader;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -93,11 +96,11 @@ public class TestOfflineImageViewerForAcl {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
       Configuration conf = new Configuration();
       conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
 

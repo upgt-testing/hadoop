@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -72,11 +75,11 @@ public class TestDFSClientFailover {
   private static final int FILE_LENGTH_TO_VERIFY = 100;
   
   private final Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   
   @Before
   public void setUpCluster() throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .build();
     cluster.transitionToActive(0);

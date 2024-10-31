@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +52,7 @@ public class TestSlowDatanodeReport {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestSlowDatanodeReport.class);
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
 
   @Before
   public void testSetup() throws Exception {
@@ -60,7 +63,7 @@ public class TestSlowDatanodeReport {
     conf.set(DFS_DATANODE_MIN_OUTLIER_DETECTION_NODES_KEY, "1");
     conf.set(DFS_DATANODE_PEER_METRICS_MIN_OUTLIER_DETECTION_SAMPLES_KEY, "1");
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
 
@@ -71,8 +74,8 @@ public class TestSlowDatanodeReport {
 
   @Test
   public void testSingleNodeReport() throws Exception {
-    List<DataNode> dataNodes = cluster.getDataNodes();
-    DataNode slowNode = dataNodes.get(1);
+    List<DataNodeInterface> dataNodes = cluster.getDataNodes();
+    DataNodeInterface slowNode = dataNodes.get(1);
     OutlierMetrics outlierMetrics = new OutlierMetrics(1.245, 2.69375, 4.5667, 15.5);
     dataNodes.get(0).getPeerMetrics().setTestOutliers(
         ImmutableMap.of(slowNode.getDatanodeHostname() + ":" + slowNode.getIpcPort(),
@@ -101,7 +104,7 @@ public class TestSlowDatanodeReport {
 
   @Test
   public void testMultiNodesReport() throws Exception {
-    List<DataNode> dataNodes = cluster.getDataNodes();
+    List<DataNodeInterface> dataNodes = cluster.getDataNodes();
     OutlierMetrics outlierMetrics1 = new OutlierMetrics(2.498237, 19.2495, 23.568204, 14.5);
     OutlierMetrics outlierMetrics2 = new OutlierMetrics(3.2535, 22.4945, 44.5667, 18.7);
     dataNodes.get(0).getPeerMetrics().setTestOutliers(ImmutableMap.of(

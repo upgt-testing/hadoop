@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertTrue;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
@@ -106,9 +109,9 @@ public class TestHostsFiles {
 
     // Two blocks and four racks
     String racks[] = {"/rack1", "/rack1", "/rack2", "/rack2"};
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
       .numDataNodes(racks.length).racks(racks).build();
-    final FSNamesystem ns = cluster.getNameNode().getNamesystem();
+    final FSNamesystemInterface ns = cluster.getNameNode().getNamesystem();
 
     try {
       // Create a file with one block
@@ -133,7 +136,7 @@ public class TestHostsFiles {
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
-              "Hadoop:service=NameNode,name=NameNodeInfo");
+              "Hadoop:service=NameNodeInterface,name=NameNodeInfo");
       String nodes = (String) mbs.getAttribute(mxbeanName, "LiveNodes");
       assertTrue("Live nodes should contain the decommissioned node",
               nodes.contains("Decommissioned"));
@@ -154,17 +157,17 @@ public class TestHostsFiles {
     hostsFileWriter.initIncludeHosts(new String[]
         {"localhost:52","127.0.0.1:7777"});
 
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
-      final FSNamesystem ns = cluster.getNameNode().getNamesystem();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
+      final FSNamesystemInterface ns = cluster.getNameNode().getNamesystem();
       assertTrue(ns.getNumDeadDataNodes() == 2);
       assertTrue(ns.getNumLiveDataNodes() == 0);
 
       // Testing using MBeans
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
-          "Hadoop:service=NameNode,name=FSNamesystemState");
+          "Hadoop:service=NameNodeInterface,name=FSNamesystemState");
       String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
       assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
       assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
@@ -38,7 +41,7 @@ import org.junit.Rule;
 import org.junit.rules.Timeout;
 
 public class TestErasureCodingPolicyWithSnapshot {
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private Configuration conf;
 
@@ -59,7 +62,7 @@ public class TestErasureCodingPolicyWithSnapshot {
     groupSize = (short) (ecPolicy.getNumDataUnits()
         + ecPolicy.getNumParityUnits());
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(groupSize).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(groupSize).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());
@@ -152,7 +155,7 @@ public class TestErasureCodingPolicyWithSnapshot {
   }
 
   /**
-   * Test verify erasure coding policy is present after restarting the NameNode.
+   * Test verify erasure coding policy is present after restarting the NameNodeInterface.
    */
   @Test
   public void testSnapshotsOnErasureCodingDirAfterNNRestart() throws Exception {

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
@@ -50,13 +53,13 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
 
   @Test
   public void testName() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     HdfsConfiguration conf = createSecureConfig(
         "authentication,privacy");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES)
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES)
           .build();
-      final MiniDFSCluster clusterRef = cluster;
+      final MiniDockerDFSCluster clusterRef = cluster;
       cluster.waitActive();
       FileSystem fsForSuperUser = UserGroupInformation
           .loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
@@ -103,14 +106,14 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
    */
   @Test
   public void testKerberosHdfsBlockTokenInconsistencyNNStartup() throws Exception {
-    MiniDFSCluster dfsCluster = null;
+    MiniDockerDFSCluster dfsCluster = null;
     HdfsConfiguration conf = createSecureConfig(
         "authentication,privacy");
     try {
       conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
       exception.expect(IOException.class);
       exception.expectMessage("Security is enabled but block access tokens");
-      dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      dfsCluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
       dfsCluster.waitActive();
     } finally {
       if (dfsCluster != null) {
@@ -134,14 +137,14 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
     UserGroupInformation.setConfiguration(simpleConf);
 
     // get attribute "SecurityEnabled" with simple configuration
-    try (MiniDFSCluster cluster =
-                 new MiniDFSCluster.Builder(simpleConf).build()) {
+    try (MiniDockerDFSCluster cluster =
+                 new MiniDockerDFSCluster.Builder(simpleConf).build()) {
       cluster.waitActive();
-      NameNode namenode = cluster.getNameNode();
+      NameNodeInterface namenode = cluster.getNameNode();
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
-              "Hadoop:service=NameNode,name=NameNodeStatus");
+              "Hadoop:service=NameNodeInterface,name=NameNodeStatus");
 
       boolean securityEnabled = (boolean) mbs.getAttribute(mxbeanName,
               "SecurityEnabled");
@@ -150,14 +153,14 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
     }
 
     // get attribute "SecurityEnabled" with secure configuration
-    try (MiniDFSCluster cluster =
-                 new MiniDFSCluster.Builder(secureConf).build()) {
+    try (MiniDockerDFSCluster cluster =
+                 new MiniDockerDFSCluster.Builder(secureConf).build()) {
       cluster.waitActive();
-      NameNode namenode = cluster.getNameNode();
+      NameNodeInterface namenode = cluster.getNameNode();
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
-              "Hadoop:service=NameNode,name=NameNodeStatus");
+              "Hadoop:service=NameNodeInterface,name=NameNodeStatus");
 
       boolean securityEnabled = (boolean) mbs.getAttribute(mxbeanName,
               "SecurityEnabled");

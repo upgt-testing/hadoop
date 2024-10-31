@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.util.Map;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
@@ -25,7 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests NameNode interaction for all XAttr APIs.
+ * Tests NameNodeInterface interaction for all XAttr APIs.
  * This test suite covers restarting NN, saving new checkpoint, 
  * and also includes test of xattrs for symlinks. 
  */

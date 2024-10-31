@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
@@ -65,7 +68,7 @@ public class TestErasureCodingMultipleRacks {
     return StripedFileTestUtil.getDefaultECPolicy();
   }
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private ErasureCodingPolicy ecPolicy;
   private Configuration conf;
   private DistributedFileSystem dfs;

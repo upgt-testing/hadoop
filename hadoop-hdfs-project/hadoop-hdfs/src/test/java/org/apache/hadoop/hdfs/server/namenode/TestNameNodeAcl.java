@@ -18,10 +18,13 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.junit.BeforeClass;
 
 /**
- * Tests NameNode interaction for all ACL modification APIs.  This test suite
+ * Tests NameNodeInterface interaction for all ACL modification APIs.  This test suite
  * also covers interaction of setPermission with inodes that have ACLs.
  */
 public class TestNameNodeAcl extends FSAclBaseTest {

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.protocol;
 
 import static org.junit.Assert.assertNotNull;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -87,7 +90,7 @@ public class TestLayoutVersion {
   }
   
   /**
-   * Test to make sure NameNode.Feature support previous features
+   * Test to make sure NameNodeInterface.Feature support previous features
    */
   @Test
   public void testNameNodeFeature() {
@@ -99,7 +102,7 @@ public class TestLayoutVersion {
   }
   
   /**
-   * Test to make sure DataNode.Feature support previous features
+   * Test to make sure DataNodeInterface.Feature support previous features
    */
   @Test
   public void testDataNodeFeature() {
@@ -111,7 +114,7 @@ public class TestLayoutVersion {
   }
 
   /**
-   * Tests expected values for minimum compatible layout version in NameNode
+   * Tests expected values for minimum compatible layout version in NameNodeInterface
    * features.  TRUNCATE, APPEND_NEW_BLOCK and QUOTA_BY_STORAGE_TYPE are all
    * features that launched in the same release.  TRUNCATE was added first, so
    * we expect all 3 features to have a minimum compatible layout version equal
@@ -149,7 +152,7 @@ public class TestLayoutVersion {
   }
 
   /**
-   * Tests that NameNode features are listed in order of minimum compatible
+   * Tests that NameNodeInterface features are listed in order of minimum compatible
    * layout version.  It would be inconsistent to have features listed out of
    * order with respect to minimum compatible layout version, because it would
    * imply going back in time to change compatibility logic in a software release
@@ -171,7 +174,7 @@ public class TestLayoutVersion {
   }
 
   /**
-   * Tests that attempting to add a new NameNode feature out of order with
+   * Tests that attempting to add a new NameNodeInterface feature out of order with
    * respect to minimum compatible layout version will fail fast.
    */
   @Test(expected=AssertionError.class)

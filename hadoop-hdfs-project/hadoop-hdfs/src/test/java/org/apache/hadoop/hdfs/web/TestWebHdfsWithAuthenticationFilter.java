@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.web;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.InetSocketAddress;
 import java.net.URI;
 
@@ -80,7 +83,7 @@ public class TestWebHdfsWithAuthenticationFilter {
   }
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static FileSystem fs;
 
   @BeforeClass
@@ -89,7 +92,7 @@ public class TestWebHdfsWithAuthenticationFilter {
     conf.set(HttpServer2.FILTER_INITIALIZER_PROPERTY,
         CustomizedFilter.Initializer.class.getName());
     conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, "localhost:0");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     InetSocketAddress addr = cluster.getNameNode().getHttpAddress();
     fs = FileSystem.get(
         URI.create("webhdfs://" + NetUtils.getHostPortString(addr)), conf);

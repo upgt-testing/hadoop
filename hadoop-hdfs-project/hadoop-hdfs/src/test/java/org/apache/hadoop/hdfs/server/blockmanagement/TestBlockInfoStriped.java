@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.blockmanagement;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
@@ -230,8 +233,8 @@ public class TestBlockInfoStriped {
     int totalSize = dataBlocks + parityBlocks;
     File builderBaseDir = new File(GenericTestUtils.getRandomizedTempPath());
     Configuration conf = new Configuration();
-    try (MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf, builderBaseDir).numDataNodes(totalSize)
+    try (MiniDockerDFSCluster cluster =
+        new MiniDockerDFSCluster.Builder(conf, builderBaseDir).numDataNodes(totalSize)
             .build()) {
       DistributedFileSystem fs = cluster.getFileSystem();
       fs.enableErasureCodingPolicy(

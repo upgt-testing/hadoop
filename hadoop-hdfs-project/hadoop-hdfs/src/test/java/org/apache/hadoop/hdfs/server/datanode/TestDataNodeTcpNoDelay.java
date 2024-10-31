@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_RPC_SOCKET_FACTORY_CLASS_DEFAULT_KEY;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.slf4j.Logger;
@@ -124,7 +127,7 @@ public class TestDataNodeTcpNoDelay {
     }
 
     /**
-     * Tests the {@code DataNode#transferBlocks()} path by re-replicating an
+     * Tests the {@code DataNodeInterface#transferBlocks()} path by re-replicating an
      * existing block.
      */
     private void transferBlock(DistributedFileSystem dfs) throws Exception {

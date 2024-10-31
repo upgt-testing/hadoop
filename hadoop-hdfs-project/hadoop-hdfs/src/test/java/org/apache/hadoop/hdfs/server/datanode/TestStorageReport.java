@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 
 import org.slf4j.Logger;
@@ -55,14 +58,14 @@ public class TestStorageReport {
   private static final StorageType storageType = StorageType.SSD; // pick non-default.
 
   private static Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   static String bpid;
 
   @Before
   public void startUpCluster() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(REPL_FACTOR)
         .storageTypes(new StorageType[] { storageType, storageType } )
         .build();
@@ -89,8 +92,8 @@ public class TestStorageReport {
     // Make sure we are not testing with the default type, that would not
     // be a very good test.
     assertNotSame(storageType, StorageType.DEFAULT);
-    NameNode nn = cluster.getNameNode();
-    DataNode dn = cluster.getDataNodes().get(0);
+    NameNodeInterface nn = cluster.getNameNode();
+    DataNodeInterface dn = cluster.getDataNodes().get(0);
 
     // Insert a spy object for the NN RPC.
     DatanodeProtocolClientSideTranslatorPB nnSpy =

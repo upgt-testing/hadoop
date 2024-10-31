@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
@@ -85,7 +88,7 @@ public class FsDatasetTestUtil {
    * Stop the lazy writer daemon that saves RAM disk files to persistent storage.
    * @param dn
    */
-  public static void stopLazyWriter(DataNode dn) {
+  public static void stopLazyWriter(DataNodeInterface dn) {
     FsDatasetImpl fsDataset = ((FsDatasetImpl) dn.getFSDataset());
     ((FsDatasetImpl.LazyWriter) fsDataset.lazyWriter.getRunnable()).stop();
   }

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertTrue;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY;
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.KMS_CLIENT_ENC_KEY_CACHE_LOW_WATERMARK;
@@ -76,7 +79,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Test for HDFS encryption zone without external Kerberos KDC by leveraging
- * Kerby-based MiniKDC, MiniKMS and MiniDFSCluster. This provides additional
+ * Kerby-based MiniKDC, MiniKMS and MiniDockerDFSCluster. This provides additional
  * unit test coverage on Secure(Kerberos) KMS + HDFS.
  */
 public class TestSecureEncryptionZoneWithKMS {
@@ -111,7 +114,7 @@ public class TestSecureEncryptionZoneWithKMS {
   private static final long AUTH_TOKEN_VALIDITY = 1;
 
   // MiniDFS
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private HdfsConfiguration conf;
   private FileSystem fs;
   private HdfsAdmin dfsAdmin;
@@ -253,7 +256,7 @@ public class TestSecureEncryptionZoneWithKMS {
         .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
     conf = new HdfsConfiguration(baseConf);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .build();
     cluster.waitActive();
 

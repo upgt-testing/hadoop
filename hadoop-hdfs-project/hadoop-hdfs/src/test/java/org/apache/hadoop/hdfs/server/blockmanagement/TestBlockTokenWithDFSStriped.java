@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.blockmanagement;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
@@ -41,7 +44,7 @@ public class TestBlockTokenWithDFSStriped extends TestBlockTokenWithDFS {
   private final int cellSize = ecPolicy.getCellSize();
   private final int stripesPerBlock = 4;
   private final int numDNs = dataBlocks + parityBlocks + 2;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private Configuration conf;
 
   {
@@ -65,7 +68,7 @@ public class TestBlockTokenWithDFSStriped extends TestBlockTokenWithDFS {
 
     /*
      * prefer non-ephemeral port to avoid conflict with tests using
-     * ephemeral ports on MiniDFSCluster#restartDataNode(true).
+     * ephemeral ports on MiniDockerDFSCluster#restartDataNode(true).
      */
     Configuration[] overlays = new Configuration[numDNs];
     for (int i = 0; i < overlays.length; i++) {
@@ -78,7 +81,7 @@ public class TestBlockTokenWithDFSStriped extends TestBlockTokenWithDFS {
       overlays[i] = c;
     }
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .nameNodePort(ServerSocketUtil.getPort(18020, 100))
         .nameNodeHttpPort(ServerSocketUtil.getPort(19870, 100))
         .numDataNodes(numDNs)

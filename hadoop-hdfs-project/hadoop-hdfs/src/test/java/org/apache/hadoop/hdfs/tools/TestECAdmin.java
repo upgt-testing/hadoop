@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.tools;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
@@ -44,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 public class TestECAdmin {
   public static final Logger LOG = LoggerFactory.getLogger(TestECAdmin.class);
   private Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private ECAdmin admin = new ECAdmin(conf);
 
   private final ByteArrayOutputStream out = new ByteArrayOutputStream();

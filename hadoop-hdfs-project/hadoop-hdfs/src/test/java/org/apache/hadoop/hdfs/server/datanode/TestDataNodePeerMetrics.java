@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import java.util.ArrayList;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +41,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
- * This class tests various cases of DataNode peer metrics.
+ * This class tests various cases of DataNodeInterface peer metrics.
  */
 public class TestDataNodePeerMetrics {
 
@@ -53,7 +56,7 @@ public class TestDataNodePeerMetrics {
     conf.setBoolean(DFS_DATANODE_PEER_STATS_ENABLED_KEY, true);
 
     final DataNodePeerMetrics peerMetrics = DataNodePeerMetrics.create(
-        "Sample-DataNode", conf);
+        "Sample-DataNodeInterface", conf);
     MetricsTestHelper.replaceRollingAveragesScheduler(
         peerMetrics.getSendPacketDownstreamRollingAverages(),
         numWindows, windowSize, TimeUnit.SECONDS);
@@ -100,7 +103,7 @@ public class TestDataNodePeerMetrics {
     conf.setBoolean(DFS_DATANODE_PEER_STATS_ENABLED_KEY, true);
 
     final DataNodePeerMetrics peerMetrics =
-        DataNodePeerMetrics.create("Sample-DataNode", conf);
+        DataNodePeerMetrics.create("Sample-DataNodeInterface", conf);
     MutableRollingAverages rollingAverages =
         peerMetrics.getSendPacketDownstreamRollingAverages();
     rollingAverages.setRecordValidityMs(numWindows * scheduleInterval);

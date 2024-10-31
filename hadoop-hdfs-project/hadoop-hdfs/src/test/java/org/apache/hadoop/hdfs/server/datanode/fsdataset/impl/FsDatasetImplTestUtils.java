@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.commons.io.FileExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +78,7 @@ public class FsDatasetImplTestUtils implements FsDatasetTestUtils {
   private static final DataChecksum DEFAULT_CHECKSUM =
       DataChecksum.newDataChecksum(DataChecksum.Type.CRC32C, 512);
   /**
-   * By default we assume 2 data directories (volumes) per DataNode.
+   * By default we assume 2 data directories (volumes) per DataNodeInterface.
    */
   public static final int DEFAULT_NUM_OF_DATA_DIRS = 2;
 
@@ -206,7 +209,7 @@ public class FsDatasetImplTestUtils implements FsDatasetTestUtils {
     }
   }
 
-  public FsDatasetImplTestUtils(DataNode datanode) {
+  public FsDatasetImplTestUtils(DataNodeInterface datanode) {
     Preconditions.checkArgument(
         datanode.getFSDataset() instanceof FsDatasetImpl);
     dataset = (FsDatasetImpl) datanode.getFSDataset();

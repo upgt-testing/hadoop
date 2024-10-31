@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs.client.impl;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.DataOutputStream;
@@ -63,7 +66,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
 /**
- * A helper class to setup the cluster, and get to BlockReader and DataNode for a block.
+ * A helper class to setup the cluster, and get to BlockReader and DataNodeInterface for a block.
  */
 public class BlockReaderTestUtil {
   /**
@@ -77,7 +80,7 @@ public class BlockReaderTestUtil {
   }
 
   private HdfsConfiguration conf = null;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
 
   /**
    * Setup the cluster
@@ -86,7 +89,7 @@ public class BlockReaderTestUtil {
     this(replicationFactor, new HdfsConfiguration());
   }
 
-  public BlockReaderTestUtil(MiniDFSCluster cluster, HdfsConfiguration conf) {
+  public BlockReaderTestUtil(MiniDockerDFSCluster cluster, HdfsConfiguration conf) {
     this.conf = conf;
     this.cluster = cluster;
   }
@@ -94,7 +97,7 @@ public class BlockReaderTestUtil {
   public BlockReaderTestUtil(int replicationFactor, HdfsConfiguration config) throws Exception {
     this.conf = config;
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, replicationFactor);
-    cluster = new MiniDFSCluster.Builder(conf).format(true).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).format(true).build();
     cluster.waitActive();
   }
 
@@ -107,7 +110,7 @@ public class BlockReaderTestUtil {
     }
   }
 
-  public MiniDFSCluster getCluster() {
+  public MiniDockerDFSCluster getCluster() {
     return cluster;
   }
 
@@ -229,9 +232,9 @@ public class BlockReaderTestUtil {
   }
 
   /**
-   * Get a DataNode that serves our testBlock.
+   * Get a DataNodeInterface that serves our testBlock.
    */
-  public DataNode getDataNode(LocatedBlock testBlock) {
+  public DataNodeInterface getDataNode(LocatedBlock testBlock) {
     DatanodeInfo[] nodes = testBlock.getLocations();
     int ipcport = nodes[0].getIpcPort();
     return cluster.getDataNode(ipcport);
@@ -264,7 +267,7 @@ public class BlockReaderTestUtil {
         Level.TRACE);
     LogManager.getLogger(ShortCircuitShm.class.getName()).setLevel(
         Level.TRACE);
-    LogManager.getLogger(DataNode.class.getName()).setLevel(
+    LogManager.getLogger(DataNodeInterface.class.getName()).setLevel(
         Level.TRACE);
   }
 }

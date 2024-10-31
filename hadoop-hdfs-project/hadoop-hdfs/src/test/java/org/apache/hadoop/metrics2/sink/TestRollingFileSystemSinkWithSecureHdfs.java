@@ -19,6 +19,9 @@
 package org.apache.hadoop.metrics2.sink;
 
 import java.io.File;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
@@ -69,7 +72,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
   private static String hdfsPrincipal;
   private static String hdfsKeytab;
   private static String spnegoPrincipal;
-  private MiniDFSCluster cluster = null;
+  private MiniDockerDFSCluster cluster = null;
   private UserGroupInformation sink = null;
 
   /**
@@ -108,7 +111,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs
     RollingFileSystemSink.hasFlushed = false;
     RollingFileSystemSink.suppliedConf = conf;
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES)
         .build();
     cluster.waitActive();
     createDirectoriesSecurely();

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -82,7 +85,7 @@ public class TestQuota {
   private static final ByteArrayOutputStream ERR_STREAM = new ByteArrayOutputStream();
   private static final PrintStream OLD_OUT = System.out;
   private static final PrintStream OLD_ERR = System.err;
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static DistributedFileSystem dfs;
   private static FileSystem webhdfs;
   /* set a smaller block size so that we can test with smaller space quotas */
@@ -95,7 +98,7 @@ public class TestQuota {
   public static void setUpClass() throws Exception {
     conf = new HdfsConfiguration();
     conf.set(
-        MiniDFSCluster.HDFS_MINIDFS_BASEDIR,
+        MiniDockerDFSCluster.HDFS_MINIDFS_BASEDIR,
         GenericTestUtils.getTestDir("my-test-quota").getAbsolutePath());
     conf.setInt("dfs.content-summary.limit", 4);
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
@@ -119,7 +122,7 @@ public class TestQuota {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
 
@@ -1131,8 +1134,8 @@ public class TestQuota {
     // Make it relinquish locks. When run serially, the result should
     // be identical.
     dfsConf.setInt(DFSConfigKeys.DFS_CONTENT_SUMMARY_LIMIT_KEY, 2);
-    MiniDFSCluster dfsCluster =
-      new MiniDFSCluster.Builder(dfsConf).numDataNodes(3).build();
+    MiniDockerDFSCluster dfsCluster =
+      new MiniDockerDFSCluster.Builder(dfsConf).numDataNodes(3).build();
     dfsCluster.waitActive();
     FileSystem fs = dfsCluster.getFileSystem();
     DFSAdmin admin = new DFSAdmin(dfsConf);

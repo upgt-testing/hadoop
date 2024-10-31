@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.PrintStream;
 
 import org.apache.hadoop.hdfs.HdfsConfiguration;
@@ -31,12 +34,12 @@ import org.junit.Before;
 
 public class TestGetGroupsWithHA extends GetGroupsTestBase {
   
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   
   @Before
   public void setUpNameNode() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(0).build();
     HATestUtil.setFailoverConfigurations(cluster, conf);

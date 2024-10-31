@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -131,7 +134,7 @@ public class TestNameEditsConfigs {
     Path file1 = new Path("TestNameEditsConfigs1");
     Path file2 = new Path("TestNameEditsConfigs2");
     Path file3 = new Path("TestNameEditsConfigs3");
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     SecondaryNameNode secondary = null;
     Configuration conf = null;
     FileSystem fileSys = null;
@@ -164,7 +167,7 @@ public class TestNameEditsConfigs {
     conf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_EDITS_DIR_KEY, checkpointNameAndEdits.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
     // Manage our own dfs directories
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
                                 .numDataNodes(NUM_DATA_NODES)
                                 .manageNameDfsDirs(false).build();
 
@@ -199,7 +202,7 @@ public class TestNameEditsConfigs {
              "," + checkpointNameAndEdits.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
     // Manage our own dfs directories. Do not format.
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
                                               .format(false)
                                               .manageNameDfsDirs(false)
                                               .build();
@@ -234,7 +237,7 @@ public class TestNameEditsConfigs {
     conf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_DIR_KEY, checkpointNameDir.getPath());
     conf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_EDITS_DIR_KEY, checkpointEditsDir.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
                                 .numDataNodes(NUM_DATA_NODES)
                                 .format(false)
                                 .manageNameDfsDirs(false)
@@ -279,7 +282,7 @@ public class TestNameEditsConfigs {
     conf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_EDITS_DIR_KEY, checkpointEditsDir.getPath() +
         "," + checkpointNameAndEdits.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
                                 .numDataNodes(NUM_DATA_NODES)
                                 .format(false)
                                 .manageNameDfsDirs(false)
@@ -320,7 +323,7 @@ public class TestNameEditsConfigs {
    */
   @Test
   public void testNameEditsRequiredConfigs() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     File nameAndEditsDir = new File(base_dir, "name_and_edits");
     File nameAndEditsDir2 = new File(base_dir, "name_and_edits2");
     File nameDir = new File(base_dir, "name");
@@ -338,7 +341,7 @@ public class TestNameEditsConfigs {
       conf.set(
           DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
           nameAndEditsDir.toURI().toString());
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .numDataNodes(NUM_DATA_NODES)
           .manageNameDfsDirs(false)
           .build();
@@ -366,7 +369,7 @@ public class TestNameEditsConfigs {
       conf.set(
           DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_REQUIRED_KEY,
           nameAndEditsDir2.toURI().toString());
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .numDataNodes(NUM_DATA_NODES)
           .manageNameDfsDirs(false)
           .build();
@@ -387,7 +390,7 @@ public class TestNameEditsConfigs {
           DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
           nameAndEditsDir.toURI().toString(),
           nameAndEditsDir2.toURI().toString());
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .numDataNodes(NUM_DATA_NODES)
           .manageNameDfsDirs(false)
           .build();
@@ -415,7 +418,7 @@ public class TestNameEditsConfigs {
     Path file1 = new Path("TestNameEditsConfigs1");
     Path file2 = new Path("TestNameEditsConfigs2");
     Path file3 = new Path("TestNameEditsConfigs3");
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     Configuration conf = null;
     FileSystem fileSys = null;
     File nameOnlyDir = new File(base_dir, "name");
@@ -431,7 +434,7 @@ public class TestNameEditsConfigs {
     
     try {
       // Manage our own dfs directories
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
                                   .numDataNodes(NUM_DATA_NODES)
                                   .manageNameDfsDirs(false)
                                   .build();
@@ -465,7 +468,7 @@ public class TestNameEditsConfigs {
     
     try {
       // Manage our own dfs directories. Do not format.
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
                                   .numDataNodes(NUM_DATA_NODES)
                                   .format(false)
                                   .manageNameDfsDirs(false)
@@ -498,7 +501,7 @@ public class TestNameEditsConfigs {
       conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameOnlyDir.getPath());
       conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, editsOnlyDir.getPath());
       replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
                                   .numDataNodes(NUM_DATA_NODES)
                                   .format(false)
                                   .manageNameDfsDirs(false)
@@ -526,7 +529,7 @@ public class TestNameEditsConfigs {
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, nameAndEditsDir.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
                                   .numDataNodes(NUM_DATA_NODES)
                                   .format(false)
                                   .manageNameDfsDirs(false)
@@ -552,7 +555,7 @@ public class TestNameEditsConfigs {
              "," + nameAndEditsDir.getPath());
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
                                   .numDataNodes(NUM_DATA_NODES)
                                   .format(false)
                                   .manageNameDfsDirs(false)
@@ -580,7 +583,7 @@ public class TestNameEditsConfigs {
    */
   @Test
   public void testCheckPointDirsAreTrimmed() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     SecondaryNameNode secondary = null;
     File checkpointNameDir1 = new File(base_dir, "chkptName1");
     File checkpointEditsDir1 = new File(base_dir, "chkptEdits1");
@@ -596,7 +599,7 @@ public class TestNameEditsConfigs {
     conf.setStrings(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_EDITS_DIR_KEY,
         whiteSpace + checkpointEditsDir1.getPath() + whiteSpace, whiteSpace
             + checkpointEditsDir2.getPath() + whiteSpace);
-    cluster = new MiniDFSCluster.Builder(conf).manageNameDfsDirs(false)
+    cluster = new MiniDockerDFSCluster.Builder(conf).manageNameDfsDirs(false)
         .numDataNodes(3).build();
     try {
       cluster.waitActive();

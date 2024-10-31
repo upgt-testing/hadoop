@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.slf4j.Logger;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -36,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TestWriteStripedFileWithFailure {
   public static final Logger LOG = LoggerFactory
       .getLogger(TestWriteStripedFileWithFailure.class);
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private FileSystem fs;
   private Configuration conf = new HdfsConfiguration();
 
@@ -57,7 +60,7 @@ public class TestWriteStripedFileWithFailure {
 
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDNs).build();
     cluster.getFileSystem().getClient().setErasureCodingPolicy("/",
         StripedFileTestUtil.getDefaultECPolicy().getName());
     fs = cluster.getFileSystem();

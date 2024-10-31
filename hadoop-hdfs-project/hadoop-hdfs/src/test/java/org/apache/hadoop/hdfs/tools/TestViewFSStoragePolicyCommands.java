@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.tools;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsConstants;
@@ -45,7 +48,7 @@ public class TestViewFSStoragePolicyCommands extends TestStoragePolicyCommands {
     conf = new HdfsConfiguration();
     String clusterName = "cluster";
     cluster =
-        new MiniDFSCluster.Builder(conf).nnTopology(
+        new MiniDockerDFSCluster.Builder(conf).nnTopology(
             MiniDFSNNTopology.simpleFederatedTopology(2))
             .numDataNodes(2)
             .build();

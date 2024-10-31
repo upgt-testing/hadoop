@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.tools.offlineImageViewer;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -68,11 +71,11 @@ public class TestOfflineImageViewerForXAttr {
    */
   @BeforeClass
   public static void createOriginalFSImage() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     Configuration conf = new Configuration();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
       // Create a name space with XAttributes

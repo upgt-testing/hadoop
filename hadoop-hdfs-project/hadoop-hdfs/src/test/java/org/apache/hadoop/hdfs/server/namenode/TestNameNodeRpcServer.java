@@ -17,14 +17,17 @@
  */
 
 /*
- * Test the MiniDFSCluster functionality that allows "dfs.datanode.address",
+ * Test the MiniDockerDFSCluster functionality that allows "dfs.datanode.address",
  * "dfs.datanode.http.address", and "dfs.datanode.ipc.address" to be
- * configurable. The MiniDFSCluster.startDataNodes() API now has a parameter
+ * configurable. The MiniDockerDFSCluster.startDataNodes() API now has a parameter
  * that will check these properties if told to do so.
  */
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_IP_PROXY_USERS;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_RPC_BIND_HOST_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -51,14 +54,14 @@ public class TestNameNodeRpcServer {
   public void testNamenodeRpcBindAny() throws IOException {
     Configuration conf = new HdfsConfiguration();
 
-    // The name node in MiniDFSCluster only binds to 127.0.0.1.
+    // The name node in MiniDockerDFSCluster only binds to 127.0.0.1.
     // We can set the bind address to 0.0.0.0 to make it listen
     // to all interfaces.
     conf.set(DFS_NAMENODE_RPC_BIND_HOST_KEY, "0.0.0.0");
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).build();
       cluster.waitActive();
       assertEquals("0.0.0.0", ((NameNodeRpcServer)cluster.getNameNodeRpc())
           .getClientRpcServer().getListenerAddress().getHostName());
@@ -72,7 +75,7 @@ public class TestNameNodeRpcServer {
   }
 
   /**
-   * Get the preferred DataNode location for the first block of the
+   * Get the preferred DataNodeInterface location for the first block of the
    * given file.
    * @param fs The file system to use
    * @param p The path to use
@@ -104,11 +107,11 @@ public class TestNameNodeRpcServer {
     // our change overrides the random choice of datanode.
     final String[] racks = new String[]{"/rack1", "/rack2", "/rack3"};
     final String[] hosts = new String[]{"node1", "node2", "node3"};
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     final CallerContext original = CallerContext.getCurrent();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDockerDFSCluster.Builder(conf)
           .racks(racks).hosts(hosts).numDataNodes(hosts.length)
           .build();
       cluster.waitActive();

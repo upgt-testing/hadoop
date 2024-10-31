@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertTrue;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.io.IOException;
 
@@ -36,7 +39,7 @@ import org.apache.hadoop.test.PathUtils;
 import org.junit.Test;
 
 /**
- * This class tests various cases where faults are injected to DataNode.
+ * This class tests various cases where faults are injected to DataNodeInterface.
  */
 public class TestDataNodeFaultInjector {
   private static final Logger LOG = LoggerFactory
@@ -132,7 +135,7 @@ public class TestDataNodeFaultInjector {
         / 2;
     conf.setLong(DFSConfigKeys.DFS_DATANODE_SLOW_IO_WARNING_THRESHOLD_KEY,
         datanodeSlowLogThresholdMs);
-    conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.toString());
+    conf.set(MiniDockerDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.toString());
 
     /**
      * configure to avoid resulting in pipeline failure due to read socket
@@ -147,9 +150,9 @@ public class TestDataNodeFaultInjector {
         HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure.POLICY_KEY,
         "ALWAYS");
 
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
 
       final FileSystem fs = cluster.getFileSystem();

@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertTrue;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.io.IOException;
 import java.util.Arrays;
 import org.slf4j.Logger;
@@ -37,9 +40,9 @@ public class TestLargeBlock {
 
     /**
      *  {
-     *    GenericTestUtils.setLogLevel(DataNode.LOG, Level.ALL);
+     *    GenericTestUtils.setLogLevel(DataNodeInterface.LOG, Level.ALL);
      *    GenericTestUtils.setLogLevel(LeaseManager.LOG, Level.ALL);
-     *    GenericTestUtils.setLogLevel(FSNamesystem.LOG, Level.ALL);
+     *    GenericTestUtils.setLogLevel(FSNamesystemInterface.LOG, Level.ALL);
      *    GenericTestUtils.setLogLevel(DFSClient.LOG, Level.ALL);
      *    GenericTestUtils.setLogLevel(TestLargeBlock.LOG, Level.ALL);
      *  }

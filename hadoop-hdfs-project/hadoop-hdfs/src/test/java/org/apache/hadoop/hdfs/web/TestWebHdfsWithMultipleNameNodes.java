@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.web;
 
 import java.net.InetSocketAddress;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.URI;
 
 import org.slf4j.Logger;
@@ -52,7 +55,7 @@ public class TestWebHdfsWithMultipleNameNodes {
   }
 
   private static final Configuration conf = new HdfsConfiguration();
-  private static MiniDFSCluster cluster;
+  private static MiniDockerDFSCluster cluster;
   private static WebHdfsFileSystem[] webhdfs;
 
   @BeforeClass
@@ -69,7 +72,7 @@ public class TestWebHdfsWithMultipleNameNodes {
       throws Exception {
     LOG.info("nNameNodes=" + nNameNodes + ", nDataNodes=" + nDataNodes);
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDockerDFSCluster.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(nNameNodes))
         .numDataNodes(nDataNodes)
         .build();

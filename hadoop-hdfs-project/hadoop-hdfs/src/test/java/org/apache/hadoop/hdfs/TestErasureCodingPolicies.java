@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.CreateFlag;
@@ -62,11 +65,11 @@ import static org.junit.Assert.*;
 
 public class TestErasureCodingPolicies {
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private DistributedFileSystem fs;
   private static final int BLOCK_SIZE = 1024 * 1024;
   private ErasureCodingPolicy ecPolicy;
-  private FSNamesystem namesystem;
+  private FSNamesystemInterface namesystem;
 
   public ErasureCodingPolicy getEcPolicy() {
     return StripedFileTestUtil.getDefaultECPolicy();
@@ -80,7 +83,7 @@ public class TestErasureCodingPolicies {
     ecPolicy = getEcPolicy();
     conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).
+    cluster = new MiniDockerDFSCluster.Builder(conf).
         numDataNodes(ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits()).
         build();
     cluster.waitActive();

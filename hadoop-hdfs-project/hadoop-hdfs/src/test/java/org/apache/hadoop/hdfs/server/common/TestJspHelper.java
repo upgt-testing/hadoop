@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.common;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
@@ -398,7 +401,7 @@ public class TestJspHelper {
     when(request.getParameter(JspHelper.DELEGATION_PARAMETER_NAME)).thenReturn(
         tokenString);
 
-    NameNode mockNN = mock(NameNode.class);
+    NameNodeInterface mockNN = mock(NameNodeInterface.class);
     Mockito.doCallRealMethod().when(mockNN)
         .verifyToken(Mockito.any(), Mockito.any());
     when(context.getAttribute("name.node")).thenReturn(mockNN);

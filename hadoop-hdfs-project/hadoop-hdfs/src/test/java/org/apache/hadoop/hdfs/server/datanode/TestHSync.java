@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.apache.hadoop.test.MetricsAsserts.assertCounter;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.test.MetricsAsserts.getMetrics;
 
 import java.io.IOException;
@@ -43,11 +46,11 @@ import org.junit.Test;
 
 public class TestHSync {
   
-  private void checkSyncMetric(MiniDFSCluster cluster, int dn, long value) {
-    DataNode datanode = cluster.getDataNodes().get(dn);
+  private void checkSyncMetric(MiniDockerDFSCluster cluster, int dn, long value) {
+    DataNodeInterface datanode = cluster.getDataNodes().get(dn);
     assertCounter("FsyncCount", value, getMetrics(datanode.getMetrics().name()));    
   }
-  private void checkSyncMetric(MiniDFSCluster cluster, long value) {
+  private void checkSyncMetric(MiniDockerDFSCluster cluster, long value) {
     checkSyncMetric(cluster, 0, value);
   }
   /** Test basic hsync cases */
@@ -63,7 +66,7 @@ public class TestHSync {
 
   private void testHSyncOperation(boolean testWithAppend) throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     final DistributedFileSystem fs = cluster.getFileSystem();
 
     final Path p = new Path("/testHSync/foo");
@@ -120,7 +123,7 @@ public class TestHSync {
   @Test
   public void testHSyncBlockBoundary() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
     final FileSystem fs = cluster.getFileSystem();
     
     final Path p = new Path("/testHSyncBlockBoundary/foo");
@@ -150,7 +153,7 @@ public class TestHSync {
   @Test
   public void testSequenceFileSync() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
 
     final FileSystem fs = cluster.getFileSystem();
     final Path p = new Path("/testSequenceFileSync/foo");
@@ -184,7 +187,7 @@ public class TestHSync {
   @Test
   public void testHSyncWithReplication() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
     final FileSystem fs = cluster.getFileSystem();
 
     final Path p = new Path("/testHSyncWithReplication/foo");

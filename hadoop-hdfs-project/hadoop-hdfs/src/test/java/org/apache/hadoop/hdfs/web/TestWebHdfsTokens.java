@@ -19,6 +19,9 @@
 package org.apache.hadoop.hdfs.web;
 
 import static org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod.KERBEROS;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod.SIMPLE;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY;
@@ -270,13 +273,13 @@ public class TestWebHdfsTokens {
   
   @Test
   public void testLazyTokenFetchForWebhdfs() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
     UserGroupInformation ugi = null;
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
       initSecureConf(clusterConf);
 
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(1).build();
+      cluster = new MiniDockerDFSCluster.Builder(clusterConf).numDataNodes(1).build();
       cluster.waitActive();
 
       ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
@@ -307,7 +310,7 @@ public class TestWebHdfsTokens {
   @Test
   public void testSetTokenServiceAndKind() throws Exception {
     initEnv();
-    MiniDFSCluster cluster = null;
+    MiniDockerDFSCluster cluster = null;
 
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -318,7 +321,7 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking s[ecurity is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(0).build();
+      cluster = new MiniDockerDFSCluster.Builder(clusterConf).numDataNodes(0).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem

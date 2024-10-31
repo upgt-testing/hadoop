@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs.tools;
 
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import java.net.URISyntaxException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -43,7 +46,7 @@ public class TestStoragePolicyCommands {
   private static final int SIZE = 128;
 
   protected static Configuration conf;
-  protected static MiniDFSCluster cluster;
+  protected static MiniDockerDFSCluster cluster;
   protected static FileSystem fs;
 
   @Before
@@ -53,7 +56,7 @@ public class TestStoragePolicyCommands {
         StoragePolicySatisfierMode.EXTERNAL.toString());
     StorageType[][] newtypes = new StorageType[][] {
         {StorageType.ARCHIVE, StorageType.DISK}};
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL)
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(REPL)
         .storageTypes(newtypes).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();

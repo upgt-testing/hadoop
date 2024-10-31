@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.thirdparty.com.google.common.primitives.Ints;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -51,7 +54,7 @@ public class TestExternalBlockReader {
         "org.apache.hadoop.hdfs.NonExistentReplicaAccessorBuilderClass");
     conf.setLong(HdfsClientConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 0);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     final int TEST_LENGTH = 2048;
@@ -276,7 +279,7 @@ public class TestExternalBlockReader {
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 0);
     String uuid = UUID.randomUUID().toString();
     conf.set(SYNTHETIC_BLOCK_READER_TEST_UUID_KEY, uuid);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
         .hosts(new String[] {NetUtils.getLocalHostname()})
         .build();
     final int TEST_LENGTH = 2047;

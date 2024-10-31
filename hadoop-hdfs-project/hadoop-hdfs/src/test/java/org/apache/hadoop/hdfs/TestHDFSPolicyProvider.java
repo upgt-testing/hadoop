@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.*;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -89,7 +92,7 @@ public class TestHDFSPolicyProvider {
   public static List<Class<?>[]> data() {
     return Arrays.asList(new Class<?>[][]{
         {NameNodeRpcServer.class},
-        {DataNode.class},
+        {DataNodeInterface.class},
         {JournalNodeRpcServer.class}
     });
   }

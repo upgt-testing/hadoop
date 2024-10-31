@@ -18,6 +18,9 @@
 package org.apache.hadoop.hdfs;
 
 import org.slf4j.Logger;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -48,7 +51,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy {
   public static final Logger LOG =
       LoggerFactory.getLogger(TestUnsetAndChangeDirectoryEcPolicy.class);
 
-  private MiniDFSCluster cluster;
+  private MiniDockerDFSCluster cluster;
   private Configuration conf = new Configuration();
   private DistributedFileSystem fs;
   private ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
@@ -71,7 +74,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy {
           CodecUtil.IO_ERASURECODE_CODEC_RS_RAWCODERS_KEY,
           NativeRSRawErasureCoderFactory.CODER_NAME);
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
+    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(
         dataBlocks + parityBlocks).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();

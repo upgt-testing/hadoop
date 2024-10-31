@@ -17,6 +17,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import java.io.IOException;
@@ -37,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This test brings up a MiniDockerDFSCluster with 1 NameNode and 0
+ * This test brings up a MiniDockerDFSCluster with 1 NameNodeInterface and 0
  * DataNodes with kerberos authentication enabled using user-specified
  * KDC, principals, and keytabs.
  *
@@ -67,9 +70,9 @@ public class TestSecureNameNodeWithExternalKdc {
             String nnPrincipal = System.getProperty("dfs.namenode.kerberos.principal");
             String nnSpnegoPrincipal = System.getProperty("dfs.namenode.kerberos.internal.spnego.principal");
             String nnKeyTab = System.getProperty("dfs.namenode.keytab.file");
-            assertNotNull("NameNode principal was not specified", nnPrincipal);
-            assertNotNull("NameNode SPNEGO principal was not specified", nnSpnegoPrincipal);
-            assertNotNull("NameNode keytab was not specified", nnKeyTab);
+            assertNotNull("NameNodeInterface principal was not specified", nnPrincipal);
+            assertNotNull("NameNodeInterface SPNEGO principal was not specified", nnSpnegoPrincipal);
+            assertNotNull("NameNodeInterface keytab was not specified", nnKeyTab);
             Configuration conf = new HdfsConfiguration();
             conf.set(CommonConfigurationKeys.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
             conf.set(DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY, nnPrincipal);

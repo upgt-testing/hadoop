@@ -17,6 +17,9 @@
  */
 package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 import org.apache.hadoop.fs.CreateFlag;
+import org.apache.hadoop.hdfs.remoteProxies.*;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
@@ -99,7 +102,7 @@ public class TestLazyPersistFiles extends LazyPersistTestCase {
     makeTestFile(path1, BLOCK_SIZE, true);
     ensureFileReplicasOnStorageType(path1, RAM_DISK);
 
-    // Stop the DataNode.
+    // Stop the DataNodeInterface.
     shutdownDataNodes();
     assertThat(cluster.getNamesystem().getNumDeadDataNodes(), is(1));
 
@@ -125,7 +128,7 @@ public class TestLazyPersistFiles extends LazyPersistTestCase {
     makeTestFile(path1, BLOCK_SIZE, true);
     ensureFileReplicasOnStorageType(path1, RAM_DISK);
 
-    // Stop the DataNode and sleep for the time it takes the NN to
+    // Stop the DataNodeInterface and sleep for the time it takes the NN to
     // detect the DN as being dead.
     shutdownDataNodes();
 
@@ -292,7 +295,7 @@ public class TestLazyPersistFiles extends LazyPersistTestCase {
     final int seed = 0xFADED;
     Path path = new Path("/" + methodName + ".Writer.File.dat");
 
-    DataNode dn = cluster.getDataNodes().get(0);
+    DataNodeInterface dn = cluster.getDataNodes().get(0);
     FsDatasetSpi.FsVolumeReferences volumes =
         DataNodeTestUtils.getFSDataset(dn).getFsVolumeReferences();
     int[] beforeCnts = new int[volumes.size()];
