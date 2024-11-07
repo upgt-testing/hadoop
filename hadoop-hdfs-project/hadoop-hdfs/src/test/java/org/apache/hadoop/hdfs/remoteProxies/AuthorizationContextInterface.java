@@ -1,0 +1,40 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface AuthorizationContextInterface {
+    void setDoCheckOwner(boolean arg0);
+    void setCallerContext(CallerContextInterface arg0);
+    boolean isIgnoreEmptyDir();
+    void setSnapshotId(int arg0);
+    void setSupergroup(java.lang.String arg0);
+    void setInodeAttrs(org.apache.hadoop.hdfs.server.namenode.INodeAttributes[] arg0);
+    CallerContextInterface getCallerContext();
+    void setAccess(org.apache.hadoop.fs.permission.FsAction arg0);
+    void setIgnoreEmptyDir(boolean arg0);
+    int hashCode();
+    boolean isDoCheckOwner();
+    org.apache.hadoop.fs.permission.FsAction getAncestorAccess();
+    java.lang.String getFsOwner();
+    boolean equals(java.lang.Object arg0);
+    java.lang.String getOperationName();
+    org.apache.hadoop.fs.permission.FsAction getParentAccess();
+    int getAncestorIndex();
+    void setFsOwner(java.lang.String arg0);
+    java.lang.String getPath();
+    UserGroupInformationInterface getCallerUgi();
+    void setCallerUgi(UserGroupInformationInterface arg0);
+    org.apache.hadoop.fs.permission.FsAction getSubAccess();
+    void setPath(java.lang.String arg0);
+    int getSnapshotId();
+    void setAncestorAccess(org.apache.hadoop.fs.permission.FsAction arg0);
+    void setParentAccess(org.apache.hadoop.fs.permission.FsAction arg0);
+    java.lang.String getSupergroup();
+    void setAncestorIndex(int arg0);
+    void setOperationName(java.lang.String arg0);
+    void setPathByNameArr(byte[][] arg0);
+    byte[][] getPathByNameArr();
+    void setInodes(INodeInterface[] arg0);
+    void setSubAccess(org.apache.hadoop.fs.permission.FsAction arg0);
+    org.apache.hadoop.fs.permission.FsAction getAccess();
+    org.apache.hadoop.hdfs.server.namenode.INodeAttributes[] getInodeAttrs();
+    INodeInterface[] getInodes();
+}

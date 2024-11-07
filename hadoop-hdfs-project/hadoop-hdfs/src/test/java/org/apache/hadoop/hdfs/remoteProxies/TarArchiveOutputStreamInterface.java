@@ -1,0 +1,42 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface TarArchiveOutputStreamInterface {
+    void setBigNumberMode(int arg0);
+    void putArchiveEntry(org.apache.commons.compress.archivers.ArchiveEntry arg0) throws java.io.IOException;
+    boolean shouldBeReplaced(char arg0);
+    boolean handleLongName(TarArchiveEntryInterface arg0, java.lang.String arg1, java.util.Map<java.lang.String, java.lang.String> arg2, java.lang.String arg3, byte arg4, java.lang.String arg5) throws java.io.IOException;
+    int getCount();
+    void addFileTimePaxHeaderForBigNumber(java.util.Map<java.lang.String, java.lang.String> arg0, java.lang.String arg1, java.nio.file.attribute.FileTime arg2, long arg3);
+    void writeEOFRecord() throws java.io.IOException;
+    int getRecordSize();
+    void writePaxHeaders(TarArchiveEntryInterface arg0, java.lang.String arg1, java.util.Map<java.lang.String, java.lang.String> arg2) throws java.io.IOException;
+    void failForBigNumberWithPosixMessage(java.lang.String arg0, long arg1, long arg2);
+    boolean canWriteEntryData(org.apache.commons.compress.archivers.ArchiveEntry arg0);
+    void failForBigNumber(java.lang.String arg0, long arg1, long arg2);
+    void finish() throws java.io.IOException;
+    void write(byte[] arg0) throws java.io.IOException;
+    org.apache.commons.compress.archivers.ArchiveEntry createArchiveEntry(java.io.File arg0, java.lang.String arg1) throws java.io.IOException;
+    void flush() throws java.io.IOException;
+    long getBytesWritten();
+    byte[] encodeExtendedPaxHeadersContents(java.util.Map<java.lang.String, java.lang.String> arg0);
+    void addInstantPaxHeader(java.util.Map<java.lang.String, java.lang.String> arg0, java.lang.String arg1, long arg2, int arg3);
+    void close() throws java.io.IOException;
+    void write(byte[] arg0, int arg1, int arg2) throws java.io.IOException;
+    void count(int arg0);
+    org.apache.commons.compress.archivers.ArchiveEntry createArchiveEntry(java.nio.file.Path arg0, java.lang.String arg1, java.nio.file.LinkOption... arg2) throws java.io.IOException;
+    java.io.OutputStream nullOutputStream();
+    void failForBigNumber(java.lang.String arg0, long arg1, long arg2, java.lang.String arg3);
+    void failForBigNumbers(TarArchiveEntryInterface arg0);
+    void addPaxHeadersForBigNumbers(java.util.Map<java.lang.String, java.lang.String> arg0, TarArchiveEntryInterface arg1);
+    void addFileTimePaxHeader(java.util.Map<java.lang.String, java.lang.String> arg0, java.lang.String arg1, java.nio.file.attribute.FileTime arg2);
+    void setAddPaxHeadersForNonAsciiNames(boolean arg0);
+    void write(int arg0) throws java.io.IOException;
+    void closeArchiveEntry() throws java.io.IOException;
+    void count(long arg0);
+    void setLongFileMode(int arg0);
+    void padAsNeeded() throws java.io.IOException;
+    void writeRecord(byte[] arg0) throws java.io.IOException;
+    java.lang.String stripTo7Bits(java.lang.String arg0);
+    void transferModTime(TarArchiveEntryInterface arg0, TarArchiveEntryInterface arg1);
+    void addPaxHeaderForBigNumber(java.util.Map<java.lang.String, java.lang.String> arg0, java.lang.String arg1, long arg2, long arg3);
+}

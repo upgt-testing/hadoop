@@ -1,0 +1,18 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface SaslDataTransferClientInterface {
+    java.lang.String getTargetQOP();
+    java.lang.String getUserNameFromEncryptionKey(DataEncryptionKeyInterface arg0);
+    char[] buildClientPassword(TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg0);
+    java.lang.String buildUserName(TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg0);
+    IOStreamPairInterface socketSend(java.net.Socket arg0, java.io.OutputStream arg1, java.io.InputStream arg2, org.apache.hadoop.hdfs.protocol.datatransfer.sasl.DataEncryptionKeyFactory arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, DatanodeIDInterface arg5, javax.crypto.SecretKey arg6) throws java.io.IOException;
+    IOStreamPairInterface getEncryptedStreams(java.net.InetAddress arg0, java.io.OutputStream arg1, java.io.InputStream arg2, DataEncryptionKeyInterface arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, javax.crypto.SecretKey arg5) throws java.io.IOException;
+    IOStreamPairInterface socketSend(java.net.Socket arg0, java.io.OutputStream arg1, java.io.InputStream arg2, org.apache.hadoop.hdfs.protocol.datatransfer.sasl.DataEncryptionKeyFactory arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, DatanodeIDInterface arg5) throws java.io.IOException;
+    IOStreamPairInterface newSocketSend(java.net.Socket arg0, java.io.OutputStream arg1, java.io.InputStream arg2, org.apache.hadoop.hdfs.protocol.datatransfer.sasl.DataEncryptionKeyFactory arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, DatanodeIDInterface arg5) throws java.io.IOException;
+    IOStreamPairInterface doSaslHandshake(java.net.InetAddress arg0, java.io.OutputStream arg1, java.io.InputStream arg2, java.lang.String arg3, java.util.Map<java.lang.String, java.lang.String> arg4, javax.security.auth.callback.CallbackHandler arg5, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg6) throws java.io.IOException;
+    IOStreamPairInterface send(java.net.InetAddress arg0, java.io.OutputStream arg1, java.io.InputStream arg2, DataEncryptionKeyInterface arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, DatanodeIDInterface arg5, javax.crypto.SecretKey arg6) throws java.io.IOException;
+    org.apache.hadoop.hdfs.net.Peer peerSend(org.apache.hadoop.hdfs.net.Peer arg0, org.apache.hadoop.hdfs.protocol.datatransfer.sasl.DataEncryptionKeyFactory arg1, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg2, DatanodeIDInterface arg3) throws java.io.IOException;
+    void updateToken(TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg0, javax.crypto.SecretKey arg1, java.util.Map<java.lang.String, java.lang.String> arg2) throws java.io.IOException;
+    IOStreamPairInterface getSaslStreams(java.net.InetAddress arg0, java.io.OutputStream arg1, java.io.InputStream arg2, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg3, javax.crypto.SecretKey arg4) throws java.io.IOException;
+    IOStreamPairInterface checkTrustAndSend(java.net.InetAddress arg0, java.io.OutputStream arg1, java.io.InputStream arg2, org.apache.hadoop.hdfs.protocol.datatransfer.sasl.DataEncryptionKeyFactory arg3, TokenInterface<org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier> arg4, DatanodeIDInterface arg5, javax.crypto.SecretKey arg6) throws java.io.IOException;
+}

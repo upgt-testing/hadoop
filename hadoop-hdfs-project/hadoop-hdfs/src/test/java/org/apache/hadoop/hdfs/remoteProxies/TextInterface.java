@@ -1,0 +1,42 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface TextInterface {
+    void write(java.io.DataOutput arg0, int arg1) throws java.io.IOException;
+    int find(java.lang.String arg0, int arg1);
+    java.lang.String toString();
+    int charAt(int arg0);
+    boolean equals(java.lang.Object arg0);
+    java.lang.String readString(java.io.DataInput arg0, int arg1) throws java.io.IOException;
+    java.lang.String decode(byte[] arg0, int arg1, int arg2, boolean arg3) throws java.nio.charset.CharacterCodingException;
+    int getLength();
+    void clear();
+    int bytesToCodePoint(java.nio.ByteBuffer arg0);
+    int find(java.lang.String arg0);
+    void validateUTF8(byte[] arg0, int arg1, int arg2) throws java.nio.charset.MalformedInputException;
+    void append(byte[] arg0, int arg1, int arg2);
+    void set(TextInterface arg0);
+    void readFields(java.io.DataInput arg0, int arg1) throws java.io.IOException;
+    void validateUTF8(byte[] arg0) throws java.nio.charset.MalformedInputException;
+    int compareTo(BinaryComparableInterface arg0);
+    byte[] copyBytes();
+    void setCapacity(int arg0, boolean arg1);
+    void write(java.io.DataOutput arg0) throws java.io.IOException;
+    java.nio.ByteBuffer encode(java.lang.String arg0) throws java.nio.charset.CharacterCodingException;
+    int hashCode();
+    java.nio.ByteBuffer encode(java.lang.String arg0, boolean arg1) throws java.nio.charset.CharacterCodingException;
+    int writeString(java.io.DataOutput arg0, java.lang.String arg1, int arg2) throws java.io.IOException;
+    int compareTo(byte[] arg0, int arg1, int arg2);
+    java.lang.String decode(java.nio.ByteBuffer arg0, boolean arg1) throws java.nio.charset.CharacterCodingException;
+    int writeString(java.io.DataOutput arg0, java.lang.String arg1) throws java.io.IOException;
+    void set(byte[] arg0);
+    void readFields(java.io.DataInput arg0) throws java.io.IOException;
+    void skip(java.io.DataInput arg0) throws java.io.IOException;
+    void set(java.lang.String arg0);
+    java.lang.String decode(byte[] arg0, int arg1, int arg2) throws java.nio.charset.CharacterCodingException;
+    java.lang.String decode(byte[] arg0) throws java.nio.charset.CharacterCodingException;
+    void set(byte[] arg0, int arg1, int arg2);
+    void readWithKnownLength(java.io.DataInput arg0, int arg1) throws java.io.IOException;
+    int utf8Length(java.lang.String arg0);
+    java.lang.String readString(java.io.DataInput arg0) throws java.io.IOException;
+    byte[] getBytes();
+}

@@ -1,0 +1,44 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface ContentSummaryInterface {
+    java.lang.String toSnapshot(boolean arg0);
+    long getLength();
+    java.lang.String toString(boolean arg0, boolean arg1, boolean arg2, boolean arg3, java.util.List<org.apache.hadoop.fs.StorageType> arg4);
+    long getSnapshotDirectoryCount();
+    long getTypeConsumed(org.apache.hadoop.fs.StorageType arg0);
+    java.lang.String getQuotaUsage(boolean arg0);
+    long getSnapshotSpaceConsumed();
+    java.lang.String getErasureCodingPolicy();
+    long getSnapshotFileCount();
+    int hashCode();
+    java.lang.String getSnapshotHeader();
+    java.lang.String toString(boolean arg0, boolean arg1, java.util.List<org.apache.hadoop.fs.StorageType> arg2);
+    java.lang.String toString(boolean arg0, boolean arg1, boolean arg2);
+    long getSnapshotLength();
+    java.lang.String toString(boolean arg0, boolean arg1, boolean arg2, java.util.List<org.apache.hadoop.fs.StorageType> arg3);
+    boolean isTypeQuotaSet();
+    java.lang.String getHeader(boolean arg0);
+    long getQuota();
+    java.lang.String[] getQuotaHeaderFields();
+    void readFields(java.io.DataInput arg0) throws java.io.IOException;
+    java.lang.String toString();
+    long getDirectoryCount();
+    void write(java.io.DataOutput arg0) throws java.io.IOException;
+    java.lang.String[] getHeaderFields();
+    java.lang.String getTypesQuotaUsage(boolean arg0, java.util.List<org.apache.hadoop.fs.StorageType> arg1);
+    void setSpaceConsumed(long arg0);
+    java.lang.String toString(boolean arg0, boolean arg1);
+    java.lang.String formatSize(long arg0, boolean arg1);
+    boolean isTypeConsumedAvailable();
+    java.lang.String getStorageTypeHeader(java.util.List<org.apache.hadoop.fs.StorageType> arg0);
+    long getSpaceQuota();
+    boolean equals(java.lang.Object arg0);
+    java.lang.String getHeader();
+    void setQuota(long arg0);
+    java.lang.String toString(boolean arg0);
+    long getFileAndDirectoryCount();
+    long getSpaceConsumed();
+    long getTypeQuota(org.apache.hadoop.fs.StorageType arg0);
+    void setSpaceQuota(long arg0);
+    long getFileCount();
+}

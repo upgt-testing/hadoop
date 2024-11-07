@@ -1,0 +1,48 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface DataNodeVolumeMetricsInterface {
+    long getFlushIoSampleCount();
+    void addFileIoError(long arg0);
+    void addFlushIoLatency(long arg0);
+    void addDataFileIoLatency(long arg0);
+    MutableQuantilesInterface[] getNativeCopyIoQuantiles();
+    double getTransferIoStdDev();
+    double getReadIoStdDev();
+    double getDataFileIoStdDev();
+    long getFileIoErrorSampleCount();
+    double getReadIoMean();
+    long getMetadataOperationSampleCount();
+    long getTotalDataFileIos();
+    MutableQuantilesInterface[] getTransferIoQuantiles();
+    double getSyncIoMean();
+    long getWriteIoSampleCount();
+    long getTotalFileIoErrors();
+    void addNativeCopyIoLatency(long arg0);
+    double getDataFileIoMean();
+    double getFlushIoStdDev();
+    void unRegister();
+    double getFileIoErrorMean();
+    double getWriteIoMean();
+    long getTransferIoSampleCount();
+    void addMetadataOperationLatency(long arg0);
+    double getNativeCopyIoStdDev();
+    void addSyncIoLatency(long arg0);
+    double getFlushIoMean();
+    double getSyncIoStdDev();
+    double getNativeCopyIoMean();
+    long getReadIoSampleCount();
+    long getDataFileIoSampleCount();
+    void addReadIoLatency(long arg0);
+    double getFileIoErrorStdDev();
+    java.lang.String name();
+    void addWriteIoLatency(long arg0);
+    long getNativeCopyIoSampleCount();
+    double getMetadataOperationMean();
+    DataNodeVolumeMetricsInterface create(ConfigurationInterface arg0, java.lang.String arg1);
+    long getSyncIoSampleCount();
+    void addTransferIoLatency(long arg0);
+    double getTransferIoMean();
+    long getTotalMetadataOperations();
+    double getMetadataOperationStdDev();
+    double getWriteIoStdDev();
+}

@@ -1,0 +1,43 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface DatanodeRegistrationInterface {
+    int getXferPort();
+    StorageInfoInterface getStorageInfo();
+    java.lang.String getIpcAddr();
+    java.lang.String getSoftwareVersion();
+    java.lang.String getInfoSecureAddr();
+    ByteStringInterface getByteString(java.lang.String arg0);
+    java.lang.String checkDatanodeUuid(java.lang.String arg0);
+    void setExportedKeys(ExportedBlockKeysInterface arg0);
+    java.lang.String getIpAddr();
+    ByteStringInterface getDatanodeUuidBytes();
+    java.lang.String getIpcAddrWithHostname();
+    boolean equals(java.lang.Object arg0);
+    ByteStringInterface getIpAddrBytes();
+    java.lang.String getHostName();
+    NamespaceInfoInterface getNamespaceInfo();
+    void setIpAddr(java.lang.String arg0);
+    java.lang.String toString();
+    int getInfoPort();
+    java.lang.String getRegistrationID();
+    int hashCode();
+    ExportedBlockKeysInterface getExportedKeys();
+    void updateRegInfo(DatanodeIDInterface arg0);
+    void setPeerHostName(java.lang.String arg0);
+    int compareTo(DatanodeIDInterface arg0);
+    int getVersion();
+    int getIpcPort();
+    java.net.InetSocketAddress getResolvedAddress();
+    void setNamespaceInfo(NamespaceInfoInterface arg0);
+    java.lang.String getXferAddr(boolean arg0);
+    ByteStringInterface getHostNameBytes();
+    java.lang.String getIpcAddr(boolean arg0);
+    java.lang.String getDatanodeUuid();
+    int getInfoSecurePort();
+    void setIpAndXferPort(java.lang.String arg0, ByteStringInterface arg1, int arg2);
+    java.lang.String getXferAddr();
+    java.lang.String getInfoAddr();
+    java.lang.String getPeerHostName();
+    java.lang.String getAddress();
+    java.lang.String getXferAddrWithHostname();
+}

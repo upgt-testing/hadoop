@@ -1,0 +1,42 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface DomainSocketInterface {
+    void sendFileDescriptors0(int arg0, java.io.FileDescriptor[] arg1, byte[] arg2, int arg3, int arg4) throws java.io.IOException;
+    int readArray0(int arg0, byte[] arg1, int arg2, int arg3) throws java.io.IOException;
+    DomainChannelInterface getChannel();
+    void close() throws java.io.IOException;
+    DomainSocketInterface accept() throws java.io.IOException;
+    DomainOutputStreamInterface getOutputStream();
+    void validateSocketPathSecurity0(java.lang.String arg0, int arg1) throws java.io.IOException;
+    int getAttribute0(int arg0, int arg1) throws java.io.IOException;
+    java.lang.String getEffectivePath(java.lang.String arg0, int arg1);
+    int[] socketpair0() throws java.io.IOException;
+    int getAttribute(int arg0) throws java.io.IOException;
+    void setAttribute(int arg0, int arg1) throws java.io.IOException;
+    void close0(int arg0) throws java.io.IOException;
+    int available0(int arg0) throws java.io.IOException;
+    int accept0(int arg0) throws java.io.IOException;
+    int recvFileInputStreams(java.io.FileInputStream[] arg0, byte[] arg1, int arg2, int arg3) throws java.io.IOException;
+    void shutdown0(int arg0) throws java.io.IOException;
+    DomainSocketInterface connect(java.lang.String arg0) throws java.io.IOException;
+    DomainInputStreamInterface getInputStream();
+    boolean isOpen();
+    void sendFileDescriptors(java.io.FileDescriptor[] arg0, byte[] arg1, int arg2, int arg3) throws java.io.IOException;
+    void setAttribute0(int arg0, int arg1, int arg2) throws java.io.IOException;
+    void writeArray0(int arg0, byte[] arg1, int arg2, int arg3) throws java.io.IOException;
+    java.lang.String toString();
+    void write0(int arg0, int arg1) throws java.io.IOException;
+    int readByteBufferDirect0(int arg0, java.nio.ByteBuffer arg1, int arg2, int arg3) throws java.io.IOException;
+    java.lang.String getPath();
+    DomainSocketInterface[] socketpair() throws java.io.IOException;
+    java.lang.String getLoadingFailureReason();
+    DomainSocketInterface bindAndListen(java.lang.String arg0) throws java.io.IOException;
+    void unreference(boolean arg0) throws java.nio.channels.ClosedChannelException;
+    int connect0(java.lang.String arg0) throws java.io.IOException;
+    int bind0(java.lang.String arg0) throws java.io.IOException;
+    void closeFileDescriptor0(java.io.FileDescriptor arg0) throws java.io.IOException;
+    void shutdown() throws java.io.IOException;
+    int receiveFileDescriptors0(int arg0, java.io.FileDescriptor[] arg1, byte[] arg2, int arg3, int arg4) throws java.io.IOException;
+    void anchorNative();
+    void disableBindPathValidation();
+}

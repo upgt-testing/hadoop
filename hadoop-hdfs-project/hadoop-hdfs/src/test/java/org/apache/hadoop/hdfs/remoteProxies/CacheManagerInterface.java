@@ -1,0 +1,47 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface CacheManagerInterface {
+    CachePoolInfoInterface addCachePool(CachePoolInfoInterface arg0) throws java.io.IOException;
+    CacheDirectiveInfoInterface addDirectiveFromEditLog(CacheDirectiveInfoInterface arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    void removeCachePool(java.lang.String arg0) throws java.io.IOException;
+    void removeDirective(long arg0, FSPermissionCheckerInterface arg1) throws java.io.IOException;
+    void removeInternal(CacheDirectiveInterface arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    PersistStateInterface saveState() throws java.io.IOException;
+    void checkLimit(CachePoolInterface arg0, java.lang.String arg1, short arg2) throws org.apache.hadoop.fs.InvalidRequestException;
+    void checkWritePermission(FSPermissionCheckerInterface arg0, CachePoolInterface arg1) throws org.apache.hadoop.security.AccessControlException;
+    void addCacheDirective(java.lang.String arg0, CacheDirectiveInterface arg1) throws java.io.IOException;
+    boolean isEnabled();
+    long validateExpiryTime(CacheDirectiveInfoInterface arg0, long arg1) throws org.apache.hadoop.fs.InvalidRequestException;
+    long getNextDirectiveId() throws java.io.IOException;
+    void saveStateCompat(java.io.DataOutputStream arg0, java.lang.String arg1) throws java.io.IOException;
+    void modifyDirectiveFromEditLog(CacheDirectiveInfoInterface arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    void clear();
+    void setCachedLocations(LocatedBlockInterface arg0);
+    java.util.Collection<org.apache.hadoop.hdfs.protocol.CacheDirective> getCacheDirectives();
+    CacheDirectiveInfoInterface addDirective(CacheDirectiveInfoInterface arg0, FSPermissionCheckerInterface arg1, java.util.EnumSet<org.apache.hadoop.fs.CacheFlag> arg2) throws java.io.IOException;
+    CacheDirectiveInfoInterface createFromInfoAndDefaults(CacheDirectiveInfoInterface arg0, CacheDirectiveInterface arg1);
+    short validateReplication(CacheDirectiveInfoInterface arg0, short arg1) throws org.apache.hadoop.fs.InvalidRequestException;
+    void waitForRescanIfNeeded();
+    BatchedListEntriesInterface<org.apache.hadoop.hdfs.protocol.CachePoolEntry> listCachePools(FSPermissionCheckerInterface arg0, java.lang.String arg1);
+    void loadStateCompat(java.io.DataInput arg0) throws java.io.IOException;
+    void setNeedsRescan();
+    CacheDirectiveStatsInterface computeNeeded(java.lang.String arg0, short arg1);
+    CachePoolInterface getCachePool(java.lang.String arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    void modifyCachePool(CachePoolInfoInterface arg0) throws java.io.IOException;
+    void stopMonitorThread();
+    org.apache.hadoop.util.GSet<org.apache.hadoop.hdfs.server.namenode.CachedBlock, org.apache.hadoop.hdfs.server.namenode.CachedBlock> getCachedBlocks();
+    void processCacheReportImpl(DatanodeDescriptorInterface arg0, java.util.List<java.lang.Long> arg1);
+    void setCachedLocations(LocatedBlocksInterface arg0);
+    void loadState(PersistStateInterface arg0) throws java.io.IOException;
+    void addInternal(CacheDirectiveInterface arg0, CachePoolInterface arg1);
+    java.lang.String validatePath(CacheDirectiveInfoInterface arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    java.lang.String validatePoolName(CacheDirectiveInfoInterface arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    BatchedListEntriesInterface<org.apache.hadoop.hdfs.protocol.CacheDirectiveEntry> listCacheDirectives(long arg0, CacheDirectiveInfoInterface arg1, FSPermissionCheckerInterface arg2) throws java.io.IOException;
+    java.lang.Thread getCacheReplicationMonitor();
+    void modifyDirective(CacheDirectiveInfoInterface arg0, FSPermissionCheckerInterface arg1, java.util.EnumSet<org.apache.hadoop.fs.CacheFlag> arg2) throws java.io.IOException;
+    void clearDirectiveStats();
+    CacheDirectiveInterface getById(long arg0) throws org.apache.hadoop.fs.InvalidRequestException;
+    void startMonitorThread();
+    void processCacheReport(DatanodeIDInterface arg0, java.util.List<java.lang.Long> arg1) throws java.io.IOException;
+    java.util.Collection<org.apache.hadoop.hdfs.server.namenode.CachePool> getCachePools();
+}

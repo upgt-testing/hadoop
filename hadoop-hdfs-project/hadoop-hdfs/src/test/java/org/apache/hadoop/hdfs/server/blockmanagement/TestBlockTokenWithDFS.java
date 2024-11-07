@@ -43,7 +43,6 @@ import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.remoteProxies.BlockManagerInterface;
 import org.apache.hadoop.hdfs.remoteProxies.BlockTokenSecretManagerInterface;
 import org.apache.hadoop.hdfs.remoteProxies.NameNodeInterface;
-import org.apache.hadoop.hdfs.remoteProxies.NamenodeProtocolsInterface;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager;
 import org.apache.hadoop.hdfs.security.token.block.InvalidBlockTokenException;

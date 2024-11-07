@@ -1,0 +1,44 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface MutatabilityAwareMapInterface<K, V> {
+    java.util.Collection<V> values();
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9, K arg10, V arg11, K arg12, V arg13, K arg14, V arg15, K arg16, V arg17);
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9, K arg10, V arg11, K arg12, V arg13, K arg14, V arg15, K arg16, V arg17, K arg18, V arg19);
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9, K arg10, V arg11);
+    java.lang.String toString();
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9, K arg10, V arg11, K arg12, V arg13, K arg14, V arg15);
+    void forEach(java.util.function.BiConsumer<? super K, ? super V> arg0);
+    void replaceAll(java.util.function.BiFunction<? super K, ? super V, ? extends V> arg0);
+    void putAll(java.util.Map<? extends K, ? extends V> arg0);
+    boolean remove(java.lang.Object arg0, java.lang.Object arg1);
+    V computeIfAbsent(K arg0, java.util.function.Function<? super K, ? extends V> arg1);
+    int hashCode();
+    boolean equals(java.lang.Object arg0);
+    boolean containsKey(java.lang.Object arg0);
+    V putIfAbsent(K arg0, V arg1);
+    V computeIfPresent(K arg0, java.util.function.BiFunction<? super K, ? super V, ? extends V> arg1);
+    V remove(java.lang.Object arg0);
+    boolean isEmpty();
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7);
+    java.util.Set<java.util.Map.Entry<K, V>> entrySet();
+    <K, V> java.util.Map<K, V> ofEntries(java.util.Map.Entry<? extends K, ? extends V>... arg0);
+    V put(K arg0, V arg1);
+    int size();
+    boolean replace(K arg0, V arg1, V arg2);
+    V get(java.lang.Object arg0);
+    V merge(K arg0, V arg1, java.util.function.BiFunction<? super V, ? super V, ? extends V> arg2);
+    <K, V> java.util.Map.Entry<K, V> entry(K arg0, V arg1);
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1);
+    boolean containsValue(java.lang.Object arg0);
+    java.util.Set<K> keySet();
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3);
+    <K, V> java.util.Map<K, V> of();
+    void clear();
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9);
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5);
+    V getOrDefault(java.lang.Object arg0, V arg1);
+    V replace(K arg0, V arg1);
+    V compute(K arg0, java.util.function.BiFunction<? super K, ? super V, ? extends V> arg1);
+    <K, V> java.util.Map<K, V> copyOf(java.util.Map<? extends K, ? extends V> arg0);
+    <K, V> java.util.Map<K, V> of(K arg0, V arg1, K arg2, V arg3, K arg4, V arg5, K arg6, V arg7, K arg8, V arg9, K arg10, V arg11, K arg12, V arg13);
+}

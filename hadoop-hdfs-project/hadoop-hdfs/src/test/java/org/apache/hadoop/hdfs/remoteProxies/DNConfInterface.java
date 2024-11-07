@@ -1,0 +1,40 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface DNConfInterface {
+    SaslPropertiesResolverInterface getSaslPropsResolver();
+    long getBpReadyTimeout();
+    boolean getAllowNonLocalLazyPersist();
+    int getVolsConfigured();
+    long getXceiverStopTimeout();
+    long getLifelineIntervalMs();
+    void setFileIoProfilingSamplingPercentage(int arg0);
+    void setInitBRDelayMs(java.lang.String arg0);
+    void initBlockReportDelay();
+    java.lang.String getEncryptionAlgorithm();
+    long getCacheReportInterval();
+    int getTransferSocketSendBufferSize();
+    int getMaxDataLength();
+    long getProcessCommandsThresholdMs();
+    int getVolFailuresTolerated();
+    TrustedChannelResolverInterface getTrustedChannelResolver();
+    void setCacheReportInterval(long arg0);
+    void setBlockReportSplitThreshold(long arg0);
+    long getBlockReportInterval();
+    int getSocketWriteTimeout();
+    void setPeerStatsEnabled(boolean arg0);
+    int getSocketTimeout();
+    boolean getDataTransferServerTcpNoDelay();
+    long getMaxLockedMemory();
+    int getTransferSocketRecvBufferSize();
+    boolean getIgnoreSecurePortsForTesting();
+    java.lang.String getMinimumNameNodeVersion();
+    ConfigurationInterface getConf();
+    boolean getEncryptDataTransfer();
+    boolean getPmemCacheRecoveryEnabled();
+    void setBlockReportInterval(long arg0);
+    boolean getConnectToDnViaHostname();
+    long getSlowIoWarningThresholdMs();
+    int getEcChecksumSocketTimeout();
+    void setOutliersReportIntervalMs(java.lang.String arg0);
+    java.lang.String[] getPmemVolumes();
+}

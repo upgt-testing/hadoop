@@ -1,0 +1,48 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface DatanodeStorageInfoInterface {
+    boolean equals(java.lang.Object arg0);
+    DatanodeDescriptorInterface[] toDatanodeDescriptors(DatanodeStorageInfoInterface[] arg0);
+    boolean areBlocksOnFailedStorage();
+    int moveBlockToHead(BlockInfoInterface arg0, int arg1, int arg2);
+    void receivedHeartbeat(StorageReportInterface arg0);
+    void decrementBlocksScheduled(org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo... arg0);
+    void updateState(StorageReportInterface arg0);
+    org.apache.hadoop.fs.StorageType[] toStorageTypes(DatanodeStorageInfoInterface[] arg0);
+    void setHeartbeatedSinceFailover(boolean arg0);
+    void setBlockReportCount(int arg0);
+    void receivedBlockReport();
+    StorageReportInterface toStorageReport();
+    DatanodeDescriptorInterface getDatanodeDescriptor();
+    long getDfsUsed();
+    void setBlockContentsStale(boolean arg0);
+    boolean areBlockContentsStale();
+    DatanodeStorageInfoInterface getDatanodeStorageInfo(java.lang.Iterable<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo> arg0, DatanodeDescriptorInterface arg1);
+    java.util.Iterator<org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo> getBlockIterator();
+    java.lang.String[] toStorageIDs(DatanodeStorageInfoInterface[] arg0);
+    int getBlockReportCount();
+    boolean removeBlock(BlockInfoInterface arg0);
+    java.lang.String getStorageID();
+    long getRemaining();
+    org.apache.hadoop.fs.StorageType getStorageType();
+    void incrementBlocksScheduled(org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo... arg0);
+    int hashCode();
+    DatanodeInfoInterface[] toDatanodeInfos(java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo> arg0);
+    void setState(org.apache.hadoop.hdfs.server.protocol.DatanodeStorage.State arg0);
+    long getNonDfsUsed();
+    java.lang.String toString();
+//    org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo.AddBlockResult addBlock(BlockInfoInterface arg0, BlockInterface arg1);
+//    org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo.AddBlockResult addBlock(BlockInfoInterface arg0);
+    void markStaleAfterFailover();
+    BlockInfoInterface getBlockListHeadForTesting();
+    int numBlocks();
+    long getBlockPoolUsed();
+    void setUtilizationForTesting(long arg0, long arg1, long arg2, long arg3);
+    long getCapacity();
+    void updateFromStorage(DatanodeStorageInterface arg0);
+    org.apache.hadoop.hdfs.server.protocol.DatanodeStorage.State getState();
+    void setRemainingForTests(int arg0);
+    void insertToList(BlockInfoInterface arg0);
+    DatanodeInfoInterface[] toDatanodeInfos(DatanodeStorageInfoInterface[] arg0);
+    java.lang.Iterable<org.apache.hadoop.fs.StorageType> toStorageTypes(java.lang.Iterable<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo> arg0);
+}

@@ -1,0 +1,41 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface HeartbeatManagerInterface {
+    void startDecommission(DatanodeDescriptorInterface arg0);
+    boolean shouldAbortHeartbeatCheck(long arg0);
+    long getBlockPoolUsed();
+    void removeDatanode(DatanodeDescriptorInterface arg0);
+    int getExpiredHeartbeats();
+    int getNumDatanodesInService();
+    long getCacheCapacity();
+    void heartbeatCheck();
+    float getPercentBlockPoolUsed();
+    void updateDnStat(DatanodeDescriptorInterface arg0);
+    void activate();
+    long getCapacityRemaining();
+    long getProvidedCapacity();
+    void close();
+    void stopDecommission(DatanodeDescriptorInterface arg0);
+    void updateLifeline(DatanodeDescriptorInterface arg0, StorageReportInterface[] arg1, long arg2, long arg3, int arg4, int arg5, VolumeFailureSummaryInterface arg6);
+    long getCapacityUsed();
+    int getXceiverCount();
+    float getCapacityUsedPercent();
+    int getInServiceXceiverCount();
+    int getLiveDatanodeCount();
+    long[] getStats();
+    void restartHeartbeatStopWatch();
+    DatanodeDescriptorInterface[] getDatanodes();
+    void startMaintenance(DatanodeDescriptorInterface arg0);
+    void addDatanode(DatanodeDescriptorInterface arg0);
+    float getCapacityRemainingPercent();
+    void stopMaintenance(DatanodeDescriptorInterface arg0);
+    long getCacheUsed();
+    boolean removeNodeFromStaleList(DatanodeDescriptorInterface arg0);
+    java.util.Map<org.apache.hadoop.fs.StorageType, org.apache.hadoop.hdfs.server.blockmanagement.StorageTypeStats> getStorageTypeStats();
+    long getCapacityTotal();
+    long getCapacityUsedNonDFS();
+    boolean removeNodeFromStaleList(DatanodeDescriptorInterface arg0, boolean arg1);
+    void updateHeartbeat(DatanodeDescriptorInterface arg0, StorageReportInterface[] arg1, long arg2, long arg3, int arg4, int arg5, VolumeFailureSummaryInterface arg6);
+    void register(DatanodeDescriptorInterface arg0);
+    void dumpStaleNodes(java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> arg0);
+}

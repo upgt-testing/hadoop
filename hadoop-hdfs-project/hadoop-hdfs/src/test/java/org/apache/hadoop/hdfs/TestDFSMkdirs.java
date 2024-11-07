@@ -140,7 +140,7 @@ public class TestDFSMkdirs {
   public void testMkdirRpcNonCanonicalPath() throws IOException {
     MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
     try {
-      NamenodeProtocolsInterface nnrpc = cluster.getNameNodeRpc();
+      NamenodeProtocols nnrpc = cluster.getNameNodeRpc();
       
       for (String pathStr : NON_CANONICAL_PATHS) {
         try {

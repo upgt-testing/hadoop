@@ -1,0 +1,48 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface FSEditLogOpInterface {
+    FsPermissionInterface fsPermissionFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    void permissionStatusToXml(org.xml.sax.ContentHandler arg0, PermissionStatusInterface arg1) throws org.xml.sax.SAXException;
+    void setRpcClientId(byte[] arg0);
+    void outputToXml(org.xml.sax.ContentHandler arg0) throws org.xml.sax.SAXException;
+    void fromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    void fsPermissionToXml(org.xml.sax.ContentHandler arg0, FsPermissionInterface arg1) throws org.xml.sax.SAXException;
+    void writeFields(java.io.DataOutputStream arg0) throws java.io.IOException;
+    org.apache.hadoop.fs.permission.FsAction fsActionFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    void delegationTokenToXml(org.xml.sax.ContentHandler arg0, DelegationTokenIdentifierInterface arg1) throws org.xml.sax.SAXException;
+    DelegationKeyInterface delegationKeyFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    java.lang.String getTransactionIdStr();
+    void resetSubFields();
+    boolean hasTransactionId();
+    java.util.List<org.apache.hadoop.fs.XAttr> readXAttrsFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    java.util.List<org.apache.hadoop.fs.permission.AclEntry> readAclEntriesFromXml(StanzaInterface arg0);
+    void setRpcCallId(int arg0);
+    void readRpcIdsFromXml(StanzaInterface arg0);
+    void setTransactionId(long arg0);
+    void appendRpcIdsToString(java.lang.StringBuilder arg0, byte[] arg1, int arg2);
+    void readFields(java.io.DataInputStream arg0, int arg1) throws java.io.IOException;
+    long readLong(java.io.DataInputStream arg0) throws java.io.IOException;
+    void blockToXml(org.xml.sax.ContentHandler arg0, BlockInterface arg1) throws org.xml.sax.SAXException;
+    BlockInterface[] deepCopy(BlockInterface[] arg0);
+    void appendXAttrsToXml(org.xml.sax.ContentHandler arg0, java.util.List<org.apache.hadoop.fs.XAttr> arg1) throws org.xml.sax.SAXException;
+    void readRpcIds(java.io.DataInputStream arg0, int arg1) throws java.io.IOException;
+    void writeRpcIds(byte[] arg0, int arg1, java.io.DataOutputStream arg2) throws java.io.IOException;
+    boolean hasRpcIds();
+    void appendRpcIdsToXml(org.xml.sax.ContentHandler arg0, byte[] arg1, int arg2) throws org.xml.sax.SAXException;
+    DelegationTokenIdentifierInterface delegationTokenFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    void writeFields(java.io.DataOutputStream arg0, int arg1) throws java.io.IOException;
+    short readShort(java.io.DataInputStream arg0) throws java.io.IOException;
+    PermissionStatusInterface permissionStatusFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    void delegationKeyToXml(org.xml.sax.ContentHandler arg0, DelegationKeyInterface arg1) throws org.xml.sax.SAXException;
+    long getTransactionId();
+    void fsActionToXml(org.xml.sax.ContentHandler arg0, org.apache.hadoop.fs.permission.FsAction arg1) throws org.xml.sax.SAXException;
+    int getCallId();
+    void reset();
+    void decodeXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+    java.util.List<org.apache.hadoop.fs.XAttr> readXAttrsFromEditLog(java.io.DataInputStream arg0, int arg1) throws java.io.IOException;
+    void appendAclEntriesToXml(org.xml.sax.ContentHandler arg0, java.util.List<org.apache.hadoop.fs.permission.AclEntry> arg1) throws org.xml.sax.SAXException;
+    ImmutableMapInterface<java.lang.String, org.apache.hadoop.fs.permission.FsAction> fsActionMap();
+    byte[] getClientId();
+    void toXml(org.xml.sax.ContentHandler arg0) throws org.xml.sax.SAXException;
+    BlockInterface blockFromXml(StanzaInterface arg0) throws org.apache.hadoop.hdfs.util.XMLUtils.InvalidXmlException;
+}

@@ -63,7 +63,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
  */
 public class TestAppendSnapshotTruncate {
   static {
-    GenericTestUtils.setLogLevel(NameNodeInterface.stateChangeLog, Level.ALL);
+    GenericTestUtils.setLogLevel(NameNode.stateChangeLog, Level.ALL);
   }
   private static final Logger LOG =
       LoggerFactory.getLogger(TestAppendSnapshotTruncate.class);

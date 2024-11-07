@@ -91,7 +91,7 @@ public class TestDFSClientSocketSize {
   }
 
   private int getSendBufferSize(Configuration conf) throws IOException {
-    final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf)
+    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     try {

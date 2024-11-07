@@ -1,0 +1,44 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface FieldSetInterface<FieldDescriptorType> {
+    boolean isInitialized(java.util.Map.Entry<FieldDescriptorType, java.lang.Object> arg0);
+    int getMessageSetSerializedSize();
+    int hashCode();
+    java.lang.Object cloneIfMutable(java.lang.Object arg0);
+    <T> FieldSetInterface<T> emptySet();
+    java.lang.Object getRepeatedField(FieldDescriptorType arg0, int arg1);
+    int getMessageSetSerializedSize(java.util.Map.Entry<FieldDescriptorType, java.lang.Object> arg0);
+    void writeTo(CodedOutputStreamInterface arg0) throws java.io.IOException;
+    java.lang.Object readPrimitiveField(CodedInputStreamInterface arg0, org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg1, boolean arg2) throws java.io.IOException;
+    int getWireFormatForFieldType(org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg0, boolean arg1);
+    void mergeFrom(FieldSetInterface<FieldDescriptorType> arg0);
+//    int computeFieldSize(org.apache.hadoop.thirdparty.protobuf.FieldSet.FieldDescriptorLite<?> arg0, java.lang.Object arg1);
+    java.util.Iterator<java.util.Map.Entry<FieldDescriptorType, java.lang.Object>> iterator();
+    void verifyType(org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg0, java.lang.Object arg1);
+    boolean hasField(FieldDescriptorType arg0);
+    void clear();
+    void addRepeatedField(FieldDescriptorType arg0, java.lang.Object arg1);
+    int computeElementSize(org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg0, int arg1, java.lang.Object arg2);
+    void makeImmutable();
+    boolean equals(java.lang.Object arg0);
+    int computeElementSizeNoTag(org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg0, java.lang.Object arg1);
+    void setField(FieldDescriptorType arg0, java.lang.Object arg1);
+    FieldSetInterface<FieldDescriptorType> clone();
+    void setRepeatedField(FieldDescriptorType arg0, int arg1, java.lang.Object arg2);
+    boolean isEmpty();
+    boolean isInitialized();
+    int getRepeatedFieldCount(FieldDescriptorType arg0);
+    void writeElement(CodedOutputStreamInterface arg0, org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg1, int arg2, java.lang.Object arg3) throws java.io.IOException;
+    java.lang.Object getField(FieldDescriptorType arg0);
+//    void writeField(org.apache.hadoop.thirdparty.protobuf.FieldSet.FieldDescriptorLite<?> arg0, java.lang.Object arg1, CodedOutputStreamInterface arg2) throws java.io.IOException;
+    void clearField(FieldDescriptorType arg0);
+    <T> FieldSetInterface<T> newFieldSet();
+    void writeElementNoTag(CodedOutputStreamInterface arg0, org.apache.hadoop.thirdparty.protobuf.WireFormat.FieldType arg1, java.lang.Object arg2) throws java.io.IOException;
+    void writeMessageSetTo(CodedOutputStreamInterface arg0) throws java.io.IOException;
+    void mergeFromField(java.util.Map.Entry<FieldDescriptorType, java.lang.Object> arg0);
+    void cloneFieldEntry(java.util.Map<FieldDescriptorType, java.lang.Object> arg0, java.util.Map.Entry<FieldDescriptorType, java.lang.Object> arg1);
+    int getSerializedSize();
+    void writeMessageSetTo(java.util.Map.Entry<FieldDescriptorType, java.lang.Object> arg0, CodedOutputStreamInterface arg1) throws java.io.IOException;
+    java.util.Map<FieldDescriptorType, java.lang.Object> getAllFields();
+    boolean isImmutable();
+}

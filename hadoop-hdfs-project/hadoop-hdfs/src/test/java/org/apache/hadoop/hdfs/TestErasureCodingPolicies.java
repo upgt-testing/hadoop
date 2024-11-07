@@ -182,7 +182,7 @@ public class TestErasureCodingPolicies {
     /* Verify files under the directory are striped */
     final Path ECFilePath = new Path(testDir, "foo");
     fs.create(ECFilePath);
-    INode inode = namesystem.getFSDirectory().getINode(ECFilePath.toString());
+    INodeInterface inode = namesystem.getFSDirectory().getINode(ECFilePath.toString());
     assertTrue(inode.asFile().isStriped());
 
     /**
@@ -196,9 +196,9 @@ public class TestErasureCodingPolicies {
     fs.setErasureCodingPolicy(notEmpty, ecPolicy.getName());
     final Path newFile = new Path(notEmpty, "new");
     fs.create(newFile);
-    INode oldInode = namesystem.getFSDirectory().getINode(oldFile.toString());
+    INodeInterface oldInode = namesystem.getFSDirectory().getINode(oldFile.toString());
     assertFalse(oldInode.asFile().isStriped());
-    INode newInode = namesystem.getFSDirectory().getINode(newFile.toString());
+    INodeInterface newInode = namesystem.getFSDirectory().getINode(newFile.toString());
     assertTrue(newInode.asFile().isStriped());
 
     /* Verify that nested EC policies are supported */
@@ -485,7 +485,7 @@ public class TestErasureCodingPolicies {
         fs.create(file).close();
         assertEquals(policy, fs.getErasureCodingPolicy(file));
         assertEquals(policy, fs.getErasureCodingPolicy(dir));
-        INode iNode = namesystem.getFSDirectory().getINode(file.toString());
+        INodeInterface iNode = namesystem.getFSDirectory().getINode(file.toString());
         assertEquals(policy.getId(), iNode.asFile().getErasureCodingPolicyID());
         assertEquals(INodeFile.DEFAULT_REPL_FOR_STRIPED_BLOCKS,
             iNode.asFile().getFileReplication());

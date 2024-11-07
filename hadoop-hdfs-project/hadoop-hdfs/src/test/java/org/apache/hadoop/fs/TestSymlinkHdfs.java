@@ -52,7 +52,7 @@ import org.junit.Test;
 abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
 
   {
-    GenericTestUtils.setLogLevel(NameNodeInterface.stateChangeLog, Level.ALL);
+    GenericTestUtils.setLogLevel(NameNode.stateChangeLog, Level.ALL);
   }
 
   protected static MiniDockerDFSCluster cluster;

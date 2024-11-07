@@ -1,0 +1,46 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface TextBufferInterface {
+    void expand(int arg0);
+    boolean hasTextAsCharacters();
+    char[] resultArray();
+    void resetWithShared(char[] arg0, int arg1, int arg2);
+    java.lang.String setCurrentAndReturn(int arg0);
+    int getTextOffset();
+    char[] finishCurrentSegment();
+    char[] buf(int arg0);
+    char[] carr(int arg0);
+    char[] emptyAndGetCurrentSegment();
+    void resetWithCopy(java.lang.String arg0, int arg1, int arg2);
+    char[] getBufferWithoutReset();
+    void append(char arg0);
+    char[] contentsAsArray();
+    char[] getTextBuffer();
+    void ensureNotShared();
+    float contentsAsFloat() throws java.lang.NumberFormatException;
+    char[] getCurrentSegment();
+    java.math.BigDecimal contentsAsDecimal() throws java.lang.NumberFormatException;
+    double contentsAsDouble(boolean arg0) throws java.lang.NumberFormatException;
+    void append(java.lang.String arg0, int arg1, int arg2);
+    java.lang.String contentsAsString();
+    void clearSegments();
+    int size();
+    int getCurrentSegmentSize();
+    char[] expandCurrentSegment();
+    long contentsAsLong(boolean arg0);
+    float contentsAsFloat(boolean arg0) throws java.lang.NumberFormatException;
+    void releaseBuffers();
+    void setCurrentLength(int arg0);
+    int contentsToWriter(java.io.Writer arg0) throws java.io.IOException;
+    void append(char[] arg0, int arg1, int arg2);
+    void resetWithString(java.lang.String arg0);
+    void unshare(int arg0);
+    char[] expandCurrentSegment(int arg0);
+    TextBufferInterface fromInitial(char[] arg0);
+    double contentsAsDouble() throws java.lang.NumberFormatException;
+    void resetWithCopy(char[] arg0, int arg1, int arg2);
+    void resetWith(char arg0);
+    void resetWithEmpty();
+    java.lang.String toString();
+    int contentsAsInt(boolean arg0);
+}

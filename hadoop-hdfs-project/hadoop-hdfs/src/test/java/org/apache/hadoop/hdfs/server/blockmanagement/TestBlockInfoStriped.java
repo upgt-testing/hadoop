@@ -247,9 +247,9 @@ public class TestBlockInfoStriped {
       ExtendedBlock blk = DFSTestUtil
           .getAllBlocks(fs, new Path("/ecDir/ecFile")).get(0).getBlock();
       String id = "blk_" + Long.toString(blk.getBlockId());
-      BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager()
+      BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager()
           .getStoredBlock(blk.getLocalBlock());
-      DatanodeStorageInfo[] dnStorageInfo = cluster.getNameNode()
+      DatanodeStorageInfoInterface[] dnStorageInfo = cluster.getNameNode()
           .getNamesystem().getBlockManager().getStorages(bInfo);
       bInfo.removeStorage(dnStorageInfo[1]);
       ByteArrayOutputStream bStream = new ByteArrayOutputStream();

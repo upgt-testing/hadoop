@@ -1,0 +1,41 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface JvmPauseMonitorInterface {
+    void recordLifecycleEvent();
+    void close() throws java.io.IOException;
+    org.apache.hadoop.service.Service.STATE enterState(org.apache.hadoop.service.Service.STATE arg0);
+    void unregisterServiceListener(org.apache.hadoop.service.ServiceStateChangeListener arg0);
+    long getStartTime();
+    long getNumGcInfoThresholdExceeded();
+    void registerGlobalListener(org.apache.hadoop.service.ServiceStateChangeListener arg0);
+    void resetGlobalListeners();
+    void registerServiceListener(org.apache.hadoop.service.ServiceStateChangeListener arg0);
+    boolean unregisterGlobalListener(org.apache.hadoop.service.ServiceStateChangeListener arg0);
+    org.apache.hadoop.service.Service.STATE getServiceState();
+    long getNumGcWarnThresholdExceeded();
+    void setConfig(ConfigurationInterface arg0);
+    java.lang.String toString();
+    void serviceInit(ConfigurationInterface arg0) throws java.lang.Exception;
+    void removeBlocker(java.lang.String arg0);
+    void start();
+    java.lang.String getName();
+    boolean isInState(org.apache.hadoop.service.Service.STATE arg0);
+    org.apache.hadoop.service.Service.STATE getFailureState();
+    void serviceStop() throws java.lang.Exception;
+    boolean isStarted();
+    void stop();
+    long getTotalGcExtraSleepTime();
+    java.util.Map<java.lang.String, java.lang.String> getBlockers();
+    void noteFailure(java.lang.Exception arg0);
+    boolean waitForServiceToStop(long arg0);
+    java.lang.Throwable getFailureCause();
+    void notifyListeners();
+    void main(java.lang.String[] arg0) throws java.lang.Exception;
+    java.util.List<org.apache.hadoop.service.LifecycleEvent> getLifecycleHistory();
+    void putBlocker(java.lang.String arg0, java.lang.String arg1);
+    ConfigurationInterface getConfig();
+    void init(ConfigurationInterface arg0);
+//    java.lang.String formatMessage(long arg0, java.util.Map<java.lang.String, org.apache.hadoop.util.JvmPauseMonitor.GcTimes> arg1, java.util.Map<java.lang.String, org.apache.hadoop.util.JvmPauseMonitor.GcTimes> arg2);
+//    java.util.Map<java.lang.String, org.apache.hadoop.util.JvmPauseMonitor.GcTimes> getGcTimes();
+    void serviceStart() throws java.lang.Exception;
+}

@@ -1,0 +1,44 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface Base64VariantInterface {
+    java.lang.String getName();
+    char encodeBase64BitsAsChar(int arg0);
+    char getPaddingChar();
+    int decodeBase64Char(int arg0);
+    Base64VariantInterface withWritePadding(boolean arg0);
+    boolean equals(java.lang.Object arg0);
+    java.lang.String missingPaddingMessage();
+    int encodeBase64Chunk(int arg0, byte[] arg1, int arg2);
+    boolean usesPadding();
+    void encodeBase64Partial(java.lang.StringBuilder arg0, int arg1, int arg2);
+    java.lang.String encode(byte[] arg0);
+    void decode(java.lang.String arg0, ByteArrayBuilderInterface arg1) throws java.lang.IllegalArgumentException;
+    int hashCode();
+    void encodeBase64Chunk(java.lang.StringBuilder arg0, int arg1);
+    Base64VariantInterface withPaddingForbidden();
+    java.lang.String unexpectedPaddingMessage();
+    Base64VariantInterface withReadPadding(com.fasterxml.jackson.core.Base64Variant.PaddingReadBehaviour arg0);
+    java.lang.String encode(byte[] arg0, boolean arg1);
+    void _reportBase64EOF() throws java.lang.IllegalArgumentException;
+    boolean usesPaddingChar(char arg0);
+    int decodeBase64Char(char arg0);
+    byte getPaddingByte();
+    Base64VariantInterface withPaddingAllowed();
+    byte encodeBase64BitsAsByte(int arg0);
+    java.lang.String encode(byte[] arg0, boolean arg1, java.lang.String arg2);
+    boolean usesPaddingChar(int arg0);
+    boolean acceptsPaddingOnRead();
+    void _reportBase64UnexpectedPadding() throws java.lang.IllegalArgumentException;
+    byte[] decode(java.lang.String arg0) throws java.lang.IllegalArgumentException;
+    int encodeBase64Partial(int arg0, int arg1, byte[] arg2, int arg3);
+    int getMaxLineLength();
+    java.lang.Object readResolve();
+    int encodeBase64Partial(int arg0, int arg1, char[] arg2, int arg3);
+    com.fasterxml.jackson.core.Base64Variant.PaddingReadBehaviour paddingReadBehaviour();
+    void _reportInvalidBase64(char arg0, int arg1, java.lang.String arg2) throws java.lang.IllegalArgumentException;
+    int decodeBase64Byte(byte arg0);
+    int encodeBase64Chunk(int arg0, char[] arg1, int arg2);
+    java.lang.String toString();
+    boolean requiresPaddingOnRead();
+    Base64VariantInterface withPaddingRequired();
+}

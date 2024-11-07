@@ -1,0 +1,40 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface ChildrenDiffInterface {
+    <K, E> ContainerInterface<E> accessPrevious(K arg0, java.util.List<E> arg1, java.util.List<E> arg2);
+//    void addCreated(E arg0, int arg1);
+    void writeDeleted(java.io.DataOutput arg0, ReferenceMapInterface arg1) throws java.io.IOException;
+//    java.util.List<E> apply2Previous(java.util.List<E> arg0);
+//    void addDeleted(E arg0, int arg1);
+    void getDirsInDeleted(java.util.List<org.apache.hadoop.hdfs.server.namenode.INodeDirectory> arg0);
+//    java.util.List<E> getCreatedUnmodifiable();
+    <K, E> java.util.List<E> apply2Previous(java.util.List<E> arg0, java.util.List<E> arg1, java.util.List<E> arg2);
+//    ContainerInterface<E> accessPrevious(K arg0);
+    void writeCreated(java.io.DataOutput arg0) throws java.io.IOException;
+    boolean replaceCreated(INodeInterface arg0, INodeInterface arg1);
+//    boolean containsDeleted(K arg0);
+//    UndoInfoInterface<E> modify(E arg0, E arg1);
+    void write(java.io.DataOutput arg0, ReferenceMapInterface arg1) throws java.io.IOException;
+    void destroyCreatedList(ReclaimContextInterface arg0, INodeDirectoryInterface arg1);
+//    boolean containsDeleted(E arg0);
+//    int create(E arg0);
+    java.lang.String toString();
+//    UndoInfoInterface<E> delete(E arg0);
+    <K, E> int search(java.util.List<E> arg0, K arg1);
+    void destroyDeletedList(ReclaimContextInterface arg0);
+//    ContainerInterface<E> accessCurrent(K arg0);
+//    void undoModify(E arg0, E arg1, UndoInfoInterface<E> arg2);
+//    boolean removeDeleted(E arg0);
+//    E getDeleted(K arg0);
+//    java.util.List<E> apply2Current(java.util.List<E> arg0);
+//    void undoDelete(E arg0, UndoInfoInterface<E> arg1);
+    void clearDeleted();
+//    E setCreated(int arg0, E arg1);
+//    void combinePosterior(DiffInterface<K, E> arg0, org.apache.hadoop.hdfs.util.Diff.Processor<E> arg1);
+    void clearCreated();
+//    void undoCreate(E arg0, int arg1);
+//    java.util.List<E> getDeletedUnmodifiable();
+    <E> void remove(java.util.List<E> arg0, int arg1, E arg2);
+    boolean isEmpty();
+//    boolean removeCreated(E arg0);
+}

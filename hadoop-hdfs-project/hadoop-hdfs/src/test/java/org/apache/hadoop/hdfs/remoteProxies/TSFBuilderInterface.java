@@ -1,0 +1,41 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface TSFBuilderInterface<F, B> {
+    void _legacyDisable(com.fasterxml.jackson.core.JsonParser.Feature arg0);
+    B disable(com.fasterxml.jackson.core.JsonFactory.Feature arg0);
+    void _legacyDisable(com.fasterxml.jackson.core.JsonGenerator.Feature arg0);
+    int factoryFeaturesMask();
+    F build();
+    B disable(com.fasterxml.jackson.core.StreamWriteFeature arg0, com.fasterxml.jackson.core.StreamWriteFeature... arg1);
+    B configure(com.fasterxml.jackson.core.JsonFactory.Feature arg0, boolean arg1);
+    B enable(com.fasterxml.jackson.core.StreamReadFeature arg0);
+    B disable(com.fasterxml.jackson.core.json.JsonWriteFeature arg0, com.fasterxml.jackson.core.json.JsonWriteFeature... arg1);
+    B disable(com.fasterxml.jackson.core.StreamWriteFeature arg0);
+    B configure(com.fasterxml.jackson.core.StreamWriteFeature arg0, boolean arg1);
+    B enable(com.fasterxml.jackson.core.json.JsonWriteFeature arg0);
+    B disable(com.fasterxml.jackson.core.StreamReadFeature arg0, com.fasterxml.jackson.core.StreamReadFeature... arg1);
+    B configure(com.fasterxml.jackson.core.StreamReadFeature arg0, boolean arg1);
+    B enable(com.fasterxml.jackson.core.JsonFactory.Feature arg0);
+    B enable(com.fasterxml.jackson.core.StreamWriteFeature arg0);
+    B disable(com.fasterxml.jackson.core.StreamReadFeature arg0);
+    int streamReadFeatures();
+    B enable(com.fasterxml.jackson.core.json.JsonReadFeature arg0);
+    void _legacyEnable(com.fasterxml.jackson.core.JsonParser.Feature arg0);
+    void _legacyEnable(com.fasterxml.jackson.core.JsonGenerator.Feature arg0);
+    B enable(com.fasterxml.jackson.core.StreamWriteFeature arg0, com.fasterxml.jackson.core.StreamWriteFeature... arg1);
+    B inputDecorator(InputDecoratorInterface arg0);
+    B enable(com.fasterxml.jackson.core.json.JsonReadFeature arg0, com.fasterxml.jackson.core.json.JsonReadFeature... arg1);
+    OutputDecoratorInterface outputDecorator();
+    InputDecoratorInterface inputDecorator();
+    int streamWriteFeatures();
+    B configure(com.fasterxml.jackson.core.json.JsonWriteFeature arg0, boolean arg1);
+    B enable(com.fasterxml.jackson.core.StreamReadFeature arg0, com.fasterxml.jackson.core.StreamReadFeature... arg1);
+    B disable(com.fasterxml.jackson.core.json.JsonReadFeature arg0, com.fasterxml.jackson.core.json.JsonReadFeature... arg1);
+    B _this();
+    B _failNonJSON(java.lang.Object arg0);
+    B enable(com.fasterxml.jackson.core.json.JsonWriteFeature arg0, com.fasterxml.jackson.core.json.JsonWriteFeature... arg1);
+    B configure(com.fasterxml.jackson.core.json.JsonReadFeature arg0, boolean arg1);
+    B disable(com.fasterxml.jackson.core.json.JsonReadFeature arg0);
+    B outputDecorator(OutputDecoratorInterface arg0);
+    B disable(com.fasterxml.jackson.core.json.JsonWriteFeature arg0);
+}

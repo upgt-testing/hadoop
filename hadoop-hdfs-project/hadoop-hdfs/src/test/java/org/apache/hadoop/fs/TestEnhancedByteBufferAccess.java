@@ -608,7 +608,7 @@ public class TestEnhancedByteBufferAccess {
     ByteBuffer result = null, result2 = null;
     cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
-    FsDatasetSpiInterface fsd = cluster.getDataNodes().get(0).getFSDataset();
+    FsDatasetSpi fsd = cluster.getDataNodes().get(0).getFSDataset();
     DistributedFileSystem fs = cluster.getFileSystem();
     DFSTestUtil.createFile(fs, TEST_PATH,
         TEST_FILE_LENGTH, (short)1, RANDOM_SEED);

@@ -1,0 +1,40 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface KeyProviderCryptoExtensionInterface {
+    KeyProviderInterface findProvider(java.util.List<org.apache.hadoop.crypto.key.KeyProvider> arg0, java.lang.String arg1) throws java.io.IOException;
+    java.lang.String noPasswordError();
+    java.util.List<java.lang.String> getKeys() throws java.io.IOException;
+    EncryptedKeyVersionInterface generateEncryptedKey(java.lang.String arg0) throws java.io.IOException, java.security.GeneralSecurityException;
+    KeyVersionInterface rollNewVersion(java.lang.String arg0, byte[] arg1) throws java.io.IOException;
+    KeyProviderCryptoExtensionInterface createKeyProviderCryptoExtension(KeyProviderInterface arg0);
+    byte[] generateKey(int arg0, java.lang.String arg1) throws java.security.NoSuchAlgorithmException;
+    boolean isTransient();
+    java.lang.String getAlgorithm(java.lang.String arg0);
+    KeyVersionInterface rollNewVersion(java.lang.String arg0) throws java.security.NoSuchAlgorithmException, java.io.IOException;
+    KeyVersionInterface decryptEncryptedKey(EncryptedKeyVersionInterface arg0) throws java.io.IOException, java.security.GeneralSecurityException;
+    void flush() throws java.io.IOException;
+    KeyVersionInterface createKey(java.lang.String arg0, OptionsInterface arg1) throws java.security.NoSuchAlgorithmException, java.io.IOException;
+    KeyVersionInterface createKey(java.lang.String arg0, org.apache.hadoop.crypto.key.KeyProvider.Options arg1) throws java.security.NoSuchAlgorithmException, java.io.IOException;
+    java.lang.String toString();
+    MetadataInterface getMetadata(java.lang.String arg0) throws java.io.IOException;
+    MetadataInterface[] getKeysMetadata(java.lang.String... arg0) throws java.io.IOException;
+    java.util.List<org.apache.hadoop.crypto.key.KeyProvider.KeyVersion> getKeyVersions(java.lang.String arg0) throws java.io.IOException;
+    java.lang.String noPasswordWarning();
+    KeyVersionInterface createKey(java.lang.String arg0, byte[] arg1, OptionsInterface arg2) throws java.io.IOException;
+    ConfigurationInterface getConf();
+    void close() throws java.io.IOException;
+    void warmUpEncryptedKeys(java.lang.String... arg0) throws java.io.IOException;
+//    E getExtension();
+    KeyVersionInterface getKeyVersion(java.lang.String arg0) throws java.io.IOException;
+    void deleteKey(java.lang.String arg0) throws java.io.IOException;
+    EncryptedKeyVersionInterface reencryptEncryptedKey(EncryptedKeyVersionInterface arg0) throws java.io.IOException, java.security.GeneralSecurityException;
+    boolean needsPassword() throws java.io.IOException;
+    java.lang.String buildVersionName(java.lang.String arg0, int arg1);
+    void reencryptEncryptedKeys(java.util.List<org.apache.hadoop.crypto.key.KeyProviderCryptoExtension.EncryptedKeyVersion> arg0) throws java.io.IOException, java.security.GeneralSecurityException;
+    KeyVersionInterface getCurrentKey(java.lang.String arg0) throws java.io.IOException;
+    void drain(java.lang.String arg0);
+    void invalidateCache(java.lang.String arg0) throws java.io.IOException;
+    java.lang.String getBaseName(java.lang.String arg0) throws java.io.IOException;
+    KeyProviderInterface getKeyProvider();
+    OptionsInterface options(ConfigurationInterface arg0);
+}

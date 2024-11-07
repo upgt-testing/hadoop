@@ -1,0 +1,41 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface LightWeightHashSetInterface<T> {
+    boolean contains(java.lang.Object arg0);
+    int getIndex(int arg0);
+    void shrinkIfNecessary();
+//    java.util.stream.Stream<E> stream();
+    void clear();
+    boolean remove(java.lang.Object arg0);
+    int getCapacity();
+    boolean isEmpty();
+    T getElement(T arg0);
+    boolean containsAll(java.util.Collection<?> arg0);
+//    java.util.Iterator<E> iterator();
+    boolean addElem(T arg0);
+//    boolean removeIf(java.util.function.Predicate<? super E> arg0);
+    int computeCapacity(int arg0);
+    T getContainedElem(int arg0, T arg1, int arg2);
+    void printDetails(java.io.PrintStream arg0);
+//    java.util.stream.Stream<E> parallelStream();
+    boolean retainAll(java.util.Collection<?> arg0);
+    boolean add(T arg0);
+    java.lang.Object[] toArray();
+    <U> U[] toArray(U[] arg0);
+    void resize(int arg0);
+    int size();
+    T[] pollToArray(T[] arg0);
+    java.util.List<T> pollN(int arg0);
+    boolean addAll(java.util.Collection<? extends T> arg0);
+    java.util.Iterator<T> iterator();
+    java.util.Spliterator<T> spliterator();
+    java.util.List<T> pollAll();
+    java.lang.String toString();
+    boolean removeAll(java.util.Collection<?> arg0);
+    void expandIfNecessary();
+    <T> T[] toArray(java.util.function.IntFunction<T[]> arg0);
+    void forEach(java.util.function.Consumer<? super T> arg0);
+    LinkedElementInterface<T> removeElem(T arg0);
+//    java.util.Spliterator<E> spliterator();
+//    <T> T[] toArray(T[] arg0);
+}

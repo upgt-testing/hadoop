@@ -1,0 +1,48 @@
+package org.apache.hadoop.hdfs.remoteProxies;
+
+public interface FSDataOutputStreamBuilderInterface<S, B> {
+    PathInterface getPath();
+    boolean isRecursive();
+    B opt(java.lang.String arg0, float arg1);
+    B replication(short arg0);
+    B checksumOpt(ChecksumOptInterface arg0);
+    B recursive();
+    void rejectUnknownMandatoryKeys(java.util.Collection<java.lang.String> arg0, java.lang.String arg1) throws java.lang.IllegalArgumentException;
+    ChecksumOptInterface getChecksumOpt();
+    B opt(java.lang.String arg0, boolean arg1);
+    B permission(FsPermissionInterface arg0);
+    short getReplication();
+    org.apache.hadoop.fs.PathHandle getPathHandle();
+    ConfigurationInterface getOptions();
+    B must(java.lang.String arg0, float arg1);
+    B getThisBuilder();
+    B opt(java.lang.String arg0, java.lang.String... arg1);
+    B must(java.lang.String arg0, java.lang.String arg1);
+    java.util.EnumSet<org.apache.hadoop.fs.CreateFlag> getFlags();
+    B blockSize(long arg0);
+    B must(java.lang.String arg0, boolean arg1);
+    B opt(java.lang.String arg0, double arg1);
+    B create();
+    B must(java.lang.String arg0, int arg1);
+    B bufferSize(int arg0);
+    int getBufferSize();
+    B append();
+    java.util.Optional<org.apache.hadoop.fs.Path> getOptionalPath();
+    B opt(java.lang.String arg0, int arg1);
+    B must(java.lang.String arg0, double arg1);
+    B overwrite(boolean arg0);
+    B must(java.lang.String arg0, java.lang.String... arg1);
+    FsPermissionInterface getPermission();
+    void rejectUnknownMandatoryKeys(java.util.Set<java.lang.String> arg0, java.util.Collection<java.lang.String> arg1, java.lang.String arg2) throws java.lang.IllegalArgumentException;
+    java.util.Optional<org.apache.hadoop.fs.PathHandle> getOptionalPathHandle();
+    B opt(java.lang.String arg0, long arg1);
+    S build() throws java.lang.IllegalArgumentException, java.io.IOException;
+    long getBlockSize();
+    B must(java.lang.String arg0, long arg1);
+    B progress(org.apache.hadoop.util.Progressable arg0);
+    B opt(java.lang.String arg0, java.lang.String arg1);
+    java.util.Set<java.lang.String> getMandatoryKeys();
+    org.apache.hadoop.util.Progressable getProgress();
+    java.util.Set<java.lang.String> getOptionalKeys();
+    FileSystemInterface getFS();
+}
