@@ -25,6 +25,7 @@ import org.apache.hadoop.hdfs.server.datanode.DatanodeUtil;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -931,7 +932,7 @@ public class MiniDockerDFSCluster implements Closeable {
     }
 
 
-    public NamenodeProtocolsInterface getNameNodeRpc() {
+    public NamenodeProtocols getNameNodeRpc() {
         return getNameNode().getRpcServer();
     }
 
