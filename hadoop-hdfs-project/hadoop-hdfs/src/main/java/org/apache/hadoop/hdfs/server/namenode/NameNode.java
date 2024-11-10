@@ -448,6 +448,7 @@ public class NameNode extends ReconfigurableBase implements
   protected final Tracer tracer;
   ScheduledThreadPoolExecutor metricsLoggerTimer;
 
+
   /**
    * The namenode address that clients will use to access this namenode
    * or the name service. For HA configurations using logical URI, it
@@ -1961,10 +1962,34 @@ public class NameNode extends ReconfigurableBase implements
     System.out.println("NameNode testRMIObject: " + conf.get("test-key"));
   }
 
+
+  //Shuai: For test only
+  List<NameNodeFake> fakeNameNodes = new ArrayList<NameNodeFake>();
+
+  public List<NameNodeFake> getFakeNameNodes() {
+    return fakeNameNodes;
+  }
+
+  public NameNodeFake getFakeNameNode(int id) {
+    if (id > fakeNameNodes.size()) {
+      return null;
+    }
+    for (NameNodeFake fake : fakeNameNodes) {
+      if (fake.getID() == id) {
+        return fake;
+      }
+    }
+    return null;
+  }
+
   /**
    * Register NameNodeStatusMXBean
    */
   private void registerNNSMXBean() {
+    for (int i = 0; i < 10; i++) {
+      fakeNameNodes.add(new NameNodeFake(i));
+    }
+
     //Shuai: Also register my RMI here
 
     //System.setProperty("java.rmi.server.hostname", "localhost"); // Replace with actual IP or hostname

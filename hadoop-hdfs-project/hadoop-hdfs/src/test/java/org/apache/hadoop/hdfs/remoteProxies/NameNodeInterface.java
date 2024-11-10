@@ -1,6 +1,7 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
 public interface NameNodeInterface {
+    String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();
     void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
@@ -91,6 +92,7 @@ public interface NameNodeInterface {
     void queueExternalCall(ExternalCallInterface<?> arg0) throws java.io.IOException, java.lang.InterruptedException;
     java.lang.String reconfHeartbeatRecheckInterval(DatanodeManagerInterface arg0, java.lang.String arg1, java.lang.String arg2) throws org.apache.hadoop.conf.ReconfigurationException;
     void testRMIConf(ConfigurationInterface arg0);
+    void testRMIConf(org.apache.hadoop.conf.Configuration arg0);
     void setRpcLifelineServerAddress(ConfigurationInterface arg0, java.net.InetSocketAddress arg1);
     void copyEditLogSegmentsToSharedDir(FSNamesystemInterface arg0, java.util.Collection<java.net.URI> arg1, NNStorageInterface arg2, ConfigurationInterface arg3) throws java.io.IOException;
     ConfigurationInterface getConf();
@@ -131,4 +133,6 @@ public interface NameNodeInterface {
     void reconfigureProperty(java.lang.String arg0, java.lang.String arg1) throws org.apache.hadoop.conf.ReconfigurationException;
     NameNodeInterface createNameNode(java.lang.String[] arg0, ConfigurationInterface arg1) throws java.io.IOException;
     java.net.InetSocketAddress getHttpServerBindAddress(ConfigurationInterface arg0);
+    java.util.List<NameNodeFakeInterface> getFakeNameNodes();
+    NameNodeFakeInterface getFakeNameNode(int id);
 }

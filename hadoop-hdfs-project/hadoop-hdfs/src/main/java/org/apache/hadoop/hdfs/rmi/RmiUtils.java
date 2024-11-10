@@ -9,6 +9,9 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class RmiUtils {
     private final static String RMI_CONNECTION_PORT_PROPERTY_KEY = "rmi.connection.port";
@@ -18,6 +21,8 @@ public class RmiUtils {
 
     private static int rmiConnectionPort = -1;
     private static int rmiObjectPort = -1;
+
+    private static final Map<UUID, Object> rmiObjectMap = new HashMap<>();
 
     public static int getRmiConnectionPort() {
         if (rmiConnectionPort == -1) {
@@ -98,10 +103,24 @@ public class RmiUtils {
         try {
             System.setProperty("java.rmi.server.hostname", "localhost");
             // Shuai: Register RMI
-            RemoteObject nnRemote = new RemoteObjectImpl(actualObj, RmiUtils.getRmiObjectPort());
+            UUID objectID = UUID.randomUUID();
+            storeRmiObjectToMap(objectID, actualObj);
+            RemoteObject nnRemote = new RemoteObjectImpl(actualObj, objectID, RmiUtils.getRmiObjectPort());
             RmiUtils.registerRmiObject(className, nnRemote, RmiUtils.getRmiConnectionPort());
         } catch (java.rmi.RemoteException e) {
             throw new RuntimeException("Failed to register RMI object", e);
         }
+    }
+
+    public static void storeRmiObjectToMap(UUID uuid, Object obj) {
+        rmiObjectMap.put(uuid, obj);
+    }
+
+    public static Object getRmiObjectFromMap(UUID uuid) {
+        if (!rmiObjectMap.containsKey(uuid)) {
+            LOG.info("Object with UUID {} is not found in the map", uuid);
+            return null;
+        }
+        return rmiObjectMap.get(uuid);
     }
 }

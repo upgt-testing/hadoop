@@ -1,8 +1,16 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 public class NameNodeFake {
+    private int ID;
+
     public NameNodeFake() {
-        System.out.println("NameNodeFake created");
+        this.ID = 0;
+        System.out.println("NameNodeFake created with ID: " + ID);
+    }
+
+    public NameNodeFake(int ID) {
+        this.ID = ID;
+        System.out.println("NameNodeFake created with ID: " + ID);
     }
 
     public boolean testRMIPrint(String message) {
@@ -10,5 +18,7 @@ public class NameNodeFake {
         return true;
     }
 
-
+    public int getID() {
+        return ID;
+    }
 }

@@ -4084,4 +4084,9 @@ public class DataNode extends ReconfigurableBase
   public BlockPoolManager getBlockPoolManager() {
     return blockPoolManager;
   }
+
+  //Shuai: For testing
+  public Configuration createConf() {
+    return new Configuration();
+  }
 }

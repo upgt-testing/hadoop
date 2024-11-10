@@ -1,6 +1,9 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
-public interface DataNodeInterface {
+import java.rmi.Remote;
+
+public interface DataNodeInterface extends Remote {
+    String clz = "org.apache.hadoop.hdfs.server.datanode.DataNode";
     void setClusterId(java.lang.String arg0, java.lang.String arg1) throws java.io.IOException;
     void scheduleAllBlockReport(long arg0);
     void removeVolumes(java.util.Collection<org.apache.hadoop.hdfs.server.datanode.StorageLocation> arg0, boolean arg1) throws java.io.IOException;
@@ -203,4 +206,5 @@ public interface DataNodeInterface {
     void setStartupOption(ConfigurationInterface arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1);
     void secureMain(java.lang.String[] arg0, SecureResourcesInterface arg1);
     void checkBlockLocalPathAccess() throws java.io.IOException;
+    ConfigurationInterface createConf();
 }
