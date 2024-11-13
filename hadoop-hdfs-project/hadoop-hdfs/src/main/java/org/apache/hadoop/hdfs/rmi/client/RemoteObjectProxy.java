@@ -1,6 +1,7 @@
 package org.apache.hadoop.hdfs.rmi.client;
 
 
+import org.apache.hadoop.hdfs.rmi.MyUUID;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -27,54 +28,29 @@ public class RemoteObjectProxy implements InvocationHandler {
         );
     }
 
+    /**
+     * The invoke method may contains RMI interfaces, the override invoke method will replace the RMI interfaces with UUID
+     * The remote part will get the actual class and object from the UUID
+     * For example, given method signature: public void setConf(ConfigurationInterface conf)
+     * The method signature will be changed to: public void setConf(MyUUID uuid) and the remote part will get the actual class and object from the UUID
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
             // Get parameter types
             Class<?>[] paramTypes = method.getParameterTypes();
-            Class<?>[] newParamTypes = new Class<?>[paramTypes.length];
-            List<Integer> remoteProxyParamIndexes = new LinkedList<>();
             for (int i = 0; i < paramTypes.length; i++) {
                 Class<?> paramType = paramTypes[i];
-                newParamTypes[i] = paramType;
                 // step1 : check whether paramTypes have any class that is (1) from remoteProxies package and (2) name ends with "Interface"
                 if (paramType.getName().contains(REMOTE_PROXIES_PACKAGE) && paramType.getName().endsWith("Interface")) {
-                    // step2: if step1 is true, then change the paramTypes to the actual class, we can do it through the "clz" field in the interface
-                    try {
-                        Class<?> clz = Class.forName(paramType.getField("clz").get(null).toString());
-                        newParamTypes[i] = clz;
-                        remoteProxyParamIndexes.add(i);
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException("Failed to get class from remoteProxies package for " + paramType.getName(), e);
-                    }
+                    // step2: if so we change the param type to UUID and rely the remote part to get the actual class and object
+                    paramTypes[i] = MyUUID.class;
+                    UUID uuid = ((RemoteObjectProxy) Proxy.getInvocationHandler(args[i])).getObjectUniqueID();
+                    args[i] = new MyUUID(uuid);
                 }
             }
 
-            Object result;
-            // step3: we need to reconstruct both the paramTypes and args
-            // For paramTypes, each element at (index+1) in remoteProxyParamIndexes need to be added as UUID.class
-            // For args, each element at index in remoteProxyParamIndexes need to be replaced with the UUID of the remote object
-            if (paramTypes.length > 0 && !remoteProxyParamIndexes.isEmpty()) {
-                Class<?>[] finalParamTypes = new Class<?>[paramTypes.length + remoteProxyParamIndexes.size()];
-                Object[] finalArgs = new Object[args.length + remoteProxyParamIndexes.size()];
-                int j = 0;
-                for (int i = 0; i < paramTypes.length; i++) {
-                    finalParamTypes[j] = newParamTypes[i];
-                    finalArgs[j] = args[i];
-                    if (remoteProxyParamIndexes.contains(i)) {
-                        // set object to null to avoid NotSerializableException
-                        // the actual object will be extracted remotely through UUID
-                        finalArgs[j] = null;
-                        finalParamTypes[j + 1] = UUID.class;
-                        finalArgs[j + 1] = ((RemoteObjectProxy) Proxy.getInvocationHandler(args[i])).getObjectUniqueID();
-                        j++;
-                    }
-                    j++;
-                }
-                result = remoteObject.invoke(method.getName(), finalParamTypes, finalArgs);
-            } else {
-                result = remoteObject.invoke(method.getName(), newParamTypes, args);
-            }
+            Object result = remoteObject.invoke(method.getName(), paramTypes, args);
 
             /*
             boolean isTarget = false;

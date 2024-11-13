@@ -1,6 +1,7 @@
 package org.apache.hadoop.hdfs.rmi.server;
 
 
+import org.apache.hadoop.hdfs.rmi.MyUUID;
 import org.apache.hadoop.hdfs.rmi.RmiUtils;
 
 import java.lang.reflect.Method;
@@ -13,13 +14,22 @@ public class RemoteObjectImpl extends UnicastRemoteObject implements RemoteObjec
     private Object actualObject;
     /** The unique ID of the actual object */
     private UUID objectUniqueID;
+    private Class<?> actualObjectClass;
 
     public RemoteObjectImpl(Object actualObject, UUID id, int port) throws RemoteException {
         super(port);
         this.actualObject = actualObject;
         this.objectUniqueID = id;
+        this.actualObjectClass = actualObject.getClass();
     }
 
+    /**
+     * The invoke paramTypes may contains RMI interfaces, and the corresponding args may contains MyUUID
+     * For example, given method signature: public void setConf(ConfigurationInterface conf) -> public void setConf(MyUUID uuid)
+     * The paramTypes will be MyUUID.class, and the args will be the actual MyUUID object.
+     * This override method will replace the MyUUID with the actual object 
+     * and replace the MyUUID.class with the actual class get from the actual object
+     */
     @Override
     public Object invoke(String methodName, Class<?>[] paramTypes, Object[] args) throws RemoteException {
         try {
@@ -27,38 +37,18 @@ public class RemoteObjectImpl extends UnicastRemoteObject implements RemoteObjec
             Class<?>[] finalParamTypes;
             Object[] finalArgs;
 
-            // If length of paramTypes is 0 or 1, then there must be no UUID in the args
-            if (paramTypes.length <= 1) {
-                finalParamTypes = paramTypes;
-                finalArgs = args;
-            } else {
-                int numUUIDs = 0;
-                for (Class<?> paramType : paramTypes) {
-                    if (paramType == UUID.class) {
-                        numUUIDs++;
-                    }
-                }
-
-                finalParamTypes = new Class<?>[paramTypes.length - numUUIDs];
-                finalArgs = new Object[args.length - numUUIDs];
-                int index = 0;
-                // iterate through the paramTypes, if type is a UUID, then replace it with the actual object
-                for (int i = 0; i < paramTypes.length; i++) {
-                    Class<?> currentType = paramTypes[i];
-                    // If currentType is UUID, then the previous element should be the actual object
-                    if (currentType == UUID.class) {
-                        // i = 0 will never be a UUID so we can safely access i - 1
-                        finalArgs[index - 1] = ActualObjectMap.getActualObject((UUID) args[i]);
-                    } else {
-                        finalParamTypes[index] = currentType;
-                        finalArgs[index] = args[i];
-                        index += 1;
-                    }
+            // Iterate through the paramTypes, if type is a MyUUID, then replace it with the actual object
+            for (int i = 0; i < paramTypes.length; i++) {
+                Class<?> currentType = paramTypes[i];
+                if (currentType == MyUUID.class) {
+                    UUID uuid = ((MyUUID) args[i]).get();
+                    args[i] = ActualObjectMap.getActualObject(uuid);
+                    paramTypes[i] = args[i].getClass();
                 }
             }
 
-            Method method = actualObject.getClass().getMethod(methodName, finalParamTypes);
-            Object result = method.invoke(actualObject, finalArgs);
+            Method method = actualObject.getClass().getMethod(methodName, paramTypes);
+            Object result = method.invoke(actualObject, args);
             if (result == null || isPrimitiveOrWrapper(result.getClass())) {
                 return result;
             } else {
