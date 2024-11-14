@@ -12,21 +12,27 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.StorageType;
+import org.apache.hadoop.ha.HAServiceProtocol;
+import org.apache.hadoop.ha.ServiceFailedException;
 import org.apache.hadoop.hdfs.protocol.Block;
+import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.Storage;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataStorage;
-import org.apache.hadoop.hdfs.server.datanode.DatanodeUtil;
+import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.test.GenericTestUtils;
+import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -41,6 +47,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +72,9 @@ public class MiniDockerDFSCluster implements Closeable {
     public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
             = DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing";
     protected final int storagesPerDatanode;
+
+    private File base_dir;
+    private File data_dir;
 
     /** Whether to enable debug logging. */
     private final boolean DEBUG = true; // Boolean.getBoolean("DEBUG_DOCKER");
@@ -548,7 +559,8 @@ public class MiniDockerDFSCluster implements Closeable {
         this.storagesPerDatanode = builder.storagesPerDatanode;
         // Re-enable symlinks for tests, see HADOOP-10020 and HADOOP-10052
         FileSystem.enableSymlinks();
-
+        base_dir = new File(determineDfsBaseDir());
+        data_dir = new File(base_dir, "data");
         this.conf = builder.conf;
         cluster = new DockerCluster();
         List<File> configFiles = generateConfigFiles();
@@ -707,13 +719,101 @@ public class MiniDockerDFSCluster implements Closeable {
         close();
     }
 
+    public void shutdown(boolean deleteBaseDir, boolean closeFileSystem) {
+        close();
+    }
+
     public void shutdown(boolean deleteBaseDir) {
         LOG.warn("The shutdown(boolean deleteBaseDir) function is not implemented yet.");
         System.out.println("The shutdown(boolean deleteBaseDir) function is not implemented yet.");
         close();
     }
 
+    public String getDataDirectory() {
+        return data_dir.getAbsolutePath();
+    }
+
+    public synchronized void startDataNodes(Configuration conf, int numDataNodes,
+                                            boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                                            String[] racks, String[] hosts,
+                                            long[] simulatedCapacities) throws IOException {
+        startDataNodes(conf, numDataNodes, manageDfsDirs, operation, racks,
+                hosts, simulatedCapacities, false);
+    }
+
+
+    public synchronized void startDataNodes(Configuration conf, int numDataNodes,
+                                            boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                                            String[] racks, String[] hosts,
+                                            long[] simulatedCapacities,
+                                            boolean setupHostsFile) throws IOException {
+        startDataNodes(conf, numDataNodes, null, manageDfsDirs, operation, racks, hosts, null,
+                simulatedCapacities, setupHostsFile, false, false, null, null, null);
+    }
+
+    public synchronized void startDataNodes(Configuration conf, int numDataNodes,
+                                            boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                                            String[] racks, String[] hosts,
+                                            long[] simulatedCapacities,
+                                            boolean setupHostsFile,
+                                            boolean checkDataNodeAddrConfig) throws IOException {
+        startDataNodes(conf, numDataNodes, null, manageDfsDirs, operation, racks, hosts, null,
+                simulatedCapacities, setupHostsFile, checkDataNodeAddrConfig, false, null, null, null);
+    }
+
+    public synchronized void startDataNodes(Configuration conf, int numDataNodes,
+                                            StorageType[][] storageTypes, boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                                            String[] racks, String[] hosts,
+                                            long[][] storageCapacities,
+                                            long[] simulatedCapacities,
+                                            boolean setupHostsFile,
+                                            boolean checkDataNodeAddrConfig,
+                                            boolean checkDataNodeHostConfig,
+                                            Configuration[] dnConfOverlays,
+                                            int[] dnHttpPorts,
+                                            int[] dnIpcPorts) throws IOException {
+
+        LOG.warn("The startDataNodes function is not implemented yet.");
+        System.out.println("The startDataNodes function is not implemented yet.");
+        throw new UnsupportedOperationException("The startDataNodes function is not implemented yet.");
+    }
+
+    public void startDataNodes(Configuration conf, int numDataNodes,
+                               boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                               String[] racks
+    ) throws IOException {
+        startDataNodes(conf, numDataNodes, manageDfsDirs, operation, racks, null,
+                null, false);
+    }
+
+    public void startDataNodes(Configuration conf, int numDataNodes,
+                               boolean manageDfsDirs, HdfsServerConstants.StartupOption operation,
+                               String[] racks,
+                               long[] simulatedCapacities) throws IOException {
+        startDataNodes(conf, numDataNodes, manageDfsDirs, operation, racks, null,
+                simulatedCapacities, false);
+
+    }
+
+    public void shutdownDataNodes() {
+        for (int i = dataNodes.size()-1; i >= 0; i--) {
+            DockerNode dataNode = dataNodes.get(i);
+            dataNode.stop();
+            dataNodes.remove(i);
+        }
+    }
+
+    public int getStoragesPerDatanode() {
+        return storagesPerDatanode;
+    }
+
     public boolean restartDataNodes(boolean deleteBaseDir) {
+        LOG.warn("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
+        System.out.println("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
+        return true;
+    }
+
+    public boolean restartDataNodes() {
         LOG.warn("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
         System.out.println("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
         return true;
@@ -901,6 +1001,29 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    private void checkSingleNameNode() {
+        /**
+        if (namenodes.size() != 1) {
+            throw new IllegalArgumentException("Namenode index is needed");
+        }**/
+    }
+
+    public synchronized void restartNameNode(String... args) throws IOException {
+        //checkSingleNameNode();
+        //restartNameNode(0, true, args);
+        restartNameNode();
+    }
+
+    /**
+     * Restart the namenode at a given index. Optionally wait for the cluster
+     * to become active.
+     */
+    public synchronized void restartNameNode(int nnIndex, boolean waitActive,
+                                             String... args) throws IOException {
+        //checkSingleNameNode();
+        restartNameNodes();
+    }
+
     //======================= RMI related functions ========================
     public Registry getNNRegistry() throws RemoteException {
         return LocateRegistry.getRegistry(nnRMIConnectionPort);
@@ -931,8 +1054,35 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
+    public void transitionToStandby(int nnIndex) throws IOException,
+            ServiceFailedException {
+        getNameNode(nnIndex).getRpcServer().transitionToStandby(
+                new HAServiceProtocol.StateChangeRequestInfo(HAServiceProtocol.RequestSource.REQUEST_BY_USER_FORCED));
+    }
+
+    private NameNodeInfo getNN(int nnIndex) {
+        int count = 0;
+        /**
+        for (NameNodeInfo nn : namenodes.values()) {
+            if (count == nnIndex) {
+                return nn;
+            }
+            count++;
+        }*/
+        LOG.warn("The getNN(int nnIndex) always return the first NameNodeInfo for now.");
+        System.out.println("The getNN(int nnIndex) always return the first NameNodeInfo for now.");
+        throw new RuntimeException("The getNN(int nnIndex) always return the first NameNodeInfo for now.");
+    }
+
+    public Collection<URI> getNameDirs(int nnIndex) {
+        return FSNamesystem.getNamespaceDirs(getNN(nnIndex).conf);
+    }
 
     public NamenodeProtocols getNameNodeRpc() {
+        return getNameNode().getRpcServer();
+    }
+
+    public NamenodeProtocols getNameNodeRpc(int idx) {
         return getNameNode().getRpcServer();
     }
 
@@ -1004,13 +1154,59 @@ public class MiniDockerDFSCluster implements Closeable {
         }
     }
 
-    public void stopDataNode(int idx) {
+    public DataNodeProperties stopDataNode(int idx) {
         dataNodes.get(idx).stop();
+        return new DataNodeProperties(idx);
+    }
+
+    public boolean restartDataNode(DataNodeProperties dp, Boolean keepPort ) throws IOException {
+        int idx = dp.idx;
+        restartDataNode(idx);
+        return true;
+    }
+
+    public boolean restartDataNode(int idx) throws IOException {
+        LOG.warn("The restartDataNode(int idx) function is not implemented yet.");
+        System.out.println("The restartDataNode(DataNodeProperties dnprop) function is not implemented yet.");
+        throw new UnsupportedOperationException("The restartDataNode(DataNodeProperties dnprop) function is not implemented yet.");
+    }
+
+    public boolean restartDataNode(DataNodeProperties dnprop) throws IOException {
+        LOG.warn("The restartDataNode(DataNodeProperties dnprop) function is not implemented yet.");
+        System.out.println("The restartDataNode(DataNodeProperties dnprop) function is not implemented yet.");
+        throw new UnsupportedOperationException("The restartDataNode(DataNodeProperties dnprop) function is not implemented yet.");
+    }
+
+    public boolean restartDataNode(String addr) throws IOException {
+        LOG.warn("The restartDataNode(String addr) function is not implemented yet.");
+        System.out.println("The restartDataNode(String addr) function is not implemented yet.");
+        throw new UnsupportedOperationException("The restartDataNode(String addr) function is not implemented yet.");
+    }
+
+    public void setDataNodeDead(DatanodeIDInterface dnId) throws IOException {
+        LOG.warn("The setDataNodeDead(DatanodeIDInterface dnId) function is not implemented yet.");
+        System.out.println("The setDataNodeDead(DatanodeIDInterface dnId) function is not implemented yet.");
+        throw new UnsupportedOperationException("The setDataNodeDead(DatanodeIDInterface dnId) function is not implemented yet.");
+    }
+
+
+    public File getInstanceStorageDir(int dnIndex, int dirIndex) {
+        return new File(base_dir, getStorageDirPath(dnIndex, dirIndex));
     }
 
     public boolean isClusterUp() {
         return nameNode.isHealthy();
     }
+
+
+    public void setLeasePeriod(long soft, long hard) {
+        NameNodeAdapter.setLeasePeriod(getNamesystem(), soft, hard);
+    }
+
+    public void setLeasePeriod(long soft, long hard, int nnIndex) {
+        NameNodeAdapter.setLeasePeriod(getNamesystem(nnIndex), soft, hard);
+    }
+
 
     public static List<File> getAllBlockFiles(File storageDir) {
         List<File> results = new ArrayList<File>();
@@ -1112,7 +1308,7 @@ public class MiniDockerDFSCluster implements Closeable {
                 getStorageDirPath(dnIndex, dirIndex));
     }
 
-    public void stopDataNode(String addr) {
+    public synchronized DataNodeProperties stopDataNode(String addr) {
         LOG.warn("The stopDataNode(String addr) function is not implemented yet.");
         System.out.println("The stopDataNode(String addr) function is not implemented yet.");
         throw new UnsupportedOperationException("The stopDataNode(String addr) function is not implemented yet.");
@@ -1122,6 +1318,12 @@ public class MiniDockerDFSCluster implements Closeable {
         LOG.warn("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
         System.out.println("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
         throw new UnsupportedOperationException("The corruptBlockOnDataNodesByDeletingBlockFile function is not implemented yet.");
+    }
+
+    public int corruptBlockOnDataNodes(ExtendedBlock block) {
+        LOG.warn("The corruptBlockOnDataNodes function is not implemented yet.");
+        System.out.println("The corruptBlockOnDataNodes function is not implemented yet.");
+        throw new UnsupportedOperationException("The corruptBlockOnDataNodes function is not implemented yet.");
     }
 
     public void corruptReplica(int i, ExtendedBlock blk) {
@@ -1147,4 +1349,163 @@ public class MiniDockerDFSCluster implements Closeable {
         System.out.println("The triggerBlockReports function is not implemented yet.");
         throw new UnsupportedOperationException("The triggerBlockReports function is not implemented yet.");
     }
+
+    /** Wait until the given namenode gets first block reports from all the datanodes */
+    public void waitFirstBRCompleted(int nnIndex, int timeout) throws
+            IOException, TimeoutException, InterruptedException {
+        if (nameNodeProxies.size() == 0) {// || getNN(nnIndex) == null || getNN(nnIndex).nameNode == null) {
+            return;
+        }
+
+        final FSNamesystemInterface ns = getNamesystem(nnIndex);
+        final DatanodeManagerInterface dm = ns.getBlockManager().getDatanodeManager();
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+            @Override
+            public Boolean get() {
+                List<DatanodeDescriptorInterface> nodes = dm.getDatanodeListForReport
+                        (HdfsConstants.DatanodeReportType.LIVE);
+                for (DatanodeDescriptorInterface node : nodes) {
+                    if (!node.checkBlockReportReceived()) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }, 100, timeout);
+    }
+
+    /**
+     * Get materialized replica that can be corrupted later.
+     * @param i the index of DataNode.
+     * @param blk name of the block.
+     * @return a materialized replica.
+     * @throws ReplicaNotFoundException if the replica does not exist on the
+     * DataNode.
+     */
+    public FsDatasetTestUtils.MaterializedReplica getMaterializedReplica(
+            int i, ExtendedBlockInterface blk) throws ReplicaNotFoundException {
+        LOG.warn("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+    public FsDatasetTestUtils.MaterializedReplica getMaterializedReplica(
+            int i, ExtendedBlock blk) throws ReplicaNotFoundException {
+        LOG.warn("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getMaterializedReplica(int i, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+    /**
+     * Get materialized replica that can be corrupted later.
+     * @param dn the index of DataNode.
+     * @param blk name of the block.
+     * @return a materialized replica.
+     * @throws ReplicaNotFoundException if the replica does not exist on the
+     * DataNode.
+     */
+    public FsDatasetTestUtils.MaterializedReplica getMaterializedReplica(
+            DataNodeInterface dn, ExtendedBlockInterface blk) throws ReplicaNotFoundException {
+        LOG.warn("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+    public FsDatasetTestUtils.MaterializedReplica getMaterializedReplica(
+            DataNodeInterface dn, ExtendedBlock blk) throws ReplicaNotFoundException {
+        LOG.warn("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        System.out.println("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getMaterializedReplica(DataNode dn, ExtendedBlock blk) function is not implemented yet.");
+    }
+
+
+    public FsDatasetTestUtils getFsDatasetTestUtils(int dnIdx) {
+        Preconditions.checkArgument(dnIdx < dataNodes.size());
+        return FsDatasetTestUtils.Factory.getFactory(conf)
+                .newInstance(dataNodeProxies.get(dnIdx));
+    }
+
+    /**
+     * Returns the corresponding FsDatasetTestUtils for a DataNode.
+     * @param dn a DataNode
+     * @return a FsDatasetTestUtils for the given DataNode.
+     */
+    public FsDatasetTestUtils getFsDatasetTestUtils(DataNodeInterface dn) {
+        Preconditions.checkArgument(dn != null);
+        return FsDatasetTestUtils.Factory.getFactory(conf)
+                .newInstance(dn);
+    }
+
+
+
+    /**
+     * Returns the current set of datanodes
+     */
+    DataNodeInterface[] listDataNodes() {
+        return dataNodeProxies.toArray(new DataNodeInterface[0]);
+    }
+
+    public static class DataNodeProperties {
+        final DataNodeInterface datanode;
+        final Configuration conf;
+        String[] dnArgs;
+        final SecureDataNodeStarter.SecureResources secureResources;
+        final int ipcPort;
+        public int idx;
+
+        DataNodeProperties(int idx) {
+            this(null, null, null, null, 0, idx);
+        }
+
+        DataNodeProperties(DataNodeInterface node, Configuration conf, String[] args,
+                           SecureDataNodeStarter.SecureResources secureResources, int ipcPort, int idx) {
+            this.datanode = node;
+            this.conf = conf;
+            this.dnArgs = args;
+            this.secureResources = secureResources;
+            this.ipcPort = ipcPort;
+            this.idx = idx;
+        }
+
+        public void setDnArgs(String ... args) {
+            dnArgs = args;
+        }
+
+        public DataNodeInterface getDatanode() {
+            return datanode;
+        }
+
+    }
+
+    /**
+     * Stores the information related to a namenode in the cluster
+     */
+    public static class NameNodeInfo {
+        public NameNodeInterface nameNode;
+        Configuration conf;
+        String nameserviceId;
+        String nnId;
+        HdfsServerConstants.StartupOption startOpt;
+        NameNodeInfo(NameNodeInterface nn, String nameserviceId, String nnId,
+                     HdfsServerConstants.StartupOption startOpt, Configuration conf) {
+            this.nameNode = nn;
+            this.nameserviceId = nameserviceId;
+            this.nnId = nnId;
+            this.startOpt = startOpt;
+            this.conf = conf;
+        }
+
+        public void setStartOpt(HdfsServerConstants.StartupOption startOpt) {
+            this.startOpt = startOpt;
+        }
+
+        public String getNameserviceId() {
+            return this.nameserviceId;
+        }
+
+        public String getNamenodeId() {
+            return this.nnId;
+        }
+    }
+
 }
