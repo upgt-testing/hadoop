@@ -61,7 +61,7 @@ public class TestDFSStartupVersions {
      */
     private static class StorageData {
 
-        private final StorageInfoInterface storageInfo;
+        private final StorageInfo storageInfo;
 
         private final String blockPoolId;
 
@@ -82,14 +82,14 @@ public class TestDFSStartupVersions {
         int layoutVersionOld = Storage.LAST_UPGRADABLE_LAYOUT_VERSION;
         int layoutVersionCur = HdfsServerConstants.DATANODE_LAYOUT_VERSION;
         int layoutVersionNew = Integer.MIN_VALUE;
-        int namespaceIdCur = UpgradeUtilities.getCurrentNamespaceID(null);
+        int namespaceIdCur = UpgradeUtilities.getCurrentNamespaceIDNull(null);
         int namespaceIdOld = Integer.MIN_VALUE;
         long fsscTimeOld = Long.MIN_VALUE;
-        long fsscTimeCur = UpgradeUtilities.getCurrentFsscTime(null);
+        long fsscTimeCur = UpgradeUtilities.getCurrentFsscTimeNull(null);
         long fsscTimeNew = Long.MAX_VALUE;
         String clusterID = "testClusterID";
         String invalidClusterID = "testClusterID";
-        String bpid = UpgradeUtilities.getCurrentBlockPoolID(null);
+        String bpid = UpgradeUtilities.getCurrentBlockPoolIDNull(null);
         String invalidBpid = "invalidBpid";
         return new StorageData[] { new StorageData(layoutVersionOld, namespaceIdCur, clusterID, fsscTimeOld, // 0
         bpid), new StorageData(layoutVersionOld, namespaceIdCur, clusterID, fsscTimeCur, // 1
@@ -151,8 +151,8 @@ public class TestDFSStartupVersions {
      * </pre>
      */
     boolean isVersionCompatible(StorageData namenodeSd, StorageData datanodeSd) {
-        final StorageInfoInterface namenodeVer = namenodeSd.storageInfo;
-        final StorageInfoInterface datanodeVer = datanodeSd.storageInfo;
+        final StorageInfo namenodeVer = namenodeSd.storageInfo;
+        final StorageInfo datanodeVer = datanodeSd.storageInfo;
         // check #0
         if (namenodeVer.getNamespaceID() != datanodeVer.getNamespaceID()) {
             LOG.info("namespaceIDs are not equal: isVersionCompatible=false");

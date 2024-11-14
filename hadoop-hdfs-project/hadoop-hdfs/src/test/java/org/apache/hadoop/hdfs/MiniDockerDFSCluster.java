@@ -23,6 +23,7 @@ import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.datanode.*;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -1588,4 +1589,83 @@ public class MiniDockerDFSCluster implements Closeable {
         throw new UnsupportedOperationException("The getAllBlockReports function is not implemented yet.");
     }
 
+    /**
+     * Returns true if there is at least one DataNode running.
+     */
+    public boolean isDataNodeUp() {
+        if (dataNodes.isEmpty()) {
+            return false;
+        }
+        for (DockerNode dn : dataNodes.values()) {
+            if (dn.isHealthy()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method is valid only if the data nodes have simulated data
+     * @param dataNodeIndex - data node i which to inject - the index is same as for getDataNodes()
+     * @param blocksToInject - the blocks
+     * @param bpid - (optional) the block pool id to use for injecting blocks.
+     *             If not supplied then it is queried from the in-process NameNode.
+     * @throws IOException
+     *              if not simulatedFSDataset
+     *             if any of blocks already exist in the data node
+     *
+     */
+    public void injectBlocks(int dataNodeIndex,
+                             Iterable<Block> blocksToInject, String bpid) throws IOException {
+        if (dataNodeIndex < 0 || dataNodeIndex > dataNodes.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        final DataNodeInterface dn = dataNodeProxies.get(dataNodeIndex);
+        final FsDatasetSpi<?> dataSet = DataNodeTestUtils.getFSDataset(dn);
+        if (!(dataSet instanceof SimulatedFSDataset)) {
+            throw new IOException("injectBlocks is valid only for" +
+                    " SimulatedFSDataset");
+        }
+        if (bpid == null) {
+            bpid = getNamesystem().getBlockPoolId();
+        }
+        SimulatedFSDataset sdataset = (SimulatedFSDataset) dataSet;
+        sdataset.injectBlocks(bpid, blocksToInject);
+        dataNodeProxies.get(dataNodeIndex).scheduleAllBlockReport(0);
+    }
+
+    /**
+     * Multiple-NameNode version of injectBlocks.
+     */
+    public void injectBlocks(int nameNodeIndex, int dataNodeIndex,
+                             Iterable<Block> blocksToInject) throws IOException {
+        if (dataNodeIndex < 0 || dataNodeIndex > dataNodes.size()) {
+            throw new IndexOutOfBoundsException();
+        }
+        final DataNodeInterface dn = dataNodeProxies.get(dataNodeIndex);
+        final FsDatasetSpi<?> dataSet = DataNodeTestUtils.getFSDataset(dn);
+        if (!(dataSet instanceof SimulatedFSDataset)) {
+            throw new IOException("injectBlocks is valid only for" +
+                    " SimulatedFSDataset");
+        }
+        String bpid = getNamesystem(nameNodeIndex).getBlockPoolId();
+        SimulatedFSDataset sdataset = (SimulatedFSDataset) dataSet;
+        sdataset.injectBlocks(bpid, blocksToInject);
+        dataNodeProxies.get(dataNodeIndex).scheduleAllBlockReport(0);
+    }
+
+    private File[] getNameNodeDirectory(int nameserviceIndex, int nnIndex) {
+        return getNameNodeDirectory(base_dir, nameserviceIndex, nnIndex);
+    }
+
+    public static File[] getNameNodeDirectory(String base_dir, int nsIndex, int nnIndex) {
+        return getNameNodeDirectory(new File(base_dir), nsIndex, nnIndex);
+    }
+
+    public static File[] getNameNodeDirectory(File base_dir, int nsIndex, int nnIndex) {
+        File[] files = new File[2];
+        files[0] = new File(base_dir, "name-" + nsIndex + "-" + (2 * nnIndex + 1));
+        files[1] = new File(base_dir, "name-" + nsIndex + "-" + (2 * nnIndex + 2));
+        return files;
+    }
 }

@@ -145,7 +145,7 @@ public class TestDFSRename {
             Path dstPath = new Path(dst);
             DFSTestUtil.createFile(dfs, srcPath, fileLen, replFactor, 1);
             DFSTestUtil.createFile(dfs, dstPath, fileLen, replFactor, 1);
-            LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), dst, 0, fileLen);
+            LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), dst, 0, fileLen);
             BlockManagerInterface bm = NameNodeAdapter.getNamesystem(cluster.getNameNode()).getBlockManager();
             assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().getLocalBlock()) != null);
             dfs.rename(srcPath, dstPath, Rename.OVERWRITE);

@@ -379,7 +379,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
 
     static DatanodeInfo killDatanode(MiniDockerDFSCluster cluster, DFSStripedOutputStream out, final int dnIndex, final AtomicInteger pos) {
         final StripedDataStreamer s = out.getStripedDataStreamer(dnIndex);
-        final DatanodeInfoInterface datanode = getDatanodes(s);
+        final DatanodeInfo datanode = getDatanodes(s);
         LOG.info("killDatanode " + dnIndex + ": " + datanode + ", pos=" + pos);
         if (datanode != null) {
             cluster.stopDataNode(datanode.getXferAddr());
@@ -388,7 +388,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
     }
 
     private void waitTokenExpires(FSDataOutputStream out) throws IOException {
-        TokenInterface<BlockTokenIdentifier> token = DFSTestUtil.getBlockToken(out);
+        Token<BlockTokenIdentifier> token = DFSTestUtil.getBlockToken(out);
         while (!SecurityTestUtil.isBlockTokenExpired(token)) {
             try {
                 Thread.sleep(10);

@@ -123,6 +123,24 @@ public class TestParallelImageWrite {
      *     actual number of StorageDirectory is less than configured.
      */
     public static String checkImages(FSNamesystem fsn, int numImageDirs) throws Exception {
+        NNStorage stg = fsn.getFSImage().getStorage();
+        //any failed StorageDirectory is removed from the storageDirs list
+        assertEquals("Some StorageDirectories failed Upgrade", numImageDirs, stg.getNumStorageDirs(NameNodeDirType.IMAGE));
+        assertTrue("Not enough fsimage copies in MiniDockerDFSCluster " + "to test parallel write", numImageDirs > 1);
+        // List of "current/" directory from each SD
+        List<File> dirs = FSImageTestUtil.getCurrentDirs(stg, NameNodeDirType.IMAGE);
+        // across directories, all files with same names should be identical hashes
+        FSImageTestUtil.assertParallelFilesAreIdentical(dirs, Collections.<String>emptySet());
+        FSImageTestUtil.assertSameNewestImage(dirs);
+        // Return the hash of the newest image file
+        StorageDirectory firstSd = stg.dirIterator(NameNodeDirType.IMAGE).next();
+        File latestImage = FSImageTestUtil.findLatestImageFile(firstSd);
+        String md5 = FSImageTestUtil.getImageFileMD5IgnoringTxId(latestImage);
+        System.err.println("md5 of " + latestImage + ": " + md5);
+        return md5;
+    }
+
+    public static String checkImages(FSNamesystemInterface fsn, int numImageDirs) throws Exception {
         NNStorageInterface stg = fsn.getFSImage().getStorage();
         //any failed StorageDirectory is removed from the storageDirs list
         assertEquals("Some StorageDirectories failed Upgrade", numImageDirs, stg.getNumStorageDirs(NameNodeDirType.IMAGE));
@@ -133,7 +151,7 @@ public class TestParallelImageWrite {
         FSImageTestUtil.assertParallelFilesAreIdentical(dirs, Collections.<String>emptySet());
         FSImageTestUtil.assertSameNewestImage(dirs);
         // Return the hash of the newest image file
-        StorageDirectoryInterface firstSd = stg.dirIterator(NameNodeDirType.IMAGE).next();
+        StorageDirectory firstSd = stg.dirIterator(NameNodeDirType.IMAGE).next();
         File latestImage = FSImageTestUtil.findLatestImageFile(firstSd);
         String md5 = FSImageTestUtil.getImageFileMD5IgnoringTxId(latestImage);
         System.err.println("md5 of " + latestImage + ": " + md5);

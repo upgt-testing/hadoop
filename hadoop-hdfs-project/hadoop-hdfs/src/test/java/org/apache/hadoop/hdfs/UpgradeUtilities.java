@@ -562,12 +562,40 @@ public class UpgradeUtilities {
     }
     return namenodeStorageNamespaceID;
   }
+
+  public static int getCurrentNamespaceID(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getNamespaceID();
+    }
+    return namenodeStorageNamespaceID;
+  }
+
+  public static int getCurrentNamespaceIDNull(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getNamespaceID();
+    }
+    return namenodeStorageNamespaceID;
+  }
   
   /**
    * Return the cluster ID inherent in the currently running
    * Namenode. 
    */
   public static String getCurrentClusterID(MiniDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getClusterID();
+    }
+    return namenodeStorageClusterID;
+  }
+
+  public static String getCurrentClusterID(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getClusterID();
+    }
+    return namenodeStorageClusterID;
+  }
+
+  public static String getCurrentClusterIDNull(MiniDockerDFSCluster cluster) throws IOException {
     if (cluster != null) {
       return cluster.getNameNodeRpc().versionRequest().getClusterID();
     }
@@ -591,7 +619,14 @@ public class UpgradeUtilities {
     }
     return namenodeStorageBlockPoolID;
   }
-  
+
+  public static String getCurrentBlockPoolIDNull(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getBlockPoolID();
+    }
+    return namenodeStorageBlockPoolID;
+  }
+
   /**
    * Return the File System State Creation Timestamp (FSSCTime) inherent
    * in the currently running Namenode.  If no Namenode is running,
@@ -601,6 +636,20 @@ public class UpgradeUtilities {
    * calling this method.
    */
   public static long getCurrentFsscTime(MiniDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getCTime();
+    }
+    return namenodeStorageFsscTime;
+  }
+
+  public static long getCurrentFsscTime(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getCTime();
+    }
+    return namenodeStorageFsscTime;
+  }
+
+  public static long getCurrentFsscTimeNull(MiniDockerDFSCluster cluster) throws IOException {
     if (cluster != null) {
       return cluster.getNameNodeRpc().versionRequest().getCTime();
     }

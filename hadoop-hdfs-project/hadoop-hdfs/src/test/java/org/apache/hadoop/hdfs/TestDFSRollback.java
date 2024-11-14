@@ -127,7 +127,7 @@ public class TestDFSRollback {
     public void testRollback() throws Exception {
         File[] baseDirs;
         UpgradeUtilities.initialize();
-        StorageInfoInterface storageInfo = null;
+        StorageInfo storageInfo = null;
         for (int numDirs = 1; numDirs <= 2; numDirs++) {
             conf = new HdfsConfiguration();
             conf.setInt(DFSConfigKeys.DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, -1);
@@ -237,7 +237,7 @@ public class TestDFSRollback {
             log("NameNode rollback with old layout version in previous", numDirs);
             UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
             baseDirs = UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
-            storageInfo = new StorageInfo(1, UpgradeUtilities.getCurrentNamespaceID(null), UpgradeUtilities.getCurrentClusterID(null), UpgradeUtilities.getCurrentFsscTime(null), NodeType.NAME_NODE);
+            storageInfo = new StorageInfo(1, UpgradeUtilities.getCurrentNamespaceIDNull(null), UpgradeUtilities.getCurrentClusterIDNull(null), UpgradeUtilities.getCurrentFsscTimeNull(null), NodeType.NAME_NODE);
             UpgradeUtilities.createNameNodeVersionFile(conf, baseDirs, storageInfo, UpgradeUtilities.getCurrentBlockPoolID(cluster));
             startNameNodeShouldFail("Cannot rollback to storage version 1 using this version");
             UpgradeUtilities.createEmptyDirs(nameNodeDirs);

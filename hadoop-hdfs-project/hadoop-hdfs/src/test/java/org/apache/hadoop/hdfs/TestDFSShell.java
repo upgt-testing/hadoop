@@ -991,7 +991,7 @@ public class TestDFSShell {
             assertTrue("Output doesn't match input", Arrays.equals(file.toByteArray(), out.toByteArray()));
             // Create a sequence file with a gz extension, to test proper
             // container detection. Magic detection.
-            SequenceFile.WriterInterface writer = SequenceFile.createWriter(conf, SequenceFile.Writer.file(new Path(root, "file.gz")), SequenceFile.Writer.keyClass(Text.class), SequenceFile.Writer.valueClass(Text.class));
+            SequenceFile.Writer writer = SequenceFile.createWriter(conf, SequenceFile.Writer.file(new Path(root, "file.gz")), SequenceFile.Writer.keyClass(Text.class), SequenceFile.Writer.valueClass(Text.class));
             writer.append(new Text("Foo"), new Text("Bar"));
             writer.close();
             out = new ByteArrayOutputStream();
@@ -1714,7 +1714,7 @@ public class TestDFSShell {
         List<Map<DatanodeStorage, BlockListAsLongs>> blocks = cluster.getAllBlockReports(poolId);
         for (int i = 0; i < blocks.size(); i++) {
             Map<DatanodeStorage, BlockListAsLongs> map = blocks.get(i);
-            for (Map.EntryInterface<DatanodeStorage, BlockListAsLongs> e : map.entrySet()) {
+            for (Map.Entry<DatanodeStorage, BlockListAsLongs> e : map.entrySet()) {
                 for (Block b : e.getValue()) {
                     replicas.add(cluster.getMaterializedReplica(i, new ExtendedBlock(poolId, b)));
                 }
@@ -1996,7 +1996,7 @@ public class TestDFSShell {
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
             final String group = status.getGroup();
-            final FsPermissionInterface perm = status.getPermission();
+            final FsPermission perm = status.getPermission();
             dfs.setXAttr(src, USER_A1, USER_A1_VALUE);
             dfs.setXAttr(src, TRUSTED_A1, TRUSTED_A1_VALUE);
             shell = new FsShell(dfs.getConf());
@@ -2010,7 +2010,7 @@ public class TestDFSShell {
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
             assertEquals(group, targetStatus.getGroup());
-            FsPermissionInterface targetPerm = targetStatus.getPermission();
+            FsPermission targetPerm = targetStatus.getPermission();
             assertTrue(perm.equals(targetPerm));
             Map<String, byte[]> xattrs = dfs.getXAttrs(target1);
             assertTrue(xattrs.isEmpty());
@@ -2234,7 +2234,7 @@ public class TestDFSShell {
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
             final String group = status.getGroup();
-            final FsPermissionInterface perm = status.getPermission();
+            final FsPermission perm = status.getPermission();
             dfs.setXAttr(srcDir, USER_A1, USER_A1_VALUE);
             dfs.setXAttr(srcDir, TRUSTED_A1, TRUSTED_A1_VALUE);
             shell = new FsShell(dfs.getConf());
@@ -2248,7 +2248,7 @@ public class TestDFSShell {
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
             assertEquals(group, targetStatus.getGroup());
-            FsPermissionInterface targetPerm = targetStatus.getPermission();
+            FsPermission targetPerm = targetStatus.getPermission();
             assertTrue(perm.equals(targetPerm));
             Map<String, byte[]> xattrs = dfs.getXAttrs(targetDir1);
             assertTrue(xattrs.isEmpty());
@@ -2352,7 +2352,7 @@ public class TestDFSShell {
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
             final String group = status.getGroup();
-            final FsPermissionInterface perm = status.getPermission();
+            final FsPermission perm = status.getPermission();
             shell = new FsShell(dfs.getConf());
             // -p preserves sticky bit and doesn't preserve ACL
             Path target1 = new Path(hdfsTestDir, "targetfile1");
@@ -2364,7 +2364,7 @@ public class TestDFSShell {
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
             assertEquals(group, targetStatus.getGroup());
-            FsPermissionInterface targetPerm = targetStatus.getPermission();
+            FsPermission targetPerm = targetStatus.getPermission();
             assertTrue(perm.equals(targetPerm));
             List<AclEntry> acls = dfs.getAclStatus(target1).getEntries();
             assertTrue(acls.isEmpty());

@@ -253,10 +253,6 @@ public class TestDFSUpgradeFromImage {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).format(false).manageDataDfsDirs(false).manageNameDfsDirs(false).startupOption(StartupOption.REGULAR).build();
             fail("Was able to start NN from 0.3.0 image");
-        } catch (IOException ioe) {
-            if (!ioe.toString().contains("Old layout version is 'too old'")) {
-                throw ioe;
-            }
         } finally {
             // We expect startup to fail, but just in case it didn't, shutdown now.
             if (cluster != null) {
@@ -417,13 +413,6 @@ public class TestDFSUpgradeFromImage {
         final Configuration conf = new Configuration();
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).format(false).startupOption(StartupOption.UPGRADE).numDataNodes(0).build();
-        } catch (IOException ioe) {
-            Throwable cause = ioe.getCause();
-            if (cause != null && cause instanceof IllegalReservedPathException) {
-                GenericTestUtils.assertExceptionContains("reserved path component in this version", cause);
-            } else {
-                throw ioe;
-            }
         } finally {
             if (cluster != null) {
                 cluster.shutdown();
@@ -488,7 +477,7 @@ public class TestDFSUpgradeFromImage {
             throw new IOException("Failed to recover lease of " + path);
         }
         byte[] prev = HdfsFileStatus.EMPTY_NAME;
-        DirectoryListingInterface dirList;
+        DirectoryListing dirList;
         do {
             dirList = dfs.listPaths(pathStr, prev);
             HdfsFileStatus[] files = dirList.getPartialListing();

@@ -396,7 +396,15 @@ public abstract class FSImageTestUtil {
      */
     public static List<File> getCurrentDirs(NNStorage storage, NameNodeDirType type) {
         List<File> ret = Lists.newArrayList();
-        for (StorageDirectoryInterface sd : storage.dirIterable(type)) {
+        for (StorageDirectory sd : storage.dirIterable(type)) {
+            ret.add(sd.getCurrentDir());
+        }
+        return ret;
+    }
+
+    public static List<File> getCurrentDirs(NNStorageInterface storage, NameNodeDirType type) {
+        List<File> ret = Lists.newArrayList();
+        for (StorageDirectory sd : storage.dirIterable(type)) {
             ret.add(sd.getCurrentDir());
         }
         return ret;

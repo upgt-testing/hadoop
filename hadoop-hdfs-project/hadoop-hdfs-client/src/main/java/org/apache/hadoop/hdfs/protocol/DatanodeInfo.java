@@ -733,6 +733,19 @@ public class DatanodeInfo extends DatanodeID implements Node {
       return this;
     }
 
+    public DatanodeInfoBuilder setNodeID(String ipAddr, String hostName,
+        String datanodeUuid, int xferPort, int infoPort, int infoSecurePort,
+        int ipcPort) {
+      this.ipAddr = ipAddr;
+      this.hostName = hostName;
+      this.datanodeUuid = datanodeUuid;
+      this.xferPort = xferPort;
+      this.infoPort = infoPort;
+      this.infoSecurePort = infoSecurePort;
+      this.ipcPort = ipcPort;
+      return this;
+    }
+
     public DatanodeInfoBuilder setCapacity(long capacity) {
       this.capacity = capacity;
       return this;

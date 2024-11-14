@@ -384,7 +384,7 @@ public class TestDFSStorageStateRecovery {
     public void testBlockPoolStorageStates() throws Exception {
         String[] baseDirs;
         // First setup the datanode storage directory
-        String bpid = UpgradeUtilities.getCurrentBlockPoolID(null);
+        String bpid = UpgradeUtilities.getCurrentBlockPoolIDNull(null);
         for (int numDirs = 1; numDirs <= 2; numDirs++) {
             conf = new HdfsConfiguration();
             conf.setInt("dfs.datanode.scan.period.hours", -1);
