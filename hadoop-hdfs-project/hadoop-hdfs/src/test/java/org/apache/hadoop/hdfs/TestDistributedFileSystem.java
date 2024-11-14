@@ -1080,8 +1080,8 @@ public class TestDistributedFileSystem {
         final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
         final FileSystem hdfs = cluster.getFileSystem();
         final String nnAddr = conf.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY);
-        final UserGroupInformationInterface current = UserGroupInformation.getCurrentUser();
-        final UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting(current.getShortUserName() + "x", new String[] { "user" });
+        final UserGroupInformation current = UserGroupInformation.getCurrentUser();
+        final UserGroupInformation ugi = UserGroupInformation.createUserForTesting(current.getShortUserName() + "x", new String[] { "user" });
         try {
             hdfs.getFileChecksum(new Path("/test/TestNonExistingFile"));
             fail("Expecting FileNotFoundException");
@@ -1124,13 +1124,13 @@ public class TestDistributedFileSystem {
                 out.close();
             }
             //compute checksum
-            final FileChecksumInterface hdfsfoocs = hdfs.getFileChecksum(foo);
+            final FileChecksum hdfsfoocs = hdfs.getFileChecksum(foo);
             System.out.println("hdfsfoocs=" + hdfsfoocs);
             //webhdfs
-            final FileChecksumInterface webhdfsfoocs = webhdfs.getFileChecksum(foo);
+            final FileChecksum webhdfsfoocs = webhdfs.getFileChecksum(foo);
             System.out.println("webhdfsfoocs=" + webhdfsfoocs);
             final Path webhdfsqualified = new Path(webhdfsuri + dir, "foo" + n);
-            final FileChecksumInterface webhdfs_qfoocs = webhdfs.getFileChecksum(webhdfsqualified);
+            final FileChecksum webhdfs_qfoocs = webhdfs.getFileChecksum(webhdfsqualified);
             System.out.println("webhdfs_qfoocs=" + webhdfs_qfoocs);
             //create a zero byte file
             final Path zeroByteFile = new Path(dir, "zeroByteFile" + n);
@@ -1146,15 +1146,15 @@ public class TestDistributedFileSystem {
                 out.close();
             }
             {
-                final FileChecksumInterface zeroChecksum = hdfs.getFileChecksum(zeroByteFile);
+                final FileChecksum zeroChecksum = hdfs.getFileChecksum(zeroByteFile);
                 final String magicValue = "MD5-of-0MD5-of-0CRC32:70bc8f4b72a86921468bf8e8441dce51";
                 // verify the magic val for zero byte files
                 assertEquals(magicValue, zeroChecksum.toString());
                 //verify checksums for empty file and 0 request length
-                final FileChecksumInterface checksumWith0 = hdfs.getFileChecksum(bar, 0);
+                final FileChecksum checksumWith0 = hdfs.getFileChecksum(bar, 0);
                 assertEquals(zeroChecksum, checksumWith0);
                 //verify checksum
-                final FileChecksumInterface barcs = hdfs.getFileChecksum(bar);
+                final FileChecksum barcs = hdfs.getFileChecksum(bar);
                 final int barhashcode = barcs.hashCode();
                 assertEquals(hdfsfoocs.hashCode(), barhashcode);
                 assertEquals(hdfsfoocs, barcs);
@@ -1223,7 +1223,7 @@ public class TestDistributedFileSystem {
             // Get the listing
             RemoteIterator<LocatedFileStatus> it = fs.listLocatedStatus(testFile);
             assertTrue("Expected file to be present", it.hasNext());
-            LocatedFileStatusInterface stat = it.next();
+            LocatedFileStatus stat = it.next();
             BlockLocation[] locs = stat.getBlockLocations();
             assertEquals("Unexpected number of locations", numBlocks, locs.length);
             Set<String> dnStorageIds = new HashSet<>();
@@ -1234,7 +1234,7 @@ public class TestDistributedFileSystem {
                     }
                 }
             }
-            for (BlockLocationInterface loc : locs) {
+            for (BlockLocation loc : locs) {
                 String[] ids = loc.getStorageIds();
                 // Run it through a set to deduplicate, since there should be no dupes
                 Set<String> storageIds = new HashSet<>();
@@ -1374,7 +1374,7 @@ public class TestDistributedFileSystem {
             dfs.create(new Path("/parent/test1/dfsclose/file-0"));
             Path snapShotDir = new Path("/parent/test1/");
             dfs.allowSnapshot(snapShotDir);
-            FileStatusInterface status = dfs.getFileStatus(new Path("/parent/test1"));
+            FileStatus status = dfs.getFileStatus(new Path("/parent/test1"));
             assertTrue(status.isSnapshotEnabled());
             status = dfs.getFileStatus(new Path("/parent/"));
             assertFalse(status.isSnapshotEnabled());
@@ -1607,7 +1607,7 @@ public class TestDistributedFileSystem {
             try (FSDataOutputStream out = fs.appendFile(path).build()) {
                 out.write(buf);
             }
-            FileStatusInterface status = fs.getFileStatus(path);
+            FileStatus status = fs.getFileStatus(path);
             assertEquals(16 * 2, status.getLen());
         }
     }
@@ -1628,7 +1628,7 @@ public class TestDistributedFileSystem {
             provider.createKey("key", options);
             provider.flush();
             // Create a non-super user.
-            UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("Non_SuperUser", new String[] { "Non_SuperGroup" });
+            UserGroupInformation user = UserGroupInformation.createUserForTesting("Non_SuperUser", new String[] { "Non_SuperGroup" });
             DistributedFileSystem userfs = (DistributedFileSystem) user.doAs((PrivilegedExceptionAction<FileSystem>) () -> FileSystem.get(conf));
             LambdaTestUtils.intercept(AccessControlException.class, "Superuser privilege is required", () -> userfs.createEncryptionZone(dir, "key"));
             RemoteExceptionInterface re = LambdaTestUtils.intercept(RemoteException.class, "Superuser privilege is required", () -> userfs.listEncryptionZones().hasNext());
@@ -1656,7 +1656,7 @@ public class TestDistributedFileSystem {
             dfs.mkdirs(dir);
             dfs.setPermission(dir, new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.ALL));
             // Create a non-super user.
-            UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("Non_SuperUser", new String[] { "Non_SuperGroup" });
+            UserGroupInformation user = UserGroupInformation.createUserForTesting("Non_SuperUser", new String[] { "Non_SuperGroup" });
             DistributedFileSystem userfs = (DistributedFileSystem) user.doAs((PrivilegedExceptionAction<FileSystem>) () -> FileSystem.get(conf));
             Path sDir = new Path("/dir/sPolicy");
             userfs.mkdirs(sDir);
@@ -1682,7 +1682,7 @@ public class TestDistributedFileSystem {
             fs.removeErasureCodingPolicy(policyName);
             assertEquals(policyName, ErasureCodingPolicyManager.getInstance().getRemovedPolicies().get(0).getName());
             // remove erasure coding policy as a user without privilege
-            UserGroupInformationInterface fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
+            UserGroupInformation fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
             final MiniDockerDFSCluster finalCluster = cluster;
             fakeUGI.doAs(new PrivilegedExceptionAction<Object>() {
 
@@ -1739,7 +1739,7 @@ public class TestDistributedFileSystem {
                 // pass
             }
             // disable and enable erasure coding policy as a user without privilege
-            UserGroupInformationInterface fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
+            UserGroupInformation fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
             final MiniDockerDFSCluster finalCluster = cluster;
             fakeUGI.doAs(new PrivilegedExceptionAction<Object>() {
 

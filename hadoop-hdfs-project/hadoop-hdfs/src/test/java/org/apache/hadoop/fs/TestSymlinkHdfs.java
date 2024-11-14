@@ -207,7 +207,7 @@ abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
         wrapper.setOwner(linkToFile, "user", "group");
         assertEquals(perms, wrapper.getFileLinkStatus(linkToFile).getPermission());
         // but the file's permissions were adjusted appropriately
-        FileStatusInterface stat = wrapper.getFileStatus(file);
+        FileStatus stat = wrapper.getFileStatus(file);
         assertEquals(0664, stat.getPermission().toShort());
         assertEquals("user", stat.getOwner());
         assertEquals("group", stat.getGroup());
@@ -306,8 +306,8 @@ abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
         Path link = new Path(testBaseDir1(), "symlinkToFile");
         createAndWriteFile(file);
         wrapper.createSymlink(file, link, false);
-        FileStatusInterface statFile = wrapper.getFileStatus(file);
-        FileStatusInterface statLink = wrapper.getFileStatus(link);
+        FileStatus statFile = wrapper.getFileStatus(file);
+        FileStatus statLink = wrapper.getFileStatus(link);
         assertEquals(statLink.getOwner(), statFile.getOwner());
     }
 

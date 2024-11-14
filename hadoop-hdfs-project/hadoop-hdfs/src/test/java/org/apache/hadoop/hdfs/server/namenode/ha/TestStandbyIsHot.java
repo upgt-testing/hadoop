@@ -55,7 +55,7 @@ public class TestStandbyIsHot {
 
     private static final String TEST_FILE = "/testStandbyIsHot";
 
-    private static final PathInterface TEST_FILE_PATH = new Path(TEST_FILE);
+    private static final Path TEST_FILE_PATH = new Path(TEST_FILE);
 
     static {
         DFSTestUtil.setNameNodeLogLevel(Level.ALL);
@@ -146,7 +146,7 @@ public class TestStandbyIsHot {
             // The SBN will not have any blocks in its neededReplication queue
             // since the SBN doesn't process replication.
             assertEquals(0, nn1.getNamesystem().getUnderReplicatedBlocks());
-            LocatedBlocksInterface locs = nn1.getRpcServer().getBlockLocations(TEST_FILE, 0, 1);
+            LocatedBlocks locs = nn1.getRpcServer().getBlockLocations(TEST_FILE, 0, 1);
             assertEquals("Standby should have registered that the block has no replicas", 0, locs.get(0).getLocations().length);
             cluster.restartDataNode(dnProps);
             // Wait for both NNs to re-register the DN.
@@ -171,7 +171,7 @@ public class TestStandbyIsHot {
             @Override
             public Boolean get() {
                 try {
-                    LocatedBlocksInterface locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
+                    LocatedBlocks locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
                     DatanodeInfo[] dnis = locs.getLastLocatedBlock().getLocations();
                     for (DatanodeInfoInterface dni : dnis) {
                         Assert.assertNotNull(dni);

@@ -107,15 +107,15 @@ public class TestBlockHasMultipleReplicasOnSameDN {
         // Write out a file with a few blocks.
         DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
         // Get the block list for the file with the block locations.
-        LocatedBlocksInterface locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
         // Generate a fake block report from one of the DataNodes, such
         // that it reports one copy of each block on either storage.
         DataNodeInterface dn = cluster.getDataNodes().get(0);
         DatanodeRegistrationInterface dnReg = dn.getDNRegistrationForBP(bpid);
         StorageBlockReport[] reports = new StorageBlockReport[cluster.getStoragesPerDatanode()];
         ArrayList<Replica> blocks = new ArrayList<>();
-        for (LocatedBlockInterface locatedBlock : locatedBlocks.getLocatedBlocks()) {
-            BlockInterface localBlock = locatedBlock.getBlock().getLocalBlock();
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
+            Block localBlock = locatedBlock.getBlock().getLocalBlock();
             blocks.add(new FinalizedReplica(localBlock, null, null));
         }
         try (FsDatasetSpi.FsVolumeReferences volumes = dn.getFSDataset().getFsVolumeReferences()) {
@@ -130,7 +130,7 @@ public class TestBlockHasMultipleReplicasOnSameDN {
         // Get the block locations once again.
         locatedBlocks = client.getLocatedBlocks(filename, 0, BLOCK_SIZE * NUM_BLOCKS);
         // Make sure that each block has two replicas, one on each DataNode.
-        for (LocatedBlockInterface locatedBlock : locatedBlocks.getLocatedBlocks()) {
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
             DatanodeInfo[] locations = locatedBlock.getLocations();
             assertThat(locations.length, is((int) NUM_DATANODES));
             assertThat(locations[0].getDatanodeUuid(), not(locations[1].getDatanodeUuid()));

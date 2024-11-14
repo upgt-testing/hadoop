@@ -97,15 +97,15 @@ public class TestRenameWithSnapshots {
 
     private static final String testDir = GenericTestUtils.getTestDir().getAbsolutePath();
 
-    static private final PathInterface dir = new Path("/testRenameWithSnapshots");
+    static private final Path dir = new Path("/testRenameWithSnapshots");
 
-    static private final PathInterface sub1 = new Path(dir, "sub1");
+    static private final Path sub1 = new Path(dir, "sub1");
 
-    static private final PathInterface file1 = new Path(sub1, "file1");
+    static private final Path file1 = new Path(sub1, "file1");
 
-    static private final PathInterface file2 = new Path(sub1, "file2");
+    static private final Path file2 = new Path(sub1, "file2");
 
-    static private final PathInterface file3 = new Path(sub1, "file3");
+    static private final Path file3 = new Path(sub1, "file3");
 
     static private final String snap1 = "snap1";
 
@@ -354,18 +354,18 @@ public class TestRenameWithSnapshots {
         hdfs.rename(foo, newfoo);
         // still can visit the snapshot copy of bar through
         // /dir2/.snapshot/s2/foo/bar
-        final PathInterface snapshotBar = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
+        final Path snapshotBar = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
         assertTrue(hdfs.exists(snapshotBar));
         // delete bar2
         final Path newBar2 = new Path(newfoo, "bar2");
         assertTrue(hdfs.exists(newBar2));
         hdfs.delete(newBar2, true);
         // /dir2/.snapshot/s2/foo/bar2 should still work
-        final PathInterface bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar2");
+        final Path bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar2");
         assertTrue(hdfs.exists(bar2_s2));
-        FileStatusInterface status = hdfs.getFileStatus(bar2_s2);
+        FileStatus status = hdfs.getFileStatus(bar2_s2);
         assertEquals(REPL, status.getReplication());
-        final PathInterface bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
+        final Path bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
         assertFalse(hdfs.exists(bar2_s3));
     }
 
@@ -388,11 +388,11 @@ public class TestRenameWithSnapshots {
         // change the replication factor of foo
         hdfs.setReplication(newfoo, REPL_1);
         // /dir2/.snapshot/s2/foo should still work
-        final PathInterface foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
+        final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
         assertTrue(hdfs.exists(foo_s2));
-        FileStatusInterface status = hdfs.getFileStatus(foo_s2);
+        FileStatus status = hdfs.getFileStatus(foo_s2);
         assertEquals(REPL, status.getReplication());
-        final PathInterface foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo");
+        final Path foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo");
         assertFalse(hdfs.exists(foo_s3));
         INodeDirectoryInterface sdir2Node = fsdir.getINode(sdir2.toString()).asDirectory();
         SnapshotInterface s2 = sdir2Node.getSnapshot(DFSUtil.string2Bytes("s2"));
@@ -428,44 +428,44 @@ public class TestRenameWithSnapshots {
         hdfs.delete(newbar3, true);
         assertFalse(hdfs.exists(newbar3));
         assertFalse(hdfs.exists(bar));
-        final PathInterface bar_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar");
-        final PathInterface bar3_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar3");
+        final Path bar_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar");
+        final Path bar3_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar3");
         assertTrue(hdfs.exists(bar_s4));
         assertTrue(hdfs.exists(bar3_s4));
         hdfs.createSnapshot(sdir1, "s5");
         hdfs.delete(newbar2, true);
         assertFalse(hdfs.exists(bar2));
-        final PathInterface bar2_s5 = SnapshotTestHelper.getSnapshotPath(sdir1, "s5", "foo/bar2");
+        final Path bar2_s5 = SnapshotTestHelper.getSnapshotPath(sdir1, "s5", "foo/bar2");
         assertTrue(hdfs.exists(bar2_s5));
         // delete snapshot s5. The diff of s5 should be combined to s4
         hdfs.deleteSnapshot(sdir1, "s5");
         restartClusterAndCheckImage(true);
         assertFalse(hdfs.exists(bar2_s5));
-        final PathInterface bar2_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar2");
+        final Path bar2_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar2");
         assertTrue(hdfs.exists(bar2_s4));
         // delete snapshot s4. The diff of s4 should be combined to s2 instead of
         // s3.
         hdfs.deleteSnapshot(sdir1, "s4");
         assertFalse(hdfs.exists(bar_s4));
-        PathInterface bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar");
+        Path bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar");
         assertFalse(hdfs.exists(bar_s3));
         bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo/bar");
         assertFalse(hdfs.exists(bar_s3));
-        final PathInterface bar_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
+        final Path bar_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
         assertTrue(hdfs.exists(bar_s2));
         assertFalse(hdfs.exists(bar2_s4));
-        PathInterface bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
+        Path bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
         assertFalse(hdfs.exists(bar2_s3));
         bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo/bar2");
         assertFalse(hdfs.exists(bar2_s3));
-        final PathInterface bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar2");
+        final Path bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar2");
         assertTrue(hdfs.exists(bar2_s2));
         assertFalse(hdfs.exists(bar3_s4));
-        PathInterface bar3_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar3");
+        Path bar3_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar3");
         assertFalse(hdfs.exists(bar3_s3));
         bar3_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo/bar3");
         assertFalse(hdfs.exists(bar3_s3));
-        final PathInterface bar3_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar3");
+        final Path bar3_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar3");
         assertFalse(hdfs.exists(bar3_s2));
         // restart the cluster and check fsimage
         restartClusterAndCheckImage(true);
@@ -529,13 +529,13 @@ public class TestRenameWithSnapshots {
         hdfs.setReplication(newfoo, REPL_1);
         hdfs.createSnapshot(sdir1, "s4");
         hdfs.setReplication(newfoo, REPL_2);
-        FileStatusInterface status = hdfs.getFileStatus(newfoo);
+        FileStatus status = hdfs.getFileStatus(newfoo);
         assertEquals(REPL_2, status.getReplication());
-        final PathInterface foo_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo");
+        final Path foo_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo");
         status = hdfs.getFileStatus(foo_s4);
         assertEquals(REPL_1, status.getReplication());
         hdfs.createSnapshot(sdir1, "s5");
-        final PathInterface foo_s5 = SnapshotTestHelper.getSnapshotPath(sdir1, "s5", "foo");
+        final Path foo_s5 = SnapshotTestHelper.getSnapshotPath(sdir1, "s5", "foo");
         status = hdfs.getFileStatus(foo_s5);
         assertEquals(REPL_2, status.getReplication());
         // delete snapshot s5.
@@ -547,11 +547,11 @@ public class TestRenameWithSnapshots {
         // delete snapshot s4.
         hdfs.deleteSnapshot(sdir1, "s4");
         assertFalse(hdfs.exists(foo_s4));
-        PathInterface foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo");
+        Path foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo");
         assertFalse(hdfs.exists(foo_s3));
         foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo");
         assertFalse(hdfs.exists(foo_s3));
-        final PathInterface foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
+        final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
         assertTrue(hdfs.exists(foo_s2));
         status = hdfs.getFileStatus(foo_s2);
         assertEquals(REPL, status.getReplication());
@@ -607,19 +607,19 @@ public class TestRenameWithSnapshots {
         hdfs.setReplication(bar1_dir2, REPL_1);
         hdfs.setReplication(bar2_dir2, REPL_1);
         // check
-        final PathInterface bar1_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo/bar1");
-        final PathInterface bar2_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "bar");
-        final PathInterface bar1_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar1");
-        final PathInterface bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "bar");
+        final Path bar1_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo/bar1");
+        final Path bar2_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "bar");
+        final Path bar1_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar1");
+        final Path bar2_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "bar");
         assertTrue(hdfs.exists(bar1_s1));
         assertTrue(hdfs.exists(bar2_s1));
         assertFalse(hdfs.exists(bar1_s2));
         assertFalse(hdfs.exists(bar2_s2));
-        FileStatusInterface statusBar1 = hdfs.getFileStatus(bar1_s1);
+        FileStatus statusBar1 = hdfs.getFileStatus(bar1_s1);
         assertEquals(REPL, statusBar1.getReplication());
         statusBar1 = hdfs.getFileStatus(bar1_dir2);
         assertEquals(REPL_1, statusBar1.getReplication());
-        FileStatusInterface statusBar2 = hdfs.getFileStatus(bar2_s1);
+        FileStatus statusBar2 = hdfs.getFileStatus(bar2_s1);
         assertEquals(REPL, statusBar2.getReplication());
         statusBar2 = hdfs.getFileStatus(bar2_dir2);
         assertEquals(REPL_1, statusBar2.getReplication());
@@ -635,8 +635,8 @@ public class TestRenameWithSnapshots {
         hdfs.setReplication(bar1_dir3, REPL_2);
         hdfs.setReplication(bar2_dir3, REPL_2);
         // check
-        final PathInterface bar1_s3 = SnapshotTestHelper.getSnapshotPath(sdir3, "s3", "foo/bar1");
-        final PathInterface bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir3, "s3", "bar");
+        final Path bar1_s3 = SnapshotTestHelper.getSnapshotPath(sdir3, "s3", "foo/bar1");
+        final Path bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir3, "s3", "bar");
         assertTrue(hdfs.exists(bar1_s1));
         assertTrue(hdfs.exists(bar2_s1));
         assertFalse(hdfs.exists(bar1_s2));
@@ -719,7 +719,7 @@ public class TestRenameWithSnapshots {
         assertEquals(REPL, statusBar1.getReplication());
         statusBar2 = hdfs.getFileStatus(bar2_s1);
         assertEquals(REPL, statusBar2.getReplication());
-        final PathInterface foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
+        final Path foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
         fooRef = fsdir.getINode(foo_s1.toString()).asReference();
         fooWithCount = (WithCount) fooRef.getReferredINode();
         assertEquals(1, fooWithCount.getReferenceCount());
@@ -781,19 +781,19 @@ public class TestRenameWithSnapshots {
         SnapshotTestHelper.createSnapshot(hdfs, sdir2, "s222");
         SnapshotTestHelper.createSnapshot(hdfs, sdir3, "s333");
         // check
-        final PathInterface bar1_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo/bar1");
-        final PathInterface bar1_s22 = SnapshotTestHelper.getSnapshotPath(sdir2, "s22", "foo/bar1");
-        final PathInterface bar1_s333 = SnapshotTestHelper.getSnapshotPath(sdir3, "s333", "foo/bar1");
-        final PathInterface bar_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "bar");
-        final PathInterface bar_s22 = SnapshotTestHelper.getSnapshotPath(sdir2, "s22", "bar");
-        final PathInterface bar_s333 = SnapshotTestHelper.getSnapshotPath(sdir3, "s333", "bar");
+        final Path bar1_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo/bar1");
+        final Path bar1_s22 = SnapshotTestHelper.getSnapshotPath(sdir2, "s22", "foo/bar1");
+        final Path bar1_s333 = SnapshotTestHelper.getSnapshotPath(sdir3, "s333", "foo/bar1");
+        final Path bar_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "bar");
+        final Path bar_s22 = SnapshotTestHelper.getSnapshotPath(sdir2, "s22", "bar");
+        final Path bar_s333 = SnapshotTestHelper.getSnapshotPath(sdir3, "s333", "bar");
         assertTrue(hdfs.exists(bar1_s1));
         assertTrue(hdfs.exists(bar1_s22));
         assertTrue(hdfs.exists(bar1_s333));
         assertTrue(hdfs.exists(bar_s1));
         assertTrue(hdfs.exists(bar_s22));
         assertTrue(hdfs.exists(bar_s333));
-        FileStatusInterface statusBar1 = hdfs.getFileStatus(bar1_s1);
+        FileStatus statusBar1 = hdfs.getFileStatus(bar1_s1);
         assertEquals(REPL, statusBar1.getReplication());
         statusBar1 = hdfs.getFileStatus(bar1_dir3);
         assertEquals(REPL_2, statusBar1.getReplication());
@@ -801,7 +801,7 @@ public class TestRenameWithSnapshots {
         assertEquals(REPL_1, statusBar1.getReplication());
         statusBar1 = hdfs.getFileStatus(bar1_s333);
         assertEquals(REPL_2, statusBar1.getReplication());
-        FileStatusInterface statusBar = hdfs.getFileStatus(bar_s1);
+        FileStatus statusBar = hdfs.getFileStatus(bar_s1);
         assertEquals(REPL, statusBar.getReplication());
         statusBar = hdfs.getFileStatus(bar_dir3);
         assertEquals(REPL_2, statusBar.getReplication());
@@ -821,8 +821,8 @@ public class TestRenameWithSnapshots {
         SnapshotTestHelper.createSnapshot(hdfs, sdir1, "s1111");
         SnapshotTestHelper.createSnapshot(hdfs, sdir2, "s2222");
         // check
-        final PathInterface bar1_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "foo/bar1");
-        final PathInterface bar_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "bar");
+        final Path bar1_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "foo/bar1");
+        final Path bar_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "bar");
         assertTrue(hdfs.exists(bar1_s1));
         assertTrue(hdfs.exists(bar1_s22));
         assertTrue(hdfs.exists(bar1_s333));
@@ -898,8 +898,8 @@ public class TestRenameWithSnapshots {
         // restart the cluster and check fsimage
         restartClusterAndCheckImage(true);
         // check
-        final PathInterface bar1_s1111 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1111", "foo/bar1");
-        final PathInterface bar_s1111 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1111", "bar");
+        final Path bar1_s1111 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1111", "foo/bar1");
+        final Path bar_s1111 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1111", "bar");
         assertTrue(hdfs.exists(bar1_s1));
         assertTrue(hdfs.exists(bar1_s22));
         assertTrue(hdfs.exists(bar1_s333));
@@ -910,7 +910,7 @@ public class TestRenameWithSnapshots {
         assertTrue(hdfs.exists(bar_s333));
         assertTrue(hdfs.exists(bar_s2222));
         assertFalse(hdfs.exists(bar_s1111));
-        final PathInterface foo_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "foo");
+        final Path foo_s2222 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2222", "foo");
         fooRef = fsdir.getINode(foo_s2222.toString()).asReference();
         fooWithCount = (WithCount) fooRef.getReferredINode();
         assertEquals(4, fooWithCount.getReferenceCount());
@@ -1032,30 +1032,30 @@ public class TestRenameWithSnapshots {
         DFSTestUtil.createFile(hdfs, bar2, BLOCKSIZE, REPL, SEED);
         hdfs.createSnapshot(sdir1, "s4");
         hdfs.delete(newfoo, true);
-        final PathInterface bar2_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar2");
+        final Path bar2_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar2");
         assertTrue(hdfs.exists(bar2_s4));
-        final PathInterface bar_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar");
+        final Path bar_s4 = SnapshotTestHelper.getSnapshotPath(sdir1, "s4", "foo/bar");
         assertTrue(hdfs.exists(bar_s4));
         // delete snapshot s4. The diff of s4 should be combined to s3
         hdfs.deleteSnapshot(sdir1, "s4");
         // restart the cluster and check fsimage
         restartClusterAndCheckImage(true);
-        PathInterface bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar");
+        Path bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar");
         assertFalse(hdfs.exists(bar_s3));
         bar_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo/bar");
         assertTrue(hdfs.exists(bar_s3));
-        PathInterface bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
+        Path bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir1, "s3", "foo/bar2");
         assertFalse(hdfs.exists(bar2_s3));
         bar2_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo/bar2");
         assertFalse(hdfs.exists(bar2_s3));
         // delete snapshot s3
         hdfs.deleteSnapshot(sdir2, "s3");
-        final PathInterface bar_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
+        final Path bar_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo/bar");
         assertTrue(hdfs.exists(bar_s2));
         // check internal details
         INodeDirectoryInterface sdir2Node = fsdir.getINode(sdir2.toString()).asDirectory();
         SnapshotInterface s2 = sdir2Node.getSnapshot(DFSUtil.string2Bytes("s2"));
-        final PathInterface foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
+        final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
         INodeReferenceInterface fooRef = fsdir.getINode(foo_s2.toString()).asReference();
         assertTrue(fooRef instanceof INodeReference.WithName);
         INodeReference.WithCountInterface fooWC = (WithCount) fooRef.getReferredINode();
@@ -1162,7 +1162,7 @@ public class TestRenameWithSnapshots {
         DiffList<DirectoryDiff> fooDiffs = fooNode.asDirectory().getDiffs().asList();
         assertEquals(1, fooDiffs.size());
         assertEquals(s1.getId(), fooDiffs.get(0).getSnapshotId());
-        final PathInterface foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
+        final Path foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
         INodeInterface fooNode_s1 = fsdir.getINode(foo_s1.toString());
         assertTrue(fooNode_s1 == fooNode);
         // check sdir2
@@ -1215,7 +1215,7 @@ public class TestRenameWithSnapshots {
         INodeInterface fooNode = fsdir.getINode4Write(foo.toString());
         assertTrue(fooNode instanceof INodeDirectory);
         assertTrue(childrenDiff.getCreatedUnmodifiable().get(0) == fooNode);
-        final PathInterface foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
+        final Path foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", "foo");
         assertFalse(hdfs.exists(foo_s1));
         // check sdir2
         assertFalse(hdfs.exists(newfoo));
@@ -1264,7 +1264,7 @@ public class TestRenameWithSnapshots {
         assertEquals(s2.getId(), dir2Diffs.get(0).getSnapshotId());
         ChildrenDiffInterface childrenDiff = dir2Diffs.get(0).getChildrenDiff();
         assertSizes(1, 0, childrenDiff);
-        final PathInterface foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo2");
+        final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo2");
         assertFalse(hdfs.exists(foo_s2));
         INodeInterface fooNode = fsdir.getINode4Write(foo_dir2.toString());
         assertTrue(childrenDiff.getCreatedUnmodifiable().get(0) == fooNode);
@@ -1291,7 +1291,7 @@ public class TestRenameWithSnapshots {
         assertTrue(childrenDiff.getCreatedUnmodifiable().get(0) == fooNode);
         childrenDiff = dir2Diffs.get(1).getChildrenDiff();
         assertSizes(0, 0, childrenDiff);
-        final PathInterface foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo2");
+        final Path foo_s3 = SnapshotTestHelper.getSnapshotPath(sdir2, "s3", "foo2");
         assertFalse(hdfs.exists(foo_s2));
         assertTrue(hdfs.exists(foo_s3));
         assertTrue(fooNode instanceof INodeReference.DstReference);
@@ -1699,7 +1699,7 @@ public class TestRenameWithSnapshots {
         final INodeDirectoryInterface dir2Node = fsdir.getINode4Write(sdir2.toString()).asDirectory();
         QuotaCountsInterface q2 = dir2Node.getDirectoryWithQuotaFeature().getSpaceConsumed();
         assertEquals(1, q2.getNameSpace());
-        final PathInterface foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", foo.getName());
+        final Path foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", foo.getName());
         INodeInterface fooRef = fsdir.getINode(foo_s1.toString());
         assertTrue(fooRef instanceof INodeReference.WithName);
         INodeReference.WithCountInterface wc = (WithCount) fooRef.asReference().getReferredINode();
@@ -1755,7 +1755,7 @@ public class TestRenameWithSnapshots {
         final INodeDirectoryInterface dir2Node = fsdir.getINode4Write(sdir2.toString()).asDirectory();
         QuotaCountsInterface q2 = dir2Node.getDirectoryWithQuotaFeature().getSpaceConsumed();
         assertEquals(1, q2.getNameSpace());
-        final PathInterface foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", foo.getName());
+        final Path foo_s1 = SnapshotTestHelper.getSnapshotPath(sdir1, "s1", foo.getName());
         final INodeInterface fooRef = fsdir.getINode(foo_s1.toString());
         assertTrue(fooRef instanceof INodeReference.WithName);
         INodeReference.WithCountInterface wc = (WithCount) fooRef.asReference().getReferredINode();
@@ -1846,7 +1846,7 @@ public class TestRenameWithSnapshots {
         // rename foo from dir2 to dir1
         final Path newfoo = new Path(dir1, foo.getName());
         hdfs.rename(foo, newfoo);
-        final PathInterface foo_s0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "dir2/foo");
+        final Path foo_s0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "dir2/foo");
         assertTrue("the snapshot path " + foo_s0 + " should exist", hdfs.exists(foo_s0));
         // delete snapshot s0. The deletion will first go down through dir1, and
         // find foo in the created list of dir1. Then it will use null as the prior
@@ -1894,9 +1894,9 @@ public class TestRenameWithSnapshots {
         // make sure the snapshot copy of file in s1 is merged to s0. For
         // HDFS-4842, we need to make sure that we do not wrongly use s2 as the
         // prior snapshot of s1.
-        final PathInterface file_s2 = SnapshotTestHelper.getSnapshotPath(dir2, "s2", "foo/bar/file");
+        final Path file_s2 = SnapshotTestHelper.getSnapshotPath(dir2, "s2", "foo/bar/file");
         assertFalse(hdfs.exists(file_s2));
-        final PathInterface file_s0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "dir2/foo/bar/file");
+        final Path file_s0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "dir2/foo/bar/file");
         assertTrue(hdfs.exists(file_s0));
         // check dir1: foo should be in the created list of s0
         INodeDirectoryInterface dir1Node = fsdir.getINode4Write(dir1.toString()).asDirectory();
@@ -1928,7 +1928,7 @@ public class TestRenameWithSnapshots {
         assertEquals(1, dir2DiffList.size());
         final List<INode> dList = dir2DiffList.get(0).getChildrenDiff().getDeletedUnmodifiable();
         assertEquals(1, dList.size());
-        final PathInterface foo_s2 = SnapshotTestHelper.getSnapshotPath(dir2, "s2", foo.getName());
+        final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(dir2, "s2", foo.getName());
         INodeReference.WithNameInterface fooNode_s2 = (INodeReference.WithName) fsdir.getINode(foo_s2.toString());
         assertSame(dList.get(0), fooNode_s2);
         assertSame(fooNode.asReference().getReferredINode(), fooNode_s2.getReferredINode());
@@ -1958,13 +1958,13 @@ public class TestRenameWithSnapshots {
         // delete bar and foo2
         hdfs.delete(new Path(foo2, "bar"), true);
         hdfs.delete(foo2, true);
-        final PathInterface sfileInBar = SnapshotTestHelper.getSnapshotPath(test, "s1", "foo2/bar/file");
+        final Path sfileInBar = SnapshotTestHelper.getSnapshotPath(test, "s1", "foo2/bar/file");
         assertTrue(hdfs.exists(sfileInBar));
         hdfs.deleteSnapshot(test, "s1");
         assertFalse(hdfs.exists(sfileInBar));
         restartClusterAndCheckImage(true);
         // make sure the file under bar is deleted
-        final PathInterface barInS0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "foo/bar");
+        final Path barInS0 = SnapshotTestHelper.getSnapshotPath(test, "s0", "foo/bar");
         INodeDirectoryInterface barNode = fsdir.getINode(barInS0.toString()).asDirectory();
         assertEquals(0, barNode.getChildrenList(Snapshot.CURRENT_STATE_ID).size());
         DiffList<DirectoryDiff> diffList = barNode.getDiffs().asList();

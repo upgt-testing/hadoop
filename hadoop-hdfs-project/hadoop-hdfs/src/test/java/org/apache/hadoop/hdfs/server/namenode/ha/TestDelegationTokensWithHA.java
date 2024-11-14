@@ -124,7 +124,7 @@ public class TestDelegationTokensWithHA {
         HATestUtil.setFailoverConfigurations(cluster, conf, HATestUtil.getLogicalHostname(cluster), 0, ObserverReadProxyProvider.class);
         conf.setBoolean("fs.hdfs.impl.disable.cache", true);
         dfs = (DistributedFileSystem) FileSystem.get(conf);
-        final UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("JobTracker");
+        final UserGroupInformation ugi = UserGroupInformation.createRemoteUser("JobTracker");
         final TokenInterface<DelegationTokenIdentifier> token = getDelegationToken(dfs, ugi.getShortUserName());
         ugi.addToken(token);
         // Recreate the DFS, this time authenticating using a DT
@@ -255,8 +255,8 @@ public class TestDelegationTokensWithHA {
     @Test(timeout = 300000)
     public void testDelegationTokenWithDoAs() throws Exception {
         final TokenInterface<DelegationTokenIdentifier> token = getDelegationToken(fs, "JobTracker");
-        final UserGroupInformationInterface longUgi = UserGroupInformation.createRemoteUser("JobTracker/foo.com@FOO.COM");
-        final UserGroupInformationInterface shortUgi = UserGroupInformation.createRemoteUser("JobTracker");
+        final UserGroupInformation longUgi = UserGroupInformation.createRemoteUser("JobTracker/foo.com@FOO.COM");
+        final UserGroupInformation shortUgi = UserGroupInformation.createRemoteUser("JobTracker");
         longUgi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -288,7 +288,7 @@ public class TestDelegationTokensWithHA {
     @Test(timeout = 300000)
     public void testHAUtilClonesDelegationTokens() throws Exception {
         final TokenInterface<DelegationTokenIdentifier> token = getDelegationToken(fs, "JobTracker");
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test");
         URI haUri = new URI("hdfs://my-ha-uri/");
         token.setService(HAUtilClient.buildTokenServiceForLogicalUri(haUri, HdfsConstants.HDFS_URI_SCHEME));
         ugi.addToken(token);
@@ -363,7 +363,7 @@ public class TestDelegationTokensWithHA {
     public void testCancelAndUpdateDelegationTokens() throws Exception {
         // Create UGI with token1
         String user = UserGroupInformation.getCurrentUser().getShortUserName();
-        UserGroupInformationInterface ugi1 = UserGroupInformation.createRemoteUser(user);
+        UserGroupInformation ugi1 = UserGroupInformation.createRemoteUser(user);
         ugi1.doAs(new PrivilegedExceptionAction<Void>() {
 
             public Void run() throws Exception {

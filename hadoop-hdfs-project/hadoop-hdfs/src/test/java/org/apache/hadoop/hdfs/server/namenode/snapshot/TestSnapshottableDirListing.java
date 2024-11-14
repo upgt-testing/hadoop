@@ -44,11 +44,11 @@ public class TestSnapshottableDirListing {
 
     static final long BLOCKSIZE = 1024;
 
-    private final PathInterface root = new Path("/");
+    private final Path root = new Path("/");
 
-    private final PathInterface dir1 = new Path("/TestSnapshot1");
+    private final Path dir1 = new Path("/TestSnapshot1");
 
-    private final PathInterface dir2 = new Path("/TestSnapshot2");
+    private final Path dir2 = new Path("/TestSnapshot2");
 
     Configuration conf;
 
@@ -176,7 +176,7 @@ public class TestSnapshottableDirListing {
         hdfs.allowSnapshot(dir2);
         hdfs.setPermission(root, FsPermission.valueOf("-rwxrwxrwx"));
         // create two dirs and make them snapshottable under the name of user1
-        UserGroupInformationInterface ugi1 = UserGroupInformation.createUserForTesting("user1", new String[] { "group1" });
+        UserGroupInformation ugi1 = UserGroupInformation.createUserForTesting("user1", new String[] { "group1" });
         DistributedFileSystem fs1 = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(ugi1, conf);
         Path dir1_user1 = new Path("/dir1_user1");
         Path dir2_user1 = new Path("/dir2_user1");
@@ -185,7 +185,7 @@ public class TestSnapshottableDirListing {
         hdfs.allowSnapshot(dir1_user1);
         hdfs.allowSnapshot(dir2_user1);
         // user2
-        UserGroupInformationInterface ugi2 = UserGroupInformation.createUserForTesting("user2", new String[] { "group2" });
+        UserGroupInformation ugi2 = UserGroupInformation.createUserForTesting("user2", new String[] { "group2" });
         DistributedFileSystem fs2 = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(ugi2, conf);
         Path dir_user2 = new Path("/dir_user2");
         Path subdir_user2 = new Path(dir_user2, "subdir");
@@ -195,7 +195,7 @@ public class TestSnapshottableDirListing {
         hdfs.allowSnapshot(subdir_user2);
         // super user
         String supergroup = conf.get(DFS_PERMISSIONS_SUPERUSERGROUP_KEY, DFS_PERMISSIONS_SUPERUSERGROUP_DEFAULT);
-        UserGroupInformationInterface superUgi = UserGroupInformation.createUserForTesting("superuser", new String[] { supergroup });
+        UserGroupInformation superUgi = UserGroupInformation.createUserForTesting("superuser", new String[] { supergroup });
         DistributedFileSystem fs3 = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(superUgi, conf);
         // list the snapshottable dirs for superuser
         SnapshottableDirectoryStatus[] dirs = fs3.getSnapshottableDirListing();

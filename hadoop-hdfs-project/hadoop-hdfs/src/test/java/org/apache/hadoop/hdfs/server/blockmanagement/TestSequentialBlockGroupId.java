@@ -56,7 +56,7 @@ public class TestSequentialBlockGroupId {
 
     private static final Logger LOG = LoggerFactory.getLogger("TestSequentialBlockGroupId");
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final short REPLICATION = 1;
 
@@ -84,7 +84,7 @@ public class TestSequentialBlockGroupId {
 
     private SequentialBlockGroupIdGeneratorInterface blockGrpIdGenerator;
 
-    private PathInterface ecDir = new Path("/ecDir");
+    private Path ecDir = new Path("/ecDir");
 
     @Before
     public void setup() throws Exception {
@@ -155,9 +155,9 @@ public class TestSequentialBlockGroupId {
         List<LocatedBlock> blocks2 = DFSTestUtil.getAllBlocks(fs, path2);
         assertThat("Wrong BlockGrps", blocks2.size(), is(blockGrpCount));
         // Make sure that file1 and file2 block IDs are different
-        for (LocatedBlockInterface locBlock1 : blocks1) {
+        for (LocatedBlock locBlock1 : blocks1) {
             long blockId1 = locBlock1.getBlock().getBlockId();
-            for (LocatedBlockInterface locBlock2 : blocks2) {
+            for (LocatedBlock locBlock2 : blocks2) {
                 long blockId2 = locBlock2.getBlock().getBlockId();
                 assertThat("BlockGrpId mismatches!", blockId1, is(not(blockId2)));
             }
@@ -201,9 +201,9 @@ public class TestSequentialBlockGroupId {
         List<LocatedBlock> blocks2 = DFSTestUtil.getAllBlocks(fs, path2);
         assertThat("Wrong BlockGrps", blocks2.size(), is(blockGrpCount));
         // Make sure that file1 and file2 block IDs are different
-        for (LocatedBlockInterface locBlock1 : contiguousBlocks) {
+        for (LocatedBlock locBlock1 : contiguousBlocks) {
             long blockId1 = locBlock1.getBlock().getBlockId();
-            for (LocatedBlockInterface locBlock2 : blocks2) {
+            for (LocatedBlock locBlock2 : blocks2) {
                 long blockId2 = locBlock2.getBlock().getBlockId();
                 assertThat("BlockGrpId mismatches!", blockId1, is(not(blockId2)));
             }

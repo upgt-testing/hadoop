@@ -298,7 +298,7 @@ public class TestExternalStoragePolicySatisfier {
     public void testWithKeytabs() throws Exception {
         try {
             initSecureConf(getConf());
-            final UserGroupInformationInterface ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
+            final UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
             ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
                 @Override
@@ -930,8 +930,8 @@ public class TestExternalStoragePolicySatisfier {
             dfs.satisfyStoragePolicy(new Path(testFile));
             // Thread.sleep(9000); // To make sure SPS triggered
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(testFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(testFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }
@@ -1287,10 +1287,10 @@ public class TestExternalStoragePolicySatisfier {
             favoredNodes[i] = dns.get(i).getXferAddress();
         }
         DFSTestUtil.createFile(dfs, new Path(file1), false, 1024, 100, DEFAULT_BLOCK_SIZE, (short) 3, 0, false, favoredNodes);
-        LocatedBlocksInterface locatedBlocks = dfs.getClient().getLocatedBlocks(file1, 0);
+        LocatedBlocks locatedBlocks = dfs.getClient().getLocatedBlocks(file1, 0);
         Assert.assertEquals("Wrong block count", 1, locatedBlocks.locatedBlockCount());
         // verify storage type before movement
-        LocatedBlockInterface lb = locatedBlocks.get(0);
+        LocatedBlock lb = locatedBlocks.get(0);
         StorageType[] storageTypes = lb.getStorageTypes();
         for (StorageType storageType : storageTypes) {
             Assert.assertTrue(StorageType.DISK == storageType);
@@ -1371,7 +1371,7 @@ public class TestExternalStoragePolicySatisfier {
 
         @Override
         public void notifyMovementTriedBlocks(Block[] moveAttemptFinishedBlks) {
-            for (BlockInterface block : moveAttemptFinishedBlks) {
+            for (Block block : moveAttemptFinishedBlks) {
                 actualBlockMovements.add(block);
             }
             LOG.info("Movement attempted blocks:{}", actualBlockMovements);

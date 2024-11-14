@@ -101,7 +101,7 @@ public class TestNameNodeMetrics {
 
     private static final int DFS_REDUNDANCY_INTERVAL = 1;
 
-    private static final PathInterface TEST_ROOT_DIR_PATH = new Path("/testNameNodeMetrics");
+    private static final Path TEST_ROOT_DIR_PATH = new Path("/testNameNodeMetrics");
 
     private static final String NN_METRICS = "NameNodeActivity";
 
@@ -111,7 +111,7 @@ public class TestNameNodeMetrics {
 
     private static final int BLOCK_SIZE = 1024 * 1024;
 
-    private static final ErasureCodingPolicyInterface EC_POLICY = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
+    private static final ErasureCodingPolicy EC_POLICY = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
 
     public static final Logger LOG = LoggerFactory.getLogger(TestNameNodeMetrics.class);
 
@@ -152,7 +152,7 @@ public class TestNameNodeMetrics {
 
     private BlockManagerInterface bm;
 
-    private PathInterface ecDir;
+    private Path ecDir;
 
     private static Path getTestPath(String fileName) {
         return new Path(TEST_ROOT_DIR_PATH, fileName);
@@ -178,7 +178,7 @@ public class TestNameNodeMetrics {
         MetricsSource source = DefaultMetricsSystem.instance().getSource("UgiMetrics");
         if (source != null) {
             // Run only once since the UGI metrics is cleaned up during teardown
-            MetricsRecordBuilderInterface rb = getMetrics(source);
+            MetricsRecordBuilder rb = getMetrics(source);
             assertQuantileGauges("GetGroups1s", rb);
         }
         if (hostsFileWriter != null) {
@@ -212,7 +212,7 @@ public class TestNameNodeMetrics {
      */
     @Test(timeout = 10000)
     public void testCapacityMetrics() throws Exception {
-        MetricsRecordBuilderInterface rb = getMetrics(NS_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NS_METRICS);
         long capacityTotal = MetricsAsserts.getLongGauge("CapacityTotal", rb);
         assert (capacityTotal != 0);
         long capacityUsed = MetricsAsserts.getLongGauge("CapacityUsed", rb);
@@ -228,7 +228,7 @@ public class TestNameNodeMetrics {
      */
     @Test
     public void testGcTimePercentageMetrics() throws Exception {
-        MetricsRecordBuilderInterface rb = getMetrics(JVM_METRICS);
+        MetricsRecordBuilder rb = getMetrics(JVM_METRICS);
         MetricsAsserts.getIntGauge(GcTimePercentage.name(), rb);
     }
 
@@ -347,13 +347,13 @@ public class TestNameNodeMetrics {
     public void testFileAdd() throws Exception {
         // File creations
         final long blockCount = 32;
-        final PathInterface normalFile = getTestPath("testFileAdd");
+        final Path normalFile = getTestPath("testFileAdd");
         createFile(normalFile, blockCount * BLOCK_SIZE, (short) 3);
         final Path ecFile = new Path(ecDir, "ecFile.log");
         DFSTestUtil.createStripedFile(cluster, ecFile, null, (int) blockCount, 1, false, EC_POLICY);
         int blockCapacity = namesystem.getBlockCapacity();
         assertGauge("BlockCapacity", blockCapacity, getMetrics(NS_METRICS));
-        MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NN_METRICS);
         // File create operations are 2
         assertCounter("CreateFileOps", 2L, rb);
         // Number of files created is depth of normalFile and ecFile, after
@@ -386,7 +386,7 @@ public class TestNameNodeMetrics {
      */
     private void verifyZeroMetrics() throws Exception {
         BlockManagerTestUtil.updateState(bm);
-        MetricsRecordBuilderInterface rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 0L, 500);
+        MetricsRecordBuilder rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 0L, 500);
         // Verify aggregated blocks metrics
         // Deprecated metric
         assertGauge("UnderReplicatedBlocks", 0L, rb);
@@ -426,7 +426,7 @@ public class TestNameNodeMetrics {
     @Test
     public void testCorruptBlock() throws Exception {
         // Create a file with single block with two replicas
-        final PathInterface file = getTestPath("testCorruptBlock");
+        final Path file = getTestPath("testCorruptBlock");
         final short replicaCount = 2;
         createFile(file, 100, replicaCount);
         DFSTestUtil.waitForReplication(fs, file, replicaCount, 15000);
@@ -439,7 +439,7 @@ public class TestNameNodeMetrics {
         verifyAggregatedMetricsTally();
         BlockManagerTestUtil.stopRedundancyThread(bm);
         // Corrupt first replica of the block
-        LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), file.toString(), 0, 1).get(0);
+        LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), file.toString(), 0, 1).get(0);
         cluster.getNamesystem().writeLock();
         try {
             bm.findAndMarkBlockAsCorrupt(block.getBlock(), block.getLocations()[0], "STORAGE_ID", "TEST");
@@ -447,7 +447,7 @@ public class TestNameNodeMetrics {
             cluster.getNamesystem().writeUnlock();
         }
         BlockManagerTestUtil.updateState(bm);
-        MetricsRecordBuilderInterface rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 1L, 500);
+        MetricsRecordBuilder rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 1L, 500);
         // Verify aggregated blocks metrics
         assertGauge("LowRedundancyBlocks", 1L, rb);
         assertGauge("PendingReplicationBlocks", 0L, rb);
@@ -515,9 +515,9 @@ public class TestNameNodeMetrics {
         verifyAggregatedMetricsTally();
         BlockManagerTestUtil.stopRedundancyThread(bm);
         // Corrupt first replica of the block
-        LocatedBlocksInterface lbs = fs.getClient().getNamenode().getBlockLocations(ecFile.toString(), 0, fileLen);
+        LocatedBlocks lbs = fs.getClient().getNamenode().getBlockLocations(ecFile.toString(), 0, fileLen);
         assert lbs.get(0) instanceof LocatedStripedBlock;
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         cluster.getNamesystem().writeLock();
         try {
             bm.findAndMarkBlockAsCorrupt(bg.getBlock(), bg.getLocations()[0], "STORAGE_ID", "TEST");
@@ -525,7 +525,7 @@ public class TestNameNodeMetrics {
             cluster.getNamesystem().writeUnlock();
         }
         BlockManagerTestUtil.updateState(bm);
-        MetricsRecordBuilderInterface rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 1L, 500);
+        MetricsRecordBuilder rb = waitForDnMetricValue(NS_METRICS, "CorruptBlocks", 1L, 500);
         // Verify aggregated blocks metrics
         assertGauge("LowRedundancyBlocks", 1L, rb);
         assertGauge("PendingReplicationBlocks", 0L, rb);
@@ -582,10 +582,10 @@ public class TestNameNodeMetrics {
      */
     @Test
     public void testExcessBlocks() throws Exception {
-        PathInterface file = getTestPath("testExcessBlocks");
+        Path file = getTestPath("testExcessBlocks");
         createFile(file, 100, (short) 2);
         NameNodeAdapter.setReplication(namesystem, file.toString(), (short) 1);
-        MetricsRecordBuilderInterface rb = getMetrics(NS_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NS_METRICS);
         assertGauge("ExcessBlocks", 1L, rb);
         // verify ExcessBlocks metric is decremented and
         // excessReplicateMap is cleared after deleting a file
@@ -602,10 +602,10 @@ public class TestNameNodeMetrics {
     @Test
     public void testMissingBlock() throws Exception {
         // Create a file with single block with two replicas
-        PathInterface file = getTestPath("testMissingBlocks");
+        Path file = getTestPath("testMissingBlocks");
         createFile(file, 100, (short) 1);
         // Corrupt the only replica of the block to result in a missing block
-        LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), file.toString(), 0, 1).get(0);
+        LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), file.toString(), 0, 1).get(0);
         cluster.getNamesystem().writeLock();
         try {
             bm.findAndMarkBlockAsCorrupt(block.getBlock(), block.getLocations()[0], "STORAGE_ID", "TEST");
@@ -614,7 +614,7 @@ public class TestNameNodeMetrics {
         }
         // Wait for block to be marked corrupt
         Thread.sleep(1000);
-        MetricsRecordBuilderInterface rb = getMetrics(NS_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NS_METRICS);
         assertGauge("UnderReplicatedBlocks", 1L, rb);
         assertGauge("MissingBlocks", 1L, rb);
         assertGauge("MissingReplOneBlocks", 1L, rb);
@@ -651,7 +651,7 @@ public class TestNameNodeMetrics {
     }
 
     private MetricsRecordBuilder waitForDnMetricValue(String source, String name, long expected, long sleepInterval) throws Exception {
-        MetricsRecordBuilderInterface rb;
+        MetricsRecordBuilder rb;
         long gauge;
         // Lots of retries are allowed for slow systems.
         // Fast ones will still exit early.
@@ -671,12 +671,12 @@ public class TestNameNodeMetrics {
 
     @Test
     public void testRenameMetrics() throws Exception {
-        PathInterface src = getTestPath("src");
+        Path src = getTestPath("src");
         createFile(src, 100, (short) 1);
-        PathInterface target = getTestPath("target");
+        Path target = getTestPath("target");
         createFile(target, 100, (short) 1);
         fs.rename(src, target, Rename.OVERWRITE);
-        MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NN_METRICS);
         assertCounter("FilesRenamed", 1L, rb);
         assertCounter("FilesDeleted", 1L, rb);
     }
@@ -811,7 +811,7 @@ public class TestNameNodeMetrics {
      */
     @Test
     public void testSyncAndBlockReportMetric() throws Exception {
-        MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NN_METRICS);
         // We have one sync when the cluster starts up, just opening the journal
         assertCounter("SyncsNumOps", 4L, rb);
         // Each datanode reports in when the cluster comes up
@@ -828,14 +828,14 @@ public class TestNameNodeMetrics {
      */
     @Test
     public void testReadWriteOps() throws Exception {
-        MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+        MetricsRecordBuilder rb = getMetrics(NN_METRICS);
         long startWriteCounter = MetricsAsserts.getLongCounter("TransactionsNumOps", rb);
         Path file1_Path = new Path(TEST_ROOT_DIR_PATH, "ReadData.dat");
         //Perform create file operation
         createFile(file1_Path, 1024, (short) 2);
         // Perform read file operation on earlier created file
         readFile(fs, file1_Path);
-        MetricsRecordBuilderInterface rbNew = getMetrics(NN_METRICS);
+        MetricsRecordBuilder rbNew = getMetrics(NN_METRICS);
         assertTrue(MetricsAsserts.getLongCounter("TransactionsNumOps", rbNew) > startWriteCounter);
     }
 
@@ -845,7 +845,7 @@ public class TestNameNodeMetrics {
      */
     @Test(timeout = 60000)
     public void testNumActiveClientsAndFilesUnderConstructionMetrics() throws Exception {
-        final PathInterface file1 = getTestPath("testFileAdd1");
+        final Path file1 = getTestPath("testFileAdd1");
         createFile(file1, 100, (short) 3);
         assertGauge("NumActiveClients", 0L, getMetrics(NS_METRICS));
         assertGauge("NumFilesUnderConstruction", 0L, getMetrics(NS_METRICS));
@@ -908,7 +908,7 @@ public class TestNameNodeMetrics {
             final Path zone1 = new Path(zoneParent, "zone1");
             fsWrapper.mkdir(zone1, FsPermission.getDirDefault(), true);
             dfsAdmin.createEncryptionZone(zone1, "test_key", EnumSet.of(CreateEncryptionZoneFlag.NO_TRASH));
-            MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+            MetricsRecordBuilder rb = getMetrics(NN_METRICS);
             for (int i = 0; i < 3; i++) {
                 Path filePath = new Path("/zones/zone1/testfile-" + i);
                 DFSTestUtil.createFile(fsEDEK, filePath, 1024, (short) 3, 1L);
@@ -927,7 +927,7 @@ public class TestNameNodeMetrics {
             tmpCluster.getNameNode(0).getNamesystem().setNNResourceChecker(mockResourceChecker);
             NNHAServiceTarget haTarget = new NNHAServiceTarget(conf, DFSUtil.getNamenodeNameServiceId(new HdfsConfiguration()), "nn1");
             HAServiceProtocol rpc = haTarget.getHealthMonitorProxy(conf, conf.getInt(HA_HM_RPC_TIMEOUT_KEY, HA_HM_RPC_TIMEOUT_DEFAULT));
-            MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+            MetricsRecordBuilder rb = getMetrics(NN_METRICS);
             for (long i = 0; i < 10; i++) {
                 rpc.monitorHealth();
                 assertQuantileGauges("ResourceCheckTime1s", rb);
@@ -956,7 +956,7 @@ public class TestNameNodeMetrics {
             Thread.sleep(2 * 1000);
             // We need to get the metrics for the SBN (excluding the NN from dfs
             // cluster created in setUp() and the ANN).
-            MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS + "-2");
+            MetricsRecordBuilder rb = getMetrics(NN_METRICS + "-2");
             assertQuantileGauges("EditLogTailTime60s", rb);
             assertQuantileGauges("EditLogFetchTime60s", rb);
             assertQuantileGauges("NumEditLogLoaded60s", rb, "Count");

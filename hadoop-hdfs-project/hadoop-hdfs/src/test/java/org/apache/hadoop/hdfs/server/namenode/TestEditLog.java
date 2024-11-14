@@ -1098,10 +1098,10 @@ public class TestEditLog {
         NNStorage storage = new NNStorage(getConf(), Collections.<URI>emptyList(), editUris);
         storage.format(new NamespaceInfo());
         // Verify permissions
-        LocalFileSystemInterface fs = LocalFileSystem.getLocal(getConf());
+        LocalFileSystem fs = LocalFileSystem.getLocal(getConf());
         for (URI uri : editUris) {
             String currDir = uri.getPath() + Path.SEPARATOR + Storage.STORAGE_DIR_CURRENT;
-            FileStatusInterface fileStatus = fs.getFileLinkStatus(new Path(currDir));
+            FileStatus fileStatus = fs.getFileLinkStatus(new Path(currDir));
             FsPermissionInterface permission = fileStatus.getPermission();
             assertEquals(getConf().getInt(DFSConfigKeys.DFS_JOURNAL_EDITS_DIR_PERMISSION_KEY, 700), permission.toOctal());
         }

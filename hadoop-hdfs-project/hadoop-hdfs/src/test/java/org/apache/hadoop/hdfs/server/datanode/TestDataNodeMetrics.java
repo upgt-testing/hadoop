@@ -81,7 +81,7 @@ public class TestDataNodeMetrics {
             List<DataNode> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface rb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
             assertCounter("BytesWritten", LONG_FILE_LEN, rb);
             assertTrue("Expected non-zero number of incremental block reports", getLongCounter("IncrementalBlockReportsNumOps", rb) > 0);
         } finally {
@@ -106,7 +106,7 @@ public class TestDataNodeMetrics {
             List<DataNode> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface rb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
             // Expect 2 packets, 1 for the 1 byte read, 1 for the empty packet
             // signaling the end of the block
             assertCounter("SendDataPacketTransferNanosNumOps", (long) 2, rb);
@@ -140,7 +140,7 @@ public class TestDataNodeMetrics {
             fout.close();
             List<DataNode> datanodes = cluster.getDataNodes();
             DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface dnMetrics = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder dnMetrics = getMetrics(datanode.getMetrics().name());
             // Expect two flushes, 1 for the flush that occurs after writing,
             // 1 that occurs on closing the data and metadata files.
             assertCounter("FlushNanosNumOps", 2L, dnMetrics);
@@ -202,7 +202,7 @@ public class TestDataNodeMetrics {
             // Close the file and wait for the metrics to rollover
             Thread.sleep((interval + 1) * 1000);
             // Check the ack was received
-            MetricsRecordBuilderInterface dnMetrics = getMetrics(headNode.getMetrics().name());
+            MetricsRecordBuilder dnMetrics = getMetrics(headNode.getMetrics().name());
             assertTrue("Expected non-zero number of acks", getLongCounter("PacketAckRoundTripTimeNanosNumOps", dnMetrics) > 0);
             assertQuantileGauges("PacketAckRoundTripTimeNanos" + interval + "s", dnMetrics);
         } finally {
@@ -228,7 +228,7 @@ public class TestDataNodeMetrics {
             out.writeBytes("old gs data\n");
             out.hflush();
             /* Test the metric. */
-            final MetricsRecordBuilderInterface dnMetrics = getMetrics(cluster.getDataNodes().get(0).getMetrics().name());
+            final MetricsRecordBuilder dnMetrics = getMetrics(cluster.getDataNodes().get(0).getMetrics().name());
             assertCounter("DatanodeNetworkErrors", 1L, dnMetrics);
             /* Test JMX datanode network counts. */
             final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -260,7 +260,7 @@ public class TestDataNodeMetrics {
             List<DataNode> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             final DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface rb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
             final long LONG_FILE_LEN = 1024 * 1024 * 10;
             final long startWriteValue = getLongCounter("TotalWriteTime", rb);
             final long startReadValue = getLongCounter("TotalReadTime", rb);
@@ -279,7 +279,7 @@ public class TestDataNodeMetrics {
                         LOG.error("Caught IOException while ingesting DN metrics", ioe);
                         return false;
                     }
-                    MetricsRecordBuilderInterface rbNew = getMetrics(datanode.getMetrics().name());
+                    MetricsRecordBuilder rbNew = getMetrics(datanode.getMetrics().name());
                     final long endWriteValue = getLongCounter("TotalWriteTime", rbNew);
                     final long endReadValue = getLongCounter("TotalReadTime", rbNew);
                     return endWriteValue > startWriteValue && endReadValue > startReadValue;
@@ -301,15 +301,15 @@ public class TestDataNodeMetrics {
             List<DataNode> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface rb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
             long blocksReplicated = getLongCounter("BlocksReplicated", rb);
             assertEquals("No blocks replicated yet", 0, blocksReplicated);
             Path path = new Path("/counter.txt");
             DFSTestUtil.createFile(fs, path, 1024, (short) 2, Time.monotonicNow());
             cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null);
-            ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fs, path);
+            ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fs, path);
             DFSTestUtil.waitForReplication(cluster, firstBlock, 1, 2, 0);
-            MetricsRecordBuilderInterface rbNew = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rbNew = getMetrics(datanode.getMetrics().name());
             blocksReplicated = getLongCounter("BlocksReplicated", rbNew);
             assertEquals("blocks replicated counter incremented", 1, blocksReplicated);
         } finally {
@@ -328,12 +328,12 @@ public class TestDataNodeMetrics {
             List<DataNode> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
-            MetricsRecordBuilderInterface rb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(datanode.getMetrics().name());
             long dataNodeActiveXceiversCount = MetricsAsserts.getIntGauge("DataNodeActiveXceiversCount", rb);
             assertEquals(dataNodeActiveXceiversCount, 0);
             Path path = new Path("/counter.txt");
             DFSTestUtil.createFile(fs, path, 204800000, (short) 3, Time.monotonicNow());
-            MetricsRecordBuilderInterface rbNew = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder rbNew = getMetrics(datanode.getMetrics().name());
             dataNodeActiveXceiversCount = MetricsAsserts.getIntGauge("DataNodeActiveXceiversCount", rbNew);
             assertTrue(dataNodeActiveXceiversCount >= 0);
         } finally {
@@ -408,7 +408,7 @@ public class TestDataNodeMetrics {
             verifyBlockLocations(fs, p, 1);
             Mockito.doThrow(new FileNotFoundException("Too many open files")).when(injector).throwTooManyOpenFiles();
             DataNodeFaultInjector.set(injector);
-            ExtendedBlockInterface b = fs.getClient().getLocatedBlocks(p.toString(), 0).get(0).getBlock();
+            ExtendedBlock b = fs.getClient().getLocatedBlocks(p.toString(), 0).get(0).getBlock();
             try {
                 new BlockSender(b, 0, -1, false, true, true, cluster.getDataNodes().get(0), null, CachingStrategy.newDefaultStrategy());
                 fail("Must throw FileNotFoundException");
@@ -429,7 +429,7 @@ public class TestDataNodeMetrics {
     }
 
     private void verifyBlockLocations(DistributedFileSystem fs, Path p, int expected) throws IOException, TimeoutException, InterruptedException {
-        final LocatedBlockInterface lb = fs.getClient().getLocatedBlocks(p.toString(), 0).get(0);
+        final LocatedBlock lb = fs.getClient().getLocatedBlocks(p.toString(), 0).get(0);
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
             @Override
@@ -449,7 +449,7 @@ public class TestDataNodeMetrics {
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         cluster.waitActive();
         DataNodeInterface dn = cluster.getDataNodes().get(0);
-        MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
         assertCounter("HeartbeatsNumOps", 1L, rb);
     }
 
@@ -464,7 +464,7 @@ public class TestDataNodeMetrics {
         cluster.waitActive();
         DataNodeInterface dn = cluster.getDataNodes().get(0);
         cluster.transitionToActive(0);
-        MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
         assertCounter("HeartbeatsForminidfs-ns-nn1NumOps", 1L, rb);
         assertCounter("HeartbeatsForminidfs-ns-nn2NumOps", 1L, rb);
         assertCounter("HeartbeatsNumOps", 2L, rb);
@@ -480,7 +480,7 @@ public class TestDataNodeMetrics {
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology("ns1,ns2")).build();
         cluster.waitActive();
         DataNodeInterface dn = cluster.getDataNodes().get(0);
-        MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
         assertCounter("HeartbeatsForns1NumOps", 1L, rb);
         assertCounter("HeartbeatsForns2NumOps", 1L, rb);
         assertCounter("HeartbeatsNumOps", 2L, rb);
@@ -496,7 +496,7 @@ public class TestDataNodeMetrics {
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHAFederatedTopology(2)).build();
         cluster.waitActive();
         DataNodeInterface dn = cluster.getDataNodes().get(0);
-        MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
         assertCounter("HeartbeatsForns0-nn0NumOps", 1L, rb);
         assertCounter("HeartbeatsForns0-nn1NumOps", 1L, rb);
         assertCounter("HeartbeatsForns1-nn0NumOps", 1L, rb);

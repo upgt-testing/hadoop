@@ -82,9 +82,9 @@ public class TestSnapshotDiffReport {
 
     private static final long FILELEN = BLOCKSIZE * 2;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
     protected Configuration conf;
 
@@ -147,7 +147,7 @@ public class TestSnapshotDiffReport {
         // create link13
         hdfs.createSymlink(file13, link13, false);
         // create snapshot
-        for (PathInterface snapshotDir : snapshotDirs) {
+        for (Path snapshotDir : snapshotDirs) {
             hdfs.allowSnapshot(snapshotDir);
             hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
         }
@@ -164,7 +164,7 @@ public class TestSnapshotDiffReport {
         // create file15
         DFSTestUtil.createFile(hdfs, file15, BLOCKSIZE, REPLICATION, SEED);
         // create snapshot
-        for (PathInterface snapshotDir : snapshotDirs) {
+        for (Path snapshotDir : snapshotDirs) {
             hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
         }
         // create file11 again
@@ -180,7 +180,7 @@ public class TestSnapshotDiffReport {
         // modify file15
         hdfs.setReplication(file15, (short) (REPLICATION - 1));
         // create snapshot
-        for (PathInterface snapshotDir : snapshotDirs) {
+        for (Path snapshotDir : snapshotDirs) {
             hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
         }
         // modify file10
@@ -370,7 +370,7 @@ public class TestSnapshotDiffReport {
 
     @Test
     public void testSnapshotDiffInfo() throws Exception {
-        PathInterface snapshotRootDirPath = dir;
+        Path snapshotRootDirPath = dir;
         Path snapshotDirDescendantPath = new Path(snapshotRootDirPath, "desc");
         Path snapshotDirNonDescendantPath = new Path("/dummy/non/snap/desc");
         hdfs.mkdirs(snapshotDirDescendantPath);
@@ -598,7 +598,7 @@ public class TestSnapshotDiffReport {
     public void testDiffReportWithOpenFiles() throws Exception {
         // Construct the directory tree
         final Path level0A = new Path("/level_0_A");
-        final PathInterface flumeSnapRootDir = level0A;
+        final Path flumeSnapRootDir = level0A;
         final String flumeFileName = "flume.log";
         final String flumeSnap1Name = "flume_snap_1";
         final String flumeSnap2Name = "flume_snap_2";
@@ -607,7 +607,7 @@ public class TestSnapshotDiffReport {
         createFile(flumeFile);
         FSDataOutputStream flumeOutputStream = hdfs.append(flumeFile);
         // Create Snapshot S1
-        final PathInterface flumeS1Dir = SnapshotTestHelper.createSnapshot(hdfs, flumeSnapRootDir, flumeSnap1Name);
+        final Path flumeS1Dir = SnapshotTestHelper.createSnapshot(hdfs, flumeSnapRootDir, flumeSnap1Name);
         final Path flumeS1Path = new Path(flumeS1Dir, flumeFileName);
         final long flumeFileLengthAfterS1 = hdfs.getFileStatus(flumeFile).getLen();
         // Verify if Snap S1 file length is same as the the live one
@@ -621,7 +621,7 @@ public class TestSnapshotDiffReport {
         // Write more data to flume file
         flumeFileWrittenDataLength += writeToStream(flumeOutputStream, buf);
         // Create Snapshot S2
-        final PathInterface flumeS2Dir = SnapshotTestHelper.createSnapshot(hdfs, flumeSnapRootDir, flumeSnap2Name);
+        final Path flumeS2Dir = SnapshotTestHelper.createSnapshot(hdfs, flumeSnapRootDir, flumeSnap2Name);
         final Path flumeS2Path = new Path(flumeS2Dir, flumeFileName);
         // Verify live files length is same as all data written till now
         final long flumeFileLengthAfterS2 = hdfs.getFileStatus(flumeFile).getLen();
@@ -665,19 +665,19 @@ public class TestSnapshotDiffReport {
     }
 
     private void printAtime(Path path, Path ssRoot, String ssName) throws IOException {
-        PathInterface ssPath = getSSpath(path, ssRoot, ssName);
+        Path ssPath = getSSpath(path, ssRoot, ssName);
         LOG.info("Access time " + path + ": " + getAccessTimeStr(path) + " " + ssPath + ": " + getAccessTimeStr(ssPath));
     }
 
     private void assertAtimeEquals(Path path, Path ssRoot, String ssName1, String ssName2) throws IOException {
-        PathInterface ssPath1 = getSSpath(path, ssRoot, ssName1);
-        PathInterface ssPath2 = getSSpath(path, ssRoot, ssName2);
+        Path ssPath1 = getSSpath(path, ssRoot, ssName1);
+        Path ssPath2 = getSSpath(path, ssRoot, ssName2);
         assertEquals(getAccessTime(ssPath1), getAccessTime(ssPath2));
     }
 
     private void assertAtimeNotEquals(Path path, Path ssRoot, String ssName1, String ssName2) throws IOException {
-        PathInterface ssPath1 = getSSpath(path, ssRoot, ssName1);
-        PathInterface ssPath2 = getSSpath(path, ssRoot, ssName2);
+        Path ssPath1 = getSSpath(path, ssRoot, ssName1);
+        Path ssPath2 = getSSpath(path, ssRoot, ssName2);
         assertNotEquals(getAccessTime(ssPath1), getAccessTime(ssPath2));
     }
 

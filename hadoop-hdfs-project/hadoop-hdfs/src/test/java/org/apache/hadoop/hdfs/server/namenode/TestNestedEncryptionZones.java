@@ -59,25 +59,25 @@ public class TestNestedEncryptionZones {
 
     protected DistributedFileSystem fs;
 
-    private final PathInterface rootDir = new Path("/");
+    private final Path rootDir = new Path("/");
 
-    private final PathInterface rawDir = new Path("/.reserved/raw/");
+    private final Path rawDir = new Path("/.reserved/raw/");
 
-    private PathInterface nestedEZBaseFile = new Path(rootDir, "nestedEZBaseFile");
+    private Path nestedEZBaseFile = new Path(rootDir, "nestedEZBaseFile");
 
-    private PathInterface topEZBaseFile = new Path(rootDir, "topEZBaseFile");
+    private Path topEZBaseFile = new Path(rootDir, "topEZBaseFile");
 
-    private PathInterface topEZDir;
+    private Path topEZDir;
 
-    private PathInterface nestedEZDir;
+    private Path nestedEZDir;
 
-    private PathInterface topEZFile;
+    private Path topEZFile;
 
-    private PathInterface nestedEZFile;
+    private Path nestedEZFile;
 
-    private PathInterface topEZRawFile;
+    private Path topEZRawFile;
 
-    private PathInterface nestedEZRawFile;
+    private Path nestedEZRawFile;
 
     // File length
     private final int len = 8196;
@@ -165,11 +165,11 @@ public class TestNestedEncryptionZones {
         renameChildrenOfEZ();
         final String currentUser = UserGroupInformation.getCurrentUser().getShortUserName();
         final Path suffixTrashPath = new Path(FileSystem.TRASH_PREFIX, currentUser);
-        final PathInterface rootTrash = fs.getTrashRoot(rootDir);
-        final PathInterface topEZTrash = fs.getTrashRoot(topEZFile);
-        final PathInterface nestedEZTrash = fs.getTrashRoot(nestedEZFile);
-        final PathInterface expectedTopEZTrash = fs.makeQualified(new Path(topEZDir, suffixTrashPath));
-        final PathInterface expectedNestedEZTrash = fs.makeQualified(new Path(nestedEZDir, suffixTrashPath));
+        final Path rootTrash = fs.getTrashRoot(rootDir);
+        final Path topEZTrash = fs.getTrashRoot(topEZFile);
+        final Path nestedEZTrash = fs.getTrashRoot(nestedEZFile);
+        final Path expectedTopEZTrash = fs.makeQualified(new Path(topEZDir, suffixTrashPath));
+        final Path expectedNestedEZTrash = fs.makeQualified(new Path(nestedEZDir, suffixTrashPath));
         assertEquals("Top ez trash should be " + expectedTopEZTrash, expectedTopEZTrash, topEZTrash);
         assertEquals("Root trash should be equal with TopEZFile trash", topEZTrash, rootTrash);
         assertEquals("Nested ez Trash should be " + expectedNestedEZTrash, expectedNestedEZTrash, nestedEZTrash);

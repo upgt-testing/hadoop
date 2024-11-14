@@ -48,7 +48,7 @@ public class TestNodeCount {
 
     long failtime = 0;
 
-    BlockInterface lastBlock = null;
+    Block lastBlock = null;
 
     NumberReplicasInterface lastNum = null;
 
@@ -71,7 +71,7 @@ public class TestNodeCount {
             final Path FILE_PATH = new Path("/testfile");
             DFSTestUtil.createFile(fs, FILE_PATH, 1L, REPLICATION_FACTOR, 1L);
             DFSTestUtil.waitReplication(fs, FILE_PATH, REPLICATION_FACTOR);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
             // keep a copy of all datanode descriptor
             final DatanodeDescriptor[] datanodes = hm.getDatanodes();
             // start two new nodes

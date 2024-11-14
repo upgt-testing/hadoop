@@ -51,11 +51,11 @@ public class TestRedudantBlocks {
 
     private DistributedFileSystem fs;
 
-    private final PathInterface dirPath = new Path("/striped");
+    private final Path dirPath = new Path("/striped");
 
-    private PathInterface filePath = new Path(dirPath, "file");
+    private Path filePath = new Path(dirPath, "file");
 
-    private final ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
+    private final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
 
     private final short dataBlocks = (short) ecPolicy.getNumDataUnits();
 
@@ -99,8 +99,8 @@ public class TestRedudantBlocks {
     public void testProcessOverReplicatedAndRedudantBlock() throws Exception {
         long fileLen = dataBlocks * blockSize;
         DFSTestUtil.createStripedFile(cluster, filePath, null, 1, stripesPerBlock, false);
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         long gs = bg.getBlock().getGenerationStamp();
         String bpid = bg.getBlock().getBlockPoolId();
         long groupId = bg.getBlock().getBlockId();
@@ -130,7 +130,7 @@ public class TestRedudantBlocks {
         lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
         bg = (LocatedStripedBlock) (lbs.get(0));
         final LocatedBlock[] blocks = StripedBlockUtil.parseStripedBlockGroup(bg, cellSize, dataBlocks, parityBlocks);
-        for (LocatedBlockInterface dn : blocks) {
+        for (LocatedBlock dn : blocks) {
             if (dn != null) {
                 blockIdsSet.add(dn.getBlock().getBlockId());
             }

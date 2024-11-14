@@ -62,7 +62,7 @@ public class TestDNFencingWithReplication {
 
         private final FileSystem fs;
 
-        private final PathInterface path;
+        private final Path path;
 
         private final MiniDockerDFSCluster cluster;
 

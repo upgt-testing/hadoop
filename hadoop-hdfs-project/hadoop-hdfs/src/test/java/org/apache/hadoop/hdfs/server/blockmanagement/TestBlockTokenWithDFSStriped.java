@@ -36,7 +36,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestBlockTokenWithDFSStriped extends TestBlockTokenWithDFS {
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int dataBlocks = ecPolicy.getNumDataUnits();
 
@@ -119,18 +119,18 @@ public class TestBlockTokenWithDFSStriped extends TestBlockTokenWithDFS {
 
     @Override
     protected void tryRead(final Configuration conf, LocatedBlock lblock, boolean shouldSucceed) {
-        LocatedStripedBlockInterface lsb = (LocatedStripedBlock) lblock;
+        LocatedStripedBlock lsb = (LocatedStripedBlock) lblock;
         LocatedBlock[] internalBlocks = StripedBlockUtil.parseStripedBlockGroup(lsb, cellSize, dataBlocks, parityBlocks);
-        for (LocatedBlockInterface internalBlock : internalBlocks) {
+        for (LocatedBlock internalBlock : internalBlocks) {
             super.tryRead(conf, internalBlock, shouldSucceed);
         }
     }
 
     @Override
     protected boolean isBlockTokenExpired(LocatedBlock lb) throws IOException {
-        LocatedStripedBlockInterface lsb = (LocatedStripedBlock) lb;
+        LocatedStripedBlock lsb = (LocatedStripedBlock) lb;
         LocatedBlock[] internalBlocks = StripedBlockUtil.parseStripedBlockGroup(lsb, cellSize, dataBlocks, parityBlocks);
-        for (LocatedBlockInterface internalBlock : internalBlocks) {
+        for (LocatedBlock internalBlock : internalBlocks) {
             if (internalBlock != null && super.isBlockTokenExpired(internalBlock)) {
                 return true;
             }

@@ -61,23 +61,23 @@ public class TestFSDirectory {
 
     private static final short REPLICATION = 3;
 
-    private final PathInterface dir = new Path("/" + getClass().getSimpleName());
+    private final Path dir = new Path("/" + getClass().getSimpleName());
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
-    private final PathInterface file1 = new Path(sub1, "file1");
+    private final Path file1 = new Path(sub1, "file1");
 
-    private final PathInterface file2 = new Path(sub1, "file2");
+    private final Path file2 = new Path(sub1, "file2");
 
-    private final PathInterface sub11 = new Path(sub1, "sub11");
+    private final Path sub11 = new Path(sub1, "sub11");
 
-    private final PathInterface file3 = new Path(sub11, "file3");
+    private final Path file3 = new Path(sub11, "file3");
 
-    private final PathInterface file5 = new Path(sub1, "z_file5");
+    private final Path file5 = new Path(sub1, "z_file5");
 
-    private final PathInterface sub2 = new Path(dir, "sub2");
+    private final Path sub2 = new Path(dir, "sub2");
 
-    private final PathInterface file6 = new Path(sub2, "file6");
+    private final Path file6 = new Path(sub2, "file6");
 
     private Configuration conf;
 
@@ -342,7 +342,7 @@ public class TestFSDirectory {
         hdfs.mkdirs(new Path("/dir1/dir2"));
         hdfs.createNewFile(new Path("/dir1/file"));
         hdfs.createNewFile(new Path("/dir1/dir2/file"));
-        INodesInPathInterface iip = fsdir.resolvePath(null, "/", DirOp.READ);
+        INodesInPath iip = fsdir.resolvePath(null, "/", DirOp.READ);
         fsdir.verifyParentDir(iip);
         iip = fsdir.resolvePath(null, "/dir1", DirOp.READ);
         fsdir.verifyParentDir(iip);

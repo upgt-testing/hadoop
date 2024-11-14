@@ -53,7 +53,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 @RunWith(Parameterized.class)
 public class TestWebHdfsWithRestCsrfPreventionFilter {
 
-    private static final PathInterface FILE = new Path("/file");
+    private static final Path FILE = new Path("/file");
 
     private final boolean nnRestCsrf;
 

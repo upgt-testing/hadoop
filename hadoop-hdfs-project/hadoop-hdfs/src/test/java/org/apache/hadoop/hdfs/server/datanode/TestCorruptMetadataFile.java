@@ -76,7 +76,7 @@ public class TestCorruptMetadataFile {
         out.write(1);
         out.hflush();
         out.close();
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
         File metadataFile = cluster.getBlockMetadataFile(0, block);
         // First ensure we can read the file OK
         FSDataInputStream in = fs.open(filePath);

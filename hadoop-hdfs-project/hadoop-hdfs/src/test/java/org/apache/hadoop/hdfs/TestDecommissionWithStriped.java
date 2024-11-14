@@ -295,7 +295,7 @@ public class TestDecommissionWithStriped {
         FileChecksum fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
         //2. make once DN busy
         final INodeFileInterface fileNode = cluster.getNamesystem().getFSDirectory().getINode4Write(ecFile.toString()).asFile();
-        BlockInfoInterface firstBlock = fileNode.getBlocks()[0];
+        BlockInfo firstBlock = fileNode.getBlocks()[0];
         DatanodeStorageInfoInterface[] dnStorageInfos = bm.getStorages(firstBlock);
         DatanodeDescriptorInterface busyNode = dnStorageInfos[busyDNIndex].getDatanodeDescriptor();
         for (int j = 0; j < replicationStreamsHardLimit; j++) {
@@ -311,8 +311,8 @@ public class TestDecommissionWithStriped {
         DatanodeStorageInfo[] newDnStorageInfos = bm.getStorages(firstBlock);
         Assert.assertEquals("Busy DN shouldn't be reconstructed", dnStorageInfos[busyDNIndex].getStorageID(), newDnStorageInfos[busyDNIndex].getStorageID());
         //5. check decommission DN block index, it should be reconstructed again
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(ecFile.toString(), 0, writeBytes);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(ecFile.toString(), 0, writeBytes);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         int decommissionBlockIndexCount = 0;
         for (byte index : bg.getBlockIndices()) {
             if (index == decommisionDNIndex) {
@@ -320,7 +320,7 @@ public class TestDecommissionWithStriped {
             }
         }
         Assert.assertEquals("Decommission DN block should be reconstructed", 2, decommissionBlockIndexCount);
-        FileChecksumInterface fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
+        FileChecksum fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
         Assert.assertTrue("Checksum mismatches!", fileChecksum1.equals(fileChecksum2));
     }
 
@@ -339,10 +339,10 @@ public class TestDecommissionWithStriped {
         int writeBytes = cellSize * dataBlocks;
         writeStripedFile(dfs, ecFile, writeBytes);
         Assert.assertEquals(0, bm.numOfUnderReplicatedBlocks());
-        FileChecksumInterface fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
+        FileChecksum fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
         //2. make once DN busy
         final INodeFileInterface fileNode = cluster.getNamesystem().getFSDirectory().getINode4Write(ecFile.toString()).asFile();
-        BlockInfoInterface firstBlock = fileNode.getBlocks()[0];
+        BlockInfo firstBlock = fileNode.getBlocks()[0];
         DatanodeStorageInfo[] dnStorageInfos = bm.getStorages(firstBlock);
         DatanodeDescriptorInterface busyNode = dnStorageInfos[busyDNIndex].getDatanodeDescriptor();
         for (int j = 0; j < replicationStreamsHardLimit; j++) {
@@ -363,7 +363,7 @@ public class TestDecommissionWithStriped {
         DatanodeStorageInfo[] newDnStorageInfos = bm.getStorages(firstBlock);
         Assert.assertEquals("Busy DN shouldn't be reconstructed", dnStorageInfos[busyDNIndex].getStorageID(), newDnStorageInfos[busyDNIndex].getStorageID());
         //8. check the checksum of a file
-        FileChecksumInterface fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
+        FileChecksum fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
         Assert.assertEquals("Checksum mismatches!", fileChecksum1, fileChecksum2);
         //9. check the data is correct
         StripedFileTestUtil.checkData(dfs, ecFile, writeBytes, decommissionNodes, null, blockGroupSize);
@@ -388,9 +388,9 @@ public class TestDecommissionWithStriped {
         int writeBytes = cellSize * dataBlocks;
         writeStripedFile(dfs, ecFile, writeBytes);
         Assert.assertEquals(0, bm.numOfUnderReplicatedBlocks());
-        FileChecksumInterface fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
+        FileChecksum fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
         final List<DatanodeInfo> decommisionNodes = new ArrayList<DatanodeInfo>();
-        LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(ecFile.toString(), 0).get(0);
+        LocatedBlock lb = dfs.getClient().getLocatedBlocks(ecFile.toString(), 0).get(0);
         DatanodeInfo[] dnLocs = lb.getLocations();
         assertEquals(dataBlocks + parityBlocks, dnLocs.length);
         int decommNodeIndex = 1;
@@ -401,7 +401,7 @@ public class TestDecommissionWithStriped {
         assertNull(checkFile(dfs, ecFile, 9, decommisionNodes, numDNs));
         StripedFileTestUtil.checkData(dfs, ecFile, writeBytes, decommisionNodes, null, blockGroupSize);
         // verify checksum
-        FileChecksumInterface fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
+        FileChecksum fileChecksum2 = dfs.getFileChecksum(ecFile, writeBytes);
         LOG.info("fileChecksum1:" + fileChecksum1);
         LOG.info("fileChecksum2:" + fileChecksum2);
         Assert.assertTrue("Checksum mismatches!", fileChecksum1.equals(fileChecksum2));
@@ -432,13 +432,13 @@ public class TestDecommissionWithStriped {
     }
 
     private void prepareBlockIndexAndTokenList(List<LocatedBlock> lbs, List<HashMap<DatanodeInfo, Byte>> locToIndexList, List<HashMap<DatanodeInfo, Token<BlockTokenIdentifier>>> locToTokenList) {
-        for (LocatedBlockInterface lb : lbs) {
+        for (LocatedBlock lb : lbs) {
             HashMap<DatanodeInfo, Byte> locToIndex = new HashMap<DatanodeInfo, Byte>();
             locToIndexList.add(locToIndex);
             HashMap<DatanodeInfo, Token<BlockTokenIdentifier>> locToToken = new HashMap<DatanodeInfo, Token<BlockTokenIdentifier>>();
             locToTokenList.add(locToToken);
             DatanodeInfo[] di = lb.getLocations();
-            LocatedStripedBlockInterface stripedBlk = (LocatedStripedBlock) lb;
+            LocatedStripedBlock stripedBlk = (LocatedStripedBlock) lb;
             for (int i = 0; i < di.length; i++) {
                 locToIndex.put(di[i], stripedBlk.getBlockIndices()[i]);
                 locToToken.put(di[i], stripedBlk.getBlockTokens()[i]);
@@ -452,8 +452,8 @@ public class TestDecommissionWithStriped {
      */
     private void assertBlockIndexAndTokenPosition(List<LocatedBlock> lbs, List<HashMap<DatanodeInfo, Byte>> locToIndexList, List<HashMap<DatanodeInfo, Token<BlockTokenIdentifier>>> locToTokenList) {
         for (int i = 0; i < lbs.size(); i++) {
-            LocatedBlockInterface lb = lbs.get(i);
-            LocatedStripedBlockInterface stripedBlk = (LocatedStripedBlock) lb;
+            LocatedBlock lb = lbs.get(i);
+            LocatedStripedBlock stripedBlk = (LocatedStripedBlock) lb;
             HashMap<DatanodeInfo, Byte> locToIndex = locToIndexList.get(i);
             HashMap<DatanodeInfo, Token<BlockTokenIdentifier>> locToToken = locToTokenList.get(i);
             DatanodeInfo[] di = lb.getLocations();
@@ -584,7 +584,7 @@ public class TestDecommissionWithStriped {
         assertTrue("Not HDFS:" + fileSys.getUri(), fileSys instanceof DistributedFileSystem);
         HdfsDataInputStream dis = (HdfsDataInputStream) fileSys.open(name);
         Collection<LocatedBlock> dinfo = dis.getAllBlocks();
-        for (LocatedBlockInterface blk : dinfo) {
+        for (LocatedBlock blk : dinfo) {
             // for each block
             int hasdown = 0;
             DatanodeInfo[] nodes = blk.getLocations();
@@ -635,7 +635,7 @@ public class TestDecommissionWithStriped {
         // Get 2 nodes of ec block and set them in decommission.
         // The 2 nodes are not in pendingNodes of DatanodeAdminManager.
         List<LocatedBlock> lbs = ((HdfsDataInputStream) dfs.open(ecFile)).getAllBlocks();
-        LocatedStripedBlockInterface blk = (LocatedStripedBlock) lbs.get(0);
+        LocatedStripedBlock blk = (LocatedStripedBlock) lbs.get(0);
         DatanodeInfo[] dnList = blk.getLocations();
         DatanodeDescriptorInterface dn0 = bm.getDatanodeManager().getDatanode(dnList[0].getDatanodeUuid());
         dn0.startDecommission();
@@ -714,8 +714,8 @@ public class TestDecommissionWithStriped {
         int writeBytes = cellSize * 6;
         writeStripedFile(dfs, ecFile, writeBytes);
         final List<DatanodeInfo> decommisionNodes = new ArrayList<DatanodeInfo>();
-        LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(ecFile.toString(), 0).get(0);
-        LocatedStripedBlockInterface lsb = (LocatedStripedBlock) lb;
+        LocatedBlock lb = dfs.getClient().getLocatedBlocks(ecFile.toString(), 0).get(0);
+        LocatedStripedBlock lsb = (LocatedStripedBlock) lb;
         DatanodeInfo[] dnLocs = lsb.getLocations();
         BlockInfoStripedInterface blockInfo = (BlockInfoStriped) bm.getStoredBlock(new Block(lsb.getBlock().getBlockId()));
         assertEquals(dataBlocks + parityBlocks, dnLocs.length);
@@ -795,7 +795,7 @@ public class TestDecommissionWithStriped {
         int writeBytes = cellSize * 6;
         writeStripedFile(dfs, ecFile, writeBytes);
         List<LocatedBlock> lbs = ((HdfsDataInputStream) dfs.open(ecFile)).getAllBlocks();
-        LocatedStripedBlockInterface blk = (LocatedStripedBlock) lbs.get(0);
+        LocatedStripedBlock blk = (LocatedStripedBlock) lbs.get(0);
         DatanodeInfo[] dnList = blk.getLocations();
         DatanodeDescriptorInterface dn0 = bm.getDatanodeManager().getDatanode(dnList[0].getDatanodeUuid());
         dn0.startDecommission();
@@ -856,7 +856,7 @@ public class TestDecommissionWithStriped {
         int writeBytes = cellSize * dataBlocks;
         byte[] originBytesArray = writeStripedFile(dfs, ecFile, writeBytes);
         List<LocatedBlock> lbs = ((HdfsDataInputStream) dfs.open(ecFile)).getAllBlocks();
-        LocatedStripedBlockInterface blk = (LocatedStripedBlock) lbs.get(0);
+        LocatedStripedBlock blk = (LocatedStripedBlock) lbs.get(0);
         DatanodeInfo[] dnList = blk.getLocations();
         BlockInfoStripedInterface blockInfo = (BlockInfoStriped) bm.getStoredBlock(new Block(blk.getBlock().getBlockId()));
         // Decommission datanode dn0 contains block b0

@@ -78,7 +78,7 @@ public class TestConsistentReadsObserver {
 
     private DistributedFileSystem dfs;
 
-    private final PathInterface testPath = new Path("/TestConsistentReadsObserver");
+    private final Path testPath = new Path("/TestConsistentReadsObserver");
 
     @BeforeClass
     public static void startUpCluster() throws Exception {
@@ -413,7 +413,7 @@ public class TestConsistentReadsObserver {
         assertEquals(1, readStatus.get());
         final int observerIdx = 2;
         NameNodeInterface observerNN = dfsCluster.getNameNode(observerIdx);
-        MetricsRecordBuilderInterface rpcMetrics = getMetrics("RpcActivityForPort" + observerNN.getNameNodeAddress().getPort());
+        MetricsRecordBuilder rpcMetrics = getMetrics("RpcActivityForPort" + observerNN.getNameNodeAddress().getPort());
         long rpcQueueTimeNumOps = getLongCounter("RpcQueueTimeNumOps", rpcMetrics);
         long rpcProcessingTimeNumOps = getLongCounter("RpcProcessingTimeNumOps", rpcMetrics);
         assertEquals(rpcQueueTimeNumOps, rpcProcessingTimeNumOps);

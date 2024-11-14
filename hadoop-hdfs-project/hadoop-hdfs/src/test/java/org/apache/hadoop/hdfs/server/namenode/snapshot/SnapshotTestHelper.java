@@ -252,9 +252,9 @@ public class SnapshotTestHelper {
      *         snapshot root.
      */
     static Path getSnapshotFile(Path snapshotRoot, Path file) {
-        PathInterface rootParent = snapshotRoot.getParent();
+        Path rootParent = snapshotRoot.getParent();
         if (rootParent != null && rootParent.getName().equals(".snapshot")) {
-            PathInterface snapshotDir = rootParent.getParent();
+            Path snapshotDir = rootParent.getParent();
             if (file.toString().contains(snapshotDir.toString()) && !file.equals(snapshotDir)) {
                 String fileName = file.toString().substring(snapshotDir.toString().length() + 1);
                 Path snapshotFile = new Path(snapshotRoot, fileName);
@@ -386,7 +386,7 @@ public class SnapshotTestHelper {
             /**
              * File path of the node
              */
-            final PathInterface nodePath;
+            final Path nodePath;
 
             /**
              * The file path list for testing snapshots before/after file

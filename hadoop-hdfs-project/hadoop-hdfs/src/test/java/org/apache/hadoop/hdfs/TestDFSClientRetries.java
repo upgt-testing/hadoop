@@ -381,7 +381,7 @@ public class TestDFSClientRetries {
             doAnswer(new Answer<LocatedBlock>() {
 
                 private int getBlockCount(LocatedBlock ret) throws IOException {
-                    LocatedBlocksInterface lb = cluster.getNameNodeRpc().getBlockLocations(src, 0, Long.MAX_VALUE);
+                    LocatedBlocks lb = cluster.getNameNodeRpc().getBlockLocations(src, 0, Long.MAX_VALUE);
                     assertEquals(lb.getLastLocatedBlock().getBlock(), ret.getBlock());
                     return lb.getLocatedBlocks().size();
                 }
@@ -391,7 +391,7 @@ public class TestDFSClientRetries {
                     LOG.info("Called addBlock: " + Arrays.toString(invocation.getArguments()));
                     // call first time
                     // warp NotReplicatedYetException with RemoteException as rpc does.
-                    final LocatedBlockInterface ret;
+                    final LocatedBlock ret;
                     try {
                         ret = (LocatedBlock) invocation.callRealMethod();
                     } catch (NotReplicatedYetException e) {
@@ -401,7 +401,7 @@ public class TestDFSClientRetries {
                     // Retrying should result in a new block at the end of the file.
                     // (abandoning the old one)
                     // It should not have NotReplicatedYetException.
-                    final LocatedBlockInterface ret2;
+                    final LocatedBlock ret2;
                     try {
                         ret2 = (LocatedBlock) invocation.callRealMethod();
                     } catch (NotReplicatedYetException e) {
@@ -472,7 +472,7 @@ public class TestDFSClientRetries {
         @Override
         public LocatedBlocks answer(InvocationOnMock invocation) throws IOException {
             Object[] args = invocation.getArguments();
-            LocatedBlocksInterface realAnswer = realNN.getBlockLocations((String) args[0], (Long) args[1], (Long) args[2]);
+            LocatedBlocks realAnswer = realNN.getBlockLocations((String) args[0], (Long) args[1], (Long) args[2]);
             if (failuresLeft-- > 0) {
                 NameNode.LOG.info("FailNTimesAnswer injecting failure.");
                 return makeBadBlockList(realAnswer);
@@ -482,7 +482,7 @@ public class TestDFSClientRetries {
         }
 
         private LocatedBlocks makeBadBlockList(LocatedBlocks goodBlockList) {
-            LocatedBlockInterface goodLocatedBlock = goodBlockList.get(0);
+            LocatedBlock goodLocatedBlock = goodBlockList.get(0);
             LocatedBlock badLocatedBlock = new LocatedBlock(goodLocatedBlock.getBlock(), new DatanodeInfo[] { DFSTestUtil.getDatanodeInfo("1.2.3.4", "bogus", 1234) });
             badLocatedBlock.setStartOffset(goodLocatedBlock.getStartOffset());
             List<LocatedBlock> badBlocks = new ArrayList<LocatedBlock>();
@@ -650,7 +650,7 @@ public class TestDFSClientRetries {
 
         FileSystem fs;
 
-        final PathInterface filePath;
+        final Path filePath;
 
         final MiniDockerDFSCluster cluster;
 
@@ -733,14 +733,14 @@ public class TestDFSClientRetries {
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, p, 1L << 20, (short) numReplicas, 20100402L);
             //get checksum
-            final FileChecksumInterface cs1 = fs.getFileChecksum(p);
+            final FileChecksum cs1 = fs.getFileChecksum(p);
             assertTrue(cs1 != null);
             //stop the first datanode
             final List<LocatedBlock> locatedblocks = DFSClient.callGetBlockLocations(cluster.getNameNodeRpc(), f, 0, Long.MAX_VALUE).getLocatedBlocks();
             final DatanodeInfoInterface first = locatedblocks.get(0).getLocations()[0];
             cluster.stopDataNode(first.getXferAddr());
             //get checksum again
-            final FileChecksumInterface cs2 = fs.getFileChecksum(p);
+            final FileChecksum cs2 = fs.getFileChecksum(p);
             assertEquals(cs1, cs2);
         } finally {
             cluster.shutdown();
@@ -794,7 +794,7 @@ public class TestDFSClientRetries {
             Path path = new Path("/corrupted");
             DFSTestUtil.createFile(fs, path, FILE_LENGTH, REPL_FACTOR, 12345L);
             DFSTestUtil.waitReplication(fs, path, REPL_FACTOR);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, path);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, path);
             int blockFilesCorrupted = cluster.corruptBlockOnDataNodes(block);
             assertEquals("All replicas not corrupted", REPL_FACTOR, blockFilesCorrupted);
             InetSocketAddress nnAddr = new InetSocketAddress("localhost", cluster.getNameNodePort());
@@ -847,7 +847,7 @@ public class TestDFSClientRetries {
             final Path file1 = new Path(dir, "foo");
             DFSTestUtil.createFile(fs, file1, length, numDatanodes, 20120406L);
             //get file status
-            final FileStatusInterface s1 = fs.getFileStatus(file1);
+            final FileStatus s1 = fs.getFileStatus(file1);
             assertEquals(length, s1.getLen());
             //create file4, write some data but not close
             final Path file4 = new Path(dir, "file4");
@@ -940,7 +940,7 @@ public class TestDFSClientRetries {
                 }
             }).start();
             //namenode is down, it should retry until namenode is up again.
-            final FileStatusInterface s2 = fs.getFileStatus(file1);
+            final FileStatus s2 = fs.getFileStatus(file1);
             assertEquals(s1, s2);
             //check file1 and file3
             thread.join();
@@ -1017,7 +1017,7 @@ public class TestDFSClientRetries {
 
     private static FileSystem createFsWithDifferentUsername(final Configuration conf, final boolean isWebHDFS) throws IOException, InterruptedException {
         final String username = UserGroupInformation.getCurrentUser().getShortUserName() + "_XXX";
-        final UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting(username, new String[] { "supergroup" });
+        final UserGroupInformation ugi = UserGroupInformation.createUserForTesting(username, new String[] { "supergroup" });
         return isWebHDFS ? WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, conf, WebHdfsConstants.WEBHDFS_SCHEME) : DFSTestUtil.getFileSystemAs(ugi, conf);
     }
 

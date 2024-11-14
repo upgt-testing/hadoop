@@ -46,7 +46,7 @@ public class TestStandbyBlockManagement {
 
     private static final String TEST_FILE = "/TestStandbyBlockManagement";
 
-    private static final PathInterface TEST_FILE_PATH = new Path(TEST_FILE);
+    private static final Path TEST_FILE_PATH = new Path(TEST_FILE);
 
     static {
         DFSTestUtil.setNameNodeLogLevel(Level.ALL);

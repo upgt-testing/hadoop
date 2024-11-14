@@ -59,9 +59,9 @@ public class TestSetTimes {
 
     Random myrand = new Random();
 
-    PathInterface hostsFile;
+    Path hostsFile;
 
-    PathInterface excludeFile;
+    Path excludeFile;
 
     private FSDataOutputStream writeFile(FileSystem fileSys, Path name, int repl) throws IOException {
         FSDataOutputStream stm = fileSys.create(name, true, fileSys.getConf().getInt(CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, 4096), (short) repl, blockSize);

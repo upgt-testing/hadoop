@@ -74,11 +74,11 @@ public class TestDFSStripedInputStream {
 
     private DistributedFileSystem fs;
 
-    private final PathInterface dirPath = new Path("/striped");
+    private final Path dirPath = new Path("/striped");
 
-    private PathInterface filePath = new Path(dirPath, "file");
+    private Path filePath = new Path(dirPath, "file");
 
-    private ErasureCodingPolicyInterface ecPolicy;
+    private ErasureCodingPolicy ecPolicy;
 
     private short dataBlocks;
 
@@ -148,14 +148,14 @@ public class TestDFSStripedInputStream {
     public void testRefreshBlock() throws Exception {
         final int numBlocks = 4;
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize * numBlocks);
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize * numBlocks);
         final DFSStripedInputStream in = new DFSStripedInputStream(fs.getClient(), filePath.toString(), false, ecPolicy, null);
         List<LocatedBlock> lbList = lbs.getLocatedBlocks();
-        for (LocatedBlockInterface aLbList : lbList) {
-            LocatedStripedBlockInterface lsb = (LocatedStripedBlock) aLbList;
+        for (LocatedBlock aLbList : lbList) {
+            LocatedStripedBlock lsb = (LocatedStripedBlock) aLbList;
             LocatedBlock[] blks = StripedBlockUtil.parseStripedBlockGroup(lsb, cellSize, dataBlocks, parityBlocks);
             for (int j = 0; j < dataBlocks; j++) {
-                LocatedBlockInterface refreshed = in.refreshLocatedBlock(blks[j]);
+                LocatedBlock refreshed = in.refreshLocatedBlock(blks[j]);
                 assertEquals(blks[j].getBlock(), refreshed.getBlock());
                 assertEquals(blks[j].getStartOffset(), refreshed.getStartOffset());
                 assertArrayEquals(blks[j].getLocations(), refreshed.getLocations());
@@ -167,12 +167,12 @@ public class TestDFSStripedInputStream {
     public void testPread() throws Exception {
         final int numBlocks = 2;
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize * numBlocks);
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize * numBlocks);
         int fileLen = blockGroupSize * numBlocks;
         byte[] expected = new byte[fileLen];
         assertEquals(numBlocks, lbs.getLocatedBlocks().size());
         for (int bgIdx = 0; bgIdx < numBlocks; bgIdx++) {
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(bgIdx));
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(bgIdx));
             for (int i = 0; i < dataBlocks; i++) {
                 Block blk = new Block(bg.getBlock().getBlockId() + i, stripesPerBlock * cellSize, bg.getBlock().getGenerationStamp());
                 blk.setGenerationStamp(bg.getBlock().getGenerationStamp());
@@ -211,9 +211,9 @@ public class TestDFSStripedInputStream {
         final int numBlocks = 4;
         final int failedDNIdx = dataBlocks - 1;
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize);
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize);
         assert lbs.get(0) instanceof LocatedStripedBlock;
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         for (int i = 0; i < dataBlocks + parityBlocks; i++) {
             Block blk = new Block(bg.getBlock().getBlockId() + i, stripesPerBlock * cellSize, bg.getBlock().getGenerationStamp());
             blk.setGenerationStamp(bg.getBlock().getGenerationStamp());
@@ -305,11 +305,11 @@ public class TestDFSStripedInputStream {
             startUp();
         }
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, fileSize);
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, fileSize);
         assert lbs.getLocatedBlocks().size() == numBlocks;
-        for (LocatedBlockInterface lb : lbs.getLocatedBlocks()) {
+        for (LocatedBlock lb : lbs.getLocatedBlocks()) {
             assert lb instanceof LocatedStripedBlock;
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lb);
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lb);
             for (int i = 0; i < dataBlocks; i++) {
                 Block blk = new Block(bg.getBlock().getBlockId() + i, stripesPerBlock * cellSize, bg.getBlock().getGenerationStamp());
                 blk.setGenerationStamp(bg.getBlock().getGenerationStamp());
@@ -318,7 +318,7 @@ public class TestDFSStripedInputStream {
         }
         DFSStripedInputStream in = new DFSStripedInputStream(fs.getClient(), filePath.toString(), false, ecPolicy, null);
         byte[] expected = new byte[fileSize];
-        for (LocatedBlockInterface bg : lbs.getLocatedBlocks()) {
+        for (LocatedBlock bg : lbs.getLocatedBlocks()) {
             /**
              * A variation of {@link DFSTestUtil#fillExpectedBuf} for striped blocks
              */
@@ -359,9 +359,9 @@ public class TestDFSStripedInputStream {
         final int numBlocks = 4;
         final int failedDNIdx = dataBlocks - 1;
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize);
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, blockGroupSize);
         assert lbs.get(0) instanceof LocatedStripedBlock;
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         for (int i = 0; i < dataBlocks + parityBlocks; i++) {
             Block blk = new Block(bg.getBlock().getBlockId() + i, stripesPerBlock * cellSize, bg.getBlock().getGenerationStamp());
             blk.setGenerationStamp(bg.getBlock().getGenerationStamp());
@@ -500,7 +500,7 @@ public class TestDFSStripedInputStream {
         DataNodeProperties stopDataNode = null;
         try {
             cluster.waitActive();
-            ErasureCodingPolicyInterface policy = getEcPolicy();
+            ErasureCodingPolicy policy = getEcPolicy();
             DistributedFileSystem filesystem = cluster.getFileSystem();
             filesystem.enableErasureCodingPolicy(policy.getName());
             Path dir = new Path("/tmp");
@@ -511,8 +511,8 @@ public class TestDFSStripedInputStream {
             long fileLength = (policy.getCellSize() * policy.getNumDataUnits()) - (policy.getCellSize() / 2);
             DFSTestUtil.createFile(filesystem, f, fileLength, (short) 1, 0);
             //2. Stop first DN from stripe.
-            LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(f.toString(), 0, fileLength);
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+            LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(f.toString(), 0, fileLength);
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
             final LocatedBlock[] blocks = StripedBlockUtil.parseStripedBlockGroup(bg, cellSize, dataBlocks, parityBlocks);
             cluster.stopDataNode(blocks[0].getLocations()[0].getName());
             //3. Do pread for fist cell, reconstruction should happen
@@ -553,10 +553,10 @@ public class TestDFSStripedInputStream {
         final int numBlocks = 2;
         final int fileSize = numBlocks * blockGroupSize;
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, fileSize);
-        for (LocatedBlockInterface lb : lbs.getLocatedBlocks()) {
+        LocatedBlocks lbs = fs.getClient().namenode.getBlockLocations(filePath.toString(), 0, fileSize);
+        for (LocatedBlock lb : lbs.getLocatedBlocks()) {
             assert lb instanceof LocatedStripedBlock;
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lb);
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lb);
             for (int i = 0; i < dataBlocks; i++) {
                 Block blk = new Block(bg.getBlock().getBlockId() + i, stripesPerBlock * cellSize, bg.getBlock().getGenerationStamp());
                 blk.setGenerationStamp(bg.getBlock().getGenerationStamp());
@@ -581,7 +581,7 @@ public class TestDFSStripedInputStream {
     @Test
     public void testBlockReader() throws Exception {
         // RS-6-3-1024k
-        ErasureCodingPolicyInterface targetPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        ErasureCodingPolicy targetPolicy = StripedFileTestUtil.getDefaultECPolicy();
         if (!ecPolicy.equals(targetPolicy)) {
             // Be sure not affected by random EC policy from
             // TestDFSStripedInputStreamWithRandomECPolicy.

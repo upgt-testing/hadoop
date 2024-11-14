@@ -98,7 +98,7 @@ public class TestRetryCacheWithHA {
 
     private static final int BlockSize = 1024;
 
-    private static ErasureCodingPolicyInterface defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+    private static ErasureCodingPolicy defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
 
     private static final short DataNodes = (short) (defaultEcPolicy.getNumDataUnits() + defaultEcPolicy.getNumParityUnits() + 1);
 
@@ -261,7 +261,7 @@ public class TestRetryCacheWithHA {
 
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
-            final PathInterface sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), snapshotName);
+            final Path sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), snapshotName);
             boolean snapshotCreated = dfs.exists(sPath);
             for (int i = 0; i < CHECKTIMES && !snapshotCreated; i++) {
                 Thread.sleep(1000);
@@ -297,7 +297,7 @@ public class TestRetryCacheWithHA {
             if (!dfs.exists(dirPath)) {
                 dfs.mkdirs(dirPath);
             }
-            PathInterface sPath = SnapshotTestHelper.getSnapshotRoot(dirPath, snapshotName);
+            Path sPath = SnapshotTestHelper.getSnapshotRoot(dirPath, snapshotName);
             if (!dfs.exists(sPath)) {
                 dfs.allowSnapshot(dirPath);
                 dfs.createSnapshot(dirPath, snapshotName);
@@ -311,7 +311,7 @@ public class TestRetryCacheWithHA {
 
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
-            final PathInterface sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), snapshotName);
+            final Path sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), snapshotName);
             boolean snapshotNotDeleted = dfs.exists(sPath);
             for (int i = 0; i < CHECKTIMES && snapshotNotDeleted; i++) {
                 Thread.sleep(1000);
@@ -350,7 +350,7 @@ public class TestRetryCacheWithHA {
             if (!dfs.exists(dirPath)) {
                 dfs.mkdirs(dirPath);
             }
-            PathInterface sPath = SnapshotTestHelper.getSnapshotRoot(dirPath, oldName);
+            Path sPath = SnapshotTestHelper.getSnapshotRoot(dirPath, oldName);
             if (!dfs.exists(sPath)) {
                 dfs.allowSnapshot(dirPath);
                 dfs.createSnapshot(dirPath, oldName);
@@ -364,7 +364,7 @@ public class TestRetryCacheWithHA {
 
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
-            final PathInterface sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), newName);
+            final Path sPath = SnapshotTestHelper.getSnapshotRoot(new Path(dir), newName);
             boolean snapshotRenamed = dfs.exists(sPath);
             for (int i = 0; i < CHECKTIMES && !snapshotRenamed; i++) {
                 Thread.sleep(1000);
@@ -399,7 +399,7 @@ public class TestRetryCacheWithHA {
             if (dfs.exists(filePath)) {
                 dfs.delete(filePath, true);
             }
-            final PathInterface fileParent = filePath.getParent();
+            final Path fileParent = filePath.getParent();
             if (!dfs.exists(fileParent)) {
                 dfs.mkdirs(fileParent);
             }
@@ -583,7 +583,7 @@ public class TestRetryCacheWithHA {
             this.target = target.toString();
             this.srcs = new String[numSrc];
             this.srcPaths = new Path[numSrc];
-            PathInterface parent = target.getParent();
+            Path parent = target.getParent();
             for (int i = 0; i < numSrc; i++) {
                 srcPaths[i] = new Path(parent, "srcfile" + i);
                 srcs[i] = srcPaths[i].toString();
@@ -701,7 +701,7 @@ public class TestRetryCacheWithHA {
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
             Path linkPath = new Path(link);
-            FileStatusInterface linkStatus = null;
+            FileStatus linkStatus = null;
             for (int i = 0; i < CHECKTIMES && linkStatus == null; i++) {
                 try {
                     linkStatus = dfs.getFileLinkStatus(linkPath);
@@ -726,9 +726,9 @@ public class TestRetryCacheWithHA {
 
         private final String file;
 
-        private ExtendedBlockInterface oldBlock;
+        private ExtendedBlock oldBlock;
 
-        private ExtendedBlockInterface newBlock;
+        private ExtendedBlock newBlock;
 
         private DatanodeInfo[] nodes;
 
@@ -749,11 +749,11 @@ public class TestRetryCacheWithHA {
             new Random().nextBytes(appendContent);
             out.write(appendContent);
             ((HdfsDataOutputStream) out).hsync(EnumSet.of(SyncFlag.UPDATE_LENGTH));
-            LocatedBlocksInterface blks = dfs.getClient().getLocatedBlocks(file, BlockSize + 1);
+            LocatedBlocks blks = dfs.getClient().getLocatedBlocks(file, BlockSize + 1);
             assertEquals(1, blks.getLocatedBlocks().size());
             nodes = blks.get(0).getLocations();
             oldBlock = blks.get(0).getBlock();
-            LocatedBlockInterface newLbk = client.getNamenode().updateBlockForPipeline(oldBlock, client.getClientName());
+            LocatedBlock newLbk = client.getNamenode().updateBlockForPipeline(oldBlock, client.getClientName());
             newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(), oldBlock.getBlockId(), oldBlock.getNumBytes(), newLbk.getBlock().getGenerationStamp());
         }
 
@@ -778,7 +778,7 @@ public class TestRetryCacheWithHA {
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
             INodeFileInterface fileNode = cluster.getNamesystem(0).getFSDirectory().getINode4Write(file).asFile();
-            BlockInfoInterface blkUC = (fileNode.getBlocks())[1];
+            BlockInfo blkUC = (fileNode.getBlocks())[1];
             int datanodeNum = blkUC.getUnderConstructionFeature().getExpectedStorageLocations().length;
             for (int i = 0; i < CHECKTIMES && datanodeNum != 2; i++) {
                 Thread.sleep(1000);

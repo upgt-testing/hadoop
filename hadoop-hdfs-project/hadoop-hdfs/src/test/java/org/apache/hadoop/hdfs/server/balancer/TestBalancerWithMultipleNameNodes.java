@@ -76,7 +76,7 @@ public class TestBalancerWithMultipleNameNodes {
 
     private static final String FILE_NAME = "/tmp.txt";
 
-    private static final PathInterface FILE_PATH = new Path(FILE_NAME);
+    private static final Path FILE_PATH = new Path(FILE_NAME);
 
     private static final Random RANDOM = new Random();
 
@@ -142,7 +142,7 @@ public class TestBalancerWithMultipleNameNodes {
             final int numOfBlocks = locatedBlocks.size();
             blocks[n] = new ExtendedBlock[numOfBlocks];
             for (int i = 0; i < numOfBlocks; i++) {
-                final ExtendedBlockInterface b = locatedBlocks.get(i).getBlock();
+                final ExtendedBlock b = locatedBlocks.get(i).getBlock();
                 blocks[n][i] = new ExtendedBlock(b.getBlockPoolId(), b.getBlockId(), b.getNumBytes(), b.getGenerationStamp());
             }
         }

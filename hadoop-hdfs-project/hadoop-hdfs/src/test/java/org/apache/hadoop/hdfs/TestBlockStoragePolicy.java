@@ -819,7 +819,7 @@ public class TestBlockStoragePolicy {
             checkDirectoryListing(fooList, COLD, WARM);
             // check the policy for /dir/.snapshot/s1/foo/f1. Note we always return
             // the latest storage policy for a file/directory.
-            PathInterface s1f1 = SnapshotTestHelper.getSnapshotPath(dir, "s1", "foo/f1");
+            Path s1f1 = SnapshotTestHelper.getSnapshotPath(dir, "s1", "foo/f1");
             DirectoryListingInterface f1Listing = fs.getClient().listPaths(s1f1.toString(), HdfsFileStatus.EMPTY_NAME);
             checkDirectoryListing(f1Listing.getPartialListing(), COLD);
             // delete f1
@@ -837,8 +837,8 @@ public class TestBlockStoragePolicy {
             fooList = fs.getClient().listPaths(fooDir.toString(), HdfsFileStatus.EMPTY_NAME).getPartialListing();
             checkDirectoryListing(fooList, HOT);
             // check storage policy of snapshot path
-            PathInterface s1 = SnapshotTestHelper.getSnapshotRoot(dir, "s1");
-            PathInterface s1foo = SnapshotTestHelper.getSnapshotPath(dir, "s1", "foo");
+            Path s1 = SnapshotTestHelper.getSnapshotRoot(dir, "s1");
+            Path s1foo = SnapshotTestHelper.getSnapshotPath(dir, "s1", "foo");
             checkDirectoryListing(fs.getClient().listPaths(s1.toString(), HdfsFileStatus.EMPTY_NAME).getPartialListing(), HOT);
             // /dir/.snapshot/.s1/foo/f1 and /dir/.snapshot/.s1/foo/f2 should still
             // follow the latest
@@ -863,9 +863,9 @@ public class TestBlockStoragePolicy {
     private void checkLocatedBlocks(HdfsLocatedFileStatus status, int blockNum, int replicaNum, StorageType... types) {
         List<StorageType> typeList = Lists.newArrayList();
         Collections.addAll(typeList, types);
-        LocatedBlocksInterface lbs = status.getLocatedBlocks();
+        LocatedBlocks lbs = status.getLocatedBlocks();
         Assert.assertEquals(blockNum, lbs.getLocatedBlocks().size());
-        for (LocatedBlockInterface lb : lbs.getLocatedBlocks()) {
+        for (LocatedBlock lb : lbs.getLocatedBlocks()) {
             Assert.assertEquals(replicaNum, lb.getStorageTypes().length);
             for (StorageType type : lb.getStorageTypes()) {
                 Assert.assertTrue(typeList.remove(type));
@@ -888,7 +888,7 @@ public class TestBlockStoragePolicy {
             DFSTestUtil.createFile(fs, foo, FILE_LEN, REPLICATION, 0L);
             HdfsFileStatus[] status = fs.getClient().listPaths(foo.toString(), HdfsFileStatus.EMPTY_NAME, true).getPartialListing();
             checkDirectoryListing(status, policyId);
-            HdfsLocatedFileStatusInterface fooStatus = (HdfsLocatedFileStatus) status[0];
+            HdfsLocatedFileStatus fooStatus = (HdfsLocatedFileStatus) status[0];
             checkLocatedBlocks(fooStatus, 1, 3, before);
             // change the replication factor to 5
             fs.setReplication(foo, (short) numDataNodes);

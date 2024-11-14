@@ -33,7 +33,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestHarFileSystemWithHA {
 
-    private static final PathInterface TEST_HAR_PATH = new Path("/input.har");
+    private static final Path TEST_HAR_PATH = new Path("/input.har");
 
     /**
      * Test that the HarFileSystem works with underlying HDFS URIs that have no

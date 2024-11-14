@@ -256,8 +256,8 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
             Calendar now = Calendar.getInstance();
             Path currentDir = new Path(path, DATE_FORMAT.format(now.getTime()) + "00");
             FileSystem fs = FileSystem.newInstance(new URI(path), new Configuration());
-            PathInterface currentFile = findMostRecentLogFile(fs, new Path(currentDir, getLogFilename()));
-            FileStatusInterface status = fs.getFileStatus(currentFile);
+            Path currentFile = findMostRecentLogFile(fs, new Path(currentDir, getLogFilename()));
+            FileStatus status = fs.getFileStatus(currentFile);
             // Each metrics record is 118+ bytes, depending on hostname
             assertTrue("The flusher thread didn't flush the log contents. Expected " + "at least 236 bytes in the log file, but got " + status.getLen(), status.getLen() >= 236);
         } finally {

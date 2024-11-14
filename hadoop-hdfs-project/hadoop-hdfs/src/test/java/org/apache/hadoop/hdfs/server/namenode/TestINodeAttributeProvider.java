@@ -239,7 +239,7 @@ public class TestINodeAttributeProvider {
         final Path fooPath = new Path("/tmp/foo");
         fs.mkdirs(tmpPath);
         fs.setPermission(tmpPath, new FsPermission(HDFS_PERMISSION));
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -294,7 +294,7 @@ public class TestINodeAttributeProvider {
         fs.mkdirs(authzChild);
         fs.setPermission(authzChild, new FsPermission(HDFS_PERMISSION));
         for (String user : users) {
-            UserGroupInformationInterface ugiBypass = UserGroupInformation.createUserForTesting(user, new String[] { "g1" });
+            UserGroupInformation ugiBypass = UserGroupInformation.createUserForTesting(user, new String[] { "g1" });
             ugiBypass.doAs(new PrivilegedExceptionAction<Void>() {
 
                 @Override
@@ -333,7 +333,7 @@ public class TestINodeAttributeProvider {
 
     private void verifyFileStatus(UserGroupInformation ugi) throws IOException {
         FileSystem fs = FileSystem.get(miniDFS.getConfiguration(0));
-        FileStatusInterface status = fs.getFileStatus(new Path("/"));
+        FileStatus status = fs.getFileStatus(new Path("/"));
         LOG.info("Path '/' is owned by: " + status.getOwner() + ":" + status.getGroup());
         Path userDir = new Path("/user/" + ugi.getShortUserName());
         fs.mkdirs(userDir);
@@ -365,7 +365,7 @@ public class TestINodeAttributeProvider {
     @Test
     public void testCustomProvider() throws Exception {
         final UserGroupInformation[] users = new UserGroupInformation[] { UserGroupInformation.createUserForTesting(System.getProperty("user.name"), new String[] { "supergroup" }), UserGroupInformation.createUserForTesting("normaluser", new String[] { "normalusergroup" }) };
-        for (final UserGroupInformationInterface user : users) {
+        for (final UserGroupInformation user : users) {
             user.doAs((PrivilegedExceptionAction<Object>) () -> {
                 verifyFileStatus(user);
                 return null;
@@ -375,7 +375,7 @@ public class TestINodeAttributeProvider {
 
     @Test
     public void testAclFeature() throws Exception {
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("testuser", new String[] { "testgroup" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("testuser", new String[] { "testgroup" });
         ugi.doAs((PrivilegedExceptionAction<Object>) () -> {
             FileSystem fs = miniDFS.getFileSystem();
             Path aclDir = new Path("/user/acl");
@@ -401,7 +401,7 @@ public class TestINodeAttributeProvider {
         fs.setPermission(authz, new FsPermission(HDFS_PERMISSION));
         fs.mkdirs(authzChild);
         fs.setPermission(authzChild, new FsPermission(HDFS_PERMISSION));
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -430,7 +430,7 @@ public class TestINodeAttributeProvider {
         fs.setPermission(authz, new FsPermission(HDFS_PERMISSION));
         fs.mkdirs(authzChild);
         fs.setPermission(authzChild, new FsPermission(HDFS_PERMISSION));
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -470,7 +470,7 @@ public class TestINodeAttributeProvider {
         fs.setPermission(authz, new FsPermission(0700));
         fs.mkdirs(authzChild);
         fs.setPermission(authzChild, new FsPermission(0700));
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("foo", new String[] { "g1" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("foo", new String[] { "g1" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -515,7 +515,7 @@ public class TestINodeAttributeProvider {
         // mv /parent/sub2/foo to /parent/sub3/foo
         hdfs.rename(sub2foo, sub3);
         hdfs.delete(sub3, true);
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("u1", new String[] { "g1" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override

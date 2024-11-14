@@ -45,7 +45,7 @@ public class TestFcHdfsSetUMask {
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     private static FileContext fc;
 
@@ -178,7 +178,7 @@ public class TestFcHdfsSetUMask {
     }
 
     public void testMkdirWithExistingDir(FsPermission umask, FsPermission expectedPerms) throws IOException {
-        PathInterface f = fileContextTestHelper.getTestRootPath(fc, "aDir");
+        Path f = fileContextTestHelper.getTestRootPath(fc, "aDir");
         fc.setUMask(umask);
         fc.mkdir(f, FileContext.DEFAULT_PERM, true);
         Assert.assertTrue(isDir(fc, f));
@@ -186,17 +186,17 @@ public class TestFcHdfsSetUMask {
     }
 
     public void testMkdirRecursiveWithNonExistingDir(FsPermission umask, FsPermission expectedPerms, FsPermission expectedParentPerms) throws IOException {
-        PathInterface f = fileContextTestHelper.getTestRootPath(fc, "NonExistant2/aDir");
+        Path f = fileContextTestHelper.getTestRootPath(fc, "NonExistant2/aDir");
         fc.setUMask(umask);
         fc.mkdir(f, FileContext.DEFAULT_PERM, true);
         Assert.assertTrue(isDir(fc, f));
         Assert.assertEquals("permissions on directory are wrong", expectedPerms, fc.getFileStatus(f).getPermission());
-        PathInterface fParent = fileContextTestHelper.getTestRootPath(fc, "NonExistant2");
+        Path fParent = fileContextTestHelper.getTestRootPath(fc, "NonExistant2");
         Assert.assertEquals("permissions on parent directory are wrong", expectedParentPerms, fc.getFileStatus(fParent).getPermission());
     }
 
     public void testCreateRecursiveWithExistingDir(FsPermission umask, FsPermission expectedPerms) throws IOException {
-        PathInterface f = fileContextTestHelper.getTestRootPath(fc, "foo");
+        Path f = fileContextTestHelper.getTestRootPath(fc, "foo");
         fc.setUMask(umask);
         createFile(fc, f);
         Assert.assertTrue(isFile(fc, f));
@@ -204,8 +204,8 @@ public class TestFcHdfsSetUMask {
     }
 
     public void testCreateRecursiveWithNonExistingDir(FsPermission umask, FsPermission expectedDirPerms, FsPermission expectedFilePerms) throws IOException {
-        PathInterface f = fileContextTestHelper.getTestRootPath(fc, "NonExisting/foo");
-        PathInterface fParent = fileContextTestHelper.getTestRootPath(fc, "NonExisting");
+        Path f = fileContextTestHelper.getTestRootPath(fc, "NonExisting/foo");
+        Path fParent = fileContextTestHelper.getTestRootPath(fc, "NonExisting");
         Assert.assertFalse(exists(fc, fParent));
         fc.setUMask(umask);
         createFile(fc, f);

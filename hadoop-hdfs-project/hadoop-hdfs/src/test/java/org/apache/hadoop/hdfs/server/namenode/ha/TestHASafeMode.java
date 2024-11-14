@@ -713,10 +713,10 @@ public class TestHASafeMode {
             create.write(testData.getBytes());
             create.hflush();
             long fileId = ((DFSOutputStream) create.getWrappedStream()).getFileId();
-            FileStatusInterface fileStatus = dfs.getFileStatus(filePath);
+            FileStatus fileStatus = dfs.getFileStatus(filePath);
             DFSClient client = DFSClientAdapter.getClient(dfs);
             // add one dummy block at NN, but not write to DataNode
-            ExtendedBlockInterface previousBlock = DFSClientAdapter.getPreviousBlock(client, fileId);
+            ExtendedBlock previousBlock = DFSClientAdapter.getPreviousBlock(client, fileId);
             DFSClientAdapter.getNamenode(client).addBlock(pathString, client.getClientName(), new ExtendedBlock(previousBlock), DatanodeInfo.EMPTY_ARRAY, DFSClientAdapter.getFileId((DFSOutputStream) create.getWrappedStream()), null, null);
             cluster.restartNameNode(0, true);
             cluster.restartDataNode(0);

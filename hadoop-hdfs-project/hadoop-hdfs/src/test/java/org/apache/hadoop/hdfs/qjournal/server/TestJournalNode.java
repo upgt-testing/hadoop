@@ -199,7 +199,7 @@ public class TestJournalNode {
 
     @Test(timeout = 100000)
     public void testJournal() throws Exception {
-        MetricsRecordBuilderInterface metrics = MetricsAsserts.getMetrics(journal.getMetrics().getName());
+        MetricsRecordBuilder metrics = MetricsAsserts.getMetrics(journal.getMetrics().getName());
         MetricsAsserts.assertCounter("BatchesWritten", 0L, metrics);
         MetricsAsserts.assertCounter("BatchesWrittenWhileLagging", 0L, metrics);
         MetricsAsserts.assertGauge("CurrentLagTxns", 0L, metrics);

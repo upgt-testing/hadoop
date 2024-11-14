@@ -447,7 +447,7 @@ public class TestShortCircuitCache {
         DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
         FSDataInputStream fis = fs.open(new Path(TEST_FILE));
         int first = fis.read();
-        final ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
         Assert.assertTrue(first != -1);
         cache.accept(new CacheVisitor() {
 
@@ -717,7 +717,7 @@ public class TestShortCircuitCache {
             cluster.waitActive();
             DistributedFileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, new Path(testFile), fileSize, replicas, 0L);
-            LocatedBlockInterface blk = new DFSClient(DFSUtilClient.getNNAddress(conf), conf).getLocatedBlocks(testFile, 0, fileSize).get(0);
+            LocatedBlock blk = new DFSClient(DFSUtilClient.getNNAddress(conf), conf).getLocatedBlocks(testFile, 0, fileSize).get(0);
             ClientContext clientContext = Mockito.mock(ClientContext.class);
             Mockito.when(clientContext.getPeerCache()).thenAnswer((Answer<PeerCache>) peerCacheCall -> {
                 PeerCache peerCache = new PeerCache(10, Long.MAX_VALUE);

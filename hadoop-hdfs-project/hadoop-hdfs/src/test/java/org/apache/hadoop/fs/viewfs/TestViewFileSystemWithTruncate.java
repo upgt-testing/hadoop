@@ -54,7 +54,7 @@ public class TestViewFileSystemWithTruncate {
 
     private FileSystem fsTarget;
 
-    private PathInterface targetTestRoot, mountOnNn1;
+    private Path targetTestRoot, mountOnNn1;
 
     private FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper("/tmp/TestViewFileSystemWithXAttrs");
 

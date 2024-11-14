@@ -1097,9 +1097,9 @@ public class TestReplicationPolicy extends BaseReplicationPolicyTest {
     @Test(timeout = 60000)
     public void testUpdateDoesNotCauseSkippedReplication() {
         LowRedundancyBlocks lowRedundancyBlocks = new LowRedundancyBlocks();
-        BlockInfoInterface block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
-        BlockInfoInterface block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
-        BlockInfoInterface block3 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block3 = genBlockInfo(ThreadLocalRandom.current().nextLong());
         // Adding QUEUE_VERY_LOW_REDUNDANCY block
         final int block1CurReplicas = 2;
         final int block1ExpectedReplicas = 7;
@@ -1134,8 +1134,8 @@ public class TestReplicationPolicy extends BaseReplicationPolicyTest {
         when(mockNS.hasReadLock()).thenReturn(true);
         BlockManager bm = new BlockManager(mockNS, false, new HdfsConfiguration());
         LowRedundancyBlocks lowRedundancyBlocks = bm.neededReconstruction;
-        BlockInfoInterface block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
-        BlockInfoInterface block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
         // Adding QUEUE_LOW_REDUNDANCY block
         lowRedundancyBlocks.add(block1, 0, 0, 1, 1);
         // Adding QUEUE_LOW_REDUNDANCY block
@@ -1179,8 +1179,8 @@ public class TestReplicationPolicy extends BaseReplicationPolicyTest {
         if (blkID2 < 0) {
             blkID2 *= -1;
         }
-        BlockInfoInterface block1 = genBlockInfo(blkID1);
-        BlockInfoInterface block2 = genBlockInfo(blkID2);
+        BlockInfo block1 = genBlockInfo(blkID1);
+        BlockInfo block2 = genBlockInfo(blkID2);
         // Adding QUEUE_LOW_REDUNDANCY block
         lowRedundancyBlocks.add(block1, 0, 0, 1, 1);
         // Adding QUEUE_LOW_REDUNDANCY block
@@ -1211,7 +1211,7 @@ public class TestReplicationPolicy extends BaseReplicationPolicyTest {
         when(storage.removeBlock(any(BlockInfo.class))).thenReturn(true);
         when(storage.addBlock(any(BlockInfo.class))).thenReturn(DatanodeStorageInfo.AddBlockResult.ADDED);
         info.addStorage(storage, info);
-        BlockInfoInterface lastBlk = mbc.getLastBlock();
+        BlockInfo lastBlk = mbc.getLastBlock();
         when(mbc.getLastBlock()).thenReturn(lastBlk, info);
         bm.convertLastBlockToUnderConstruction(mbc, 0L);
         // Choose 1 block from lowRedundancyBlocks. Then it should pick 1 block
@@ -1227,8 +1227,8 @@ public class TestReplicationPolicy extends BaseReplicationPolicyTest {
         when(mockNS.hasReadLock()).thenReturn(true);
         BlockManager bm = new BlockManager(mockNS, false, new HdfsConfiguration());
         LowRedundancyBlocks lowRedundancyBlocks = bm.neededReconstruction;
-        BlockInfoInterface block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
-        BlockInfoInterface block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block1 = genBlockInfo(ThreadLocalRandom.current().nextLong());
+        BlockInfo block2 = genBlockInfo(ThreadLocalRandom.current().nextLong());
         // Adding QUEUE_LOW_REDUNDANCY block
         lowRedundancyBlocks.add(block1, 0, 0, 1, 1);
         // Adding QUEUE_LOW_REDUNDANCY block

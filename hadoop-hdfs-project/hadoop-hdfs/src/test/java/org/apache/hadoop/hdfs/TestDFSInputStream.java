@@ -218,7 +218,7 @@ public class TestDFSInputStream {
             fs = cluster.getFileSystem();
             FSDataOutputStream out = fs.create(filePath, true, 4096, (short) 3, 512);
             DFSInputStream dfsInputStream = (DFSInputStream) fs.open(filePath).getWrappedStream();
-            LocatedBlockInterface lb = mock(LocatedBlock.class);
+            LocatedBlock lb = mock(LocatedBlock.class);
             when(lb.getCachedLocations()).thenReturn(DatanodeInfo.EMPTY_ARRAY);
             DatanodeID nodeId = new DatanodeID("localhost", "localhost", "dn0", 1111, 1112, 1113, 1114);
             DatanodeInfo dnInfo = new DatanodeDescriptor(nodeId);
@@ -243,7 +243,7 @@ public class TestDFSInputStream {
             fs = cluster.getFileSystem();
             FSDataOutputStream out = fs.create(filePath, true, 4096, (short) 3, 512);
             DFSInputStream dfsInputStream = (DFSInputStream) fs.open(filePath).getWrappedStream();
-            LocatedBlockInterface lb = mock(LocatedBlock.class);
+            LocatedBlock lb = mock(LocatedBlock.class);
             when(lb.getCachedLocations()).thenReturn(DatanodeInfo.EMPTY_ARRAY);
             DatanodeID nodeId = new DatanodeID("localhost", "localhost", "dn0", 1111, 1112, 1113, 1114);
             DatanodeInfo dnInfo = new DatanodeDescriptor(nodeId);

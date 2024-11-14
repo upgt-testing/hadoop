@@ -183,7 +183,7 @@ public class TestOfflineImageViewer {
         tempDir = nnDirs[0];
         MiniDockerDFSCluster cluster = null;
         try {
-            final ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
+            final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
             Configuration conf = new Configuration();
             conf.setLong(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_MAX_LIFETIME_KEY, 10000);
             conf.setLong(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_RENEW_INTERVAL_KEY, 5000);
@@ -392,7 +392,7 @@ public class TestOfflineImageViewer {
             int totalDirs = Integer.parseInt(matcher.group(1));
             // totalDirs includes root directory
             assertEquals(dirCount + 1, totalDirs);
-            FileStatusInterface maxFile = Collections.max(writtenFiles.values(), new Comparator<FileStatus>() {
+            FileStatus maxFile = Collections.max(writtenFiles.values(), new Comparator<FileStatus>() {
 
                 @Override
                 public int compare(FileStatus first, FileStatus second) {
@@ -526,8 +526,8 @@ public class TestOfflineImageViewer {
             statuses = webhdfs.listStatus(new Path("/dir0"));
             assertEquals(FILES_PER_DIR, statuses.length);
             // compare a file
-            FileStatusInterface status = webhdfs.listStatus(new Path("/dir0/file0"))[0];
-            FileStatusInterface expected = writtenFiles.get("/dir0/file0");
+            FileStatus status = webhdfs.listStatus(new Path("/dir0/file0"))[0];
+            FileStatus expected = writtenFiles.get("/dir0/file0");
             compareFile(expected, status);
             // LISTSTATUS operation to an empty directory
             statuses = webhdfs.listStatus(new Path("/emptydir"));
@@ -540,14 +540,14 @@ public class TestOfflineImageViewer {
             verifyHttpResponseCode(HttpURLConnection.HTTP_NOT_FOUND, url);
             // Verify the Erasure Coded empty file status
             Path emptyECFilePath = new Path("/ec/EmptyECFile.txt");
-            FileStatusInterface actualEmptyECFileStatus = webhdfs.getFileStatus(new Path(emptyECFilePath.toString()));
-            FileStatusInterface expectedEmptyECFileStatus = writtenFiles.get(emptyECFilePath.toString());
+            FileStatus actualEmptyECFileStatus = webhdfs.getFileStatus(new Path(emptyECFilePath.toString()));
+            FileStatus expectedEmptyECFileStatus = writtenFiles.get(emptyECFilePath.toString());
             System.out.println(webhdfs.getFileStatus(new Path(emptyECFilePath.toString())));
             compareFile(expectedEmptyECFileStatus, actualEmptyECFileStatus);
             // Verify the Erasure Coded small file status
             Path smallECFilePath = new Path("/ec/SmallECFile.txt");
-            FileStatusInterface actualSmallECFileStatus = webhdfs.getFileStatus(new Path(smallECFilePath.toString()));
-            FileStatusInterface expectedSmallECFileStatus = writtenFiles.get(smallECFilePath.toString());
+            FileStatus actualSmallECFileStatus = webhdfs.getFileStatus(new Path(smallECFilePath.toString()));
+            FileStatus expectedSmallECFileStatus = writtenFiles.get(smallECFilePath.toString());
             compareFile(expectedSmallECFileStatus, actualSmallECFileStatus);
             // GETFILESTATUS operation
             status = webhdfs.getFileStatus(new Path("/dir0/file0"));

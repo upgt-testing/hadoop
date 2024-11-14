@@ -47,7 +47,7 @@ public class TestQuotaWithStripedBlocks {
 
     private int blockSize;
 
-    private ErasureCodingPolicyInterface ecPolicy;
+    private ErasureCodingPolicy ecPolicy;
 
     private int dataBlocks;
 
@@ -57,7 +57,7 @@ public class TestQuotaWithStripedBlocks {
 
     private int cellSize;
 
-    private PathInterface ecDir;
+    private Path ecDir;
 
     private long diskQuota;
 
@@ -113,9 +113,9 @@ public class TestQuotaWithStripedBlocks {
         try {
             out = dfs.create(file, (short) 1);
             INodeFileInterface fileNode = dir.getINode4Write(file.toString()).asFile();
-            ExtendedBlockInterface previous = null;
+            ExtendedBlock previous = null;
             // Create striped blocks which have a cell in each block.
-            BlockInterface newBlock = DFSTestUtil.addBlockToFile(true, cluster.getDataNodes(), dfs, cluster.getNamesystem(), file.toString(), fileNode, dfs.getClient().getClientName(), previous, 1, 0);
+            Block newBlock = DFSTestUtil.addBlockToFile(true, cluster.getDataNodes(), dfs, cluster.getNamesystem(), file.toString(), fileNode, dfs.getClient().getClientName(), previous, 1, 0);
             previous = new ExtendedBlock(cluster.getNamesystem().getBlockPoolId(), newBlock);
             final INodeDirectoryInterface dirNode = dir.getINode4Write(ecDir.toString()).asDirectory();
             final long spaceUsed = dirNode.getDirectoryWithQuotaFeature().getSpaceConsumed().getStorageSpace();

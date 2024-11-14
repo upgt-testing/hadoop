@@ -42,11 +42,11 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
  */
 public class TestDisallowModifyROSnapshot {
 
-    private final static PathInterface dir = new Path("/TestSnapshot");
+    private final static Path dir = new Path("/TestSnapshot");
 
-    private final static PathInterface sub1 = new Path(dir, "sub1");
+    private final static Path sub1 = new Path(dir, "sub1");
 
-    private final static PathInterface sub2 = new Path(dir, "sub2");
+    private final static Path sub2 = new Path(dir, "sub2");
 
     protected static Configuration conf;
 
@@ -62,7 +62,7 @@ public class TestDisallowModifyROSnapshot {
      */
     protected static ArrayList<Path> snapshotList = new ArrayList<Path>();
 
-    static PathInterface objInSnapshot = null;
+    static Path objInSnapshot = null;
 
     @BeforeClass
     public static void setUp() throws Exception {

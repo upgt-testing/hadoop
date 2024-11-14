@@ -592,9 +592,9 @@ public class TestDataNodeVolumeFailure {
     private void triggerFailure(String path, long size) throws IOException {
         NamenodeProtocols nn = cluster.getNameNodeRpc();
         List<LocatedBlock> locatedBlocks = nn.getBlockLocations(path, 0, size).getLocatedBlocks();
-        for (LocatedBlockInterface lb : locatedBlocks) {
+        for (LocatedBlock lb : locatedBlocks) {
             DatanodeInfoInterface dinfo = lb.getLocations()[1];
-            ExtendedBlockInterface b = lb.getBlock();
+            ExtendedBlock b = lb.getBlock();
             try {
                 accessBlock(dinfo, lb);
             } catch (IOException e) {
@@ -629,7 +629,7 @@ public class TestDataNodeVolumeFailure {
      */
     private void accessBlock(DatanodeInfo datanode, LocatedBlock lblock) throws IOException {
         InetSocketAddress targetAddr = null;
-        ExtendedBlockInterface block = lblock.getBlock();
+        ExtendedBlock block = lblock.getBlock();
         targetAddr = NetUtils.createSocketAddr(datanode.getXferAddr());
         BlockReader blockReader = new BlockReaderFactory(new DfsClientConf(conf)).setInetSocketAddress(targetAddr).setBlock(block).setFileName(BlockReaderFactory.getFileName(targetAddr, "test-blockpoolid", block.getBlockId())).setBlockToken(lblock.getBlockToken()).setStartOffset(0).setLength(0).setVerifyChecksum(true).setClientName("TestDataNodeVolumeFailure").setDatanodeInfo(datanode).setCachingStrategy(CachingStrategy.newDefaultStrategy()).setClientCacheContext(ClientContext.getFromConf(conf)).setConfiguration(conf).setRemotePeerFactory(new RemotePeerFactory() {
 
@@ -666,7 +666,7 @@ public class TestDataNodeVolumeFailure {
         NamenodeProtocols nn = cluster.getNameNodeRpc();
         List<LocatedBlock> locatedBlocks = nn.getBlockLocations(path, 0, size).getLocatedBlocks();
         //System.out.println("Number of blocks: " + locatedBlocks.size());
-        for (LocatedBlockInterface lb : locatedBlocks) {
+        for (LocatedBlock lb : locatedBlocks) {
             String blockId = "" + lb.getBlock().getBlockId();
             //System.out.print(blockId + ": ");
             DatanodeInfo[] dn_locs = lb.getLocations();
@@ -823,7 +823,7 @@ public class TestDataNodeVolumeFailure {
         failedDir.setReadOnly();
         final DataNodeInterface dn = cluster.getDataNodes().get(1);
         dn.checkDiskError();
-        MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
         long volumeFailures = getLongCounter("VolumeFailures", rb);
         assertEquals(2, volumeFailures);
     }

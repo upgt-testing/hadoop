@@ -98,13 +98,13 @@ public class TestAddBlockRetry {
         LOG.info("Starting second addBlock for " + src);
         nn.addBlock(src, "clientName", null, null, HdfsConstants.GRANDFATHER_INODE_ID, null, null);
         assertTrue("Penultimate block must be complete", checkFileProgress(src, false));
-        LocatedBlocksInterface lbs = nn.getBlockLocations(src, 0, Long.MAX_VALUE);
+        LocatedBlocks lbs = nn.getBlockLocations(src, 0, Long.MAX_VALUE);
         assertEquals("Must be one block", 1, lbs.getLocatedBlocks().size());
-        LocatedBlockInterface lb2 = lbs.get(0);
+        LocatedBlock lb2 = lbs.get(0);
         assertEquals("Wrong replication", REPLICATION, lb2.getLocations().length);
         // continue first addBlock()
         ns.writeLock();
-        LocatedBlockInterface newBlock;
+        LocatedBlock newBlock;
         try {
             newBlock = FSDirWriteFileOp.storeAllocatedBlock(ns, src, HdfsConstants.GRANDFATHER_INODE_ID, "clientName", null, targets);
         } finally {
@@ -114,7 +114,7 @@ public class TestAddBlockRetry {
         // check locations
         lbs = nn.getBlockLocations(src, 0, Long.MAX_VALUE);
         assertEquals("Must be one block", 1, lbs.getLocatedBlocks().size());
-        LocatedBlockInterface lb1 = lbs.get(0);
+        LocatedBlock lb1 = lbs.get(0);
         assertEquals("Wrong replication", REPLICATION, lb1.getLocations().length);
         assertEquals("Blocks are not equal", lb1.getBlock(), lb2.getBlock());
     }
@@ -142,11 +142,11 @@ public class TestAddBlockRetry {
         nameNodeRpc.create(src, FsPermission.getFileDefault(), "clientName", new EnumSetWritable<CreateFlag>(EnumSet.of(CreateFlag.CREATE)), true, (short) 3, 1024, null, null, null);
         // start first addBlock()
         LOG.info("Starting first addBlock for " + src);
-        LocatedBlockInterface lb1 = nameNodeRpc.addBlock(src, "clientName", null, null, HdfsConstants.GRANDFATHER_INODE_ID, null, null);
+        LocatedBlock lb1 = nameNodeRpc.addBlock(src, "clientName", null, null, HdfsConstants.GRANDFATHER_INODE_ID, null, null);
         assertTrue("Block locations should be present", lb1.getLocations().length > 0);
         cluster.restartNameNode();
         nameNodeRpc = cluster.getNameNodeRpc();
-        LocatedBlockInterface lb2 = nameNodeRpc.addBlock(src, "clientName", null, null, HdfsConstants.GRANDFATHER_INODE_ID, null, null);
+        LocatedBlock lb2 = nameNodeRpc.addBlock(src, "clientName", null, null, HdfsConstants.GRANDFATHER_INODE_ID, null, null);
         assertEquals("Blocks are not equal", lb1.getBlock(), lb2.getBlock());
         assertTrue("Wrong locations with retry", lb2.getLocations().length > 0);
     }

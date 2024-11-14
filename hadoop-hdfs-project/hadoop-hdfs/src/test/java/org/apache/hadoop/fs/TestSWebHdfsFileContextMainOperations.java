@@ -43,7 +43,7 @@ public class TestSWebHdfsFileContextMainOperations extends TestWebHdfsFileContex
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     private static String keystoresDir;
 

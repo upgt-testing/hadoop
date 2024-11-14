@@ -112,10 +112,10 @@ public class TestBlockPlacementPolicyRackFaultTolerant {
                 // Create the file with client machine
                 HdfsFileStatus fileStatus = namesystem.startFile(src, perm, clientMachine, clientMachine, EnumSet.of(CreateFlag.CREATE), true, replication, DEFAULT_BLOCK_SIZE, null, null, null, false);
                 //test chooseTarget for new file
-                LocatedBlockInterface locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
+                LocatedBlock locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
                 doTestLocatedBlock(replication, locatedBlock);
                 //test chooseTarget for existing file.
-                LocatedBlockInterface additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), locatedBlock.getLocations(), locatedBlock.getStorageIDs(), DatanodeInfo.EMPTY_ARRAY, additionalReplication, clientMachine);
+                LocatedBlock additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), locatedBlock.getLocations(), locatedBlock.getStorageIDs(), DatanodeInfo.EMPTY_ARRAY, additionalReplication, clientMachine);
                 doTestLocatedBlock(replication + additionalReplication, additionalLocatedBlock);
             }
         }
@@ -133,7 +133,7 @@ public class TestBlockPlacementPolicyRackFaultTolerant {
         // Create the file with client machine
         HdfsFileStatus fileStatus = namesystem.startFile(src, perm, clientMachine, clientMachine, EnumSet.of(CreateFlag.CREATE), true, (short) 20, DEFAULT_BLOCK_SIZE, null, null, null, false);
         //test chooseTarget for new file
-        LocatedBlockInterface locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
+        LocatedBlock locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
         doTestLocatedBlock(20, locatedBlock);
         DatanodeInfo[] locs = locatedBlock.getLocations();
         String[] storageIDs = locatedBlock.getStorageIDs();
@@ -145,7 +145,7 @@ public class TestBlockPlacementPolicyRackFaultTolerant {
                 System.arraycopy(locs, 0, partLocs, 0, i);
                 System.arraycopy(storageIDs, 0, partStorageIDs, 0, i);
                 for (int j = 1; j < 20 - i; j++) {
-                    LocatedBlockInterface additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), partLocs, partStorageIDs, DatanodeInfo.EMPTY_ARRAY, j, clientMachine);
+                    LocatedBlock additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), partLocs, partStorageIDs, DatanodeInfo.EMPTY_ARRAY, j, clientMachine);
                     doTestLocatedBlock(i + j, additionalLocatedBlock);
                 }
             }
@@ -191,11 +191,11 @@ public class TestBlockPlacementPolicyRackFaultTolerant {
             // Create the file with client machine
             HdfsFileStatus fileStatus = namesystem.startFile(src, perm, clientMachine, clientMachine, EnumSet.of(CreateFlag.CREATE), true, replication, DEFAULT_BLOCK_SIZE * 1024 * 10, null, null, null, false);
             //test chooseTarget for new file
-            LocatedBlockInterface locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
+            LocatedBlock locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null, null, fileStatus.getFileId(), null, null);
             HashMap<String, Integer> racksCount = new HashMap<String, Integer>();
             doTestLocatedBlockRacks(racksCount, replication, 4, locatedBlock);
             //test chooseTarget for existing file.
-            LocatedBlockInterface additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), locatedBlock.getLocations(), locatedBlock.getStorageIDs(), DatanodeInfo.EMPTY_ARRAY, additionalReplication, clientMachine);
+            LocatedBlock additionalLocatedBlock = nameNodeRpc.getAdditionalDatanode(src, fileStatus.getFileId(), locatedBlock.getBlock(), locatedBlock.getLocations(), locatedBlock.getStorageIDs(), DatanodeInfo.EMPTY_ARRAY, additionalReplication, clientMachine);
             racksCount.clear();
             doTestLocatedBlockRacks(racksCount, additionalReplication + replication, 4, additionalLocatedBlock);
             assertEquals(racksCount.get("/RACK0"), (Integer) 2);
@@ -219,9 +219,9 @@ public class TestBlockPlacementPolicyRackFaultTolerant {
                 return dnd3.isDecommissioned();
             }
         }, 1000, 10 * 1000);
-        LocatedBlocksInterface locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(src, 0, DEFAULT_BLOCK_SIZE);
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(src, 0, DEFAULT_BLOCK_SIZE);
         assertEquals(4, bm.getDatanodeManager().getNetworkTopology().getNumOfNonEmptyRacks());
-        for (LocatedBlockInterface block : locatedBlocks.getLocatedBlocks()) {
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
             BlockPlacementStatus status = bm.getStriptedBlockPlacementPolicy().verifyBlockPlacement(block.getLocations(), 5);
             Assert.assertTrue(status.isPlacementPolicySatisfied());
         }

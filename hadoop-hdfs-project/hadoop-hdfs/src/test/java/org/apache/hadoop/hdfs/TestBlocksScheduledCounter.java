@@ -146,7 +146,7 @@ public class TestBlocksScheduledCounter {
             ArrayList<DatanodeDescriptor> dnList = new ArrayList<DatanodeDescriptor>();
             datanodeManager.fetchDatanodes(dnList, dnList, false);
             // 3. mark a couple of blocks as corrupt
-            LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
+            LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
             DatanodeInfo[] locs = block.getLocations();
             cluster.getNamesystem().writeLock();
             try {

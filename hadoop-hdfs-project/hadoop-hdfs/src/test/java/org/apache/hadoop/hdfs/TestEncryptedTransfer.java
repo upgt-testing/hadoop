@@ -88,7 +88,7 @@ public class TestEncryptedTransfer {
 
     private static final String PLAIN_TEXT = "this is very secret plain text";
 
-    private static final PathInterface TEST_PATH = new Path("/non-encrypted-file");
+    private static final Path TEST_PATH = new Path("/non-encrypted-file");
 
     private MiniDockerDFSCluster cluster = null;
 
@@ -140,7 +140,7 @@ public class TestEncryptedTransfer {
         fs = getFileSystem(conf);
         writeTestDataToFile(fs);
         assertEquals(PLAIN_TEXT, DFSTestUtil.readFile(fs, TEST_PATH));
-        FileChecksumInterface checksum = fs.getFileChecksum(TEST_PATH);
+        FileChecksum checksum = fs.getFileChecksum(TEST_PATH);
         fs.close();
         cluster.shutdown();
         setEncryptionConfigKeys();
@@ -154,7 +154,7 @@ public class TestEncryptedTransfer {
         // encryption yet.
         conf.set(DFSConfigKeys.DFS_DATA_ENCRYPTION_ALGORITHM_KEY, algorithm);
         conf.set(HdfsClientConfigKeys.DFS_ENCRYPT_DATA_TRANSFER_CIPHER_SUITES_KEY, cipherSuite);
-        FileChecksumInterface checksum = writeUnencryptedAndThenRestartEncryptedCluster();
+        FileChecksum checksum = writeUnencryptedAndThenRestartEncryptedCluster();
         LogCapturer logs = GenericTestUtils.LogCapturer.captureLogs(LoggerFactory.getLogger(SaslDataTransferServer.class));
         LogCapturer logs1 = GenericTestUtils.LogCapturer.captureLogs(LoggerFactory.getLogger(DataTransferSaslUtil.class));
         try {
@@ -232,7 +232,7 @@ public class TestEncryptedTransfer {
 
     @Test
     public void testLongLivedReadClientAfterRestart() throws IOException {
-        FileChecksumInterface checksum = writeUnencryptedAndThenRestartEncryptedCluster();
+        FileChecksum checksum = writeUnencryptedAndThenRestartEncryptedCluster();
         assertEquals(PLAIN_TEXT, DFSTestUtil.readFile(fs, TEST_PATH));
         assertEquals(checksum, fs.getFileChecksum(TEST_PATH));
         // Restart the NN and DN, after which the client's encryption key will no
@@ -261,7 +261,7 @@ public class TestEncryptedTransfer {
 
     @Test
     public void testLongLivedClient() throws IOException, InterruptedException {
-        FileChecksumInterface checksum = writeUnencryptedAndThenRestartEncryptedCluster();
+        FileChecksum checksum = writeUnencryptedAndThenRestartEncryptedCluster();
         BlockTokenSecretManagerInterface btsm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
         btsm.setKeyUpdateIntervalForTesting(2 * 1000);
         btsm.setTokenLifetime(2 * 1000);
@@ -292,7 +292,7 @@ public class TestEncryptedTransfer {
         DFSClient spyClient = Mockito.spy(client);
         DFSClientAdapter.setDFSClient((DistributedFileSystem) fs, spyClient);
         writeTestDataToFile(fs);
-        FileChecksumInterface checksum = fs.getFileChecksum(TEST_PATH);
+        FileChecksum checksum = fs.getFileChecksum(TEST_PATH);
         BlockTokenSecretManagerInterface btsm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
         // Reduce key update interval and token life for testing.
         btsm.setKeyUpdateIntervalForTesting(2 * 1000);
@@ -317,7 +317,7 @@ public class TestEncryptedTransfer {
         Assert.assertTrue(client.getEncryptionKey() == null);
         Mockito.verify(spyClient, times(1)).clearDataEncryptionKey();
         // Retry the operation after clearing the encryption key
-        FileChecksumInterface verifyChecksum = fs.getFileChecksum(TEST_PATH);
+        FileChecksum verifyChecksum = fs.getFileChecksum(TEST_PATH);
         Assert.assertEquals(checksum, verifyChecksum);
     }
 

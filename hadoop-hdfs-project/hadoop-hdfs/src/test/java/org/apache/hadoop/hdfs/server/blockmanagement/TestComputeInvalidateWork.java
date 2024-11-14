@@ -63,15 +63,15 @@ public class TestComputeInvalidateWork {
 
     private DatanodeDescriptor[] nodes;
 
-    private ErasureCodingPolicyInterface ecPolicy;
+    private ErasureCodingPolicy ecPolicy;
 
     private DistributedFileSystem fs;
 
-    private PathInterface ecFile;
+    private Path ecFile;
 
     private int totalBlockGroups, blockGroupSize, stripesPerBlock, cellSize;
 
-    private LocatedStripedBlockInterface locatedStripedBlock;
+    private LocatedStripedBlock locatedStripedBlock;
 
     @Before
     public void setup() throws Exception {
@@ -97,7 +97,7 @@ public class TestComputeInvalidateWork {
         blockGroupSize = ecPolicy.getNumDataUnits() * blockSize;
         totalBlockGroups = 4;
         DFSTestUtil.createStripedFile(cluster, ecFile, ecDir, totalBlockGroups, stripesPerBlock, false, ecPolicy);
-        LocatedBlocksInterface lbs = cluster.getFileSystem().getClient().getNamenode().getBlockLocations(ecFile.toString(), 0, blockGroupSize);
+        LocatedBlocks lbs = cluster.getFileSystem().getClient().getNamenode().getBlockLocations(ecFile.toString(), 0, blockGroupSize);
         assert lbs.get(0) instanceof LocatedStripedBlock;
         locatedStripedBlock = (LocatedStripedBlock) (lbs.get(0));
     }

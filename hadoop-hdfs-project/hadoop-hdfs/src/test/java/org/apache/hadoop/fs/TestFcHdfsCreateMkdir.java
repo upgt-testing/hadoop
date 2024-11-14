@@ -35,7 +35,7 @@ public class TestFcHdfsCreateMkdir extends FileContextCreateMkdirBaseTest {
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     @Override
     protected FileContextTestHelper createFileContextHelper() {

@@ -167,7 +167,7 @@ public class TestDelegationToken {
 
     @Test
     public void testAddDelegationTokensDFSApi() throws Exception {
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("JobTracker");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("JobTracker");
         DistributedFileSystem dfs = cluster.getFileSystem();
         Credentials creds = new Credentials();
         final Token<?>[] tokens = dfs.addDelegationTokens("JobTracker", creds);
@@ -185,7 +185,7 @@ public class TestDelegationToken {
         GenericTestUtils.setLogLevel(NamenodeWebHdfsMethods.LOG, Level.TRACE);
         final String uri = WebHdfsConstants.WEBHDFS_SCHEME + "://" + config.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY);
         //get file system as JobTracker
-        final UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("JobTracker", new String[] { "user" });
+        final UserGroupInformation ugi = UserGroupInformation.createUserForTesting("JobTracker", new String[] { "user" });
         final WebHdfsFileSystem webhdfs = ugi.doAs(new PrivilegedExceptionAction<WebHdfsFileSystem>() {
 
             @Override
@@ -214,8 +214,8 @@ public class TestDelegationToken {
         Assert.assertEquals(1, tokens.length);
         @SuppressWarnings("unchecked")
         final TokenInterface<DelegationTokenIdentifier> token = (Token<DelegationTokenIdentifier>) tokens[0];
-        final UserGroupInformationInterface longUgi = UserGroupInformation.createRemoteUser("JobTracker/foo.com@FOO.COM");
-        final UserGroupInformationInterface shortUgi = UserGroupInformation.createRemoteUser("JobTracker");
+        final UserGroupInformation longUgi = UserGroupInformation.createRemoteUser("JobTracker/foo.com@FOO.COM");
+        final UserGroupInformation shortUgi = UserGroupInformation.createRemoteUser("JobTracker");
         longUgi.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
@@ -257,7 +257,7 @@ public class TestDelegationToken {
         Assert.assertEquals(1, tokens.length);
         TokenInterface<?> token1 = tokens[0];
         DelegationTokenIdentifierInterface ident = (DelegationTokenIdentifier) token1.decodeIdentifier();
-        UserGroupInformationInterface expectedUgi = ident.getUser();
+        UserGroupInformation expectedUgi = ident.getUser();
         // get 2 new instances (clones) of the identifier, query their ugi
         // twice each, all ugi instances should be equivalent
         for (int i = 0; i < 2; i++) {

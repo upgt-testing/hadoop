@@ -69,8 +69,8 @@ public class TestCommitBlockWithInvalidGenStamp {
         try {
             out = dfs.create(file, (short) 1);
             INodeFileInterface fileNode = dir.getINode4Write(file.toString()).asFile();
-            ExtendedBlockInterface previous = null;
-            BlockInterface newBlock = DFSTestUtil.addBlockToFile(false, cluster.getDataNodes(), dfs, cluster.getNamesystem(), file.toString(), fileNode, dfs.getClient().getClientName(), previous, 0, 100);
+            ExtendedBlock previous = null;
+            Block newBlock = DFSTestUtil.addBlockToFile(false, cluster.getDataNodes(), dfs, cluster.getNamesystem(), file.toString(), fileNode, dfs.getClient().getClientName(), previous, 0, 100);
             Block newBlockClone = new Block(newBlock);
             previous = new ExtendedBlock(cluster.getNamesystem().getBlockPoolId(), newBlockClone);
             previous.setGenerationStamp(123);

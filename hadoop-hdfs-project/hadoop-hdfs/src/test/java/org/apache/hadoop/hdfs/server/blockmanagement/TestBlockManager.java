@@ -216,7 +216,7 @@ public class TestBlockManager {
     private void doBasicTest(int testIndex) {
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface blockInfo = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(testIndex, origNodes);
         DatanodeStorageInfo[] pipeline = scheduleSingleReplication(blockInfo);
         assertEquals(2, pipeline.length);
         assertTrue("Source of replication should be one of the nodes the block " + "was on. Was: " + pipeline[0], origStorages.contains(pipeline[0]));
@@ -242,7 +242,7 @@ public class TestBlockManager {
         // Block originally on A1, A2, B1
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1, 3);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface blockInfo = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(testIndex, origNodes);
         // Decommission two of the nodes (A1, A2)
         List<DatanodeDescriptor> decomNodes = startDecommission(0, 1);
         DatanodeStorageInfo[] pipeline = scheduleSingleReplication(blockInfo);
@@ -277,7 +277,7 @@ public class TestBlockManager {
         // Block originally on A1, A2, B1
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1, 3);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface blockInfo = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(testIndex, origNodes);
         // Decommission all of the nodes
         List<DatanodeDescriptor> decomNodes = startDecommission(0, 1, 3);
         DatanodeStorageInfo[] pipeline = scheduleSingleReplication(blockInfo);
@@ -321,7 +321,7 @@ public class TestBlockManager {
         // Block originally on A1, A2, B1
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1, 3);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface blockInfo = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(testIndex, origNodes);
         // Decommission all of the nodes in rack A
         List<DatanodeDescriptor> decomNodes = startDecommission(0, 1, 2);
         DatanodeStorageInfo[] pipeline = scheduleSingleReplication(blockInfo);
@@ -369,7 +369,7 @@ public class TestBlockManager {
     private void doTestSufficientlyReplBlocksUsesNewRack(int testIndex) {
         // Originally on only nodes in rack A.
         List<DatanodeDescriptor> origNodes = rackA;
-        BlockInfoInterface blockInfo = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(testIndex, origNodes);
         DatanodeStorageInfo[] pipeline = scheduleSingleReplication(blockInfo);
         // single new copy
         assertEquals(2, pipeline.length);
@@ -389,7 +389,7 @@ public class TestBlockManager {
 
     private void doTestSingleRackClusterHasSufficientRedundancy(int testIndex, List<DatanodeDescriptor> origNodes) throws Exception {
         assertEquals(0, bm.numOfUnderReplicatedBlocks());
-        BlockInfoInterface block = addBlockOnNodes(testIndex, origNodes);
+        BlockInfo block = addBlockOnNodes(testIndex, origNodes);
         assertFalse(bm.isNeededReconstruction(block, bm.countNodes(block, fsn.isInStartupSafeMode())));
     }
 
@@ -411,7 +411,7 @@ public class TestBlockManager {
                 out.hflush();
                 out.close();
                 FSDataInputStream in = null;
-                ExtendedBlockInterface oldBlock = null;
+                ExtendedBlock oldBlock = null;
                 try {
                     in = fs.open(file);
                     oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
@@ -420,10 +420,10 @@ public class TestBlockManager {
                 }
                 String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
                 namenode.append(src, clientName, new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND)));
-                LocatedBlockInterface newLocatedBlock = namenode.updateBlockForPipeline(oldBlock, clientName);
+                LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(oldBlock, clientName);
                 ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(), oldBlock.getBlockId(), oldBlock.getNumBytes(), newLocatedBlock.getBlock().getGenerationStamp());
                 namenode.updatePipeline(clientName, oldBlock, newBlock, newLocatedBlock.getLocations(), newLocatedBlock.getStorageIDs());
-                BlockInfoInterface bi = bm.getStoredBlock(newBlock.getLocalBlock());
+                BlockInfo bi = bm.getStoredBlock(newBlock.getLocalBlock());
                 assertFalse(bm.isNeededReconstruction(bi, bm.countNodes(bi, cluster.getNamesystem().isInStartupSafeMode())));
             } finally {
                 IOUtils.closeStream(out);
@@ -525,7 +525,7 @@ public class TestBlockManager {
     private BlockInfo addBlockOnNodes(long blockId, List<DatanodeDescriptor> nodes) {
         long inodeId = ++mockINodeId;
         final INodeFileInterface bc = TestINodeFile.createINodeFile(inodeId);
-        BlockInfoInterface blockInfo = blockOnNodes(blockId, nodes);
+        BlockInfo blockInfo = blockOnNodes(blockId, nodes);
         blockInfo.setReplication((short) 3);
         blockInfo.setBlockCollectionId(inodeId);
         Mockito.doReturn(bc).when(fsn).getBlockCollection(inodeId);
@@ -536,7 +536,7 @@ public class TestBlockManager {
     private BlockInfo addCorruptBlockOnNodes(long blockId, List<DatanodeDescriptor> nodes) throws IOException {
         long inodeId = ++mockINodeId;
         final INodeFileInterface bc = TestINodeFile.createINodeFile(inodeId);
-        BlockInfoInterface blockInfo = blockOnNodes(blockId, nodes);
+        BlockInfo blockInfo = blockOnNodes(blockId, nodes);
         blockInfo.setReplication((short) 3);
         blockInfo.setBlockCollectionId(inodeId);
         Mockito.doReturn(bc).when(fsn).getBlockCollection(inodeId);
@@ -652,7 +652,7 @@ public class TestBlockManager {
         long blockId = -9223372036854775776L;
         Block aBlock = new Block(blockId, 0, 0);
         // RS-3-2 EC policy
-        ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
+        ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
         // striped blockInfo
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlock, ecPolicy);
         // ec storageInfo
@@ -689,7 +689,7 @@ public class TestBlockManager {
         // real ec block id
         long blockId = -9223372036854775776L;
         // RS-3-2 EC policy
-        ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
+        ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
         // create an EC block group: 3 data blocks + 2 parity blocks
         Block aBlockGroup = new Block(blockId, ecPolicy.getCellSize() * ecPolicy.getNumDataUnits(), 0);
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlockGroup, ecPolicy);
@@ -724,7 +724,7 @@ public class TestBlockManager {
         // real ec block id
         long blockId = -9223372036854775776L;
         // RS-3-2 EC policy
-        ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
+        ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getPolicies().get(1);
         // create an EC block group: 2 data blocks + 2 parity blocks
         Block aBlockGroup = new Block(blockId, ecPolicy.getCellSize() * (ecPolicy.getNumDataUnits() - 1), 0);
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlockGroup, ecPolicy);
@@ -858,17 +858,17 @@ public class TestBlockManager {
         // blk_42 is finalized.
         // arbitrary
         long receivedBlockId = 42;
-        BlockInfoInterface receivedBlock = addBlockToBM(receivedBlockId);
+        BlockInfo receivedBlock = addBlockToBM(receivedBlockId);
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(receivedBlock), ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, null));
         builder.add(new FinalizedReplica(receivedBlock, null, null));
         // blk_43 is under construction.
         long receivingBlockId = 43;
-        BlockInfoInterface receivingBlock = addUcBlockToBM(receivingBlockId);
+        BlockInfo receivingBlock = addUcBlockToBM(receivingBlockId);
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(receivingBlock), ReceivedDeletedBlockInfo.BlockStatus.RECEIVING_BLOCK, null));
         builder.add(new ReplicaBeingWritten(receivingBlock, null, null, null));
         // blk_44 has 2 records in IBR. It's finalized. So full BR has 1 record.
         long receivingReceivedBlockId = 44;
-        BlockInfoInterface receivingReceivedBlock = addBlockToBM(receivingReceivedBlockId);
+        BlockInfo receivingReceivedBlock = addBlockToBM(receivingReceivedBlockId);
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(receivingReceivedBlock), ReceivedDeletedBlockInfo.BlockStatus.RECEIVING_BLOCK, null));
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(receivingReceivedBlock), ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, null));
         builder.add(new FinalizedReplica(receivingReceivedBlock, null, null));
@@ -878,7 +878,7 @@ public class TestBlockManager {
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(ReceivedDeletedBlockId), ReceivedDeletedBlockInfo.BlockStatus.DELETED_BLOCK, null));
         // blk_46 exists in DN for a long time, so it's in full BR, but not in IBR.
         long existedBlockId = 46;
-        BlockInfoInterface existedBlock = addBlockToBM(existedBlockId);
+        BlockInfo existedBlock = addBlockToBM(existedBlockId);
         builder.add(new FinalizedReplica(existedBlock, null, null));
         // process IBR and full BR
         StorageReceivedDeletedBlocks srdb = new StorageReceivedDeletedBlocks(new DatanodeStorage(ds.getStorageID()), rdbiList.toArray(new ReceivedDeletedBlockInfo[rdbiList.size()]));
@@ -947,7 +947,7 @@ public class TestBlockManager {
         // immediately deleted on same node
         // arbitrary
         long blockId = 42;
-        BlockInfoInterface receivedBlock = addUcBlockToBM(blockId);
+        BlockInfo receivedBlock = addUcBlockToBM(blockId);
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(receivedBlock), ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, null));
         rdbiList.add(new ReceivedDeletedBlockInfo(new Block(blockId), ReceivedDeletedBlockInfo.BlockStatus.DELETED_BLOCK, null));
         // process IBR
@@ -1003,7 +1003,7 @@ public class TestBlockManager {
         final Configuration conf = new HdfsConfiguration();
         final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         FileSystem fs = FileSystem.get(conf);
-        PathInterface file1 = null;
+        Path file1 = null;
         try {
             cluster.waitActive();
             final FSNamesystemInterface namesystem = cluster.getNamesystem();
@@ -1181,14 +1181,14 @@ public class TestBlockManager {
             boolean sawQueued = false;
             while (!writeLatch.await(10, TimeUnit.MILLISECONDS)) {
                 assertFalse(failure.get());
-                MetricsRecordBuilderInterface rb = getMetrics("NameNodeActivity");
+                MetricsRecordBuilder rb = getMetrics("NameNodeActivity");
                 long queued = MetricsAsserts.getIntGauge("BlockOpsQueued", rb);
                 sawQueued |= (queued > 0);
             }
             assertFalse(failure.get());
             assertTrue(sawQueued);
             // verify that batching of the IBRs occurred.
-            MetricsRecordBuilderInterface rb = getMetrics("NameNodeActivity");
+            MetricsRecordBuilder rb = getMetrics("NameNodeActivity");
             long batched = MetricsAsserts.getLongCounter("BlockOpsBatched", rb);
             assertTrue(batched > 0);
         } finally {
@@ -1218,7 +1218,7 @@ public class TestBlockManager {
             File storageDir = cluster.getInstanceStorageDir(0, 0);
             File dataDir = MiniDockerDFSCluster.getFinalizedDir(storageDir, bpid);
             assertTrue("Data directory does not exist", dataDir.exists());
-            BlockInfoInterface blockInfo = blockManager.blocksMap.getBlocks().iterator().next();
+            BlockInfo blockInfo = blockManager.blocksMap.getBlocks().iterator().next();
             ExtendedBlock blk = new ExtendedBlock(bpid, blockInfo.getBlockId(), blockInfo.getNumBytes(), blockInfo.getGenerationStamp());
             DatanodeDescriptorInterface failedStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(0);
             DatanodeDescriptorInterface corruptStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(1);
@@ -1227,7 +1227,7 @@ public class TestBlockManager {
                 DatanodeStorageInfoInterface storageInfo = failedStorageDataNode.getStorageInfos()[i];
                 DatanodeStorage dns = new DatanodeStorage(failedStorageDataNode.getStorageInfos()[i].getStorageID(), DatanodeStorage.State.FAILED, failedStorageDataNode.getStorageInfos()[i].getStorageType());
                 while (storageInfo.getBlockIterator().hasNext()) {
-                    BlockInfoInterface blockInfo1 = storageInfo.getBlockIterator().next();
+                    BlockInfo blockInfo1 = storageInfo.getBlockIterator().next();
                     if (blockInfo1.equals(blockInfo)) {
                         StorageReport report = new StorageReport(dns, true, storageInfo.getCapacity(), storageInfo.getDfsUsed(), storageInfo.getRemaining(), storageInfo.getBlockPoolUsed(), 0L);
                         reports.add(report);
@@ -1241,7 +1241,7 @@ public class TestBlockManager {
             for (int i = 0; i < corruptStorageDataNode.getStorageInfos().length; i++) {
                 corruptStorageInfo = corruptStorageDataNode.getStorageInfos()[i];
                 while (corruptStorageInfo.getBlockIterator().hasNext()) {
-                    BlockInfoInterface blockInfo1 = corruptStorageInfo.getBlockIterator().next();
+                    BlockInfo blockInfo1 = corruptStorageInfo.getBlockIterator().next();
                     if (blockInfo1.equals(blockInfo)) {
                         break;
                     }
@@ -1251,7 +1251,7 @@ public class TestBlockManager {
             ns.writeUnlock();
             BlockInfo[] blockInfos = new BlockInfo[] { blockInfo };
             ns.readLock();
-            LocatedBlocksInterface locatedBlocks = blockManager.createLocatedBlocks(blockInfos, 3L, false, 0L, 3L, false, false, null, null);
+            LocatedBlocks locatedBlocks = blockManager.createLocatedBlocks(blockInfos, 3L, false, 0L, 3L, false, false, null, null);
             assertTrue("Located Blocks should exclude corrupt" + "replicas and failed storages", locatedBlocks.getLocatedBlocks().size() == 1);
             ns.readUnlock();
         } finally {
@@ -1301,7 +1301,7 @@ public class TestBlockManager {
         BlockManagerInterface spyBM = spy(bm);
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1, 3);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface blockInfo = addBlockOnNodes(0, origNodes);
+        BlockInfo blockInfo = addBlockOnNodes(0, origNodes);
         spyBM.createLocatedBlocks(new BlockInfo[] { blockInfo }, 3L, false, 0L, 3L, false, false, null, null);
         verify(spyBM, Mockito.atLeast(0)).isReplicaCorrupt(any(BlockInfo.class), any(DatanodeDescriptor.class));
         addCorruptBlockOnNodes(0, origNodes);
@@ -1370,8 +1370,8 @@ public class TestBlockManager {
     private void verifyPlacementPolicy(final MiniDockerDFSCluster cluster, final Path file, boolean isBlockPlacementSatisfied) throws IOException {
         DistributedFileSystem dfs = cluster.getFileSystem();
         BlockManagerInterface blockManager = cluster.getNamesystem().getBlockManager();
-        LocatedBlockInterface lb = DFSTestUtil.getAllBlocks(dfs, file).get(0);
-        BlockInfoInterface blockInfo = blockManager.getStoredBlock(lb.getBlock().getLocalBlock());
+        LocatedBlock lb = DFSTestUtil.getAllBlocks(dfs, file).get(0);
+        BlockInfo blockInfo = blockManager.getStoredBlock(lb.getBlock().getLocalBlock());
         LOG.info("Block " + blockInfo + " storages: ");
         Iterator<DatanodeStorageInfo> itr = blockInfo.getStorageInfos();
         while (itr.hasNext()) {
@@ -1418,7 +1418,7 @@ public class TestBlockManager {
     public void testMetaSaveMissingReplicas() throws Exception {
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface block = makeBlockReplicasMissing(0, origNodes);
+        BlockInfo block = makeBlockReplicasMissing(0, origNodes);
         File file = new File("test.log");
         PrintWriter out = new PrintWriter(file);
         bm.metaSave(out);
@@ -1446,7 +1446,7 @@ public class TestBlockManager {
     private BlockInfo makeBlockReplicasMissing(long blockId, List<DatanodeDescriptor> nodesList) throws IOException {
         long inodeId = ++mockINodeId;
         final INodeFileInterface bc = TestINodeFile.createINodeFile(inodeId);
-        BlockInfoInterface blockInfo = blockOnNodes(blockId, nodesList);
+        BlockInfo blockInfo = blockOnNodes(blockId, nodesList);
         blockInfo.setReplication((short) 3);
         blockInfo.setBlockCollectionId(inodeId);
         Mockito.doReturn(bc).when(fsn).getBlockCollection(inodeId);
@@ -1461,7 +1461,7 @@ public class TestBlockManager {
     private BlockInfo makeBlockReplicasMaintenance(long blockId, List<DatanodeDescriptor> nodesList) throws IOException {
         long inodeId = ++mockINodeId;
         final INodeFileInterface bc = TestINodeFile.createINodeFile(inodeId);
-        BlockInfoInterface blockInfo = blockOnNodes(blockId, nodesList);
+        BlockInfo blockInfo = blockOnNodes(blockId, nodesList);
         blockInfo.setReplication((short) 3);
         blockInfo.setBlockCollectionId(inodeId);
         Mockito.doReturn(bc).when(fsn).getBlockCollection(inodeId);
@@ -1477,7 +1477,7 @@ public class TestBlockManager {
     public void testMetaSaveInMaintenanceReplicas() throws Exception {
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface block = makeBlockReplicasMaintenance(0, origNodes);
+        BlockInfo block = makeBlockReplicasMaintenance(0, origNodes);
         File file = new File("test.log");
         PrintWriter out = new PrintWriter(file);
         bm.metaSave(out);
@@ -1506,7 +1506,7 @@ public class TestBlockManager {
     private BlockInfo makeBlockReplicasDecommission(long blockId, List<DatanodeDescriptor> nodesList) throws IOException {
         long inodeId = ++mockINodeId;
         final INodeFileInterface bc = TestINodeFile.createINodeFile(inodeId);
-        BlockInfoInterface blockInfo = blockOnNodes(blockId, nodesList);
+        BlockInfo blockInfo = blockOnNodes(blockId, nodesList);
         blockInfo.setReplication((short) 3);
         blockInfo.setBlockCollectionId(inodeId);
         Mockito.doReturn(bc).when(fsn).getBlockCollection(inodeId);
@@ -1522,7 +1522,7 @@ public class TestBlockManager {
     public void testMetaSaveDecommissioningReplicas() throws Exception {
         List<DatanodeStorageInfo> origStorages = getStorages(0, 1);
         List<DatanodeDescriptor> origNodes = getNodes(origStorages);
-        BlockInfoInterface block = makeBlockReplicasDecommission(0, origNodes);
+        BlockInfo block = makeBlockReplicasDecommission(0, origNodes);
         File file = new File("test.log");
         PrintWriter out = new PrintWriter(file);
         bm.metaSave(out);

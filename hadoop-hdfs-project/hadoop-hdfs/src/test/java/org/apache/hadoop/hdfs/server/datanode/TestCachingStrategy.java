@@ -219,7 +219,7 @@ public class TestCachingStrategy {
             // create new file
             createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, true);
             // verify that we dropped everything from the cache during file creation.
-            ExtendedBlockInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
+            ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
             StatsInterface stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
@@ -260,7 +260,7 @@ public class TestCachingStrategy {
             // create new file
             createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, null);
             // verify that we dropped everything from the cache during file creation.
-            ExtendedBlockInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
+            ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
             StatsInterface stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
@@ -297,7 +297,7 @@ public class TestCachingStrategy {
             createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, null);
             // Since the DataNode was configured with drop-behind, and we didn't
             // specify any policy, we should have done drop-behind.
-            ExtendedBlockInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
+            ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
             StatsInterface stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
@@ -334,7 +334,7 @@ public class TestCachingStrategy {
             // create new file
             createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, false);
             // verify that we did not drop everything from the cache during file creation.
-            ExtendedBlockInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
+            ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
             StatsInterface stats = tracker.getStats(fadvisedFileName);
             Assert.assertNull(stats);

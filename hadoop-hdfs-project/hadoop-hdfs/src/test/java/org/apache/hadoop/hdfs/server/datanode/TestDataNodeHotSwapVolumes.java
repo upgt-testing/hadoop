@@ -166,7 +166,7 @@ public class TestDataNodeHotSwapVolumes {
      * Verify whether a file has enough content.
      */
     private static void verifyFileLength(FileSystem fs, Path path, int numBlocks) throws IOException {
-        FileStatusInterface status = fs.getFileStatus(path);
+        FileStatus status = fs.getFileStatus(path);
         assertEquals(numBlocks * BLOCK_SIZE, status.getLen());
     }
 
@@ -615,7 +615,7 @@ public class TestDataNodeHotSwapVolumes {
         DataNodeInterface dn = cluster.getDataNodes().get(0);
         Collection<String> oldDirs = getDataDirs(dn);
         // Findout the storage with block and remove it
-        ExtendedBlockInterface block = DFSTestUtil.getAllBlocks(fs, testFile).get(1).getBlock();
+        ExtendedBlock block = DFSTestUtil.getAllBlocks(fs, testFile).get(1).getBlock();
         FsVolumeSpi volumeWithBlock = dn.getFSDataset().getVolume(block);
         String dirWithBlock = "[" + volumeWithBlock.getStorageType() + "]" + volumeWithBlock.getStorageLocation().getUri();
         String newDirs = dirWithBlock;
@@ -761,8 +761,8 @@ public class TestDataNodeHotSwapVolumes {
         try {
             DataNodeFaultInjector.set(newInjector);
             List<String> oldDirs = getDataDirs(dn);
-            LocatedBlocksInterface lbs = client.getLocatedBlocks("/test", 0);
-            LocatedBlockInterface block = lbs.get(0);
+            LocatedBlocks lbs = client.getLocatedBlocks("/test", 0);
+            LocatedBlock block = lbs.get(0);
             FsVolumeImpl volume = (FsVolumeImpl) dn.getFSDataset().getVolume(block.getBlock());
             final String newDirs = oldDirs.stream().filter((d) -> !d.contains(volume.getStorageLocation().toString())).collect(Collectors.joining(","));
             final List<IOException> exceptions = new ArrayList<>();

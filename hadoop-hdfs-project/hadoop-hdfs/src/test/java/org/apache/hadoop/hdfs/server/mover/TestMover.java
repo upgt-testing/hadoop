@@ -147,7 +147,7 @@ public class TestMover {
             final Mover mover = newMover(conf);
             mover.init();
             final Mover.Processor processor = mover.new Processor();
-            final LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            final LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             final List<MLocation> locations = MLocation.toLocations(lb);
             final MLocation ml = locations.get(0);
             final DBlock db = mover.newDBlock(lb, locations, null);
@@ -173,7 +173,7 @@ public class TestMover {
             out.writeChars("testScheduleWithinSameNode");
             out.close();
             // verify before movement
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             StorageType[] storageTypes = lb.getStorageTypes();
             for (StorageType storageType : storageTypes) {
                 Assert.assertTrue(StorageType.DISK == storageType);
@@ -203,7 +203,7 @@ public class TestMover {
         out.writeChars("testScheduleWithinSameNode");
         out.close();
         //verify before movement
-        LocatedBlockInterface lb = dfs1.getClient().getLocatedBlocks(file, 0).get(0);
+        LocatedBlock lb = dfs1.getClient().getLocatedBlocks(file, 0).get(0);
         StorageType[] storageTypes = lb.getStorageTypes();
         for (StorageType storageType : storageTypes) {
             Assert.assertTrue(StorageType.DISK == storageType);
@@ -221,7 +221,7 @@ public class TestMover {
 
             @Override
             public Boolean get() {
-                LocatedBlockInterface lb = null;
+                LocatedBlock lb = null;
                 try {
                     lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
                 } catch (IOException e) {
@@ -333,7 +333,7 @@ public class TestMover {
 
             @Override
             public Boolean get() {
-                LocatedBlockInterface lb = null;
+                LocatedBlock lb = null;
                 try {
                     lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
                 } catch (IOException e) {
@@ -361,7 +361,7 @@ public class TestMover {
 
     private void checkMovePaths(List<Path> actual, Path... expected) {
         Assert.assertEquals(expected.length, actual.size());
-        for (PathInterface p : expected) {
+        for (Path p : expected) {
             Assert.assertTrue(actual.contains(p));
         }
     }
@@ -502,7 +502,7 @@ public class TestMover {
             out.writeChars("testForTwoReplicaSameStorageTypeShouldNotSelect");
             out.close();
             // verify before movement
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             StorageType[] storageTypes = lb.getStorageTypes();
             for (StorageType storageType : storageTypes) {
                 Assert.assertTrue(StorageType.DISK == storageType);
@@ -583,7 +583,7 @@ public class TestMover {
             out.writeChars("testMoverFailedRetry");
             out.close();
             // Delete block file so, block move will fail with FileNotFoundException
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             cluster.corruptBlockOnDataNodesByDeletingBlockFile(lb.getBlock());
             // move to ARCHIVE
             dfs.setStoragePolicy(new Path(file), "COLD");
@@ -630,7 +630,7 @@ public class TestMover {
         }
     }
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int dataBlocks = ecPolicy.getNumDataUnits();
 
@@ -680,8 +680,8 @@ public class TestMover {
             long fileLen = 20 * defaultBlockSize;
             DFSTestUtil.createFile(cluster.getFileSystem(), new Path(fooFile), fileLen, (short) 3, 0);
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }
@@ -704,7 +704,7 @@ public class TestMover {
             Assert.assertEquals("Movement to ARCHIVE should be successful", 0, rc);
             // verify storage types and locations
             locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.ARCHIVE, type);
                 }
@@ -728,7 +728,7 @@ public class TestMover {
             // Movements should have been ignored for the unsupported policy on
             // striped file
             locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.ARCHIVE, type);
                 }
@@ -789,7 +789,7 @@ public class TestMover {
         final Configuration conf = new HdfsConfiguration();
         try {
             initSecureConf(conf);
-            final UserGroupInformationInterface ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
+            final UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
             ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
                 @Override
@@ -832,7 +832,7 @@ public class TestMover {
             out.write(fileData);
             out.close();
             // verify before movement
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             StorageType[] storageTypes = lb.getStorageTypes();
             for (StorageType storageType : storageTypes) {
                 Assert.assertTrue(StorageType.DISK == storageType);
@@ -880,9 +880,9 @@ public class TestMover {
             // Adding pinned blocks.
             createFileWithFavoredDatanodes(conf, cluster, dfs);
             // Delete block file so, block move will fail with FileNotFoundException
-            LocatedBlocksInterface locatedBlocks = dfs.getClient().getLocatedBlocks(file1, 0);
+            LocatedBlocks locatedBlocks = dfs.getClient().getLocatedBlocks(file1, 0);
             Assert.assertEquals("Wrong block count", 2, locatedBlocks.locatedBlockCount());
-            LocatedBlockInterface lb = locatedBlocks.get(0);
+            LocatedBlock lb = locatedBlocks.get(0);
             cluster.corruptBlockOnDataNodesByDeletingBlockFile(lb.getBlock());
             // move to ARCHIVE
             dfs.setStoragePolicy(new Path(parenDir), "COLD");
@@ -911,7 +911,7 @@ public class TestMover {
             // Wait till namenode notified about the block location details
             waitForLocatedBlockWithArchiveStorageType(dfs, file, 1);
             // verify before unset policy
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(file, 0).get(0);
             Assert.assertTrue(StorageType.ARCHIVE == (lb.getStorageTypes())[0]);
             // unset storage policy
             dfs.unsetStoragePolicy(new Path(file));
@@ -941,9 +941,9 @@ public class TestMover {
         out.write(fileData);
         out.close();
         // Mock FsDatasetSpi#getPinning to show that the block is pinned.
-        LocatedBlocksInterface locatedBlocks = dfs.getClient().getLocatedBlocks(file, 0);
+        LocatedBlocks locatedBlocks = dfs.getClient().getLocatedBlocks(file, 0);
         Assert.assertEquals("Wrong block count", 2, locatedBlocks.locatedBlockCount());
-        LocatedBlockInterface lb = locatedBlocks.get(0);
+        LocatedBlock lb = locatedBlocks.get(0);
         DatanodeInfoInterface datanodeInfo = lb.getLocations()[0];
         for (DataNodeInterface dn : cluster.getDataNodes()) {
             if (dn.getDatanodeId().getDatanodeUuid().equals(datanodeInfo.getDatanodeUuid())) {

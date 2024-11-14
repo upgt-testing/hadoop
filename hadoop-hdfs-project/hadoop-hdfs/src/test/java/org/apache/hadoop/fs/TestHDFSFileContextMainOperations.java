@@ -45,7 +45,7 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     private static final HdfsConfiguration CONF = new HdfsConfiguration();
 
@@ -119,14 +119,14 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
         final int blockSize = 1024;
         final int numOfBlocks = 2;
         DistributedFileSystem fs = cluster.getFileSystem();
-        PathInterface dir = getTestRootPath(fc, "test/hadoop");
-        PathInterface file = getTestRootPath(fc, "test/hadoop/file");
+        Path dir = getTestRootPath(fc, "test/hadoop");
+        Path file = getTestRootPath(fc, "test/hadoop/file");
         final byte[] data = FileSystemTestHelper.getFileData(numOfBlocks, blockSize);
         FileSystemTestHelper.createFile(fs, file, data, blockSize, repl);
         final int newLength = blockSize;
         boolean isReady = fc.truncate(file, newLength);
         Assert.assertTrue("Recovery is not expected.", isReady);
-        FileStatusInterface fileStatus = fc.getFileStatus(file);
+        FileStatus fileStatus = fc.getFileStatus(file);
         Assert.assertEquals(fileStatus.getLen(), newLength);
         AppendTestUtil.checkFullFile(fs, file, newLength, data, file.toString());
         ContentSummaryInterface cs = fs.getContentSummary(dir);
@@ -137,10 +137,10 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
     @Test
     public void testOldRenameWithQuota() throws Exception {
         DistributedFileSystem fs = cluster.getFileSystem();
-        PathInterface src1 = getTestRootPath(fc, "test/testOldRenameWithQuota/srcdir/src1");
-        PathInterface src2 = getTestRootPath(fc, "test/testOldRenameWithQuota/srcdir/src2");
-        PathInterface dst1 = getTestRootPath(fc, "test/testOldRenameWithQuota/dstdir/dst1");
-        PathInterface dst2 = getTestRootPath(fc, "test/testOldRenameWithQuota/dstdir/dst2");
+        Path src1 = getTestRootPath(fc, "test/testOldRenameWithQuota/srcdir/src1");
+        Path src2 = getTestRootPath(fc, "test/testOldRenameWithQuota/srcdir/src2");
+        Path dst1 = getTestRootPath(fc, "test/testOldRenameWithQuota/dstdir/dst1");
+        Path dst2 = getTestRootPath(fc, "test/testOldRenameWithQuota/dstdir/dst2");
         createFile(src1);
         createFile(src2);
         fs.setQuota(src1.getParent(), HdfsConstants.QUOTA_DONT_SET, HdfsConstants.QUOTA_DONT_SET);
@@ -168,10 +168,10 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
     @Test
     public void testRenameWithQuota() throws Exception {
         DistributedFileSystem fs = cluster.getFileSystem();
-        PathInterface src1 = getTestRootPath(fc, "test/testRenameWithQuota/srcdir/src1");
-        PathInterface src2 = getTestRootPath(fc, "test/testRenameWithQuota/srcdir/src2");
-        PathInterface dst1 = getTestRootPath(fc, "test/testRenameWithQuota/dstdir/dst1");
-        PathInterface dst2 = getTestRootPath(fc, "test/testRenameWithQuota/dstdir/dst2");
+        Path src1 = getTestRootPath(fc, "test/testRenameWithQuota/srcdir/src1");
+        Path src2 = getTestRootPath(fc, "test/testRenameWithQuota/srcdir/src2");
+        Path dst1 = getTestRootPath(fc, "test/testRenameWithQuota/dstdir/dst1");
+        Path dst2 = getTestRootPath(fc, "test/testRenameWithQuota/dstdir/dst2");
         createFile(src1);
         createFile(src2);
         fs.setQuota(src1.getParent(), HdfsConstants.QUOTA_DONT_SET, HdfsConstants.QUOTA_DONT_SET);
@@ -221,7 +221,7 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
 
     @Test(expected = RemoteException.class)
     public void testRenameRoot() throws Exception {
-        PathInterface src = getTestRootPath(fc, "test/testRenameRoot/srcdir/src1");
+        Path src = getTestRootPath(fc, "test/testRenameRoot/srcdir/src1");
         Path dst = new Path("/");
         createFile(src);
         rename(dst, src, true, true, Rename.OVERWRITE);
@@ -229,7 +229,7 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
 
     @Test(expected = RemoteException.class)
     public void testRenameToRoot() throws Exception {
-        PathInterface src = getTestRootPath(fc, "test/testRenameRoot/srcdir/src1");
+        Path src = getTestRootPath(fc, "test/testRenameRoot/srcdir/src1");
         Path dst = new Path("/");
         createFile(src);
         rename(src, dst, true, true, Rename.OVERWRITE);
@@ -242,8 +242,8 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
     @Test
     public void testEditsLogOldRename() throws Exception {
         DistributedFileSystem fs = cluster.getFileSystem();
-        PathInterface src1 = getTestRootPath(fc, "testEditsLogOldRename/srcdir/src1");
-        PathInterface dst1 = getTestRootPath(fc, "testEditsLogOldRename/dstdir/dst1");
+        Path src1 = getTestRootPath(fc, "testEditsLogOldRename/srcdir/src1");
+        Path dst1 = getTestRootPath(fc, "testEditsLogOldRename/dstdir/dst1");
         createFile(src1);
         fs.mkdirs(dst1.getParent());
         createFile(dst1);
@@ -271,8 +271,8 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
     @Test
     public void testEditsLogRename() throws Exception {
         DistributedFileSystem fs = cluster.getFileSystem();
-        PathInterface src1 = getTestRootPath(fc, "testEditsLogRename/srcdir/src1");
-        PathInterface dst1 = getTestRootPath(fc, "testEditsLogRename/dstdir/dst1");
+        Path src1 = getTestRootPath(fc, "testEditsLogRename/srcdir/src1");
+        Path dst1 = getTestRootPath(fc, "testEditsLogRename/dstdir/dst1");
         createFile(src1);
         fs.mkdirs(dst1.getParent());
         createFile(dst1);

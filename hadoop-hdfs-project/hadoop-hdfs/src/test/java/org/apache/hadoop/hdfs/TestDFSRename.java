@@ -42,11 +42,11 @@ public class TestDFSRename {
         return NameNodeAdapter.getLeaseManager(cluster.getNamesystem()).countLease();
     }
 
-    final PathInterface dir = new Path("/test/rename/");
+    final Path dir = new Path("/test/rename/");
 
     void list(FileSystem fs, String name) throws IOException {
         FileSystem.LOG.info("\n\n" + name);
-        for (FileStatusInterface s : fs.listStatus(dir)) {
+        for (FileStatus s : fs.listStatus(dir)) {
             FileSystem.LOG.info("" + s.getPath());
         }
     }
@@ -145,7 +145,7 @@ public class TestDFSRename {
             Path dstPath = new Path(dst);
             DFSTestUtil.createFile(dfs, srcPath, fileLen, replFactor, 1);
             DFSTestUtil.createFile(dfs, dstPath, fileLen, replFactor, 1);
-            LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), dst, 0, fileLen);
+            LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), dst, 0, fileLen);
             BlockManagerInterface bm = NameNodeAdapter.getNamesystem(cluster.getNameNode()).getBlockManager();
             assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().getLocalBlock()) != null);
             dfs.rename(srcPath, dstPath, Rename.OVERWRITE);

@@ -106,7 +106,7 @@ public class TestSeveralNameNodes {
 
         private final int maxLength;
 
-        private final PathInterface dir;
+        private final Path dir;
 
         private final FileSystem fs;
 
@@ -148,7 +148,7 @@ public class TestSeveralNameNodes {
          */
         private void checkList() throws IOException {
             for (int i = 0; i < maxLength; i++) {
-                PathInterface nextFile = getNextFile(i);
+                Path nextFile = getNextFile(i);
                 if (!fs.exists(nextFile)) {
                     throw new RuntimeException("Next file " + nextFile + " for list does not exist!");
                 }
@@ -169,7 +169,7 @@ public class TestSeveralNameNodes {
         }
 
         private void writeList() throws IOException {
-            PathInterface nextPath = getNextFile(currentListIndex++);
+            Path nextPath = getNextFile(currentListIndex++);
             LOG.info("Writing next file: " + nextPath);
             FSDataOutputStream file = fs.create(nextPath);
             file.write(currentListIndex);

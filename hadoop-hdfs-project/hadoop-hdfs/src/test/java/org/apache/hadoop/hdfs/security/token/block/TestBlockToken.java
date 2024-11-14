@@ -124,11 +124,11 @@ public class TestBlockToken {
     // 2 mins
     final long blockTokenLifetime = 2 * 60 * 1000;
 
-    final ExtendedBlockInterface block1 = new ExtendedBlock("0", 0L);
+    final ExtendedBlock block1 = new ExtendedBlock("0", 0L);
 
-    final ExtendedBlockInterface block2 = new ExtendedBlock("10", 10L);
+    final ExtendedBlock block2 = new ExtendedBlock("10", 10L);
 
-    final ExtendedBlockInterface block3 = new ExtendedBlock("-10", -108L);
+    final ExtendedBlock block3 = new ExtendedBlock("-10", -108L);
 
     @Before
     public void disableKerberos() {
@@ -279,7 +279,7 @@ public class TestBlockToken {
         final ServerInterface server = createMockDatanode(sm, token, conf);
         server.start();
         final InetSocketAddress addr = NetUtils.getConnectAddress(server);
-        final UserGroupInformationInterface ticket = UserGroupInformation.createRemoteUser(block3.toString());
+        final UserGroupInformation ticket = UserGroupInformation.createRemoteUser(block3.toString());
         ticket.addToken(token);
         ClientDatanodeProtocol proxy = null;
         try {
@@ -426,7 +426,7 @@ public class TestBlockToken {
             out.write(new byte[1000]);
             // ensure that the first block is written out (see FSOutputSummer#flush)
             out.flush();
-            LocatedBlocksInterface locatedBlocks = cluster.getNameNodeRpc().getBlockLocations(fileName, 0, 1000);
+            LocatedBlocks locatedBlocks = cluster.getNameNodeRpc().getBlockLocations(fileName, 0, 1000);
             while (locatedBlocks.getLastLocatedBlock() == null) {
                 Thread.sleep(100);
                 locatedBlocks = cluster.getNameNodeRpc().getBlockLocations(fileName, 0, 1000);

@@ -237,7 +237,7 @@ public class DiskBalancerTestUtil {
             FsVolumeSpi.BlockIterator sourceIter = source.newBlockIterator(blockPoolID, "TestDiskBalancerSource");
             int blockCount = 0;
             while (!sourceIter.atEnd()) {
-                ExtendedBlockInterface block = sourceIter.nextBlock();
+                ExtendedBlock block = sourceIter.nextBlock();
                 if (block != null) {
                     blockCount++;
                 }
@@ -304,7 +304,7 @@ public class DiskBalancerTestUtil {
         for (String blockPoolID : source.getBlockPoolList()) {
             FsVolumeSpi.BlockIterator sourceIter = source.newBlockIterator(blockPoolID, "TestDiskBalancerSource");
             while (!sourceIter.atEnd()) {
-                ExtendedBlockInterface block = sourceIter.nextBlock();
+                ExtendedBlock block = sourceIter.nextBlock();
                 if (block != null) {
                     fsDataset.moveBlockAcrossVolumes(block, dest);
                 }

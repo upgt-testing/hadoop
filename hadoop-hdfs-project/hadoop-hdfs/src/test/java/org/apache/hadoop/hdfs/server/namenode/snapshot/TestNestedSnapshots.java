@@ -102,13 +102,13 @@ public class TestNestedSnapshots {
         DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, SEED);
         print("create file " + file1);
         final String s1name = "foo-s1";
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(foo, s1name);
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(foo, s1name);
         hdfs.allowSnapshot(foo);
         print("allow snapshot " + foo);
         hdfs.createSnapshot(foo, s1name);
         print("create snapshot " + s1name);
         final String s2name = "bar-s2";
-        final PathInterface s2path = SnapshotTestHelper.getSnapshotRoot(bar, s2name);
+        final Path s2path = SnapshotTestHelper.getSnapshotRoot(bar, s2name);
         hdfs.allowSnapshot(bar);
         print("allow snapshot " + bar);
         hdfs.createSnapshot(bar, s2name);
@@ -123,7 +123,7 @@ public class TestNestedSnapshots {
         final Path rootPath = new Path(rootStr);
         hdfs.allowSnapshot(rootPath);
         print("allow snapshot " + rootStr);
-        final PathInterface rootSnapshot = hdfs.createSnapshot(rootPath);
+        final Path rootSnapshot = hdfs.createSnapshot(rootPath);
         print("create snapshot " + rootSnapshot);
         hdfs.deleteSnapshot(rootPath, rootSnapshot.getName());
         print("delete snapshot " + rootSnapshot);
@@ -212,7 +212,7 @@ public class TestNestedSnapshots {
             final String file = "f" + f;
             s = RANDOM.nextInt(step);
             for (; s < SNAPSHOT_QUOTA_DEFAULT; s += RANDOM.nextInt(step)) {
-                final PathInterface p = SnapshotTestHelper.getSnapshotPath(dir, "s" + s, file);
+                final Path p = SnapshotTestHelper.getSnapshotPath(dir, "s" + s, file);
                 //the file #f exists in snapshot #s iff s > f.
                 Assert.assertEquals(s > f, hdfs.exists(p));
             }
@@ -234,11 +234,11 @@ public class TestNestedSnapshots {
         DFSTestUtil.createFile(hdfs, f1, BLOCKSIZE, REPLICATION, SEED);
         {
             //create a snapshot with default snapshot name
-            final PathInterface snapshotPath = hdfs.createSnapshot(dir);
+            final Path snapshotPath = hdfs.createSnapshot(dir);
             //check snapshot path and the default snapshot name
             final String snapshotName = snapshotPath.getName();
             Assert.assertTrue("snapshotName=" + snapshotName, Pattern.matches("s\\d\\d\\d\\d\\d\\d\\d\\d-\\d\\d\\d\\d\\d\\d\\.\\d\\d\\d", snapshotName));
-            final PathInterface parent = snapshotPath.getParent();
+            final Path parent = snapshotPath.getParent();
             Assert.assertEquals(HdfsConstants.DOT_SNAPSHOT_DIR, parent.getName());
             Assert.assertEquals(dir, parent.getParent());
         }

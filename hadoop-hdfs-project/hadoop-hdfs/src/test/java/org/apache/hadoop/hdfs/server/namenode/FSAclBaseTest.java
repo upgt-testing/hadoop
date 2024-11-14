@@ -64,14 +64,14 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
  */
 public abstract class FSAclBaseTest {
 
-    private static final UserGroupInformationInterface BRUCE = UserGroupInformation.createUserForTesting("bruce", new String[] {});
+    private static final UserGroupInformation BRUCE = UserGroupInformation.createUserForTesting("bruce", new String[] {});
 
-    private static final UserGroupInformationInterface DIANA = UserGroupInformation.createUserForTesting("diana", new String[] {});
+    private static final UserGroupInformation DIANA = UserGroupInformation.createUserForTesting("diana", new String[] {});
 
-    private static final UserGroupInformationInterface SUPERGROUP_MEMBER = UserGroupInformation.createUserForTesting("super", new String[] { DFSConfigKeys.DFS_PERMISSIONS_SUPERUSERGROUP_DEFAULT });
+    private static final UserGroupInformation SUPERGROUP_MEMBER = UserGroupInformation.createUserForTesting("super", new String[] { DFSConfigKeys.DFS_PERMISSIONS_SUPERUSERGROUP_DEFAULT });
 
     // group member
-    private static final UserGroupInformationInterface BOB = UserGroupInformation.createUserForTesting("bob", new String[] { "groupY", "groupZ" });
+    private static final UserGroupInformation BOB = UserGroupInformation.createUserForTesting("bob", new String[] { "groupY", "groupZ" });
 
     protected static MiniDockerDFSCluster cluster;
 
@@ -79,7 +79,7 @@ public abstract class FSAclBaseTest {
 
     private static int pathCount = 0;
 
-    private static PathInterface path;
+    private static Path path;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -628,7 +628,7 @@ public abstract class FSAclBaseTest {
         FsPermissionInterface perm = inode.getFsPermission();
         assertNotNull(perm);
         assertEquals(0755, perm.toShort());
-        FileStatusInterface stat = fs.getFileStatus(path);
+        FileStatus stat = fs.getFileStatus(path);
         assertFalse(stat.hasAcl());
         assertFalse(stat.isEncrypted());
         assertFalse(stat.isErasureCoded());

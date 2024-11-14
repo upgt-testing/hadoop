@@ -59,7 +59,7 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         GenericTestUtils.setLogLevel(BlockManager.LOG, Level.ALL);
     }
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int cellSize = ecPolicy.getCellSize();
 
@@ -242,8 +242,8 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         // make sure the excess replica is detected, and we delete host1's replica
         // so that we have 6 racks
         DFSTestUtil.waitForReplication(fs, file, blockNum, 15 * 1000);
-        LocatedBlocksInterface blks = fs.getClient().getLocatedBlocks(file.toString(), 0);
-        LocatedStripedBlockInterface block = (LocatedStripedBlock) blks.getLastLocatedBlock();
+        LocatedBlocks blks = fs.getClient().getLocatedBlocks(file.toString(), 0);
+        LocatedStripedBlock block = (LocatedStripedBlock) blks.getLastLocatedBlock();
         for (DatanodeInfoInterface dn : block.getLocations()) {
             Assert.assertFalse(dn.getHostName().equals("host1"));
         }
@@ -270,7 +270,7 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         MiniDockerDFSCluster.DataNodeProperties h10 = stopDataNode(hostNames[hostNames.length - 2]);
         final Path file = new Path("/foo");
         DFSTestUtil.createFile(fs, file, cellSize * dataBlocks * 2, (short) 1, 0L);
-        final BlockInfoInterface blockInfo = cluster.getNamesystem().getFSDirectory().getINode(file.toString()).asFile().getLastBlock();
+        final BlockInfo blockInfo = cluster.getNamesystem().getFSDirectory().getINode(file.toString()).asFile().getLastBlock();
         // bring h9 back
         cluster.restartDataNode(h9);
         cluster.waitActive();

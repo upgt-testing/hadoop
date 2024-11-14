@@ -527,7 +527,7 @@ public class DFSTestUtil {
    */
     public static boolean allBlockReplicasCorrupt(MiniDockerDFSCluster cluster, Path file, int blockNo) throws IOException {
         try (DFSClient client = new DFSClient(new InetSocketAddress("localhost", cluster.getNameNodePort()), cluster.getConfiguration(0))) {
-            LocatedBlocksInterface blocks;
+            LocatedBlocks blocks;
             blocks = client.getNamenode().getBlockLocations(file.toString(), 0, Long.MAX_VALUE);
             return blocks.get(blockNo).isCorrupt();
         }
@@ -569,9 +569,9 @@ public class DFSTestUtil {
             @Override
             public Boolean get() {
                 try {
-                    FileStatusInterface stat = dfs.getFileStatus(file);
+                    FileStatus stat = dfs.getFileStatus(file);
                     BlockLocation[] locs = dfs.getFileBlockLocations(stat, 0, stat.getLen());
-                    for (BlockLocationInterface loc : locs) {
+                    for (BlockLocation loc : locs) {
                         if (replication != loc.getHosts().length) {
                             return false;
                         }
@@ -1253,7 +1253,7 @@ public class DFSTestUtil {
         fout.hflush();
         long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
         DFSClient dfsclient = DFSClientAdapter.getDFSClient(filesystem);
-        LocatedBlocksInterface blocks = dfsclient.getNamenode().getBlockLocations(updateBlockFile, 0, Integer.MAX_VALUE);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(updateBlockFile, 0, Integer.MAX_VALUE);
         dfsclient.getNamenode().abandonBlock(blocks.get(0).getBlock(), fileId, updateBlockFile, dfsclient.clientName);
         fout.close();
         // OP_SET_STORAGE_POLICY 45
@@ -1333,7 +1333,7 @@ public class DFSTestUtil {
         // Set the hard lease timeout to 1 second.
         cluster.setLeasePeriod(60 * 1000, 1000, nnIndex);
         // wait for lease recovery to complete
-        LocatedBlocksInterface locatedBlocks;
+        LocatedBlocks locatedBlocks;
         do {
             try {
                 Thread.sleep(1000);
@@ -1390,8 +1390,8 @@ public class DFSTestUtil {
         // OP_ADD on erasure coding directory
         Path ecDir = new Path("/ec");
         filesystem.mkdirs(ecDir);
-        final ErasureCodingPolicyInterface defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
-        final ErasureCodingPolicyInterface ecPolicyRS32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        final ErasureCodingPolicy defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        final ErasureCodingPolicy ecPolicyRS32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
         filesystem.enableErasureCodingPolicy(ecPolicyRS32.getName());
         filesystem.enableErasureCodingPolicy(defaultEcPolicy.getName());
         filesystem.setErasureCodingPolicy(ecDir, defaultEcPolicy.getName());
@@ -1563,8 +1563,8 @@ public class DFSTestUtil {
             return false;
         }
         long fileLength = client.getFileInfo(path.toString()).getLen();
-        LocatedBlocksInterface locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
-        for (LocatedBlockInterface locatedBlock : locatedBlocks.getLocatedBlocks()) {
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
             if (locatedBlock.getStorageTypes()[0] != storageType) {
                 LOG.info("verifyFileReplicasOnStorageType: for file " + path + ". Expect blk" + locatedBlock + " on Type: " + storageType + ". Actual Type: " + locatedBlock.getStorageTypes()[0]);
                 return false;
@@ -1652,7 +1652,7 @@ public class DFSTestUtil {
      */
     public static DatanodeDescriptor getExpectedPrimaryNode(NameNode nn, ExtendedBlock blk) {
         BlockManagerInterface bm0 = nn.getNamesystem().getBlockManager();
-        BlockInfoInterface storedBlock = bm0.getStoredBlock(blk.getLocalBlock());
+        BlockInfo storedBlock = bm0.getStoredBlock(blk.getLocalBlock());
         assertTrue("Block " + blk + " should be under construction, " + "got: " + storedBlock, !storedBlock.isComplete());
         // We expect that the replica with the most recent heart beat will be
         // the one to be in charge of the synchronization / recovery protocol.
@@ -1718,9 +1718,9 @@ public class DFSTestUtil {
     public static void addDataNodeLayoutVersion(final int lv, final String description) throws NoSuchFieldException, IllegalAccessException {
         Preconditions.checkState(lv < DataNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
         // Override {@link DataNodeLayoutVersion#CURRENT_LAYOUT_VERSION} via reflection.
-        FieldInterface modifiersField = Field.class.getDeclaredField("modifiers");
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
-        FieldInterface field = DataNodeLayoutVersion.class.getField("CURRENT_LAYOUT_VERSION");
+        Field field = DataNodeLayoutVersion.class.getField("CURRENT_LAYOUT_VERSION");
         field.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         field.setInt(null, lv);
@@ -1857,7 +1857,7 @@ public class DFSTestUtil {
             blks[i] = lbs.getLocatedBlocks().get(i).getBlock().getLocalBlock();
         }
         int bufPos = 0;
-        for (BlockInterface b : blks) {
+        for (Block b : blks) {
             for (long blkPos = 0; blkPos < b.getNumBytes(); blkPos++) {
                 assert bufPos < expected.length;
                 expected[bufPos++] = SimulatedFSDataset.simulatedByte(b, blkPos);
@@ -1917,9 +1917,9 @@ public class DFSTestUtil {
         FSNamesystemInterface ns = cluster.getNamesystem();
         FSDirectoryInterface fsdir = ns.getFSDirectory();
         INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
-        ExtendedBlockInterface previous = null;
+        ExtendedBlock previous = null;
         for (int i = 0; i < numBlocks; i++) {
-            BlockInterface newBlock = addBlockToFile(true, cluster.getDataNodes(), dfs, ns, file.toString(), fileNode, dfs.getClient().getClientName(), previous, numStripesPerBlk, 0);
+            Block newBlock = addBlockToFile(true, cluster.getDataNodes(), dfs, ns, file.toString(), fileNode, dfs.getClient().getClientName(), previous, numStripesPerBlk, 0);
             previous = new ExtendedBlock(ns.getBlockPoolId(), newBlock);
         }
         dfs.getClient().namenode.complete(file.toString(), dfs.getClient().getClientName(), previous, fileNode.getId());
@@ -1940,7 +1940,7 @@ public class DFSTestUtil {
      */
     public static Block addBlockToFile(boolean isStripedBlock, List<DataNode> dataNodes, DistributedFileSystem fs, FSNamesystem ns, String file, INodeFile fileNode, String clientName, ExtendedBlock previous, int numStripes, int len) throws Exception {
         fs.getClient().namenode.addBlock(file, clientName, previous, null, fileNode.getId(), null, null);
-        final BlockInfoInterface lastBlock = fileNode.getLastBlock();
+        final BlockInfo lastBlock = fileNode.getLastBlock();
         final int groupSize = fileNode.getPreferredBlockReplication();
         assert dataNodes.size() >= groupSize;
         // 1. RECEIVING_BLOCK IBR
@@ -1953,7 +1953,7 @@ public class DFSTestUtil {
                 ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
             }
         }
-        final ErasureCodingPolicyInterface ecPolicy = fs.getErasureCodingPolicy(new Path(file));
+        final ErasureCodingPolicy ecPolicy = fs.getErasureCodingPolicy(new Path(file));
         // 2. RECEIVED_BLOCK IBR
         long blockSize = isStripedBlock ? numStripes * ecPolicy.getCellSize() : len;
         for (int i = 0; i < groupSize; i++) {
@@ -2069,14 +2069,14 @@ public class DFSTestUtil {
     }
 
     public static void verifyDelete(FsShell shell, FileSystem fs, Path path, boolean shouldExistInTrash) throws Exception {
-        PathInterface trashPath = Path.mergePaths(shell.getCurrentTrashDir(path), path);
+        Path trashPath = Path.mergePaths(shell.getCurrentTrashDir(path), path);
         verifyDelete(shell, fs, path, trashPath, shouldExistInTrash);
     }
 
     public static void verifyDelete(FsShell shell, FileSystem fs, Path path, Path trashPath, boolean shouldExistInTrash) throws Exception {
         assertTrue(path + " file does not exist", fs.exists(path));
         // Verify that trashPath has a path component named ".Trash"
-        PathInterface checkTrash = trashPath;
+        Path checkTrash = trashPath;
         while (!checkTrash.isRoot() && !checkTrash.getName().equals(".Trash")) {
             checkTrash = checkTrash.getParent();
         }
@@ -2223,7 +2223,7 @@ public class DFSTestUtil {
 
             @Override
             public Boolean get() {
-                final LocatedBlockInterface lb;
+                final LocatedBlock lb;
                 try {
                     lb = fs.getClient().getLocatedBlocks(fileName, 0).get(0);
                 } catch (IOException e) {

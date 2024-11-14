@@ -133,9 +133,9 @@ public class TestSequentialBlockId {
         BlockIdManagerInterface bid = mock(BlockIdManager.class);
         final long maxGenStampForLegacyBlocks = 10000;
         when(bid.getLegacyGenerationStampLimit()).thenReturn(maxGenStampForLegacyBlocks);
-        BlockInterface legacyBlock = spy(new Block());
+        Block legacyBlock = spy(new Block());
         when(legacyBlock.getGenerationStamp()).thenReturn(maxGenStampForLegacyBlocks / 2);
-        BlockInterface newBlock = spy(new Block());
+        Block newBlock = spy(new Block());
         when(newBlock.getGenerationStamp()).thenReturn(maxGenStampForLegacyBlocks + 1);
         // Make sure that isLegacyBlock() can correctly detect
         // legacy and new blocks.

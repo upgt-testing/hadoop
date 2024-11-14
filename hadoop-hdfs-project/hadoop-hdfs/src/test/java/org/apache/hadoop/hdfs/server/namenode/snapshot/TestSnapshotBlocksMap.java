@@ -58,9 +58,9 @@ public class TestSnapshotBlocksMap {
 
     private static final int BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
     protected Configuration conf;
 
@@ -97,7 +97,7 @@ public class TestSnapshotBlocksMap {
     static INodeFile assertBlockCollection(String path, int numBlocks, final FSDirectory dir, final BlockManager blkManager) throws Exception {
         final INodeFileInterface file = INodeFile.valueOf(dir.getINode(path), path);
         assertEquals(numBlocks, file.getBlocks().length);
-        for (BlockInfoInterface b : file.getBlocks()) {
+        for (BlockInfo b : file.getBlocks()) {
             assertBlockCollection(blkManager, file, b);
         }
         return file;
@@ -131,7 +131,7 @@ public class TestSnapshotBlocksMap {
             BlockInfo[] blocks = f2.getBlocks();
             hdfs.delete(sub2, true);
             // The INode should have been removed from the blocksMap
-            for (BlockInfoInterface b : blocks) {
+            for (BlockInfo b : blocks) {
                 assertEquals(INVALID_INODE_ID, b.getBlockCollectionId());
             }
         }
@@ -156,12 +156,12 @@ public class TestSnapshotBlocksMap {
         final INodeFileInterface f0 = assertBlockCollection(file0.toString(), 4, fsdir, blockmanager);
         BlockInfo[] blocks0 = f0.getBlocks();
         // Also check the block information for snapshot of file0
-        PathInterface snapshotFile0 = SnapshotTestHelper.getSnapshotPath(sub1, "s0", file0.getName());
+        Path snapshotFile0 = SnapshotTestHelper.getSnapshotPath(sub1, "s0", file0.getName());
         assertBlockCollection(snapshotFile0.toString(), 4, fsdir, blockmanager);
         // Delete file0
         hdfs.delete(file0, true);
         // Make sure the blocks of file0 is still in blocksMap
-        for (BlockInfoInterface b : blocks0) {
+        for (BlockInfo b : blocks0) {
             assertNotEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         assertBlockCollection(snapshotFile0.toString(), 4, fsdir, blockmanager);
@@ -171,7 +171,7 @@ public class TestSnapshotBlocksMap {
         // Delete snapshot s1
         hdfs.deleteSnapshot(sub1, "s1");
         // Make sure the first block of file0 is still in blocksMap
-        for (BlockInfoInterface b : blocks0) {
+        for (BlockInfo b : blocks0) {
             assertNotEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         assertBlockCollection(snapshotFile0.toString(), 4, fsdir, blockmanager);
@@ -267,7 +267,7 @@ public class TestSnapshotBlocksMap {
         assertEquals(BLOCKSIZE, blks[0].getNumBytes());
         assertEquals(0, blks[1].getNumBytes());
         hdfs.delete(bar, true);
-        final PathInterface sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", bar.getName());
+        final Path sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", bar.getName());
         barNode = fsdir.getINode(sbar.toString()).asFile();
         blks = barNode.getBlocks();
         assertEquals(1, blks.length);
@@ -296,7 +296,7 @@ public class TestSnapshotBlocksMap {
         assertEquals(BLOCKSIZE, blks[0].getNumBytes());
         assertEquals(0, blks[1].getNumBytes());
         hdfs.delete(subDir, true);
-        final PathInterface sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", "sub/bar");
+        final Path sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", "sub/bar");
         barNode = fsdir.getINode(sbar.toString()).asFile();
         blks = barNode.getBlocks();
         assertEquals(1, blks.length);
@@ -332,7 +332,7 @@ public class TestSnapshotBlocksMap {
         assertEquals(0, blks[1].getNumBytes());
         // delete subDir
         hdfs.delete(subDir, true);
-        final PathInterface sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", "sub/bar");
+        final Path sbar = SnapshotTestHelper.getSnapshotPath(foo, "s1", "sub/bar");
         barNode = fsdir.getINode(sbar.toString()).asFile();
         blks = barNode.getBlocks();
         assertEquals(1, blks.length);

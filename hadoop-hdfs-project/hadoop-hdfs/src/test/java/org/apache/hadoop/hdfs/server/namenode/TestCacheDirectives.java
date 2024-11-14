@@ -100,7 +100,7 @@ public class TestCacheDirectives {
 
     static final Logger LOG = LoggerFactory.getLogger(TestCacheDirectives.class);
 
-    private static final UserGroupInformationInterface unprivilegedUser = UserGroupInformation.createRemoteUser("unprivilegedUser");
+    private static final UserGroupInformation unprivilegedUser = UserGroupInformation.createRemoteUser("unprivilegedUser");
 
     static private Configuration conf;
 
@@ -713,15 +713,15 @@ public class TestCacheDirectives {
     private static void checkNumCachedReplicas(final DistributedFileSystem dfs, final List<Path> paths, final int expectedBlocks, final int expectedReplicas) throws Exception {
         int numCachedBlocks = 0;
         int numCachedReplicas = 0;
-        for (PathInterface p : paths) {
-            final FileStatusInterface f = dfs.getFileStatus(p);
+        for (Path p : paths) {
+            final FileStatus f = dfs.getFileStatus(p);
             final long len = f.getLen();
             final long blockSize = f.getBlockSize();
             // round it up to full blocks
             final long numBlocks = (len + blockSize - 1) / blockSize;
             BlockLocation[] locs = dfs.getFileBlockLocations(p, 0, len);
             assertEquals("Unexpected number of block locations for path " + p, numBlocks, locs.length);
-            for (BlockLocationInterface l : locs) {
+            for (BlockLocation l : locs) {
                 if (l.getCachedHosts().length > 0) {
                     numCachedBlocks++;
                 }
@@ -752,7 +752,7 @@ public class TestCacheDirectives {
         LinkedList<Long> bogusBlockIds = new LinkedList<Long>();
         bogusBlockIds.add(999999L);
         nnRpc.cacheReport(dn0.getDNRegistrationForBP(bpid), bpid, bogusBlockIds);
-        PathInterface rootDir = helper.getDefaultWorkingDirectory(dfs);
+        Path rootDir = helper.getDefaultWorkingDirectory(dfs);
         // Create the pool
         final String pool = "friendlyPool";
         nnRpc.addCachePool(new CachePoolInfo("friendlyPool"));
@@ -814,7 +814,7 @@ public class TestCacheDirectives {
         dfs.mkdir(new Path("/foo"), FsPermission.getDirDefault());
         dfs.mkdir(new Path("/foo2"), FsPermission.getDirDefault());
         final int numBlocksPerFile = 2;
-        for (PathInterface path : paths) {
+        for (Path path : paths) {
             FileSystemTestHelper.createFile(dfs, path, numBlocksPerFile, (int) BLOCK_SIZE, (short) 3, false);
         }
         waitForCachedBlocks(namenode, 0, 0, "testWaitForCachedReplicasInDirectory:0");
@@ -860,7 +860,7 @@ public class TestCacheDirectives {
         dfs.mkdir(new Path("/foo"), FsPermission.getDirDefault());
         dfs.mkdir(new Path("/foo2"), FsPermission.getDirDefault());
         final int numBlocksPerFile = 2;
-        for (PathInterface path : paths) {
+        for (Path path : paths) {
             FileSystemTestHelper.createFile(dfs, path, numBlocksPerFile, (int) BLOCK_SIZE, (short) 3, false);
         }
         waitForCachedBlocks(namenode, 0, 0, "testReplicationFactor:0");
@@ -889,7 +889,7 @@ public class TestCacheDirectives {
 
     @Test(timeout = 60000)
     public void testListCachePoolPermissions() throws Exception {
-        final UserGroupInformationInterface myUser = UserGroupInformation.createRemoteUser("myuser");
+        final UserGroupInformation myUser = UserGroupInformation.createRemoteUser("myuser");
         final DistributedFileSystem myDfs = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(myUser, conf);
         final String poolName = "poolparty";
         dfs.addCachePool(new CachePoolInfo(poolName).setMode(new FsPermission((short) 0700)));
@@ -1193,7 +1193,7 @@ public class TestCacheDirectives {
     @Test
     public void testNoLookupsWhenNotUsed() throws Exception {
         CacheManagerInterface cm = cluster.getNamesystem().getCacheManager();
-        LocatedBlocksInterface locations = Mockito.mock(LocatedBlocks.class);
+        LocatedBlocks locations = Mockito.mock(LocatedBlocks.class);
         cm.setCachedLocations(locations);
         Mockito.verifyZeroInteractions(locations);
     }

@@ -84,7 +84,7 @@ public class TestWebHdfsUrl {
     @Test(timeout = 60000)
     public void testSimpleAuthParamsInUrl() throws IOException {
         Configuration conf = new Configuration();
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         UserGroupInformation.setLoginUser(ugi);
         WebHdfsFileSystem webhdfs = getWebHdfsFileSystem(ugi, conf);
         Path fsPath = new Path("/");
@@ -96,7 +96,7 @@ public class TestWebHdfsUrl {
     @Test(timeout = 60000)
     public void testSimpleProxyAuthParamsInUrl() throws IOException {
         Configuration conf = new Configuration();
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         ugi = UserGroupInformation.createProxyUser("test-proxy-user", ugi);
         UserGroupInformation.setLoginUser(ugi);
         WebHdfsFileSystem webhdfs = getWebHdfsFileSystem(ugi, conf);
@@ -112,7 +112,7 @@ public class TestWebHdfsUrl {
         // fake turning on security so api thinks it should use tokens
         SecurityUtil.setAuthenticationMethod(KERBEROS, conf);
         UserGroupInformation.setConfiguration(conf);
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         ugi.setAuthenticationMethod(KERBEROS);
         UserGroupInformation.setLoginUser(ugi);
         WebHdfsFileSystem webhdfs = getWebHdfsFileSystem(ugi, conf);
@@ -151,7 +151,7 @@ public class TestWebHdfsUrl {
         // fake turning on security so api thinks it should use tokens
         SecurityUtil.setAuthenticationMethod(KERBEROS, conf);
         UserGroupInformation.setConfiguration(conf);
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         ugi.setAuthenticationMethod(KERBEROS);
         ugi = UserGroupInformation.createProxyUser("test-proxy-user", ugi);
         UserGroupInformation.setLoginUser(ugi);
@@ -188,7 +188,7 @@ public class TestWebHdfsUrl {
     @Test(timeout = 60000)
     public void testCheckAccessUrl() throws IOException {
         Configuration conf = new Configuration();
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         UserGroupInformation.setLoginUser(ugi);
         WebHdfsFileSystem webhdfs = getWebHdfsFileSystem(ugi, conf);
         Path fsPath = new Path("/p1");
@@ -199,7 +199,7 @@ public class TestWebHdfsUrl {
     @Test(timeout = 60000)
     public void testBatchedListingUrl() throws Exception {
         Configuration conf = new Configuration();
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         UserGroupInformation.setLoginUser(ugi);
         WebHdfsFileSystem webhdfs = getWebHdfsFileSystem(ugi, conf);
         Path fsPath = new Path("/p1");
@@ -233,7 +233,7 @@ public class TestWebHdfsUrl {
 
     @Test
     public void testWebHdfsSpecialCharacterFile() throws Exception {
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         ugi.setAuthenticationMethod(KERBEROS);
         UserGroupInformation.setLoginUser(ugi);
         final Configuration conf = WebHdfsTestUtil.createConf();
@@ -248,12 +248,12 @@ public class TestWebHdfsUrl {
             final Path file1 = new Path(dir, SPECIAL_CHARACTER_FILENAME);
             DFSTestUtil.createFile(fs, file1, length, numDatanodes, 20120406L);
             //get file status and check that it was written properly.
-            final FileStatusInterface s1 = fs.getFileStatus(file1);
+            final FileStatus s1 = fs.getFileStatus(file1);
             assertEquals("Write failed for file " + file1, length, s1.getLen());
             boolean found = false;
             RemoteIterator<LocatedFileStatus> statusRemoteIterator = fs.listFiles(dir, false);
             while (statusRemoteIterator.hasNext()) {
-                LocatedFileStatusInterface locatedFileStatus = statusRemoteIterator.next();
+                LocatedFileStatus locatedFileStatus = statusRemoteIterator.next();
                 if (locatedFileStatus.isFile() && SPECIAL_CHARACTER_FILENAME.equals(locatedFileStatus.getPath().getName())) {
                     found = true;
                 }
@@ -268,7 +268,7 @@ public class TestWebHdfsUrl {
 
     @Test
     public void testWebHdfsBackwardCompatibleSpecialCharacterFile() throws Exception {
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser("test-user");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test-user");
         ugi.setAuthenticationMethod(KERBEROS);
         UserGroupInformation.setLoginUser(ugi);
         final Configuration conf = WebHdfsTestUtil.createConf();
@@ -283,12 +283,12 @@ public class TestWebHdfsUrl {
             final Path file1 = new Path(dir, BACKWARD_COMPATIBLE_SPECIAL_CHARACTER_FILENAME);
             DFSTestUtil.createFile(fs, file1, length, numDatanodes, 20120406L);
             //get file status and check that it was written properly.
-            final FileStatusInterface s1 = fs.getFileStatus(file1);
+            final FileStatus s1 = fs.getFileStatus(file1);
             assertEquals("Write failed for file " + file1, length, s1.getLen());
             boolean found = false;
             RemoteIterator<LocatedFileStatus> statusRemoteIterator = fs.listFiles(dir, false);
             while (statusRemoteIterator.hasNext()) {
-                LocatedFileStatusInterface locatedFileStatus = statusRemoteIterator.next();
+                LocatedFileStatus locatedFileStatus = statusRemoteIterator.next();
                 if (locatedFileStatus.isFile() && BACKWARD_COMPATIBLE_SPECIAL_CHARACTER_FILENAME.equals(locatedFileStatus.getPath().getName())) {
                     found = true;
                 }

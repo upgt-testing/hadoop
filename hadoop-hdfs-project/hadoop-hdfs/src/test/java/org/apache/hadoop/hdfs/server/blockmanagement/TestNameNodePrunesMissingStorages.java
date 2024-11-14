@@ -151,13 +151,13 @@ public class TestNameNodePrunesMissingStorages {
             for (DataNodeInterface dn : cluster.getDataNodes()) {
                 DataNodeTestUtils.triggerBlockReport(dn);
             }
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, new Path("/foo1"));
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/foo1"));
             cluster.getNamesystem().writeLock();
             final String storageIdToRemove;
             String datanodeUuid;
             // Find the first storage which this block is in.
             try {
-                BlockInfoInterface storedBlock = cluster.getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
+                BlockInfo storedBlock = cluster.getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
                 Iterator<DatanodeStorageInfo> storageInfoIter = cluster.getNamesystem().getBlockManager().blocksMap.getStorages(storedBlock).iterator();
                 assertTrue(storageInfoIter.hasNext());
                 DatanodeStorageInfoInterface info = storageInfoIter.next();
@@ -291,7 +291,7 @@ public class TestNameNodePrunesMissingStorages {
             } finally {
                 volumeRefs.close();
             }
-            final ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+            final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
             cluster.restartDataNodes();
             GenericTestUtils.waitFor(new Supplier<Boolean>() {
 

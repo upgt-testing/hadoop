@@ -51,7 +51,7 @@ public class TestViewFsWithXAttrs {
 
     private Configuration fsViewConf;
 
-    private PathInterface targetTestRoot, targetTestRoot2, mountOnNn1, mountOnNn2;
+    private Path targetTestRoot, targetTestRoot2, mountOnNn1, mountOnNn2;
 
     private FileContextTestHelper fileContextTestHelper = new FileContextTestHelper("/tmp/TestViewFsWithXAttrs");
 

@@ -127,7 +127,7 @@ public class TestDFSOutputStream {
         Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
         method.setAccessible(true);
         method.invoke(dos, packetSize, bytesPerChecksum);
-        FieldInterface field = dos.getClass().getDeclaredField("packetSize");
+        Field field = dos.getClass().getDeclaredField("packetSize");
         field.setAccessible(true);
         Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
         // If PKT_MAX_HEADER_LEN is 257, actual packet size come to over 64KB
@@ -193,7 +193,7 @@ public class TestDFSOutputStream {
             setBytesCurBlockMethod.setAccessible(true);
             setBytesCurBlockMethod.invoke(dos, bytesCurBlock);
             /* set blockSize */
-            final FieldInterface blockSizeField = dos.getClass().getDeclaredField("blockSize");
+            final Field blockSizeField = dos.getClass().getDeclaredField("blockSize");
             blockSizeField.setAccessible(true);
             blockSizeField.setLong(dos, blockSize);
             /* call adjustChunkBoundary */
@@ -201,15 +201,15 @@ public class TestDFSOutputStream {
             method.setAccessible(true);
             method.invoke(dos);
             /* get and verify writePacketSize */
-            final FieldInterface writePacketSizeField = dos.getClass().getDeclaredField("writePacketSize");
+            final Field writePacketSizeField = dos.getClass().getDeclaredField("writePacketSize");
             writePacketSizeField.setAccessible(true);
             Assert.assertEquals(writePacketSizeField.getInt(dos), finalWritePacketSize);
             /* get and verify chunksPerPacket */
-            final FieldInterface chunksPerPacketField = dos.getClass().getDeclaredField("chunksPerPacket");
+            final Field chunksPerPacketField = dos.getClass().getDeclaredField("chunksPerPacket");
             chunksPerPacketField.setAccessible(true);
             Assert.assertEquals(chunksPerPacketField.getInt(dos), (finalWritePacketSize - packateMaxHeaderLength) / chunkSize);
             /* get and verify packetSize */
-            final FieldInterface packetSizeField = dos.getClass().getDeclaredField("packetSize");
+            final Field packetSizeField = dos.getClass().getDeclaredField("packetSize");
             packetSizeField.setAccessible(true);
             Assert.assertEquals(packetSizeField.getInt(dos), chunksPerPacketField.getInt(dos) * chunkSize);
         } finally {

@@ -67,7 +67,7 @@ public class TestViewFsLinkFallback {
 
     private static URI viewFsDefaultClusterUri;
 
-    private PathInterface targetTestRoot;
+    private Path targetTestRoot;
 
     @BeforeClass
     public static void clusterSetupAtBeginning() throws IOException, URISyntaxException {
@@ -101,7 +101,7 @@ public class TestViewFsLinkFallback {
 
     private void initializeTargetTestRoot() throws IOException {
         targetTestRoot = fsDefault.makeQualified(new Path("/"));
-        for (FileStatusInterface status : fsDefault.listStatus(targetTestRoot)) {
+        for (FileStatus status : fsDefault.listStatus(targetTestRoot)) {
             fsDefault.delete(status.getPath(), true);
         }
     }
@@ -122,7 +122,7 @@ public class TestViewFsLinkFallback {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         Path p = new Path("/user1/hive/warehouse/test");
-        PathInterface test = Path.mergePaths(fallbackTarget, p);
+        Path test = Path.mergePaths(fallbackTarget, p);
         assertFalse(fsTarget.exists(test));
         vfs.mkdir(p, null, true);
         assertTrue(fsTarget.exists(test));
@@ -143,7 +143,7 @@ public class TestViewFsLinkFallback {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         Path p = new Path("/");
-        PathInterface test = Path.mergePaths(fallbackTarget, p);
+        Path test = Path.mergePaths(fallbackTarget, p);
         assertTrue(fsTarget.exists(test));
         vfs.mkdir(p, null, true);
         assertTrue(fsTarget.exists(test));
@@ -164,7 +164,7 @@ public class TestViewFsLinkFallback {
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         // user2 does not exist in fallback
         Path p = new Path("/user2");
-        PathInterface test = Path.mergePaths(fallbackTarget, p);
+        Path test = Path.mergePaths(fallbackTarget, p);
         assertFalse(fsTarget.exists(test));
         vfs.mkdir(p, null, true);
         assertTrue(fsTarget.exists(test));
@@ -202,7 +202,7 @@ public class TestViewFsLinkFallback {
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         //user1 does not exist in fallback
         Path immediateLevelToInternalDir = new Path("/user1/test");
-        PathInterface test = Path.mergePaths(fallbackTarget, immediateLevelToInternalDir);
+        Path test = Path.mergePaths(fallbackTarget, immediateLevelToInternalDir);
         assertFalse(fsTarget.exists(test));
         vfs.mkdir(immediateLevelToInternalDir, null, true);
         assertTrue(fsTarget.exists(test));
@@ -225,7 +225,7 @@ public class TestViewFsLinkFallback {
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         //user1 does not exist in fallback
         Path multipleLevelToInternalDir = new Path("/user1/test/test");
-        PathInterface test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
+        Path test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
         assertFalse(fsTarget.exists(test));
         vfs.mkdir(multipleLevelToInternalDir, null, true);
         assertTrue(fsTarget.exists(test));
@@ -246,7 +246,7 @@ public class TestViewFsLinkFallback {
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         //user1/hive/test1 does not exist in fallback
         Path multipleLevelToInternalDir = new Path("/user1/hive/test1");
-        PathInterface test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
+        Path test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
         assertFalse(fsTarget.exists(test));
         // user1/hive exist in viewFS.
         assertNotNull(vfs.getFileStatus(new Path("/user1/hive")));
@@ -271,7 +271,7 @@ public class TestViewFsLinkFallback {
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         //user1/test1 does not exist in fallback
         Path nextLevelToInternalDir = new Path("/user1/test1");
-        PathInterface test = Path.mergePaths(fallbackTarget, nextLevelToInternalDir);
+        Path test = Path.mergePaths(fallbackTarget, nextLevelToInternalDir);
         assertFalse(fsTarget.exists(test));
         // user1 exists in viewFS mount.
         assertNotNull(vfs.getFileStatus(new Path("/user1")));
@@ -306,7 +306,7 @@ public class TestViewFsLinkFallback {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         Path vfsTestFile = new Path("/user1/hive/warehouse/test.file");
-        PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+        Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
         assertFalse(fsTarget.exists(testFileInFallback));
         assertTrue(fsTarget.exists(testFileInFallback.getParent()));
         vfs.create(vfsTestFile, EnumSet.of(CREATE), Options.CreateOpts.perms(FsPermission.getDefault())).close();
@@ -326,7 +326,7 @@ public class TestViewFsLinkFallback {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         Path vfsTestFile = new Path("/user2/test.file");
-        PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+        Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
         assertFalse(fsTarget.exists(testFileInFallback));
         // user2 does not exist in fallback
         assertFalse(fsTarget.exists(testFileInFallback.getParent()));
@@ -348,7 +348,7 @@ public class TestViewFsLinkFallback {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         AbstractFileSystem vfs = AbstractFileSystem.get(viewFsDefaultClusterUri, conf);
         Path vfsTestFile = new Path("/test.file");
-        PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+        Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
         assertFalse(fsTarget.exists(testFileInFallback));
         vfs.create(vfsTestFile, EnumSet.of(CREATE), Options.CreateOpts.perms(FsPermission.getDefault())).close();
         // /test.file should be created in fallback

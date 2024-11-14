@@ -286,7 +286,7 @@ public class TestSpaceReservation {
         // Mock BlockPoolSlice so that RBW file creation gives IOExcception
         BlockPoolSlice blockPoolSlice = Mockito.mock(BlockPoolSlice.class);
         Mockito.when(blockPoolSlice.createRbwFile((Block) Mockito.any())).thenThrow(new IOException("Synthetic IO Exception Throgh MOCK"));
-        FieldInterface field = FsVolumeImpl.class.getDeclaredField("bpSlices");
+        Field field = FsVolumeImpl.class.getDeclaredField("bpSlices");
         field.setAccessible(true);
         Map<String, BlockPoolSlice> bpSlices = (Map<String, BlockPoolSlice>) field.get(fsVolumeImpl);
         bpSlices.put(fsVolumeImpl.getBlockPoolList()[0], blockPoolSlice);
@@ -381,7 +381,7 @@ public class TestSpaceReservation {
             final FsVolumeImpl fsVolumeImpl = (FsVolumeImpl) cluster.getDataNodes().get(newReplicaDNIndex).getFSDataset().getFsVolumeReferences().get(0);
             // Reserve some bytes to verify double clearing space should't happen
             fsVolumeImpl.reserveSpaceForReplica(1000);
-            FieldInterface field = FsVolumeImpl.class.getDeclaredField("bpSlices");
+            Field field = FsVolumeImpl.class.getDeclaredField("bpSlices");
             field.setAccessible(true);
             @SuppressWarnings("unchecked")
             Map<String, BlockPoolSlice> bpSlices = (Map<String, BlockPoolSlice>) field.get(fsVolumeImpl);
@@ -613,7 +613,7 @@ public class TestSpaceReservation {
      * down is one of the mirror, not the first datanode.
      */
         HdfsBlockLocation blockLocation = (HdfsBlockLocation) fs.getClient().getBlockLocations(file.toString(), 0, BLOCK_SIZE)[0];
-        LocatedBlockInterface lastBlock = blockLocation.getLocatedBlock();
+        LocatedBlock lastBlock = blockLocation.getLocatedBlock();
         // stop 3rd node.
         cluster.stopDataNode(lastBlock.getLocations()[2].getName());
         try {

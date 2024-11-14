@@ -73,13 +73,13 @@ public class FSXAttrBaseTest {
 
     private static int pathCount = 0;
 
-    protected static PathInterface path;
+    protected static Path path;
 
-    protected static PathInterface filePath;
+    protected static Path filePath;
 
-    protected static PathInterface rawPath;
+    protected static Path rawPath;
 
-    protected static PathInterface rawFilePath;
+    protected static Path rawFilePath;
 
     // XAttrs
     protected static final String name1 = "user.a1";
@@ -106,9 +106,9 @@ public class FSXAttrBaseTest {
 
     protected FileSystem fs;
 
-    private static final UserGroupInformationInterface BRUCE = UserGroupInformation.createUserForTesting("bruce", new String[] {});
+    private static final UserGroupInformation BRUCE = UserGroupInformation.createUserForTesting("bruce", new String[] {});
 
-    private static final UserGroupInformationInterface DIANA = UserGroupInformation.createUserForTesting("diana", new String[] {});
+    private static final UserGroupInformation DIANA = UserGroupInformation.createUserForTesting("diana", new String[] {});
 
     @BeforeClass
     public static void init() throws Exception {
@@ -403,7 +403,7 @@ public class FSXAttrBaseTest {
      * The 'trusted' namespace should not be accessible and should throw an
      * exception.
      */
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         fs.setXAttr(path, "trusted.foo", "1234".getBytes());
         try {
             user.doAs(new PrivilegedExceptionAction<Object>() {
@@ -585,7 +585,7 @@ public class FSXAttrBaseTest {
      * The 'trusted' namespace should not be accessible and should throw an
      * exception.
      */
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         fs.setXAttr(path, "trusted.foo", "1234".getBytes());
         try {
             user.doAs(new PrivilegedExceptionAction<Object>() {
@@ -724,7 +724,7 @@ public class FSXAttrBaseTest {
      */
     @Test(timeout = 120000)
     public void testListXAttrs() throws Exception {
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         /* listXAttrs in a path that doesn't exist. */
         try {
             fs.listXAttrs(path);
@@ -897,7 +897,7 @@ public class FSXAttrBaseTest {
 
     @Test(timeout = 120000)
     public void testRawXAttrs() throws Exception {
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short) 0750));
         fs.setXAttr(rawPath, raw1, value1, EnumSet.of(XAttrSetFlag.CREATE, XAttrSetFlag.REPLACE));
         {
@@ -1101,7 +1101,7 @@ public class FSXAttrBaseTest {
                     return null;
                 }
             });
-            final UserGroupInformationInterface fakeUser = UserGroupInformation.createUserForTesting("fakeUser", new String[] { "fakeGroup" });
+            final UserGroupInformation fakeUser = UserGroupInformation.createUserForTesting("fakeUser", new String[] { "fakeGroup" });
             fakeUser.doAs(new PrivilegedExceptionAction<Object>() {
 
                 @Override
@@ -1131,7 +1131,7 @@ public class FSXAttrBaseTest {
         // Run tests as superuser...
         doTestUnreadableBySuperuserXAttr(fs, true);
         // ...and again as non-superuser
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         user.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override

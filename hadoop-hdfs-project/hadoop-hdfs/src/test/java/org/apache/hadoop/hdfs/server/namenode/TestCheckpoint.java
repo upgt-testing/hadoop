@@ -940,7 +940,7 @@ public class TestCheckpoint {
             //
             secondary = startSecondaryNameNode(conf);
             secondary.doCheckpoint();
-            MetricsRecordBuilderInterface rb = getMetrics(NN_METRICS);
+            MetricsRecordBuilder rb = getMetrics(NN_METRICS);
             assertCounterGt("GetImageNumOps", 0, rb);
             assertCounterGt("GetEditNumOps", 0, rb);
             assertCounterGt("PutImageNumOps", 0, rb);

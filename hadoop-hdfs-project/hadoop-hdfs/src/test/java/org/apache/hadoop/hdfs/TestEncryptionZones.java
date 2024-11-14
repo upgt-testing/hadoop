@@ -290,10 +290,10 @@ public class TestEncryptionZones {
         assertEquals("Can't remove a file in EZ as superuser", 0, res);
         final Path trashDir = new Path(zone1, FileSystem.TRASH_PREFIX);
         assertTrue(fsWrapper.exists(trashDir));
-        FileStatusInterface trashFileStatus = fsWrapper.getFileStatus(trashDir);
+        FileStatus trashFileStatus = fsWrapper.getFileStatus(trashDir);
         assertTrue(trashFileStatus.getPermission().getStickyBit());
         // create a non-privileged user
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         user.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
@@ -393,7 +393,7 @@ public class TestEncryptionZones {
         String[] provisionTrashArgv = new String[] { "-provisionTrash", "-path", zone1.toUri().getPath() };
         cryptoAdmin.run(provisionTrashArgv);
         assertTrue(fsWrapper.exists(trashDir));
-        FileStatusInterface trashFileStatus = fsWrapper.getFileStatus(trashDir);
+        FileStatus trashFileStatus = fsWrapper.getFileStatus(trashDir);
         assertTrue(trashFileStatus.getPermission().getStickyBit());
     }
 
@@ -487,7 +487,7 @@ public class TestEncryptionZones {
         assertNumZones(++numZones);
         assertZonePresent(myKeyName, zone2.toString());
         /* Test failure of create encryption zones as a non super user. */
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         final Path nonSuper = new Path("/nonSuper");
         fsWrapper.mkdir(nonSuper, FsPermission.getDirDefault(), false);
         user.doAs(new PrivilegedExceptionAction<Object>() {
@@ -596,7 +596,7 @@ public class TestEncryptionZones {
      */
     @Test
     public void testListEncryptionZonesAsNonSuperUser() throws Exception {
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         final Path testRoot = new Path("/tmp/TestEncryptionZones");
         final Path superPath = new Path(testRoot, "superuseronly");
         final Path allPath = new Path(testRoot, "accessall");
@@ -624,7 +624,7 @@ public class TestEncryptionZones {
      */
     @Test
     public void testGetEZAsNonSuperUser() throws Exception {
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         final Path testRoot = new Path("/tmp/TestEncryptionZones");
         final Path superPath = new Path(testRoot, "superuseronly");
         final Path superPathFile = new Path(superPath, "file1");
@@ -641,7 +641,7 @@ public class TestEncryptionZones {
         dfsAdmin.createEncryptionZone(superPath, TEST_KEY, NO_TRASH);
         dfsAdmin.createEncryptionZone(allPath, TEST_KEY, NO_TRASH);
         dfsAdmin.allowSnapshot(new Path("/"));
-        final PathInterface newSnap = fs.createSnapshot(new Path("/"));
+        final Path newSnap = fs.createSnapshot(new Path("/"));
         DFSTestUtil.createFile(fs, superPathFile, len, (short) 1, 0xFEED);
         DFSTestUtil.createFile(fs, allPathFile, len, (short) 1, 0xFEED);
         DFSTestUtil.createFile(fs, nonEZFile, len, (short) 1, 0xFEED);
@@ -741,7 +741,7 @@ public class TestEncryptionZones {
     }
 
     private FileEncryptionInfo getFileEncryptionInfo(Path path) throws Exception {
-        LocatedBlocksInterface blocks = fs.getClient().getLocatedBlocks(path.toString(), 0);
+        LocatedBlocks blocks = fs.getClient().getLocatedBlocks(path.toString(), 0);
         return blocks.getFileEncryptionInfo();
     }
 
@@ -942,7 +942,7 @@ public class TestEncryptionZones {
         try {
             dTIEM(prefix);
         } finally {
-            for (FileStatusInterface s : fsWrapper.listStatus(prefix)) {
+            for (FileStatus s : fsWrapper.listStatus(prefix)) {
                 fsWrapper.delete(s.getPath(), true);
             }
         }
@@ -953,7 +953,7 @@ public class TestEncryptionZones {
         // Create an unencrypted file to check isEncrypted returns false
         final Path baseFile = new Path(prefix, "base");
         fsWrapper.createFile(baseFile);
-        FileStatusInterface stat = fsWrapper.getFileStatus(baseFile);
+        FileStatus stat = fsWrapper.getFileStatus(baseFile);
         assertFalse("Expected isEncrypted to return false for " + baseFile, stat.isEncrypted());
         // Create an encrypted file to check isEncrypted returns true
         final Path zone = new Path(prefix, "zone");
@@ -978,20 +978,20 @@ public class TestEncryptionZones {
         assertFalse("Expected isEncrypted to return false for directory " + nonEzDirPath, stat.isEncrypted());
         // check that it returns true for listings within an ez
         FileStatus[] statuses = fsWrapper.listStatus(zone);
-        for (FileStatusInterface s : statuses) {
+        for (FileStatus s : statuses) {
             assertTrue("Expected isEncrypted to return true for ez stat " + zone, s.isEncrypted());
         }
         statuses = fsWrapper.listStatus(encFile);
-        for (FileStatusInterface s : statuses) {
+        for (FileStatus s : statuses) {
             assertTrue("Expected isEncrypted to return true for ez file stat " + encFile, s.isEncrypted());
         }
         // check that it returns false for listings outside an ez
         statuses = fsWrapper.listStatus(nonEzDirPath);
-        for (FileStatusInterface s : statuses) {
+        for (FileStatus s : statuses) {
             assertFalse("Expected isEncrypted to return false for nonez stat " + nonEzDirPath, s.isEncrypted());
         }
         statuses = fsWrapper.listStatus(baseFile);
-        for (FileStatusInterface s : statuses) {
+        for (FileStatus s : statuses) {
             assertFalse("Expected isEncrypted to return false for non ez stat " + baseFile, s.isEncrypted());
         }
     }
@@ -1083,7 +1083,7 @@ public class TestEncryptionZones {
 
         private FileSystemTestWrapper fsWrapper;
 
-        private PathInterface name;
+        private Path name;
 
         CreateFileTask(FileSystemTestWrapper fsWrapper, Path name) {
             this.fsWrapper = fsWrapper;
@@ -1099,9 +1099,9 @@ public class TestEncryptionZones {
 
     private class InjectFaultTask implements Callable<Void> {
 
-        final PathInterface zone1 = new Path("/zone1");
+        final Path zone1 = new Path("/zone1");
 
-        final PathInterface file = new Path(zone1, "file1");
+        final Path file = new Path(zone1, "file1");
 
         final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -1291,14 +1291,14 @@ public class TestEncryptionZones {
         dfsAdmin.createEncryptionZone(zone, TEST_KEY, NO_TRASH);
         DFSTestUtil.createFile(fs, zoneFile, len, (short) 1, 0xFEED);
         String contents = DFSTestUtil.readFile(fs, zoneFile);
-        final PathInterface snap1 = fs.createSnapshot(zoneParent, "snap1");
+        final Path snap1 = fs.createSnapshot(zoneParent, "snap1");
         final Path snap1Zone = new Path(snap1, zone.getName());
         assertEquals("Got unexpected ez path", zone.toString(), dfsAdmin.getEncryptionZoneForPath(snap1Zone).getPath().toString());
         // Now delete the encryption zone, recreate the dir, and take another
         // snapshot
         fsWrapper.delete(zone, true);
         fsWrapper.mkdir(zone, FsPermission.getDirDefault(), true);
-        final PathInterface snap2 = fs.createSnapshot(zoneParent, "snap2");
+        final Path snap2 = fs.createSnapshot(zoneParent, "snap2");
         final Path snap2Zone = new Path(snap2, zone.getName());
         assertEquals("Got unexpected ez path", zone.toString(), dfsAdmin.getEncryptionZoneForPath(snap1Zone).getPath().toString());
         assertNull("Expected null ez path", dfsAdmin.getEncryptionZoneForPath(snap2Zone));
@@ -1308,7 +1308,7 @@ public class TestEncryptionZones {
         assertEquals("Got unexpected ez path", zone.toString(), ezSnap1.getPath().toString());
         assertEquals("Unexpected ez key", TEST_KEY, ezSnap1.getKeyName());
         assertNull("Expected null ez path", dfsAdmin.getEncryptionZoneForPath(snap2Zone));
-        final PathInterface snap3 = fs.createSnapshot(zoneParent, "snap3");
+        final Path snap3 = fs.createSnapshot(zoneParent, "snap3");
         final Path snap3Zone = new Path(snap3, zone.getName());
         // Check that snap3's EZ has the correct settings
         EncryptionZoneInterface ezSnap3 = dfsAdmin.getEncryptionZoneForPath(snap3Zone);
@@ -1359,7 +1359,7 @@ public class TestEncryptionZones {
         String contents = DFSTestUtil.readFile(fs, zoneFile);
         // Create the snapshot which contains the file
         dfsAdmin.allowSnapshot(zoneParent);
-        final PathInterface snap1 = fs.createSnapshot(zoneParent, "snap1");
+        final Path snap1 = fs.createSnapshot(zoneParent, "snap1");
         // Now delete the file and create encryption zone
         fsWrapper.delete(zoneFile, false);
         dfsAdmin.createEncryptionZone(zone, TEST_KEY, NO_TRASH);
@@ -1572,8 +1572,8 @@ public class TestEncryptionZones {
         final String currentUser = UserGroupInformation.getCurrentUser().getShortUserName();
         final Path expectedTopTrash = new Path(topEZ, new Path(FileSystem.TRASH_PREFIX, currentUser));
         final Path expectedNestedTrash = new Path(nestedEZ, new Path(FileSystem.TRASH_PREFIX, currentUser));
-        final PathInterface topTrash = webFS.getTrashRoot(topEZFile);
-        final PathInterface nestedTrash = webFS.getTrashRoot(nestedEZFile);
+        final Path topTrash = webFS.getTrashRoot(topEZFile);
+        final Path nestedTrash = webFS.getTrashRoot(nestedEZFile);
         assertEquals(expectedTopTrash.toUri().getPath(), topTrash.toUri().getPath());
         assertEquals(expectedNestedTrash.toUri().getPath(), nestedTrash.toUri().getPath());
         verifyShellDeleteWithTrash(shell, nestedEZ);
@@ -1595,13 +1595,13 @@ public class TestEncryptionZones {
         verifyShellDeleteWithTrash(shell, encFile);
         // Trash path should be consistent
         // if root path is an encryption zone
-        PathInterface encFileCurrentTrash = shell.getCurrentTrashDir(encFile);
-        PathInterface rootDirCurrentTrash = shell.getCurrentTrashDir(rootDir);
+        Path encFileCurrentTrash = shell.getCurrentTrashDir(encFile);
+        Path rootDirCurrentTrash = shell.getCurrentTrashDir(rootDir);
         assertEquals("Root trash should be equal with ezFile trash", encFileCurrentTrash, rootDirCurrentTrash);
         // Use webHDFS client to test trash root path
         final WebHdfsFileSystem webFS = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
         final Path expectedTrash = new Path(rootDir, new Path(FileSystem.TRASH_PREFIX, currentUser));
-        PathInterface webHDFSTrash = webFS.getTrashRoot(encFile);
+        Path webHDFSTrash = webFS.getTrashRoot(encFile);
         assertEquals(expectedTrash.toUri().getPath(), webHDFSTrash.toUri().getPath());
         assertEquals(encFileCurrentTrash.getParent().toUri().getPath(), webHDFSTrash.toUri().getPath());
     }
@@ -1638,9 +1638,9 @@ public class TestEncryptionZones {
 
     private void verifyShellDeleteWithTrash(FsShell shell, Path path) throws Exception {
         try {
-            PathInterface trashDir = shell.getCurrentTrashDir(path);
+            Path trashDir = shell.getCurrentTrashDir(path);
             // Verify that trashDir has a path component named ".Trash"
-            PathInterface checkTrash = trashDir;
+            Path checkTrash = trashDir;
             while (!checkTrash.isRoot() && !checkTrash.getName().equals(".Trash")) {
                 checkTrash = checkTrash.getParent();
             }
@@ -1815,7 +1815,7 @@ public class TestEncryptionZones {
         dfsAdmin.allowSnapshot(snapshottable);
         dfsAdmin.createEncryptionZone(zoneDirectChild, TEST_KEY, NO_TRASH);
         dfsAdmin.createEncryptionZone(zoneSubChild, TEST_KEY, NO_TRASH);
-        final PathInterface snap1 = fs.createSnapshot(snapshottable, "snap1");
+        final Path snap1 = fs.createSnapshot(snapshottable, "snap1");
         Configuration clientConf = new Configuration(conf);
         clientConf.setLong(FS_TRASH_INTERVAL_KEY, 1);
         FsShell shell = new FsShell(clientConf);

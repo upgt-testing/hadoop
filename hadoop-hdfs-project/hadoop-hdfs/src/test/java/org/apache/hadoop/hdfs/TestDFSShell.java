@@ -210,7 +210,7 @@ public class TestDFSShell {
         assertTrue(f1.isFile());
         assertEquals(0L, f1.length());
         //copy to remote
-        final PathInterface root = mkdir(dfs, new Path("/testZeroSizeFile/zeroSizeFile"));
+        final Path root = mkdir(dfs, new Path("/testZeroSizeFile/zeroSizeFile"));
         final Path remotef = new Path(root, "dst");
         show("copy local " + f1 + " to remote " + remotef);
         dfs.copyFromLocalFile(false, false, new Path(f1.getPath()), remotef);
@@ -531,7 +531,7 @@ public class TestDFSShell {
         new File(TEST_ROOT_DIR, ".f2.crc").delete();
         final File f1 = createLocalFile(new File(TEST_ROOT_DIR, "f1"));
         final File f2 = createLocalFile(new File(TEST_ROOT_DIR, "f2"));
-        final PathInterface root = mkdir(dfs, new Path("/testPut"));
+        final Path root = mkdir(dfs, new Path("/testPut"));
         final Path dst = new Path(root, "dst");
         show("begin");
         final Thread copy2ndFileThread = new Thread() {
@@ -584,7 +584,7 @@ public class TestDFSShell {
         }
         System.setSecurityManager(sm);
         // copy multiple files to destination directory
-        final PathInterface destmultiple = mkdir(dfs, new Path(root, "putmultiple"));
+        final Path destmultiple = mkdir(dfs, new Path(root, "putmultiple"));
         Path[] srcs = new Path[2];
         srcs[0] = new Path(f1.getPath());
         srcs[1] = new Path(f2.getPath());
@@ -594,7 +594,7 @@ public class TestDFSShell {
         assertTrue(dfs.exists(srcs[0]));
         assertTrue(dfs.exists(srcs[1]));
         // move multiple files to destination directory
-        final PathInterface destmultiple2 = mkdir(dfs, new Path(root, "movemultiple"));
+        final Path destmultiple2 = mkdir(dfs, new Path(root, "movemultiple"));
         srcs[0] = new Path(f1.getPath());
         srcs[1] = new Path(f2.getPath());
         dfs.moveFromLocalFile(srcs, destmultiple2);
@@ -1065,8 +1065,8 @@ public class TestDFSShell {
             FsShell shell = new FsShell(dfs.getConf());
             final Path filePath = new Path("/testChecksum/file1");
             writeFile(dfs, filePath);
-            FileStatusInterface fileStatus = dfs.getFileStatus(filePath);
-            FileChecksumInterface checksum = dfs.getFileChecksum(filePath);
+            FileStatus fileStatus = dfs.getFileStatus(filePath);
+            FileChecksum checksum = dfs.getFileChecksum(filePath);
             String[] args = { "-checksum", "-v", filePath.toString() };
             assertEquals(0, shell.run(args));
             // verify block size is printed in the output
@@ -1136,9 +1136,9 @@ public class TestDFSShell {
         //   ROOT2
         //   |- f1
         String path = "/test/" + name;
-        PathInterface root = mkdir(fs, new Path(path));
-        PathInterface sub = mkdir(fs, new Path(root, "sub"));
-        PathInterface root2 = mkdir(fs, new Path(path + "2"));
+        Path root = mkdir(fs, new Path(path));
+        Path sub = mkdir(fs, new Path(root, "sub"));
+        Path root2 = mkdir(fs, new Path(path + "2"));
         writeFile(fs, new Path(root, "f1"));
         writeFile(fs, new Path(root, "f2"));
         writeFile(fs, new Path(sub, "f3"));
@@ -1297,7 +1297,7 @@ public class TestDFSShell {
     }
 
     private void confirmOwner(String owner, String group, FileSystem fs, Path... paths) throws IOException {
-        for (PathInterface path : paths) {
+        for (Path path : paths) {
             if (owner != null) {
                 assertEquals(owner, fs.getFileStatus(path).getOwner());
             }
@@ -1679,7 +1679,7 @@ public class TestDFSShell {
             assertEquals(0, val);
             // Verify -test -r negative case (file exists but cannot read)
             runCmd(shell, "-chmod", "600", permFile.toString());
-            UserGroupInformationInterface smokeUser = UserGroupInformation.createUserForTesting("smokeUser", new String[] { "hadoop" });
+            UserGroupInformation smokeUser = UserGroupInformation.createUserForTesting("smokeUser", new String[] { "hadoop" });
             smokeUser.doAs(new PrivilegedExceptionAction<String>() {
 
                 @Override
@@ -1715,7 +1715,7 @@ public class TestDFSShell {
         for (int i = 0; i < blocks.size(); i++) {
             Map<DatanodeStorage, BlockListAsLongs> map = blocks.get(i);
             for (Map.EntryInterface<DatanodeStorage, BlockListAsLongs> e : map.entrySet()) {
-                for (BlockInterface b : e.getValue()) {
+                for (Block b : e.getValue()) {
                     replicas.add(cluster.getMaterializedReplica(i, new ExtendedBlock(poolId, b)));
                 }
             }
@@ -1739,7 +1739,7 @@ public class TestDFSShell {
 
     @Test(timeout = 30000)
     public void testRemoteException() throws Exception {
-        UserGroupInformationInterface tmpUGI = UserGroupInformation.createUserForTesting("tmpname", new String[] { "mygroup" });
+        UserGroupInformation tmpUGI = UserGroupInformation.createUserForTesting("tmpname", new String[] { "mygroup" });
         PrintStream bak = null;
         try {
             Path p = new Path("/foo");
@@ -1863,12 +1863,12 @@ public class TestDFSShell {
         dfs.mkdirs(testDir1);
         final Path testFile2 = new Path(testDir1, "file2");
         DFSTestUtil.createFile(dfs, testFile2, 2 * BLOCK_SIZE, (short) 3, 0);
-        final FileStatusInterface status1 = dfs.getFileStatus(testDir1);
+        final FileStatus status1 = dfs.getFileStatus(testDir1);
         final String mtime1 = fmt.format(new Date(status1.getModificationTime()));
         final String atime1 = fmt.format(new Date(status1.getAccessTime()));
         long now = Time.now();
         dfs.setTimes(testFile2, now + 3000, now + 6000);
-        final FileStatusInterface status2 = dfs.getFileStatus(testFile2);
+        final FileStatus status2 = dfs.getFileStatus(testFile2);
         final String mtime2 = fmt.format(new Date(status2.getModificationTime()));
         final String atime2 = fmt.format(new Date(status2.getAccessTime()));
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -1913,7 +1913,7 @@ public class TestDFSShell {
             if (format != null) {
                 argv.add(format);
             }
-            for (PathInterface f : files) {
+            for (Path f : files) {
                 argv.add(f.toString());
             }
             int ret = ToolRunner.run(new FsShell(conf), argv.toArray(new String[0]));
@@ -1929,9 +1929,9 @@ public class TestDFSShell {
         runLsr(new FsShell(conf), root, 0);
         final Path sub = new Path(root, "sub");
         dfs.setPermission(sub, new FsPermission((short) 0));
-        final UserGroupInformationInterface ugi = UserGroupInformation.getCurrentUser();
+        final UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
         final String tmpusername = ugi.getShortUserName() + "1";
-        UserGroupInformationInterface tmpUGI = UserGroupInformation.createUserForTesting(tmpusername, new String[] { tmpusername });
+        UserGroupInformation tmpUGI = UserGroupInformation.createUserForTesting(tmpusername, new String[] { tmpusername });
         String results = tmpUGI.doAs(new PrivilegedExceptionAction<String>() {
 
             @Override
@@ -1991,7 +1991,7 @@ public class TestDFSShell {
             Path src = new Path(hdfsTestDir, "srcfile");
             dfs.create(src).close();
             dfs.setAcl(src, Lists.newArrayList(aclEntry(ACCESS, USER, ALL), aclEntry(ACCESS, USER, "foo", ALL), aclEntry(ACCESS, GROUP, READ_EXECUTE), aclEntry(ACCESS, GROUP, "bar", READ_EXECUTE), aclEntry(ACCESS, OTHER, EXECUTE)));
-            FileStatusInterface status = dfs.getFileStatus(src);
+            FileStatus status = dfs.getFileStatus(src);
             final long mtime = status.getModificationTime();
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
@@ -2005,7 +2005,7 @@ public class TestDFSShell {
             String[] argv = new String[] { "-cp", "-p", src.toUri().toString(), target1.toUri().toString() };
             int ret = ToolRunner.run(shell, argv);
             assertEquals("cp -p is not working", SUCCESS, ret);
-            FileStatusInterface targetStatus = dfs.getFileStatus(target1);
+            FileStatus targetStatus = dfs.getFileStatus(target1);
             assertEquals(mtime, targetStatus.getModificationTime());
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
@@ -2129,7 +2129,7 @@ public class TestDFSShell {
             doTestCopyCommandsWithRawXAttrs(shell, dfs, src, rawHdfsTestDir, false);
             doTestCopyCommandsWithRawXAttrs(shell, dfs, rawSrc, rawHdfsTestDir, true);
             /* Use a relative /.reserved/raw path. */
-            final PathInterface savedWd = dfs.getWorkingDirectory();
+            final Path savedWd = dfs.getWorkingDirectory();
             try {
                 dfs.setWorkingDirectory(new Path(rawSrcBase));
                 final Path relRawSrc = new Path("../srcfile");
@@ -2156,7 +2156,7 @@ public class TestDFSShell {
     }
 
     private void doTestCopyCommandsWithRawXAttrs(FsShell shell, FileSystem fs, Path src, Path hdfsTestDir, boolean expectRaw) throws Exception {
-        PathInterface target;
+        Path target;
         boolean srcIsRaw;
         if (src.isAbsolute()) {
             srcIsRaw = src.toString().contains("/.reserved/raw");
@@ -2229,7 +2229,7 @@ public class TestDFSShell {
             // (srcFile), modification time will not be preserved.
             Path srcFile = new Path(srcDir, "srcFile");
             dfs.create(srcFile).close();
-            FileStatusInterface status = dfs.getFileStatus(srcDir);
+            FileStatus status = dfs.getFileStatus(srcDir);
             final long mtime = status.getModificationTime();
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
@@ -2243,7 +2243,7 @@ public class TestDFSShell {
             String[] argv = new String[] { "-cp", "-p", srcDir.toUri().toString(), targetDir1.toUri().toString() };
             int ret = ToolRunner.run(shell, argv);
             assertEquals("cp -p is not working", SUCCESS, ret);
-            FileStatusInterface targetStatus = dfs.getFileStatus(targetDir1);
+            FileStatus targetStatus = dfs.getFileStatus(targetDir1);
             assertEquals(mtime, targetStatus.getModificationTime());
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
@@ -2347,7 +2347,7 @@ public class TestDFSShell {
             dfs.setAcl(src, Lists.newArrayList(aclEntry(ACCESS, USER, ALL), aclEntry(ACCESS, USER, "foo", ALL), aclEntry(ACCESS, GROUP, READ_EXECUTE), aclEntry(ACCESS, GROUP, "bar", READ_EXECUTE), aclEntry(ACCESS, OTHER, EXECUTE)));
             // set sticky bit
             dfs.setPermission(src, new FsPermission(ALL, READ_EXECUTE, EXECUTE, true));
-            FileStatusInterface status = dfs.getFileStatus(src);
+            FileStatus status = dfs.getFileStatus(src);
             final long mtime = status.getModificationTime();
             final long atime = status.getAccessTime();
             final String owner = status.getOwner();
@@ -2359,7 +2359,7 @@ public class TestDFSShell {
             String[] argv = new String[] { "-cp", "-p", src.toUri().toString(), target1.toUri().toString() };
             int ret = ToolRunner.run(shell, argv);
             assertEquals("cp is not working", SUCCESS, ret);
-            FileStatusInterface targetStatus = dfs.getFileStatus(target1);
+            FileStatus targetStatus = dfs.getFileStatus(target1);
             assertEquals(mtime, targetStatus.getModificationTime());
             assertEquals(atime, targetStatus.getAccessTime());
             assertEquals(owner, targetStatus.getOwner());
@@ -2665,7 +2665,7 @@ public class TestDFSShell {
 
     @Test(timeout = 30000)
     public void testSetXAttrPermission() throws Exception {
-        UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         PrintStream bak = null;
         try {
             Path p = new Path("/foo");
@@ -2795,9 +2795,9 @@ public class TestDFSShell {
         final String root = "/testSetXAttrPermissionAsDifferentOwner";
         final String USER1 = "user1";
         final String GROUP1 = "supergroup";
-        final UserGroupInformationInterface user1 = UserGroupInformation.createUserForTesting(USER1, new String[] { GROUP1 });
-        final UserGroupInformationInterface user2 = UserGroupInformation.createUserForTesting("user2", new String[] { "mygroup2" });
-        final UserGroupInformationInterface SUPERUSER = UserGroupInformation.getCurrentUser();
+        final UserGroupInformation user1 = UserGroupInformation.createUserForTesting(USER1, new String[] { GROUP1 });
+        final UserGroupInformation user2 = UserGroupInformation.createUserForTesting("user2", new String[] { "mygroup2" });
+        final UserGroupInformation SUPERUSER = UserGroupInformation.getCurrentUser();
         PrintStream bak = null;
         try {
             dfs.mkdirs(new Path(root));
@@ -2948,7 +2948,7 @@ public class TestDFSShell {
    */
     @Test(timeout = 120000)
     public void testGetFAttrErrors() throws Exception {
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         PrintStream bakErr = null;
         try {
             final Path p = new Path("/testGetFAttrErrors");
@@ -3030,7 +3030,7 @@ public class TestDFSShell {
         FileSystem fs = cluster.getFileSystem();
         FsShell shell = new FsShell();
         shell.setConf(conf);
-        FileStatusInterface test = fs.getFileStatus(new Path("/.reserved"));
+        FileStatus test = fs.getFileStatus(new Path("/.reserved"));
         assertEquals(FSDirectory.DOT_RESERVED_STRING, test.getPath().getName());
         // Listing /.reserved/ should show 2 items: raw and .inodes
         FileStatus[] stats = fs.listStatus(new Path("/.reserved"));

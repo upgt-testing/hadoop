@@ -218,7 +218,7 @@ public abstract class BlockReportTestBase {
         long[] oldLengths = new long[blocks.size()];
         int tempLen;
         for (int i = 0; i < blocks.size(); i++) {
-            BlockInterface b = blocks.get(i);
+            Block b = blocks.get(i);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Block " + b.getBlockName() + " before\t" + "Size " + b.getNumBytes());
             }
@@ -243,7 +243,7 @@ public abstract class BlockReportTestBase {
             LOG.debug("After mods: Number of blocks allocated " + blocksAfterReport.size());
         }
         for (int i = 0; i < blocksAfterReport.size(); i++) {
-            ExtendedBlockInterface b = blocksAfterReport.get(i).getBlock();
+            ExtendedBlock b = blocksAfterReport.get(i).getBlock();
             assertEquals("Length of " + i + "th block is incorrect", oldLengths[i], b.getNumBytes());
         }
     }
@@ -281,7 +281,7 @@ public abstract class BlockReportTestBase {
             LOG.debug("Number of blocks allocated " + lBlocks.size());
         }
         final DataNodeInterface dn0 = cluster.getDataNodes().get(DN_N0);
-        for (ExtendedBlockInterface b : blocks2Remove) {
+        for (ExtendedBlock b : blocks2Remove) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Removing the block " + b.getBlockName());
             }
@@ -446,7 +446,7 @@ public abstract class BlockReportTestBase {
         startUpCluster();
         try {
             ArrayList<Block> blocks = writeFile(METHOD_NAME, 12 * bytesChkSum, filePath);
-            BlockInterface bl = findBlock(filePath, 12 * bytesChkSum);
+            Block bl = findBlock(filePath, 12 * bytesChkSum);
             BlockChecker bc = new BlockChecker(filePath);
             bc.start();
             waitForTempReplica(bl, DN_N1);
@@ -484,7 +484,7 @@ public abstract class BlockReportTestBase {
         // write file and start second node to be "older" than the original
         try {
             writeFile(METHOD_NAME, 12 * bytesChkSum, filePath);
-            BlockInterface bl = findBlock(filePath, 12 * bytesChkSum);
+            Block bl = findBlock(filePath, 12 * bytesChkSum);
             BlockChecker bc = new BlockChecker(filePath);
             bc.start();
             waitForTempReplica(bl, DN_N1);
@@ -769,9 +769,9 @@ public abstract class BlockReportTestBase {
     }
 
     private Block findBlock(Path path, long size) throws IOException {
-        BlockInterface ret;
+        Block ret;
         List<LocatedBlock> lbs = cluster.getNameNodeRpc().getBlockLocations(path.toString(), FILE_START, size).getLocatedBlocks();
-        LocatedBlockInterface lb = lbs.get(lbs.size() - 1);
+        LocatedBlock lb = lbs.get(lbs.size() - 1);
         // Get block from the first DN
         ret = cluster.getDataNodes().get(DN_N0).data.getStoredBlock(lb.getBlock().getBlockPoolId(), lb.getBlock().getBlockId());
         return ret;
@@ -779,7 +779,7 @@ public abstract class BlockReportTestBase {
 
     private class BlockChecker extends Thread {
 
-        final PathInterface filePath;
+        final Path filePath;
 
         public BlockChecker(final Path filePath) {
             this.filePath = filePath;

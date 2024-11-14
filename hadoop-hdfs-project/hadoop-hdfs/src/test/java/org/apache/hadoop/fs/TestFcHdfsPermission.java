@@ -39,7 +39,7 @@ public class TestFcHdfsPermission extends FileContextPermissionBase {
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     @Override
     protected FileContextTestHelper getFileContextHelper() {

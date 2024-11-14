@@ -45,7 +45,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestOfflineImageViewerWithStripedBlocks {
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private int dataBlocks = ecPolicy.getNumDataUnits();
 
@@ -146,7 +146,7 @@ public class TestOfflineImageViewerWithStripedBlocks {
         assertEquals(StripedFileTestUtil.getDefaultECPolicy().getId(), fileNode.getErasureCodingPolicyID());
         assertTrue("Invalid block size", fileNode.getBlocks().length > 0);
         long actualFileSize = 0;
-        for (BlockInfoInterface blockInfo : fileNode.getBlocks()) {
+        for (BlockInfo blockInfo : fileNode.getBlocks()) {
             assertTrue("Didn't find block striped information", blockInfo instanceof BlockInfoStriped);
             actualFileSize += blockInfo.getNumBytes();
         }

@@ -129,7 +129,7 @@ public class TestBlockTokenWithShortCircuitRead {
                 // verify token is not expired
                 List<LocatedBlock> locatedBlocks = nnProto.getBlockLocations(FILE_TO_SHORT_CIRCUIT_READ, 0, FILE_SIZE).getLocatedBlocks();
                 // first block
-                LocatedBlockInterface lblock = locatedBlocks.get(0);
+                LocatedBlock lblock = locatedBlocks.get(0);
                 TokenInterface<BlockTokenIdentifier> myToken = lblock.getBlockToken();
                 assertFalse(SecurityTestUtil.isBlockTokenExpired(myToken));
                 // check the number of slot objects

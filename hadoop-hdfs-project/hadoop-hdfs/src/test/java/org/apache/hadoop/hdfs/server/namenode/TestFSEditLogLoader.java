@@ -107,7 +107,7 @@ public class TestFSEditLogLoader {
 
     private static final String FAKE_EDIT_STREAM_NAME = "FAKE_STREAM";
 
-    private final ErasureCodingPolicyInterface testECPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy testECPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     @Test
     public void testDisplayRecentEditLogOpCodes() throws IOException {
@@ -663,7 +663,7 @@ public class TestFSEditLogLoader {
             cluster.restartNameNodes();
             cluster.waitActive();
             // check if new policy is reapplied through edit log
-            ErasureCodingPolicyInterface ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(newPolicy.getId());
+            ErasureCodingPolicy ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(newPolicy.getId());
             assertEquals(ErasureCodingPolicyState.DISABLED, DFSTestUtil.getECPolicyState(ecPolicy));
             // 2. enable policy
             fs.enableErasureCodingPolicy(newPolicy.getName());

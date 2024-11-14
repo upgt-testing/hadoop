@@ -42,13 +42,13 @@ public class TestPendingDataNodeMessages {
 
     final PendingDataNodeMessages msgs = new PendingDataNodeMessages();
 
-    private final BlockInterface block1Gs1 = new Block(1, 0, 1);
+    private final Block block1Gs1 = new Block(1, 0, 1);
 
-    private final BlockInterface block1Gs2 = new Block(1, 0, 2);
+    private final Block block1Gs2 = new Block(1, 0, 2);
 
-    private final BlockInterface block1Gs2DifferentInstance = new Block(1, 0, 2);
+    private final Block block1Gs2DifferentInstance = new Block(1, 0, 2);
 
-    private final BlockInterface block2Gs1 = new Block(2, 0, 1);
+    private final Block block2Gs1 = new Block(2, 0, 1);
 
     @Test
     public void testQueues() {
@@ -71,7 +71,7 @@ public class TestPendingDataNodeMessages {
 
     @Test
     public void testPendingDataNodeMessagesWithEC() throws Exception {
-        ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
+        ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
         Path dirPath = new Path("/testPendingDataNodeMessagesWithEC");
         Configuration conf = new Configuration();
         conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 20 * 60000);

@@ -75,7 +75,7 @@ public class TestReconstructStripedFile {
 
     public static final Logger LOG = LoggerFactory.getLogger(TestReconstructStripedFile.class);
 
-    private ErasureCodingPolicyInterface ecPolicy;
+    private ErasureCodingPolicy ecPolicy;
 
     private int dataBlkNum;
 
@@ -309,9 +309,9 @@ public class TestReconstructStripedFile {
         assertTrue("File length must be positive.", fileLen > 0);
         Path file = new Path(fileName);
         writeFile(fs, fileName, fileLen);
-        LocatedBlocksInterface locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
+        LocatedBlocks locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
         assertEquals(locatedBlocks.getFileLength(), fileLen);
-        LocatedStripedBlockInterface lastBlock = (LocatedStripedBlock) locatedBlocks.getLastLocatedBlock();
+        LocatedStripedBlock lastBlock = (LocatedStripedBlock) locatedBlocks.getLastLocatedBlock();
         DatanodeInfo[] storageInfos = lastBlock.getLocations();
         byte[] indices = lastBlock.getBlockIndices();
         BitSet bitset = new BitSet(dnNum);
@@ -437,7 +437,7 @@ public class TestReconstructStripedFile {
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
         cluster.waitActive();
         fs = cluster.getFileSystem();
-        ErasureCodingPolicyInterface policy = ecPolicy;
+        ErasureCodingPolicy policy = ecPolicy;
         fs.enableErasureCodingPolicy(policy.getName());
         fs.getClient().setErasureCodingPolicy("/", policy.getName());
         final int fileLen = cellSize * ecPolicy.getNumDataUnits();
@@ -523,7 +523,7 @@ public class TestReconstructStripedFile {
     public void testTimeoutReadBlockInReconstruction() throws Exception {
         assumeTrue("Ignore case where num parity units <= 1", ecPolicy.getNumParityUnits() > 1);
         int stripedBufferSize = conf.getInt(DFSConfigKeys.DFS_DN_EC_RECONSTRUCTION_STRIPED_READ_BUFFER_SIZE_KEY, cellSize);
-        ErasureCodingPolicyInterface policy = ecPolicy;
+        ErasureCodingPolicy policy = ecPolicy;
         fs.enableErasureCodingPolicy(policy.getName());
         fs.getClient().setErasureCodingPolicy("/", policy.getName());
         // StripedBlockReconstructor#reconstruct will loop 2 times
@@ -532,10 +532,10 @@ public class TestReconstructStripedFile {
         Path file = new Path(fileName);
         writeFile(fs, fileName, fileLen);
         fs.getFileBlockLocations(file, 0, fileLen);
-        LocatedBlocksInterface locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
+        LocatedBlocks locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
         Assert.assertEquals(1, locatedBlocks.getLocatedBlocks().size());
         // The file only has one block group
-        LocatedBlockInterface lblock = locatedBlocks.get(0);
+        LocatedBlock lblock = locatedBlocks.get(0);
         DatanodeInfo[] datanodeinfos = lblock.getLocations();
         // to reconstruct first block
         DataNodeInterface dataNode = cluster.getDataNode(datanodeinfos[0].getIpcPort());
@@ -597,10 +597,10 @@ public class TestReconstructStripedFile {
         Path file = new Path(fileName);
         writeFile(fs, fileName, fileLen);
         fs.getFileBlockLocations(file, 0, fileLen);
-        LocatedBlocksInterface locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
+        LocatedBlocks locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
         Assert.assertEquals(1, locatedBlocks.getLocatedBlocks().size());
         // The file only has one block group
-        LocatedBlockInterface lblock = locatedBlocks.get(0);
+        LocatedBlock lblock = locatedBlocks.get(0);
         DatanodeInfo[] datanodeinfos = lblock.getLocations();
         // to reconstruct first block
         DataNodeInterface dataNode = cluster.getDataNode(datanodeinfos[0].getIpcPort());

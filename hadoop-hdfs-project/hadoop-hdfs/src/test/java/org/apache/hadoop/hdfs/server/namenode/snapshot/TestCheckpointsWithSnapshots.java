@@ -36,7 +36,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestCheckpointsWithSnapshots {
 
-    private static final PathInterface TEST_PATH = new Path("/foo");
+    private static final Path TEST_PATH = new Path("/foo");
 
     private static final Configuration conf = new HdfsConfiguration();
 
@@ -77,7 +77,7 @@ public class TestCheckpointsWithSnapshots {
             // 2. Create a snapshot of the dir foo. This will be referenced both in
             // the SnapshotManager as well as in the file system tree. The snapshot
             // count will go up to 1.
-            PathInterface snapshotPath = fs.createSnapshot(TEST_PATH);
+            Path snapshotPath = fs.createSnapshot(TEST_PATH);
             assertEquals(1, nnSnapshotManager.getNumSnapshots());
             assertEquals(1, nnSnapshotManager.getNumSnapshottableDirs());
             // 3. Start up a 2NN and have it do a checkpoint. It will have foo and its

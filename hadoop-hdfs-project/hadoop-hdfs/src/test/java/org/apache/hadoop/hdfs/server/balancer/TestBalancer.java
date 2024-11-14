@@ -145,7 +145,7 @@ public class TestBalancer {
 
     final private static String fileName = "/tmp.txt";
 
-    final static PathInterface filePath = new Path(fileName);
+    final static Path filePath = new Path(fileName);
 
     final static private String username = "balancer";
 
@@ -220,7 +220,7 @@ public class TestBalancer {
         conf.setInt(DFSConfigKeys.DFS_BALANCER_MAX_NO_MOVE_INTERVAL_KEY, 5 * 1000);
     }
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int dataBlocks = ecPolicy.getNumDataUnits();
 
@@ -316,7 +316,7 @@ public class TestBalancer {
             int numOfBlocks = locatedBlocks.size();
             ExtendedBlock[] blocks = new ExtendedBlock[numOfBlocks];
             for (int i = 0; i < numOfBlocks; i++) {
-                ExtendedBlockInterface b = locatedBlocks.get(i).getBlock();
+                ExtendedBlock b = locatedBlocks.get(i).getBlock();
                 blocks[i] = new ExtendedBlock(b.getBlockPoolId(), b.getBlockId(), b.getNumBytes(), b.getGenerationStamp());
             }
             return blocks;
@@ -1419,7 +1419,7 @@ public class TestBalancer {
             FileSystem fs = cluster.getFileSystem(0);
             DFSTestUtil.createFile(fs, filePath, fileLen, (short) 3, r.nextLong());
             // verify locations of striped blocks
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fileName, 0, fileLen);
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fileName, 0, fileLen);
             StripedFileTestUtil.verifyLocatedStripedBlocks(locatedBlocks, groupSize);
             // add datanodes in new rack
             String newRack = "/rack" + (++numOfRacks);
@@ -1475,7 +1475,7 @@ public class TestBalancer {
             FileSystem fs = cluster.getFileSystem(0);
             DFSTestUtil.createFile(fs, filePath, fileLen, (short) 3, r.nextLong());
             // verify locations of striped blocks
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fileName, 0, fileLen);
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fileName, 0, fileLen);
             StripedFileTestUtil.verifyLocatedStripedBlocks(locatedBlocks, groupSize);
             // get datanode report
             DatanodeInfo[] datanodeReport = client.getDatanodeReport(DatanodeReportType.ALL);
@@ -1540,7 +1540,7 @@ public class TestBalancer {
         final Configuration conf = new HdfsConfiguration();
         try {
             initSecureConf(conf);
-            final UserGroupInformationInterface ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
+            final UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytabFile.getAbsolutePath());
             ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
                 @Override

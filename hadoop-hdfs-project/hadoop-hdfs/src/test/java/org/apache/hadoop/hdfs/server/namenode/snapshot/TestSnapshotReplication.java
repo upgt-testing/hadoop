@@ -53,11 +53,11 @@ public class TestSnapshotReplication {
 
     private static final long BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
-    private final PathInterface file1 = new Path(sub1, "file1");
+    private final Path file1 = new Path(sub1, "file1");
 
     Configuration conf;
 
@@ -104,7 +104,7 @@ public class TestSnapshotReplication {
         // Check the correctness of getPreferredBlockReplication()
         INodeInterface inode = fsdir.getINode(file1.toString());
         assertTrue(inode instanceof INodeFile);
-        for (BlockInfoInterface b : inode.asFile().getBlocks()) {
+        for (BlockInfo b : inode.asFile().getBlocks()) {
             assertEquals(blockReplication, b.getReplication());
         }
     }
@@ -146,17 +146,17 @@ public class TestSnapshotReplication {
         // First check the getPreferredBlockReplication for the INode of
         // the currentFile
         final INodeFileInterface inodeOfCurrentFile = getINodeFile(currentFile);
-        for (BlockInfoInterface b : inodeOfCurrentFile.getBlocks()) {
+        for (BlockInfo b : inodeOfCurrentFile.getBlocks()) {
             assertEquals(expectedBlockRep, b.getReplication());
         }
         // Then check replication for every snapshot
-        for (PathInterface ss : snapshotRepMap.keySet()) {
-            final INodesInPathInterface iip = fsdir.getINodesInPath(ss.toString(), DirOp.READ);
+        for (Path ss : snapshotRepMap.keySet()) {
+            final INodesInPath iip = fsdir.getINodesInPath(ss.toString(), DirOp.READ);
             final INodeFileInterface ssInode = iip.getLastINode().asFile();
             // The replication number derived from the
             // INodeFileWithLink#getPreferredBlockReplication should
             // always == expectedBlockRep
-            for (BlockInfoInterface b : ssInode.getBlocks()) {
+            for (BlockInfo b : ssInode.getBlocks()) {
                 assertEquals(expectedBlockRep, b.getReplication());
             }
             // Also check the number derived from INodeFile#getFileReplication
@@ -177,7 +177,7 @@ public class TestSnapshotReplication {
         // snapshots for sub1
         for (; fileRep < NUMDATANODE; ) {
             // Create snapshot for sub1
-            PathInterface snapshotRoot = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s" + fileRep);
+            Path snapshotRoot = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s" + fileRep);
             Path snapshot = new Path(snapshotRoot, file1.getName());
             // Check the replication stored in the INode of the snapshot of file1
             assertEquals(fileRep, getINodeFile(snapshot).getFileReplication());
@@ -210,7 +210,7 @@ public class TestSnapshotReplication {
         Map<Path, Short> snapshotRepMap = new HashMap<Path, Short>();
         // Take 3 snapshots of sub1
         for (int i = 1; i <= 3; i++) {
-            PathInterface root = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s" + i);
+            Path root = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s" + i);
             Path ssFile = new Path(root, file1.getName());
             snapshotRepMap.put(ssFile, REPLICATION);
         }
@@ -220,12 +220,12 @@ public class TestSnapshotReplication {
         // Delete file1
         hdfs.delete(file1, true);
         // Check replication of snapshots
-        for (PathInterface ss : snapshotRepMap.keySet()) {
+        for (Path ss : snapshotRepMap.keySet()) {
             final INodeFileInterface ssInode = getINodeFile(ss);
             // The replication number derived from the
             // INodeFileWithLink#getPreferredBlockReplication should
             // always == expectedBlockRep
-            for (BlockInfoInterface b : ssInode.getBlocks()) {
+            for (BlockInfo b : ssInode.getBlocks()) {
                 assertEquals(REPLICATION, b.getReplication());
             }
             // Also check the number derived from INodeFile#getFileReplication

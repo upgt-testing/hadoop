@@ -135,7 +135,7 @@ public class TestBlockTokenWithDFS {
         InetSocketAddress targetAddr = null;
         IOException ioe = null;
         BlockReader blockReader = null;
-        ExtendedBlockInterface block = lblock.getBlock();
+        ExtendedBlock block = lblock.getBlock();
         try {
             DatanodeInfo[] nodes = lblock.getLocations();
             targetAddr = NetUtils.createSocketAddr(nodes[0].getXferAddr());
@@ -350,7 +350,7 @@ public class TestBlockTokenWithDFS {
         }
         List<LocatedBlock> locatedBlocks = nnProto.getBlockLocations(FILE_TO_READ, 0, FILE_SIZE).getLocatedBlocks();
         // first block
-        LocatedBlockInterface lblock = locatedBlocks.get(0);
+        LocatedBlock lblock = locatedBlocks.get(0);
         // verify token is not expired
         assertFalse(isBlockTokenExpired(lblock));
         // read with valid token, should succeed
@@ -395,7 +395,7 @@ public class TestBlockTokenWithDFS {
        */
         // confirm all tokens cached in in1 are expired by now
         List<LocatedBlock> lblocks = DFSTestUtil.getAllBlocks(in1);
-        for (LocatedBlockInterface blk : lblocks) {
+        for (LocatedBlock blk : lblocks) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() is able to re-fetch token transparently
@@ -403,7 +403,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in1, expected));
         // confirm all tokens cached in in2 are expired by now
         List<LocatedBlock> lblocks2 = DFSTestUtil.getAllBlocks(in2);
-        for (LocatedBlockInterface blk : lblocks2) {
+        for (LocatedBlock blk : lblocks2) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() is able to re-fetch token transparently (testing
@@ -417,7 +417,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in2, expected));
         // confirm all tokens cached in in3 are expired by now
         List<LocatedBlock> lblocks3 = DFSTestUtil.getAllBlocks(in3);
-        for (LocatedBlockInterface blk : lblocks3) {
+        for (LocatedBlock blk : lblocks3) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify fetchBlockByteRange() is able to re-fetch token transparently
@@ -435,7 +435,7 @@ public class TestBlockTokenWithDFS {
         cluster.shutdownNameNode(0);
         // confirm tokens cached in in1 are still valid
         lblocks = DFSTestUtil.getAllBlocks(in1);
-        for (LocatedBlockInterface blk : lblocks) {
+        for (LocatedBlock blk : lblocks) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() still works (forced to use cached tokens)
@@ -443,7 +443,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in1, expected));
         // confirm tokens cached in in2 are still valid
         lblocks2 = DFSTestUtil.getAllBlocks(in2);
-        for (LocatedBlockInterface blk : lblocks2) {
+        for (LocatedBlock blk : lblocks2) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() still works (forced to use cached tokens)
@@ -455,7 +455,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in2, expected));
         // confirm tokens cached in in3 are still valid
         lblocks3 = DFSTestUtil.getAllBlocks(in3);
-        for (LocatedBlockInterface blk : lblocks3) {
+        for (LocatedBlock blk : lblocks3) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify fetchBlockByteRange() still works (forced to use cached tokens)
@@ -573,7 +573,7 @@ public class TestBlockTokenWithDFS {
         }
         List<LocatedBlock> locatedBlocks = nnProto.getBlockLocations(FILE_TO_READ, 0, FILE_SIZE).getLocatedBlocks();
         // first block
-        LocatedBlockInterface lblock = locatedBlocks.get(0);
+        LocatedBlock lblock = locatedBlocks.get(0);
         // verify token is not expired
         assertFalse(isBlockTokenExpired(lblock));
         // read with valid token, should succeed
@@ -618,7 +618,7 @@ public class TestBlockTokenWithDFS {
      */
         // confirm all tokens cached in in1 are expired by now
         List<LocatedBlock> lblocks = DFSTestUtil.getAllBlocks(in1);
-        for (LocatedBlockInterface blk : lblocks) {
+        for (LocatedBlock blk : lblocks) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() is able to re-fetch token transparently
@@ -626,7 +626,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in1, expected));
         // confirm all tokens cached in in2 are expired by now
         List<LocatedBlock> lblocks2 = DFSTestUtil.getAllBlocks(in2);
-        for (LocatedBlockInterface blk : lblocks2) {
+        for (LocatedBlock blk : lblocks2) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() is able to re-fetch token transparently (testing
@@ -640,7 +640,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in2, expected));
         // confirm all tokens cached in in3 are expired by now
         List<LocatedBlock> lblocks3 = DFSTestUtil.getAllBlocks(in3);
-        for (LocatedBlockInterface blk : lblocks3) {
+        for (LocatedBlock blk : lblocks3) {
             assertTrue(isBlockTokenExpired(blk));
         }
         // verify fetchBlockByteRange() is able to re-fetch token transparently
@@ -658,7 +658,7 @@ public class TestBlockTokenWithDFS {
         cluster.shutdownNameNode(0);
         // confirm tokens cached in in1 are still valid
         lblocks = DFSTestUtil.getAllBlocks(in1);
-        for (LocatedBlockInterface blk : lblocks) {
+        for (LocatedBlock blk : lblocks) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() still works (forced to use cached tokens)
@@ -666,7 +666,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in1, expected));
         // confirm tokens cached in in2 are still valid
         lblocks2 = DFSTestUtil.getAllBlocks(in2);
-        for (LocatedBlockInterface blk : lblocks2) {
+        for (LocatedBlock blk : lblocks2) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify blockSeekTo() still works (forced to use cached tokens)
@@ -678,7 +678,7 @@ public class TestBlockTokenWithDFS {
         assertTrue(checkFile1(in2, expected));
         // confirm tokens cached in in3 are still valid
         lblocks3 = DFSTestUtil.getAllBlocks(in3);
-        for (LocatedBlockInterface blk : lblocks3) {
+        for (LocatedBlock blk : lblocks3) {
             assertFalse(isBlockTokenExpired(blk));
         }
         // verify fetchBlockByteRange() still works (forced to use cached tokens)

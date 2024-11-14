@@ -79,7 +79,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs extends RollingFileSystemSi
 
     private MiniDockerDFSCluster cluster = null;
 
-    private UserGroupInformationInterface sink = null;
+    private UserGroupInformation sink = null;
 
     /**
      * Setup the KDC for testing a secure HDFS cluster.
@@ -185,7 +185,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs extends RollingFileSystemSi
     protected void createDirectoriesSecurely() throws IOException, InterruptedException {
         Path tmp = new Path("/tmp");
         Path test = new Path(tmp, "test");
-        UserGroupInformationInterface hdfs = UserGroupInformation.loginUserFromKeytabAndReturnUGI(hdfsPrincipal, hdfsKeytab);
+        UserGroupInformation hdfs = UserGroupInformation.loginUserFromKeytabAndReturnUGI(hdfsPrincipal, hdfsKeytab);
         FileSystem fsForSuperUser = hdfs.doAs(new PrivilegedExceptionAction<FileSystem>() {
 
             @Override

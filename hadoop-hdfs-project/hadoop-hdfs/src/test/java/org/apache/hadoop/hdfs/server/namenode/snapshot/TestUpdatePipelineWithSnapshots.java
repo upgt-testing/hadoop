@@ -56,7 +56,7 @@ public class TestUpdatePipelineWithSnapshots {
                 SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
                 // Grab the block info of this file for later use.
                 FSDataInputStream in = null;
-                ExtendedBlockInterface oldBlock = null;
+                ExtendedBlock oldBlock = null;
                 try {
                     in = fs.open(file);
                     oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
@@ -66,7 +66,7 @@ public class TestUpdatePipelineWithSnapshots {
                 // Allocate a new block ID/gen stamp so we can simulate pipeline
                 // recovery.
                 String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
-                LocatedBlockInterface newLocatedBlock = namenode.updateBlockForPipeline(oldBlock, clientName);
+                LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(oldBlock, clientName);
                 ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(), oldBlock.getBlockId(), oldBlock.getNumBytes(), newLocatedBlock.getBlock().getGenerationStamp());
                 // Delete the file from the present FS. It will still exist the
                 // previously-created snapshot. This will log an OP_DELETE for the

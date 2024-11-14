@@ -175,7 +175,7 @@ public class TestSnapshot {
     protected TestDirectoryTree.Node[] createSnapshots() throws Exception {
         TestDirectoryTree.Node[] nodes = new TestDirectoryTree.Node[2];
         // Each time we will create a snapshot for the top level dir
-        PathInterface root = SnapshotTestHelper.createSnapshot(hdfs, dirTree.topNode.nodePath, nextSnapshotName());
+        Path root = SnapshotTestHelper.createSnapshot(hdfs, dirTree.topNode.nodePath, nextSnapshotName());
         snapshotList.add(root);
         nodes[0] = dirTree.topNode;
         SnapshotTestHelper.checkSnapshotCreation(hdfs, root, nodes[0].nodePath);
@@ -298,12 +298,12 @@ public class TestSnapshot {
         Path sub = new Path(dir, "sub");
         Path subFile = new Path(sub, "file");
         DFSTestUtil.createFile(hdfs, subFile, BLOCKSIZE, REPLICATION, seed);
-        FileStatusInterface oldStatus = hdfs.getFileStatus(sub);
+        FileStatus oldStatus = hdfs.getFileStatus(sub);
         hdfs.allowSnapshot(dir);
         hdfs.createSnapshot(dir, "s1");
         hdfs.setTimes(sub, 100L, 100L);
-        PathInterface snapshotPath = SnapshotTestHelper.getSnapshotPath(dir, "s1", "sub");
-        FileStatusInterface snapshotStatus = hdfs.getFileStatus(snapshotPath);
+        Path snapshotPath = SnapshotTestHelper.getSnapshotPath(dir, "s1", "sub");
+        FileStatus snapshotStatus = hdfs.getFileStatus(snapshotPath);
         assertEquals(oldStatus.getModificationTime(), snapshotStatus.getModificationTime());
         assertEquals(oldStatus.getAccessTime(), snapshotStatus.getAccessTime());
     }
@@ -427,10 +427,10 @@ public class TestSnapshot {
         Path subFile = new Path(sub, "file");
         DFSTestUtil.createFile(hdfs, subFile, BLOCKSIZE, REPLICATION, seed);
         hdfs.allowSnapshot(dir);
-        PathInterface snapshotPath = hdfs.createSnapshot(dir, "s1");
-        FileStatusInterface oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
+        Path snapshotPath = hdfs.createSnapshot(dir, "s1");
+        FileStatus oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
         cluster.restartNameNodes();
-        FileStatusInterface newSnapshotStatus = hdfs.getFileStatus(snapshotPath);
+        FileStatus newSnapshotStatus = hdfs.getFileStatus(snapshotPath);
         assertEquals(oldSnapshotStatus.getModificationTime(), newSnapshotStatus.getModificationTime());
     }
 
@@ -441,11 +441,11 @@ public class TestSnapshot {
         Path subFile = new Path(sub, "file");
         DFSTestUtil.createFile(hdfs, subFile, BLOCKSIZE, REPLICATION, seed);
         hdfs.allowSnapshot(dir);
-        PathInterface snapshotPath = hdfs.createSnapshot(dir, "s1");
-        FileStatusInterface oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
+        Path snapshotPath = hdfs.createSnapshot(dir, "s1");
+        FileStatus oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
         hdfs.renameSnapshot(dir, "s1", "s2");
         Path snapshotRenamePath = new Path("/dir/.snapshot/s2");
-        FileStatusInterface newSnapshotStatus = hdfs.getFileStatus(snapshotRenamePath);
+        FileStatus newSnapshotStatus = hdfs.getFileStatus(snapshotRenamePath);
         assertNotEquals(oldSnapshotStatus.getModificationTime(), newSnapshotStatus.getModificationTime());
     }
 
@@ -459,13 +459,13 @@ public class TestSnapshot {
         Path subFile = new Path(sub, "file");
         DFSTestUtil.createFile(hdfs, subFile, BLOCKSIZE, REPLICATION, seed);
         hdfs.allowSnapshot(dir);
-        PathInterface snapshotPath = hdfs.createSnapshot(dir, "s1");
-        FileStatusInterface oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
+        Path snapshotPath = hdfs.createSnapshot(dir, "s1");
+        FileStatus oldSnapshotStatus = hdfs.getFileStatus(snapshotPath);
         hdfs.deleteSnapshot(dir, "s1");
-        FileStatusInterface dirStatus = hdfs.getFileStatus(dir);
+        FileStatus dirStatus = hdfs.getFileStatus(dir);
         assertNotEquals(dirStatus.getModificationTime(), oldSnapshotStatus.getModificationTime());
         cluster.restartNameNodes();
-        FileStatusInterface newSnapshotStatus = hdfs.getFileStatus(dir);
+        FileStatus newSnapshotStatus = hdfs.getFileStatus(dir);
         assertEquals(dirStatus.getModificationTime(), newSnapshotStatus.getModificationTime());
     }
 
@@ -552,7 +552,7 @@ public class TestSnapshot {
             //
             Modification create = new FileCreation(node.fileList.get(node.nullFileIndex), hdfs, BLOCKSIZE);
             Modification delete = new FileDeletion(node.fileList.get((node.nullFileIndex + 1) % node.fileList.size()), hdfs);
-            PathInterface f = node.fileList.get((node.nullFileIndex + 2) % node.fileList.size());
+            Path f = node.fileList.get((node.nullFileIndex + 2) % node.fileList.size());
             Modification append = new FileAppend(f, hdfs, BLOCKSIZE);
             FileAppendNotClose appendNotClose = new FileAppendNotClose(f, hdfs, BLOCKSIZE);
             Modification appendClose = new FileAppendClose(f, hdfs, BLOCKSIZE, appendNotClose);
@@ -619,7 +619,7 @@ public class TestSnapshot {
      */
     static abstract class Modification {
 
-        protected final PathInterface file;
+        protected final Path file;
 
         protected final FileSystem fs;
 
@@ -658,11 +658,11 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
                 if (snapshotFile != null) {
                     if (fs.exists(snapshotFile)) {
-                        FileStatusInterface status = fs.getFileStatus(snapshotFile);
+                        FileStatus status = fs.getFileStatus(snapshotFile);
                         statusMap.put(snapshotFile, status);
                     } else {
                         statusMap.put(snapshotFile, null);
@@ -673,9 +673,9 @@ public class TestSnapshot {
 
         @Override
         void checkSnapshots() throws Exception {
-            for (PathInterface snapshotFile : statusMap.keySet()) {
-                FileStatusInterface currentStatus = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile) : null;
-                FileStatusInterface originalStatus = statusMap.get(snapshotFile);
+            for (Path snapshotFile : statusMap.keySet()) {
+                FileStatus currentStatus = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile) : null;
+                FileStatus originalStatus = statusMap.get(snapshotFile);
                 assertEquals(currentStatus, originalStatus);
                 if (currentStatus != null) {
                     String s = null;
@@ -766,8 +766,8 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
                 if (snapshotFile != null) {
                     long snapshotFileLen = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile).getLen() : -1L;
                     snapshotFileLengthMap.put(snapshotFile, snapshotFileLen);
@@ -784,7 +784,7 @@ public class TestSnapshot {
         @Override
         void checkSnapshots() throws Exception {
             byte[] buffer = new byte[32];
-            for (PathInterface snapshotFile : snapshotFileLengthMap.keySet()) {
+            for (Path snapshotFile : snapshotFileLengthMap.keySet()) {
                 long currentSnapshotFileLen = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile).getLen() : -1L;
                 long originalSnapshotFileLen = snapshotFileLengthMap.get(snapshotFile);
                 String s = null;
@@ -870,10 +870,10 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
                 if (snapshotFile != null) {
-                    FileStatusInterface status = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile) : null;
+                    FileStatus status = fs.exists(snapshotFile) ? fs.getFileStatus(snapshotFile) : null;
                     fileStatusMap.put(snapshotFile, status);
                 }
             }
@@ -886,15 +886,15 @@ public class TestSnapshot {
 
         @Override
         void checkSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotFile = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file);
                 if (snapshotFile != null) {
                     boolean computed = fs.exists(snapshotFile);
                     boolean expected = fileStatusMap.get(snapshotFile) != null;
                     assertEquals(expected, computed);
                     if (computed) {
-                        FileStatusInterface currentSnapshotStatus = fs.getFileStatus(snapshotFile);
-                        FileStatusInterface originalStatus = fileStatusMap.get(snapshotFile);
+                        FileStatus currentSnapshotStatus = fs.getFileStatus(snapshotFile);
+                        FileStatus originalStatus = fileStatusMap.get(snapshotFile);
                         // We compare the string because it contains all the information,
                         // while FileStatus#equals only compares the path
                         assertEquals(currentSnapshotStatus.toString(), originalStatus.toString());
@@ -918,7 +918,7 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
+            for (Path snapshotRoot : snapshotList) {
                 boolean existence = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file) != null;
                 snapshotFileExistenceMap.put(snapshotRoot, existence);
             }
@@ -931,7 +931,7 @@ public class TestSnapshot {
 
         @Override
         void checkSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
+            for (Path snapshotRoot : snapshotList) {
                 boolean currentSnapshotFileExist = SnapshotTestHelper.getSnapshotFile(snapshotRoot, file) != null;
                 boolean originalSnapshotFileExist = snapshotFileExistenceMap.get(snapshotRoot);
                 assertEquals(currentSnapshotFileExist, originalSnapshotFileExist);
@@ -948,7 +948,7 @@ public class TestSnapshot {
 
         private final boolean isCreation;
 
-        private final PathInterface changedPath;
+        private final Path changedPath;
 
         private final HashMap<Path, FileStatus> statusMap;
 
@@ -970,10 +970,10 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotDir = SnapshotTestHelper.getSnapshotFile(snapshotRoot, changedPath);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotDir = SnapshotTestHelper.getSnapshotFile(snapshotRoot, changedPath);
                 if (snapshotDir != null) {
-                    FileStatusInterface status = fs.exists(snapshotDir) ? fs.getFileStatus(snapshotDir) : null;
+                    FileStatus status = fs.exists(snapshotDir) ? fs.getFileStatus(snapshotDir) : null;
                     statusMap.put(snapshotDir, status);
                     // In each non-snapshottable directory, we also create a file. Thus
                     // here we also need to check the file's status before/after taking
@@ -1002,9 +1002,9 @@ public class TestSnapshot {
 
         @Override
         void checkSnapshots() throws Exception {
-            for (PathInterface snapshot : statusMap.keySet()) {
-                FileStatusInterface currentStatus = fs.exists(snapshot) ? fs.getFileStatus(snapshot) : null;
-                FileStatusInterface originalStatus = statusMap.get(snapshot);
+            for (Path snapshot : statusMap.keySet()) {
+                FileStatus currentStatus = fs.exists(snapshot) ? fs.getFileStatus(snapshot) : null;
+                FileStatus originalStatus = statusMap.get(snapshot);
                 assertEquals(currentStatus, originalStatus);
                 if (currentStatus != null) {
                     assertEquals(currentStatus.toString(), originalStatus.toString());
@@ -1022,9 +1022,9 @@ public class TestSnapshot {
 
         private final TestDirectoryTree.NodeInterface dstParent;
 
-        private final PathInterface srcPath;
+        private final Path srcPath;
 
-        private final PathInterface dstPath;
+        private final Path dstPath;
 
         private final HashMap<Path, FileStatus> statusMap;
 
@@ -1050,10 +1050,10 @@ public class TestSnapshot {
 
         @Override
         void loadSnapshots() throws Exception {
-            for (PathInterface snapshotRoot : snapshotList) {
-                PathInterface snapshotDir = SnapshotTestHelper.getSnapshotFile(snapshotRoot, srcPath);
+            for (Path snapshotRoot : snapshotList) {
+                Path snapshotDir = SnapshotTestHelper.getSnapshotFile(snapshotRoot, srcPath);
                 if (snapshotDir != null) {
-                    FileStatusInterface status = fs.exists(snapshotDir) ? fs.getFileStatus(snapshotDir) : null;
+                    FileStatus status = fs.exists(snapshotDir) ? fs.getFileStatus(snapshotDir) : null;
                     statusMap.put(snapshotDir, status);
                     // In each non-snapshottable directory, we also create a file. Thus
                     // here we also need to check the file's status before/after taking
@@ -1074,9 +1074,9 @@ public class TestSnapshot {
 
         @Override
         void checkSnapshots() throws Exception {
-            for (PathInterface snapshot : statusMap.keySet()) {
-                FileStatusInterface currentStatus = fs.exists(snapshot) ? fs.getFileStatus(snapshot) : null;
-                FileStatusInterface originalStatus = statusMap.get(snapshot);
+            for (Path snapshot : statusMap.keySet()) {
+                FileStatus currentStatus = fs.exists(snapshot) ? fs.getFileStatus(snapshot) : null;
+                FileStatus originalStatus = statusMap.get(snapshot);
                 assertEquals(currentStatus, originalStatus);
                 if (currentStatus != null) {
                     assertEquals(currentStatus.toString(), originalStatus.toString());

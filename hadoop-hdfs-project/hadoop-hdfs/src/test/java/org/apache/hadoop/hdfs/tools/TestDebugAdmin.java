@@ -111,7 +111,7 @@ public class TestDebugAdmin {
         DataNodeInterface datanode = cluster.getDataNodes().get(0);
         DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
         FsDatasetSpi<?> fsd = datanode.getFSDataset();
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
         File blockFile = getBlockFile(fsd, block.getBlockPoolId(), block.getLocalBlock());
         assertEquals("ret: 1, You must specify a meta file with -meta", runCmd(new String[] { "verifyMeta", "-block", blockFile.getAbsolutePath() }));
         File metaFile = getMetaFile(fsd, block.getBlockPoolId(), block.getLocalBlock());
@@ -127,7 +127,7 @@ public class TestDebugAdmin {
         DataNodeInterface datanode = cluster.getDataNodes().get(0);
         DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
         FsDatasetSpi<?> fsd = datanode.getFSDataset();
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
         File blockFile = getBlockFile(fsd, block.getBlockPoolId(), block.getLocalBlock());
         assertEquals("ret: 1, computeMeta -block <block-file> -out " + "<output-metadata-file>  Compute HDFS metadata from the specified" + " block file, and save it to  the specified output metadata file." + "**NOTE: Use at your own risk! If the block file is corrupt" + " and you overwrite it's meta file,  it will show up" + " as good in HDFS, but you can't read the data." + " Only use as a last measure, and when you are 100% certain" + " the block file is good.", runCmd(new String[] { "computeMeta" }));
         assertEquals("ret: 2, You must specify a block file with -block", runCmd(new String[] { "computeMeta", "-whatever" }));
@@ -150,7 +150,7 @@ public class TestDebugAdmin {
 
     @Test(timeout = 60000)
     public void testVerifyECCommand() throws Exception {
-        final ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
         cluster = DFSTestUtil.setupCluster(conf, 6, 5, 0);
         cluster.waitActive();
         DistributedFileSystem fs = cluster.getFileSystem();
@@ -187,11 +187,11 @@ public class TestDebugAdmin {
         DFSTestUtil.createFile(fs, corruptFile, 5841961, repl, seed);
         List<LocatedBlock> blocks = DFSTestUtil.getAllBlocks(fs, corruptFile);
         assertEquals(1, blocks.size());
-        LocatedStripedBlockInterface blockGroup = (LocatedStripedBlock) blocks.get(0);
+        LocatedStripedBlock blockGroup = (LocatedStripedBlock) blocks.get(0);
         LocatedBlock[] indexedBlocks = StripedBlockUtil.parseStripedBlockGroup(blockGroup, ecPolicy.getCellSize(), ecPolicy.getNumDataUnits(), ecPolicy.getNumParityUnits());
         // Try corrupt block 0 in block group.
-        LocatedBlockInterface toCorruptLocatedBlock = indexedBlocks[0];
-        ExtendedBlockInterface toCorruptBlock = toCorruptLocatedBlock.getBlock();
+        LocatedBlock toCorruptLocatedBlock = indexedBlocks[0];
+        ExtendedBlock toCorruptBlock = toCorruptLocatedBlock.getBlock();
         DataNodeInterface datanode = cluster.getDataNode(toCorruptLocatedBlock.getLocations()[0].getIpcPort());
         File blockFile = getBlockFile(datanode.getFSDataset(), toCorruptBlock.getBlockPoolId(), toCorruptBlock.getLocalBlock());
         File metaFile = getMetaFile(datanode.getFSDataset(), toCorruptBlock.getBlockPoolId(), toCorruptBlock.getLocalBlock());

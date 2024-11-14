@@ -142,14 +142,14 @@ public class TestIncrementalBrVariations {
         // Write out a file with a few blocks, get block locations.
         DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
         // Get the block list for the file with the block locations.
-        LocatedBlocksInterface blocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        LocatedBlocks blocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
         assertThat(cluster.getNamesystem().getUnderReplicatedBlocks(), is(0L));
         return blocks;
     }
 
     public void verifyIncrementalBlockReports(boolean splitReports) throws IOException {
         // Get the block list for the file with the block locations.
-        LocatedBlocksInterface blocks = createFileGetBlocks(GenericTestUtils.getMethodName());
+        LocatedBlocks blocks = createFileGetBlocks(GenericTestUtils.getMethodName());
         try (FsDatasetSpi.FsVolumeReferences volumes = dn0.getFSDataset().getFsVolumeReferences()) {
             // We will send 'fake' incremental block reports to the NN that look
             // like they originated from DN 0.
@@ -161,7 +161,7 @@ public class TestIncrementalBrVariations {
                 ReceivedDeletedBlockInfo[] rdbi = new ReceivedDeletedBlockInfo[1];
                 // Find the first block on this storage and mark it as deleted for the
                 // report.
-                for (LocatedBlockInterface block : blocks.getLocatedBlocks()) {
+                for (LocatedBlock block : blocks.getLocatedBlocks()) {
                     if (block.getStorageIDs()[0].equals(volume.getStorageID())) {
                         rdbi[0] = new ReceivedDeletedBlockInfo(block.getBlock().getLocalBlock(), ReceivedDeletedBlockInfo.BlockStatus.DELETED_BLOCK, null);
                         foundBlockOnStorage = true;
@@ -196,10 +196,10 @@ public class TestIncrementalBrVariations {
      */
     @Test(timeout = 60000)
     public void testDataNodeDoesNotSplitReports() throws IOException, InterruptedException {
-        LocatedBlocksInterface blocks = createFileGetBlocks(GenericTestUtils.getMethodName());
+        LocatedBlocks blocks = createFileGetBlocks(GenericTestUtils.getMethodName());
         assertThat(cluster.getDataNodes().size(), is(1));
         // Remove all blocks from the DataNode.
-        for (LocatedBlockInterface block : blocks.getLocatedBlocks()) {
+        for (LocatedBlock block : blocks.getLocatedBlocks()) {
             dn0.notifyNamenodeDeletedBlock(block.getBlock(), block.getStorageIDs()[0]);
         }
         LOG.info("Triggering report after deleting blocks");

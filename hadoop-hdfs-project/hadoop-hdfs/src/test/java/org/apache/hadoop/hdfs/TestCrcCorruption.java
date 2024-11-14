@@ -267,7 +267,7 @@ public class TestCrcCorruption {
             FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, file, fileSize, replFactor, 12345L);
             DFSTestUtil.waitReplication(fs, file, replFactor);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, file);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, file);
             int blockFilesCorrupted = cluster.corruptBlockOnDataNodes(block);
             assertEquals("All replicas not corrupted", replFactor, blockFilesCorrupted);
             try {

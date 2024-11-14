@@ -95,7 +95,7 @@ public class TestBlockReaderLocalLegacy {
         Path path = new Path("/corrupted");
         DFSTestUtil.createFile(fs, path, FILE_LENGTH, REPL_FACTOR, 12345L);
         DFSTestUtil.waitReplication(fs, path, REPL_FACTOR);
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, path);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, path);
         int blockFilesCorrupted = cluster.corruptBlockOnDataNodes(block);
         assertEquals("All replicas not corrupted", REPL_FACTOR, blockFilesCorrupted);
         FSDataInputStream dis = cluster.getFileSystem().open(path);
@@ -167,10 +167,10 @@ public class TestBlockReaderLocalLegacy {
         DFSTestUtil.waitReplication(dfs, path, REPL_FACTOR);
         final ClientDatanodeProtocol proxy;
         final TokenInterface<BlockTokenIdentifier> token;
-        final ExtendedBlockInterface originalBlock;
+        final ExtendedBlock originalBlock;
         final long originalGS;
         {
-            final LocatedBlockInterface lb = cluster.getNameNode().getRpcServer().getBlockLocations(path.toString(), 0, 1).get(0);
+            final LocatedBlock lb = cluster.getNameNode().getRpcServer().getBlockLocations(path.toString(), 0, 1).get(0);
             proxy = DFSUtilClient.createClientDatanodeProtocolProxy(lb.getLocations()[0], conf, 60000, false);
             token = lb.getBlockToken();
             // get block and generation stamp
@@ -189,7 +189,7 @@ public class TestBlockReaderLocalLegacy {
         }
         {
             // get new generation stamp
-            final LocatedBlockInterface lb = cluster.getNameNode().getRpcServer().getBlockLocations(path.toString(), 0, 1).get(0);
+            final LocatedBlock lb = cluster.getNameNode().getRpcServer().getBlockLocations(path.toString(), 0, 1).get(0);
             final long newGS = lb.getBlock().getGenerationStamp();
             Assert.assertTrue(newGS > originalGS);
             // getBlockLocalPathInfo using the original block.

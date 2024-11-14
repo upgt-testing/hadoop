@@ -115,8 +115,8 @@ public class TestNamenodeStorageDirectives {
         }
         long fileLength = client.getFileInfo(path.toString()).getLen();
         int foundBlocks = 0;
-        LocatedBlocksInterface locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
-        for (LocatedBlockInterface locatedBlock : locatedBlocks.getLocatedBlocks()) {
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
             for (StorageType st : locatedBlock.getStorageTypes()) {
                 if (st == storageType) {
                     foundBlocks++;

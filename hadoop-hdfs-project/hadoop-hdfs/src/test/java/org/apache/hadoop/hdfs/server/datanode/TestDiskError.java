@@ -140,9 +140,9 @@ public class TestDiskError {
         DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
         DFSTestUtil.waitReplication(fs, fileName, (short) 1);
         // get the block belonged to the created file
-        LocatedBlocksInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        LocatedBlocks blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
         assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
-        LocatedBlockInterface block = blocks.get(0);
+        LocatedBlock block = blocks.get(0);
         // bring up a second datanode
         cluster.startDataNodes(conf, 1, true, null, null);
         cluster.waitActive();
@@ -154,7 +154,7 @@ public class TestDiskError {
         Socket s = new Socket(target.getAddress(), target.getPort());
         // write the header.
         DataOutputStream out = new DataOutputStream(s.getOutputStream());
-        DataChecksumInterface checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
         new Sender(out).writeBlock(block.getBlock(), StorageType.DEFAULT, BlockTokenSecretManager.DUMMY_TOKEN, "", DatanodeInfo.EMPTY_ARRAY, StorageType.EMPTY_ARRAY, null, BlockConstructionStage.PIPELINE_SETUP_CREATE, 1, 0L, 0L, 0L, checksum, CachingStrategy.newDefaultStrategy(), false, false, null, null, new String[0]);
         out.flush();
         // close the connection before sending the content of the block
@@ -232,7 +232,7 @@ public class TestDiskError {
         out.close();
         // Corrupt the metadata file. Insert all 0's in the type and
         // bytesPerChecksum files of the metadata header.
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
         File metadataFile = cluster.getBlockMetadataFile(0, block);
         RandomAccessFile raFile = new RandomAccessFile(metadataFile, "rw");
         raFile.seek(2);
@@ -240,7 +240,7 @@ public class TestDiskError {
         raFile.writeInt(0);
         raFile.close();
         String datanodeId0 = dn0.getDatanodeUuid();
-        LocatedBlockInterface lb = DFSTestUtil.getAllBlocks(fs, filePath).get(0);
+        LocatedBlock lb = DFSTestUtil.getAllBlocks(fs, filePath).get(0);
         String storageId = lb.getStorageIDs()[0];
         cluster.startDataNodes(conf, 1, true, null, null);
         DataNodeInterface dn1 = null;

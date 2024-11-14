@@ -72,7 +72,7 @@ public class TestStripedINodeFile {
     private final BlockStoragePolicyInterface defaultPolicy = defaultSuite.getDefaultPolicy();
 
     // use hard coded policy - see HDFS-9816
-    private static final ErasureCodingPolicyInterface testECPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private static final ErasureCodingPolicy testECPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     @Rule
     public Timeout globalTimeout = new Timeout(300000);
@@ -290,12 +290,12 @@ public class TestStripedINodeFile {
             assertTrue("Failed to get INodeFile for /parentDir/ecDir/ecFile", inodeStriped instanceof INodeFile);
             INodeFileInterface inodeStripedFile = (INodeFile) inodeStriped;
             BlockInfo[] stripedBlks = inodeStripedFile.getBlocks();
-            for (BlockInfoInterface blockInfo : stripedBlks) {
+            for (BlockInfo blockInfo : stripedBlks) {
                 assertFalse("Mistakenly marked the block as deleted!", blockInfo.isDeleted());
             }
             // delete directory with erasure coding policy
             dfs.delete(ecDir, true);
-            for (BlockInfoInterface blockInfo : stripedBlks) {
+            for (BlockInfo blockInfo : stripedBlks) {
                 assertTrue("Didn't mark the block as deleted!", blockInfo.isDeleted());
             }
             // Case-2: Verify the behavior of contiguous blocks
@@ -304,12 +304,12 @@ public class TestStripedINodeFile {
             assertTrue("Failed to get INodeFile for /parentDir/someFile", inode instanceof INodeFile);
             INodeFileInterface inodeFile = (INodeFile) inode;
             BlockInfo[] contiguousBlks = inodeFile.getBlocks();
-            for (BlockInfoInterface blockInfo : contiguousBlks) {
+            for (BlockInfo blockInfo : contiguousBlks) {
                 assertFalse("Mistakenly marked the block as deleted!", blockInfo.isDeleted());
             }
             // delete parent directory
             dfs.delete(parentDir, true);
-            for (BlockInfoInterface blockInfo : contiguousBlks) {
+            for (BlockInfo blockInfo : contiguousBlks) {
                 assertTrue("Didn't mark the block as deleted!", blockInfo.isDeleted());
             }
         } finally {
@@ -358,8 +358,8 @@ public class TestStripedINodeFile {
             long fileLen = 20 * defaultStripedBlockSize;
             DFSTestUtil.createFile(cluster.getFileSystem(), new Path(barFile), fileLen, (short) 3, 0);
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(barFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(barFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }

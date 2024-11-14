@@ -288,7 +288,7 @@ public class TestLeaseManager {
         assertEquals(filesLeased.size(), lm.getINodeIdWithLeases().size());
         assertEquals(filesLeased.size(), lm.getINodeWithLeases().size());
         Set<INodesInPath> iNodeWithLeases = lm.getINodeWithLeases();
-        for (INodesInPathInterface iNodesInPath : iNodeWithLeases) {
+        for (INodesInPath iNodesInPath : iNodeWithLeases) {
             String leasedFileName = DFSUtil.bytes2String(iNodesInPath.getLastLocalName());
             assertTrue(filesLeased.contains(leasedFileName));
         }

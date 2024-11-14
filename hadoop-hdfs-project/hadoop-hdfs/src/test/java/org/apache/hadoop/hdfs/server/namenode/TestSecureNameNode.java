@@ -64,7 +64,7 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
             });
             fsForSuperUser.mkdirs(new Path("/tmp"));
             fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
-            UserGroupInformationInterface ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
             FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
 
                 @Override

@@ -1092,7 +1092,7 @@ public class TestReencryption {
         fsWrapper.mkdir(subdir, FsPermission.getDirDefault(), true);
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         // create a snapshot and rename a file, so INodeReference is created.
-        final PathInterface zoneSnap = fs.createSnapshot(zone);
+        final Path zoneSnap = fs.createSnapshot(zone);
         fsWrapper.rename(new Path(zone, "5"), new Path(zone, "5new"));
         fsWrapper.rename(new Path(zone, "6"), new Path(zone, "6new"));
         fsWrapper.delete(new Path(zone, "6new"), true);

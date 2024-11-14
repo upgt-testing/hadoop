@@ -102,7 +102,7 @@ public class TestHostsFiles {
             // Create a file with one block
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Decommission one of the hosts with the block, this should cause
             // the block to get replicated to another host on the same rack,

@@ -51,7 +51,7 @@ public class TestInitializeSharedEdits {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestInitializeSharedEdits.class);
 
-    private static final PathInterface TEST_PATH = new Path("/test");
+    private static final Path TEST_PATH = new Path("/test");
 
     private Configuration conf;
 

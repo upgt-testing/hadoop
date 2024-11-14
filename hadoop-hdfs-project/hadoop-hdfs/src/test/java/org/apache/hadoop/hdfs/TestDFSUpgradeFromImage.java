@@ -192,11 +192,11 @@ public class TestDFSUpgradeFromImage {
     private void verifyDir(DistributedFileSystem dfs, Path dir, CRC32 overallChecksum) throws IOException {
         FileStatus[] fileArr = dfs.listStatus(dir);
         TreeMap<Path, Boolean> fileMap = new TreeMap<Path, Boolean>();
-        for (FileStatusInterface file : fileArr) {
+        for (FileStatus file : fileArr) {
             fileMap.put(file.getPath(), Boolean.valueOf(file.isDirectory()));
         }
         for (Iterator<Path> it = fileMap.keySet().iterator(); it.hasNext(); ) {
-            PathInterface path = it.next();
+            Path path = it.next();
             boolean isDir = fileMap.get(path);
             String pathName = path.toUri().getPath();
             overallChecksum.update(pathName.getBytes());
@@ -331,9 +331,9 @@ public class TestDFSUpgradeFromImage {
                 toList.add(new Path("/"));
                 ArrayList<String> found = new ArrayList<String>();
                 while (!toList.isEmpty()) {
-                    PathInterface p = toList.remove(0);
+                    Path p = toList.remove(0);
                     FileStatus[] statuses = dfs.listStatus(p);
-                    for (FileStatusInterface status : statuses) {
+                    for (FileStatus status : statuses) {
                         final String path = status.getPath().toUri().getPath();
                         System.out.println("Found path " + path);
                         found.add(path);
@@ -382,9 +382,9 @@ public class TestDFSUpgradeFromImage {
                 toList.add(new Path("/"));
                 ArrayList<String> found = new ArrayList<String>();
                 while (!toList.isEmpty()) {
-                    PathInterface p = toList.remove(0);
+                    Path p = toList.remove(0);
                     FileStatus[] statuses = dfs.listStatus(p);
-                    for (FileStatusInterface status : statuses) {
+                    for (FileStatus status : statuses) {
                         final String path = status.getPath().toUri().getPath();
                         System.out.println("Found path " + path);
                         found.add(path);
@@ -448,9 +448,9 @@ public class TestDFSUpgradeFromImage {
                 toList.add(new Path("/"));
                 ArrayList<String> found = new ArrayList<String>();
                 while (!toList.isEmpty()) {
-                    PathInterface p = toList.remove(0);
+                    Path p = toList.remove(0);
                     FileStatus[] statuses = dfs.listStatus(p);
-                    for (FileStatusInterface status : statuses) {
+                    for (FileStatus status : statuses) {
                         final String path = status.getPath().toUri().getPath();
                         System.out.println("Found path " + path);
                         found.add(path);

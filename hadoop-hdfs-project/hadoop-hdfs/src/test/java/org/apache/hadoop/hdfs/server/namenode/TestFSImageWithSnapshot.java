@@ -71,7 +71,7 @@ public class TestFSImageWithSnapshot {
 
     static final long txid = 1;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
     private static final String testDir = GenericTestUtils.getTestDir().getAbsolutePath();
 
@@ -407,7 +407,7 @@ public class TestFSImageWithSnapshot {
         cluster = new MiniDockerDFSCluster.Builder(conf).format(false).numDataNodes(NUM_DATANODES).build();
         cluster.waitActive();
         hdfs = cluster.getFileSystem();
-        FileStatusInterface status = hdfs.getFileStatus(file);
+        FileStatus status = hdfs.getFileStatus(file);
         assertEquals(1, status.getLen());
     }
 

@@ -243,7 +243,7 @@ public class TestFsDatasetCache {
         for (int i = 0; i < locs.length; i++) {
             HdfsBlockLocation loc = locs[i];
             String bpid = loc.getLocatedBlock().getBlock().getBlockPoolId();
-            BlockInterface block = loc.getLocatedBlock().getBlock().getLocalBlock();
+            Block block = loc.getLocatedBlock().getBlock().getLocalBlock();
             ExtendedBlock extBlock = new ExtendedBlock(bpid, block);
             FileInputStream blockInputStream = null;
             FileChannel blockChannel = null;
@@ -277,7 +277,7 @@ public class TestFsDatasetCache {
         long current = 0;
         assertEquals("Unexpected cache capacity", CACHE_CAPACITY, cacheCapacity);
         assertEquals("Unexpected amount of cache used", current, cacheUsed);
-        MetricsRecordBuilderInterface dnMetrics;
+        MetricsRecordBuilder dnMetrics;
         long numCacheCommands = 0;
         long numUncacheCommands = 0;
         // Cache each block in succession, checking each time
@@ -483,7 +483,7 @@ public class TestFsDatasetCache {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksCached = MetricsAsserts.getLongCounter("BlocksCached", dnMetrics);
                 return blocksCached > 0;
             }
@@ -494,14 +494,14 @@ public class TestFsDatasetCache {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksUncached = MetricsAsserts.getLongCounter("BlocksUncached", dnMetrics);
                 return blocksUncached > 0;
             }
         }, 1000, 30000);
         // Make sure that no additional messages were sent
         Thread.sleep(10000);
-        MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
         MetricsAsserts.assertCounter("BlocksCached", 1l, dnMetrics);
         MetricsAsserts.assertCounter("BlocksUncached", 1l, dnMetrics);
     }
@@ -524,7 +524,7 @@ public class TestFsDatasetCache {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksCached = MetricsAsserts.getLongCounter("BlocksCached", dnMetrics);
                 if (blocksCached != TOTAL_BLOCKS_PER_CACHE) {
                     LOG.info("waiting for " + TOTAL_BLOCKS_PER_CACHE + " to " + "be cached.   Right now only " + blocksCached + " blocks are cached.");
@@ -537,7 +537,7 @@ public class TestFsDatasetCache {
         // Try to cache a smaller file.  It should fail.
         final long shortCacheDirectiveId = dfs.addCacheDirective(new CacheDirectiveInfo.Builder().setPool("pool").setPath(SMALL_FILE).setReplication((short) 1).build());
         Thread.sleep(10000);
-        MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
         Assert.assertEquals(TOTAL_BLOCKS_PER_CACHE, MetricsAsserts.getLongCounter("BlocksCached", dnMetrics));
         // Uncache the big file and verify that the small file can now be
         // cached (regression test for HDFS-6107)

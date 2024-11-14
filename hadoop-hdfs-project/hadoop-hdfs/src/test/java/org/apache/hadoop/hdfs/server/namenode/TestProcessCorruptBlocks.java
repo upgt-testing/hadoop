@@ -66,7 +66,7 @@ public class TestProcessCorruptBlocks {
             final Path fileName = new Path("/foo1");
             DFSTestUtil.createFile(fs, fileName, 2, (short) 3, 0L);
             DFSTestUtil.waitReplication(fs, fileName, (short) 3);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             corruptBlock(cluster, fs, fileName, 0, block);
             DFSTestUtil.waitReplication(fs, fileName, (short) 2);
             assertEquals(2, countReplicas(namesystem, block).liveReplicas());
@@ -113,7 +113,7 @@ public class TestProcessCorruptBlocks {
             final Path fileName = new Path("/foo1");
             DFSTestUtil.createFile(fs, fileName, 2, (short) 3, 0L);
             DFSTestUtil.waitReplication(fs, fileName, (short) 3);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             corruptBlock(cluster, fs, fileName, 0, block);
             DFSTestUtil.waitReplication(fs, fileName, (short) 2);
             assertEquals(2, countReplicas(namesystem, block).liveReplicas());
@@ -156,7 +156,7 @@ public class TestProcessCorruptBlocks {
             final Path fileName = new Path("/foo1");
             DFSTestUtil.createFile(fs, fileName, 2, (short) 2, 0L);
             DFSTestUtil.waitReplication(fs, fileName, (short) 2);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             corruptBlock(cluster, fs, fileName, 0, block);
             DFSTestUtil.waitReplication(fs, fileName, (short) 1);
             assertEquals(1, countReplicas(namesystem, block).liveReplicas());
@@ -202,7 +202,7 @@ public class TestProcessCorruptBlocks {
             final Path fileName = new Path("/foo1");
             DFSTestUtil.createFile(fs, fileName, 2, (short) 3, 0L);
             DFSTestUtil.waitReplication(fs, fileName, (short) 3);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             corruptBlock(cluster, fs, fileName, 0, block);
             corruptBlock(cluster, fs, fileName, 1, block);
             corruptBlock(cluster, fs, fileName, 2, block);

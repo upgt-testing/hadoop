@@ -240,7 +240,7 @@ public class TestShortCircuitLocalRead {
             Path path = new Path("/");
             assertTrue("/ should be a directory", fs.getFileStatus(path).isDirectory());
             byte[] fileData = AppendTestUtil.randomBytes(seed, size);
-            PathInterface file1 = fs.makeQualified(new Path("filelocal.dat"));
+            Path file1 = fs.makeQualified(new Path("filelocal.dat"));
             FSDataOutputStream stm = createFile(fs, file1, 1);
             stm.write(fileData);
             stm.close();
@@ -299,7 +299,7 @@ public class TestShortCircuitLocalRead {
     }
 
     private static DistributedFileSystem getFileSystem(String user, final URI uri, final Configuration conf) throws InterruptedException, IOException {
-        UserGroupInformationInterface ugi = UserGroupInformation.createRemoteUser(user);
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser(user);
         return ugi.doAs(new PrivilegedExceptionAction<DistributedFileSystem>() {
 
             @Override
@@ -317,7 +317,7 @@ public class TestShortCircuitLocalRead {
         FileSystem fs = cluster.getFileSystem();
         try {
             DFSTestUtil.createFile(fs, new Path("/tmp/x"), 16, (short) 1, 23);
-            LocatedBlocksInterface lb = cluster.getNameNode().getRpcServer().getBlockLocations("/tmp/x", 0, 16);
+            LocatedBlocks lb = cluster.getNameNode().getRpcServer().getBlockLocations("/tmp/x", 0, 16);
             // Create a new block object, because the block inside LocatedBlock at
             // namenode is of type BlockInfo.
             ExtendedBlock blk = new ExtendedBlock(lb.get(0).getBlock());
@@ -405,7 +405,7 @@ public class TestShortCircuitLocalRead {
             } catch (TimeoutException e) {
                 Assert.fail("unexpected TimeoutException during " + "waitReplication: " + e);
             }
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
             File dataFile = cluster.getBlockFile(0, block);
             cluster.shutdown();
             cluster = null;

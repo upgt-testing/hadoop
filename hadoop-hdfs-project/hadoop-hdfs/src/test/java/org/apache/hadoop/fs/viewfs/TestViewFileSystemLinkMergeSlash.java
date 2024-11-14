@@ -115,7 +115,7 @@ public class TestViewFileSystemLinkMergeSlash extends ViewFileSystemBaseTest {
     @Override
     void initializeTargetTestRoot() throws IOException {
         targetTestRoot = fsDefault.makeQualified(new Path("/"));
-        for (FileStatusInterface status : fsDefault.listStatus(targetTestRoot)) {
+        for (FileStatus status : fsDefault.listStatus(targetTestRoot)) {
             fsDefault.delete(status.getPath(), true);
         }
     }
@@ -160,7 +160,7 @@ public class TestViewFileSystemLinkMergeSlash extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkMergeSlash(conf, clusterName, TEST_DIR.toURI());
         FileSystem vfs = FileSystem.get(viewFsUri, conf);
         assertEquals(ViewFileSystem.class, vfs.getClass());
-        FileStatusInterface stat = vfs.getFileStatus(new Path(viewFsUri.toString() + testFileName));
+        FileStatus stat = vfs.getFileStatus(new Path(viewFsUri.toString() + testFileName));
         LOG.info("File stat: " + stat);
         vfs.close();
     }

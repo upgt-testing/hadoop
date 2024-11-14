@@ -110,12 +110,12 @@ public class TestGetContentSummaryWithPermission {
         final Path bar = new Path(foo, "barNoneSuper");
         final Path baz = new Path(bar, "bazNoneSuper");
         // run as some random non-superuser, non-owner user.
-        final UserGroupInformationInterface userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
         dfs.mkdirs(bar);
         DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
         // by default, permission is rwxr-xr-x, as long as READ and EXECUTE are set,
         // content summary should accessible
-        FileStatusInterface fileStatus;
+        FileStatus fileStatus;
         fileStatus = dfs.getFileStatus(foo);
         assertEquals((short) 755, fileStatus.getPermission().toOctal());
         fileStatus = dfs.getFileStatus(bar);

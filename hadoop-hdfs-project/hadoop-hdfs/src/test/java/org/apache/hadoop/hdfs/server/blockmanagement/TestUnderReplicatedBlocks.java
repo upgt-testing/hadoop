@@ -54,7 +54,7 @@ public class TestUnderReplicatedBlocks {
             DFSTestUtil.verifyClientStats(conf, cluster);
             // remove one replica from the blocksMap so block becomes under-replicated
             // but the block does not get put into the under-replicated blocks queue
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
             DatanodeDescriptorInterface dn = bm.blocksMap.getStorages(b.getLocalBlock()).iterator().next().getDatanodeDescriptor();
             bm.addToInvalidates(b.getLocalBlock(), dn);
             // Compute the invalidate work in NN, and trigger the heartbeat from DN
@@ -120,7 +120,7 @@ public class TestUnderReplicatedBlocks {
             DFSTestUtil.waitReplication(fs, FILE_PATH, REP_FACTOR);
             cluster.startDataNodes(conf, 1, true, null, null, null, null);
             final BlockManagerInterface bm = cluster.getNamesystem().getBlockManager();
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
             Iterator<DatanodeStorageInfo> storageInfos = bm.blocksMap.getStorages(b.getLocalBlock()).iterator();
             DatanodeDescriptorInterface firstDn = storageInfos.next().getDatanodeDescriptor();
             DatanodeDescriptorInterface secondDn = storageInfos.next().getDatanodeDescriptor();

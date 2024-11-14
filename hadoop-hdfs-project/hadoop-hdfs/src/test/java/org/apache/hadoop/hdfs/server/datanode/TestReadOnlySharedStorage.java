@@ -68,7 +68,7 @@ public class TestReadOnlySharedStorage {
 
     private static final long seed = 0x1BADF00DL;
 
-    private static final PathInterface PATH = new Path("/" + TestReadOnlySharedStorage.class.getName() + ".dat");
+    private static final Path PATH = new Path("/" + TestReadOnlySharedStorage.class.getName() + ".dat");
 
     private static final int RETRIES = 10;
 
@@ -88,11 +88,11 @@ public class TestReadOnlySharedStorage {
 
     private DatanodeInfoInterface readOnlyDataNode;
 
-    private BlockInterface block;
+    private Block block;
 
-    private BlockInfoInterface storedBlock;
+    private BlockInfo storedBlock;
 
-    private ExtendedBlockInterface extendedBlock;
+    private ExtendedBlock extendedBlock;
 
     /**
      * Setup a {@link MiniDockerDFSCluster}.
@@ -120,7 +120,7 @@ public class TestReadOnlySharedStorage {
         }
         // Create a 1 block file
         DFSTestUtil.createFile(fs, PATH, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, (short) 1, seed);
-        LocatedBlockInterface locatedBlock = getLocatedBlock();
+        LocatedBlock locatedBlock = getLocatedBlock();
         extendedBlock = locatedBlock.getBlock();
         block = extendedBlock.getLocalBlock();
         storedBlock = blockManager.getStoredBlock(block);
@@ -148,7 +148,7 @@ public class TestReadOnlySharedStorage {
 
     private void waitForLocations(int locations) throws IOException, InterruptedException {
         for (int tries = 0; tries < RETRIES; ) try {
-            LocatedBlockInterface locatedBlock = getLocatedBlock();
+            LocatedBlock locatedBlock = getLocatedBlock();
             assertThat(locatedBlock.getLocations().length, is(locations));
             break;
         } catch (AssertionError e) {
@@ -161,7 +161,7 @@ public class TestReadOnlySharedStorage {
     }
 
     private LocatedBlock getLocatedBlock() throws IOException {
-        LocatedBlocksInterface locatedBlocks = client.getLocatedBlocks(PATH.toString(), 0, BLOCK_SIZE);
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(PATH.toString(), 0, BLOCK_SIZE);
         assertThat(locatedBlocks.getLocatedBlocks().size(), is(1));
         return Iterables.getOnlyElement(locatedBlocks.getLocatedBlocks());
     }

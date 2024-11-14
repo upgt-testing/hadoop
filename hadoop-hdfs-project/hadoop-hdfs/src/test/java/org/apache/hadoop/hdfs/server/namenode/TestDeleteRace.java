@@ -143,7 +143,7 @@ public class TestDeleteRace {
 
         private FileSystem fs;
 
-        private PathInterface path;
+        private Path path;
 
         DeleteThread(FileSystem fs, Path path) {
             this.fs = fs;
@@ -172,9 +172,9 @@ public class TestDeleteRace {
 
         private FileSystem fs;
 
-        private PathInterface from;
+        private Path from;
 
-        private PathInterface to;
+        private Path to;
 
         RenameThread(FileSystem fs, Path from, Path to) {
             this.fs = fs;
@@ -252,7 +252,7 @@ public class TestDeleteRace {
                 LOG.info("test on " + testPath + " mkSameDir: " + mkSameDir + " snapshot: " + hasSnapshot);
                 Path fPath = new Path(testPath);
                 //find grandest non-root parent
-                PathInterface grandestNonRootParent = fPath;
+                Path grandestNonRootParent = fPath;
                 while (!grandestNonRootParent.getParent().equals(rootPath)) {
                     grandestNonRootParent = grandestNonRootParent.getParent();
                 }
@@ -268,7 +268,7 @@ public class TestDeleteRace {
                 // Look into the block manager on the active node for the block
                 // under construction.
                 NameNodeInterface nn = cluster.getNameNode();
-                ExtendedBlockInterface blk = DFSTestUtil.getFirstBlock(fs, fPath);
+                ExtendedBlock blk = DFSTestUtil.getFirstBlock(fs, fPath);
                 DatanodeDescriptorInterface expectedPrimary = DFSTestUtil.getExpectedPrimaryNode(nn, blk);
                 LOG.info("Expecting block recovery to be triggered on DN " + expectedPrimary);
                 // Find the corresponding DN daemon, and spy on its connection to the
@@ -390,7 +390,7 @@ public class TestDeleteRace {
             final FSNamesystemInterface fsn = dfsCluster.getNamesystem();
             hdfs = dfsCluster.getFileSystem();
             DFSTestUtil.createFile(hdfs, new Path(src), 5, (short) 1, 0xFEED);
-            FileStatusInterface status = hdfs.getFileStatus(new Path(src));
+            FileStatus status = hdfs.getFileStatus(new Path(src));
             long accessTime = status.getAccessTime();
             Semaphore openSem = new Semaphore(0);
             Semaphore renameSem = new Semaphore(0);

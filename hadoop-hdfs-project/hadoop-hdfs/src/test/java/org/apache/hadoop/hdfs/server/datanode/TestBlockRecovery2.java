@@ -207,7 +207,7 @@ public class TestBlockRecovery2 {
             out.writeBytes("data");
             out.hsync();
             List<LocatedBlock> blocks = DFSTestUtil.getAllBlocks(fs.open(path));
-            final LocatedBlockInterface block = blocks.get(0);
+            final LocatedBlock block = blocks.get(0);
             final DataNodeInterface dataNode = cluster.getDataNodes().get(0);
             final AtomicBoolean recoveryInitResult = new AtomicBoolean(true);
             Thread recoveryThread = new Thread(() -> {
@@ -295,7 +295,7 @@ public class TestBlockRecovery2 {
     public void testEcRecoverBlocks() throws Throwable {
         // Stop the Mocked DN started in startup()
         tearDown();
-        ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(8).build();
         try {
             cluster.waitActive();
@@ -366,7 +366,7 @@ public class TestBlockRecovery2 {
             out.write(AppendTestUtil.randomBytes(0, blockSize));
             out.hsync();
             DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost", cluster.getNameNodePort()), configuration);
-            LocatedBlockInterface blk = dfsClient.getNamenode().getBlockLocations(filename, 0, blockSize).getLastLocatedBlock();
+            LocatedBlock blk = dfsClient.getNamenode().getBlockLocations(filename, 0, blockSize).getLastLocatedBlock();
             // Kill 2 out of 3 datanodes so that only 1 alive, thus < minReplication
             List<DatanodeInfo> dataNodes = Arrays.asList(blk.getLocations());
             assertEquals(dataNodes.size(), numReplicas);

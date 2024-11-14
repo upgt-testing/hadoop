@@ -138,10 +138,10 @@ public class TestStorageMover {
          * Create files/directories/snapshots.
          */
         void prepare(DistributedFileSystem dfs, short repl) throws Exception {
-            for (PathInterface d : dirs) {
+            for (Path d : dirs) {
                 dfs.mkdirs(d);
             }
-            for (PathInterface file : files) {
+            for (Path file : files) {
                 DFSTestUtil.createFile(dfs, file, fileSize, repl, 0L);
             }
             for (Map.EntryInterface<Path, List<String>> entry : snapshotMap.entrySet()) {
@@ -295,7 +295,7 @@ public class TestStorageMover {
 
         private void verifyRecursively(final Path parent, final HdfsFileStatus status) throws Exception {
             if (status.isDirectory()) {
-                PathInterface fullPath = parent == null ? new Path("/") : status.getFullPath(parent);
+                Path fullPath = parent == null ? new Path("/") : status.getFullPath(parent);
                 DirectoryListingInterface children = dfs.getClient().listPaths(fullPath.toString(), HdfsFileStatus.EMPTY_NAME, true);
                 for (HdfsFileStatus child : children.getPartialListing()) {
                     verifyRecursively(fullPath, child);
@@ -307,7 +307,7 @@ public class TestStorageMover {
         }
 
         void verifyFile(final Path file, final Byte expectedPolicyId) throws Exception {
-            final PathInterface parent = file.getParent();
+            final Path parent = file.getParent();
             DirectoryListingInterface children = dfs.getClient().listPaths(parent.toString(), HdfsFileStatus.EMPTY_NAME, true);
             for (HdfsFileStatus child : children.getPartialListing()) {
                 if (child.getLocalName().equals(file.getName())) {
@@ -319,14 +319,14 @@ public class TestStorageMover {
         }
 
         private void verifyFile(final Path parent, final HdfsFileStatus status, final Byte expectedPolicyId) throws Exception {
-            HdfsLocatedFileStatusInterface fileStatus = (HdfsLocatedFileStatus) status;
+            HdfsLocatedFileStatus fileStatus = (HdfsLocatedFileStatus) status;
             byte policyId = fileStatus.getStoragePolicy();
             BlockStoragePolicyInterface policy = policies.getPolicy(policyId);
             if (expectedPolicyId != null) {
                 Assert.assertEquals((byte) expectedPolicyId, policy.getId());
             }
             final List<StorageType> types = policy.chooseStorageTypes(status.getReplication());
-            for (LocatedBlockInterface lb : fileStatus.getLocatedBlocks().getLocatedBlocks()) {
+            for (LocatedBlock lb : fileStatus.getLocatedBlocks().getLocatedBlocks()) {
                 final Mover.StorageTypeDiff diff = new Mover.StorageTypeDiff(types, lb.getStorageTypes());
                 Assert.assertTrue(fileStatus.getFullName(parent.toString()) + " with policy " + policy + " has non-empty overlap: " + diff + ", the corresponding block is " + lb.getBlock().getLocalBlock(), diff.removeOverlap(true));
             }
@@ -346,7 +346,7 @@ public class TestStorageMover {
         private Replication getOrVerifyReplication(Path file, Replication expected) throws IOException {
             final List<LocatedBlock> lbs = dfs.getClient().getLocatedBlocks(file.toString(), 0).getLocatedBlocks();
             Assert.assertEquals(1, lbs.size());
-            LocatedBlockInterface lb = lbs.get(0);
+            LocatedBlock lb = lbs.get(0);
             StringBuilder types = new StringBuilder();
             final Replication r = new Replication();
             for (StorageType t : lb.getStorageTypes()) {
@@ -422,11 +422,11 @@ public class TestStorageMover {
 
         final Map<Path, BlockStoragePolicy> map = Maps.newHashMap();
 
-        final PathInterface hot = new Path("/hot");
+        final Path hot = new Path("/hot");
 
-        final PathInterface warm = new Path("/warm");
+        final Path warm = new Path("/warm");
 
-        final PathInterface cold = new Path("/cold");
+        final Path cold = new Path("/cold");
 
         final List<Path> files;
 
@@ -435,7 +435,7 @@ public class TestStorageMover {
             map.put(warm, WARM);
             map.put(cold, COLD);
             files = new ArrayList<Path>();
-            for (PathInterface dir : map.keySet()) {
+            for (Path dir : map.keySet()) {
                 for (int i = 0; i < filesPerDir; i++) {
                     files.add(new Path(dir, "file" + i));
                 }
@@ -451,9 +451,9 @@ public class TestStorageMover {
          * and cold files to hot and warm.
          */
         void moveAround(DistributedFileSystem dfs) throws Exception {
-            for (PathInterface srcDir : map.keySet()) {
+            for (Path srcDir : map.keySet()) {
                 int i = 0;
-                for (PathInterface dstDir : map.keySet()) {
+                for (Path dstDir : map.keySet()) {
                     if (!srcDir.equals(dstDir)) {
                         final Path src = new Path(srcDir, "file" + i++);
                         final Path dst = new Path(dstDir, srcDir.getName() + "2" + dstDir.getName());
@@ -542,7 +542,7 @@ public class TestStorageMover {
             test.setStoragePolicy();
             test.migrate(ExitStatus.SUCCESS);
             // make sure the under construction block has not been migrated
-            LocatedBlocksInterface lbs = test.dfs.getClient().getLocatedBlocks(barFile.toString(), BLOCK_SIZE);
+            LocatedBlocks lbs = test.dfs.getClient().getLocatedBlocks(barFile.toString(), BLOCK_SIZE);
             LOG.info("Locations: " + lbs);
             List<LocatedBlock> blks = lbs.getLocatedBlocks();
             Assert.assertEquals(1, blks.size());
@@ -593,8 +593,8 @@ public class TestStorageMover {
     private void waitForAllReplicas(int expectedReplicaNum, Path file, DistributedFileSystem dfs, int retryCount) throws Exception {
         LOG.info("Waiting for replicas count " + expectedReplicaNum + ", file name: " + file);
         for (int i = 0; i < retryCount; i++) {
-            LocatedBlocksInterface lbs = dfs.getClient().getLocatedBlocks(file.toString(), 0, BLOCK_SIZE);
-            LocatedBlockInterface lb = lbs.get(0);
+            LocatedBlocks lbs = dfs.getClient().getLocatedBlocks(file.toString(), 0, BLOCK_SIZE);
+            LocatedBlock lb = lbs.get(0);
             if (lb.getLocations().length >= expectedReplicaNum) {
                 return;
             } else {

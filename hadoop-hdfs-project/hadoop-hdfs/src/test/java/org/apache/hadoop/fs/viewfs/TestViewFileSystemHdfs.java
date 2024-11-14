@@ -71,9 +71,9 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
 
     private static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
-    private static PathInterface defaultWorkingDirectory2;
+    private static Path defaultWorkingDirectory2;
 
     private static final Configuration CONF = new Configuration();
 
@@ -83,7 +83,7 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
 
     private FileSystem fsTarget2;
 
-    PathInterface targetTestRoot2;
+    Path targetTestRoot2;
 
     @Override
     protected FileSystemTestHelper createFileSystemHelper() {
@@ -220,10 +220,10 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
         Path fsTargetFilePath = new Path(targetTestRoot, "data/debug.log");
         Path mountDataFilePath = new Path(mountDataRootPath, fsTargetFileName);
         fileSystemTestHelper.createFile(fsTarget, fsTargetFilePath);
-        FileStatusInterface fileStatus = viewFs.getFileStatus(mountDataFilePath);
+        FileStatus fileStatus = viewFs.getFileStatus(mountDataFilePath);
         long fileLength = fileStatus.getLen();
-        FileChecksumInterface fileChecksumViaViewFs = viewFs.getFileChecksum(mountDataFilePath);
-        FileChecksumInterface fileChecksumViaTargetFs = fsTarget.getFileChecksum(fsTargetFilePath);
+        FileChecksum fileChecksumViaViewFs = viewFs.getFileChecksum(mountDataFilePath);
+        FileChecksum fileChecksumViaTargetFs = fsTarget.getFileChecksum(fsTargetFilePath);
         assertTrue("File checksum not matching!", fileChecksumViaViewFs.equals(fileChecksumViaTargetFs));
         fileChecksumViaViewFs = viewFs.getFileChecksum(mountDataFilePath, fileLength / 2);
         fileChecksumViaTargetFs = fsTarget.getFileChecksum(fsTargetFilePath, fileLength / 2);
@@ -361,12 +361,12 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
         fs.mkdirs(user1Path);
         fs.delete(user1Path, false);
         // Scenario - 2: Create FileSystem with the a different user context
-        final UserGroupInformationInterface userUgi = UserGroupInformation.createUserForTesting("user1@HADOOP.COM", new String[] { "hadoop" });
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("user1@HADOOP.COM", new String[] { "hadoop" });
         userUgi.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
             public Object run() throws IOException {
-                UserGroupInformationInterface ugi = UserGroupInformation.getCurrentUser();
+                UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
                 String doAsUserName = ugi.getUserName();
                 assertEquals(doAsUserName, "user1@HADOOP.COM");
                 FileSystem viewFS = FileSystem.get(FsConstants.VIEWFS_URI, conf);

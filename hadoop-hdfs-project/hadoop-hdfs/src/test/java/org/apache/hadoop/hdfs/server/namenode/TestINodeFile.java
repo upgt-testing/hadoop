@@ -576,13 +576,13 @@ public class TestINodeFile {
             DistributedFileSystem fs = cluster.getFileSystem();
             NamenodeProtocols nnRpc = cluster.getNameNodeRpc();
             // FileSystem#mkdirs "/testInodeIdBasedPaths"
-            PathInterface baseDir = getInodePath(INodeId.ROOT_INODE_ID, "testInodeIdBasedPaths");
+            Path baseDir = getInodePath(INodeId.ROOT_INODE_ID, "testInodeIdBasedPaths");
             Path baseDirRegPath = new Path("/testInodeIdBasedPaths");
             fs.mkdirs(baseDir);
             fs.exists(baseDir);
             long baseDirFileId = nnRpc.getFileInfo(baseDir.toString()).getFileId();
             // FileSystem#create file and FileSystem#close
-            PathInterface testFileInodePath = getInodePath(baseDirFileId, "test1");
+            Path testFileInodePath = getInodePath(baseDirFileId, "test1");
             Path testFileRegularPath = new Path(baseDir, "test1");
             final int testFileBlockSize = 1024;
             FileSystemTestHelper.createFile(fs, testFileInodePath, 1, testFileBlockSize);
@@ -591,7 +591,7 @@ public class TestINodeFile {
             FsPermission perm = new FsPermission((short) 0666);
             fs.setPermission(testFileInodePath, perm);
             // FileSystem#getFileStatus and FileSystem#getPermission
-            FileStatusInterface fileStatus = fs.getFileStatus(testFileInodePath);
+            FileStatus fileStatus = fs.getFileStatus(testFileInodePath);
             assertEquals(perm, fileStatus.getPermission());
             // FileSystem#setOwner
             fs.setOwner(testFileInodePath, fileStatus.getOwner(), fileStatus.getGroup());
@@ -633,11 +633,11 @@ public class TestINodeFile {
             // DistributedFileSystem#recoverLease
             fs.recoverLease(testFileInodePath);
             // Namenode#getBlockLocations
-            LocatedBlocksInterface l1 = nnRpc.getBlockLocations(testFileInodePath.toString(), 0, Long.MAX_VALUE);
-            LocatedBlocksInterface l2 = nnRpc.getBlockLocations(testFileRegularPath.toString(), 0, Long.MAX_VALUE);
+            LocatedBlocks l1 = nnRpc.getBlockLocations(testFileInodePath.toString(), 0, Long.MAX_VALUE);
+            LocatedBlocks l2 = nnRpc.getBlockLocations(testFileRegularPath.toString(), 0, Long.MAX_VALUE);
             checkEquals(l1, l2);
             // FileSystem#rename - both the variants
-            PathInterface renameDst = getInodePath(baseDirFileId, "test2");
+            Path renameDst = getInodePath(baseDirFileId, "test2");
             fileStatus = fs.getFileStatus(testFileInodePath);
             // Rename variant 1: rename and rename bacck
             fs.rename(testFileInodePath, renameDst);
@@ -682,8 +682,8 @@ public class TestINodeFile {
         List<LocatedBlock> list2 = l2.getLocatedBlocks();
         assertEquals(list1.size(), list2.size());
         for (int i = 0; i < list1.size(); i++) {
-            LocatedBlockInterface b1 = list1.get(i);
-            LocatedBlockInterface b2 = list2.get(i);
+            LocatedBlock b1 = list1.get(i);
+            LocatedBlock b2 = list2.get(i);
             assertEquals(b1.getBlock(), b2.getBlock());
             assertEquals(b1.getBlockSize(), b2.getBlockSize());
         }
@@ -694,8 +694,8 @@ public class TestINodeFile {
             assertTrue(i2.hasNext());
             // Compare all the fields but the path name, which is relative
             // to the original path from listFiles.
-            LocatedFileStatusInterface l1 = i1.next();
-            LocatedFileStatusInterface l2 = i2.next();
+            LocatedFileStatus l1 = i1.next();
+            LocatedFileStatus l2 = i2.next();
             assertEquals(l1.getAccessTime(), l2.getAccessTime());
             assertEquals(l1.getBlockSize(), l2.getBlockSize());
             assertEquals(l1.getGroup(), l2.getGroup());

@@ -77,7 +77,7 @@ public class TestDataTransferProtocol {
 
     private static final Logger LOG = LoggerFactory.getLogger("org.apache.hadoop.hdfs.TestDataTransferProtocol");
 
-    private static final DataChecksumInterface DEFAULT_CHECKSUM = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32C, 512);
+    private static final DataChecksum DEFAULT_CHECKSUM = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32C, 512);
 
     DatanodeIDInterface datanode;
 
@@ -204,7 +204,7 @@ public class TestDataTransferProtocol {
             Path file = new Path("dataprotocol.dat");
             DFSTestUtil.createFile(fileSys, file, 1L, (short) numDataNodes, 0L);
             // get the first blockid for the file
-            ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
+            ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
             // test PIPELINE_SETUP_CREATE on a finalized block
             testWrite(firstBlock, BlockConstructionStage.PIPELINE_SETUP_CREATE, 0L, "Cannot create an existing block", true);
             // test PIPELINE_DATA_STREAMING on a finalized block
@@ -301,7 +301,7 @@ public class TestDataTransferProtocol {
             int fileLen = Math.min(conf.getInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096), 4096);
             DFSTestUtil.createFile(fileSys, file, fileLen, fileLen, fileSys.getDefaultBlockSize(file), fileSys.getDefaultReplication(file), 0L);
             // get the first blockid for the file
-            final ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
+            final ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
             final String poolId = firstBlock.getBlockPoolId();
             long newBlockId = firstBlock.getBlockId() + 1;
             recvBuf.reset();
@@ -317,7 +317,7 @@ public class TestDataTransferProtocol {
             sendRecvData("Wrong Op Code", true);
             /* Test OP_WRITE_BLOCK */
             sendBuf.reset();
-            DataChecksumInterface badChecksum = Mockito.spy(DEFAULT_CHECKSUM);
+            DataChecksum badChecksum = Mockito.spy(DEFAULT_CHECKSUM);
             Mockito.doReturn(-1).when(badChecksum).getBytesPerChecksum();
             writeBlock(poolId, newBlockId, badChecksum);
             recvBuf.reset();
@@ -456,7 +456,7 @@ public class TestDataTransferProtocol {
             int fileLen = Math.min(conf.getInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096), 4096);
             DFSTestUtil.createFile(fileSys, file, fileLen, fileLen, fileSys.getDefaultBlockSize(file), fileSys.getDefaultReplication(file), 0L);
             // Get the first blockid for the file.
-            final ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
+            final ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
             String bpid = cluster.getNamesystem().getBlockPoolId();
             ExtendedBlock blk = new ExtendedBlock(bpid, firstBlock.getLocalBlock());
             sendBuf.reset();

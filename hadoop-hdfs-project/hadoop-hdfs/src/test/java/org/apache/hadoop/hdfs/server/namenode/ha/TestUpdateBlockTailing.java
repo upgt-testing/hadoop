@@ -113,7 +113,7 @@ public class TestUpdateBlockTailing {
         DatanodeManagerInterface dnManager = fsn0.getBlockManager().getDatanodeManager();
         DatanodeStorageInfo[] targets = dnManager.getDatanode(dn0.getDatanodeId()).getStorageInfos();
         targets = new DatanodeStorageInfo[] { targets[0] };
-        BlockInfoInterface newBlock = NameNodeAdapter.addBlockNoJournal(fsn0, testFile, targets);
+        BlockInfo newBlock = NameNodeAdapter.addBlockNoJournal(fsn0, testFile, targets);
         // NN1 tails increment generation stamp transaction
         fsn0.getEditLog().logSync();
         fsn1.getEditLogTailer().doTailEdits();
@@ -129,14 +129,14 @@ public class TestUpdateBlockTailing {
         fsn1.getEditLogTailer().doTailEdits();
         assertEquals("Global Generation stamps on NN0 and " + "impending on NN1 should be equal", NameNodeAdapter.getGenerationStamp(fsn0), NameNodeAdapter.getImpendingGenerationStamp(fsn1));
         // The new block on NN1 should have the replica
-        BlockInfoInterface newBlock1 = NameNodeAdapter.getStoredBlock(fsn1, newBlock);
+        BlockInfo newBlock1 = NameNodeAdapter.getStoredBlock(fsn1, newBlock);
         assertTrue("New block on NN1 should contain the replica", newBlock1.getStorageInfos().hasNext());
         assertEquals("Generation stamps of the block on NNs should be the same", newBlock.getGenerationStamp(), newBlock1.getGenerationStamp());
         assertEquals("Global Generation stamps on NNs should be the same", NameNodeAdapter.getGenerationStamp(fsn0), NameNodeAdapter.getGenerationStamp(fsn1));
         // Check that the generation stamp restores on Standby after failover
         ClientProtocol rpc0 = dfsCluster.getNameNode(0).getRpcServer();
         ClientProtocol rpc1 = dfsCluster.getNameNode(1).getRpcServer();
-        LocatedBlockInterface lb = rpc0.getBlockLocations(testFile, 0, 0).get(0);
+        LocatedBlock lb = rpc0.getBlockLocations(testFile, 0, 0).get(0);
         rpc0.updateBlockForPipeline(lb.getBlock(), dfs.getClient().getClientName());
         long gs0 = NameNodeAdapter.getGenerationStamp(fsn0);
         dfsCluster.transitionToStandby(0);

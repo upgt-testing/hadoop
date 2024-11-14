@@ -44,7 +44,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestAddStripedBlockInFBR {
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int cellSize = ecPolicy.getCellSize();
 

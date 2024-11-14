@@ -45,7 +45,7 @@ public class TestMultiObserverNode {
 
     private static DistributedFileSystem dfs;
 
-    private final PathInterface testPath = new Path("/TestMultiObserverNode");
+    private final Path testPath = new Path("/TestMultiObserverNode");
 
     @BeforeClass
     public static void startUpCluster() throws Exception {

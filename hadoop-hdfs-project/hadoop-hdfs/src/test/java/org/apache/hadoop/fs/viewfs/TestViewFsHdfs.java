@@ -62,7 +62,7 @@ public class TestViewFsHdfs extends ViewFsBaseTest {
         cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
         cluster.waitClusterUp();
         fc = FileContext.getFileContext(cluster.getURI(0), CONF);
-        PathInterface defaultWorkingDirectory = fc.makeQualified(new Path("/user/" + UserGroupInformation.getCurrentUser().getShortUserName()));
+        Path defaultWorkingDirectory = fc.makeQualified(new Path("/user/" + UserGroupInformation.getCurrentUser().getShortUserName()));
         fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
     }
 
@@ -100,12 +100,12 @@ public class TestViewFsHdfs extends ViewFsBaseTest {
         fs.mkdir(user1Path, FileContext.DEFAULT_PERM, false);
         fs.delete(user1Path, false);
         // Scenario - 2: Create FileContext with the a different user context
-        final UserGroupInformationInterface userUgi = UserGroupInformation.createUserForTesting("user1@HADOOP.COM", new String[] { "hadoop" });
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("user1@HADOOP.COM", new String[] { "hadoop" });
         userUgi.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
             public Object run() throws IOException {
-                UserGroupInformationInterface ugi = UserGroupInformation.getCurrentUser();
+                UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
                 String doAsUserName = ugi.getUserName();
                 assertEquals(doAsUserName, "user1@HADOOP.COM");
                 FileContext viewFS = FileContext.getFileContext(FsConstants.VIEWFS_URI, conf);

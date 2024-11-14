@@ -220,7 +220,7 @@ public class TestPmemCacheRecovery {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksCached = MetricsAsserts.getLongCounter("BlocksCached", dnMetrics);
                 if (blocksCached != cacheBlocksNum) {
                     LOG.info("waiting for " + cacheBlocksNum + " blocks to " + "be cached. Right now " + blocksCached + " blocks are cached.");
@@ -295,7 +295,7 @@ public class TestPmemCacheRecovery {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksUncached = MetricsAsserts.getLongCounter("BlocksUncached", dnMetrics);
                 if (blocksUncached != cacheBlocksNum) {
                     LOG.info("waiting for " + cacheBlocksNum + " blocks to be " + "uncached. Right now " + blocksUncached + " blocks are uncached.");

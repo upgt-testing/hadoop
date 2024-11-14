@@ -53,7 +53,7 @@ public class TestQuotaByStorageType {
 
     private static final long seed = 0L;
 
-    private static final PathInterface dir = new Path("/TestQuotaByStorageType");
+    private static final Path dir = new Path("/TestQuotaByStorageType");
 
     private MiniDockerDFSCluster cluster;
 
@@ -649,7 +649,7 @@ public class TestQuotaByStorageType {
         /* set space quota */
         dfs.setQuota(testDir, HdfsConstants.QUOTA_DONT_SET, storageSpaceQuota);
         /* init vars */
-        PathInterface createdFile;
+        Path createdFile;
         final long fileLen = BLOCKSIZE;
         /**
          * create one file with 3 replicas, REPLICATION * BLOCKSIZE go to DISK due
@@ -692,7 +692,7 @@ public class TestQuotaByStorageType {
         /* set space quota */
         dfs.setQuota(testDir, HdfsConstants.QUOTA_DONT_SET, storageSpaceQuota);
         /* init vars */
-        PathInterface createdFile = null;
+        Path createdFile = null;
         final long fileLen = BLOCKSIZE;
         try {
             /* create one file with 3 replicas */

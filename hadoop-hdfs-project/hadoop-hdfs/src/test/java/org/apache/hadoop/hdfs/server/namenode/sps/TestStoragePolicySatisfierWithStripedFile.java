@@ -64,7 +64,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
 
     private final int stripesPerBlock = 2;
 
-    private ErasureCodingPolicyInterface ecPolicy;
+    private ErasureCodingPolicy ecPolicy;
 
     private int dataBlocks;
 
@@ -139,8 +139,8 @@ public class TestStoragePolicySatisfierWithStripedFile {
             long fileLen = cellSize * dataBlocks;
             DFSTestUtil.createFile(cluster.getFileSystem(), new Path(fooFile), fileLen, (short) 3, 0);
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }
@@ -211,8 +211,8 @@ public class TestStoragePolicySatisfierWithStripedFile {
             long fileLen = cellSize * dataBlocks;
             DFSTestUtil.createFile(cluster.getFileSystem(), new Path(fooFile), fileLen, (short) 3, 0);
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }
@@ -354,8 +354,8 @@ public class TestStoragePolicySatisfierWithStripedFile {
             long fileLen = cellSize * dataBlocks;
             DFSTestUtil.createFile(cluster.getFileSystem(), new Path(fooFile), fileLen, (short) 3, 0);
             // verify storage types and locations
-            LocatedBlocksInterface locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
-            for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+            LocatedBlocks locatedBlocks = client.getBlockLocations(fooFile, 0, fileLen);
+            for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                 for (StorageType type : lb.getStorageTypes()) {
                     Assert.assertEquals(StorageType.DISK, type);
                 }
@@ -401,8 +401,8 @@ public class TestStoragePolicySatisfierWithStripedFile {
             public Boolean get() {
                 int actualStorageCount = 0;
                 try {
-                    LocatedBlocksInterface locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(fileName, 0, fileLen);
-                    for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+                    LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(fileName, 0, fileLen);
+                    for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                         LOG.info("LocatedBlocks => Size {}, locs {}", lb.getLocations().length, lb);
                         if (lb.getLocations().length > expectedBlkLocationCount) {
                             return false;

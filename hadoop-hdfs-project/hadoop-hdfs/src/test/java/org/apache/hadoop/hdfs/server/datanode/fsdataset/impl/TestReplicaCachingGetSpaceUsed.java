@@ -90,8 +90,8 @@ public class TestReplicaCachingGetSpaceUsed {
         long blockLength = 0;
         long metaLength = 0;
         List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
-        for (LocatedBlockInterface locatedBlock : locatedBlocks) {
-            ExtendedBlockInterface extendedBlock = locatedBlock.getBlock();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
             blockLength += extendedBlock.getLocalBlock().getNumBytes();
             metaLength += dataNode.getFSDataset().getMetaDataInputStream(extendedBlock).getLength();
         }
@@ -115,8 +115,8 @@ public class TestReplicaCachingGetSpaceUsed {
         long blockLength = 0;
         long metaLength = 0;
         List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
-        for (LocatedBlockInterface locatedBlock : locatedBlocks) {
-            ExtendedBlockInterface extendedBlock = locatedBlock.getBlock();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
             blockLength += extendedBlock.getLocalBlock().getNumBytes();
             metaLength += dataNode.getFSDataset().getMetaDataInputStream(extendedBlock).getLength();
         }

@@ -121,7 +121,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
     @Override
     void initializeTargetTestRoot() throws IOException {
         targetTestRoot = fsDefault.makeQualified(new Path("/"));
-        for (FileStatusInterface status : fsDefault.listStatus(targetTestRoot)) {
+        for (FileStatus status : fsDefault.listStatus(targetTestRoot)) {
             fsDefault.delete(status.getPath(), true);
         }
     }
@@ -165,13 +165,13 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, clusterName, fsTarget.getUri());
         FileSystem vfs = FileSystem.get(viewFsUri, conf);
         assertEquals(ViewFileSystem.class, vfs.getClass());
-        FileStatusInterface baseFileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFile.toUri().toString()));
+        FileStatus baseFileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFile.toUri().toString()));
         LOG.info("BaseFileStat: " + baseFileStat);
-        FileStatusInterface baseFileRelStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFileRelative.toUri().toString()));
+        FileStatus baseFileRelStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFileRelative.toUri().toString()));
         LOG.info("BaseFileRelStat: " + baseFileRelStat);
         Assert.assertEquals("Unexpected file length for " + testBaseFile, 1, baseFileStat.getLen());
         Assert.assertEquals("Unexpected file length for " + testBaseFileRelative, baseFileStat.getLen(), baseFileRelStat.getLen());
-        FileStatusInterface level2FileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
+        FileStatus level2FileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
         LOG.info("Level2FileStat: " + level2FileStat);
         vfs.close();
     }
@@ -199,15 +199,15 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, clusterName, targetTestRoot.toUri());
         FileSystem vfs = FileSystem.get(viewFsUri, conf);
         assertEquals(ViewFileSystem.class, vfs.getClass());
-        FileStatusInterface baseFileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFile.toUri().toString()));
+        FileStatus baseFileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testBaseFile.toUri().toString()));
         LOG.info("BaseFileStat: " + baseFileStat);
         Assert.assertEquals("Unexpected file length for " + testBaseFile, 0, baseFileStat.getLen());
-        FileStatusInterface level2FileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
+        FileStatus level2FileStat = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
         LOG.info("Level2FileStat: " + level2FileStat);
         dataOutputStream = vfs.append(testLevel2File);
         dataOutputStream.write("Writing via viewfs fallback path".getBytes());
         dataOutputStream.close();
-        FileStatusInterface level2FileStatAfterWrite = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
+        FileStatus level2FileStatAfterWrite = vfs.getFileStatus(new Path(viewFsUri.toString() + testLevel2File.toUri().toString()));
         Assert.assertTrue("Unexpected file length for " + testLevel2File, level2FileStatAfterWrite.getLen() > level2FileStat.getLen());
         vfs.close();
     }
@@ -243,14 +243,14 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         URI viewFsUri = new URI(FsConstants.VIEWFS_SCHEME, clusterName, "/", null, null);
         HashSet<Path> beforeFallback = new HashSet<>();
         try (FileSystem vfs = FileSystem.get(viewFsUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsUri.toString()))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsUri.toString()))) {
                 beforeFallback.add(stat.getPath());
             }
         }
         ConfigUtil.addLinkFallback(conf, clusterName, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsUri, conf)) {
             HashSet<Path> afterFallback = new HashSet<>();
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsUri.toString()))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsUri.toString()))) {
                 afterFallback.add(stat.getPath());
             }
             afterFallback.removeAll(beforeFallback);
@@ -262,7 +262,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
             // Create a directory using the returned fallback path and verify
             Path childDir = new Path(fallbackArray[0], "child");
             vfs.mkdirs(childDir);
-            FileStatusInterface status = fsTarget.getFileStatus(new Path(dir1, "child"));
+            FileStatus status = fsTarget.getFileStatus(new Path(dir1, "child"));
             assertTrue(status.isDirectory());
             assertTrue(vfs.getFileStatus(childDir).isDirectory());
         }
@@ -285,14 +285,14 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         String clusterName = Constants.CONFIG_VIEWFS_DEFAULT_MOUNT_TABLE;
         HashSet<Path> beforeFallback = new HashSet<>();
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString()))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString()))) {
                 beforeFallback.add(stat.getPath());
             }
         }
         ConfigUtil.addLinkFallback(conf, clusterName, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             HashSet<Path> afterFallback = new HashSet<>();
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString()))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString()))) {
                 afterFallback.add(stat.getPath());
             }
             afterFallback.removeAll(beforeFallback);
@@ -304,7 +304,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
             // Create a directory using the returned fallback path and verify
             Path childDir = new Path(fallbackArray[0], "child");
             vfs.mkdirs(childDir);
-            FileStatusInterface status = fsTarget.getFileStatus(new Path(dir2, "child"));
+            FileStatus status = fsTarget.getFileStatus(new Path(dir2, "child"));
             assertTrue(status.isDirectory());
             assertTrue(vfs.getFileStatus(childDir).isDirectory());
         }
@@ -347,14 +347,14 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         fsTarget.setPermission(new Path(targetTestRoot, "fallbackDir/user1/hive/"), FsPermission.valueOf("-rwxr--r--"));
         HashSet<Path> beforeFallback = new HashSet<>();
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/"))) {
                 beforeFallback.add(stat.getPath());
             }
         }
         ConfigUtil.addLinkFallback(conf, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             HashSet<Path> afterFallback = new HashSet<>();
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/"))) {
                 afterFallback.add(stat.getPath());
                 if (dir1.getName().equals(stat.getPath().getName())) {
                     // make sure fallback dir listed out with correct permissions, but not
@@ -406,14 +406,14 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         fsTarget.setPermission(targetTestRoot, FsPermission.valueOf("-rwxr--rw-"));
         HashSet<Path> beforeFallback = new HashSet<>();
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
                 beforeFallback.add(stat.getPath());
             }
         }
         ConfigUtil.addLinkFallback(conf, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             HashSet<Path> afterFallback = new HashSet<>();
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
                 afterFallback.add(stat.getPath());
                 if (dir1.getName().equals(stat.getPath().getName())) {
                     // make sure fallback dir listed out with correct permissions, but not
@@ -456,14 +456,14 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         fsTarget.setPermission(targetTestRoot, FsPermission.valueOf("-rwxr--rw-"));
         HashSet<Path> beforeFallback = new HashSet<>();
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/"))) {
                 beforeFallback.add(stat.getPath());
             }
         }
         ConfigUtil.addLinkFallback(conf, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             HashSet<Path> afterFallback = new HashSet<>();
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/"))) {
                 afterFallback.add(stat.getPath());
                 if (dir1.getName().equals(stat.getPath().getName())) {
                     // make sure fallback dir listed out with correct permissions, but not
@@ -491,7 +491,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         fsTarget.mkdirs(dir2);
         ConfigUtil.addLinkFallback(conf, new Path(targetTestRoot, "fallbackDir").toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
-            for (FileStatusInterface stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
+            for (FileStatus stat : vfs.listStatus(new Path(viewFsDefaultClusterUri.toString(), "/user1/hive/warehouse/"))) {
                 if (file1.getName().equals(stat.getPath().getName())) {
                     // Link represents as symlink.
                     assertFalse(stat.isFile());
@@ -522,7 +522,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             Path p = new Path("/user1/hive/warehouse/test");
-            PathInterface test = Path.mergePaths(fallbackTarget, p);
+            Path test = Path.mergePaths(fallbackTarget, p);
             assertFalse(fsTarget.exists(test));
             assertTrue(vfs.mkdirs(p));
             assertTrue(fsTarget.exists(test));
@@ -544,7 +544,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             Path p = new Path("/");
-            PathInterface test = Path.mergePaths(fallbackTarget, p);
+            Path test = Path.mergePaths(fallbackTarget, p);
             assertTrue(fsTarget.exists(test));
             assertTrue(vfs.mkdirs(p));
             assertTrue(fsTarget.exists(test));
@@ -566,7 +566,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             // user2 does not exist in fallback
             Path p = new Path("/user2");
-            PathInterface test = Path.mergePaths(fallbackTarget, p);
+            Path test = Path.mergePaths(fallbackTarget, p);
             assertFalse(fsTarget.exists(test));
             assertTrue(vfs.mkdirs(p));
             assertTrue(fsTarget.exists(test));
@@ -589,7 +589,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             //user1 does not exist in fallback
             Path immediateLevelToInternalDir = new Path("/user1/test");
-            PathInterface test = Path.mergePaths(fallbackTarget, immediateLevelToInternalDir);
+            Path test = Path.mergePaths(fallbackTarget, immediateLevelToInternalDir);
             assertFalse(fsTarget.exists(test));
             assertTrue(vfs.mkdirs(immediateLevelToInternalDir));
             assertTrue(fsTarget.exists(test));
@@ -613,7 +613,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             //user1 does not exist in fallback
             Path multipleLevelToInternalDir = new Path("/user1/test/test");
-            PathInterface test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
+            Path test = Path.mergePaths(fallbackTarget, multipleLevelToInternalDir);
             assertFalse(fsTarget.exists(test));
             assertTrue(vfs.mkdirs(multipleLevelToInternalDir));
             assertTrue(fsTarget.exists(test));
@@ -635,7 +635,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             //user1/test1 does not exist in fallback
             Path nextLevelToInternalDir = new Path("/user1/test1");
-            PathInterface test = Path.mergePaths(fallbackTarget, nextLevelToInternalDir);
+            Path test = Path.mergePaths(fallbackTarget, nextLevelToInternalDir);
             assertFalse(fsTarget.exists(test));
             // user1 exists in viewFS mount.
             assertNotNull(vfs.getFileStatus(new Path("/user1")));
@@ -670,7 +670,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             Path vfsTestFile = new Path("/user1/hive/warehouse/test.file");
-            PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+            Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
             assertFalse(fsTarget.exists(testFileInFallback));
             assertTrue(fsTarget.exists(testFileInFallback.getParent()));
             vfs.create(vfsTestFile).close();
@@ -691,7 +691,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             Path vfsTestFile = new Path("/user2/test.file");
-            PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+            Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
             assertFalse(fsTarget.exists(testFileInFallback));
             // user2 does not exist in fallback
             assertFalse(fsTarget.exists(testFileInFallback.getParent()));
@@ -714,7 +714,7 @@ public class TestViewFileSystemLinkFallback extends ViewFileSystemBaseTest {
         ConfigUtil.addLinkFallback(conf, fallbackTarget.toUri());
         try (FileSystem vfs = FileSystem.get(viewFsDefaultClusterUri, conf)) {
             Path vfsTestFile = new Path("/test.file");
-            PathInterface testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
+            Path testFileInFallback = Path.mergePaths(fallbackTarget, vfsTestFile);
             assertFalse(fsTarget.exists(testFileInFallback));
             vfs.create(vfsTestFile).close();
             // /test.file should be created in fallback

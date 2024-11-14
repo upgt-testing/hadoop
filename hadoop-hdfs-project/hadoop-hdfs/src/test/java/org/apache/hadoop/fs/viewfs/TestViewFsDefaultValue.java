@@ -75,12 +75,12 @@ public class TestViewFsDefaultValue {
 
     private static FileSystem vfs;
 
-    private static PathInterface testFilePath;
+    private static Path testFilePath;
 
-    private static PathInterface testFileDirPath;
+    private static Path testFileDirPath;
 
     // Use NotInMountpoint path to trigger the exception
-    private static PathInterface notInMountpointPath;
+    private static Path notInMountpointPath;
 
     @BeforeClass
     public static void clusterSetupAtBegining() throws IOException, LoginException, URISyntaxException {

@@ -105,8 +105,8 @@ public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract extends Test
     @Test
     public void testListStatusRootDir() throws Throwable {
         assumeTrue(rootDirTestEnabled());
-        PathInterface dir = path("/");
-        PathInterface child = path("/FileSystemContractBaseTest");
+        Path dir = path("/");
+        Path child = path("/FileSystemContractBaseTest");
         try (FileSystem dfs = ((ViewFileSystemOverloadScheme) fs).getRawFileSystem(new Path(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY), "/"), conf)) {
             dfs.mkdirs(child);
         }

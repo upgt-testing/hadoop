@@ -120,10 +120,10 @@ public class TestDataNodeVolumeMetrics {
     private void verifyDataNodeVolumeMetrics(final FileSystem fs, final MiniDockerDFSCluster cluster, final Path fileName) throws IOException {
         List<DataNode> datanodes = cluster.getDataNodes();
         DataNodeInterface datanode = datanodes.get(0);
-        final ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
         final FsVolumeSpi volume = datanode.getFSDataset().getVolume(block);
         DataNodeVolumeMetricsInterface metrics = volume.getMetrics();
-        MetricsRecordBuilderInterface rb = getMetrics(volume.getMetrics().name());
+        MetricsRecordBuilder rb = getMetrics(volume.getMetrics().name());
         assertCounter("TotalDataFileIos", metrics.getTotalDataFileIos(), rb);
         LOG.info("TotalMetadataOperations : " + metrics.getTotalMetadataOperations());
         LOG.info("TotalDataFileIos : " + metrics.getTotalDataFileIos());
@@ -170,7 +170,7 @@ public class TestDataNodeVolumeMetrics {
             DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen, fs.getDefaultBlockSize(fileName), REPL, 1L, true);
             List<DataNode> datanodes = cluster.getDataNodes();
             DataNodeInterface datanode = datanodes.get(0);
-            final ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             final FsVolumeSpi volume = datanode.getFSDataset().getVolume(block);
             DataNodeVolumeMetricsInterface metrics = volume.getMetrics();
             assertEquals(0, metrics.getSyncIoSampleCount());

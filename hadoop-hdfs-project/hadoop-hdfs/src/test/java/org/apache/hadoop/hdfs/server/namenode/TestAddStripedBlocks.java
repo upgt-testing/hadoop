@@ -69,7 +69,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestAddStripedBlocks {
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final short dataBlocks = (short) ecPolicy.getNumDataUnits();
 
@@ -142,7 +142,7 @@ public class TestAddStripedBlocks {
         Path testPath = new Path("/testfile");
         // create a file while allocates a new block
         DFSTestUtil.writeFile(dfs, testPath, "hello, world!");
-        LocatedBlocksInterface lb = dfs.getClient().getLocatedBlocks(testPath.toString(), 0);
+        LocatedBlocks lb = dfs.getClient().getLocatedBlocks(testPath.toString(), 0);
         final long firstId = lb.get(0).getBlock().getBlockId();
         // delete the file
         dfs.delete(testPath, true);
@@ -238,9 +238,9 @@ public class TestAddStripedBlocks {
             BlockInfoStripedInterface lastBlk = (BlockInfoStriped) fileNode.getLastBlock();
             DatanodeInfo[] expectedDNs = DatanodeStorageInfo.toDatanodeInfos(lastBlk.getUnderConstructionFeature().getExpectedStorageLocations());
             byte[] indices = lastBlk.getUnderConstructionFeature().getBlockIndices();
-            LocatedBlocksInterface blks = dfs.getClient().getLocatedBlocks(file.toString(), 0L);
+            LocatedBlocks blks = dfs.getClient().getLocatedBlocks(file.toString(), 0L);
             assertEquals(1, blks.locatedBlockCount());
-            LocatedBlockInterface lblk = blks.get(0);
+            LocatedBlock lblk = blks.get(0);
             assertTrue(lblk instanceof LocatedStripedBlock);
             DatanodeInfo[] datanodes = lblk.getLocations();
             byte[] blockIndices = ((LocatedStripedBlock) lblk).getBlockIndices();
@@ -269,7 +269,7 @@ public class TestAddStripedBlocks {
             FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
             cluster.getNamesystem().getAdditionalBlock(file.toString(), fileNode.getId(), dfs.getClient().getClientName(), null, null, null, null);
-            BlockInfoInterface lastBlock = fileNode.getLastBlock();
+            BlockInfo lastBlock = fileNode.getLastBlock();
             DatanodeStorageInfo[] locs = lastBlock.getUnderConstructionFeature().getExpectedStorageLocations();
             byte[] indices = lastBlock.getUnderConstructionFeature().getBlockIndices();
             assertEquals(groupSize, locs.length);
@@ -302,7 +302,7 @@ public class TestAddStripedBlocks {
         cluster.restartNameNode(true);
         final String bpId = cluster.getNamesystem().getBlockPoolId();
         INodeFileInterface fileNode = cluster.getNamesystem().getFSDirectory().getINode4Write(file.toString()).asFile();
-        BlockInfoInterface lastBlock = fileNode.getLastBlock();
+        BlockInfo lastBlock = fileNode.getLastBlock();
         int i = groupSize - 1;
         for (DataNodeInterface dn : cluster.getDataNodes()) {
             String storageID = storageIDs.get(i);
@@ -335,7 +335,7 @@ public class TestAddStripedBlocks {
         DFSTestUtil.createStripedFile(cluster, filePath, null, numBlocks, numStripes, false);
         INodeFileInterface fileNode = ns.getFSDirectory().getINode(filePath.toString()).asFile();
         assertTrue(fileNode.isStriped());
-        BlockInfoInterface stored = fileNode.getBlocks()[0];
+        BlockInfo stored = fileNode.getBlocks()[0];
         BlockManagerTestUtil.updateState(ns.getBlockManager());
         assertEquals(0, ns.getCorruptReplicaBlocks());
         // Now send a block report with correct size

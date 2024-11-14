@@ -182,7 +182,7 @@ public class BlockReaderTestUtil {
      */
     public static BlockReader getBlockReader(final DistributedFileSystem fs, LocatedBlock testBlock, int offset, long lenToRead) throws IOException {
         InetSocketAddress targetAddr = null;
-        ExtendedBlockInterface block = testBlock.getBlock();
+        ExtendedBlock block = testBlock.getBlock();
         DatanodeInfo[] nodes = testBlock.getLocations();
         targetAddr = NetUtils.createSocketAddr(nodes[0].getXferAddr());
         return new BlockReaderFactory(fs.getClient().getConf()).setInetSocketAddress(targetAddr).setBlock(block).setFileName(targetAddr.toString() + ":" + block.getBlockId()).setBlockToken(testBlock.getBlockToken()).setStartOffset(offset).setLength(lenToRead).setVerifyChecksum(true).setClientName("BlockReaderTestUtil").setDatanodeInfo(nodes[0]).setClientCacheContext(ClientContext.getFromConf(fs.getConf())).setCachingStrategy(CachingStrategy.newDefaultStrategy()).setConfiguration(fs.getConf()).setAllowShortCircuitLocalReads(true).setRemotePeerFactory(new RemotePeerFactory() {

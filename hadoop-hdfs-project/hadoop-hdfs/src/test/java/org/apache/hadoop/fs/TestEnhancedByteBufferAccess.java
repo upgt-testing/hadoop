@@ -335,7 +335,7 @@ public class TestEnhancedByteBufferAccess {
         fsIn.seek(0);
         results[1] = fsIn.read(null, BLOCK_SIZE, EnumSet.of(ReadOption.SKIP_CHECKSUMS));
         // The mmap should be of the first block of the file.
-        final ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+        final ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
         cache.accept(new CacheVisitor() {
 
             @Override
@@ -579,7 +579,7 @@ public class TestEnhancedByteBufferAccess {
         fsIn2.releaseBuffer(result2);
         fsIn2.close();
         // check that the replica is anchored
-        final ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+        final ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
         final ShortCircuitCache cache = ClientContext.get(CONTEXT, conf).getShortCircuitCache(0);
         waitForReplicaAnchorStatus(cache, firstBlock, true, true, 1);
         // Uncache the replica

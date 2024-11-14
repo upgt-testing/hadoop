@@ -115,7 +115,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         assertTrue("Not HDFS:" + fileSys.getUri(), fileSys instanceof DistributedFileSystem);
         HdfsDataInputStream dis = (HdfsDataInputStream) fileSys.open(name);
         Collection<LocatedBlock> dinfo = dis.getAllBlocks();
-        for (LocatedBlockInterface blk : dinfo) {
+        for (LocatedBlock blk : dinfo) {
             // for each block
             int hasdown = 0;
             DatanodeInfo[] nodes = blk.getLocations();
@@ -371,7 +371,7 @@ public class TestDecommission extends AdminStatesBaseTest {
             // Write a file to n-1 datanodes
             writeFile(fileSys, file1, replicas);
             // Decommission one of the datanodes with a replica
-            BlockLocationInterface loc = fileSys.getFileBlockLocations(file1, 0, 1)[0];
+            BlockLocation loc = fileSys.getFileBlockLocations(file1, 0, 1)[0];
             assertEquals("Unexpected number of replicas from getFileBlockLocations", replicas, loc.getHosts().length);
             final String toDecomHost = loc.getNames()[0];
             String toDecomUuid = null;
@@ -391,13 +391,13 @@ public class TestDecommission extends AdminStatesBaseTest {
             DFSClient client = getDfsClient(0);
             assertEquals("All datanodes must be alive", numDatanodes, client.datanodeReport(DatanodeReportType.LIVE).length);
             // wait for the block to be replicated
-            final ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fileSys, file1);
+            final ExtendedBlock b = DFSTestUtil.getFirstBlock(fileSys, file1);
             final String uuid = toDecomUuid;
             GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
                 @Override
                 public Boolean get() {
-                    BlockInfoInterface info = blockManager.getStoredBlock(b.getLocalBlock());
+                    BlockInfo info = blockManager.getStoredBlock(b.getLocalBlock());
                     int count = 0;
                     StringBuilder sb = new StringBuilder("Replica locations: ");
                     for (int i = 0; i < info.numNodes(); i++) {
@@ -534,7 +534,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         writeFile(fileSys, new Path(openFile), (short) 3);
         // make sure the file was open for write
         FSDataOutputStream fdos = fileSys.append(new Path(openFile));
-        LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile, 0, fileSize);
+        LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile, 0, fileSize);
         DatanodeInfo[] dnInfos4LastBlock = lbs.getLastLocatedBlock().getLocations();
         DatanodeInfo[] dnInfos4FirstBlock = lbs.get(0).getLocations();
         ArrayList<String> nodes = new ArrayList<String>();
@@ -588,13 +588,13 @@ public class TestDecommission extends AdminStatesBaseTest {
     private boolean verifyOpenFilesListing(String message, HashSet<Path> closedFileSet, HashMap<Path, FSDataOutputStream> openFilesMap, ByteArrayOutputStream out, int expOpenFilesListSize) {
         final String outStr = scanIntoString(out);
         LOG.info(message + " - stdout: \n" + outStr);
-        for (PathInterface closedFilePath : closedFileSet) {
+        for (Path closedFilePath : closedFileSet) {
             if (outStr.contains(closedFilePath.toString())) {
                 return false;
             }
         }
         HashSet<Path> openFilesNotListed = new HashSet<>();
-        for (PathInterface openFilePath : openFilesMap.keySet()) {
+        for (Path openFilePath : openFilesMap.keySet()) {
             if (!outStr.contains(openFilePath.toString())) {
                 openFilesNotListed.add(openFilePath);
             }
@@ -686,7 +686,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         }
         HashMap<DatanodeInfo, Integer> dnInfoMap = new HashMap<>();
         for (int i = 0; i < 3; i++) {
-            LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFiles[i], 0, blockSize * 10);
+            LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFiles[i], 0, blockSize * 10);
             for (DatanodeInfoInterface dn : lbs.getLastLocatedBlock().getLocations()) {
                 if (dnInfoMap.containsKey(dn)) {
                     dnInfoMap.put(dn, dnInfoMap.get(dn) + 1);
@@ -761,7 +761,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         for (DataNodeInterface d : getCluster().getDataNodes()) {
             DataNodeTestUtils.triggerBlockReport(d);
         }
-        LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), file.toUri().getPath(), 0, blockSize * 10);
+        LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), file.toUri().getPath(), 0, blockSize * 10);
         DatanodeInfoInterface dnToDecommission = lbs.getLastLocatedBlock().getLocations()[0];
         DatanodeManagerInterface dm = ns.getBlockManager().getDatanodeManager();
         dnToDecommission = dm.getDatanode(dnToDecommission.getDatanodeUuid());
@@ -834,7 +834,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         byte[] bytes = new byte[1];
         fdos.write(bytes);
         fdos.hsync();
-        LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile, 0, fileSize);
+        LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile, 0, fileSize);
         DatanodeInfo[] dnInfos4LastBlock = lbs.getLastLocatedBlock().getLocations();
         ArrayList<String> nodes = new ArrayList<String>();
         ArrayList<DatanodeInfo> dnInfos = new ArrayList<DatanodeInfo>();
@@ -884,7 +884,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         }
         out.hsync();
         // Get fist block information
-        LocatedBlockInterface firstLocatedBlock = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(), "/testAllocAndIBRWhileDecommission", 0, fileSize).getLastLocatedBlock();
+        LocatedBlock firstLocatedBlock = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(), "/testAllocAndIBRWhileDecommission", 0, fileSize).getLastLocatedBlock();
         DatanodeInfo[] firstBlockLocations = firstLocatedBlock.getLocations();
         // Close first block's datanode IBR.
         ArrayList<String> toDecom = new ArrayList<>();

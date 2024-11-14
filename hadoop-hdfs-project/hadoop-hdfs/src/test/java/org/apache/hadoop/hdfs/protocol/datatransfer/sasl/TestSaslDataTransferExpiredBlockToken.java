@@ -47,7 +47,7 @@ public class TestSaslDataTransferExpiredBlockToken extends SaslDataTransferTestC
 
     private static final int FILE_SIZE = 2 * BLOCK_SIZE;
 
-    private static final PathInterface PATH = new Path("/file1");
+    private static final Path PATH = new Path("/file1");
 
     private final byte[] rawData = new byte[FILE_SIZE];
 
@@ -168,7 +168,7 @@ public class TestSaslDataTransferExpiredBlockToken extends SaslDataTransferTestC
 
     private void waitBlockTokenExpired(FSDataInputStream in1) throws Exception {
         DFSInputStream innerStream = (DFSInputStream) in1.getWrappedStream();
-        for (LocatedBlockInterface block : innerStream.getAllBlocks()) {
+        for (LocatedBlock block : innerStream.getAllBlocks()) {
             while (!SecurityTestUtil.isBlockTokenExpired(block.getBlockToken())) {
                 Thread.sleep(100);
             }

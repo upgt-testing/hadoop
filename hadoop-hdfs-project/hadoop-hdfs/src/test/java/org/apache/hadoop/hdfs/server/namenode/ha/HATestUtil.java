@@ -354,7 +354,7 @@ public abstract class HATestUtil {
     public static long setACStateId(DistributedFileSystem dfs, long stateId) throws Exception {
         ObserverReadProxyProvider<?> provider = (ObserverReadProxyProvider<?>) ((RetryInvocationHandler<?>) Proxy.getInvocationHandler(dfs.getClient().getNamenode())).getProxyProvider();
         ClientGSIContext ac = (ClientGSIContext) (provider.getAlignmentContext());
-        FieldInterface f = ac.getClass().getDeclaredField("lastSeenStateId");
+        Field f = ac.getClass().getDeclaredField("lastSeenStateId");
         f.setAccessible(true);
         LongAccumulator lastSeenStateId = (LongAccumulator) f.get(ac);
         long currentStateId = lastSeenStateId.getThenReset();

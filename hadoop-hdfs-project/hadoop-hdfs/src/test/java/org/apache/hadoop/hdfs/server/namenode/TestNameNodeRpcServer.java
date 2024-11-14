@@ -76,7 +76,7 @@ public class TestNameNodeRpcServer {
     private static String getPreferredLocation(DistributedFileSystem fs, Path p) throws IOException {
         // Use getLocatedBlocks because it is the basis for HDFS open,
         // but provides visibility into which host will be used.
-        LocatedBlocksInterface blocks = fs.getClient().getLocatedBlocks(p.toUri().getPath(), 0);
+        LocatedBlocks blocks = fs.getClient().getLocatedBlocks(p.toUri().getPath(), 0);
         return blocks.get(0).getLocations()[0].getHostName();
     }
 
@@ -103,7 +103,7 @@ public class TestNameNodeRpcServer {
             cluster.waitActive();
             DistributedFileSystem fs = cluster.getFileSystem();
             // Write a sample file
-            final PathInterface fooName = fs.makeQualified(new Path("/foo"));
+            final Path fooName = fs.makeQualified(new Path("/foo"));
             FSDataOutputStream stream = fs.create(fooName);
             stream.write("Hello world!\n".getBytes(StandardCharsets.UTF_8));
             stream.close();
@@ -120,7 +120,7 @@ public class TestNameNodeRpcServer {
                 }
             }
             // Run as fake joe to authorize the test
-            UserGroupInformationInterface joe = UserGroupInformation.createUserForTesting("fake_joe", new String[] { "fake_group" });
+            UserGroupInformation joe = UserGroupInformation.createUserForTesting("fake_joe", new String[] { "fake_group" });
             DistributedFileSystem joeFs = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(joe, conf);
             // As joe, we should get all node1.
             for (int trial = 0; trial < ITERATIONS_TO_USE; ++trial) {

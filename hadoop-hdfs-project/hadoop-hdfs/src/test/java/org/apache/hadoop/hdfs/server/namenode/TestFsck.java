@@ -305,7 +305,7 @@ public class TestFsck {
         util.waitReplication(fs, dir, (short) 3);
         fs.setPermission(dirpath, new FsPermission((short) 0700));
         // run DFSck as another user, should fail with permission issue
-        UserGroupInformationInterface fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
+        UserGroupInformation fakeUGI = UserGroupInformation.createUserForTesting("ProbablyNotARealUserName", new String[] { "ShangriLa" });
         fakeUGI.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
@@ -449,7 +449,7 @@ public class TestFsck {
         public void removeBlocks(MiniDockerDFSCluster cluster) throws AccessControlException, FileNotFoundException, UnresolvedLinkException, IOException {
             for (int corruptIdx : blocksToCorrupt) {
                 // Corrupt a block by deleting it
-                ExtendedBlockInterface block = dfsClient.getNamenode().getBlockLocations(name, blockSize * corruptIdx, Long.MAX_VALUE).get(0).getBlock();
+                ExtendedBlock block = dfsClient.getNamenode().getBlockLocations(name, blockSize * corruptIdx, Long.MAX_VALUE).get(0).getBlock();
                 for (int i = 0; i < numDataNodes; i++) {
                     File blockFile = cluster.getBlockFile(i, block);
                     if (blockFile != null && blockFile.exists()) {
@@ -462,7 +462,7 @@ public class TestFsck {
         public void corruptBlocks(MiniDockerDFSCluster cluster) throws IOException {
             for (int corruptIdx : blocksToCorrupt) {
                 // Corrupt a block by deleting it
-                ExtendedBlockInterface block = dfsClient.getNamenode().getBlockLocations(name, blockSize * corruptIdx, Long.MAX_VALUE).get(0).getBlock();
+                ExtendedBlock block = dfsClient.getNamenode().getBlockLocations(name, blockSize * corruptIdx, Long.MAX_VALUE).get(0).getBlock();
                 for (int i = 0; i < numDataNodes; i++) {
                     File blockFile = cluster.getBlockFile(i, block);
                     if (blockFile != null && blockFile.exists()) {
@@ -537,7 +537,7 @@ public class TestFsck {
         String[] fileNames = util.getFileNames(topDir);
         DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost", cluster.getNameNodePort()), conf);
         String corruptFileName = fileNames[0];
-        ExtendedBlockInterface block = dfsClient.getNamenode().getBlockLocations(corruptFileName, 0, Long.MAX_VALUE).get(0).getBlock();
+        ExtendedBlock block = dfsClient.getNamenode().getBlockLocations(corruptFileName, 0, Long.MAX_VALUE).get(0).getBlock();
         for (int i = 0; i < 4; i++) {
             File blockFile = cluster.getBlockFile(i, block);
             if (blockFile != null && blockFile.exists()) {
@@ -626,7 +626,7 @@ public class TestFsck {
     public void testFsckOpenECFiles() throws Exception {
         DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFsckECFile").setNumFiles(4).build();
         conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 10000L);
-        ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
         final int dataBlocks = ecPolicy.getNumDataUnits();
         final int cellSize = ecPolicy.getCellSize();
         final int numAllUnits = dataBlocks + ecPolicy.getNumParityUnits();
@@ -668,7 +668,7 @@ public class TestFsck {
         assertTrue(outStr.contains("Expected_repl=" + numAllUnits));
         assertTrue(outStr.contains("Under Construction Block:"));
         // check reported blockIDs of internal blocks
-        LocatedStripedBlockInterface lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(openFile.toString(), 0, cellSize * dataBlocks).get(0);
+        LocatedStripedBlock lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(openFile.toString(), 0, cellSize * dataBlocks).get(0);
         long groupId = lsb.getBlock().getBlockId();
         byte[] indices = lsb.getBlockIndices();
         DatanodeInfo[] locs = lsb.getLocations();
@@ -704,7 +704,7 @@ public class TestFsck {
         conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
         FileSystem fs = null;
         DFSClient dfsClient = null;
-        LocatedBlocksInterface blocks = null;
+        LocatedBlocks blocks = null;
         int replicaCount = 0;
         Random random = new Random();
         String outStr = null;
@@ -717,7 +717,7 @@ public class TestFsck {
         DFSTestUtil.createFile(fs, file1, 1024, factor, 0);
         // Wait until file replication has completed
         DFSTestUtil.waitReplication(fs, file1, factor);
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, file1);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, file1);
         // Make sure filesystem is in healthy state
         outStr = runFsck(conf, 0, true, "/");
         System.out.println(outStr);
@@ -768,7 +768,7 @@ public class TestFsck {
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY, minReplication);
         FileSystem fs = null;
         DFSClient dfsClient = null;
-        LocatedBlocksInterface blocks = null;
+        LocatedBlocks blocks = null;
         int replicaCount = 0;
         Random random = new Random();
         String outStr = null;
@@ -781,7 +781,7 @@ public class TestFsck {
         DFSTestUtil.createFile(fs, file1, 1024, minReplication, 0);
         // Wait until file replication has completed
         DFSTestUtil.waitReplication(fs, file1, minReplication);
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, file1);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, file1);
         // Make sure filesystem is in healthy state
         outStr = runFsck(conf, 0, true, "/");
         System.out.println(outStr);
@@ -1172,7 +1172,7 @@ public class TestFsck {
         FSDirectoryInterface fsd = mock(FSDirectory.class);
         BlockManagerInterface blockManager = mock(BlockManager.class);
         DatanodeManagerInterface dnManager = mock(DatanodeManager.class);
-        INodesInPathInterface iip = mock(INodesInPath.class);
+        INodesInPath iip = mock(INodesInPath.class);
         when(namenode.getNamesystem()).thenReturn(fsName);
         when(fsName.getBlockManager()).thenReturn(blockManager);
         when(fsName.getFSDirectory()).thenReturn(fsd);
@@ -1272,7 +1272,7 @@ public class TestFsck {
         util.createFile(dfs, path, 1024, replFactor, 1000L);
         util.waitReplication(dfs, path, replFactor);
         StringBuilder sb = new StringBuilder();
-        for (LocatedBlockInterface lb : util.getAllBlocks(dfs, path)) {
+        for (LocatedBlock lb : util.getAllBlocks(dfs, path)) {
             sb.append(lb.getBlock().getLocalBlock().getBlockName() + " ");
         }
         String[] bIds = sb.toString().split(" ");
@@ -1315,7 +1315,7 @@ public class TestFsck {
         util.createFile(dfs, path, 1024, replFactor, 1000L);
         util.waitReplication(dfs, path, replFactor);
         StringBuilder sb = new StringBuilder();
-        for (LocatedBlockInterface lb : util.getAllBlocks(dfs, path)) {
+        for (LocatedBlock lb : util.getAllBlocks(dfs, path)) {
             sb.append(lb.getBlock().getLocalBlock().getBlockName() + " ");
         }
         String[] bIds = sb.toString().split(" ");
@@ -1326,11 +1326,11 @@ public class TestFsck {
         //decommission datanode
         FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
         BlockManagerInterface bm = fsn.getBlockManager();
-        ExtendedBlockInterface eb = util.getFirstBlock(dfs, path);
+        ExtendedBlock eb = util.getFirstBlock(dfs, path);
         BlockCollection bc = null;
         try {
             fsn.writeLock();
-            BlockInfoInterface bi = bm.getStoredBlock(eb.getLocalBlock());
+            BlockInfo bi = bm.getStoredBlock(eb.getLocalBlock());
             bc = fsn.getBlockCollection(bi);
         } finally {
             fsn.writeUnlock();
@@ -1388,7 +1388,7 @@ public class TestFsck {
         util.createFile(dfs, path, 1024, replFactor, 1000L);
         util.waitReplication(dfs, path, replFactor);
         StringBuilder sb = new StringBuilder();
-        for (LocatedBlockInterface lb : util.getAllBlocks(dfs, path)) {
+        for (LocatedBlock lb : util.getAllBlocks(dfs, path)) {
             sb.append(lb.getBlock().getLocalBlock().getBlockName() + " ");
         }
         String[] bIds = sb.toString().split(" ");
@@ -1466,7 +1466,7 @@ public class TestFsck {
         short numDn = 1;
         final long blockSize = 512;
         Random random = new Random();
-        ExtendedBlockInterface block;
+        ExtendedBlock block;
         short repFactor = 1;
         String[] racks = { "/rack1" };
         String[] hosts = { "host1" };
@@ -1489,7 +1489,7 @@ public class TestFsck {
         util.createFile(dfs, path, 1024, repFactor, 1000L);
         util.waitReplication(dfs, path, repFactor);
         StringBuilder sb = new StringBuilder();
-        for (LocatedBlockInterface lb : util.getAllBlocks(dfs, path)) {
+        for (LocatedBlock lb : util.getAllBlocks(dfs, path)) {
             sb.append(lb.getBlock().getLocalBlock().getBlockName() + " ");
         }
         String[] bIds = sb.toString().split(" ");
@@ -1589,11 +1589,11 @@ public class TestFsck {
         // decommission datanode
         FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
         BlockManagerInterface bm = fsn.getBlockManager();
-        ExtendedBlockInterface eb = util.getFirstBlock(dfs, path);
+        ExtendedBlock eb = util.getFirstBlock(dfs, path);
         BlockCollection bc = null;
         try {
             fsn.writeLock();
-            BlockInfoInterface bi = bm.getStoredBlock(eb.getLocalBlock());
+            BlockInfo bi = bm.getStoredBlock(eb.getLocalBlock());
             bc = fsn.getBlockCollection(bi);
         } finally {
             fsn.writeUnlock();
@@ -1651,7 +1651,7 @@ public class TestFsck {
         util.createFile(dfs, path, 1024, replFactor, 1000L);
         util.waitReplication(dfs, path, replFactor);
         StringBuilder sb = new StringBuilder();
-        for (LocatedBlockInterface lb : util.getAllBlocks(dfs, path)) {
+        for (LocatedBlock lb : util.getAllBlocks(dfs, path)) {
             sb.append(lb.getBlock().getLocalBlock().getBlockName() + " ");
         }
         String[] bIds = sb.toString().split(" ");
@@ -1924,7 +1924,7 @@ public class TestFsck {
         LOG.info("Items in lost+found: " + retVal);
         // Expect all good blocks moved, only corrupted block skipped.
         long totalLength = 0;
-        for (LocatedFileStatusInterface lfs : retVal) {
+        for (LocatedFileStatus lfs : retVal) {
             totalLength += lfs.getLen();
         }
         Assert.assertTrue("Nothing is moved to lost+found!", totalLength > 0);
@@ -2010,7 +2010,7 @@ public class TestFsck {
         final int length = cellSize * dataBlocks;
         final byte[] bytes = StripedFileTestUtil.generateBytes(length);
         DFSTestUtil.writeFile(fs, file, bytes);
-        LocatedStripedBlockInterface lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(file.toString(), 0, cellSize * dataBlocks).get(0);
+        LocatedStripedBlock lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(file.toString(), 0, cellSize * dataBlocks).get(0);
         final LocatedBlock[] blks = StripedBlockUtil.parseStripedBlockGroup(lsb, cellSize, dataBlocks, parityBlocks);
         // make an unrecoverable ec file with corrupted blocks
         for (int i = 0; i < parityBlocks + 1; i++) {
@@ -2128,7 +2128,7 @@ public class TestFsck {
     @Test
     public void testFsckNonPrivilegedListCorrupt() throws Exception {
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(4).build();
-        UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting("systest", new String[] { "" });
+        UserGroupInformation ugi = UserGroupInformation.createUserForTesting("systest", new String[] { "" });
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override

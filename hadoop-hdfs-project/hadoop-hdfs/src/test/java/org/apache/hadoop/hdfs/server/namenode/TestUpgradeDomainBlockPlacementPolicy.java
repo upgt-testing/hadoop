@@ -181,8 +181,8 @@ public class TestUpgradeDomainBlockPlacementPolicy {
         final String testFile = "/testfile";
         final Path path = new Path(testFile);
         createFileAndWaitForReplication(path, FILE_SIZE);
-        LocatedBlocksInterface locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
-        for (LocatedBlockInterface block : locatedBlocks.getLocatedBlocks()) {
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
             Set<DatanodeInfo> locs = new HashSet<>();
             for (DatanodeInfoInterface datanodeInfo : block.getLocations()) {
                 if (datanodeInfo.getAdminState().equals(DatanodeInfo.AdminStates.NORMAL)) {
@@ -207,13 +207,13 @@ public class TestUpgradeDomainBlockPlacementPolicy {
 
             @Override
             public Boolean get() {
-                LocatedBlocksInterface locatedBlocks;
+                LocatedBlocks locatedBlocks;
                 try {
                     locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
                 } catch (IOException ioe) {
                     return false;
                 }
-                for (LocatedBlockInterface block : locatedBlocks.getLocatedBlocks()) {
+                for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
                     Set<DatanodeInfo> locs = new HashSet<>();
                     for (DatanodeInfoInterface datanodeInfo : block.getLocations()) {
                         if (datanodeInfo.getAdminState().equals(DatanodeInfo.AdminStates.NORMAL)) {
@@ -230,8 +230,8 @@ public class TestUpgradeDomainBlockPlacementPolicy {
             }
         }, 1000, WAIT_TIMEOUT_MS);
         // Verify block placement policy of each block.
-        LocatedBlocksInterface locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
-        for (LocatedBlockInterface block : locatedBlocks.getLocatedBlocks()) {
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
             BlockPlacementStatus status = cluster.getNamesystem().getBlockManager().getBlockPlacementPolicy().verifyBlockPlacement(block.getLocations(), REPLICATION_FACTOR);
             Assert.assertTrue(status.isPlacementPolicySatisfied());
         }

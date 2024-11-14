@@ -54,11 +54,11 @@ public class TestAddOverReplicatedStripedBlocks {
 
     private DistributedFileSystem fs;
 
-    private final PathInterface dirPath = new Path("/striped");
+    private final Path dirPath = new Path("/striped");
 
-    private PathInterface filePath = new Path(dirPath, "file");
+    private Path filePath = new Path(dirPath, "file");
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final short dataBlocks = (short) ecPolicy.getNumDataUnits();
 
@@ -107,8 +107,8 @@ public class TestAddOverReplicatedStripedBlocks {
         // create a file which has exact one block group to the first GROUP_SIZE DNs
         long fileLen = dataBlocks * blockSize;
         DFSTestUtil.createStripedFile(cluster, filePath, null, 1, stripesPerBlock, false);
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         long gs = bg.getBlock().getGenerationStamp();
         String bpid = bg.getBlock().getBlockPoolId();
         long groupId = bg.getBlock().getBlockId();
@@ -144,8 +144,8 @@ public class TestAddOverReplicatedStripedBlocks {
         int fileLen = cellSize * (dataBlocks - 1);
         byte[] content = new byte[fileLen];
         DFSTestUtil.writeFile(fs, filePath, new String(content));
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         long gs = bg.getBlock().getGenerationStamp();
         String bpid = bg.getBlock().getBlockPoolId();
         long groupId = bg.getBlock().getBlockId();
@@ -179,8 +179,8 @@ public class TestAddOverReplicatedStripedBlocks {
     public void testProcessOverReplicatedAndCorruptStripedBlock() throws Exception {
         long fileLen = dataBlocks * blockSize;
         DFSTestUtil.createStripedFile(cluster, filePath, null, 1, stripesPerBlock, false);
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         long gs = bg.getBlock().getGenerationStamp();
         String bpid = bg.getBlock().getBlockPoolId();
         long groupId = bg.getBlock().getBlockId();
@@ -234,8 +234,8 @@ public class TestAddOverReplicatedStripedBlocks {
     public void testProcessOverReplicatedAndMissingStripedBlock() throws Exception {
         long fileLen = cellSize * dataBlocks;
         DFSTestUtil.createStripedFile(cluster, filePath, null, 1, stripesPerBlock, false);
-        LocatedBlocksInterface lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
-        LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+        LocatedBlocks lbs = cluster.getNameNodeRpc().getBlockLocations(filePath.toString(), 0, fileLen);
+        LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
         long gs = bg.getBlock().getGenerationStamp();
         String bpid = bg.getBlock().getBlockPoolId();
         long groupId = bg.getBlock().getBlockId();

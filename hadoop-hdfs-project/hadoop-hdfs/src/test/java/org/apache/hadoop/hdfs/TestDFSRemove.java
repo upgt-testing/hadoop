@@ -32,11 +32,11 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestDFSRemove {
 
-    final PathInterface dir = new Path("/test/remove/");
+    final Path dir = new Path("/test/remove/");
 
     void list(FileSystem fs, String name) throws IOException {
         FileSystem.LOG.info("\n\n" + name);
-        for (FileStatusInterface s : fs.listStatus(dir)) {
+        for (FileStatus s : fs.listStatus(dir)) {
             FileSystem.LOG.info("" + s.getPath());
         }
     }

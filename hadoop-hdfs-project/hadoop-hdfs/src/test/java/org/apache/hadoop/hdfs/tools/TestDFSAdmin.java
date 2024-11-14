@@ -498,7 +498,7 @@ public class TestDFSAdmin {
 
             @Override
             public Boolean get() {
-                LocatedBlocksInterface blocks = null;
+                LocatedBlocks blocks = null;
                 try {
                     miniCluster.triggerBlockReports();
                     blocks = client.getNamenode().getBlockLocations(file.toString(), 0, Long.MAX_VALUE);
@@ -516,7 +516,7 @@ public class TestDFSAdmin {
         redirectStream();
         // init conf
         final Configuration dfsConf = new HdfsConfiguration();
-        ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
+        ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
         dfsConf.setInt(DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 500);
         dfsConf.setLong(DFS_HEARTBEAT_INTERVAL_KEY, 1);
         final Path baseDir = new Path(PathUtils.getTestDir(getClass()).getAbsolutePath(), GenericTestUtils.getMethodName());
@@ -538,10 +538,10 @@ public class TestDFSAdmin {
             fs.enableErasureCodingPolicy(ecPolicy.getName());
             DFSTestUtil.createFile(fs, file, fileLength, replFactor, 12345L);
             DFSTestUtil.waitReplication(fs, file, replFactor);
-            final ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, file);
-            LocatedBlocksInterface lbs = miniCluster.getFileSystem().getClient().getNamenode().getBlockLocations(file.toString(), 0, fileLength);
+            final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, file);
+            LocatedBlocks lbs = miniCluster.getFileSystem().getClient().getNamenode().getBlockLocations(file.toString(), 0, fileLength);
             assertTrue("Unexpected block type: " + lbs.get(0), lbs.get(0) instanceof LocatedBlock);
-            LocatedBlockInterface locatedBlock = lbs.get(0);
+            LocatedBlock locatedBlock = lbs.get(0);
             DatanodeInfoInterface locatedDataNode = locatedBlock.getLocations()[0];
             LOG.info("Replica block located on: " + locatedDataNode);
             Path ecDir = new Path(baseDir, "ec");
@@ -596,7 +596,7 @@ public class TestDFSAdmin {
             verifyNodesAndCorruptBlocks(numDn, numDn - 1, 1, 0, client, 0L, 1L);
             lbs = miniCluster.getFileSystem().getClient().getNamenode().getBlockLocations(ecFile.toString(), 0, blockGroupSize);
             assertTrue("Unexpected block type: " + lbs.get(0), lbs.get(0) instanceof LocatedStripedBlock);
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
             miniCluster.getNamesystem().writeLock();
             try {
                 BlockManagerInterface bm = miniCluster.getNamesystem().getBlockManager();
@@ -656,7 +656,7 @@ public class TestDFSAdmin {
             }
             // test -listOpenFiles command with option <path>
             openFilesMap.clear();
-            PathInterface file;
+            Path file;
             HashMap<Path, FSDataOutputStream> openFiles1 = new HashMap<>();
             HashMap<Path, FSDataOutputStream> openFiles2 = new HashMap<>();
             for (int i = 0; i < numOpenFiles; i++) {
@@ -697,7 +697,7 @@ public class TestDFSAdmin {
             // list invalid path file
             assertEquals(0, ToolRunner.run(dfsAdmin, new String[] { "-listOpenFiles", "-path", "/invalid_path" }));
             outStr = scanIntoString(out);
-            for (PathInterface openFilePath : openFilesMap.keySet()) {
+            for (Path openFilePath : openFilesMap.keySet()) {
                 assertThat(outStr, not(containsString(openFilePath.toString())));
             }
             DFSTestUtil.closeOpenFiles(openFilesMap, openFilesMap.size());
@@ -708,11 +708,11 @@ public class TestDFSAdmin {
         final String outStr = scanIntoString(out);
         LOG.info("dfsadmin -listOpenFiles output: \n" + out);
         if (closedFileSet != null) {
-            for (PathInterface closedFilePath : closedFileSet) {
+            for (Path closedFilePath : closedFileSet) {
                 assertThat(outStr, not(containsString(closedFilePath.toString() + System.lineSeparator())));
             }
         }
-        for (PathInterface openFilePath : openFilesMap.keySet()) {
+        for (Path openFilePath : openFilesMap.keySet()) {
             assertThat(outStr, is(containsString(openFilePath.toString() + System.lineSeparator())));
         }
     }
@@ -791,10 +791,10 @@ public class TestDFSAdmin {
     public void testRefreshProxyUser() throws Exception {
         Path dirPath = new Path("/testdir1");
         Path subDirPath = new Path("/testdir1/subdir1");
-        UserGroupInformationInterface loginUserUgi = UserGroupInformation.getLoginUser();
+        UserGroupInformation loginUserUgi = UserGroupInformation.getLoginUser();
         String proxyUser = "fakeuser";
         String realUser = loginUserUgi.getShortUserName();
-        UserGroupInformationInterface proxyUgi = UserGroupInformation.createProxyUserForTesting(proxyUser, loginUserUgi, loginUserUgi.getGroupNames());
+        UserGroupInformation proxyUgi = UserGroupInformation.createProxyUserForTesting(proxyUser, loginUserUgi, loginUserUgi.getGroupNames());
         // create a directory as login user and re-assign it to proxy user
         loginUserUgi.doAs(new PrivilegedExceptionAction<Integer>() {
 

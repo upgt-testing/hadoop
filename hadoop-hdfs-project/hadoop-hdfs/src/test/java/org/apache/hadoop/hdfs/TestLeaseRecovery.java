@@ -415,7 +415,7 @@ public class TestLeaseRecovery {
             updatedBlock.setNumBytes(1234);
             // get the stored block and make it look like the DN sent a RBW IBR.
             BlockManagerInterface bm = cluster.getNamesystem().getBlockManager();
-            BlockInfoInterface storedBlock = bm.getStoredBlock(block.getLocalBlock());
+            BlockInfo storedBlock = bm.getStoredBlock(block.getLocalBlock());
             BlockUnderConstructionFeatureInterface uc = storedBlock.getUnderConstructionFeature();
             uc.setExpectedLocations(updatedBlock.getLocalBlock(), uc.getExpectedStorageLocations(), BlockType.CONTIGUOUS);
             // complete the file w/o updatePipeline to simulate client failure.
@@ -495,8 +495,8 @@ public class TestLeaseRecovery {
     private void createCommittedNotCompleteFile(DFSClient client, String file, byte[] bytesToWrite, int repFactor) throws IOException {
         HdfsFileStatus stat = client.getNamenode().create(file, new FsPermission("777"), client.clientName, new EnumSetWritable<CreateFlag>(EnumSet.of(CreateFlag.CREATE)), true, (short) repFactor, 1024 * 1024 * 128L, new CryptoProtocolVersion[0], null, null);
         // Add a block to the file
-        LocatedBlockInterface blk = client.getNamenode().addBlock(file, client.clientName, null, DatanodeInfo.EMPTY_ARRAY, stat.getFileId(), new String[0], null);
-        ExtendedBlockInterface finalBlock = blk.getBlock();
+        LocatedBlock blk = client.getNamenode().addBlock(file, client.clientName, null, DatanodeInfo.EMPTY_ARRAY, stat.getFileId(), new String[0], null);
+        ExtendedBlock finalBlock = blk.getBlock();
         if (bytesToWrite != null) {
             // Here we create a output stream and then abort it so the block gets
             // created on the datanode, but we never send the message to tell the DN

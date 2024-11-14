@@ -59,8 +59,8 @@ public class TestParallelImageWrite {
         final Path rootpath = new Path("/");
         final Path dirpath = new Path(dir);
         long rootmtime;
-        FileStatusInterface rootstatus;
-        FileStatusInterface dirstatus;
+        FileStatus rootstatus;
+        FileStatus dirstatus;
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).format(true).numDataNodes(NUM_DATANODES).build();
             String[] nameNodeDirs = conf.getStrings(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, new String[] {});
@@ -87,11 +87,11 @@ public class TestParallelImageWrite {
             fsn = cluster.getNamesystem();
             FileSystem fs = cluster.getFileSystem();
             assertTrue("Filesystem corrupted after restart.", files.checkFiles(fs, dir));
-            final FileStatusInterface newrootstatus = fs.getFileStatus(rootpath);
+            final FileStatus newrootstatus = fs.getFileStatus(rootpath);
             assertEquals(rootmtime, newrootstatus.getModificationTime());
             assertEquals(rootstatus.getOwner() + "_XXX", newrootstatus.getOwner());
             assertEquals(rootstatus.getGroup(), newrootstatus.getGroup());
-            final FileStatusInterface newdirstatus = fs.getFileStatus(dirpath);
+            final FileStatus newdirstatus = fs.getFileStatus(dirpath);
             assertEquals(dirstatus.getOwner(), newdirstatus.getOwner());
             assertEquals(dirstatus.getGroup() + "_XXX", newdirstatus.getGroup());
             rootmtime = fs.getFileStatus(rootpath).getModificationTime();

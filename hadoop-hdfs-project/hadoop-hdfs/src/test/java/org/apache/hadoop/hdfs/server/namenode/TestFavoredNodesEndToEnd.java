@@ -97,7 +97,7 @@ public class TestFavoredNodesEndToEnd {
             out.close();
             BlockLocation[] locations = getBlockLocations(p);
             //verify the files got created in the right nodes
-            for (BlockLocationInterface loc : locations) {
+            for (BlockLocation loc : locations) {
                 String[] hosts = loc.getNames();
                 String[] hosts1 = getStringForInetSocketAddrs(datanode);
                 assertTrue(compareNodes(hosts, hosts1));
@@ -174,7 +174,7 @@ public class TestFavoredNodesEndToEnd {
             out.close();
             BlockLocation[] locations = getBlockLocations(p);
             // verify the files got created in the right nodes
-            for (BlockLocationInterface loc : locations) {
+            for (BlockLocation loc : locations) {
                 String[] hosts = loc.getNames();
                 String[] hosts1 = getStringForInetSocketAddrs(datanode);
                 assertTrue(compareNodes(hosts, hosts1));
@@ -196,7 +196,7 @@ public class TestFavoredNodesEndToEnd {
             out.close();
             BlockLocation[] locations = getBlockLocations(p);
             //verify the files got created in the right nodes
-            for (BlockLocationInterface loc : locations) {
+            for (BlockLocation loc : locations) {
                 String[] hosts = loc.getNames();
                 String[] hosts1 = getStringForInetSocketAddrs(dns);
                 assertTrue(compareNodes(hosts, hosts1));

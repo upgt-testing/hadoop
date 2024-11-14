@@ -52,7 +52,7 @@ public class TestFsckWithMultipleNameNodes {
 
     private static final String FILE_NAME = "/tmp.txt";
 
-    private static final PathInterface FILE_PATH = new Path(FILE_NAME);
+    private static final Path FILE_PATH = new Path(FILE_NAME);
 
     private static final Random RANDOM = new Random();
 

@@ -705,7 +705,7 @@ public class TestNameNodeMXBean {
         DistributedFileSystem fs = null;
         try {
             Configuration conf = new HdfsConfiguration();
-            ErasureCodingPolicyInterface defaultPolicy = StripedFileTestUtil.getDefaultECPolicy();
+            ErasureCodingPolicy defaultPolicy = StripedFileTestUtil.getDefaultECPolicy();
             int dataBlocks = defaultPolicy.getNumDataUnits();
             int parityBlocks = defaultPolicy.getNumParityUnits();
             int totalSize = dataBlocks + parityBlocks;
@@ -746,7 +746,7 @@ public class TestNameNodeMXBean {
             final int length = cellSize * dataBlocks;
             final byte[] bytes = StripedFileTestUtil.generateBytes(length);
             DFSTestUtil.writeFile(fs, file, bytes);
-            LocatedStripedBlockInterface lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(file.toString(), 0, cellSize * dataBlocks).get(0);
+            LocatedStripedBlock lsb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(file.toString(), 0, cellSize * dataBlocks).get(0);
             final LocatedBlock[] blks = StripedBlockUtil.parseStripedBlockGroup(lsb, cellSize, dataBlocks, parityBlocks);
             // make an unrecoverable ec file with corrupted blocks
             for (int i = 0; i < parityBlocks + 1; i++) {

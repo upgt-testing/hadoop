@@ -85,7 +85,7 @@ public class TestRBWBlockInvalidation {
             out.writeBytes("HDFS-3157: " + testPath);
             out.hsync();
             cluster.startDataNodes(conf, 1, true, null, null, null);
-            ExtendedBlockInterface blk = DFSTestUtil.getFirstBlock(fs, testPath);
+            ExtendedBlock blk = DFSTestUtil.getFirstBlock(fs, testPath);
             // Delete partial block and its meta information from the RBW folder
             // of first datanode.
             MaterializedReplica replica = cluster.getMaterializedReplica(0, blk);
@@ -154,13 +154,13 @@ public class TestRBWBlockInvalidation {
             List<FSDataOutputStream> streams = Lists.newArrayList();
             try {
                 // Open the test files and write some data to each
-                for (PathInterface path : testPaths) {
+                for (Path path : testPaths) {
                     FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
                     streams.add(out);
                     out.writeBytes("old gs data\n");
                     out.hflush();
                 }
-                for (PathInterface path : testPaths) {
+                for (Path path : testPaths) {
                     DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
                 }
                 // Shutdown one of the nodes in the pipeline
@@ -168,7 +168,7 @@ public class TestRBWBlockInvalidation {
                 // Write some more data and flush again. This data will only
                 // be in the latter genstamp copy of the blocks.
                 for (int i = 0; i < streams.size(); i++) {
-                    PathInterface path = testPaths.get(i);
+                    Path path = testPaths.get(i);
                     FSDataOutputStream out = streams.get(i);
                     out.writeBytes("new gs data\n");
                     out.hflush();
@@ -177,7 +177,7 @@ public class TestRBWBlockInvalidation {
                     cluster.getFileSystem().setReplication(path, (short) 1);
                     out.close();
                 }
-                for (PathInterface path : testPaths) {
+                for (Path path : testPaths) {
                     DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
                 }
                 // Upon restart, there will be two replicas, one with an old genstamp
@@ -199,7 +199,7 @@ public class TestRBWBlockInvalidation {
                 cluster.triggerDeletionReports();
                 waitForNumTotalBlocks(cluster, numFiles);
                 // Make sure we can still read the blocks.
-                for (PathInterface path : testPaths) {
+                for (Path path : testPaths) {
                     String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
                     assertEquals("old gs data\n" + "new gs data\n", ret);
                 }

@@ -45,13 +45,13 @@ public class TestSnapshotMetrics {
 
     private static final String NS_METRICS = "FSNamesystem";
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
-    private final PathInterface file1 = new Path(sub1, "file1");
+    private final Path file1 = new Path(sub1, "file1");
 
-    private final PathInterface file2 = new Path(sub1, "file2");
+    private final Path file2 = new Path(sub1, "file2");
 
     private Configuration conf;
 

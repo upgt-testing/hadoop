@@ -495,7 +495,7 @@ public class TestStartup {
 
     @Test(timeout = 30000)
     public void testCorruptImageFallbackLostECPolicy() throws IOException {
-        final ErasureCodingPolicyInterface defaultPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        final ErasureCodingPolicy defaultPolicy = StripedFileTestUtil.getDefaultECPolicy();
         final String policy = defaultPolicy.getName();
         final Path f1 = new Path("/f1");
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(config).numDataNodes(0).format(true).build();
@@ -508,9 +508,9 @@ public class TestStartup {
             fs.setErasureCodingPolicy(srcECDir, defaultPolicy.getName());
             // create a file which will use the default ec policy
             fs.create(f1);
-            FileStatusInterface fs1 = fs.getFileStatus(f1);
+            FileStatus fs1 = fs.getFileStatus(f1);
             assertTrue(fs1.isErasureCoded());
-            ErasureCodingPolicyInterface fs1Policy = fs.getErasureCodingPolicy(f1);
+            ErasureCodingPolicy fs1Policy = fs.getErasureCodingPolicy(f1);
             assertEquals(fs1Policy, defaultPolicy);
         } finally {
             cluster.close();
@@ -670,10 +670,10 @@ public class TestStartup {
             List<StorageDirectory> nameDirs = dfsCluster.getNameNode().getFSImage().getStorage().getStorageDirs();
             Collection<URI> nameDirUris = nameDirs.stream().map(d -> d.getCurrentDir().toURI()).collect(Collectors.toList());
             assertNotNull(nameDirUris);
-            LocalFileSystemInterface fs = LocalFileSystem.getLocal(config);
+            LocalFileSystem fs = LocalFileSystem.getLocal(config);
             FsPermission permission = new FsPermission(conf.get(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_PERMISSION_KEY, DFSConfigKeys.DFS_NAMENODE_NAME_DIR_PERMISSION_DEFAULT));
             for (URI uri : nameDirUris) {
-                FileStatusInterface fileStatus = fs.getFileLinkStatus(new Path(uri));
+                FileStatus fileStatus = fs.getFileLinkStatus(new Path(uri));
                 assertEquals(permission.toOctal(), fileStatus.getPermission().toOctal());
             }
         }

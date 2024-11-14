@@ -74,7 +74,7 @@ public class TestPipelinesFailover {
 
     protected static final Logger LOG = LoggerFactory.getLogger(TestPipelinesFailover.class);
 
-    private static final PathInterface TEST_PATH = new Path("/test-file");
+    private static final Path TEST_PATH = new Path("/test-file");
 
     private static final int BLOCK_SIZE = 4096;
 
@@ -310,7 +310,7 @@ public class TestPipelinesFailover {
             // Look into the block manager on the active node for the block
             // under construction.
             NameNodeInterface nn0 = cluster.getNameNode(0);
-            ExtendedBlockInterface blk = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+            ExtendedBlock blk = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
             DatanodeDescriptorInterface expectedPrimary = DFSTestUtil.getExpectedPrimaryNode(nn0, blk);
             LOG.info("Expecting block recovery to be triggered on DN " + expectedPrimary);
             // Find the corresponding DN daemon, and spy on its connection to the
@@ -464,7 +464,7 @@ public class TestPipelinesFailover {
 
         private final FileSystem fsOtherUser;
 
-        private final PathInterface path;
+        private final Path path;
 
         public PipelineTestThread(TestContext ctx, FileSystem fs, FileSystem fsOtherUser, Path p) {
             super(ctx);

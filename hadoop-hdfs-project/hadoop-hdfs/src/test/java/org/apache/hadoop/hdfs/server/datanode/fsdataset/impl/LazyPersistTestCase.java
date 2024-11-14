@@ -171,8 +171,8 @@ public abstract class LazyPersistTestCase {
         long fileLength = client.getFileInfo(path.toString()).getLen();
         GenericTestUtils.waitFor(() -> {
             try {
-                LocatedBlocksInterface locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
-                for (LocatedBlockInterface locatedBlock : locatedBlocks.getLocatedBlocks()) {
+                LocatedBlocks locatedBlocks = client.getLocatedBlocks(path.toString(), 0, fileLength);
+                for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
                     if (locatedBlock.getStorageTypes()[0] != storageType) {
                         return false;
                     }
@@ -205,7 +205,7 @@ public abstract class LazyPersistTestCase {
         // We should find a persisted copy for each located block.
         try (FsDatasetSpi.FsVolumeReferences volumes = cluster.getDataNodes().get(0).getFSDataset().getFsVolumeReferences()) {
             GenericTestUtils.waitFor(() -> {
-                for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+                for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                     for (FsVolumeSpi v : volumes) {
                         if (v.isTransientStorage()) {
                             continue;
@@ -447,7 +447,7 @@ public abstract class LazyPersistTestCase {
     }
 
     protected final boolean verifyBlockDeletedFromDir(File dir, LocatedBlocks locatedBlocks) {
-        for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+        for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
             File targetDir = DatanodeUtil.idToBlockDir(dir, lb.getBlock().getBlockId());
             File blockFile = new File(targetDir, lb.getBlock().getBlockName());
             if (blockFile.exists()) {

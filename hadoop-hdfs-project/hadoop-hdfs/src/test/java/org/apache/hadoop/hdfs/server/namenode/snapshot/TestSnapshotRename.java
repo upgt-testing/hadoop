@@ -59,11 +59,11 @@ public class TestSnapshotRename {
 
     static final long BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub1 = new Path(dir, "sub1");
+    private final Path sub1 = new Path(dir, "sub1");
 
-    private final PathInterface file1 = new Path(sub1, "file1");
+    private final Path file1 = new Path(sub1, "file1");
 
     Configuration conf;
 
@@ -145,10 +145,10 @@ public class TestSnapshotRename {
     public void testSnapshotRename() throws Exception {
         DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
         // Create snapshot for sub1
-        PathInterface snapshotRoot = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s1");
+        Path snapshotRoot = SnapshotTestHelper.createSnapshot(hdfs, sub1, "s1");
         Path ssPath = new Path(snapshotRoot, file1.getName());
         assertTrue(hdfs.exists(ssPath));
-        FileStatusInterface statusBeforeRename = hdfs.getFileStatus(ssPath);
+        FileStatus statusBeforeRename = hdfs.getFileStatus(ssPath);
         // Rename the snapshot
         hdfs.renameSnapshot(sub1, "s1", "s2");
         // <sub1>/.snapshot/s1/file1 should no longer exist
@@ -157,7 +157,7 @@ public class TestSnapshotRename {
         ssPath = new Path(snapshotRoot, file1.getName());
         // Instead, <sub1>/.snapshot/s2/file1 should exist
         assertTrue(hdfs.exists(ssPath));
-        FileStatusInterface statusAfterRename = hdfs.getFileStatus(ssPath);
+        FileStatus statusAfterRename = hdfs.getFileStatus(ssPath);
         // FileStatus of the snapshot should not change except the path
         assertFalse(statusBeforeRename.equals(statusAfterRename));
         statusBeforeRename.setPath(statusAfterRename.getPath());

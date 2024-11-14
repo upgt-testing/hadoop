@@ -43,7 +43,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
  */
 public class TestXAttrsWithHA {
 
-    private static final PathInterface path = new Path("/file");
+    private static final Path path = new Path("/file");
 
     // XAttrs
     protected static final String name1 = "user.a1";

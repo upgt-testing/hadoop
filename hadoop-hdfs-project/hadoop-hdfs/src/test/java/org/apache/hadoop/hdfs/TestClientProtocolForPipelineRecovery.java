@@ -75,7 +75,7 @@ public class TestClientProtocolForPipelineRecovery {
             Path file = new Path("dataprotocol.dat");
             DFSTestUtil.createFile(fileSys, file, 1L, (short) numDataNodes, 0L);
             // get the first blockid for the file
-            ExtendedBlockInterface firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
+            ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
             // test getNewStampAndToken on a finalized block
             try {
                 namenode.updateBlockForPipeline(firstBlock, "");
@@ -717,7 +717,7 @@ public class TestClientProtocolForPipelineRecovery {
             String clientName = ((DistributedFileSystem) fileSys).getClient().getClientName();
             NamenodeProtocols namenode = cluster.getNameNodeRpc();
             //Update the genstamp and call updatepipeline
-            LocatedBlockInterface newBlock = namenode.updateBlockForPipeline(dfsO.getBlock(), clientName);
+            LocatedBlock newBlock = namenode.updateBlockForPipeline(dfsO.getBlock(), clientName);
             dfsO.getStreamer().updatePipeline(newBlock.getBlock().getGenerationStamp());
             newBlock = namenode.updateBlockForPipeline(dfsO.getBlock(), clientName);
             //Should not throw any error Pipeline should be success

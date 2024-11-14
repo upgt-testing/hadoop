@@ -727,7 +727,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         byte[] bytes = new byte[1024];
         fsDataOutputStream.write(bytes);
         fsDataOutputStream.hsync();
-        LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile.toString(), 0, 3 * blockSize);
+        LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile.toString(), 0, 3 * blockSize);
         DatanodeInfo[] dnInfos4LastBlock = lbs.getLastLocatedBlock().getLocations();
         // Request maintenance for DataNodes 1 and 2 which has the last block.
         takeNodeOutofService(0, Lists.newArrayList(dnInfos4LastBlock[0].getDatanodeUuid(), dnInfos4LastBlock[1].getDatanodeUuid()), Time.now() + expirationInMs, null, null, AdminStates.ENTERING_MAINTENANCE);
@@ -759,7 +759,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         BlockManagerInterface bm = ns.getBlockManager();
         Collection<LocatedBlock> dinfo = dis.getAllBlocks();
         String output;
-        for (LocatedBlockInterface blk : dinfo) {
+        for (LocatedBlock blk : dinfo) {
             // for each block
             DatanodeInfo[] nodes = blk.getLocations();
             for (int j = 0; j < nodes.length; j++) {

@@ -53,7 +53,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestFailoverWithBlockTokensEnabled {
 
-    private static final PathInterface TEST_PATH = new Path("/test-path");
+    private static final Path TEST_PATH = new Path("/test-path");
 
     private static final String TEST_DATA = "very important text";
 
@@ -120,8 +120,8 @@ public class TestFailoverWithBlockTokensEnabled {
 
             @Override
             public LocatedBlocks answer(InvocationOnMock arg0) throws Throwable {
-                LocatedBlocksInterface locatedBlocks = (LocatedBlocks) arg0.callRealMethod();
-                for (LocatedBlockInterface lb : locatedBlocks.getLocatedBlocks()) {
+                LocatedBlocks locatedBlocks = (LocatedBlocks) arg0.callRealMethod();
+                for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
                     TokenInterface<BlockTokenIdentifier> token = lb.getBlockToken();
                     BlockTokenIdentifierInterface id = lb.getBlockToken().decodeIdentifier();
                     // This will make the token invalid, since the password

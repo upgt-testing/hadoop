@@ -66,7 +66,7 @@ public class TestDiskspaceQuotaUpdate {
 
     static final long seed = 0L;
 
-    private static final PathInterface BASE_DIR = new Path("/TestQuotaUpdate");
+    private static final Path BASE_DIR = new Path("/TestQuotaUpdate");
 
     private static Configuration conf;
 
@@ -222,7 +222,7 @@ public class TestDiskspaceQuotaUpdate {
      */
     @Test(timeout = 60000)
     public void testAppendOverStorageQuota() throws Exception {
-        final PathInterface dir = getParent(GenericTestUtils.getMethodName());
+        final Path dir = getParent(GenericTestUtils.getMethodName());
         final Path file = new Path(dir, "file");
         // create partial block file
         getDFS().mkdirs(dir);
@@ -257,7 +257,7 @@ public class TestDiskspaceQuotaUpdate {
      */
     @Test(timeout = 60000)
     public void testAppendOverTypeQuota() throws Exception {
-        final PathInterface dir = getParent(GenericTestUtils.getMethodName());
+        final Path dir = getParent(GenericTestUtils.getMethodName());
         final Path file = new Path(dir, "file");
         // create partial block file
         getDFS().mkdirs(dir);
@@ -293,7 +293,7 @@ public class TestDiskspaceQuotaUpdate {
      */
     @Test(timeout = 60000)
     public void testTruncateOverQuota() throws Exception {
-        final PathInterface dir = getParent(GenericTestUtils.getMethodName());
+        final Path dir = getParent(GenericTestUtils.getMethodName());
         final Path file = new Path(dir, "file");
         // create partial block file
         getDFS().mkdirs(dir);

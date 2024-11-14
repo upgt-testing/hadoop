@@ -76,8 +76,8 @@ public class TestCreateEditsLog {
         CreateEditsLog.main(new String[] { "-f", "1000", "0", "1", "-d", TEST_DIR.getAbsolutePath() });
         Path editsWildcard = new Path(TEST_DIR.getAbsolutePath(), "*");
         FileContext localFc = FileContext.getLocalFSFileContext();
-        for (FileStatusInterface edits : localFc.util().globStatus(editsWildcard)) {
-            PathInterface src = edits.getPath();
+        for (FileStatus edits : localFc.util().globStatus(editsWildcard)) {
+            Path src = edits.getPath();
             Path dst = new Path(new File(nameDir, "current").getAbsolutePath(), src.getName());
             localFc.rename(src, dst);
         }

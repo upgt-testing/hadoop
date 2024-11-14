@@ -59,7 +59,7 @@ public class TestXAttrWithSnapshot {
 
     private static int pathCount = 0;
 
-    private static PathInterface path, snapshotPath, snapshotPath2, snapshotPath3;
+    private static Path path, snapshotPath, snapshotPath2, snapshotPath3;
 
     private static String snapshotName, snapshotName2, snapshotName3;
 

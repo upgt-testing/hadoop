@@ -80,9 +80,9 @@ public class TestRandomOpsWithSnapshots {
 
     private static final String WITNESSDIRSTRING = "/WITNESSDIR";
 
-    private static final PathInterface TESTDIR = new Path(TESTDIRSTRING);
+    private static final Path TESTDIR = new Path(TESTDIRSTRING);
 
-    private static final PathInterface WITNESSDIR = new Path(WITNESSDIRSTRING);
+    private static final Path WITNESSDIR = new Path(WITNESSDIRSTRING);
 
     private static List<Path> snapshottableDirectories = new ArrayList<Path>();
 
@@ -309,7 +309,7 @@ public class TestRandomOpsWithSnapshots {
     private void createTestDir() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface parentDir = snapshottableDirectories.get(index);
+            Path parentDir = snapshottableDirectories.get(index);
             Path newDir = new Path(parentDir, "createTestDir_" + UUID.randomUUID().toString());
             for (OperationDirectories dir : OperationDirectories.values()) {
                 if (dir == OperationDirectories.WitnessDir) {
@@ -327,7 +327,7 @@ public class TestRandomOpsWithSnapshots {
     private void deleteTestDir() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface deleteDir = snapshottableDirectories.get(index);
+            Path deleteDir = snapshottableDirectories.get(index);
             if (!pathToSnapshotsMap.containsKey(deleteDir)) {
                 boolean isWitnessDir = false;
                 for (OperationDirectories dir : OperationDirectories.values()) {
@@ -351,9 +351,9 @@ public class TestRandomOpsWithSnapshots {
     private void renameTestDir() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface oldDir = snapshottableDirectories.get(index);
+            Path oldDir = snapshottableDirectories.get(index);
             if (!pathToSnapshotsMap.containsKey(oldDir)) {
-                PathInterface newDir = oldDir.suffix("_renameDir+" + UUID.randomUUID().toString());
+                Path newDir = oldDir.suffix("_renameDir+" + UUID.randomUUID().toString());
                 for (OperationDirectories dir : OperationDirectories.values()) {
                     if (dir == OperationDirectories.WitnessDir) {
                         oldDir = new Path(getNewPathString(oldDir.toString(), TESTDIRSTRING, WITNESSDIRSTRING));
@@ -377,7 +377,7 @@ public class TestRandomOpsWithSnapshots {
     private void createSnapshot() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface randomDir = snapshottableDirectories.get(index);
+            Path randomDir = snapshottableDirectories.get(index);
             String snapshotName = Integer.toString(generator.nextInt()) + ".ss";
             hdfs.createSnapshot(randomDir, snapshotName);
             LOG.info("createSnapshot, directory: " + randomDir + ", snapshot name: " + snapshotName);
@@ -395,7 +395,7 @@ public class TestRandomOpsWithSnapshots {
         if (!pathToSnapshotsMap.isEmpty()) {
             int index = generator.nextInt(pathToSnapshotsMap.size());
             Object[] snapshotPaths = pathToSnapshotsMap.keySet().toArray();
-            PathInterface snapshotPath = (Path) snapshotPaths[index];
+            Path snapshotPath = (Path) snapshotPaths[index];
             ArrayList<String> snapshotNameList = pathToSnapshotsMap.get(snapshotPath);
             String snapshotNameToBeDeleted = snapshotNameList.get(generator.nextInt(snapshotNameList.size()));
             hdfs.deleteSnapshot(snapshotPath, snapshotNameToBeDeleted);
@@ -415,7 +415,7 @@ public class TestRandomOpsWithSnapshots {
         if (!pathToSnapshotsMap.isEmpty()) {
             int index = generator.nextInt(pathToSnapshotsMap.size());
             Object[] snapshotPaths = pathToSnapshotsMap.keySet().toArray();
-            PathInterface snapshotPath = (Path) snapshotPaths[index];
+            Path snapshotPath = (Path) snapshotPaths[index];
             ArrayList<String> snapshotNameList = pathToSnapshotsMap.get(snapshotPath);
             String snapshotOldName = snapshotNameList.get(generator.nextInt(snapshotNameList.size()));
             String snapshotOldNameNoExt = snapshotOldName.substring(0, snapshotOldName.lastIndexOf('.') - 1);
@@ -433,7 +433,7 @@ public class TestRandomOpsWithSnapshots {
     private void createTestFile() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface randomDir = snapshottableDirectories.get(index);
+            Path randomDir = snapshottableDirectories.get(index);
             if (!randomDir.isRoot()) {
                 randomDir = randomDir.getParent();
             }
@@ -454,11 +454,11 @@ public class TestRandomOpsWithSnapshots {
     private void deleteTestFile() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface randomDir = snapshottableDirectories.get(index);
+            Path randomDir = snapshottableDirectories.get(index);
             FileStatus[] fileStatusList = hdfs.listStatus(randomDir);
-            for (FileStatusInterface fsEntry : fileStatusList) {
+            for (FileStatus fsEntry : fileStatusList) {
                 if (fsEntry.isFile()) {
-                    PathInterface deleteFile = fsEntry.getPath();
+                    Path deleteFile = fsEntry.getPath();
                     for (OperationDirectories dir : OperationDirectories.values()) {
                         if (dir == OperationDirectories.WitnessDir) {
                             deleteFile = new Path(getNewPathString(deleteFile.toString(), TESTDIRSTRING, WITNESSDIRSTRING));
@@ -478,12 +478,12 @@ public class TestRandomOpsWithSnapshots {
     private void renameTestFile() throws IOException {
         if (snapshottableDirectories.size() > 0) {
             int index = generator.nextInt(snapshottableDirectories.size());
-            PathInterface randomDir = snapshottableDirectories.get(index);
+            Path randomDir = snapshottableDirectories.get(index);
             FileStatus[] fileStatusList = hdfs.listStatus(randomDir);
-            for (FileStatusInterface fsEntry : fileStatusList) {
+            for (FileStatus fsEntry : fileStatusList) {
                 if (fsEntry.isFile()) {
-                    PathInterface oldFile = fsEntry.getPath();
-                    PathInterface newFile = oldFile.suffix("_renameFile");
+                    Path oldFile = fsEntry.getPath();
+                    Path newFile = oldFile.suffix("_renameFile");
                     for (OperationDirectories dir : OperationDirectories.values()) {
                         if (dir == OperationDirectories.WitnessDir) {
                             oldFile = new Path(getNewPathString(oldFile.toString(), TESTDIRSTRING, WITNESSDIRSTRING));

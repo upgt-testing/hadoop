@@ -167,13 +167,13 @@ public class TestDiffListBySkipList {
         DiffListBySkipList.LOG.info("run " + root);
         hdfs.mkdirs(root);
         for (int i = 1; i < n; i++) {
-            final PathInterface child = getChildPath(root, i);
+            final Path child = getChildPath(root, i);
             hdfs.mkdirs(child);
         }
         INodeDirectoryInterface dir = fsdir.getINode(root.toString()).asDirectory();
         SnapshotTestHelper.createSnapshot(hdfs, root, "s0");
         for (int i = 1; i < n; i++) {
-            final PathInterface child = getChildPath(root, n - i);
+            final Path child = getChildPath(root, n - i);
             hdfs.delete(child, false);
             hdfs.createSnapshot(root, "s" + i);
         }
@@ -196,7 +196,7 @@ public class TestDiffListBySkipList {
         hdfs.mkdirs(root);
         SnapshotTestHelper.createSnapshot(hdfs, root, "s0");
         for (int i = 1; i < n; i++) {
-            final PathInterface child = getChildPath(root, i);
+            final Path child = getChildPath(root, i);
             hdfs.mkdirs(child);
             hdfs.createSnapshot(root, "s" + i);
         }

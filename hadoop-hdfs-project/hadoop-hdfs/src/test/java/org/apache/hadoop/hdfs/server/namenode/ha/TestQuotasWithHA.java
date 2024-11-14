@@ -40,9 +40,9 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestQuotasWithHA {
 
-    private static final PathInterface TEST_DIR = new Path("/test");
+    private static final Path TEST_DIR = new Path("/test");
 
-    private static final PathInterface TEST_FILE = new Path(TEST_DIR, "file");
+    private static final Path TEST_FILE = new Path(TEST_DIR, "file");
 
     private static final String TEST_DIR_STR = TEST_DIR.toUri().getPath();
 

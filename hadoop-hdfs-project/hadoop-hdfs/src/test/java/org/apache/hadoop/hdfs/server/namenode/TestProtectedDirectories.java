@@ -74,7 +74,7 @@ public class TestProtectedDirectories {
         try {
             cluster.waitActive();
             FileSystem fs = cluster.getFileSystem();
-            for (PathInterface path : Iterables.concat(protectedDirs, unProtectedDirs)) {
+            for (Path path : Iterables.concat(protectedDirs, unProtectedDirs)) {
                 fs.mkdirs(path);
             }
             return cluster;
@@ -169,7 +169,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface path : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path path : testMatrixEntry.getAllPathsToBeDeleted()) {
                     final long countBefore = cluster.getNamesystem().getFilesTotal();
                     assertThat(testMatrixEntry + ": Testing whether " + path + " can be deleted", deletePath(fs, path), is(testMatrixEntry.canPathBeDeleted(path)));
                     final long countAfter = cluster.getNamesystem().getFilesTotal();
@@ -192,7 +192,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface path : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path path : testMatrixEntry.getAllPathsToBeDeleted()) {
                     assertThat(testMatrixEntry + ": Testing whether " + path + " can be moved to trash", moveToTrash(fs, path, conf), is(testMatrixEntry.canPathBeDeleted(path)));
                 }
             } finally {
@@ -212,7 +212,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
                     assertThat(testMatrixEntry + ": Testing whether " + srcPath + " can be renamed", renamePath(fs, srcPath, new Path(srcPath.toString() + "_renamed")), is(testMatrixEntry.canPathBeRenamed(srcPath)));
                 }
             } finally {
@@ -230,7 +230,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
                     assertThat(testMatrixEntry + ": Testing whether " + srcPath + " can be renamed", renamePath(fs, srcPath, new Path(srcPath.toString() + "_renamed")), is(testMatrixEntry.canPathBeRenamed(srcPath)));
                 }
             } finally {
@@ -249,7 +249,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path srcPath : testMatrixEntry.getAllPathsToBeDeleted()) {
                     assertThat(testMatrixEntry + ": Testing whether " + srcPath + " can be moved to trash", moveToTrash(fs, srcPath, conf), is(testMatrixEntry.canPathBeRenamed(srcPath)));
                 }
             } finally {
@@ -267,7 +267,7 @@ public class TestProtectedDirectories {
             try {
                 LOG.info("Running {}", testMatrixEntry);
                 FileSystem fs = cluster.getFileSystem();
-                for (PathInterface path : testMatrixEntry.getAllPathsToBeDeleted()) {
+                for (Path path : testMatrixEntry.getAllPathsToBeDeleted()) {
                     final long countBefore = cluster.getNamesystem().getFilesTotal();
                     assertThat(testMatrixEntry + ": Testing whether " + path + " can be deleted", deletePath(fs, path), is(testMatrixEntry.canPathBeDeleted(path)));
                     final long countAfter = cluster.getNamesystem().getFilesTotal();

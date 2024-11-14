@@ -121,7 +121,7 @@ public class TestHDFSConcat {
         int i;
         for (i = 0; i < files.length; i++) {
             files[i] = new Path("/file" + i);
-            PathInterface path = files[i];
+            Path path = files[i];
             System.out.println("Creating file " + path);
             // make files with different content
             DFSTestUtil.createFile(dfs, path, fileLen, REPL_FACTOR, i);
@@ -137,7 +137,7 @@ public class TestHDFSConcat {
             stm.close();
         }
         // check permissions -try the operation with the "wrong" user
-        final UserGroupInformationInterface user1 = UserGroupInformation.createUserForTesting("theDoctor", new String[] { "tardis" });
+        final UserGroupInformation user1 = UserGroupInformation.createUserForTesting("theDoctor", new String[] { "tardis" });
         DistributedFileSystem hdfs = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(user1, conf);
         try {
             hdfs.concat(trgPath, files);
@@ -150,7 +150,7 @@ public class TestHDFSConcat {
         ContentSummaryInterface cBefore = dfs.getContentSummary(trgPath.getParent());
         // resort file array, make INode id not sorted.
         for (int j = 0; j < files.length / 2; j++) {
-            PathInterface tempPath = files[j];
+            Path tempPath = files[j];
             files[j] = files[files.length - 1 - j];
             files[files.length - 1 - j] = tempPath;
             byte[] tempBytes = bytes[1 + j];
@@ -185,7 +185,7 @@ public class TestHDFSConcat {
         // 2. file lengths
         assertEquals(trgLen, totalLen);
         // 3. removal of the src file
-        for (PathInterface p : files) {
+        for (Path p : files) {
             fStatus = nn.getFileInfo(p.toUri().getPath());
             // file shouldn't exist
             assertNull("File " + p + " still exists", fStatus);
@@ -230,14 +230,14 @@ public class TestHDFSConcat {
         // 2. Verify the concat operation basically worked, and record
         // file status.
         assertTrue(dfs.exists(targetFile));
-        FileStatusInterface origStatus = dfs.getFileStatus(targetFile);
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
         // 3. Restart NN to force replay from edit log
         cluster.restartNameNode(true);
         // 4. Verify concat operation was replayed correctly and file status
         // did not change.
         assertTrue(dfs.exists(targetFile));
         assertFalse(dfs.exists(srcFiles[0]));
-        FileStatusInterface statusAfterRestart = dfs.getFileStatus(targetFile);
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
         assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
     }
 
@@ -276,7 +276,7 @@ public class TestHDFSConcat {
         byte[] byteFile1 = new byte[(int) trgFileLen];
         stm.readFully(0, byteFile1);
         stm.close();
-        LocatedBlocksInterface lb1 = nn.getBlockLocations(name1, 0, trgFileLen);
+        LocatedBlocks lb1 = nn.getBlockLocations(name1, 0, trgFileLen);
         Path filePath2 = new Path(name2);
         DFSTestUtil.createFile(dfs, filePath2, srcFileLen, REPL_FACTOR, 1);
         fStatus = nn.getFileInfo(name2);
@@ -287,7 +287,7 @@ public class TestHDFSConcat {
         byte[] byteFile2 = new byte[(int) srcFileLen];
         stm.readFully(0, byteFile2);
         stm.close();
-        LocatedBlocksInterface lb2 = nn.getBlockLocations(name2, 0, srcFileLen);
+        LocatedBlocks lb2 = nn.getBlockLocations(name2, 0, srcFileLen);
         System.out.println("trg len=" + trgFileLen + "; src len=" + srcFileLen);
         // move the blocks
         dfs.concat(filePath1, new Path[] { filePath2 });
@@ -299,7 +299,7 @@ public class TestHDFSConcat {
         byte[] byteFileConcat = new byte[(int) fileLen];
         stm.readFully(0, byteFileConcat);
         stm.close();
-        LocatedBlocksInterface lbConcat = nn.getBlockLocations(name1, 0, fileLen);
+        LocatedBlocks lbConcat = nn.getBlockLocations(name1, 0, fileLen);
         //verifications
         // 1. number of blocks
         assertEquals(lbConcat.locatedBlockCount(), lb1.locatedBlockCount() + lb2.locatedBlockCount());

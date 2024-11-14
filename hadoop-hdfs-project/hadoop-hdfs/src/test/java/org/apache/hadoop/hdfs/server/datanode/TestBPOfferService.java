@@ -97,7 +97,7 @@ public class TestBPOfferService {
 
     protected static final Logger LOG = LoggerFactory.getLogger(TestBPOfferService.class);
 
-    private static final ExtendedBlockInterface FAKE_BLOCK = new ExtendedBlock(FAKE_BPID, 12345L);
+    private static final ExtendedBlock FAKE_BLOCK = new ExtendedBlock(FAKE_BPID, 12345L);
 
     private static final File TEST_BUILD_DATA = PathUtils.getTestDir(TestBPOfferService.class);
 
@@ -1017,7 +1017,7 @@ public class TestBPOfferService {
             FileSystem fs = cluster.getFileSystem();
             Path file = new Path("/test");
             DFSTestUtil.createFile(fs, file, 10240L, (short) 1, 0L);
-            MetricsRecordBuilderInterface mrb = getMetrics(datanode.getMetrics().name());
+            MetricsRecordBuilder mrb = getMetrics(datanode.getMetrics().name());
             assertTrue("Process command nums is not expected.", getLongCounter("NumProcessedCommands", mrb) > 0);
             assertEquals(0, getLongCounter("SumOfActorCommandQueueLength", mrb));
             // Check new metric result about processedCommandsOp.

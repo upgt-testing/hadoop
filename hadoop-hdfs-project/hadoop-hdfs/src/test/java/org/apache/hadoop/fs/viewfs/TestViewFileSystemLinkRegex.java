@@ -114,7 +114,7 @@ public class TestViewFileSystemLinkRegex extends ViewFileSystemBaseTest {
     @Override
     void initializeTargetTestRoot() throws IOException {
         targetTestRoot = fsDefault.makeQualified(new Path("/"));
-        for (FileStatusInterface status : fsDefault.listStatus(targetTestRoot)) {
+        for (FileStatus status : fsDefault.listStatus(targetTestRoot)) {
             fsDefault.delete(status.getPath(), true);
         }
     }
@@ -154,7 +154,7 @@ public class TestViewFileSystemLinkRegex extends ViewFileSystemBaseTest {
     private void createDirWithChildren(FileSystem fileSystem, Path dir, List<Path> childrenFiles) throws IOException {
         Assert.assertTrue(fileSystem.mkdirs(dir));
         int index = 0;
-        for (PathInterface childFile : childrenFiles) {
+        for (Path childFile : childrenFiles) {
             createFile(fileSystem, childFile, index, true);
         }
     }

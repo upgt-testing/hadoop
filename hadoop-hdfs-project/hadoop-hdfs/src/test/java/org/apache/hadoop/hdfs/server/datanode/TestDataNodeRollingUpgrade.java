@@ -112,9 +112,9 @@ public class TestDataNodeRollingUpgrade {
      * Test assumes that the file has a single block
      */
     private File getBlockForFile(Path path, boolean exists) throws IOException {
-        LocatedBlocksInterface blocks = nn.getRpcServer().getBlockLocations(path.toString(), 0, Long.MAX_VALUE);
+        LocatedBlocks blocks = nn.getRpcServer().getBlockLocations(path.toString(), 0, Long.MAX_VALUE);
         assertEquals("The test helper functions assume that each file has a single block", 1, blocks.getLocatedBlocks().size());
-        ExtendedBlockInterface block = blocks.getLocatedBlocks().get(0).getBlock();
+        ExtendedBlock block = blocks.getLocatedBlocks().get(0).getBlock();
         BlockLocalPathInfoInterface bInfo = dn0.getFSDataset().getBlockLocalPathInfo(block);
         File blockFile = new File(bInfo.getBlockPath());
         assertEquals(exists, blockFile.exists());

@@ -60,7 +60,7 @@ public class TestReconstructStripedBlocks {
 
     public static final Logger LOG = LoggerFactory.getLogger(TestReconstructStripedBlocks.class);
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int cellSize = ecPolicy.getCellSize();
 
@@ -74,9 +74,9 @@ public class TestReconstructStripedBlocks {
 
     private MiniDockerDFSCluster cluster;
 
-    private final PathInterface dirPath = new Path("/dir");
+    private final Path dirPath = new Path("/dir");
 
-    private PathInterface filePath = new Path(dirPath, "file");
+    private Path filePath = new Path(dirPath, "file");
 
     private int maxReplicationStreams = DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_DEFAULT;
 
@@ -126,7 +126,7 @@ public class TestReconstructStripedBlocks {
             assertTrue(fileNode.isStriped());
             BlockInfo[] blocks = fileNode.getBlocks();
             assertEquals(numBlocks, blocks.length);
-            for (BlockInfoInterface blk : blocks) {
+            for (BlockInfo blk : blocks) {
                 assertTrue(blk.isStriped());
                 assertTrue(blk.isComplete());
                 assertEquals(cellSize * dataBlocks, blk.getNumBytes());
@@ -134,7 +134,7 @@ public class TestReconstructStripedBlocks {
                 assertEquals(groupSize, sb.numNodes());
             }
             final BlockManagerInterface bm = cluster.getNamesystem().getBlockManager();
-            BlockInfoInterface firstBlock = fileNode.getBlocks()[0];
+            BlockInfo firstBlock = fileNode.getBlocks()[0];
             DatanodeStorageInfo[] storageInfos = bm.getStorages(firstBlock);
             // make numOfBusy nodes busy
             int i = 0;
@@ -200,7 +200,7 @@ public class TestReconstructStripedBlocks {
             DFSTestUtil.waitForReplication(fs, p, groupSize, 5000);
             BlockManagerTestUtil.updateState(bm);
             DFSTestUtil.verifyClientStats(conf, cluster);
-            LocatedStripedBlockInterface lb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(p.toString(), 0).get(0);
+            LocatedStripedBlock lb = (LocatedStripedBlock) fs.getClient().getLocatedBlocks(p.toString(), 0).get(0);
             LocatedBlock[] lbs = StripedBlockUtil.parseStripedBlockGroup(lb, cellSize, dataBlocks, parityBlocks);
             BlockManagerTestUtil.getComputedDatanodeWork(bm);
             BlockManagerTestUtil.updateState(bm);
@@ -259,8 +259,8 @@ public class TestReconstructStripedBlocks {
             fs.setErasureCodingPolicy(dirPath, StripedFileTestUtil.getDefaultECPolicy().getName());
             DFSTestUtil.createFile(fs, filePath, cellSize * dataBlocks * 2, (short) 1, 0L);
             // stop a dn
-            LocatedBlocksInterface blks = fs.getClient().getLocatedBlocks(filePath.toString(), 0);
-            LocatedStripedBlockInterface block = (LocatedStripedBlock) blks.getLastLocatedBlock();
+            LocatedBlocks blks = fs.getClient().getLocatedBlocks(filePath.toString(), 0);
+            LocatedStripedBlock block = (LocatedStripedBlock) blks.getLastLocatedBlock();
             DatanodeInfoInterface dnToStop = block.getLocations()[0];
             MiniDockerDFSCluster.DataNodeProperties dnProp = cluster.stopDataNode(dnToStop.getXferAddr());
             cluster.setDataNodeDead(dnToStop);
@@ -294,7 +294,7 @@ public class TestReconstructStripedBlocks {
                 NumberReplicasInterface num = null;
                 fsn.readLock();
                 try {
-                    BlockInfoInterface blockInfo = cluster.getNamesystem().getFSDirectory().getINode4Write(filePath.toString()).asFile().getLastBlock();
+                    BlockInfo blockInfo = cluster.getNamesystem().getFSDirectory().getINode4Write(filePath.toString()).asFile().getLastBlock();
                     num = bm.countNodes(blockInfo);
                 } finally {
                     fsn.readUnlock();
@@ -331,7 +331,7 @@ public class TestReconstructStripedBlocks {
         conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1000);
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_INTERVAL_SECONDS_KEY, 1000);
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_WORK_MULTIPLIER_PER_ITERATION, 5);
-        ErasureCodingPolicyInterface policy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
+        ErasureCodingPolicy policy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.XOR_2_1_POLICY_ID);
         Path ecDir = new Path("/ec");
         Path ecFilePath = new Path(ecDir, "ec-file");
         int blockGroups = 2;
@@ -345,9 +345,9 @@ public class TestReconstructStripedBlocks {
             fs.setErasureCodingPolicy(ecDir, policy.getName());
             DFSTestUtil.createStripedFile(dfsCluster, ecFilePath, ecDir, blockGroups, 2, false, policy);
             final BlockManagerInterface bm = dfsCluster.getNamesystem().getBlockManager();
-            LocatedBlocksInterface lbs = fs.getClient().getNamenode().getBlockLocations(ecFilePath.toString(), 0, blockGroups);
+            LocatedBlocks lbs = fs.getClient().getNamenode().getBlockLocations(ecFilePath.toString(), 0, blockGroups);
             assert lbs.get(0) instanceof LocatedStripedBlock;
-            LocatedStripedBlockInterface bg = (LocatedStripedBlock) (lbs.get(0));
+            LocatedStripedBlock bg = (LocatedStripedBlock) (lbs.get(0));
             Iterator<DatanodeStorageInfo> storageInfos = bm.getStorages(bg.getBlock().getLocalBlock()).iterator();
             DatanodeDescriptorInterface firstDn = storageInfos.next().getDatanodeDescriptor();
             BlockManagerTestUtil.updateState(bm);

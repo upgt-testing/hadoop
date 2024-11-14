@@ -91,7 +91,7 @@ public class TestPendingReconstruction {
         //
         DatanodeStorageInfo[] storages = DFSTestUtil.createDatanodeStorageInfos(10);
         for (int i = 0; i < storages.length; i++) {
-            BlockInfoInterface block = genBlockInfo(i, i, 0);
+            BlockInfo block = genBlockInfo(i, i, 0);
             DatanodeStorageInfo[] targets = new DatanodeStorageInfo[i];
             System.arraycopy(storages, 0, targets, 0, i);
             pendingReconstructions.increment(block, targets);
@@ -100,7 +100,7 @@ public class TestPendingReconstruction {
         //
         // remove one item
         //
-        BlockInfoInterface blk = genBlockInfo(8, 8, 0);
+        BlockInfo blk = genBlockInfo(8, 8, 0);
         // removes one replica
         pendingReconstructions.decrement(blk, storages[7]);
         assertEquals("pendingReconstructions.getNumReplicas ", 7, pendingReconstructions.getNumReplicas(blk));
@@ -121,7 +121,7 @@ public class TestPendingReconstruction {
         // are sane.
         //
         for (int i = 0; i < 10; i++) {
-            BlockInfoInterface block = genBlockInfo(i, i, 0);
+            BlockInfo block = genBlockInfo(i, i, 0);
             int numReplicas = pendingReconstructions.getNumReplicas(block);
             assertTrue(numReplicas == i);
         }
@@ -138,7 +138,7 @@ public class TestPendingReconstruction {
         } catch (Exception ignored) {
         }
         for (int i = 10; i < 15; i++) {
-            BlockInfoInterface block = genBlockInfo(i, i, 0);
+            BlockInfo block = genBlockInfo(i, i, 0);
             pendingReconstructions.increment(block, DFSTestUtil.createDatanodeStorageInfos(i));
         }
         assertEquals(15, pendingReconstructions.size());
@@ -165,7 +165,7 @@ public class TestPendingReconstruction {
         assertEquals(15, timedOut.length);
         // Verify the number is not reset
         assertEquals(15L, pendingReconstructions.getNumTimedOuts());
-        for (BlockInterface block : timedOut) {
+        for (Block block : timedOut) {
             assertTrue(block.getBlockId() < 15);
         }
         pendingReconstructions.stop();
@@ -180,8 +180,8 @@ public class TestPendingReconstruction {
         final Configuration conf = new HdfsConfiguration();
         conf.setLong(DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, TIMEOUT);
         MiniDockerDFSCluster cluster = null;
-        BlockInterface block;
-        BlockInfoInterface blockInfo;
+        Block block;
+        BlockInfo blockInfo;
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(DATANODE_COUNT).build();
             cluster.waitActive();
@@ -201,7 +201,7 @@ public class TestPendingReconstruction {
             blockInfo.setGenerationStamp(1);
             blocksMap.addBlockCollection(blockInfo, bc);
             //Save it for later.
-            BlockInfoInterface storedBlock = blockInfo;
+            BlockInfo storedBlock = blockInfo;
             assertEquals("Size of pendingReconstructions ", 1, pendingReconstruction.size());
             // Add a second block to pendingReconstructions that has no
             // corresponding entry in blocksmap
@@ -230,7 +230,7 @@ public class TestPendingReconstruction {
             }
             // Verify that the generation stamp we will try to replicate
             // is now 1
-            for (BlockInterface b : neededReconstruction) {
+            for (Block b : neededReconstruction) {
                 assertEquals("Generation stamp is 1 ", 1, b.getGenerationStamp());
             }
             // Verify size of neededReconstruction is exactly 1.
@@ -304,7 +304,7 @@ public class TestPendingReconstruction {
             INodeFileInterface fileNode = fsn.getFSDirectory().getINode4Write(file).asFile();
             BlockInfo[] blocks = fileNode.getBlocks();
             assertEquals(DATANODE_COUNT - 1, blkManager.pendingReconstruction.getNumReplicas(blocks[0]));
-            LocatedBlockInterface locatedBlock = hdfs.getClient().getLocatedBlocks(file, 0).get(0);
+            LocatedBlock locatedBlock = hdfs.getClient().getLocatedBlocks(file, 0).get(0);
             DatanodeInfoInterface existingDn = (locatedBlock.getLocations())[0];
             int reportDnNum = 0;
             String poolId = cluster.getNamesystem().getBlockPoolId();
@@ -373,7 +373,7 @@ public class TestPendingReconstruction {
                 DataNodeTestUtils.setHeartbeatsDisabledForTests(dn, true);
             }
             // 3. mark a couple of blocks as corrupt
-            LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
+            LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
             cluster.getNamesystem().writeLock();
             try {
                 bm.findAndMarkBlockAsCorrupt(block.getBlock(), block.getLocations()[0], "STORAGE_ID", "TEST");
@@ -381,7 +381,7 @@ public class TestPendingReconstruction {
                 BlockManagerTestUtil.computeAllPendingWork(bm);
                 BlockManagerTestUtil.updateState(bm);
                 assertEquals(bm.getPendingReconstructionBlocksCount(), 1L);
-                BlockInfoInterface storedBlock = bm.getStoredBlock(block.getBlock().getLocalBlock());
+                BlockInfo storedBlock = bm.getStoredBlock(block.getBlock().getLocalBlock());
                 assertEquals(bm.pendingReconstruction.getNumReplicas(storedBlock), 2);
             } finally {
                 cluster.getNamesystem().writeUnlock();
@@ -437,7 +437,7 @@ public class TestPendingReconstruction {
             blocksMap.addBlockCollection(blockInfo1, bc1);
             blocksMap.addBlockCollection(blockInfo2, bc2);
             PendingReconstructionBlocks pending = bm.pendingReconstruction;
-            MetricsRecordBuilderInterface rb = getMetrics("NameNodeActivity");
+            MetricsRecordBuilder rb = getMetrics("NameNodeActivity");
             assertCounter("SuccessfulReReplications", 0L, rb);
             assertCounter("NumTimesReReplicationNotScheduled", 0L, rb);
             assertCounter("TimeoutReReplications", 0L, rb);
@@ -455,7 +455,7 @@ public class TestPendingReconstruction {
 
                 @Override
                 public Boolean get() {
-                    MetricsRecordBuilderInterface rb = getMetrics("NameNodeActivity");
+                    MetricsRecordBuilder rb = getMetrics("NameNodeActivity");
                     return getLongCounter("SuccessfulReReplications", rb) == 1 && getLongCounter("NumTimesReReplicationNotScheduled", rb) == 1 && getLongCounter("TimeoutReReplications", rb) == 1;
                 }
             }, 100, 60000);
@@ -486,7 +486,7 @@ public class TestPendingReconstruction {
             DatanodeManagerInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
             ArrayList<DatanodeDescriptor> dnList = new ArrayList<DatanodeDescriptor>();
             datanodeManager.fetchDatanodes(dnList, dnList, false);
-            LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
+            LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
             // 3. set replication as 3
             dfs.setReplication(filePath, (short) 3);
             // 4 compute replication work twice to make sure the same DN is not adding

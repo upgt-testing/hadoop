@@ -70,7 +70,7 @@ public class TestBlockCountersInPendingIBR {
         try (FsDatasetSpi.FsVolumeReferences volumes = dataset.getFsVolumeReferences()) {
             storage = dataset.getStorage(volumes.get(0).getStorageID());
         }
-        ReceivedDeletedBlockInfoInterface rdbi = null;
+        ReceivedDeletedBlockInfo rdbi = null;
         /* block at status of RECEIVING_BLOCK */
         rdbi = new ReceivedDeletedBlockInfo(new Block(5678, 512, 1000), BlockStatus.RECEIVING_BLOCK, null);
         actor.getIbrManager().addRDBI(rdbi, storage);
@@ -95,7 +95,7 @@ public class TestBlockCountersInPendingIBR {
     }
 
     private void verifyBlockCounters(final DataNode datanode, final long blocksInPendingIBR, final long blocksReceivingInPendingIBR, final long blocksReceivedInPendingIBR, final long blocksDeletedInPendingIBR) {
-        final MetricsRecordBuilderInterface m = MetricsAsserts.getMetrics(datanode.getMetrics().name());
+        final MetricsRecordBuilder m = MetricsAsserts.getMetrics(datanode.getMetrics().name());
         MetricsAsserts.assertGauge("BlocksInPendingIBR", blocksInPendingIBR, m);
         MetricsAsserts.assertGauge("BlocksReceivingInPendingIBR", blocksReceivingInPendingIBR, m);
         MetricsAsserts.assertGauge("BlocksReceivedInPendingIBR", blocksReceivedInPendingIBR, m);

@@ -47,7 +47,7 @@ public class TestWebHdfsFileContextMainOperations extends FileContextMainOperati
 
     protected static MiniDockerDFSCluster cluster;
 
-    private static PathInterface defaultWorkingDirectory;
+    private static Path defaultWorkingDirectory;
 
     protected static URI webhdfsUrl;
 
@@ -116,7 +116,7 @@ public class TestWebHdfsFileContextMainOperations extends FileContextMainOperati
      * TODO: Open JIRA for the idiosyncrasies between hdfs and webhdfs
      */
     public void testSetVerifyChecksum() throws IOException {
-        final PathInterface rootPath = getTestRootPath(fc, "test");
+        final Path rootPath = getTestRootPath(fc, "test");
         final Path path = new Path(rootPath, "zoo");
         FSDataOutputStream out = fc.create(path, EnumSet.of(CREATE), Options.CreateOpts.createParent());
         try {
@@ -129,7 +129,7 @@ public class TestWebHdfsFileContextMainOperations extends FileContextMainOperati
         // immediately after the creation call.
         // instruct FS to verify checksum through the FileContext:
         fc.setVerifyChecksum(true, path);
-        FileStatusInterface fileStatus = fc.getFileStatus(path);
+        FileStatus fileStatus = fc.getFileStatus(path);
         final long len = fileStatus.getLen();
         assertTrue(len == data.length);
         byte[] bb = new byte[(int) len];

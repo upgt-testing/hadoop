@@ -94,7 +94,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block with a replication factor of 3
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 1, REPLICATION_FACTOR, 0);
             // Add a new datanode on a different rack
             String[] newRacks = { "/rack2" };
@@ -123,7 +123,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block with a replication factor of 1
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 1, REPLICATION_FACTOR, 0);
             REPLICATION_FACTOR = 2;
             NameNodeAdapter.setReplication(ns, "/testFile", REPLICATION_FACTOR);
@@ -159,7 +159,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block with a replication factor of 3
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, replicationFactor, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitReplication(cluster.getFileSystem(), filePath, replicationFactor);
             // Add datanode on rack2 and wait for it be recognized as alive by NN
             cluster.startDataNodes(conf, 1, true, null, new String[] { "/rack2" });
@@ -204,7 +204,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 1, REPLICATION_FACTOR, 0);
             // Add new datanodes on a different rack and increase the
             // replication factor so the block is underreplicated and make
@@ -238,7 +238,7 @@ public class TestBlocksWithNotEnoughRacks {
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, fileLen, REPLICATION_FACTOR, 1L);
             final byte[] fileContent = DFSTestUtil.readFileAsBytes(fs, filePath);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Corrupt a replica of the block
             int dnToCorrupt = DFSTestUtil.firstDnWithBlock(cluster, b);
@@ -279,7 +279,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Decrease the replication factor, make sure the deleted replica
             // was not the one that lived on the rack with only one replica,
@@ -310,7 +310,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block with a replication factor of 3
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Make the last datanode look like it failed to heartbeat by
             // calling removeDatanode and stopping it.
@@ -359,7 +359,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Make the last (cross rack) datanode look like it failed
             // to heartbeat by stopping it and calling removeDatanode.
@@ -405,7 +405,7 @@ public class TestBlocksWithNotEnoughRacks {
             // Create a file with one block
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Decommission one of the hosts with the block, this should cause
             // the block to get replicated to another host on the same rack,
@@ -441,7 +441,7 @@ public class TestBlocksWithNotEnoughRacks {
         try {
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, REPLICATION_FACTOR, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             DFSTestUtil.waitForReplication(cluster, b, 2, REPLICATION_FACTOR, 0);
             // Lower the replication factor so the blocks are over replicated
             REPLICATION_FACTOR = 2;
@@ -482,9 +482,9 @@ public class TestBlocksWithNotEnoughRacks {
             // No upgrade domains are set.
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, replicationFactor, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             BlockManagerInterface bm = cluster.getNamesystem().getBlockManager();
-            BlockInfoInterface storedBlock = bm.getStoredBlock(b.getLocalBlock());
+            BlockInfo storedBlock = bm.getStoredBlock(b.getLocalBlock());
             // The block should be replicated OK - so Reconstruction Work will be null
             BlockReconstructionWorkInterface work = scheduleReconstruction(cluster.getNamesystem(), storedBlock, 2);
             assertNull(work);
@@ -539,7 +539,7 @@ public class TestBlocksWithNotEnoughRacks {
         try {
             final FileSystem fs = cluster.getFileSystem();
             DFSTestUtil.createFile(fs, filePath, 1L, (short) 1, 1L);
-            ExtendedBlockInterface b = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, filePath);
             fs.setReplication(filePath, replicationFactor);
             DFSTestUtil.waitForReplication(cluster, b, 2, replicationFactor, 0, 3);
         } finally {

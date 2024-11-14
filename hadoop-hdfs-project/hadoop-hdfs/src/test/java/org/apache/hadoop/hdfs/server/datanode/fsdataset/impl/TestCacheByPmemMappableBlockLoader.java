@@ -222,7 +222,7 @@ public class TestCacheByPmemMappableBlockLoader {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksCached = MetricsAsserts.getLongCounter("BlocksCached", dnMetrics);
                 if (blocksCached != maxCacheBlocksNum) {
                     LOG.info("waiting for " + maxCacheBlocksNum + " blocks to " + "be cached. Right now " + blocksCached + " blocks are cached.");
@@ -269,7 +269,7 @@ public class TestCacheByPmemMappableBlockLoader {
         final long smallFileCacheDirectiveId = fs.addCacheDirective(new CacheDirectiveInfo.Builder().setPool("testPool").setPath(smallTestFile).setReplication((short) 1).build());
         // Wait for enough time to verify smallTestFile could not be cached.
         Thread.sleep(10000);
-        MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+        MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
         long blocksCached = MetricsAsserts.getLongCounter("BlocksCached", dnMetrics);
         // The cached block num should not be increased.
         assertTrue(blocksCached == maxCacheBlocksNum);
@@ -286,7 +286,7 @@ public class TestCacheByPmemMappableBlockLoader {
 
             @Override
             public Boolean get() {
-                MetricsRecordBuilderInterface dnMetrics = getMetrics(dn.getMetrics().name());
+                MetricsRecordBuilder dnMetrics = getMetrics(dn.getMetrics().name());
                 long blocksUncached = MetricsAsserts.getLongCounter("BlocksUncached", dnMetrics);
                 if (blocksUncached != maxCacheBlocksNum) {
                     LOG.info("waiting for " + maxCacheBlocksNum + " blocks to be " + "uncached. Right now " + blocksUncached + " blocks are uncached.");

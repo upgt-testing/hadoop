@@ -107,7 +107,7 @@ public class TestFileTruncate {
 
     static DistributedFileSystem fs;
 
-    private PathInterface parent;
+    private Path parent;
 
     @Before
     public void setUp() throws IOException {
@@ -202,7 +202,7 @@ public class TestFileTruncate {
         writeContents(data, data.length, p);
         final String snapshot = "s0";
         fs.createSnapshot(dir, snapshot);
-        BlockInterface lastBlock = getLocatedBlocks(p).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block lastBlock = getLocatedBlocks(p).getLastLocatedBlock().getBlock().getLocalBlock();
         final int newLength = data.length - 1;
         assert newLength % BLOCK_SIZE != 0 : " newLength must not be multiple of BLOCK_SIZE";
         final boolean isReady = fs.truncate(p, newLength);
@@ -320,18 +320,18 @@ public class TestFileTruncate {
         int[] length = new int[4];
         length[0] = 2 * BLOCK_SIZE + BLOCK_SIZE / 2;
         DFSTestUtil.createFile(fs, src, 64, length[0], BLOCK_SIZE, REPLICATION, 0L);
-        BlockInterface firstBlk = getLocatedBlocks(src).get(0).getBlock().getLocalBlock();
+        Block firstBlk = getLocatedBlocks(src).get(0).getBlock().getLocalBlock();
         Path[] snapshotFiles = new Path[4];
         // Diskspace consumed should be 10 bytes * 3. [blk 1,2,3]
         ContentSummaryInterface contentSummary = fs.getContentSummary(parent);
         assertThat(contentSummary.getSpaceConsumed(), is(30L));
         // Add file to snapshot and append
         String[] ss = new String[] { "ss0", "ss1", "ss2", "ss3" };
-        PathInterface snapshotDir = fs.createSnapshot(parent, ss[0]);
+        Path snapshotDir = fs.createSnapshot(parent, ss[0]);
         snapshotFiles[0] = new Path(snapshotDir, truncateFile);
         length[1] = length[2] = length[0] + BLOCK_SIZE + 1;
         DFSTestUtil.appendFile(fs, src, BLOCK_SIZE + 1);
-        BlockInterface lastBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block lastBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
         // Diskspace consumed should be 15 bytes * 3. [blk 1,2,3,4]
         contentSummary = fs.getContentSummary(parent);
         assertThat(contentSummary.getSpaceConsumed(), is(45L));
@@ -342,7 +342,7 @@ public class TestFileTruncate {
         snapshotDir = fs.createSnapshot(parent, ss[2]);
         snapshotFiles[2] = new Path(snapshotDir, truncateFile);
         DFSTestUtil.appendFile(fs, src, BLOCK_SIZE - 1 + BLOCK_SIZE / 2);
-        BlockInterface appendedBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block appendedBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
         // Diskspace consumed should be 20 bytes * 3. [blk 1,2,3,4,5]
         contentSummary = fs.getContentSummary(parent);
         assertThat(contentSummary.getSpaceConsumed(), is(60L));
@@ -376,7 +376,7 @@ public class TestFileTruncate {
         assertFileLength(snapshotFiles[2], length[2]);
         assertFileLength(snapshotFiles[1], length[1]);
         assertFileLength(snapshotFiles[0], length[0]);
-        BlockInterface replacedBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block replacedBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
         // Diskspace consumed should be 16 bytes * 3. [blk 1,6 SS:2,3,4]
         contentSummary = fs.getContentSummary(parent);
         assertThat(contentSummary.getSpaceConsumed(), is(54L));
@@ -458,15 +458,15 @@ public class TestFileTruncate {
         int[] length = new int[3];
         length[0] = 3 * BLOCK_SIZE;
         DFSTestUtil.createFile(fs, src, 64, length[0], BLOCK_SIZE, REPLICATION, 0L);
-        BlockInterface firstBlk = getLocatedBlocks(src).get(0).getBlock().getLocalBlock();
-        BlockInterface lastBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block firstBlk = getLocatedBlocks(src).get(0).getBlock().getLocalBlock();
+        Block lastBlk = getLocatedBlocks(src).getLastLocatedBlock().getBlock().getLocalBlock();
         Path[] snapshotFiles = new Path[3];
         // Diskspace consumed should be 12 bytes * 3. [blk 1,2,3]
         ContentSummaryInterface contentSummary = fs.getContentSummary(parent);
         assertThat(contentSummary.getSpaceConsumed(), is(36L));
         // Add file to snapshot and append
         String[] ss = new String[] { "ss0", "ss1", "ss2" };
-        PathInterface snapshotDir = fs.createSnapshot(parent, ss[0]);
+        Path snapshotDir = fs.createSnapshot(parent, ss[0]);
         snapshotFiles[0] = new Path(snapshotDir, truncateFile);
         length[1] = 2 * BLOCK_SIZE;
         boolean isReady = fs.truncate(src, 2 * BLOCK_SIZE);
@@ -601,7 +601,7 @@ public class TestFileTruncate {
         }
         fs.setPermission(p, FsPermission.createImmutable((short) 0664));
         {
-            final UserGroupInformationInterface fooUgi = UserGroupInformation.createUserForTesting("foo", new String[] { "foo" });
+            final UserGroupInformation fooUgi = UserGroupInformation.createUserForTesting("foo", new String[] { "foo" });
             try {
                 final FileSystem foofs = DFSTestUtil.getFileSystemAs(fooUgi, conf);
                 foofs.truncate(p, 0);
@@ -654,14 +654,14 @@ public class TestFileTruncate {
         byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
         final Path p = new Path(parent, "testTruncateWithDataNodesRestart");
         writeContents(contents, startingFileSize, p);
-        LocatedBlockInterface oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
         int dn = 0;
         int toTruncateLength = 1;
         int newLength = startingFileSize - toTruncateLength;
         cluster.getDataNodes().get(dn).shutdown();
         truncateAndRestartDN(p, dn, newLength);
         checkBlockRecovery(p);
-        LocatedBlockInterface newBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock newBlock = getLocatedBlocks(p).getLastLocatedBlock();
         /*
      * For non copy-on-truncate, the truncated block id is the same, but the 
      * GS should increase.
@@ -679,7 +679,7 @@ public class TestFileTruncate {
         assertEquals(utils.getStoredDataLength(newBlock.getBlock()), newBlock.getBlockSize());
         assertEquals(utils.getStoredGenerationStamp(newBlock.getBlock()), newBlock.getBlock().getGenerationStamp());
         // Validate the file
-        FileStatusInterface fileStatus = fs.getFileStatus(p);
+        FileStatus fileStatus = fs.getFileStatus(p);
         assertThat(fileStatus.getLen(), is((long) newLength));
         checkFullFile(p, newLength, contents);
         fs.delete(parent, true);
@@ -695,7 +695,7 @@ public class TestFileTruncate {
         byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
         final Path p = new Path(parent, "testCopyOnTruncateWithDataNodesRestart");
         writeContents(contents, startingFileSize, p);
-        LocatedBlockInterface oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
         fs.allowSnapshot(parent);
         fs.createSnapshot(parent, "ss0");
         int dn = 1;
@@ -704,7 +704,7 @@ public class TestFileTruncate {
         cluster.getDataNodes().get(dn).shutdown();
         truncateAndRestartDN(p, dn, newLength);
         checkBlockRecovery(p);
-        LocatedBlockInterface newBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock newBlock = getLocatedBlocks(p).getLastLocatedBlock();
         /*
      * For copy-on-truncate, new block is made with new block id and new GS.
      * The replicas of the new block is 2, then it will be replicated to dn1.
@@ -720,7 +720,7 @@ public class TestFileTruncate {
         assertEquals(utils.getStoredDataLength(oldBlock.getBlock()), oldBlock.getBlockSize());
         assertEquals(utils.getStoredGenerationStamp(oldBlock.getBlock()), oldBlock.getBlock().getGenerationStamp());
         // Validate the file
-        FileStatusInterface fileStatus = fs.getFileStatus(p);
+        FileStatus fileStatus = fs.getFileStatus(p);
         assertThat(fileStatus.getLen(), is((long) newLength));
         checkFullFile(p, newLength, contents);
         fs.deleteSnapshot(parent, "ss0");
@@ -737,7 +737,7 @@ public class TestFileTruncate {
         byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
         final Path p = new Path(parent, "testTruncateWithDataNodesRestartImmediately");
         writeContents(contents, startingFileSize, p);
-        LocatedBlockInterface oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock oldBlock = getLocatedBlocks(p).getLastLocatedBlock();
         int dn0 = 0;
         int dn1 = 1;
         int toTruncateLength = 1;
@@ -748,7 +748,7 @@ public class TestFileTruncate {
         cluster.restartDataNode(dn1, false, true);
         cluster.waitActive();
         checkBlockRecovery(p);
-        LocatedBlockInterface newBlock = getLocatedBlocks(p).getLastLocatedBlock();
+        LocatedBlock newBlock = getLocatedBlocks(p).getLastLocatedBlock();
         /*
      * For non copy-on-truncate, the truncated block id is the same, but the 
      * GS should increase.
@@ -769,7 +769,7 @@ public class TestFileTruncate {
         assertEquals(utils.getStoredDataLength(newBlock.getBlock()), newBlock.getBlockSize());
         assertEquals(utils.getStoredGenerationStamp(newBlock.getBlock()), newBlock.getBlock().getGenerationStamp());
         // Validate the file
-        FileStatusInterface fileStatus = fs.getFileStatus(p);
+        FileStatus fileStatus = fs.getFileStatus(p);
         assertThat(fileStatus.getLen(), is((long) newLength));
         checkFullFile(p, newLength, contents);
         fs.delete(parent, true);
@@ -796,7 +796,7 @@ public class TestFileTruncate {
                 Thread.sleep(SLEEP);
             }
             assertFalse("All DataNodes should be down.", cluster.isDataNodeUp());
-            LocatedBlocksInterface blocks = getLocatedBlocks(p);
+            LocatedBlocks blocks = getLocatedBlocks(p);
             assertTrue(blocks.isUnderConstruction());
         } finally {
             cluster.startDataNodes(conf, DATANODE_NUM, true, StartupOption.REGULAR, null);
@@ -846,7 +846,7 @@ public class TestFileTruncate {
         int toTruncate = 1;
         byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
         writeContents(contents, startingFileSize, p);
-        PathInterface snapshotDir = fs.createSnapshot(parent, "ss0");
+        Path snapshotDir = fs.createSnapshot(parent, "ss0");
         Path snapshotFile = new Path(snapshotDir, truncateFile);
         int newLengthBeforeUpgrade = startingFileSize - toTruncate;
         boolean isReady = fs.truncate(p, newLengthBeforeUpgrade);
@@ -858,10 +858,10 @@ public class TestFileTruncate {
         restartCluster(StartupOption.UPGRADE);
         assertThat("SafeMode should be OFF", cluster.getNamesystem().isInSafeMode(), is(false));
         assertThat("NameNode should be performing upgrade.", cluster.getNamesystem().isUpgradeFinalized(), is(false));
-        FileStatusInterface fileStatus = fs.getFileStatus(p);
+        FileStatus fileStatus = fs.getFileStatus(p);
         assertThat(fileStatus.getLen(), is((long) newLengthBeforeUpgrade));
         int newLengthAfterUpgrade = newLengthBeforeUpgrade - toTruncate;
-        BlockInterface oldBlk = getLocatedBlocks(p).getLastLocatedBlock().getBlock().getLocalBlock();
+        Block oldBlk = getLocatedBlocks(p).getLastLocatedBlock().getBlock().getLocalBlock();
         isReady = fs.truncate(p, newLengthAfterUpgrade);
         assertThat("truncate should have triggered block recovery.", isReady, is(false));
         fileStatus = fs.getFileStatus(p);
@@ -904,14 +904,14 @@ public class TestFileTruncate {
         Path srcPath = new Path(src);
         byte[] contents = AppendTestUtil.initBuffer(BLOCK_SIZE);
         writeContents(contents, BLOCK_SIZE, srcPath);
-        INodesInPathInterface iip = fsn.getFSDirectory().getINodesInPath(src, DirOp.WRITE);
+        INodesInPath iip = fsn.getFSDirectory().getINodesInPath(src, DirOp.WRITE);
         INodeFileInterface file = iip.getLastINode().asFile();
         long initialGenStamp = file.getLastBlock().getGenerationStamp();
         // Test that prepareFileForTruncate sets up in-place truncate.
         fsn.writeLock();
         try {
-            BlockInterface oldBlock = file.getLastBlock();
-            BlockInterface truncateBlock = FSDirTruncateOp.prepareFileForTruncate(fsn, iip, client, clientMachine, 1, null);
+            Block oldBlock = file.getLastBlock();
+            Block truncateBlock = FSDirTruncateOp.prepareFileForTruncate(fsn, iip, client, clientMachine, 1, null);
             // In-place truncate uses old block id with new genStamp.
             assertThat(truncateBlock.getBlockId(), is(equalTo(oldBlock.getBlockId())));
             assertThat(truncateBlock.getNumBytes(), is(oldBlock.getNumBytes()));
@@ -935,8 +935,8 @@ public class TestFileTruncate {
         // Test that prepareFileForTruncate sets up copy-on-write truncate
         fsn.writeLock();
         try {
-            BlockInterface oldBlock = file.getLastBlock();
-            BlockInterface truncateBlock = FSDirTruncateOp.prepareFileForTruncate(fsn, iip, client, clientMachine, 1, null);
+            Block oldBlock = file.getLastBlock();
+            Block truncateBlock = FSDirTruncateOp.prepareFileForTruncate(fsn, iip, client, clientMachine, 1, null);
             // Copy-on-write truncate makes new block with new id and genStamp
             assertThat(truncateBlock.getBlockId(), is(not(equalTo(oldBlock.getBlockId()))));
             assertThat(truncateBlock.getNumBytes() < oldBlock.getNumBytes(), is(true));
@@ -1018,7 +1018,7 @@ public class TestFileTruncate {
         final int newLength = fileLength / 3;
         boolean isReady = fs.truncate(link, newLength);
         assertTrue("Recovery is not expected.", isReady);
-        FileStatusInterface fileStatus = fs.getFileStatus(file);
+        FileStatus fileStatus = fs.getFileStatus(file);
         assertThat(fileStatus.getLen(), is((long) newLength));
         ContentSummaryInterface cs = fs.getContentSummary(parent);
         assertEquals("Bad disk space usage", cs.getSpaceConsumed(), newLength * REPLICATION);
@@ -1075,7 +1075,7 @@ public class TestFileTruncate {
     public static void checkBlockRecovery(Path p, DistributedFileSystem dfs, int attempts, long sleepMs) throws IOException {
         boolean success = false;
         for (int i = 0; i < attempts; i++) {
-            LocatedBlocksInterface blocks = getLocatedBlocks(p, dfs);
+            LocatedBlocks blocks = getLocatedBlocks(p, dfs);
             boolean noLastBlock = blocks.getLastLocatedBlock() == null;
             if (!blocks.isUnderConstruction() && (noLastBlock || blocks.isLastBlockComplete())) {
                 success = true;
@@ -1236,7 +1236,7 @@ public class TestFileTruncate {
         // 1. create a file and snapshot for dir which is having a file
         DFSTestUtil.createFile(fs, file, 10, (short) 3, 0);
         fs.allowSnapshot(dir);
-        PathInterface snapshotPath = fs.createSnapshot(dir, "s0");
+        Path snapshotPath = fs.createSnapshot(dir, "s0");
         assertTrue(fs.exists(snapshotPath));
         // 2. move the file
         fs.rename(file, new Path("/"));
@@ -1245,10 +1245,10 @@ public class TestFileTruncate {
         if (!isReady) {
             checkBlockRecovery(movedFile);
         }
-        FileStatusInterface fileStatus = fs.getFileStatus(movedFile);
+        FileStatus fileStatus = fs.getFileStatus(movedFile);
         assertEquals(5, fileStatus.getLen());
         // 4. get block locations of file which is in snapshot
-        LocatedBlocksInterface locations = fs.getClient().getNamenode().getBlockLocations("/dir/.snapshot/s0/file", 0, 10);
+        LocatedBlocks locations = fs.getClient().getNamenode().getBlockLocations("/dir/.snapshot/s0/file", 0, 10);
         assertEquals(10, locations.get(0).getBlockSize());
     }
 }

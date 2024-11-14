@@ -105,7 +105,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme {
             fs.initialize(defaultFSURI, conf);
             try {
                 FileStatus[] statuses = fs.listStatus(new Path("/"));
-                for (FileStatusInterface st : statuses) {
+                for (FileStatus st : statuses) {
                     Assert.assertTrue(fs.delete(st.getPath(), true));
                 }
             } finally {

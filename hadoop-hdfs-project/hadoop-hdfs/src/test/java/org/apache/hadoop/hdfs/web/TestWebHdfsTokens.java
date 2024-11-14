@@ -254,7 +254,7 @@ public class TestWebHdfsTokens {
     @Test
     public void testLazyTokenFetchForWebhdfs() throws Exception {
         MiniDockerDFSCluster cluster = null;
-        UserGroupInformationInterface ugi = null;
+        UserGroupInformation ugi = null;
         try {
             final Configuration clusterConf = new HdfsConfiguration(conf);
             initSecureConf(clusterConf);

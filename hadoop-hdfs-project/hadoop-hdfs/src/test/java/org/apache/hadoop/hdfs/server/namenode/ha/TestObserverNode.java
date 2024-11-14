@@ -90,7 +90,7 @@ public class TestObserverNode {
 
     private static DistributedFileSystem dfs;
 
-    private final PathInterface testPath = new Path("/TestObserverNode");
+    private final Path testPath = new Path("/TestObserverNode");
 
     @BeforeClass
     public static void startUpCluster() throws Exception {
@@ -438,7 +438,7 @@ public class TestObserverNode {
         setObserverRead(true);
         DFSTestUtil.createFile(dfs, testPath, 512, (short) 1, 0);
         DFSTestUtil.waitForReplication(dfs, testPath, (short) 1, 5000);
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(dfs, testPath);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, testPath);
         int dnToCorrupt = DFSTestUtil.firstDnWithBlock(dfsCluster, block);
         FSNamesystemInterface ns = dfsCluster.getNameNode(0).getNamesystem();
         // corrupt Replicas are detected on restarting datanode
@@ -514,7 +514,7 @@ public class TestObserverNode {
 
     static class MkDirRunner implements Runnable {
 
-        private static final PathInterface DIR_PATH = new Path("/TestObserverNode/testMkdirsRaceWithObserverRead");
+        private static final Path DIR_PATH = new Path("/TestObserverNode/testMkdirsRaceWithObserverRead");
 
         private DistributedFileSystem fs;
 
@@ -532,7 +532,7 @@ public class TestObserverNode {
                 fs.mkdirs(DIR_PATH);
                 clientState.lastSeenStateId = HATestUtil.getLastSeenStateId(fs);
                 assertSentTo(fs, 0);
-                FileStatusInterface stat = fs.getFileStatus(DIR_PATH);
+                FileStatus stat = fs.getFileStatus(DIR_PATH);
                 assertSentTo(fs, 2);
                 assertTrue("Should be a directory", stat.isDirectory());
             } catch (FileNotFoundException ioe) {

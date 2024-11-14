@@ -68,7 +68,7 @@ public class TestINodeFileUnderConstructionWithSnapshot {
 
     static final int BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
     Configuration conf;
 
@@ -193,8 +193,8 @@ public class TestINodeFileUnderConstructionWithSnapshot {
         DFSTestUtil.createFile(hdfs, file, BLOCKSIZE, REPLICATION, seed);
         // take a snapshot on root
         SnapshotTestHelper.createSnapshot(hdfs, root, "s1");
-        final PathInterface fileInSnapshot = SnapshotTestHelper.getSnapshotPath(root, "s1", file.getName());
-        FileStatusInterface status = hdfs.getFileStatus(fileInSnapshot);
+        final Path fileInSnapshot = SnapshotTestHelper.getSnapshotPath(root, "s1", file.getName());
+        FileStatus status = hdfs.getFileStatus(fileInSnapshot);
         // make sure we record the size for the file
         assertEquals(BLOCKSIZE, status.getLen());
         // append data to file
@@ -206,18 +206,18 @@ public class TestINodeFileUnderConstructionWithSnapshot {
         status = hdfs.getFileStatus(file);
         assertEquals(BLOCKSIZE * 2 - 1, status.getLen());
         // call DFSClient#callGetBlockLocations for the file in snapshot
-        LocatedBlocksInterface blocks = DFSClientAdapter.callGetBlockLocations(cluster.getNameNodeRpc(), fileInSnapshot.toString(), 0, Long.MAX_VALUE);
+        LocatedBlocks blocks = DFSClientAdapter.callGetBlockLocations(cluster.getNameNodeRpc(), fileInSnapshot.toString(), 0, Long.MAX_VALUE);
         List<LocatedBlock> blockList = blocks.getLocatedBlocks();
         // should be only one block
         assertEquals(BLOCKSIZE, blocks.getFileLength());
         assertEquals(1, blockList.size());
         // check the last block
-        LocatedBlockInterface lastBlock = blocks.getLastLocatedBlock();
+        LocatedBlock lastBlock = blocks.getLastLocatedBlock();
         assertEquals(0, lastBlock.getStartOffset());
         assertEquals(BLOCKSIZE, lastBlock.getBlockSize());
         // take another snapshot
         SnapshotTestHelper.createSnapshot(hdfs, root, "s2");
-        final PathInterface fileInSnapshot2 = SnapshotTestHelper.getSnapshotPath(root, "s2", file.getName());
+        final Path fileInSnapshot2 = SnapshotTestHelper.getSnapshotPath(root, "s2", file.getName());
         // append data to file without closing
         HdfsDataOutputStream out = appendFileWithoutClosing(file, BLOCKSIZE);
         out.hsync(EnumSet.of(SyncFlag.UPDATE_LENGTH));

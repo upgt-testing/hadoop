@@ -107,7 +107,7 @@ public class TestGetContentSummaryWithSnapshot {
         Assert.assertEquals(1, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
         Assert.assertEquals(20, summary.getLength());
-        final PathInterface barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
         summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
         Assert.assertEquals(1, summary.getDirectoryCount());
         Assert.assertEquals(0, summary.getFileCount());
@@ -117,7 +117,7 @@ public class TestGetContentSummaryWithSnapshot {
         Assert.assertEquals(2, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
         Assert.assertEquals(20, summary.getLength());
-        final PathInterface fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
         summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
         Assert.assertEquals(2, summary.getDirectoryCount());
         Assert.assertEquals(0, summary.getFileCount());
@@ -129,7 +129,7 @@ public class TestGetContentSummaryWithSnapshot {
         Assert.assertEquals(1, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
         Assert.assertEquals(30, summary.getLength());
-        final PathInterface fooS2 = SnapshotTestHelper.getSnapshotRoot(foo, "s2");
+        final Path fooS2 = SnapshotTestHelper.getSnapshotRoot(foo, "s2");
         summary = cluster.getNameNodeRpc().getContentSummary(fooS2.toString());
         Assert.assertEquals(2, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
@@ -142,7 +142,7 @@ public class TestGetContentSummaryWithSnapshot {
         Assert.assertEquals(2, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
         Assert.assertEquals(30, summary.getLength());
-        final PathInterface bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
         try {
             cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
             Assert.fail("should get FileNotFoundException");

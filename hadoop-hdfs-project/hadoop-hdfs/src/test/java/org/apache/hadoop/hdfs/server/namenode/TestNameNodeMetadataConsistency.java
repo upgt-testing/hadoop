@@ -40,9 +40,9 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestNameNodeMetadataConsistency {
 
-    private static final PathInterface filePath1 = new Path("/testdata1.txt");
+    private static final Path filePath1 = new Path("/testdata1.txt");
 
-    private static final PathInterface filePath2 = new Path("/testdata2.txt");
+    private static final Path filePath2 = new Path("/testdata2.txt");
 
     private static final String TEST_DATA_IN_FUTURE = "This is test data";
 
@@ -82,7 +82,7 @@ public class TestNameNodeMetadataConsistency {
         ostream.write(TEST_DATA_IN_FUTURE.getBytes());
         ostream.close();
         // Re-write the Generation Stamp to a Generation Stamp in future.
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath1);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath1);
         final long genStamp = block.getGenerationStamp();
         final int datanodeIndex = 0;
         cluster.changeGenStampOfBlock(datanodeIndex, block, genStamp + 1);
@@ -92,7 +92,7 @@ public class TestNameNodeMetadataConsistency {
         // Simulate Namenode forgetting a Block
         cluster.restartNameNode(true);
         cluster.getNameNode().getNamesystem().writeLock();
-        BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
+        BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
         bInfo.delete();
         cluster.getNameNode().getNamesystem().getBlockManager().removeBlock(bInfo);
         cluster.getNameNode().getNamesystem().writeUnlock();
@@ -120,14 +120,14 @@ public class TestNameNodeMetadataConsistency {
         OutputStream ostream = fs.create(filePath2);
         ostream.write(testData.getBytes());
         ostream.close();
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath2);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath2);
         long genStamp = block.getGenerationStamp();
         // Re-write the Generation Stamp to a Generation Stamp in future.
         cluster.changeGenStampOfBlock(0, block, genStamp + 1);
         MiniDockerDFSCluster.DataNodeProperties dnProps = cluster.stopDataNode(0);
         // Simulate  Namenode forgetting a Block
         cluster.restartNameNode(true);
-        BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
+        BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
         cluster.getNameNode().getNamesystem().writeLock();
         bInfo.delete();
         cluster.getNameNode().getNamesystem().getBlockManager().removeBlock(bInfo);

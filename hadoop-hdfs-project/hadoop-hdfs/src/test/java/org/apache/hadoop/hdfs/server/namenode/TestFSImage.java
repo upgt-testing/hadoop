@@ -88,7 +88,7 @@ public class TestFSImage {
 
     private static final String HADOOP_2_7_ZER0_BLOCK_SIZE_TGZ = "image-with-zero-block-size.tar.gz";
 
-    private static final ErasureCodingPolicyInterface testECPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_10_4_POLICY_ID);
+    private static final ErasureCodingPolicy testECPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_10_4_POLICY_ID);
 
     @Test
     public void testPersist() throws IOException {
@@ -435,7 +435,7 @@ public class TestFSImage {
             DFSTestUtil.enableAllECPolicies(fs);
             Path parentDir = new Path("/ec-10-4");
             Path childDir = new Path(parentDir, "ec-3-2");
-            ErasureCodingPolicyInterface ec32Policy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+            ErasureCodingPolicy ec32Policy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
             // Create directories and files
             fs.mkdirs(parentDir);
             fs.mkdirs(childDir);
@@ -482,7 +482,7 @@ public class TestFSImage {
             content = DFSTestUtil.readFileAsBytes(fs, file_3_2);
             assertArrayEquals(bytes, content);
             // check the EC policy on parent Dir
-            ErasureCodingPolicyInterface ecPolicy = fsn.getErasureCodingPolicy(parentDir.toString());
+            ErasureCodingPolicy ecPolicy = fsn.getErasureCodingPolicy(parentDir.toString());
             assertNotNull(ecPolicy);
             assertEquals(testECPolicy.getId(), ecPolicy.getId());
             // check the EC policy on child Dir
@@ -657,8 +657,8 @@ public class TestFSImage {
             FSNamesystemInterface fsn = cluster.getNamesystem();
             DistributedFileSystem fs = cluster.getFileSystem();
             DFSTestUtil.enableAllECPolicies(fs);
-            ErasureCodingPolicyInterface replicaPolicy = SystemErasureCodingPolicies.getReplicationPolicy();
-            ErasureCodingPolicyInterface defaultEcPolicy = StripedFileTestUtil.getDefaultECPolicy();
+            ErasureCodingPolicy replicaPolicy = SystemErasureCodingPolicies.getReplicationPolicy();
+            ErasureCodingPolicy defaultEcPolicy = StripedFileTestUtil.getDefaultECPolicy();
             final Path ecDir = new Path("/ec");
             final Path replicaDir = new Path(ecDir, "replica");
             final Path replicaFile1 = new Path(replicaDir, "f1");
@@ -744,7 +744,7 @@ public class TestFSImage {
             cluster.restartNameNodes();
             cluster.waitActive();
             assertEquals("Erasure coding policy number should match", SystemErasureCodingPolicies.getPolicies().size() + 1, ErasureCodingPolicyManager.getInstance().getPolicies().length);
-            ErasureCodingPolicyInterface ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(newPolicy.getId());
+            ErasureCodingPolicy ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(newPolicy.getId());
             assertEquals("Newly added erasure coding policy is not found", newPolicy, ecPolicy);
             assertEquals("Newly added erasure coding policy should be of disabled state", ErasureCodingPolicyState.DISABLED, DFSTestUtil.getECPolicyState(ecPolicy));
             // Test enable/disable/remove user customized erasure coding policy
@@ -774,7 +774,7 @@ public class TestFSImage {
         fs.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
         cluster.restartNameNodes();
         cluster.waitActive();
-        ErasureCodingPolicyInterface ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(targetPolicy.getId());
+        ErasureCodingPolicy ecPolicy = ErasureCodingPolicyManager.getInstance().getByID(targetPolicy.getId());
         assertEquals("The erasure coding policy is not found", targetPolicy, ecPolicy);
         assertEquals("The erasure coding policy should be of enabled state", ErasureCodingPolicyState.ENABLED, DFSTestUtil.getECPolicyState(ecPolicy));
         assertTrue("Policy should be in disabled state in FSImage!", isPolicyEnabledInFsImage(targetPolicy));

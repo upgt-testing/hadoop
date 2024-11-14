@@ -112,7 +112,7 @@ public class TestReadStripedFileWithDecoding {
             // check whether the corruption has been reported to the NameNode
             final FSNamesystemInterface ns = cluster.getNamesystem();
             final BlockManagerInterface bm = ns.getBlockManager();
-            BlockInfoInterface blockInfo = (ns.getFSDirectory().getINode4Write(file.toString()).asFile().getBlocks())[0];
+            BlockInfo blockInfo = (ns.getFSDirectory().getINode4Write(file.toString()).asFile().getBlocks())[0];
             Assert.assertEquals(1, bm.getCorruptReplicas(blockInfo).size());
         } finally {
             for (DataNodeInterface dn : cluster.getDataNodes()) {

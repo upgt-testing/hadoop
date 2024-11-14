@@ -138,7 +138,7 @@ public class TestBlockRecovery {
 
     private final static long REPLICA_LEN2 = 5000L;
 
-    private final static ExtendedBlockInterface block = new ExtendedBlock(POOL_ID, BLOCK_ID, BLOCK_LEN, GEN_STAMP);
+    private final static ExtendedBlock block = new ExtendedBlock(POOL_ID, BLOCK_ID, BLOCK_LEN, GEN_STAMP);
 
     @Rule
     public TestName currentTestName = new TestName();
@@ -432,7 +432,7 @@ public class TestBlockRecovery {
             LOG.debug("Running " + GenericTestUtils.getMethodName());
         }
         doThrow(new RecoveryInProgressException("Replica recovery is in progress")).when(spyDN).initReplicaRecovery(any(RecoveringBlock.class));
-        for (RecoveringBlockInterface rBlock : initRecoveringBlocks()) {
+        for (RecoveringBlock rBlock : initRecoveringBlocks()) {
             BlockRecoveryWorker.RecoveryTaskContiguous RecoveryTaskContiguous = recoveryWorker.new RecoveryTaskContiguous(rBlock);
             BlockRecoveryWorker.RecoveryTaskContiguous spyTask = spy(RecoveryTaskContiguous);
             spyTask.recover();
@@ -452,7 +452,7 @@ public class TestBlockRecovery {
             LOG.debug("Running " + GenericTestUtils.getMethodName());
         }
         doThrow(new IOException()).when(spyDN).initReplicaRecovery(any(RecoveringBlock.class));
-        for (RecoveringBlockInterface rBlock : initRecoveringBlocks()) {
+        for (RecoveringBlock rBlock : initRecoveringBlocks()) {
             BlockRecoveryWorker.RecoveryTaskContiguous RecoveryTaskContiguous = recoveryWorker.new RecoveryTaskContiguous(rBlock);
             BlockRecoveryWorker.RecoveryTaskContiguous spyTask = spy(RecoveryTaskContiguous);
             try {
@@ -476,7 +476,7 @@ public class TestBlockRecovery {
             LOG.debug("Running " + GenericTestUtils.getMethodName());
         }
         doReturn(new ReplicaRecoveryInfo(block.getBlockId(), 0, block.getGenerationStamp(), ReplicaState.FINALIZED)).when(spyDN).initReplicaRecovery(any(RecoveringBlock.class));
-        for (RecoveringBlockInterface rBlock : initRecoveringBlocks()) {
+        for (RecoveringBlock rBlock : initRecoveringBlocks()) {
             BlockRecoveryWorker.RecoveryTaskContiguous RecoveryTaskContiguous = recoveryWorker.new RecoveryTaskContiguous(rBlock);
             BlockRecoveryWorker.RecoveryTaskContiguous spyTask = spy(RecoveryTaskContiguous);
             spyTask.recover();
@@ -493,7 +493,7 @@ public class TestBlockRecovery {
         return blocks;
     }
 
-    private final static RecoveringBlockInterface rBlock = new RecoveringBlock(block, null, RECOVERY_ID);
+    private final static RecoveringBlock rBlock = new RecoveringBlock(block, null, RECOVERY_ID);
 
     /**
      * BlockRecoveryFI_09. some/all DNs failed to update replicas.
@@ -580,7 +580,7 @@ public class TestBlockRecovery {
         doReturn(new ReplicaRecoveryInfo(block.getBlockId(), block.getNumBytes(), block.getGenerationStamp(), ReplicaState.RUR)).when(spyDN).initReplicaRecovery(any(RecoveringBlock.class));
         boolean exceptionThrown = false;
         try {
-            for (RecoveringBlockInterface rBlock : initRecoveringBlocks()) {
+            for (RecoveringBlock rBlock : initRecoveringBlocks()) {
                 BlockRecoveryWorker.RecoveryTaskContiguous RecoveryTaskContiguous = recoveryWorker.new RecoveryTaskContiguous(rBlock);
                 BlockRecoveryWorker.RecoveryTaskContiguous spyTask = spy(RecoveryTaskContiguous);
                 spyTask.recover();
@@ -598,7 +598,7 @@ public class TestBlockRecovery {
     @Test(timeout = 60000)
     public void testSafeLength() throws Exception {
         // hard coded policy to work with hard coded test suite
-        ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
         RecoveringStripedBlock rBlockStriped = new RecoveringStripedBlock(rBlock, new byte[9], ecPolicy);
         BlockRecoveryWorker recoveryWorker = new BlockRecoveryWorker(dn);
         BlockRecoveryWorker.RecoveryTaskStriped recoveryTask = recoveryWorker.new RecoveryTaskStriped(rBlockStriped);
@@ -698,7 +698,7 @@ public class TestBlockRecovery {
             @Override
             public void run(RecoveringBlock recoveringBlock) throws Exception {
                 try {
-                    ExtendedBlockInterface extBlock = recoveringBlock.getBlock();
+                    ExtendedBlock extBlock = recoveringBlock.getBlock();
                     spyDN.getFSDataset().recoverAppend(extBlock, extBlock.getGenerationStamp() + 1, extBlock.getNumBytes());
                 } catch (Exception e) {
                     if (!e.getMessage().contains("Corrupted replica ReplicaBeingWritten")) {
@@ -721,7 +721,7 @@ public class TestBlockRecovery {
             @Override
             public void run(RecoveringBlock recoveringBlock) throws Exception {
                 try {
-                    ExtendedBlockInterface extBlock = recoveringBlock.getBlock();
+                    ExtendedBlock extBlock = recoveringBlock.getBlock();
                     spyDN.getFSDataset().recoverClose(extBlock, extBlock.getGenerationStamp() + 1, extBlock.getNumBytes());
                 } catch (Exception e) {
                     if (!e.getMessage().contains("Corrupted replica ReplicaBeingWritten")) {
@@ -746,8 +746,8 @@ public class TestBlockRecovery {
         final TestStopWorkerSemaphore terminateSlowWriter = new TestStopWorkerSemaphore();
         final AtomicReference<String> failure = new AtomicReference<String>(null);
         Collection<RecoveringBlock> recoveringBlocks = initRecoveringBlocks();
-        final RecoveringBlockInterface recoveringBlock = Iterators.get(recoveringBlocks.iterator(), 0);
-        final ExtendedBlockInterface block = recoveringBlock.getBlock();
+        final RecoveringBlock recoveringBlock = Iterators.get(recoveringBlocks.iterator(), 0);
+        final ExtendedBlock block = recoveringBlock.getBlock();
         Thread slowWriterThread = new Thread(new Runnable() {
 
             @Override

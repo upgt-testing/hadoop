@@ -41,7 +41,7 @@ public class TestSnapshotListing {
 
     static final long BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/test.snapshot/dir");
+    private final Path dir = new Path("/test.snapshot/dir");
 
     Configuration conf;
 

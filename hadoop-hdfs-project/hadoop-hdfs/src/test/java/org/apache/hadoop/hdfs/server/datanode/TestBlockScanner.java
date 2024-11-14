@@ -181,7 +181,7 @@ public class TestBlockScanner {
         ctx.createFiles(0, numFiles, 1);
         assertEquals(1, ctx.volumes.size());
         FsVolumeSpi volume = ctx.volumes.get(0);
-        ExtendedBlockInterface savedBlock = null, loadedBlock = null;
+        ExtendedBlock savedBlock = null, loadedBlock = null;
         boolean testedRewind = false, testedSave = false, testedLoad = false;
         int blocksProcessed = 0, savedBlocksProcessed = 0;
         try {
@@ -196,7 +196,7 @@ public class TestBlockScanner {
                     blocks.add(ctx.getFileBlock(0, blockIdx));
                 }
                 while (true) {
-                    ExtendedBlockInterface block = iter.nextBlock();
+                    ExtendedBlock block = iter.nextBlock();
                     if (block == null) {
                         break;
                     }
@@ -399,7 +399,7 @@ public class TestBlockScanner {
                 StringBuilder foundBlocksBld = new StringBuilder();
                 String prefix = "";
                 synchronized (info) {
-                    for (ExtendedBlockInterface block : info.goodBlocks) {
+                    for (ExtendedBlock block : info.goodBlocks) {
                         assertTrue(expectedBlocks.contains(block));
                         numFoundBlocks++;
                         foundBlocksBld.append(prefix).append(block);
@@ -495,7 +495,7 @@ public class TestBlockScanner {
         final int NUM_EXPECTED_BLOCKS = 5;
         final int CORRUPT_INDEX = 3;
         ctx.createFiles(0, NUM_EXPECTED_BLOCKS, 4);
-        ExtendedBlockInterface badBlock = ctx.getFileBlock(0, CORRUPT_INDEX);
+        ExtendedBlock badBlock = ctx.getFileBlock(0, CORRUPT_INDEX);
         ctx.cluster.corruptBlockOnDataNodes(badBlock);
         final TestScanResultHandler.Info info = TestScanResultHandler.getInfo(ctx.volumes.get(0));
         synchronized (info) {
@@ -515,7 +515,7 @@ public class TestBlockScanner {
             assertTrue(info.badBlocks.contains(badBlock));
             for (int i = 0; i < NUM_EXPECTED_BLOCKS; i++) {
                 if (i != CORRUPT_INDEX) {
-                    ExtendedBlockInterface block = ctx.getFileBlock(0, i);
+                    ExtendedBlock block = ctx.getFileBlock(0, i);
                     assertTrue(info.goodBlocks.contains(block));
                 }
             }
@@ -731,7 +731,7 @@ public class TestBlockScanner {
             assertEquals("Did not expect bad blocks.", 0, info.badBlocks.size());
             info.blocksScanned = 0;
         }
-        ExtendedBlockInterface first = ctx.getFileBlock(0, 0);
+        ExtendedBlock first = ctx.getFileBlock(0, 0);
         ctx.datanode.getBlockScanner().markSuspectBlock(storageID, first);
         // When we increment the semaphore, the TestScanResultHandler will finish
         // adding the block that it was scanning previously (the 5th block).
@@ -809,7 +809,7 @@ public class TestBlockScanner {
         final int NUM_FILES = 4;
         ctx.createFiles(0, NUM_FILES, 5);
         MaterializedReplica unreachableReplica = ctx.getMaterializedReplica(0, 1);
-        ExtendedBlockInterface unreachableBlock = ctx.getFileBlock(0, 1);
+        ExtendedBlock unreachableBlock = ctx.getFileBlock(0, 1);
         unreachableReplica.makeUnreachable();
         final TestScanResultHandler.Info info = TestScanResultHandler.getInfo(ctx.volumes.get(0));
         String storageID = ctx.volumes.get(0).getStorageID();
@@ -890,7 +890,7 @@ public class TestBlockScanner {
         BlockScanner.Conf newConf = new BlockScanner.Conf(conf);
         ctx.datanode.getBlockScanner().setConf(newConf);
         // schedule the first block for scanning
-        ExtendedBlockInterface first = ctx.getFileBlock(0, 0);
+        ExtendedBlock first = ctx.getFileBlock(0, 0);
         ctx.datanode.getBlockScanner().markSuspectBlock(storageID, first);
         // append the file before VolumeScanner completes scanning the block,
         // which takes approximately 2 seconds to complete.

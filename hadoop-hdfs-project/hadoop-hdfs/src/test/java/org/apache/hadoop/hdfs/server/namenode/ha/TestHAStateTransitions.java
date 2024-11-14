@@ -64,9 +64,9 @@ public class TestHAStateTransitions {
 
     protected static final Logger LOG = LoggerFactory.getLogger(TestStandbyIsHot.class);
 
-    private static final PathInterface TEST_DIR = new Path("/test");
+    private static final Path TEST_DIR = new Path("/test");
 
-    private static final PathInterface TEST_FILE_PATH = new Path(TEST_DIR, "foo");
+    private static final Path TEST_FILE_PATH = new Path(TEST_DIR, "foo");
 
     private static final String TEST_FILE_STR = TEST_FILE_PATH.toUri().getPath();
 

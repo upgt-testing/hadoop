@@ -70,7 +70,7 @@ public class TestDNFencing {
 
     private static final String TEST_FILE = "/testStandbyIsHot";
 
-    private static final PathInterface TEST_FILE_PATH = new Path(TEST_FILE);
+    private static final Path TEST_FILE_PATH = new Path(TEST_FILE);
 
     private static final int SMALL_BLOCK = 1024;
 
@@ -125,7 +125,7 @@ public class TestDNFencing {
     public void testDnFencing() throws Exception {
         // Create a file with replication level 3.
         DFSTestUtil.createFile(fs, TEST_FILE_PATH, 30 * SMALL_BLOCK, (short) 3, 1L);
-        ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, TEST_FILE_PATH);
+        ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, TEST_FILE_PATH);
         // Drop its replication count to 1, so it becomes over-replicated.
         // Then compute the invalidation of the extra blocks and trigger
         // heartbeats so the invalidations are flushed to the DNs.

@@ -54,7 +54,7 @@ public class TestDataNodeErasureCodingMetrics {
 
     public static final Logger LOG = LoggerFactory.getLogger(TestDataNodeErasureCodingMetrics.class);
 
-    private final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+    private final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
 
     private final int dataBlocks = ecPolicy.getNumDataUnits();
 
@@ -146,7 +146,7 @@ public class TestDataNodeErasureCodingMetrics {
         long metricValue = 0;
         // Add all reconstruction metric value from all data nodes
         for (DataNodeInterface dn : cluster.getDataNodes()) {
-            MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
             metricValue += getLongCounter(metricName, rb);
         }
         return metricValue;
@@ -156,7 +156,7 @@ public class TestDataNodeErasureCodingMetrics {
         long metricValue = 0;
         // Add all reconstruction metric value from all data nodes
         for (DataNodeInterface dn : cluster.getDataNodes()) {
-            MetricsRecordBuilderInterface rb = getMetrics(dn.getMetrics().name());
+            MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
             metricValue += getLongCounterWithoutCheck(metricName, rb);
         }
         return metricValue;
@@ -169,8 +169,8 @@ public class TestDataNodeErasureCodingMetrics {
         final byte[] data = StripedFileTestUtil.generateBytes(fileLen);
         DFSTestUtil.writeFile(fs, file, data);
         StripedFileTestUtil.waitBlockGroupsReported(fs, fileName);
-        final LocatedBlocksInterface locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
-        final LocatedStripedBlockInterface lastBlock = (LocatedStripedBlock) locatedBlocks.getLastLocatedBlock();
+        final LocatedBlocks locatedBlocks = StripedFileTestUtil.getLocatedBlocks(file, fs);
+        final LocatedStripedBlock lastBlock = (LocatedStripedBlock) locatedBlocks.getLastLocatedBlock();
         assertTrue(lastBlock.getLocations().length > deadNodeIndex);
         final DataNodeInterface toCorruptDn = cluster.getDataNode(lastBlock.getLocations()[deadNodeIndex].getIpcPort());
         LOG.info("Datanode to be corrupted: " + toCorruptDn);

@@ -60,19 +60,19 @@ public class TestPersistentStoragePolicySatisfier {
 
     private ExternalSPSContext ctxt;
 
-    private static PathInterface testFile = new Path("/testFile");
+    private static Path testFile = new Path("/testFile");
 
     private static String testFileName = testFile.toString();
 
-    private static PathInterface parentDir = new Path("/parentDir");
+    private static Path parentDir = new Path("/parentDir");
 
-    private static PathInterface parentFile = new Path(parentDir, "parentFile");
+    private static Path parentFile = new Path(parentDir, "parentFile");
 
     private static String parentFileName = parentFile.toString();
 
-    private static PathInterface childDir = new Path(parentDir, "childDir");
+    private static Path childDir = new Path(parentDir, "childDir");
 
-    private static PathInterface childFile = new Path(childDir, "childFile");
+    private static Path childFile = new Path(childDir, "childFile");
 
     private static String childFileName = childFile.toString();
 

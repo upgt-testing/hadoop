@@ -1154,7 +1154,7 @@ public class TestFileCreation {
             } finally {
                 out.close();
             }
-            LocatedBlocksInterface oldBlocks = NameNodeAdapter.getBlockLocations(nn, file, 0, fileSize);
+            LocatedBlocks oldBlocks = NameNodeAdapter.getBlockLocations(nn, file, 0, fileSize);
             assertBlocks(bm, oldBlocks, true);
             out = dfs.create(filePath, true);
             BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(cluster.getNamesystem(0).getBlockManager());
@@ -1166,7 +1166,7 @@ public class TestFileCreation {
             }
             dfs.deleteOnExit(filePath);
             BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(cluster.getNamesystem(0).getBlockManager());
-            LocatedBlocksInterface newBlocks = NameNodeAdapter.getBlockLocations(nn, file, 0, fileSize);
+            LocatedBlocks newBlocks = NameNodeAdapter.getBlockLocations(nn, file, 0, fileSize);
             assertBlocks(bm, newBlocks, true);
             assertBlocks(bm, oldBlocks, false);
             FSDataInputStream in = dfs.open(filePath);
@@ -1219,8 +1219,8 @@ public class TestFileCreation {
         }
     }
 
-    private void assertBlocks(BlockManagerInterface bm, LocatedBlocksInterface lbs, boolean exist) {
-        for (LocatedBlockInterface locatedBlock : lbs.getLocatedBlocks()) {
+    private void assertBlocks(BlockManagerInterface bm, LocatedBlocks lbs, boolean exist) {
+        for (LocatedBlock locatedBlock : lbs.getLocatedBlocks()) {
             if (exist) {
                 assertTrue(bm.getStoredBlock(locatedBlock.getBlock().getLocalBlock()) != null);
             } else {

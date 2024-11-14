@@ -75,7 +75,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
 
     protected final int stripesPerBlock = 4;
 
-    protected ErasureCodingPolicyInterface ecPolicy;
+    protected ErasureCodingPolicy ecPolicy;
 
     protected int dataBlocks;
 
@@ -95,7 +95,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
 
     DistributedFileSystem dfs;
 
-    final PathInterface dir = new Path("/" + TestDFSStripedOutputStreamWithFailureBase.class.getSimpleName());
+    final Path dir = new Path("/" + TestDFSStripedOutputStreamWithFailureBase.class.getSimpleName());
 
     protected static final int FLUSH_POS = 9 * DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_DEFAULT + 1;
 
@@ -358,7 +358,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
             DatanodeInfo[] datanodes = streamer.getNodes();
             if (datanodes == null) {
                 // try peeking following block.
-                final LocatedBlockInterface lb = streamer.peekFollowingBlock();
+                final LocatedBlock lb = streamer.peekFollowingBlock();
                 if (lb != null) {
                     datanodes = lb.getLocations();
                 }

@@ -117,10 +117,10 @@ public class TestBlockReplacement {
             DFSClient client = new DFSClient(addr, CONF);
             List<LocatedBlock> locatedBlocks = client.getNamenode().getBlockLocations("/tmp.txt", 0, DEFAULT_BLOCK_SIZE).getLocatedBlocks();
             assertEquals(1, locatedBlocks.size());
-            LocatedBlockInterface block = locatedBlocks.get(0);
+            LocatedBlock block = locatedBlocks.get(0);
             DatanodeInfo[] oldNodes = block.getLocations();
             assertEquals(oldNodes.length, 3);
-            ExtendedBlockInterface b = block.getBlock();
+            ExtendedBlock b = block.getBlock();
             // add a fourth datanode to the cluster
             cluster.startDataNodes(CONF, 1, true, null, NEW_RACKS);
             cluster.waitActive();
@@ -200,11 +200,11 @@ public class TestBlockReplacement {
             String fileName = "/testBlockReplacementWithPinnedBlocks/file";
             final Path file = new Path(fileName);
             DFSTestUtil.createFile(dfs, file, 1024, (short) 1, 1024);
-            LocatedBlockInterface lb = dfs.getClient().getLocatedBlocks(fileName, 0).get(0);
+            LocatedBlock lb = dfs.getClient().getLocatedBlocks(fileName, 0).get(0);
             DatanodeInfo[] oldNodes = lb.getLocations();
             assertEquals("Wrong block locations", oldNodes.length, 1);
             DatanodeInfoInterface source = oldNodes[0];
-            ExtendedBlockInterface b = lb.getBlock();
+            ExtendedBlock b = lb.getBlock();
             DatanodeInfo[] datanodes = dfs.getDataNodeStats();
             DatanodeInfoInterface destin = null;
             for (DatanodeInfoInterface datanodeInfo : datanodes) {
@@ -241,10 +241,10 @@ public class TestBlockReplacement {
             final DistributedFileSystem dfs = cluster.getFileSystem();
             final Path file = new Path("/testBlockMoveAcrossStorageInSameNode/file");
             DFSTestUtil.createFile(dfs, file, 1024, (short) 1, 1024);
-            LocatedBlocksInterface locatedBlocks = dfs.getClient().getLocatedBlocks(file.toString(), 0);
+            LocatedBlocks locatedBlocks = dfs.getClient().getLocatedBlocks(file.toString(), 0);
             // get the current
-            LocatedBlockInterface locatedBlock = locatedBlocks.get(0);
-            ExtendedBlockInterface block = locatedBlock.getBlock();
+            LocatedBlock locatedBlock = locatedBlocks.get(0);
+            ExtendedBlock block = locatedBlock.getBlock();
             DatanodeInfo[] locations = locatedBlock.getLocations();
             assertEquals(1, locations.length);
             StorageType[] storageTypes = locatedBlock.getStorageTypes();
@@ -364,7 +364,7 @@ public class TestBlockReplacement {
             String activeNNBPId = cluster.getNamesystem(0).getBlockPoolId();
             DatanodeDescriptorInterface sourceDnDesc = NameNodeAdapter.getDatanode(cluster.getNamesystem(0), dn0.getDNRegistrationForBP(activeNNBPId));
             DatanodeDescriptorInterface destDnDesc = NameNodeAdapter.getDatanode(cluster.getNamesystem(0), dn1.getDNRegistrationForBP(activeNNBPId));
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             LOG.info("replaceBlock:  " + replaceBlock(block, (DatanodeInfo) sourceDnDesc, (DatanodeInfo) sourceDnDesc, (DatanodeInfo) destDnDesc));
             // Waiting for the FsDatasetAsyncDsikService to delete the block
             for (int tries = 0; tries < 20; tries++) {

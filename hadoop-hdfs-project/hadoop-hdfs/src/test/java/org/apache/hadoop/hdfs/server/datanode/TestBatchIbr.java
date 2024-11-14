@@ -142,7 +142,7 @@ public class TestBatchIbr {
             final ExecutorCompletionService<Boolean> verifyService = new ExecutorCompletionService<>(executor);
             final AtomicLong verifyFileTime = new AtomicLong();
             for (int i = 0; i < NUM_FILES; i++) {
-                final PathInterface file = createService.take().get();
+                final Path file = createService.take().get();
                 verifyService.submit(new Callable<Boolean>() {
 
                     @Override
@@ -181,7 +181,7 @@ public class TestBatchIbr {
     static void logIbrCounts(List<DataNodeInterface> datanodes) {
         final String name = "IncrementalBlockReportsNumOps";
         for (DataNodeInterface dn : datanodes) {
-            final MetricsRecordBuilderInterface m = MetricsAsserts.getMetrics(dn.getMetrics().name());
+            final MetricsRecordBuilder m = MetricsAsserts.getMetrics(dn.getMetrics().name());
             final long ibr = MetricsAsserts.getLongCounter(name, m);
             LOG.info(dn.getDisplayName() + ": " + name + "=" + ibr);
         }

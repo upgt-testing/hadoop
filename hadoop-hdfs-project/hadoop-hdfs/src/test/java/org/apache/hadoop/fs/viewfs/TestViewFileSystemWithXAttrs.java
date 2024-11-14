@@ -54,7 +54,7 @@ public class TestViewFileSystemWithXAttrs {
 
     private FileSystem fsTarget, fsTarget2;
 
-    private PathInterface targetTestRoot, targetTestRoot2, mountOnNn1, mountOnNn2;
+    private Path targetTestRoot, targetTestRoot2, mountOnNn1, mountOnNn2;
 
     private FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper("/tmp/TestViewFileSystemWithXAttrs");
 

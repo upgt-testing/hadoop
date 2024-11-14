@@ -39,7 +39,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
  */
 public class TestXAttrConfigFlag {
 
-    private static final PathInterface PATH = new Path("/path");
+    private static final Path PATH = new Path("/path");
 
     private MiniDockerDFSCluster cluster;
 

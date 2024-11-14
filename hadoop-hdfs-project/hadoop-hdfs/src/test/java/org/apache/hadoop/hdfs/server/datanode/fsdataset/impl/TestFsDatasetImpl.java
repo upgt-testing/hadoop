@@ -521,7 +521,7 @@ public class TestFsDatasetImpl {
             try (FsDatasetSpi.FsVolumeReferences volumes = ds.getFsVolumeReferences()) {
                 vol = (FsVolumeImpl) volumes.get(0);
             }
-            ExtendedBlockInterface eb;
+            ExtendedBlock eb;
             ReplicaInfoInterface info;
             List<Block> blockList = new ArrayList<>();
             for (int i = 1; i <= 63; i++) {
@@ -748,10 +748,10 @@ public class TestFsDatasetImpl {
             FSDataOutputStream out = fs.create(filePath, (short) 1);
             out.write(1);
             out.hflush();
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             final FsVolumeImpl volume = (FsVolumeImpl) dataNode.getFSDataset().getVolume(block);
             File finalizedDir = volume.getFinalizedDir(cluster.getNamesystem().getBlockPoolId());
-            LocatedBlockInterface lb = DFSTestUtil.getAllBlocks(fs, filePath).get(0);
+            LocatedBlock lb = DFSTestUtil.getAllBlocks(fs, filePath).get(0);
             DatanodeInfoInterface info = lb.getLocations()[0];
             if (finalizedDir.exists()) {
                 // Remove write and execute access so that checkDiskErrorThread detects
@@ -828,7 +828,7 @@ public class TestFsDatasetImpl {
             DataNodeInterface dataNode = cluster.getDataNodes().get(0);
             Path filePath = new Path("testData");
             DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
             ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
             // Append to file to update its GS
@@ -858,7 +858,7 @@ public class TestFsDatasetImpl {
             DataNodeInterface dataNode = cluster.getDataNodes().get(0);
             Path filePath = new Path("testData");
             DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
             ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
             fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block);
@@ -922,9 +922,9 @@ public class TestFsDatasetImpl {
             fout.writeBytes(blockData);
             fout.close();
             assertEquals(blockData, DFSTestUtil.readFile(fs, filePath));
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             BlockReaderTestUtil util = new BlockReaderTestUtil(cluster, new HdfsConfiguration(conf));
-            LocatedBlockInterface blk = util.getFileBlocks(filePath, 512 * 2).get(0);
+            LocatedBlock blk = util.getFileBlocks(filePath, 512 * 2).get(0);
             File[] blkFiles = cluster.getAllBlockFiles(block);
             // Part 1: Read partial data from block
             LOG.info("Reading partial data for block {} before moving it: ", blk.getBlock().toString());
@@ -951,7 +951,7 @@ public class TestFsDatasetImpl {
             // 3. Assert new file location for block is different
             // 4. Confirm client can read data from new location
             blkReader.close();
-            ExtendedBlockInterface block2 = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block2 = DFSTestUtil.getFirstBlock(fs, filePath);
             File[] blkFiles2 = cluster.getAllBlockFiles(block2);
             blk = util.getFileBlocks(filePath, 512 * 4).get(0);
             blkReader = BlockReaderTestUtil.getBlockReader((DistributedFileSystem) fs, blk, 0, blockData.length());
@@ -1026,7 +1026,7 @@ public class TestFsDatasetImpl {
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(new HdfsConfiguration()).build();
         cluster.waitActive();
         FsVolumeImpl vol = (FsVolumeImpl) dataset.getFsVolumeReferences().get(0);
-        ExtendedBlockInterface eb;
+        ExtendedBlock eb;
         ReplicaInfoInterface info;
         int beforeCnt = 0;
         try {
@@ -1060,7 +1060,7 @@ public class TestFsDatasetImpl {
             // Create file that has one block with one replica.
             Path filePath = new Path("test");
             DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             // Copy a new replica to other volume.
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
             ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);

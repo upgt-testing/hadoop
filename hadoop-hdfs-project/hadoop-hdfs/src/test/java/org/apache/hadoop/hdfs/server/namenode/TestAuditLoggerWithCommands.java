@@ -78,9 +78,9 @@ public class TestAuditLoggerWithCommands {
 
     static Configuration conf;
 
-    static UserGroupInformationInterface user1;
+    static UserGroupInformation user1;
 
-    static UserGroupInformationInterface user2;
+    static UserGroupInformation user2;
 
     private static NamenodeProtocols proto;
 
@@ -198,7 +198,7 @@ public class TestAuditLoggerWithCommands {
         }
         verifyAuditLogs(aceCreatePattern);
         try {
-            PathInterface s1 = fs.createSnapshot(srcDir);
+            Path s1 = fs.createSnapshot(srcDir);
             fileSys.renameSnapshot(srcDir, s1.getName(), "test");
             fail("The operation should have failed with AccessControlException");
         } catch (AccessControlException ace) {
@@ -221,7 +221,7 @@ public class TestAuditLoggerWithCommands {
     @Test
     public void testDeleteSnapshot() throws Exception {
         Path srcDir = new Path("/src");
-        PathInterface s1;
+        Path s1;
         fs.mkdirs(srcDir);
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         ((DistributedFileSystem) fs).allowSnapshot(srcDir);
@@ -363,8 +363,8 @@ public class TestAuditLoggerWithCommands {
         Path snapshotDirPath = new Path("/test");
         fs.mkdirs(snapshotDirPath, new FsPermission((short) 0));
         cluster.getNamesystem().allowSnapshot(snapshotDirPath.toString());
-        PathInterface s1 = fs.createSnapshot(snapshotDirPath);
-        PathInterface s2 = fs.createSnapshot(snapshotDirPath);
+        Path s1 = fs.createSnapshot(snapshotDirPath);
+        Path s2 = fs.createSnapshot(snapshotDirPath);
         int length;
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         try {
@@ -579,7 +579,7 @@ public class TestAuditLoggerWithCommands {
         final String getDT = ".*src=HDFS_DELEGATION_TOKEN token 1.*with renewer foo.*";
         verifyAuditLogs(true, ".*cmd=getDelegationToken" + getDT);
         // renew
-        final UserGroupInformationInterface foo = UserGroupInformation.createUserForTesting("foo", new String[] {});
+        final UserGroupInformation foo = UserGroupInformation.createUserForTesting("foo", new String[] {});
         foo.doAs(new PrivilegedExceptionAction<Void>() {
 
             @Override
@@ -596,7 +596,7 @@ public class TestAuditLoggerWithCommands {
         }
         verifyAuditLogs(false, ".*cmd=renewDelegationToken" + getDT);
         // cancel
-        final UserGroupInformationInterface bar = UserGroupInformation.createUserForTesting("bar", new String[] {});
+        final UserGroupInformation bar = UserGroupInformation.createUserForTesting("bar", new String[] {});
         try {
             bar.doAs(new PrivilegedExceptionAction<Void>() {
 

@@ -58,9 +58,9 @@ public class TestBlockInfoStriped {
 
     private static final long BASE_ID = -1600;
 
-    private final BlockInterface baseBlock = new Block(BASE_ID);
+    private final Block baseBlock = new Block(BASE_ID);
 
-    private final ErasureCodingPolicyInterface testECPolicy;
+    private final ErasureCodingPolicy testECPolicy;
 
     private final int totalBlocks;
 
@@ -230,9 +230,9 @@ public class TestBlockInfoStriped {
             fs.mkdirs(new Path("/ecDir"));
             fs.setErasureCodingPolicy(new Path("/ecDir"), testECPolicy.getName());
             DFSTestUtil.createFile(fs, new Path("/ecDir/ecFile"), fs.getDefaultBlockSize() * dataBlocks, (short) 1, 1024);
-            ExtendedBlockInterface blk = DFSTestUtil.getAllBlocks(fs, new Path("/ecDir/ecFile")).get(0).getBlock();
+            ExtendedBlock blk = DFSTestUtil.getAllBlocks(fs, new Path("/ecDir/ecFile")).get(0).getBlock();
             String id = "blk_" + Long.toString(blk.getBlockId());
-            BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(blk.getLocalBlock());
+            BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(blk.getLocalBlock());
             DatanodeStorageInfoInterface[] dnStorageInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStorages(bInfo);
             bInfo.removeStorage(dnStorageInfo[1]);
             ByteArrayOutputStream bStream = new ByteArrayOutputStream();

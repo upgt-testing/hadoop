@@ -170,7 +170,7 @@ public class TestBlockReaderLocal {
             fsIn.close();
             fsIn = null;
             for (int i = 0; i < shortCircuitCachesNum; i++) {
-                ExtendedBlockInterface block = DFSTestUtil.getAllBlocks(fs, TEST_PATH).get(i).getBlock();
+                ExtendedBlock block = DFSTestUtil.getAllBlocks(fs, TEST_PATH).get(i).getBlock();
                 File dataFile = cluster.getBlockFile(0, block);
                 File metaFile = cluster.getBlockMetadataFile(0, block);
                 ShortCircuitCache shortCircuitCache = ClientContext.getFromConf(conf).getShortCircuitCache(block.getBlockId());
@@ -700,7 +700,7 @@ public class TestBlockReaderLocal {
     @Test(timeout = 60000)
     public void testStatisticsForErasureCodingRead() throws IOException {
         HdfsConfiguration conf = new HdfsConfiguration();
-        final ErasureCodingPolicyInterface ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
+        final ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
         final int numDataNodes = ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits();
         // The length of test file is one full strip + one partial stripe. And
         // it is not bound to the stripe cell size.

@@ -44,7 +44,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestPendingCorruptDnMessages {
 
-    private static final PathInterface filePath = new Path("/foo.txt");
+    private static final Path filePath = new Path("/foo.txt");
 
     @Test(timeout = 60000)
     public void testChangedStorageId() throws IOException, URISyntaxException, InterruptedException, TimeoutException {
@@ -60,7 +60,7 @@ public class TestPendingCorruptDnMessages {
             HATestUtil.waitForStandbyToCatchUp(cluster.getNameNode(0), cluster.getNameNode(1));
             // Change the gen stamp of the block on datanode to go back in time (gen
             // stamps start at 1000)
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, filePath);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             cluster.changeGenStampOfBlock(0, block, 900);
             // Run directory dsscanner to update Datanode's volumeMap
             DataNodeTestUtils.runDirectoryScanner(cluster.getDataNodes().get(0));

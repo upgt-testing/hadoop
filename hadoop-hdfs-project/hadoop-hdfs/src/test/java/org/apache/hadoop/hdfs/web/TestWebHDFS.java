@@ -362,7 +362,7 @@ public class TestWebHDFS {
                 it = fs.listStatusIterator(d);
                 int count = 0;
                 while (it.hasNext()) {
-                    FileStatusInterface stat = it.next();
+                    FileStatus stat = it.next();
                     assertEquals("FileStatuses not equal", statuses[count], stat);
                     count++;
                 }
@@ -371,7 +371,7 @@ public class TestWebHDFS {
                 it = fs.listStatusIterator(d);
                 // Try advancing the iterator without calling hasNext()
                 for (int i = 0; i < statuses.length; i++) {
-                    FileStatusInterface stat = it.next();
+                    FileStatus stat = it.next();
                     assertEquals("FileStatuses not equal", statuses[i], stat);
                 }
                 assertFalse("No more items expected", it.hasNext());
@@ -488,7 +488,7 @@ public class TestWebHDFS {
         assertTrue(dfs.getFileStatus(bar).isSnapshotEnabled());
         assertTrue(webHdfs.getFileStatus(bar).isSnapshotEnabled());
         webHdfs.createSnapshot(bar, "s1");
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(bar, "s1");
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(bar, "s1");
         Assert.assertTrue(webHdfs.exists(s1path));
         SnapshottableDirectoryStatus[] snapshottableDirs = dfs.getSnapshottableDirListing();
         assertEquals(1, snapshottableDirs.length);
@@ -539,23 +539,23 @@ public class TestWebHDFS {
         dfs.mkdirs(normalDir);
         final Path normalFile = new Path(normalDir, "file.log");
         DFSTestUtil.createFile(dfs, normalFile, 1024 * 10, (short) 1, 0xFEED);
-        FileStatusInterface expectedECDirStatus = dfs.getFileStatus(ecDir);
-        FileStatusInterface actualECDirStatus = webHdfs.getFileStatus(ecDir);
+        FileStatus expectedECDirStatus = dfs.getFileStatus(ecDir);
+        FileStatus actualECDirStatus = webHdfs.getFileStatus(ecDir);
         Assert.assertEquals(expectedECDirStatus.isErasureCoded(), actualECDirStatus.isErasureCoded());
         ContractTestUtils.assertErasureCoded(dfs, ecDir);
         assertTrue(ecDir + " should have erasure coding set in " + "FileStatus#toString(): " + actualECDirStatus, actualECDirStatus.toString().contains("isErasureCoded=true"));
-        FileStatusInterface expectedECFileStatus = dfs.getFileStatus(ecFile);
-        FileStatusInterface actualECFileStatus = webHdfs.getFileStatus(ecFile);
+        FileStatus expectedECFileStatus = dfs.getFileStatus(ecFile);
+        FileStatus actualECFileStatus = webHdfs.getFileStatus(ecFile);
         Assert.assertEquals(expectedECFileStatus.isErasureCoded(), actualECFileStatus.isErasureCoded());
         ContractTestUtils.assertErasureCoded(dfs, ecFile);
         assertTrue(ecFile + " should have erasure coding set in " + "FileStatus#toString(): " + actualECFileStatus, actualECFileStatus.toString().contains("isErasureCoded=true"));
-        FileStatusInterface expectedNormalDirStatus = dfs.getFileStatus(normalDir);
-        FileStatusInterface actualNormalDirStatus = webHdfs.getFileStatus(normalDir);
+        FileStatus expectedNormalDirStatus = dfs.getFileStatus(normalDir);
+        FileStatus actualNormalDirStatus = webHdfs.getFileStatus(normalDir);
         Assert.assertEquals(expectedNormalDirStatus.isErasureCoded(), actualNormalDirStatus.isErasureCoded());
         ContractTestUtils.assertNotErasureCoded(dfs, normalDir);
         assertTrue(normalDir + " should have erasure coding unset in " + "FileStatus#toString(): " + actualNormalDirStatus, actualNormalDirStatus.toString().contains("isErasureCoded=false"));
-        FileStatusInterface expectedNormalFileStatus = dfs.getFileStatus(normalFile);
-        FileStatusInterface actualNormalFileStatus = webHdfs.getFileStatus(normalDir);
+        FileStatus expectedNormalFileStatus = dfs.getFileStatus(normalFile);
+        FileStatus actualNormalFileStatus = webHdfs.getFileStatus(normalDir);
         Assert.assertEquals(expectedNormalFileStatus.isErasureCoded(), actualNormalFileStatus.isErasureCoded());
         ContractTestUtils.assertNotErasureCoded(dfs, normalFile);
         assertTrue(normalFile + " should have erasure coding unset in " + "FileStatus#toString(): " + actualNormalFileStatus, actualNormalFileStatus.toString().contains("isErasureCoded=false"));
@@ -584,9 +584,9 @@ public class TestWebHDFS {
         // create snapshots on foo using WebHdfs
         webHdfs.createSnapshot(foo, "s1");
         // create snapshot without specifying name
-        final PathInterface spath = webHdfs.createSnapshot(foo, null);
+        final Path spath = webHdfs.createSnapshot(foo, null);
         Assert.assertTrue(webHdfs.exists(spath));
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
         Assert.assertTrue(webHdfs.exists(s1path));
     }
 
@@ -604,9 +604,9 @@ public class TestWebHDFS {
         dfs.mkdirs(foo);
         dfs.allowSnapshot(foo);
         webHdfs.createSnapshot(foo, "s1");
-        final PathInterface spath = webHdfs.createSnapshot(foo, null);
+        final Path spath = webHdfs.createSnapshot(foo, null);
         Assert.assertTrue(webHdfs.exists(spath));
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
         Assert.assertTrue(webHdfs.exists(s1path));
         // delete operation snapshot name as null
         try {
@@ -642,7 +642,7 @@ public class TestWebHDFS {
         DFSTestUtil.createFile(dfs, file2, 100, (short) 1, 0);
         dfs.allowSnapshot(foo);
         webHdfs.createSnapshot(foo, "s1");
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
         Assert.assertTrue(webHdfs.exists(s1path));
         Path file3 = new Path(foo, "file3");
         DFSTestUtil.createFile(dfs, file3, 100, (short) 1, 0);
@@ -747,7 +747,7 @@ public class TestWebHDFS {
         dfs.mkdirs(foo);
         dfs.allowSnapshot(foo);
         webHdfs.createSnapshot(foo, "s1");
-        final PathInterface s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        final Path s1path = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
         Assert.assertTrue(webHdfs.exists(s1path));
         // rename s1 to s2 with oldsnapshotName as null
         try {
@@ -759,7 +759,7 @@ public class TestWebHDFS {
         // rename s1 to s2
         webHdfs.renameSnapshot(foo, "s1", "s2");
         assertFalse(webHdfs.exists(s1path));
-        final PathInterface s2path = SnapshotTestHelper.getSnapshotRoot(foo, "s2");
+        final Path s2path = SnapshotTestHelper.getSnapshotRoot(foo, "s2");
         Assert.assertTrue(webHdfs.exists(s2path));
         webHdfs.deleteSnapshot(foo, "s2");
         assertFalse(webHdfs.exists(s2path));
@@ -997,7 +997,7 @@ public class TestWebHDFS {
             os.write(CONTENTS);
         }
         BlockLocation[] locations = fs.getFileBlockLocations(PATH, OFFSET, LENGTH);
-        for (BlockLocationInterface location : locations) {
+        for (BlockLocation location : locations) {
             StorageType[] storageTypes = location.getStorageTypes();
             Assert.assertTrue(storageTypes != null && storageTypes.length > 0 && storageTypes[0] == StorageType.DISK);
         }
@@ -1066,8 +1066,8 @@ public class TestWebHDFS {
 
     private void verifyEquals(BlockLocation[] locations1, BlockLocation[] locations2) throws IOException {
         for (int i = 0; i < locations1.length; i++) {
-            BlockLocationInterface location1 = locations1[i];
-            BlockLocationInterface location2 = locations2[i];
+            BlockLocation location1 = locations1[i];
+            BlockLocation location2 = locations2[i];
             Assert.assertEquals(location1.getLength(), location2.getLength());
             Assert.assertEquals(location1.getOffset(), location2.getOffset());
             Assert.assertArrayEquals(location1.getCachedHosts(), location2.getCachedHosts());
@@ -1093,7 +1093,7 @@ public class TestWebHDFS {
     }
 
     private WebHdfsFileSystem createWebHDFSAsTestUser(final Configuration conf, final URI uri, final String userName) throws Exception {
-        final UserGroupInformationInterface ugi = UserGroupInformation.createUserForTesting(userName, new String[] { "supergroup" });
+        final UserGroupInformation ugi = UserGroupInformation.createUserForTesting(userName, new String[] { "supergroup" });
         return ugi.doAs(new PrivilegedExceptionAction<WebHdfsFileSystem>() {
 
             @Override
@@ -1122,7 +1122,7 @@ public class TestWebHDFS {
         final Path file1 = new Path(dir, "testFile");
         DFSTestUtil.createFile(fs, file1, length, numDatanodes, 20120406L);
         // get file status and check that it was written properly.
-        final FileStatusInterface s1 = fs.getFileStatus(file1);
+        final FileStatus s1 = fs.getFileStatus(file1);
         assertEquals("Write failed for file " + file1, length, s1.getLen());
         // Ensure file can be read through WebHdfsInputStream
         FSDataInputStream in = fs.open(file1);
@@ -1266,7 +1266,7 @@ public class TestWebHDFS {
         final String currentUser = UserGroupInformation.getCurrentUser().getShortUserName();
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
         final WebHdfsFileSystem webFS = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
-        PathInterface trashPath = webFS.getTrashRoot(new Path("/"));
+        Path trashPath = webFS.getTrashRoot(new Path("/"));
         Path expectedPath = new Path(FileSystem.USER_HOME_PREFIX, new Path(currentUser, FileSystem.TRASH_PREFIX));
         assertEquals(expectedPath.toUri().getPath(), trashPath.toUri().getPath());
     }
@@ -1532,7 +1532,7 @@ public class TestWebHDFS {
         final Path file1 = new Path(dir, "testFile");
         DFSTestUtil.createFile(fs, file1, length, numDatanodes, 20120406L);
         // get file status and check that it was written properly.
-        final FileStatusInterface s1 = fs.getFileStatus(file1);
+        final FileStatus s1 = fs.getFileStatus(file1);
         assertEquals("Write failed for file " + file1, length, s1.getLen());
         FSDataInputStream in = fs.open(file1);
         // Connection is made only when the first read() occurs.
@@ -1559,7 +1559,7 @@ public class TestWebHDFS {
     @Test(timeout = 300000)
     public void testECPolicyInFileStatus() throws Exception {
         final Configuration conf = WebHdfsTestUtil.createConf();
-        final ErasureCodingPolicyInterface ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
         final String ecPolicyName = ecPolicy.getName();
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(5).build();
         cluster.waitActive();

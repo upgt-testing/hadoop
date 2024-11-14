@@ -71,7 +71,7 @@ public class TestBalancerWithNodeGroup {
 
     final static private String fileName = "/tmp.txt";
 
-    final static private PathInterface filePath = new Path(fileName);
+    final static private Path filePath = new Path(fileName);
 
     MiniDockerDFSClusterWithNodeGroup cluster;
 
@@ -185,7 +185,7 @@ public class TestBalancerWithNodeGroup {
 
     private Set<ExtendedBlock> getBlocksOnRack(List<LocatedBlock> blks, String rack) {
         Set<ExtendedBlock> ret = new HashSet<ExtendedBlock>();
-        for (LocatedBlockInterface blk : blks) {
+        for (LocatedBlock blk : blks) {
             for (DatanodeInfoInterface di : blk.getLocations()) {
                 if (rack.equals(NetworkTopology.getFirstHalf(di.getNetworkLocation()))) {
                     ret.add(blk.getBlock());
@@ -219,7 +219,7 @@ public class TestBalancerWithNodeGroup {
             long totalUsedSpace = totalCapacity * 3 / 10;
             long length = totalUsedSpace / numOfDatanodes;
             TestBalancer.createFile(cluster, filePath, length, (short) numOfDatanodes, 0);
-            LocatedBlocksInterface lbs = client.getBlockLocations(filePath.toUri().getPath(), 0, length);
+            LocatedBlocks lbs = client.getBlockLocations(filePath.toUri().getPath(), 0, length);
             Set<ExtendedBlock> before = getBlocksOnRack(lbs.getLocatedBlocks(), RACK0);
             long newCapacity = CAPACITY;
             String newRack = RACK1;

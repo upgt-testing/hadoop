@@ -83,11 +83,11 @@ public class TestSnapshotDeletion {
 
     protected static final long BLOCKSIZE = 1024;
 
-    private final PathInterface dir = new Path("/TestSnapshot");
+    private final Path dir = new Path("/TestSnapshot");
 
-    private final PathInterface sub = new Path(dir, "sub1");
+    private final Path sub = new Path(dir, "sub1");
 
-    private final PathInterface subsub = new Path(sub, "subsub1");
+    private final Path subsub = new Path(sub, "subsub1");
 
     protected Configuration conf;
 
@@ -258,7 +258,7 @@ public class TestSnapshotDeletion {
         // check dir's quota usage
         checkQuotaUsageComputation(dir, 8, BLOCKSIZE * REPLICATION * 3);
         // check blocks of tempFile
-        for (BlockInfoInterface b : blocks) {
+        for (BlockInfo b : blocks) {
             assertEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         // make a change: create a new file under subsub
@@ -284,7 +284,7 @@ public class TestSnapshotDeletion {
         // for s1, we also add diffs for both sub and noChangeDirParent
         checkQuotaUsageComputation(dir, 9L, BLOCKSIZE * REPLICATION * 4);
         // check the snapshot copy of noChangeDir
-        PathInterface snapshotNoChangeDir = SnapshotTestHelper.getSnapshotPath(dir, "s1", sub.getName() + "/" + noChangeDirParent.getName() + "/" + noChangeDir.getName());
+        Path snapshotNoChangeDir = SnapshotTestHelper.getSnapshotPath(dir, "s1", sub.getName() + "/" + noChangeDirParent.getName() + "/" + noChangeDir.getName());
         INodeDirectoryInterface snapshotNode = (INodeDirectory) fsdir.getINode(snapshotNoChangeDir.toString());
         // should still be an INodeDirectory
         assertEquals(INodeDirectory.class, snapshotNode.getClass());
@@ -315,11 +315,11 @@ public class TestSnapshotDeletion {
         // while deletion, we add diff for subsub and metaChangeFile1, and remove
         // newFile
         checkQuotaUsageComputation(dir, 9L, BLOCKSIZE * REPLICATION * 4);
-        for (BlockInfoInterface b : blocks) {
+        for (BlockInfo b : blocks) {
             assertEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         // make sure the whole subtree of sub is stored correctly in snapshot
-        PathInterface snapshotSub = SnapshotTestHelper.getSnapshotPath(dir, "s1", sub.getName());
+        Path snapshotSub = SnapshotTestHelper.getSnapshotPath(dir, "s1", sub.getName());
         INodeDirectoryInterface snapshotNode4Sub = fsdir.getINode(snapshotSub.toString()).asDirectory();
         assertTrue(snapshotNode4Sub.isWithSnapshot());
         // the snapshot copy of sub has only one child subsub.
@@ -397,12 +397,12 @@ public class TestSnapshotDeletion {
         hdfs.createSnapshot(sub, snapshotName2);
         checkQuotaUsageComputation(sub, 4, BLOCKSIZE * REPLICATION * 3);
         // Get the filestatus of sub under snapshot s2
-        PathInterface ss = SnapshotTestHelper.getSnapshotPath(sub, snapshotName2, "newFile");
-        FileStatusInterface statusBeforeDeletion = hdfs.getFileStatus(ss);
+        Path ss = SnapshotTestHelper.getSnapshotPath(sub, snapshotName2, "newFile");
+        FileStatus statusBeforeDeletion = hdfs.getFileStatus(ss);
         // delete s1
         hdfs.deleteSnapshot(sub, snapshotName);
         checkQuotaUsageComputation(sub, 4, BLOCKSIZE * REPLICATION * 3);
-        FileStatusInterface statusAfterDeletion = hdfs.getFileStatus(ss);
+        FileStatus statusAfterDeletion = hdfs.getFileStatus(ss);
         System.out.println("Before deletion: " + statusBeforeDeletion.toString() + "\n" + "After deletion: " + statusAfterDeletion.toString());
         assertEquals(statusBeforeDeletion.toString(), statusAfterDeletion.toString());
     }
@@ -451,7 +451,7 @@ public class TestSnapshotDeletion {
         // metaChangeDir's diff, dir's diff. diskspace: remove toDeleteFile, and
         // metaChangeFile's replication factor decreases
         checkQuotaUsageComputation(dir, 6, 2 * BLOCKSIZE * REPLICATION - BLOCKSIZE);
-        for (BlockInfoInterface b : blocks) {
+        for (BlockInfo b : blocks) {
             assertEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         // check 1. there is no snapshot s0
@@ -471,7 +471,7 @@ public class TestSnapshotDeletion {
         assertEquals(INodeFile.class, noChangeFileNode.getClass());
         TestSnapshotBlocksMap.assertBlockCollection(noChangeFile.toString(), 1, fsdir, blockmanager);
         // check 3: current metadata of metaChangeFile and metaChangeDir
-        FileStatusInterface status = hdfs.getFileStatus(metaChangeDir);
+        FileStatus status = hdfs.getFileStatus(metaChangeDir);
         assertEquals("unknown", status.getOwner());
         assertEquals("unknown", status.getGroup());
         status = hdfs.getFileStatus(metaChangeFile);
@@ -484,7 +484,7 @@ public class TestSnapshotDeletion {
         } catch (FileNotFoundException e) {
             GenericTestUtils.assertExceptionContains("File does not exist: " + toDeleteFile.toString(), e);
         }
-        final PathInterface toDeleteFileInSnapshot = SnapshotTestHelper.getSnapshotPath(dir, "s0", toDeleteFile.toString().substring(dir.toString().length()));
+        final Path toDeleteFileInSnapshot = SnapshotTestHelper.getSnapshotPath(dir, "s0", toDeleteFile.toString().substring(dir.toString().length()));
         try {
             hdfs.getFileStatus(toDeleteFileInSnapshot);
             fail("should throw FileNotFoundException");
@@ -603,8 +603,8 @@ public class TestSnapshotDeletion {
         // and newFile2. Rename s2 diff to s1 for subDir1
         checkQuotaUsageComputation(dir, 4, 0);
         // Check rename of snapshot diff in subDir1
-        PathInterface subdir1_s1 = SnapshotTestHelper.getSnapshotPath(dir, "s1", subDir1.getName());
-        PathInterface subdir1_s2 = SnapshotTestHelper.getSnapshotPath(dir, "s2", subDir1.getName());
+        Path subdir1_s1 = SnapshotTestHelper.getSnapshotPath(dir, "s1", subDir1.getName());
+        Path subdir1_s2 = SnapshotTestHelper.getSnapshotPath(dir, "s2", subDir1.getName());
         assertTrue(hdfs.exists(subdir1_s1));
         assertFalse(hdfs.exists(subdir1_s2));
     }
@@ -617,7 +617,7 @@ public class TestSnapshotDeletion {
      *        path to the snapshotRoot.
      */
     private void testCombineSnapshotDiffImpl(Path snapshotRoot, String modDirStr, int dirNodeNum) throws Exception {
-        PathInterface modDir = modDirStr.isEmpty() ? snapshotRoot : new Path(snapshotRoot, modDirStr);
+        Path modDir = modDirStr.isEmpty() ? snapshotRoot : new Path(snapshotRoot, modDirStr);
         Path file10 = new Path(modDir, "file10");
         Path file11 = new Path(modDir, "file11");
         Path file12 = new Path(modDir, "file12");
@@ -670,16 +670,16 @@ public class TestSnapshotDeletion {
         // modify file10, to check if the posterior diff was set correctly
         hdfs.setReplication(file10, REPLICATION);
         checkQuotaUsageComputation(snapshotRoot, dirNodeNum + 7, 20 * BLOCKSIZE);
-        PathInterface file10_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file10");
-        PathInterface file11_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file11");
-        PathInterface file12_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file12");
-        PathInterface file13_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file13");
-        PathInterface file14_s2 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s2", modDirStr + "file14");
-        PathInterface file15_s2 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s2", modDirStr + "file15");
-        FileStatusInterface statusBeforeDeletion10 = hdfs.getFileStatus(file10_s1);
-        FileStatusInterface statusBeforeDeletion11 = hdfs.getFileStatus(file11_s1);
-        FileStatusInterface statusBeforeDeletion12 = hdfs.getFileStatus(file12_s1);
-        FileStatusInterface statusBeforeDeletion13 = hdfs.getFileStatus(file13_s1);
+        Path file10_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file10");
+        Path file11_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file11");
+        Path file12_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file12");
+        Path file13_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file13");
+        Path file14_s2 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s2", modDirStr + "file14");
+        Path file15_s2 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s2", modDirStr + "file15");
+        FileStatus statusBeforeDeletion10 = hdfs.getFileStatus(file10_s1);
+        FileStatus statusBeforeDeletion11 = hdfs.getFileStatus(file11_s1);
+        FileStatus statusBeforeDeletion12 = hdfs.getFileStatus(file12_s1);
+        FileStatus statusBeforeDeletion13 = hdfs.getFileStatus(file13_s1);
         INodeFileInterface file14Node = TestSnapshotBlocksMap.assertBlockCollection(file14_s2.toString(), 1, fsdir, blockmanager);
         BlockInfo[] blocks_14 = file14Node.getBlocks();
         TestSnapshotBlocksMap.assertBlockCollection(file15_s2.toString(), 1, fsdir, blockmanager);
@@ -687,10 +687,10 @@ public class TestSnapshotDeletion {
         hdfs.deleteSnapshot(snapshotRoot, "s2");
         checkQuotaUsageComputation(snapshotRoot, dirNodeNum + 6, 14 * BLOCKSIZE);
         // check the correctness of s1
-        FileStatusInterface statusAfterDeletion10 = hdfs.getFileStatus(file10_s1);
-        FileStatusInterface statusAfterDeletion11 = hdfs.getFileStatus(file11_s1);
-        FileStatusInterface statusAfterDeletion12 = hdfs.getFileStatus(file12_s1);
-        FileStatusInterface statusAfterDeletion13 = hdfs.getFileStatus(file13_s1);
+        FileStatus statusAfterDeletion10 = hdfs.getFileStatus(file10_s1);
+        FileStatus statusAfterDeletion11 = hdfs.getFileStatus(file11_s1);
+        FileStatus statusAfterDeletion12 = hdfs.getFileStatus(file12_s1);
+        FileStatus statusAfterDeletion13 = hdfs.getFileStatus(file13_s1);
         assertEquals(statusBeforeDeletion10.toString(), statusAfterDeletion10.toString());
         assertEquals(statusBeforeDeletion11.toString(), statusAfterDeletion11.toString());
         assertEquals(statusBeforeDeletion12.toString(), statusAfterDeletion12.toString());
@@ -700,20 +700,20 @@ public class TestSnapshotDeletion {
         TestSnapshotBlocksMap.assertBlockCollection(file12_s1.toString(), 1, fsdir, blockmanager);
         TestSnapshotBlocksMap.assertBlockCollection(file13_s1.toString(), 1, fsdir, blockmanager);
         // make sure file14 and file15 are not included in s1
-        PathInterface file14_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file14");
-        PathInterface file15_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file15");
+        Path file14_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file14");
+        Path file15_s1 = SnapshotTestHelper.getSnapshotPath(snapshotRoot, "s1", modDirStr + "file15");
         assertFalse(hdfs.exists(file14_s1));
         assertFalse(hdfs.exists(file15_s1));
-        for (BlockInfoInterface b : blocks_14) {
+        for (BlockInfo b : blocks_14) {
             assertEquals(INVALID_INODE_ID, b.getBlockCollectionId());
         }
         INodeFileInterface nodeFile13 = (INodeFile) fsdir.getINode(file13.toString());
-        for (BlockInfoInterface b : nodeFile13.getBlocks()) {
+        for (BlockInfo b : nodeFile13.getBlocks()) {
             assertEquals(REPLICATION_1, b.getReplication());
         }
         TestSnapshotBlocksMap.assertBlockCollection(file13.toString(), 1, fsdir, blockmanager);
         INodeFileInterface nodeFile12 = (INodeFile) fsdir.getINode(file12_s1.toString());
-        for (BlockInfoInterface b : nodeFile12.getBlocks()) {
+        for (BlockInfo b : nodeFile12.getBlocks()) {
             assertEquals(REPLICATION_1, b.getReplication());
         }
     }
@@ -743,14 +743,14 @@ public class TestSnapshotDeletion {
         hdfs.deleteSnapshot(sub, "s3");
         checkQuotaUsageComputation(sub, 2, BLOCKSIZE * 3);
         // check sub1's metadata in snapshot s2
-        FileStatusInterface statusOfS2 = hdfs.getFileStatus(new Path(sub, HdfsConstants.DOT_SNAPSHOT_DIR + "/s2"));
+        FileStatus statusOfS2 = hdfs.getFileStatus(new Path(sub, HdfsConstants.DOT_SNAPSHOT_DIR + "/s2"));
         assertEquals("user2", statusOfS2.getOwner());
         assertEquals("group2", statusOfS2.getGroup());
         // delete snapshot s2
         hdfs.deleteSnapshot(sub, "s2");
         checkQuotaUsageComputation(sub, 2, BLOCKSIZE * 3);
         // check sub1's metadata in snapshot s1
-        FileStatusInterface statusOfS1 = hdfs.getFileStatus(new Path(sub, HdfsConstants.DOT_SNAPSHOT_DIR + "/s1"));
+        FileStatus statusOfS1 = hdfs.getFileStatus(new Path(sub, HdfsConstants.DOT_SNAPSHOT_DIR + "/s1"));
         assertEquals("user1", statusOfS1.getOwner());
         assertEquals("group1", statusOfS1.getGroup());
     }
@@ -768,7 +768,7 @@ public class TestSnapshotDeletion {
         hdfs.allowSnapshot(path);
         hdfs.mkdirs(new Path(path, "/test"));
         hdfs.createSnapshot(path, "s1");
-        UserGroupInformationInterface anotherUser = UserGroupInformation.createRemoteUser("anotheruser");
+        UserGroupInformation anotherUser = UserGroupInformation.createRemoteUser("anotheruser");
         anotherUser.doAs(new PrivilegedAction<Object>() {
 
             @Override
@@ -825,15 +825,15 @@ public class TestSnapshotDeletion {
         checkQuotaUsageComputation(new Path("/"), 8, BLOCKSIZE * 11);
         checkQuotaUsageComputation(dir, 7, BLOCKSIZE * 11);
         checkQuotaUsageComputation(sub, 6, BLOCKSIZE * 11);
-        PathInterface subsubSnapshotCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subsub.getName());
-        PathInterface subsubFile1SCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subsub.getName() + Path.SEPARATOR + subsubFile1.getName());
-        PathInterface subFile1SCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subFile1.getName());
-        FileStatusInterface subsubStatus = hdfs.getFileStatus(subsubSnapshotCopy);
+        Path subsubSnapshotCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subsub.getName());
+        Path subsubFile1SCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subsub.getName() + Path.SEPARATOR + subsubFile1.getName());
+        Path subFile1SCopy = SnapshotTestHelper.getSnapshotPath(dir, "s2", sub.getName() + Path.SEPARATOR + subFile1.getName());
+        FileStatus subsubStatus = hdfs.getFileStatus(subsubSnapshotCopy);
         assertEquals("owner", subsubStatus.getOwner());
         assertEquals("group", subsubStatus.getGroup());
-        FileStatusInterface subsubFile1Status = hdfs.getFileStatus(subsubFile1SCopy);
+        FileStatus subsubFile1Status = hdfs.getFileStatus(subsubFile1SCopy);
         assertEquals(REPLICATION, subsubFile1Status.getReplication());
-        FileStatusInterface subFile1Status = hdfs.getFileStatus(subFile1SCopy);
+        FileStatus subFile1Status = hdfs.getFileStatus(subFile1SCopy);
         assertEquals(REPLICATION_1, subFile1Status.getReplication());
         // delete snapshot s2
         hdfs.deleteSnapshot(dir, "s2");

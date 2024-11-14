@@ -62,7 +62,7 @@ public class TestOverReplicatedBlocks {
             DFSTestUtil.createFile(fs, fileName, 2, (short) 3, 0L);
             DFSTestUtil.waitReplication(fs, fileName, (short) 3);
             // corrupt the block on datanode 0
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, fileName);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             cluster.corruptReplica(0, block);
             DataNodeProperties dnProps = cluster.stopDataNode(0);
             // remove block scanner log to trigger block scanning
@@ -160,7 +160,7 @@ public class TestOverReplicatedBlocks {
             final int dnBlocks = bm.getExcessSize4Testing(dnReg.getDatanodeUuid());
             assertEquals("Replicas on node " + lastDNid + " should have been deleted", SMALL_FILE_LENGTH / SMALL_BLOCK_SIZE, dnBlocks);
             namesystem.readUnlock();
-            for (BlockLocationInterface location : locs) assertEquals("Block should still have 4 replicas", 4, location.getNames().length);
+            for (BlockLocation location : locs) assertEquals("Block should still have 4 replicas", 4, location.getNames().length);
         } finally {
             if (fs != null)
                 fs.close();
@@ -187,7 +187,7 @@ public class TestOverReplicatedBlocks {
             out.hsync();
             fs.setReplication(p, (short) 1);
             out.close();
-            ExtendedBlockInterface block = DFSTestUtil.getFirstBlock(fs, p);
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, p);
             assertEquals("Expected only one live replica for the block", 1, bm.countNodes(bm.getStoredBlock(block.getLocalBlock())).liveReplicas());
         } finally {
             cluster.shutdown();

@@ -34,14 +34,14 @@ public class DockerTest {
         NameNodeInterface nameNode = dockerHDFSCluster.getNameNode();
         DataNodeInterface dataNode = dockerHDFSCluster.getDataNode(0);
 
-        ConfigurationInterface conf = dataNode.getConf();
+        Configuration conf = dataNode.getConf();
         conf.set("fake-from-test", "datanode-value");
         System.out.println("Configuration datanode after set: " + conf.get("fake-from-test"));
 
-        ConfigurationInterface sameConf = dataNode.getConf();
+        Configuration sameConf = dataNode.getConf();
         //Assert.assertEquals(conf, sameConf);
 
-        ConfigurationInterface brandNewConf = dataNode.createConf();
+        Configuration brandNewConf = dataNode.createConf();
         dataNode.setConf(brandNewConf);
         System.out.println("Configuration datanode after reset: " + dataNode.getConf().get("fake-from-test"));
     }
@@ -73,17 +73,17 @@ public class DockerTest {
 
         // test real object through UUID
 
-        ConfigurationInterface conf = dataNode.getConf();
+        Configuration conf = dataNode.getConf();
         conf.set("fake-from-test", "datanode-value");
 
         // this test whether we get the same object from dataNode or not
-        ConfigurationInterface confFromDataNodeBefore = dataNode.getConf();
+        Configuration confFromDataNodeBefore = dataNode.getConf();
         System.out.println("Configuration datanode after set: " + confFromDataNodeBefore.get("fake-from-test"));
         Assert.assertEquals("datanode-value", confFromDataNodeBefore.get("fake-from-test"));
 
         // this test (1) whether we can create a new Configuration object;
         // (2) whether we reset the same old configuration or not
-        ConfigurationInterface brandNewConf = dataNode.createConf();
+        Configuration brandNewConf = dataNode.createConf();
         dataNode.setConf(brandNewConf);
         System.out.println("Configuration datanode after reset: " + dataNode.getConf().get("fake-from-test"));
         Assert.assertNull(dataNode.getConf().get("fake-from-test"));
@@ -92,7 +92,7 @@ public class DockerTest {
         // With the current implementation, the configuration get from NameNode does not exist in DataNode
         // So the code will fail due to NullPointerException when trying to get the object through UUID
         try {
-            ConfigurationInterface nnConf = nameNode.getConf();
+            Configuration nnConf = nameNode.getConf();
             nnConf.set("fake-from-test", "namenode-value");
             dataNode.setConf(nnConf);
             System.out.println("Configuration datanode after set from NameNode: " + dataNode.getConf().get("fake-from-test"));

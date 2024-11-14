@@ -94,7 +94,7 @@ public class TestBalancerLongRunningTasks {
 
     private final static String FILE_NAME = "/tmp.txt";
 
-    private final static PathInterface FILE_PATH = new Path(FILE_NAME);
+    private final static Path FILE_PATH = new Path(FILE_NAME);
 
     private MiniDockerDFSCluster cluster;
 
@@ -384,7 +384,7 @@ public class TestBalancerLongRunningTasks {
             Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
             BlockPlacementPolicyInterface placementPolicy = cluster.getNamesystem().getBlockManager().getBlockPlacementPolicy();
             List<LocatedBlock> locatedBlocks = client.getBlockLocations(FILE_NAME, 0, fileSize).getLocatedBlocks();
-            for (LocatedBlockInterface locatedBlock : locatedBlocks) {
+            for (LocatedBlock locatedBlock : locatedBlocks) {
                 BlockPlacementStatus status = placementPolicy.verifyBlockPlacement(locatedBlock.getLocations(), numOfDatanodes);
                 assertTrue(status.isPlacementPolicySatisfied());
             }

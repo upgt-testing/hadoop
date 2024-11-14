@@ -81,7 +81,7 @@ public class TestNamenodeRetryCache {
 
     private static MiniDockerDFSCluster cluster;
 
-    private static ErasureCodingPolicyInterface defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+    private static ErasureCodingPolicy defaultEcPolicy = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
 
     private static int numDataNodes = defaultEcPolicy.getNumDataUnits() + defaultEcPolicy.getNumParityUnits() + 1;
 
@@ -129,7 +129,7 @@ public class TestNamenodeRetryCache {
 
     static class DummyCall extends Server.Call {
 
-        private UserGroupInformationInterface ugi;
+        private UserGroupInformation ugi;
 
         DummyCall(int callId, byte[] clientId) {
             super(callId, 1, null, null, RpcKind.RPC_PROTOCOL_BUFFER, clientId);

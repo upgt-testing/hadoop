@@ -96,7 +96,7 @@ public class TestBlockUnderConstruction {
         BlockInfo[] blocks = inode.getBlocks();
         assertTrue("File does not have blocks: " + inode.toString(), blocks != null && blocks.length > 0);
         int idx = 0;
-        BlockInfoInterface curBlock;
+        BlockInfo curBlock;
         // all blocks but the last two should be regular blocks
         for (; idx < blocks.length - 2; idx++) {
             curBlock = blocks[idx];
@@ -152,10 +152,10 @@ public class TestBlockUnderConstruction {
         writeFile(p, out, len);
         for (int i = 1; i < NUM_BLOCKS; ) {
             // verify consistency
-            final LocatedBlocksInterface lb = namenode.getBlockLocations(src, 0, len);
+            final LocatedBlocks lb = namenode.getBlockLocations(src, 0, len);
             final List<LocatedBlock> blocks = lb.getLocatedBlocks();
             assertEquals(i, blocks.size());
-            final BlockInterface b = blocks.get(blocks.size() - 1).getBlock().getLocalBlock();
+            final Block b = blocks.get(blocks.size() - 1).getBlock().getLocalBlock();
             assertFalse(blockManager.getStoredBlock(b).isComplete());
             if (++i < NUM_BLOCKS) {
                 // write one more block
@@ -184,9 +184,9 @@ public class TestBlockUnderConstruction {
         writeFile(p, out, 256);
         out.hflush();
         // make sure the block is readable
-        LocatedBlocksInterface lbs = namenode.getBlockLocations(src, 0, 256);
-        LocatedBlockInterface lastLB = lbs.getLocatedBlocks().get(0);
-        final BlockInterface b = lastLB.getBlock().getLocalBlock();
+        LocatedBlocks lbs = namenode.getBlockLocations(src, 0, 256);
+        LocatedBlock lastLB = lbs.getLocatedBlocks().get(0);
+        final Block b = lastLB.getBlock().getLocalBlock();
         // fake a block recovery
         long blockRecoveryId = bm.nextGenerationStamp(false);
         BlockUnderConstructionFeatureInterface uc = bm.getStoredBlock(b).getUnderConstructionFeature();

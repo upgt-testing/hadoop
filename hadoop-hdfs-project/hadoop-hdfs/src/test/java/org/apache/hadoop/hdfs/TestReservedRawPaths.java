@@ -112,7 +112,7 @@ public class TestReservedRawPaths {
     public void testINodesInPath() throws IOException {
         FSDirectoryInterface fsd = cluster.getNamesystem().getFSDirectory();
         final String path = "/path";
-        INodesInPathInterface iip = fsd.resolvePath(null, path, DirOp.READ);
+        INodesInPath iip = fsd.resolvePath(null, path, DirOp.READ);
         assertFalse(iip.isRaw());
         assertEquals(path, iip.getPath());
         iip = fsd.resolvePath(null, "/.reserved/raw" + path, DirOp.READ);
@@ -242,7 +242,7 @@ public class TestReservedRawPaths {
         final Path reservedRaw = new Path("/.reserved/raw");
         final int len = 8192;
         /* Test failure of create file in reserved/raw as non admin */
-        final UserGroupInformationInterface user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
+        final UserGroupInformation user = UserGroupInformation.createUserForTesting("user", new String[] { "mygroup" });
         user.doAs(new PrivilegedExceptionAction<Object>() {
 
             @Override
@@ -328,7 +328,7 @@ public class TestReservedRawPaths {
     @Test(timeout = 120000)
     public void testListRecursive() throws Exception {
         Path rootPath = new Path("/");
-        PathInterface p = rootPath;
+        Path p = rootPath;
         for (int i = 0; i < 3; i++) {
             p = new Path(p, "dir" + i);
             fs.mkdirs(p);
@@ -337,7 +337,7 @@ public class TestReservedRawPaths {
         int cnt = 0;
         FileStatus[] fileStatuses = fs.listStatus(curPath);
         while (fileStatuses != null && fileStatuses.length > 0) {
-            FileStatusInterface f = fileStatuses[0];
+            FileStatus f = fileStatuses[0];
             assertMatches(f.getPath().toString(), "/.reserved/raw");
             curPath = Path.getPathWithoutSchemeAndAuthority(f.getPath());
             cnt++;

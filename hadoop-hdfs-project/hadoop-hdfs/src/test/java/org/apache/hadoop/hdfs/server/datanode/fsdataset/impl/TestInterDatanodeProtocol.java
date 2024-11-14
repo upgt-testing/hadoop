@@ -178,7 +178,7 @@ public class TestInterDatanodeProtocol {
             DFSTestUtil.createFile(dfs, filepath, 1024L, (short) 3, 0L);
             assertTrue(dfs.exists(filepath));
             //get block info
-            LocatedBlockInterface locatedblock = getLastLocatedBlock(DFSClientAdapter.getDFSClient(dfs).getNamenode(), filestr);
+            LocatedBlock locatedblock = getLastLocatedBlock(DFSClientAdapter.getDFSClient(dfs).getNamenode(), filestr);
             DatanodeInfo[] datanodeinfo = locatedblock.getLocations();
             assertTrue(datanodeinfo.length > 0);
             //connect to a data node
@@ -187,7 +187,7 @@ public class TestInterDatanodeProtocol {
             // Stop the block scanners.
             datanode.getBlockScanner().removeAllVolumeScanners();
             //verify BlockMetaDataInfo
-            ExtendedBlockInterface b = locatedblock.getBlock();
+            ExtendedBlock b = locatedblock.getBlock();
             InterDatanodeProtocol.LOG.info("b=" + b + ", " + b.getClass());
             checkMetaInfo(b, datanode);
             long recoveryId = b.getGenerationStamp() + 1;
@@ -235,7 +235,7 @@ public class TestInterDatanodeProtocol {
         }
         {
             //normal case
-            final BlockInterface b = blocks[0];
+            final Block b = blocks[0];
             final ReplicaInfoInterface originalInfo = map.get(bpid, b);
             final long recoveryid = gs + 1;
             final ReplicaRecoveryInfoInterface recoveryInfo = FsDatasetImpl.initReplicaRecovery(bpid, map, blocks[0], recoveryid, DFSConfigKeys.DFS_DATANODE_XCEIVER_STOP_TIMEOUT_MILLIS_DEFAULT);
@@ -305,14 +305,14 @@ public class TestInterDatanodeProtocol {
             Path filepath = new Path(filestr);
             DFSTestUtil.createFile(dfs, filepath, 1024L, (short) 3, 0L);
             //get block info
-            final LocatedBlockInterface locatedblock = getLastLocatedBlock(DFSClientAdapter.getDFSClient(dfs).getNamenode(), filestr);
+            final LocatedBlock locatedblock = getLastLocatedBlock(DFSClientAdapter.getDFSClient(dfs).getNamenode(), filestr);
             final DatanodeInfo[] datanodeinfo = locatedblock.getLocations();
             Assert.assertTrue(datanodeinfo.length > 0);
             //get DataNode and FSDataset objects
             final DataNodeInterface datanode = cluster.getDataNode(datanodeinfo[0].getIpcPort());
             Assert.assertTrue(datanode != null);
             //initReplicaRecovery
-            final ExtendedBlockInterface b = locatedblock.getBlock();
+            final ExtendedBlock b = locatedblock.getBlock();
             final long recoveryid = b.getGenerationStamp() + 1;
             final long newlength = b.getNumBytes() - 1;
             final FsDatasetSpi<?> fsdataset = DataNodeTestUtils.getFSDataset(datanode);
