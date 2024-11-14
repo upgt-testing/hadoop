@@ -4,6 +4,7 @@ public interface SlowDiskTrackerInterface {
     void cleanUpOldReports(long arg0);
     void setReportValidityMs(long arg0);
     void addSlowDiskReport(java.lang.String arg0, SlowDiskReportsInterface arg1);
+    void addSlowDiskReport(java.lang.String arg0, org.apache.hadoop.hdfs.server.protocol.SlowDiskReports arg1);
     long getReportValidityMs();
     java.util.ArrayList<org.apache.hadoop.hdfs.server.blockmanagement.SlowDiskTracker.DiskLatency> getSlowDisksReport();
     java.lang.String getSlowDiskIDForReport(java.lang.String arg0, java.lang.String arg1);

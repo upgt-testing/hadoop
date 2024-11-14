@@ -103,7 +103,7 @@ public class TestDirectoryScanner {
 
     private FsDatasetSpi<? extends FsVolumeSpi> fds = null;
 
-    private DirectoryScannerInterface scanner = null;
+    private DirectoryScanner scanner = null;
 
     private final Random rand = new Random();
 
@@ -138,7 +138,7 @@ public class TestDirectoryScanner {
      */
     private long truncateBlockFile() throws IOException {
         try (AutoCloseableLock lock = fds.acquireDatasetLock()) {
-            for (ReplicaInfoInterface b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
+            for (ReplicaInfo b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
                 File f = new File(b.getBlockURI());
                 File mf = new File(b.getMetadataURI());
                 // Truncate a block file that has a corresponding metadata file
@@ -165,7 +165,7 @@ public class TestDirectoryScanner {
      */
     private long deleteBlockFile() {
         try (AutoCloseableLock lock = fds.acquireDatasetLock()) {
-            for (ReplicaInfoInterface b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
+            for (ReplicaInfo b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
                 File f = new File(b.getBlockURI());
                 File mf = new File(b.getMetadataURI());
                 // Delete a block file that has corresponding metadata file
@@ -183,7 +183,7 @@ public class TestDirectoryScanner {
      */
     private long deleteMetaFile() {
         try (AutoCloseableLock lock = fds.acquireDatasetLock()) {
-            for (ReplicaInfoInterface b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
+            for (ReplicaInfo b : FsDatasetTestUtil.getReplicas(fds, bpid)) {
                 // Delete a metadata file
                 if (b.metadataExists() && b.deleteMetadata()) {
                     LOG.info("Deleting metadata " + b.getMetadataURI());
@@ -202,7 +202,7 @@ public class TestDirectoryScanner {
      */
     private void duplicateBlock(long blockId) throws IOException {
         try (AutoCloseableLock lock = fds.acquireDatasetLock()) {
-            ReplicaInfoInterface b = FsDatasetTestUtil.fetchReplicaInfo(fds, bpid, blockId);
+            ReplicaInfo b = FsDatasetTestUtil.fetchReplicaInfo(fds, bpid, blockId);
             try (FsDatasetSpi.FsVolumeReferences volumes = fds.getFsVolumeReferences()) {
                 for (FsVolumeSpi v : volumes) {
                     if (v.getStorageID().equals(b.getVolume().getStorageID())) {
@@ -339,7 +339,7 @@ public class TestDirectoryScanner {
     private void verifyStats(long totalBlocks, int diffsize, long missingMetaFile, long missingBlockFile, long missingMemoryBlocks, long mismatchBlocks, long duplicateBlocks) {
         Collection<FsVolumeSpi.ScanInfo> diff = scanner.diffs.getScanInfo(bpid);
         assertEquals(diffsize, diff.size());
-        DirectoryScanner.StatsInterface stats = scanner.stats.get(bpid);
+        DirectoryScanner.Stats stats = scanner.stats.get(bpid);
         assertNotNull(stats);
         assertEquals(totalBlocks, stats.totalBlocks);
         assertEquals(missingMetaFile, stats.missingMetaFile);
@@ -743,7 +743,7 @@ public class TestDirectoryScanner {
     }
 
     private void verifyAddition(long blockId, long genStamp, long size) {
-        final ReplicaInfoInterface replicainfo;
+        final ReplicaInfo replicainfo;
         replicainfo = FsDatasetTestUtil.fetchReplicaInfo(fds, bpid, blockId);
         assertNotNull(replicainfo);
         // Added block has the same file as the one created by the test
@@ -761,14 +761,14 @@ public class TestDirectoryScanner {
     }
 
     private void verifyGenStamp(long blockId, long genStamp) {
-        final ReplicaInfoInterface memBlock;
+        final ReplicaInfo memBlock;
         memBlock = FsDatasetTestUtil.fetchReplicaInfo(fds, bpid, blockId);
         assertNotNull(memBlock);
         assertEquals(genStamp, memBlock.getGenerationStamp());
     }
 
     private void verifyStorageType(long blockId, boolean expectTransient) {
-        final ReplicaInfoInterface memBlock;
+        final ReplicaInfo memBlock;
         memBlock = FsDatasetTestUtil.fetchReplicaInfo(fds, bpid, blockId);
         assertNotNull(memBlock);
         assertThat(memBlock.getVolume().isTransientStorage(), is(expectTransient));
@@ -1012,7 +1012,7 @@ public class TestDirectoryScanner {
         File blockDir = DatanodeUtil.idToBlockDir(new File(baseDir), blkId);
         String subdir1 = new File(blockDir.getParent()).getName();
         // test parsing dir without ./subdir/subdir
-        LocalReplica.ReplicaDirInfoInterface info = LocalReplica.parseBaseDir(new File(baseDir), blkId);
+        LocalReplica.ReplicaDirInfo info = LocalReplica.parseBaseDir(new File(baseDir), blkId);
         assertEquals(baseDir, info.baseDirPath);
         assertEquals(false, info.hasSubidrs);
         // test when path doesn't match the idToBLockDir.
@@ -1050,7 +1050,7 @@ public class TestDirectoryScanner {
         File memBlockDir = blockDir;
         LocalReplica localReplica = (LocalReplica) new ReplicaBuilder(HdfsServerConstants.ReplicaState.FINALIZED).setDirectoryToUse(memBlockDir).setBlockId(blkId).build();
         // DirectoryScanner find the inconsistent file and try to make it right
-        StorageLocationInterface sl = StorageLocation.parse(realBlkFile.toString());
+        StorageLocation sl = StorageLocation.parse(realBlkFile.toString());
         localReplica.updateWithReplica(sl);
         assertEquals(realBlkFile, localReplica.getBlockFile());
     }

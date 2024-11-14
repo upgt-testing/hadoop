@@ -92,7 +92,7 @@ public class TestBlockRecovery2 {
 
     private static final String DATA_DIR = MiniDockerDFSCluster.getBaseDirectory() + "data";
 
-    private DataNodeInterface dn;
+    private DataNode dn;
 
     private Configuration conf;
 
@@ -130,9 +130,9 @@ public class TestBlockRecovery2 {
         File dataDir = new File(DATA_DIR);
         FileUtil.fullyDelete(dataDir);
         dataDir.mkdirs();
-        StorageLocationInterface location = StorageLocation.parse(dataDir.getPath());
+        StorageLocation location = StorageLocation.parse(dataDir.getPath());
         locations.add(location);
-        final DatanodeProtocolClientSideTranslatorPBInterface namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
+        final DatanodeProtocolClientSideTranslatorPB namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
         Mockito.doAnswer((Answer<DatanodeRegistration>) invocation -> (DatanodeRegistration) invocation.getArguments()[0]).when(namenode).registerDatanode(Mockito.any(DatanodeRegistration.class));
         when(namenode.versionRequest()).thenReturn(new NamespaceInfo(1, CLUSTER_ID, POOL_ID, 1L));
         when(namenode.sendHeartbeat(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any())).thenReturn(new HeartbeatResponse(new DatanodeCommand[0], new NNHAStatusHeartbeat(HAServiceProtocol.HAServiceState.ACTIVE, 1), null, ThreadLocalRandom.current().nextLong() | 1L));

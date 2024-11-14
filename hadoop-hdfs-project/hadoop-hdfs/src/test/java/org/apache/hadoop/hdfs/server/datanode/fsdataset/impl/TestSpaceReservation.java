@@ -422,12 +422,12 @@ public class TestSpaceReservation {
         }
         Thread.sleep(60000);
         // Stop the writers.
-        for (WriterInterface w : writers) {
+        for (Writer w : writers) {
             w.stopWriter();
         }
         int filesCreated = 0;
         int numFailures = 0;
-        for (WriterInterface w : writers) {
+        for (Writer w : writers) {
             w.join();
             filesCreated += w.getFilesCreated();
             numFailures += w.getNumFailures();
@@ -632,7 +632,7 @@ public class TestSpaceReservation {
      * recovery. If so, then recovery will not happen in time. So mark stopped
      * node as dead to exclude that node.
      */
-        cluster.setDataNodeDead(lastBlock.getLocations()[2]);
+        //cluster.setDataNodeDead(lastBlock.getLocations()[2]);
         fs.recoverLease(file);
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
 

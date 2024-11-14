@@ -16,6 +16,7 @@ public interface BlockIdManagerInterface {
     void setLegacyGenerationStamp(long arg0);
     SequentialBlockGroupIdGeneratorInterface getBlockGroupIdGenerator();
     boolean isLegacyBlock(BlockInterface arg0);
+    boolean isLegacyBlock(org.apache.hadoop.hdfs.protocol.Block arg0);
     void setLastAllocatedContiguousBlockId(long arg0);
     long getNextGenerationStamp();
     boolean isGenStampInFuture(BlockInterface arg0);

@@ -65,7 +65,7 @@ public class TestDatanodeProtocolRetryPolicy {
 
     private static final String DATA_DIR = MiniDockerDFSCluster.getBaseDirectory() + "data";
 
-    private DataNodeInterface dn;
+    private DataNode dn;
 
     private Configuration conf;
 
@@ -79,7 +79,7 @@ public class TestDatanodeProtocolRetryPolicy {
 
     private final static InetSocketAddress NN_ADDR = new InetSocketAddress("localhost", 5020);
 
-    private static DatanodeRegistrationInterface datanodeRegistration = DFSTestUtil.getLocalDatanodeRegistration();
+    private static DatanodeRegistration datanodeRegistration = DFSTestUtil.getLocalDatanodeRegistration();
 
     static {
         GenericTestUtils.setLogLevel(LOG, Level.TRACE);
@@ -102,7 +102,7 @@ public class TestDatanodeProtocolRetryPolicy {
         File dataDir = new File(DATA_DIR);
         FileUtil.fullyDelete(dataDir);
         dataDir.mkdirs();
-        StorageLocationInterface location = StorageLocation.parse(dataDir.getPath());
+        StorageLocation location = StorageLocation.parse(dataDir.getPath());
         locations.add(location);
     }
 
@@ -154,7 +154,7 @@ public class TestDatanodeProtocolRetryPolicy {
      */
     @Test(timeout = 60000)
     public void testDatanodeRegistrationRetry() throws Exception {
-        final DatanodeProtocolClientSideTranslatorPBInterface namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
+        final DatanodeProtocolClientSideTranslatorPB namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
         Mockito.doAnswer(new Answer<DatanodeRegistration>() {
 
             int i = 0;
@@ -166,7 +166,7 @@ public class TestDatanodeProtocolRetryPolicy {
                     LOG.info("mockito exception " + i);
                     throw new EOFException("TestDatanodeProtocolRetryPolicy");
                 } else {
-                    DatanodeRegistrationInterface dr = (DatanodeRegistration) invocation.getArguments()[0];
+                    DatanodeRegistration dr = (DatanodeRegistration) invocation.getArguments()[0];
                     datanodeRegistration = new DatanodeRegistration(dr.getDatanodeUuid(), dr);
                     LOG.info("mockito succeeded " + datanodeRegistration);
                     return datanodeRegistration;
@@ -181,7 +181,7 @@ public class TestDatanodeProtocolRetryPolicy {
             @Override
             public HeartbeatResponse answer(InvocationOnMock invocation) throws Throwable {
                 i++;
-                HeartbeatResponseInterface heartbeatResponse;
+                HeartbeatResponse heartbeatResponse;
                 if (i == 1) {
                     LOG.info("mockito heartbeatResponse registration " + i);
                     heartbeatResponse = new HeartbeatResponse(new DatanodeCommand[] { RegisterCommand.REGISTER }, new NNHAStatusHeartbeat(HAServiceState.ACTIVE, 1), null, ThreadLocalRandom.current().nextLong() | 1L);

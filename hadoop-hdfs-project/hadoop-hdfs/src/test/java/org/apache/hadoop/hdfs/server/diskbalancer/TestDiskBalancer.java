@@ -137,7 +137,7 @@ public class TestDiskBalancer {
         try {
             DataMover dataMover = new DataMover(cluster, dataNodeIndex, sourceDiskIndex, conf, blockSize, blockCount);
             dataMover.moveDataToSourceDisk();
-            NodePlanInterface plan = dataMover.generatePlan();
+            NodePlan plan = dataMover.generatePlan();
             dataMover.executePlan(plan);
             dataMover.verifyPlanExectionDone();
             dataMover.verifyAllVolumesHaveData(true);
@@ -175,7 +175,7 @@ public class TestDiskBalancer {
         try {
             DataMover dataMover = new DataMover(cluster, dataNodeIndex, sourceDiskIndex, conf, blockSize, blockCount);
             dataMover.moveDataToSourceDisk();
-            NodePlanInterface plan = dataMover.generatePlan();
+            NodePlan plan = dataMover.generatePlan();
             dataMover.executePlan(plan);
             dataMover.verifyPlanExectionDone();
             dataMover.verifyAllVolumesHaveData(true);
@@ -201,7 +201,7 @@ public class TestDiskBalancer {
         try {
             DataNodeInterface node = cluster.getDataNodes().get(dataNodeIndex);
             final FsDatasetSpi<?> fsDatasetSpy = Mockito.spy(node.getFSDataset());
-            DiskBalancerWorkItemInterface item = Mockito.spy(new DiskBalancerWorkItem());
+            DiskBalancerWorkItem item = Mockito.spy(new DiskBalancerWorkItem());
             // Mocking bandwidth as 10mb/sec.
             Mockito.doReturn((long) 10).when(item).getBandwidth();
             doAnswer(new Answer<Object>() {
@@ -260,7 +260,7 @@ public class TestDiskBalancer {
         try {
             DataMover dataMover = new DataMover(cluster, dataNodeIndex, sourceDiskIndex, conf, blockSize, blockCount);
             dataMover.moveDataToSourceDisk();
-            NodePlanInterface plan = dataMover.generatePlan();
+            NodePlan plan = dataMover.generatePlan();
             dataMover.executePlan(plan);
             dataMover.verifyPlanExectionDone();
             // Because here we have one nameservice empty, don't check blockPoolCount.
@@ -289,7 +289,7 @@ public class TestDiskBalancer {
         try {
             DataMover dataMover = new DataMover(cluster, dataNodeIndex, sourceDiskIndex, conf, blockSize, blockCount);
             dataMover.moveDataToSourceDisk();
-            NodePlanInterface plan = dataMover.generatePlan();
+            NodePlan plan = dataMover.generatePlan();
             // 3 disks , The plan should move data both disks,
             // so we must have 2 plan steps.
             assertEquals(plan.getVolumeSetPlans().size(), 2);
@@ -322,7 +322,7 @@ public class TestDiskBalancer {
         try {
             DataMover dataMover = new DataMover(cluster, dataNodeIndex, sourceDiskIndex, conf, blockSize, blockCount);
             dataMover.moveDataToSourceDisk();
-            NodePlanInterface plan = dataMover.generatePlan();
+            NodePlan plan = dataMover.generatePlan();
             dataMover.executePlanDuringDiskRemove(plan);
             dataMover.verifyAllVolumesHaveData(true);
             dataMover.verifyTolerance(plan, 0, sourceDiskIndex, 10);
@@ -494,6 +494,24 @@ public class TestDiskBalancer {
             }
         }
 
+        private void moveAllDataToDestDisk(DataNodeInterface dataNode, int destDiskindex) throws IOException {
+            Preconditions.checkNotNull(dataNode);
+            Preconditions.checkState(destDiskindex >= 0);
+            try (FsDatasetSpi.FsVolumeReferences refs = dataNode.getFSDataset().getFsVolumeReferences()) {
+                if (refs.size() <= destDiskindex) {
+                    throw new IllegalArgumentException("Invalid Disk index.");
+                }
+                FsVolumeImpl dest = (FsVolumeImpl) refs.get(destDiskindex);
+                for (int x = 0; x < refs.size(); x++) {
+                    if (x == destDiskindex) {
+                        continue;
+                    }
+                    FsVolumeImpl source = (FsVolumeImpl) refs.get(x);
+                    DiskBalancerTestUtil.moveAllDataToDestVolume(dataNode.getFSDataset(), source, dest);
+                }
+            }
+        }
+
         /**
          * Generates a NodePlan for the datanode specified.
          *
@@ -514,7 +532,7 @@ public class TestDiskBalancer {
             // Now we must have a plan,since the node is imbalanced and we
             // asked the disk balancer to create a plan.
             assertTrue(clusterplan.size() == 1);
-            NodePlanInterface plan = clusterplan.get(0);
+            NodePlan plan = clusterplan.get(0);
             plan.setNodeUUID(node.getDatanodeUuid());
             plan.setTimeStamp(Time.now());
             assertNotNull(plan.getVolumeSetPlans());
@@ -534,7 +552,7 @@ public class TestDiskBalancer {
             node.submitDiskBalancerPlan(planID, 1, PLAN_FILE, planJson, false);
             String jmxString = node.getDiskBalancerStatus();
             assertNotNull(jmxString);
-            DiskBalancerWorkStatusInterface status = DiskBalancerWorkStatus.parseJson(jmxString);
+            DiskBalancerWorkStatus status = DiskBalancerWorkStatus.parseJson(jmxString);
             DiskBalancerWorkStatusInterface realStatus = node.queryDiskBalancerPlan();
             assertEquals(realStatus.getPlanID(), status.getPlanID());
             GenericTestUtils.waitFor(new Supplier<Boolean>() {

@@ -95,7 +95,7 @@ public class TestDataNodeVolumeMetrics {
                 out.writeBytes("hello world");
                 ((DFSOutputStream) out.getWrappedStream()).hsync();
             }
-            ArrayList<DataNode> dns = cluster.getDataNodes();
+            ArrayList<DataNodeInterface> dns = cluster.getDataNodes();
             assertTrue("DN1 should be up", dns.get(0).isDatanodeUp());
             final File dn1Vol2 = cluster.getInstanceStorageDir(0, 1);
             DataNodeTestUtils.injectDataDirFailure(dn1Vol2);
@@ -118,11 +118,11 @@ public class TestDataNodeVolumeMetrics {
     }
 
     private void verifyDataNodeVolumeMetrics(final FileSystem fs, final MiniDockerDFSCluster cluster, final Path fileName) throws IOException {
-        List<DataNode> datanodes = cluster.getDataNodes();
+        List<DataNodeInterface> datanodes = cluster.getDataNodes();
         DataNodeInterface datanode = datanodes.get(0);
         final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
         final FsVolumeSpi volume = datanode.getFSDataset().getVolume(block);
-        DataNodeVolumeMetricsInterface metrics = volume.getMetrics();
+        DataNodeVolumeMetrics metrics = volume.getMetrics();
         MetricsRecordBuilder rb = getMetrics(volume.getMetrics().name());
         assertCounter("TotalDataFileIos", metrics.getTotalDataFileIos(), rb);
         LOG.info("TotalMetadataOperations : " + metrics.getTotalMetadataOperations());
@@ -168,11 +168,11 @@ public class TestDataNodeVolumeMetrics {
             final long fileLen = Integer.MAX_VALUE + 1L;
             long lastWriteIoSampleCount;
             DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen, fs.getDefaultBlockSize(fileName), REPL, 1L, true);
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             DataNodeInterface datanode = datanodes.get(0);
             final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
             final FsVolumeSpi volume = datanode.getFSDataset().getVolume(block);
-            DataNodeVolumeMetricsInterface metrics = volume.getMetrics();
+            DataNodeVolumeMetrics metrics = volume.getMetrics();
             assertEquals(0, metrics.getSyncIoSampleCount());
             assertNotEquals(0, metrics.getWriteIoSampleCount());
             assertTrue(metrics.getFlushIoSampleCount() > metrics.getSyncIoSampleCount());

@@ -69,7 +69,7 @@ public class TestSlowDiskTracker {
 
     private static Configuration conf;
 
-    private SlowDiskTrackerInterface tracker;
+    private SlowDiskTracker tracker;
 
     private FakeTimer timer;
 
@@ -365,18 +365,26 @@ public class TestSlowDiskTracker {
     private void addSlowDiskForTesting(String dnID, String disk, Map<DiskOp, Double> latencies) {
         Map<String, Map<DiskOp, Double>> slowDisk = Maps.newHashMap();
         slowDisk.put(disk, latencies);
-        SlowDiskReportsInterface slowDiskReport = SlowDiskReports.create(slowDisk);
+        SlowDiskReports slowDiskReport = SlowDiskReports.create(slowDisk);
         tracker.addSlowDiskReport(dnID, slowDiskReport);
     }
 
     private SlowDiskReports generateSlowDiskReport(String disk, Map<DiskOp, Double> latencies) {
         Map<String, Map<DiskOp, Double>> slowDisk = Maps.newHashMap();
         slowDisk.put(disk, latencies);
-        SlowDiskReportsInterface slowDiskReport = SlowDiskReports.create(slowDisk);
+        SlowDiskReports slowDiskReport = SlowDiskReports.create(slowDisk);
         return slowDiskReport;
     }
 
     Map<String, DiskLatency> getSlowDisksReportForTesting(SlowDiskTracker slowDiskTracker) {
+        Map<String, DiskLatency> slowDisksMap = Maps.newHashMap();
+        for (DiskLatency diskLatency : slowDiskTracker.getSlowDisksReport()) {
+            slowDisksMap.put(diskLatency.getSlowDiskID(), diskLatency);
+        }
+        return slowDisksMap;
+    }
+
+    Map<String, DiskLatency> getSlowDisksReportForTesting(SlowDiskTrackerInterface slowDiskTracker) {
         Map<String, DiskLatency> slowDisksMap = Maps.newHashMap();
         for (DiskLatency diskLatency : slowDiskTracker.getSlowDisksReport()) {
             slowDisksMap.put(diskLatency.getSlowDiskID(), diskLatency);

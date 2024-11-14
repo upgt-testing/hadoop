@@ -64,7 +64,7 @@ public class TestDataNodeMetricsLogger {
 
     private final static InetSocketAddress NN_ADDR = new InetSocketAddress("localhost", 5020);
 
-    private DataNodeInterface dn;
+    private DataNode dn;
 
     static final Random random = new Random(System.currentTimeMillis());
 

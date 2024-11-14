@@ -126,10 +126,10 @@ public class TestBlockReplacement {
             cluster.waitActive();
             DatanodeInfo[] datanodes = client.datanodeReport(DatanodeReportType.ALL);
             // find out the new node
-            DatanodeInfoInterface newNode = null;
-            for (DatanodeInfoInterface node : datanodes) {
+            DatanodeInfo newNode = null;
+            for (DatanodeInfo node : datanodes) {
                 Boolean isNewNode = true;
-                for (DatanodeInfoInterface oldNode : oldNodes) {
+                for (DatanodeInfo oldNode : oldNodes) {
                     if (node.equals(oldNode)) {
                         isNewNode = false;
                         break;
@@ -141,9 +141,9 @@ public class TestBlockReplacement {
                 }
             }
             assertTrue(newNode != null);
-            DatanodeInfoInterface source = null;
+            DatanodeInfo source = null;
             ArrayList<DatanodeInfo> proxies = new ArrayList<DatanodeInfo>(2);
-            for (DatanodeInfoInterface node : datanodes) {
+            for (DatanodeInfo node : datanodes) {
                 if (node != newNode) {
                     if (node.getNetworkLocation().equals(newNode.getNetworkLocation())) {
                         source = node;
@@ -203,11 +203,11 @@ public class TestBlockReplacement {
             LocatedBlock lb = dfs.getClient().getLocatedBlocks(fileName, 0).get(0);
             DatanodeInfo[] oldNodes = lb.getLocations();
             assertEquals("Wrong block locations", oldNodes.length, 1);
-            DatanodeInfoInterface source = oldNodes[0];
+            DatanodeInfo source = oldNodes[0];
             ExtendedBlock b = lb.getBlock();
             DatanodeInfo[] datanodes = dfs.getDataNodeStats();
-            DatanodeInfoInterface destin = null;
-            for (DatanodeInfoInterface datanodeInfo : datanodes) {
+            DatanodeInfo destin = null;
+            for (DatanodeInfo datanodeInfo : datanodes) {
                 // choose different destination node
                 if (!oldNodes[0].equals(datanodeInfo)) {
                     destin = datanodeInfo;

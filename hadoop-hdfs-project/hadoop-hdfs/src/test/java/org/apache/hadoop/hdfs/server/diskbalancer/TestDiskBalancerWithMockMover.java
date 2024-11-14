@@ -92,7 +92,7 @@ public class TestDiskBalancerWithMockMover {
         conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, false);
         restartDataNode();
         TestMover blockMover = new TestMover(cluster.getDataNodes().get(0).getFSDataset());
-        DiskBalancerInterface balancer = new DiskBalancerBuilder(conf).setMover(blockMover).build();
+        DiskBalancer balancer = new DiskBalancerBuilder(conf).setMover(blockMover).build();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(DiskBalancerException.Result.DISK_BALANCER_NOT_ENABLED));
         balancer.queryWorkStatus();
@@ -108,8 +108,8 @@ public class TestDiskBalancerWithMockMover {
         Configuration conf = new HdfsConfiguration();
         conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
         TestMover blockMover = new TestMover(cluster.getDataNodes().get(0).getFSDataset());
-        DiskBalancerInterface balancer = new DiskBalancerBuilder(conf).setMover(blockMover).build();
-        DiskBalancerWorkStatusInterface status = balancer.queryWorkStatus();
+        DiskBalancer balancer = new DiskBalancerBuilder(conf).setMover(blockMover).build();
+        DiskBalancerWorkStatus status = balancer.queryWorkStatus();
         assertEquals(NO_PLAN, status.getResult());
     }
 
@@ -131,8 +131,8 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testResubmitDiskBalancerPlan() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         // ask block mover to get stuck in copy block
         mockMoverHelper.getBlockMover().setSleep();
         executeSubmitPlan(plan, balancer);
@@ -146,8 +146,8 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testSubmitDiskBalancerPlan() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        final DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        final DiskBalancer balancer = mockMoverHelper.getBalancer();
         executeSubmitPlan(plan, balancer);
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
@@ -168,8 +168,8 @@ public class TestDiskBalancerWithMockMover {
     public void testSubmitWithOlderPlan() throws Exception {
         final long millisecondInAnHour = 1000 * 60 * 60L;
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         plan.setTimeStamp(Time.now() - (32 * millisecondInAnHour));
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(DiskBalancerException.Result.OLD_PLAN_SUBMITTED));
@@ -179,8 +179,8 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testSubmitWithOldInvalidVersion() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(DiskBalancerException.Result.INVALID_PLAN_VERSION));
         // Plan version is invalid -- there is no version 0.
@@ -190,8 +190,8 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testSubmitWithNullPlan() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         String planJson = plan.toJson();
         String planID = DigestUtils.shaHex(planJson);
         thrown.expect(DiskBalancerException.class);
@@ -202,8 +202,8 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testSubmitWithInvalidHash() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         String planJson = plan.toJson();
         String planID = DigestUtils.shaHex(planJson);
         char repChar = planID.charAt(0);
@@ -221,15 +221,15 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testCancelDiskBalancerPlan() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
         // ask block mover to delay execution
         mockMoverHelper.getBlockMover().setSleep();
         executeSubmitPlan(plan, balancer);
         String planJson = plan.toJson();
         String planID = DigestUtils.shaHex(planJson);
         balancer.cancelPlan(planID);
-        DiskBalancerWorkStatusInterface status = balancer.queryWorkStatus();
+        DiskBalancerWorkStatus status = balancer.queryWorkStatus();
         assertEquals(DiskBalancerWorkStatus.Result.PLAN_CANCELLED, status.getResult());
         executeSubmitPlan(plan, balancer);
         // Send a Wrong cancellation request.
@@ -254,16 +254,16 @@ public class TestDiskBalancerWithMockMover {
     @Test
     public void testCustomBandwidth() throws Exception {
         MockMoverHelper mockMoverHelper = new MockMoverHelper().invoke();
-        NodePlanInterface plan = mockMoverHelper.getPlan();
-        DiskBalancerInterface balancer = mockMoverHelper.getBalancer();
-        for (StepInterface step : plan.getVolumeSetPlans()) {
+        NodePlan plan = mockMoverHelper.getPlan();
+        DiskBalancer balancer = mockMoverHelper.getBalancer();
+        for (Step step : plan.getVolumeSetPlans()) {
             MoveStep tempStep = (MoveStep) step;
             tempStep.setBandwidth(100);
         }
         executeSubmitPlan(plan, balancer);
-        DiskBalancerWorkStatusInterface status = balancer.queryWorkStatus();
+        DiskBalancerWorkStatus status = balancer.queryWorkStatus();
         assertNotNull(status);
-        DiskBalancerWorkStatus.DiskBalancerWorkEntryInterface entry = balancer.queryWorkStatus().getCurrentState().get(0);
+        DiskBalancerWorkStatus.DiskBalancerWorkEntry entry = balancer.queryWorkStatus().getCurrentState().get(0);
         assertEquals(100L, entry.getWorkItem().getBandwidth());
     }
 
@@ -416,9 +416,9 @@ public class TestDiskBalancerWithMockMover {
 
     private class MockMoverHelper {
 
-        private DiskBalancerInterface balancer;
+        private DiskBalancer balancer;
 
-        private NodePlanInterface plan;
+        private NodePlan plan;
 
         private TestMover blockMover;
 

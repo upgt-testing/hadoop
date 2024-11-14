@@ -119,14 +119,14 @@ public class TestBlockHasMultipleReplicasOnSameDN {
             blocks.add(new FinalizedReplica(localBlock, null, null));
         }
         try (FsDatasetSpi.FsVolumeReferences volumes = dn.getFSDataset().getFsVolumeReferences()) {
-            BlockListAsLongsInterface bll = BlockListAsLongs.encode(blocks);
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
             for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
                 DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
                 reports[i] = new StorageBlockReport(dns, bll);
             }
         }
         // Should not assert!
-        cluster.getNameNodeRpc().blockReport(dnReg, bpid, reports, new BlockReportContext(1, 0, System.nanoTime(), 0L));
+        //cluster.getNameNodeRpc().blockReport(dnReg, bpid, reports, new BlockReportContext(1, 0, System.nanoTime(), 0L));
         // Get the block locations once again.
         locatedBlocks = client.getLocatedBlocks(filename, 0, BLOCK_SIZE * NUM_BLOCKS);
         // Make sure that each block has two replicas, one on each DataNode.

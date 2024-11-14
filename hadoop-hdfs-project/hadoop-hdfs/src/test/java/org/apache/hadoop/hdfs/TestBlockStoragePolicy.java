@@ -55,9 +55,9 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
  */
 public class TestBlockStoragePolicy {
 
-    public static final BlockStoragePolicySuiteInterface POLICY_SUITE;
+    public static final BlockStoragePolicySuite POLICY_SUITE;
 
-    public static final BlockStoragePolicyInterface DEFAULT_STORAGE_POLICY;
+    public static final BlockStoragePolicy DEFAULT_STORAGE_POLICY;
 
     public static final Configuration conf;
 

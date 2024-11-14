@@ -26,6 +26,7 @@ public interface BlockManagerInterface {
     long getMissingReplicationOneBlocks();
     DatanodeStorageInfoInterface[] chooseTarget4AdditionalDatanode(java.lang.String arg0, int arg1, org.apache.hadoop.net.Node arg2, java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo> arg3, java.util.Set<org.apache.hadoop.net.Node> arg4, long arg5, byte arg6, org.apache.hadoop.hdfs.protocol.BlockType arg7);
     void addToInvalidates(BlockInterface arg0, DatanodeInfoInterface arg1);
+    void addToInvalidates(org.apache.hadoop.hdfs.protocol.Block arg0, DatanodeDescriptorInterface arg1);
     void setBlockPoolId(java.lang.String arg0);
     BlocksWithLocationsInterface getBlocksWithLocations(DatanodeIDInterface arg0, long arg1, long arg2) throws org.apache.hadoop.hdfs.protocol.UnregisteredNodeException;
 //    void reportDiff(DatanodeStorageInfoInterface arg0, BlockListAsLongsInterface arg1, java.util.Collection<org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.BlockInfoToAdd> arg2, java.util.Collection<org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo> arg3, java.util.Collection<org.apache.hadoop.hdfs.protocol.Block> arg4, java.util.Collection<org.apache.hadoop.hdfs.server.blockmanagement.BlockToMarkCorrupt> arg5, java.util.Collection<org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.StatefulBlockInfo> arg6);

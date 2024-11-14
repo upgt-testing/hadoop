@@ -166,7 +166,7 @@ public class TestBlockReaderLocalLegacy {
         DFSTestUtil.createFile(dfs, path, 10, REPL_FACTOR, 0);
         DFSTestUtil.waitReplication(dfs, path, REPL_FACTOR);
         final ClientDatanodeProtocol proxy;
-        final TokenInterface<BlockTokenIdentifier> token;
+        final Token<BlockTokenIdentifier> token;
         final ExtendedBlock originalBlock;
         final long originalGS;
         {
@@ -178,7 +178,7 @@ public class TestBlockReaderLocalLegacy {
             originalBlock = new ExtendedBlock(blk);
             originalGS = originalBlock.getGenerationStamp();
             // test getBlockLocalPathInfo
-            final BlockLocalPathInfoInterface info = proxy.getBlockLocalPathInfo(blk, token);
+            final BlockLocalPathInfo info = proxy.getBlockLocalPathInfo(blk, token);
             Assert.assertEquals(originalGS, info.getBlock().getGenerationStamp());
         }
         {
@@ -194,7 +194,7 @@ public class TestBlockReaderLocalLegacy {
             Assert.assertTrue(newGS > originalGS);
             // getBlockLocalPathInfo using the original block.
             Assert.assertEquals(originalGS, originalBlock.getGenerationStamp());
-            final BlockLocalPathInfoInterface info = proxy.getBlockLocalPathInfo(originalBlock, token);
+            final BlockLocalPathInfo info = proxy.getBlockLocalPathInfo(originalBlock, token);
             Assert.assertEquals(newGS, info.getBlock().getGenerationStamp());
         }
         cluster.shutdown();

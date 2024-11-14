@@ -69,7 +69,7 @@ public class TestTransferRbw {
             Thread.sleep(1000);
         }
         Assert.assertEquals(1, replicas.size());
-        final ReplicaInfoInterface r = replicas.iterator().next();
+        final ReplicaInfo r = replicas.iterator().next();
         Assert.assertEquals(expectedState, r.getState());
         return (LocalReplicaInPipeline) r;
     }

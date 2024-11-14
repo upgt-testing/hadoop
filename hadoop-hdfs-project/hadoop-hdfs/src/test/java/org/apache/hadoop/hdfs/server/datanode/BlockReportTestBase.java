@@ -152,16 +152,16 @@ public abstract class BlockReportTestBase {
 
     // Generate a block report, optionally corrupting the generation
     // stamp and/or length of one block.
-    private static StorageBlockReport[] getBlockReports(DataNode dn, String bpid, boolean corruptOneBlockGs, boolean corruptOneBlockLen) {
+    private static StorageBlockReport[] getBlockReports(DataNodeInterface dn, String bpid, boolean corruptOneBlockGs, boolean corruptOneBlockLen) {
         Map<DatanodeStorage, BlockListAsLongs> perVolumeBlockLists = dn.getFSDataset().getBlockReports(bpid);
         // Send block report
         StorageBlockReport[] reports = new StorageBlockReport[perVolumeBlockLists.size()];
         boolean corruptedGs = false;
         boolean corruptedLen = false;
         int reportIndex = 0;
-        for (Map.EntryInterface<DatanodeStorage, BlockListAsLongs> kvPair : perVolumeBlockLists.entrySet()) {
-            DatanodeStorageInterface dnStorage = kvPair.getKey();
-            BlockListAsLongsInterface blockList = kvPair.getValue();
+        for (Map.Entry<DatanodeStorage, BlockListAsLongs> kvPair : perVolumeBlockLists.entrySet()) {
+            DatanodeStorage dnStorage = kvPair.getKey();
+            BlockListAsLongs blockList = kvPair.getValue();
             // Walk the list of blocks until we find one each to corrupt the
             // generation stamp and length, if so requested.
             BlockListAsLongs.Builder builder = BlockListAsLongs.builder();
@@ -198,7 +198,7 @@ public abstract class BlockReportTestBase {
      *
      * @throws IOException
      */
-    protected abstract void sendBlockReports(DatanodeRegistration dnR, String poolId, StorageBlockReport[] reports) throws IOException;
+    protected abstract void sendBlockReports(DatanodeRegistrationInterface dnR, String poolId, StorageBlockReport[] reports) throws IOException;
 
     /**
      * Test write a file, verifies and closes it. Then the length of the blocks
@@ -544,7 +544,7 @@ public abstract class BlockReportTestBase {
             // Set up a spy so that we can delay the block report coming
             // from this node.
             DataNodeInterface dn = cluster.getDataNodes().get(0);
-            DatanodeProtocolClientSideTranslatorPBInterface spy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
+            DatanodeProtocolClientSideTranslatorPB spy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
             Mockito.doAnswer(delayer).when(spy).blockReport(any(), anyString(), any(), any());
             // Force a block report to be generated. The block report will have
             // an RBW replica in it. Wait for the RPC to be sent, but block
@@ -581,7 +581,7 @@ public abstract class BlockReportTestBase {
         // before the test
         BlockManagerInterface bm = cluster.getNameNode().getNamesystem().getBlockManager();
         final DatanodeDescriptorInterface dnDescriptor = bm.getDatanodeManager().getDatanode(dn.getDatanodeId());
-        DatanodeStorageInfo[] storageInfos = dnDescriptor.getStorageInfos();
+        DatanodeStorageInfoInterface[] storageInfos = dnDescriptor.getStorageInfos();
         // Send the block report concurrently using
         // numThreads=numConcurrentBlockReports
         ExecutorService executorService = Executors.newFixedThreadPool(numConcurrentBlockReports);
@@ -674,7 +674,7 @@ public abstract class BlockReportTestBase {
         }
         cluster.startDataNodes(conf, 1, true, null, null);
         cluster.waitClusterUp();
-        ArrayList<DataNode> datanodes = cluster.getDataNodes();
+        ArrayList<DataNodeInterface> datanodes = cluster.getDataNodes();
         assertEquals(datanodes.size(), 2);
         if (LOG.isDebugEnabled()) {
             int lastDn = datanodes.size() - 1;

@@ -36,7 +36,7 @@ public class TestDataNodeTransferSocketSize {
         SimulatedFSDataset.setFactory(conf);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             DataNodeInterface datanode = datanodes.get(0);
             assertEquals("Receive buffer size should be 4K", 4 * 1024, datanode.getXferServer().getPeerServer().getReceiveBufferSize());
         } finally {
@@ -53,7 +53,7 @@ public class TestDataNodeTransferSocketSize {
         SimulatedFSDataset.setFactory(conf);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             DataNodeInterface datanode = datanodes.get(0);
             assertTrue("Receive buffer size should be a default value (determined by kernel)", datanode.getXferServer().getPeerServer().getReceiveBufferSize() > 0);
         } finally {

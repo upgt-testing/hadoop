@@ -11,6 +11,7 @@ import edu.illinois.util.config.HadoopXMLModifier;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.ServiceFailedException;
@@ -22,6 +23,8 @@ import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.Storage;
+import org.apache.hadoop.hdfs.server.common.blockaliasmap.BlockAliasMap;
+import org.apache.hadoop.hdfs.server.common.blockaliasmap.impl.InMemoryLevelDBAliasMapClient;
 import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
@@ -30,6 +33,8 @@ import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
+import org.apache.hadoop.http.HttpConfig;
+import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.slf4j.Logger;
@@ -46,12 +51,14 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.*;
+import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -71,6 +78,13 @@ public class MiniDockerDFSCluster implements Closeable {
     public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
             = DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing";
     protected final int storagesPerDatanode;
+    /**
+     * For the Junit tests, this is the default value of the The amount of time
+     * in milliseconds that the BlockScanner times out waiting for the
+     * {@link VolumeScanner} thread to join during a shutdown call.
+     */
+    public static final long DEFAULT_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC =
+            TimeUnit.SECONDS.toMillis(30);
 
     private File base_dir;
     private File data_dir;
@@ -955,6 +969,10 @@ public class MiniDockerDFSCluster implements Closeable {
         return;
     }
 
+    public void waitActive(int nnIndex) throws BindException {
+        return;
+    }
+
     public void waitClusterUp() {
         return;
     }
@@ -1668,4 +1686,118 @@ public class MiniDockerDFSCluster implements Closeable {
         files[1] = new File(base_dir, "name-" + nsIndex + "-" + (2 * nnIndex + 2));
         return files;
     }
+
+    /**
+     * Get the latest metadata file correpsonding to a block
+     * @param storageDir storage directory
+     * @param blk the block
+     * @return metadata file corresponding to the block
+     */
+    public static File getBlockMetadataFile(File storageDir, ExtendedBlock blk) {
+        return new File(DatanodeUtil.idToBlockDir(getFinalizedDir(storageDir,
+                blk.getBlockPoolId()), blk.getBlockId()), blk.getBlockName() + "_" +
+                blk.getGenerationStamp() + Block.METADATA_EXTENSION);
+    }
+
+    /**
+     * Get the block metadata file for a block from a given datanode
+     *
+     * @param dnIndex Index of the datanode to get block files for
+     * @param block block for which corresponding files are needed
+     */
+    public File getBlockMetadataFile(int dnIndex, ExtendedBlock block) {
+        // Check for block file in the two storage directories of the datanode
+        for (int i = 0; i <=1 ; i++) {
+            File storageDir = getStorageDir(dnIndex, i);
+            File blockMetaFile = getBlockMetadataFile(storageDir, block);
+            if (blockMetaFile.exists()) {
+                return blockMetaFile;
+            }
+        }
+        return null;
+    }
+
+    public static void setupKerberosConfiguration(Configuration conf,
+                                                  String userName, String realm, String keytab, String keystoresDir,
+                                                  String sslConfDir) throws Exception {
+        // Windows will not reverse name lookup "127.0.0.1" to "localhost".
+        String krbInstance = Path.WINDOWS ? "127.0.0.1" : "localhost";
+        String hdfsPrincipal = userName + "/" + krbInstance + "@" + realm;
+        String spnegoPrincipal = "HTTP/" + krbInstance + "@" + realm;
+
+        conf.set(DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY, hdfsPrincipal);
+        conf.set(DFS_NAMENODE_KEYTAB_FILE_KEY, keytab);
+        conf.set(DFS_DATANODE_KERBEROS_PRINCIPAL_KEY, hdfsPrincipal);
+        conf.set(DFS_DATANODE_KEYTAB_FILE_KEY, keytab);
+        conf.set(DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY, spnegoPrincipal);
+        conf.setBoolean(DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, true);
+        conf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
+
+        conf.set(DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
+        conf.set(DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
+        conf.set(DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
+        conf.set(DFS_JOURNALNODE_HTTPS_ADDRESS_KEY, "localhost:0");
+        conf.setInt(IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY, 10);
+
+        KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
+        conf.set(DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
+                KeyStoreTestUtil.getClientSSLConfigFileName());
+        conf.set(DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
+                KeyStoreTestUtil.getServerSSLConfigFileName());
+
+        KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
+        conf.set(DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
+                KeyStoreTestUtil.getClientSSLConfigFileName());
+        conf.set(DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
+                KeyStoreTestUtil.getServerSSLConfigFileName());
+    }
+
+    /**
+     * Setup the namenode-level PROVIDED configurations, using the
+     * {@link InMemoryLevelDBAliasMapClient}.
+     *
+     * @param conf Configuration, which is modified, to enable provided storage.
+     *        This cannot be null.
+     */
+    public static void setupNamenodeProvidedConfiguration(Configuration conf) {
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_PROVIDED_ENABLED, true);
+        conf.setBoolean(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_ENABLED, true);
+        conf.setClass(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_CLASS,
+                InMemoryLevelDBAliasMapClient.class, BlockAliasMap.class);
+        File tempDirectory = new File(GenericTestUtils.getRandomizedTestDir(),
+                "in-memory-alias-map");
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_LEVELDB_DIR,
+                tempDirectory.getAbsolutePath());
+        conf.setInt(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_LOAD_RETRIES, 10);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_LEVELDB_PATH,
+                tempDirectory.getAbsolutePath());
+    }
+
+    public void triggerDeletionReports()
+            throws IOException {
+        for (DataNodeInterface dn : getDataNodes()) {
+            DataNodeTestUtils.triggerDeletionReport(dn);
+        }
+    }
+
+    /**
+     * @return a http URL
+     */
+    public String getHttpUri(int nnIndex) {
+        return "http://"
+                + getNN(nnIndex).conf
+                .get(DFS_NAMENODE_HTTP_ADDRESS_KEY);
+    }
+
+    /**
+     * Get finalized directory for a block pool
+     * @param storageDir storage directory
+     * @param bpid Block pool Id
+     * @return finalized directory for a block pool
+     */
+    public static File getRbwDir(File storageDir, String bpid) {
+        return new File(getBPDir(storageDir, bpid, Storage.STORAGE_DIR_CURRENT)
+                + DataStorage.STORAGE_DIR_RBW );
+    }
+
 }

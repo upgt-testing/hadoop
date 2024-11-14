@@ -61,7 +61,7 @@ public class TestComputeInvalidateWork {
 
     private BlockManagerInterface bm;
 
-    private DatanodeDescriptor[] nodes;
+    private DatanodeDescriptorInterface[] nodes;
 
     private ErasureCodingPolicy ecPolicy;
 

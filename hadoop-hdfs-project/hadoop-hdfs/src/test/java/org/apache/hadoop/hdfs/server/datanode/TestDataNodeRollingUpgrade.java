@@ -115,14 +115,14 @@ public class TestDataNodeRollingUpgrade {
         LocatedBlocks blocks = nn.getRpcServer().getBlockLocations(path.toString(), 0, Long.MAX_VALUE);
         assertEquals("The test helper functions assume that each file has a single block", 1, blocks.getLocatedBlocks().size());
         ExtendedBlock block = blocks.getLocatedBlocks().get(0).getBlock();
-        BlockLocalPathInfoInterface bInfo = dn0.getFSDataset().getBlockLocalPathInfo(block);
+        BlockLocalPathInfo bInfo = dn0.getFSDataset().getBlockLocalPathInfo(block);
         File blockFile = new File(bInfo.getBlockPath());
         assertEquals(exists, blockFile.exists());
         return blockFile;
     }
 
     private File getTrashFileForBlock(File blockFile, boolean exists) {
-        ReplicaInfoInterface info = Mockito.mock(ReplicaInfo.class);
+        ReplicaInfoInterface info = Mockito.mock(ReplicaInfoInterface.class);
         Mockito.when(info.getBlockURI()).thenReturn(blockFile.toURI());
         File trashFile = new File(dn0.getStorage().getTrashDirectoryForReplica(blockPoolId, info));
         assertEquals(exists, trashFile.exists());

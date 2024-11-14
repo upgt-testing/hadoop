@@ -94,7 +94,7 @@ public class TestDnRespectsBlockReportSplitThreshold {
         for (StorageBlockReport[] reports : listOfReports) {
             assertThat(reports.length, is(expectedReportsPerCall));
             for (StorageBlockReport report : reports) {
-                BlockListAsLongsInterface blockList = report.getBlocks();
+                BlockListAsLongs blockList = report.getBlocks();
                 numBlocksReported += blockList.getNumberOfBlocks();
             }
         }
@@ -113,7 +113,7 @@ public class TestDnRespectsBlockReportSplitThreshold {
         // Create a file with a few blocks.
         createFile(GenericTestUtils.getMethodName(), BLOCKS_IN_FILE);
         // Insert a spy object for the NN RPC.
-        DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
+        DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
         // Trigger a block report so there is an interaction with the spy
         // object.
         DataNodeTestUtils.triggerBlockReport(dn);
@@ -134,7 +134,7 @@ public class TestDnRespectsBlockReportSplitThreshold {
         // Create a file with a few blocks.
         createFile(GenericTestUtils.getMethodName(), BLOCKS_IN_FILE);
         // Insert a spy object for the NN RPC.
-        DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
+        DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
         // Trigger a block report so there is an interaction with the spy
         // object.
         DataNodeTestUtils.triggerBlockReport(dn);
@@ -155,7 +155,7 @@ public class TestDnRespectsBlockReportSplitThreshold {
         // Create a file with a few blocks.
         createFile(GenericTestUtils.getMethodName(), BLOCKS_IN_FILE);
         // Insert a spy object for the NN RPC.
-        DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
+        DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
         // Trigger a block report so there is an interaction with the spy
         // object.
         DataNodeTestUtils.triggerBlockReport(dn);

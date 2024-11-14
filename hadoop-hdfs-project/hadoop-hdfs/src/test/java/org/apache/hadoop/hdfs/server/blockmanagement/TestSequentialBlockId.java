@@ -130,7 +130,7 @@ public class TestSequentialBlockId {
     public void testBlockTypeDetection() throws IOException {
         // Setup a mock object and stub out a few routines to
         // retrieve the generation stamp counters.
-        BlockIdManagerInterface bid = mock(BlockIdManager.class);
+        BlockIdManager bid = mock(BlockIdManager.class);
         final long maxGenStampForLegacyBlocks = 10000;
         when(bid.getLegacyGenerationStampLimit()).thenReturn(maxGenStampForLegacyBlocks);
         Block legacyBlock = spy(new Block());
@@ -139,7 +139,7 @@ public class TestSequentialBlockId {
         when(newBlock.getGenerationStamp()).thenReturn(maxGenStampForLegacyBlocks + 1);
         // Make sure that isLegacyBlock() can correctly detect
         // legacy and new blocks.
-        when(bid.isLegacyBlock(any(Block.class))).thenCallRealMethod();
+        when(bid.isLegacyBlock(any(BlockInfo.class))).thenCallRealMethod();
         assertThat(bid.isLegacyBlock(legacyBlock), is(true));
         assertThat(bid.isLegacyBlock(newBlock), is(false));
     }
@@ -154,7 +154,7 @@ public class TestSequentialBlockId {
     public void testGenerationStampUpdate() throws IOException {
         // Setup a mock object and stub out a few routines to
         // retrieve the generation stamp counters.
-        BlockIdManagerInterface bid = mock(BlockIdManager.class);
+        BlockIdManager bid = mock(BlockIdManager.class);
         final long nextLegacyGenerationStamp = 5000;
         final long nextGenerationStamp = 20000;
         when(bid.getNextLegacyGenerationStamp()).thenReturn(nextLegacyGenerationStamp);

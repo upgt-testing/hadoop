@@ -58,9 +58,9 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestJournal {
 
-    private static final NamespaceInfoInterface FAKE_NSINFO = new NamespaceInfo(12345, "mycluster", "my-bp", 0L);
+    private static final NamespaceInfo FAKE_NSINFO = new NamespaceInfo(12345, "mycluster", "my-bp", 0L);
 
-    private static final NamespaceInfoInterface FAKE_NSINFO_2 = new NamespaceInfo(6789, "mycluster", "my-bp", 0L);
+    private static final NamespaceInfo FAKE_NSINFO_2 = new NamespaceInfo(6789, "mycluster", "my-bp", 0L);
 
     private static final String JID = "test-journal";
 
@@ -248,7 +248,7 @@ public class TestJournal {
     @Test(timeout = 10000)
     public void testJournalLocking() throws Exception {
         Assume.assumeTrue(journal.getStorage().getStorageDir(0).isLockSupported());
-        StorageDirectoryInterface sd = journal.getStorage().getStorageDir(0);
+        StorageDirectory sd = journal.getStorage().getStorageDir(0);
         File lockFile = new File(sd.getRoot(), Storage.STORAGE_FILE_LOCK);
         // Journal should be locked, since the format() call locks it.
         GenericTestUtils.assertExists(lockFile);

@@ -1,5 +1,8 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
+
 import java.rmi.Remote;
 
 public interface DataNodeInterface extends Remote {
@@ -8,7 +11,7 @@ public interface DataNodeInterface extends Remote {
     void scheduleAllBlockReport(long arg0);
     void removeVolumes(java.util.Collection<org.apache.hadoop.hdfs.server.datanode.StorageLocation> arg0, boolean arg1) throws java.io.IOException;
     void shutdownPeriodicScanners();
-    java.util.List<org.apache.hadoop.hdfs.server.datanode.BPOfferService> getAllBpOs();
+    java.util.List<BPOfferServiceInterface> getAllBpOs();
     BlockScannerInterface getBlockScanner();
     java.lang.String getSoftwareVersion();
     void handleAddBlockPoolError(AddBlockPoolExceptionInterface arg0) throws java.io.IOException;
@@ -98,6 +101,7 @@ public interface DataNodeInterface extends Remote {
     void shutdownReconfigurationTask();
     long getReplicaVisibleLength(ExtendedBlockInterface arg0) throws java.io.IOException;
     void refreshNamenodes(ConfigurationInterface arg0) throws java.io.IOException;
+    void refreshNamenodes(Configuration arg0) throws java.io.IOException;
     SaslDataTransferServerInterface getSaslServer();
     ShortCircuitRegistryInterface getShortCircuitRegistry();
     void initDataXceiver() throws java.io.IOException;
@@ -115,6 +119,7 @@ public interface DataNodeInterface extends Remote {
     org.apache.hadoop.hdfs.server.protocol.InterDatanodeProtocol createInterDataNodeProtocolProxy(DatanodeIDInterface arg0, ConfigurationInterface arg1, int arg2, boolean arg3) throws java.io.IOException;
     boolean isRestarting();
     void reportBadBlocks(ExtendedBlockInterface arg0, org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi arg1) throws java.io.IOException;
+    void reportBadBlocks(ExtendedBlock arg0, org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi arg1) throws java.io.IOException;
     ErasureCodingWorkerInterface getErasureCodingWorker();
     DNConfInterface getDnConf();
     DataNodeInterface createDataNode(java.lang.String[] arg0, ConfigurationInterface arg1, SecureResourcesInterface arg2) throws java.io.IOException;
@@ -139,6 +144,7 @@ public interface DataNodeInterface extends Remote {
     void checkDiskErrorAsync(org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi arg0);
     void initBlockPool(BPOfferServiceInterface arg0) throws java.io.IOException;
     void triggerBlockReport(BlockReportOptionsInterface arg0) throws java.io.IOException;
+    void triggerBlockReport(org.apache.hadoop.hdfs.client.BlockReportOptions arg0) throws java.io.IOException;
     DatanodeRegistrationInterface getDNRegistrationForBP(java.lang.String arg0) throws java.io.IOException;
     void decrementXmitsInProgress(int arg0);
     java.lang.String getHttpPort();
@@ -183,6 +189,7 @@ public interface DataNodeInterface extends Remote {
     long getLastDiskErrorCheck();
     void reportRemoteBadBlock(DatanodeInfoInterface arg0, ExtendedBlockInterface arg1) throws java.io.IOException;
     void reportBadBlocks(ExtendedBlockInterface arg0) throws java.io.IOException;
+    void reportBadBlocks(ExtendedBlock arg0) throws java.io.IOException;
     java.lang.String getRevision();
     org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi<?> getFSDataset();
     DatanodeProtocolClientSideTranslatorPBInterface connectToNN(java.net.InetSocketAddress arg0) throws java.io.IOException;

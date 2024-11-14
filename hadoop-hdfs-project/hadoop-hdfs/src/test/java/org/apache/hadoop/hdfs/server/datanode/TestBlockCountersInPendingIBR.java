@@ -56,7 +56,7 @@ public class TestBlockCountersInPendingIBR {
         conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1080L);
         final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
         cluster.waitActive();
-        final DatanodeProtocolClientSideTranslatorPBInterface spy = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode());
+        final DatanodeProtocolClientSideTranslatorPB spy = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode());
         final DataNodeInterface datanode = cluster.getDataNodes().get(0);
         /* We should get 0 incremental block report. */
         Mockito.verify(spy, timeout(60000).times(0)).blockReceivedAndDeleted(any(DatanodeRegistration.class), anyString(), any(StorageReceivedDeletedBlocks[].class));
@@ -64,9 +64,9 @@ public class TestBlockCountersInPendingIBR {
      * Create fake blocks notification on the DataNode. This will be sent with
      * the next incremental block report.
      */
-        final BPServiceActorInterface actor = datanode.getAllBpOs().get(0).getBPServiceActors().get(0);
+        final BPServiceActor actor = datanode.getAllBpOs().get(0).getBPServiceActors().get(0);
         final FsDatasetSpi<?> dataset = datanode.getFSDataset();
-        final DatanodeStorageInterface storage;
+        final DatanodeStorage storage;
         try (FsDatasetSpi.FsVolumeReferences volumes = dataset.getFsVolumeReferences()) {
             storage = dataset.getStorage(volumes.get(0).getStorageID());
         }
@@ -95,6 +95,14 @@ public class TestBlockCountersInPendingIBR {
     }
 
     private void verifyBlockCounters(final DataNode datanode, final long blocksInPendingIBR, final long blocksReceivingInPendingIBR, final long blocksReceivedInPendingIBR, final long blocksDeletedInPendingIBR) {
+        final MetricsRecordBuilder m = MetricsAsserts.getMetrics(datanode.getMetrics().name());
+        MetricsAsserts.assertGauge("BlocksInPendingIBR", blocksInPendingIBR, m);
+        MetricsAsserts.assertGauge("BlocksReceivingInPendingIBR", blocksReceivingInPendingIBR, m);
+        MetricsAsserts.assertGauge("BlocksReceivedInPendingIBR", blocksReceivedInPendingIBR, m);
+        MetricsAsserts.assertGauge("BlocksDeletedInPendingIBR", blocksDeletedInPendingIBR, m);
+    }
+
+    private void verifyBlockCounters(final DataNodeInterface datanode, final long blocksInPendingIBR, final long blocksReceivingInPendingIBR, final long blocksReceivedInPendingIBR, final long blocksDeletedInPendingIBR) {
         final MetricsRecordBuilder m = MetricsAsserts.getMetrics(datanode.getMetrics().name());
         MetricsAsserts.assertGauge("BlocksInPendingIBR", blocksInPendingIBR, m);
         MetricsAsserts.assertGauge("BlocksReceivingInPendingIBR", blocksReceivingInPendingIBR, m);

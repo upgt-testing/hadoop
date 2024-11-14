@@ -140,9 +140,9 @@ public class TestDiskError {
         DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
         DFSTestUtil.waitReplication(fs, fileName, (short) 1);
         // get the block belonged to the created file
-        LocatedBlocks blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        LocatedBlocksInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
         assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
-        LocatedBlock block = blocks.get(0);
+        LocatedBlockInterface block = blocks.get(0);
         // bring up a second datanode
         cluster.startDataNodes(conf, 1, true, null, null);
         cluster.waitActive();

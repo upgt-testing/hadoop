@@ -79,7 +79,7 @@ public class TestFsVolumeList {
 
     private String baseDir;
 
-    private BlockScannerInterface blockScanner;
+    private BlockScanner blockScanner;
 
     private final static int NUM_DATANODES = 3;
 
@@ -341,7 +341,7 @@ public class TestFsVolumeList {
         cluster.waitActive();
         FileSystem fs = cluster.getFileSystem();
         // Create file for each datanode.
-        ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+        ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
         DataNodeInterface dn0 = dataNodes.get(0);
         DataNodeInterface dn1 = dataNodes.get(1);
         DataNodeInterface dn2 = dataNodes.get(2);

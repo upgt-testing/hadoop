@@ -122,7 +122,7 @@ public class TestDatanodeRestart {
             String bpid = cluster.getNamesystem().getBlockPoolId();
             ReplicaMap replicas = dataset(dn).volumeMap;
             Assert.assertEquals(1, replicas.size(bpid));
-            ReplicaInfoInterface replica = replicas.replicas(bpid).iterator().next();
+            ReplicaInfo replica = replicas.replicas(bpid).iterator().next();
             Assert.assertEquals(ReplicaState.RWR, replica.getState());
             if (isCorrupt) {
                 Assert.assertEquals((fileLen - 1) / 512 * 512, replica.getNumBytes());
@@ -140,6 +140,10 @@ public class TestDatanodeRestart {
     }
 
     private static FsDatasetImpl dataset(DataNode dn) {
+        return (FsDatasetImpl) DataNodeTestUtils.getFSDataset(dn);
+    }
+
+    private static FsDatasetImpl dataset(DataNodeInterface dn) {
         return (FsDatasetImpl) DataNodeTestUtils.getFSDataset(dn);
     }
 

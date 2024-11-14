@@ -175,6 +175,11 @@ public class NameNodeAdapter {
     return ns.getDelegationTokenSecretManager();
   }
 
+  public static DelegationTokenSecretManagerInterface getDtSecretManager(
+          final FSNamesystemInterface ns) {
+    return ns.getDelegationTokenSecretManager();
+  }
+
   public static HeartbeatResponse sendHeartBeat(DatanodeRegistration nodeReg,
       DatanodeDescriptor dd, FSNamesystem namesystem) throws IOException {
     return namesystem.handleHeartbeat(nodeReg,
@@ -185,6 +190,11 @@ public class NameNodeAdapter {
 
   public static boolean setReplication(final FSNamesystem ns,
       final String src, final short replication) throws IOException {
+    return ns.setReplication(src, replication);
+  }
+
+  public static boolean setReplication(final FSNamesystemInterface ns,
+                                       final String src, final short replication) throws IOException {
     return ns.setReplication(src, replication);
   }
   

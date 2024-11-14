@@ -55,7 +55,7 @@ public class TestRBWBlockInvalidation {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRBWBlockInvalidation.class);
 
-    private static NumberReplicas countReplicas(final FSNamesystem namesystem, ExtendedBlock block) {
+    private static NumberReplicasInterface countReplicas(final FSNamesystemInterface namesystem, ExtendedBlock block) {
         final BlockManagerInterface blockManager = namesystem.getBlockManager();
         return blockManager.countNodes(blockManager.getStoredBlock(block.getLocalBlock()));
     }

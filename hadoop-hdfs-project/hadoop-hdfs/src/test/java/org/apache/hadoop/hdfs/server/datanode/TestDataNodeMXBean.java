@@ -58,7 +58,7 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
         Configuration conf = new Configuration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             Assert.assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -117,7 +117,7 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
         Configuration secureConf = createSecureConfig("authentication");
         // get attribute "SecurityEnabled" with simple configuration
         try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(simpleConf).build()) {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             Assert.assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -128,7 +128,7 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
         }
         // get attribute "SecurityEnabled" with secure configuration
         try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(secureConf).build()) {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             Assert.assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -177,7 +177,7 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
         Configuration conf = new Configuration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             assertEquals(datanodes.size(), 1);
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
@@ -228,7 +228,7 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
         conf.setInt(DFSConfigKeys.DFS_DATANODE_FILEIO_PROFILING_SAMPLING_PERCENTAGE_KEY, 100);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             Assert.assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
             String slowDiskPath = "test/data1/slowVolume";

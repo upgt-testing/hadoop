@@ -83,7 +83,8 @@ public interface DatanodeManagerInterface {
     void datanodeDump(java.io.PrintWriter arg0);
     SlowPeerTrackerInterface getSlowPeerTracker();
     java.util.Set<java.lang.String> getSlowPeersUuidSet();
-    void fetchDatanodes(java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> arg0, java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> arg1, boolean arg2);
+    //void fetchDatanodes(java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> arg0, java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> arg1, boolean arg2);
+    void fetchDatanodes(java.util.List<DatanodeDescriptorInterface> arg0, java.util.List<DatanodeDescriptorInterface> arg1, boolean arg2);
     void setHeartbeatInterval(long arg0, int arg1);
     void addDatanode(DatanodeDescriptorInterface arg0);
     void setHeartbeatInterval(long arg0);

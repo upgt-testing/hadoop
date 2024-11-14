@@ -422,7 +422,7 @@ public abstract class LazyPersistTestCase {
      */
     protected final void triggerBlockReport() throws InterruptedException, TimeoutException, IOException {
         // Trigger block report to NN
-        final Map<DatanodeStorageInfo, Integer> reportCountsBefore = new HashMap<>();
+        final Map<DatanodeStorageInfoInterface, Integer> reportCountsBefore = new HashMap<>();
         final FSNamesystemInterface fsn = cluster.getNamesystem();
         for (DataNodeInterface dn : cluster.getDataNodes()) {
             final DatanodeDescriptorInterface dnd = NameNodeAdapter.getDatanode(fsn, dn.getDatanodeId());
@@ -432,7 +432,7 @@ public abstract class LazyPersistTestCase {
         }
         // wait for block reports to be received.
         GenericTestUtils.waitFor(() -> {
-            for (EntryInterface<DatanodeStorageInfo, Integer> reportEntry : reportCountsBefore.entrySet()) {
+            for (Entry<DatanodeStorageInfoInterface, Integer> reportEntry : reportCountsBefore.entrySet()) {
                 final DatanodeStorageInfoInterface dnStorageInfo = reportEntry.getKey();
                 final int cntBefore = reportEntry.getValue();
                 final int currentCnt = dnStorageInfo.getBlockReportCount();

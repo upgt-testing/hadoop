@@ -160,6 +160,10 @@ public class DataNodeTestUtils {
         return FsDatasetTestUtil.fetchReplicaInfo(dn.getFSDataset(), bpid, blkId);
     }
 
+    public static ReplicaInfo fetchReplicaInfo(final DataNodeInterface dn, final String bpid, final long blkId) {
+        return FsDatasetTestUtil.fetchReplicaInfo(dn.getFSDataset(), bpid, blkId);
+    }
+
     /**
      * It injects disk failures to data dirs by replacing these data dirs with
      * regular files.
@@ -209,6 +213,13 @@ public class DataNodeTestUtils {
     }
 
     public static void runDirectoryScanner(DataNode dn) throws IOException {
+        DirectoryScanner directoryScanner = dn.getDirectoryScanner();
+        if (directoryScanner != null) {
+            dn.getDirectoryScanner().reconcile();
+        }
+    }
+
+    public static void runDirectoryScanner(DataNodeInterface dn) throws IOException {
         DirectoryScannerInterface directoryScanner = dn.getDirectoryScanner();
         if (directoryScanner != null) {
             dn.getDirectoryScanner().reconcile();
@@ -223,6 +234,24 @@ public class DataNodeTestUtils {
      * @throws Exception if there is any failure
      */
     public static void reconfigureDataNode(DataNode dn, File... newVols) throws Exception {
+        StringBuilder dnNewDataDirs = new StringBuilder();
+        for (File newVol : newVols) {
+            if (dnNewDataDirs.length() > 0) {
+                dnNewDataDirs.append(',');
+            }
+            dnNewDataDirs.append(newVol.getAbsolutePath());
+        }
+        try {
+            assertThat(dn.reconfigurePropertyImpl(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, dnNewDataDirs.toString()), is(dn.getConf().get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY)));
+        } catch (ReconfigurationException e) {
+            // This can be thrown if reconfiguration tries to use a failed volume.
+            // We need to swallow the exception, because some of our tests want to
+            // cover this case.
+            LOG.warn("Could not reconfigure DataNode.", e);
+        }
+    }
+
+    public static void reconfigureDataNode(DataNodeInterface dn, File... newVols) throws Exception {
         StringBuilder dnNewDataDirs = new StringBuilder();
         for (File newVol : newVols) {
             if (dnNewDataDirs.length() > 0) {

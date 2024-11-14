@@ -86,7 +86,7 @@ public class TestDiskBalancerRPC {
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
     }
 
@@ -99,7 +99,7 @@ public class TestDiskBalancerRPC {
         hashArray[0]++;
         planHash = String.valueOf(hashArray);
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_HASH));
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
@@ -112,7 +112,7 @@ public class TestDiskBalancerRPC {
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
         planVersion++;
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_VERSION));
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
@@ -124,7 +124,7 @@ public class TestDiskBalancerRPC {
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN));
         dataNode.submitDiskBalancerPlan(planHash, planVersion, "", "", false);
@@ -136,7 +136,7 @@ public class TestDiskBalancerRPC {
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
         dataNode.cancelDiskBalancePlan(planHash);
     }
@@ -149,7 +149,7 @@ public class TestDiskBalancerRPC {
         char[] hashArray = planHash.toCharArray();
         hashArray[0]++;
         planHash = String.valueOf(hashArray);
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
         dataNode.cancelDiskBalancePlan(planHash);
@@ -160,7 +160,7 @@ public class TestDiskBalancerRPC {
         RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = "";
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         thrown.expect(DiskBalancerException.class);
         thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
         dataNode.cancelDiskBalancePlan(planHash);
@@ -194,7 +194,7 @@ public class TestDiskBalancerRPC {
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
         String bandwidthString = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_BANDWIDTH);
         long value = Long.decode(bandwidthString);
@@ -207,7 +207,7 @@ public class TestDiskBalancerRPC {
         DataNodeInterface dataNode = rpcTestHelper.getDataNode();
         String planHash = rpcTestHelper.getPlanHash();
         int planVersion = rpcTestHelper.getPlanVersion();
-        NodePlanInterface plan = rpcTestHelper.getPlan();
+        NodePlan plan = rpcTestHelper.getPlan();
         dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE, plan.toJson(), false);
         DiskBalancerWorkStatusInterface status = dataNode.queryDiskBalancerPlan();
         Assert.assertTrue(status.getResult() == PLAN_UNDER_PROGRESS || status.getResult() == PLAN_DONE);
@@ -257,7 +257,7 @@ public class TestDiskBalancerRPC {
 
     private class RpcTestHelper {
 
-        private NodePlanInterface plan;
+        private NodePlan plan;
 
         private int planVersion;
 
@@ -273,7 +273,7 @@ public class TestDiskBalancerRPC {
             return planVersion;
         }
 
-        public DataNode getDataNode() {
+        public DataNodeInterface getDataNode() {
             return dataNode;
         }
 

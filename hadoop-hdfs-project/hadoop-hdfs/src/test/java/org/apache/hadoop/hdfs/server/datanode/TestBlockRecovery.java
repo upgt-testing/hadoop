@@ -110,11 +110,11 @@ public class TestBlockRecovery {
 
     private static final String DATA_DIR = MiniDockerDFSCluster.getBaseDirectory() + "data";
 
-    private DataNodeInterface dn;
+    private DataNode dn;
 
-    private DataNodeInterface spyDN;
+    private DataNode spyDN;
 
-    private BlockRecoveryWorkerInterface recoveryWorker;
+    private BlockRecoveryWorker recoveryWorker;
 
     private Configuration conf;
 
@@ -178,9 +178,9 @@ public class TestBlockRecovery {
         File dataDir = new File(DATA_DIR);
         FileUtil.fullyDelete(dataDir);
         dataDir.mkdirs();
-        StorageLocationInterface location = StorageLocation.parse(dataDir.getPath());
+        StorageLocation location = StorageLocation.parse(dataDir.getPath());
         locations.add(location);
-        final DatanodeProtocolClientSideTranslatorPBInterface namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
+        final DatanodeProtocolClientSideTranslatorPB namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
         Mockito.doAnswer(new Answer<DatanodeRegistration>() {
 
             @Override
@@ -413,7 +413,7 @@ public class TestBlockRecovery {
 
     private Collection<RecoveringBlock> initRecoveringBlocks() throws IOException {
         Collection<RecoveringBlock> blocks = new ArrayList<RecoveringBlock>(1);
-        DatanodeInfoInterface mockOtherDN = DFSTestUtil.getLocalDatanodeInfo();
+        DatanodeInfo mockOtherDN = DFSTestUtil.getLocalDatanodeInfo();
         DatanodeInfo[] locs = new DatanodeInfo[] { new DatanodeInfoBuilder().setNodeID(dn.getDNRegistrationForBP(block.getBlockPoolId())).build(), mockOtherDN };
         RecoveringBlock rBlock = new RecoveringBlock(block, locs, RECOVERY_ID);
         blocks.add(rBlock);
@@ -487,7 +487,7 @@ public class TestBlockRecovery {
 
     private List<BlockRecord> initBlockRecords(DataNode spyDN) throws IOException {
         List<BlockRecord> blocks = new ArrayList<BlockRecord>(1);
-        DatanodeRegistrationInterface dnR = dn.getDNRegistrationForBP(block.getBlockPoolId());
+        DatanodeRegistration dnR = dn.getDNRegistrationForBP(block.getBlockPoolId());
         BlockRecord blockRecord = new BlockRecord(new DatanodeID(dnR), spyDN, new ReplicaRecoveryInfo(block.getBlockId(), block.getNumBytes(), block.getGenerationStamp(), ReplicaState.FINALIZED));
         blocks.add(blockRecord);
         return blocks;
@@ -755,7 +755,7 @@ public class TestBlockRecovery {
                 try {
                     // Register this thread as the writer for the recoveringBlock.
                     LOG.debug("slowWriter creating rbw");
-                    ReplicaHandlerInterface replicaHandler = spyDN.data.createRbw(StorageType.DISK, null, block, false);
+                    ReplicaHandler replicaHandler = spyDN.data.createRbw(StorageType.DISK, null, block, false);
                     replicaHandler.close();
                     LOG.debug("slowWriter created rbw");
                     // Tell the parent thread to start progressing.
@@ -820,14 +820,14 @@ public class TestBlockRecovery {
             final FSNamesystemInterface ns = cluster.getNamesystem();
             final NameNodeInterface nn = cluster.getNameNode();
             final DistributedFileSystem dfs = cluster.getFileSystem();
-            cluster.setBlockRecoveryTimeout(TimeUnit.SECONDS.toMillis(15));
+            //cluster.setBlockRecoveryTimeout(TimeUnit.SECONDS.toMillis(15));
             // Create a file and never close the output stream to trigger recovery
             FSDataOutputStream out = dfs.create(new Path("/testSlowRecovery"), (short) 2);
             out.write(AppendTestUtil.randomBytes(0, 4096));
             out.hsync();
-            List<DataNode> dataNodes = cluster.getDataNodes();
+            List<DataNodeInterface> dataNodes = cluster.getDataNodes();
             for (DataNodeInterface datanode : dataNodes) {
-                DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(datanode, nn);
+                DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(datanode, nn);
                 Mockito.doAnswer(recoveryDelayer).when(nnSpy).commitBlockSynchronization(Mockito.any(ExtendedBlock.class), Mockito.anyInt(), Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(DatanodeID[].class), Mockito.any(String[].class));
             }
             // Make sure hard lease expires to trigger replica recovery

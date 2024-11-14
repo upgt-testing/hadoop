@@ -88,13 +88,13 @@ public class TestStorageMover {
 
     private static final Configuration DEFAULT_CONF = new HdfsConfiguration();
 
-    private static final BlockStoragePolicySuiteInterface DEFAULT_POLICIES;
+    private static final BlockStoragePolicySuite DEFAULT_POLICIES;
 
-    private static final BlockStoragePolicyInterface HOT;
+    private static final BlockStoragePolicy HOT;
 
-    private static final BlockStoragePolicyInterface WARM;
+    private static final BlockStoragePolicy WARM;
 
-    private static final BlockStoragePolicyInterface COLD;
+    private static final BlockStoragePolicy COLD;
 
     static {
         DEFAULT_CONF.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
@@ -144,7 +144,7 @@ public class TestStorageMover {
             for (Path file : files) {
                 DFSTestUtil.createFile(dfs, file, fileSize, repl, 0L);
             }
-            for (Map.EntryInterface<Path, List<String>> entry : snapshotMap.entrySet()) {
+            for (Map.Entry<Path, List<String>> entry : snapshotMap.entrySet()) {
                 for (String snapshot : entry.getValue()) {
                     SnapshotTestHelper.createSnapshot(dfs, entry.getKey(), snapshot);
                 }
@@ -155,7 +155,7 @@ public class TestStorageMover {
          * Set storage policies according to the corresponding scheme.
          */
         void setStoragePolicy(DistributedFileSystem dfs) throws Exception {
-            for (Map.EntryInterface<Path, BlockStoragePolicy> entry : policyMap.entrySet()) {
+            for (Map.Entry<Path, BlockStoragePolicy> entry : policyMap.entrySet()) {
                 dfs.setStoragePolicy(entry.getKey(), entry.getValue().getName());
             }
         }
@@ -204,7 +204,7 @@ public class TestStorageMover {
 
         private DistributedFileSystem dfs;
 
-        private final BlockStoragePolicySuiteInterface policies;
+        private final BlockStoragePolicySuite policies;
 
         MigrationTest(ClusterScheme cScheme, NamespaceScheme nsScheme) {
             this.clusterScheme = cScheme;
@@ -296,7 +296,7 @@ public class TestStorageMover {
         private void verifyRecursively(final Path parent, final HdfsFileStatus status) throws Exception {
             if (status.isDirectory()) {
                 Path fullPath = parent == null ? new Path("/") : status.getFullPath(parent);
-                DirectoryListingInterface children = dfs.getClient().listPaths(fullPath.toString(), HdfsFileStatus.EMPTY_NAME, true);
+                DirectoryListing children = dfs.getClient().listPaths(fullPath.toString(), HdfsFileStatus.EMPTY_NAME, true);
                 for (HdfsFileStatus child : children.getPartialListing()) {
                     verifyRecursively(fullPath, child);
                 }
@@ -308,7 +308,7 @@ public class TestStorageMover {
 
         void verifyFile(final Path file, final Byte expectedPolicyId) throws Exception {
             final Path parent = file.getParent();
-            DirectoryListingInterface children = dfs.getClient().listPaths(parent.toString(), HdfsFileStatus.EMPTY_NAME, true);
+            DirectoryListing children = dfs.getClient().listPaths(parent.toString(), HdfsFileStatus.EMPTY_NAME, true);
             for (HdfsFileStatus child : children.getPartialListing()) {
                 if (child.getLocalName().equals(file.getName())) {
                     verifyFile(parent, child, expectedPolicyId);
@@ -321,7 +321,7 @@ public class TestStorageMover {
         private void verifyFile(final Path parent, final HdfsFileStatus status, final Byte expectedPolicyId) throws Exception {
             HdfsLocatedFileStatus fileStatus = (HdfsLocatedFileStatus) status;
             byte policyId = fileStatus.getStoragePolicy();
-            BlockStoragePolicyInterface policy = policies.getPolicy(policyId);
+            BlockStoragePolicy policy = policies.getPolicy(policyId);
             if (expectedPolicyId != null) {
                 Assert.assertEquals((byte) expectedPolicyId, policy.getId());
             }
@@ -604,6 +604,20 @@ public class TestStorageMover {
     }
 
     private void setVolumeFull(DataNode dn, StorageType type) {
+        try (FsDatasetSpi.FsVolumeReferences refs = dn.getFSDataset().getFsVolumeReferences()) {
+            for (FsVolumeSpi fvs : refs) {
+                FsVolumeImpl volume = (FsVolumeImpl) fvs;
+                if (volume.getStorageType() == type) {
+                    LOG.info("setCapacity to 0 for [" + volume.getStorageType() + "]" + volume.getStorageID());
+                    volume.setCapacityForTesting(0);
+                }
+            }
+        } catch (IOException e) {
+            LOG.error("Unexpected exception by closing FsVolumeReference", e);
+        }
+    }
+
+    private void setVolumeFull(DataNodeInterface dn, StorageType type) {
         try (FsDatasetSpi.FsVolumeReferences refs = dn.getFSDataset().getFsVolumeReferences()) {
             for (FsVolumeSpi fvs : refs) {
                 FsVolumeImpl volume = (FsVolumeImpl) fvs;

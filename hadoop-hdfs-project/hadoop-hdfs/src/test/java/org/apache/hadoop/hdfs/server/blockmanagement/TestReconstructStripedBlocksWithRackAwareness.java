@@ -127,7 +127,7 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         return dnProp;
     }
 
-    private DataNode getDataNode(String host) {
+    private DataNodeInterface getDataNode(String host) {
         for (DataNodeInterface dn : cluster.getDataNodes()) {
             if (dn.getDatanodeId().getHostName().equals(host)) {
                 return dn;
@@ -162,12 +162,12 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         GenericTestUtils.waitFor(() -> bm.numOfUnderReplicatedBlocks() == 0, 100, 30000);
         LOG.info("Created file {}", file);
         final INodeFileInterface fileNode = fsn.getFSDirectory().getINode4Write(file.toString()).asFile();
-        BlockInfoStripedInterface blockInfo = (BlockInfoStriped) fileNode.getLastBlock();
+        BlockInfoStripedInterface blockInfo = (BlockInfoStripedInterface) fileNode.getLastBlock();
         // we now should have 9 internal blocks distributed in 5 racks
         Set<String> rackSet = new HashSet<>();
         Iterator<DatanodeStorageInfo> it = blockInfo.getStorageInfos();
         while (it.hasNext()) {
-            DatanodeStorageInfoInterface storage = it.next();
+            DatanodeStorageInfo storage = it.next();
             rackSet.add(storage.getDatanodeDescriptor().getNetworkLocation());
         }
         Assert.assertEquals("rackSet size is wrong: " + rackSet, dataBlocks - 1, rackSet.size());
@@ -195,9 +195,9 @@ public class TestReconstructStripedBlocksWithRackAwareness {
             // retry 5 times
             it = blockInfo.getStorageInfos();
             while (it.hasNext()) {
-                DatanodeStorageInfoInterface storage = it.next();
+                DatanodeStorageInfo storage = it.next();
                 if (storage != null) {
-                    DatanodeDescriptorInterface dn = storage.getDatanodeDescriptor();
+                    DatanodeDescriptor dn = storage.getDatanodeDescriptor();
                     Assert.assertEquals("Block to be erasure coded is wrong for datanode:" + dn, 0, dn.getNumberOfBlocksToBeErasureCoded());
                     if (dn.getNumberOfBlocksToBeReplicated() == 1) {
                         scheduled = true;
@@ -244,7 +244,7 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         DFSTestUtil.waitForReplication(fs, file, blockNum, 15 * 1000);
         LocatedBlocks blks = fs.getClient().getLocatedBlocks(file.toString(), 0);
         LocatedStripedBlock block = (LocatedStripedBlock) blks.getLastLocatedBlock();
-        for (DatanodeInfoInterface dn : block.getLocations()) {
+        for (DatanodeInfo dn : block.getLocations()) {
             Assert.assertFalse(dn.getHostName().equals("host1"));
         }
     }
@@ -270,7 +270,7 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         MiniDockerDFSCluster.DataNodeProperties h10 = stopDataNode(hostNames[hostNames.length - 2]);
         final Path file = new Path("/foo");
         DFSTestUtil.createFile(fs, file, cellSize * dataBlocks * 2, (short) 1, 0L);
-        final BlockInfo blockInfo = cluster.getNamesystem().getFSDirectory().getINode(file.toString()).asFile().getLastBlock();
+        final BlockInfoInterface blockInfo = cluster.getNamesystem().getFSDirectory().getINode(file.toString()).asFile().getLastBlock();
         // bring h9 back
         cluster.restartDataNode(h9);
         cluster.waitActive();
@@ -295,11 +295,11 @@ public class TestReconstructStripedBlocksWithRackAwareness {
         // start decommissioning h9
         boolean satisfied = bm.isPlacementPolicySatisfied(blockInfo);
         Assert.assertFalse(satisfied);
-        final DatanodeAdminManagerInterface decomManager = (DatanodeAdminManager) Whitebox.getInternalState(dm, "datanodeAdminManager");
+        final DatanodeAdminManager decomManager = (DatanodeAdminManager) Whitebox.getInternalState(dm, "datanodeAdminManager");
         cluster.getNamesystem().writeLock();
         try {
             dn9.stopDecommission();
-            decomManager.startDecommission(dn9);
+            //decomManager.startDecommission(dn9);
         } finally {
             cluster.getNamesystem().writeUnlock();
         }

@@ -125,13 +125,13 @@ public class TestFsDatasetImpl {
     private static final String[] BLOCK_POOL_IDS = { "bpid-0", "bpid-1" };
 
     // Use to generate storageUuid
-    private static final DataStorageInterface dsForStorageUuid = new DataStorage(new StorageInfo(HdfsServerConstants.NodeType.DATA_NODE));
+    private static final DataStorage dsForStorageUuid = new DataStorage(new StorageInfo(HdfsServerConstants.NodeType.DATA_NODE));
 
     private Configuration conf;
 
-    private DataNodeInterface datanode;
+    private DataNode datanode;
 
-    private DataStorageInterface storage;
+    private DataStorage storage;
 
     private FsDatasetImpl dataset;
 
@@ -305,8 +305,8 @@ public class TestFsDatasetImpl {
             String path = BASE_DIR + "/newData" + i;
             String pathUri = new Path(path).toUri().toString();
             expectedVolumes.add(new File(pathUri).getAbsolutePath());
-            StorageLocationInterface loc = StorageLocation.parse(pathUri);
-            Storage.StorageDirectoryInterface sd = createStorageDirectory(new File(path), conf);
+            StorageLocation loc = StorageLocation.parse(pathUri);
+            Storage.StorageDirectory sd = createStorageDirectory(new File(path), conf);
             DataStorage.VolumeBuilder builder = new DataStorage.VolumeBuilder(storage, sd);
             when(storage.prepareVolume(eq(datanode), eq(loc), anyList())).thenReturn(builder);
             dataset.addVolume(loc, nsInfos);
@@ -354,7 +354,7 @@ public class TestFsDatasetImpl {
         for (int i = 0; i < numBlocks; i++) {
             String bpid = BLOCK_POOL_IDS[numBlocks % BLOCK_POOL_IDS.length];
             ExtendedBlock eb = new ExtendedBlock(bpid, i);
-            ReplicaHandlerInterface replica = null;
+            ReplicaHandler replica = null;
             try {
                 replica = dataset.createRbw(StorageType.DEFAULT, null, eb, false);
             } finally {
@@ -409,7 +409,7 @@ public class TestFsDatasetImpl {
         for (int i = 0; i < numBlocks; i++) {
             String bpid = BLOCK_POOL_IDS[numBlocks % BLOCK_POOL_IDS.length];
             ExtendedBlock eb = new ExtendedBlock(bpid, i);
-            ReplicaHandlerInterface replica = null;
+            ReplicaHandler replica = null;
             try {
                 replica = dataset.createRbw(StorageType.DEFAULT, null, eb, false);
             } finally {
@@ -426,7 +426,7 @@ public class TestFsDatasetImpl {
         FsVolumeReferences volReferences = dataset.getFsVolumeReferences();
         Set<FsVolumeImpl> volumes = new HashSet<>();
         for (FsVolumeSpi vol : volReferences) {
-            for (StorageLocationInterface volume : volumesToRemove) {
+            for (StorageLocation volume : volumesToRemove) {
                 if (vol.getStorageLocation().equals(volume)) {
                     volumes.add((FsVolumeImpl) vol);
                 }
@@ -469,8 +469,8 @@ public class TestFsDatasetImpl {
             nsInfos.add(new NamespaceInfo(0, CLUSTER_ID, bpid, 1));
         }
         String newVolumePath = BASE_DIR + "/newVolumeToRemoveLater";
-        StorageLocationInterface loc = StorageLocation.parse(newVolumePath);
-        Storage.StorageDirectoryInterface sd = createStorageDirectory(new File(newVolumePath), conf);
+        StorageLocation loc = StorageLocation.parse(newVolumePath);
+        Storage.StorageDirectory sd = createStorageDirectory(new File(newVolumePath), conf);
         DataStorage.VolumeBuilder builder = new DataStorage.VolumeBuilder(storage, sd);
         when(storage.prepareVolume(eq(datanode), eq(loc), anyList())).thenReturn(builder);
         dataset.addVolume(loc, nsInfos);
@@ -491,11 +491,11 @@ public class TestFsDatasetImpl {
         badDir.mkdirs();
         doReturn(mockVolume).when(spyDataset).createFsVolume(anyString(), any(StorageDirectory.class), any(StorageLocation.class));
         doThrow(new IOException("Failed to getVolumeMap()")).when(mockVolume).getVolumeMap(anyString(), any(ReplicaMap.class), any(RamDiskReplicaLruTracker.class));
-        Storage.StorageDirectoryInterface sd = createStorageDirectory(badDir, conf);
+        Storage.StorageDirectory sd = createStorageDirectory(badDir, conf);
         sd.lock();
         DataStorage.VolumeBuilder builder = new DataStorage.VolumeBuilder(storage, sd);
         when(storage.prepareVolume(eq(datanode), eq(StorageLocation.parse(badDir.toURI().toString())), anyList())).thenReturn(builder);
-        StorageLocationInterface location = StorageLocation.parse(badDir.toString());
+        StorageLocation location = StorageLocation.parse(badDir.toString());
         List<NamespaceInfo> nsInfos = Lists.newArrayList();
         for (String bpid : BLOCK_POOL_IDS) {
             nsInfos.add(new NamespaceInfo(0, CLUSTER_ID, bpid, 1));
@@ -607,8 +607,8 @@ public class TestFsDatasetImpl {
         String DU_CACHE_FILE = BlockPoolSlice.DU_CACHE_FILE;
         String path = BASE_DIR + "/newData0";
         String pathUri = new Path(path).toUri().toString();
-        StorageLocationInterface loc = StorageLocation.parse(pathUri);
-        Storage.StorageDirectoryInterface sd = createStorageDirectory(new File(path), conf);
+        StorageLocation loc = StorageLocation.parse(pathUri);
+        Storage.StorageDirectory sd = createStorageDirectory(new File(path), conf);
         DataStorage.VolumeBuilder builder = new DataStorage.VolumeBuilder(storage, sd);
         when(storage.prepareVolume(eq(datanode), eq(loc), anyList())).thenReturn(builder);
         String cacheFilePath = String.format("%s/%s/%s/%s/%s", path, CURRENT_DIR, BLOCK_POOL_IDS[0], CURRENT_DIR, DU_CACHE_FILE);
@@ -666,7 +666,7 @@ public class TestFsDatasetImpl {
         class ResponderThread extends Thread {
 
             public void run() {
-                try (ReplicaHandlerInterface replica = dataset.createRbw(StorageType.DEFAULT, null, eb, false)) {
+                try (ReplicaHandler replica = dataset.createRbw(StorageType.DEFAULT, null, eb, false)) {
                     LOG.info("CreateRbw finished");
                     startFinalizeLatch.countDown();
                     // Slow down while we're holding the reference to the volume.
@@ -752,7 +752,7 @@ public class TestFsDatasetImpl {
             final FsVolumeImpl volume = (FsVolumeImpl) dataNode.getFSDataset().getVolume(block);
             File finalizedDir = volume.getFinalizedDir(cluster.getNamesystem().getBlockPoolId());
             LocatedBlock lb = DFSTestUtil.getAllBlocks(fs, filePath).get(0);
-            DatanodeInfoInterface info = lb.getLocations()[0];
+            DatanodeInfo info = lb.getLocations()[0];
             if (finalizedDir.exists()) {
                 // Remove write and execute access so that checkDiskErrorThread detects
                 // this volume is bad.
@@ -830,7 +830,7 @@ public class TestFsDatasetImpl {
             DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
             ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
-            ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
+            ReplicaInfo newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
             // Append to file to update its GS
             FSDataOutputStream out = fs.append(filePath, (short) 1);
             out.write(100);
@@ -860,7 +860,7 @@ public class TestFsDatasetImpl {
             DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
             ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
-            ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
+            ReplicaInfo newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
             fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block);
         } catch (Exception ex) {
             LOG.info("Exception in testMoveBlockSuccess ", ex);
@@ -880,7 +880,7 @@ public class TestFsDatasetImpl {
      * @throws IOException
      */
     private ReplicaInfo createNewReplicaObj(ExtendedBlock block, FsDatasetImpl fsDataSetImpl) throws IOException {
-        ReplicaInfoInterface replicaInfo = fsDataSetImpl.getReplicaInfo(block);
+        ReplicaInfo replicaInfo = fsDataSetImpl.getReplicaInfo(block);
         FsVolumeSpi destVolume = getDestinationVolume(block, fsDataSetImpl);
         return fsDataSetImpl.copyReplicaToVolume(block, replicaInfo, destVolume.obtainReference());
     }
@@ -934,7 +934,7 @@ public class TestFsDatasetImpl {
             assertEquals(blockData.substring(0, 512), new String(buf, StandardCharsets.US_ASCII).substring(0, 512));
             // Part 2: Move block and than read remaining block
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
-            ReplicaInfoInterface replicaInfo = fsDataSetImpl.getReplicaInfo(block);
+            ReplicaInfo replicaInfo = fsDataSetImpl.getReplicaInfo(block);
             FsVolumeSpi destVolume = getDestinationVolume(block, fsDataSetImpl);
             assertNotNull("Destination volume should not be null.", destVolume);
             fsDataSetImpl.moveBlock(block, replicaInfo, destVolume.obtainReference());
@@ -1027,7 +1027,7 @@ public class TestFsDatasetImpl {
         cluster.waitActive();
         FsVolumeImpl vol = (FsVolumeImpl) dataset.getFsVolumeReferences().get(0);
         ExtendedBlock eb;
-        ReplicaInfoInterface info;
+        ReplicaInfo info;
         int beforeCnt = 0;
         try {
             List<Block> blockList = new ArrayList<Block>();
@@ -1063,7 +1063,7 @@ public class TestFsDatasetImpl {
             ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
             // Copy a new replica to other volume.
             FsDatasetImpl fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset();
-            ReplicaInfoInterface newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
+            ReplicaInfo newReplicaInfo = createNewReplicaObj(block, fsDataSetImpl);
             fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block);
             // Get the volume where the original replica resides.
             FsVolumeSpi volume = null;
@@ -1073,7 +1073,7 @@ public class TestFsDatasetImpl {
                 }
             }
             // Assert metrics.
-            DataNodeVolumeMetricsInterface metrics = volume.getMetrics();
+            DataNodeVolumeMetrics metrics = volume.getMetrics();
             assertEquals(2, metrics.getTransferIoSampleCount());
             assertEquals(3, metrics.getTransferIoQuantiles().length);
             assertEquals(2, metrics.getNativeCopyIoSampleCount());

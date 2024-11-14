@@ -236,7 +236,7 @@ public class TestPmemCacheRecovery {
         assertEquals(blockKeyToVolume.size(), cacheBlocksNum);
         assertTrue(blockKeyToVolume.keySet().containsAll(blockKeys));
         // Test each replica's cache file path
-        for (ExtendedBlockIdInterface key : blockKeys) {
+        for (ExtendedBlockId key : blockKeys) {
             if (blockPoolId.isEmpty()) {
                 blockPoolId = key.getBlockPoolId();
             }
@@ -267,7 +267,7 @@ public class TestPmemCacheRecovery {
         assertEquals(blockKeyToVolume.size(), cacheBlocksNum);
         assertTrue(blockKeyToVolume.keySet().containsAll(blockKeys));
         // Test each replica's cache file path
-        for (ExtendedBlockIdInterface key : blockKeys) {
+        for (ExtendedBlockId key : blockKeys) {
             String cachePath = cacheManager.getReplicaCachePath(key.getBlockPoolId(), key.getBlockId());
             // The cachePath shouldn't be null if the replica has been cached
             // to pmem.
@@ -287,7 +287,7 @@ public class TestPmemCacheRecovery {
             }
         }
         // Uncache the test file
-        for (ExtendedBlockIdInterface key : blockKeys) {
+        for (ExtendedBlockId key : blockKeys) {
             cacheManager.uncacheBlock(blockPoolId, key.getBlockId());
         }
         // Wait for uncaching

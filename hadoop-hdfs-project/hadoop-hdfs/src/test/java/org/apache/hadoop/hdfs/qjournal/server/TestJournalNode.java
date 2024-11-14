@@ -60,7 +60,7 @@ import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestJournalNode {
 
-    private static final NamespaceInfoInterface FAKE_NSINFO = new NamespaceInfo(12345, "mycluster", "my-bp", 0L);
+    private static final NamespaceInfo FAKE_NSINFO = new NamespaceInfo(12345, "mycluster", "my-bp", 0L);
 
     @Rule
     public TestName testName = new TestName();

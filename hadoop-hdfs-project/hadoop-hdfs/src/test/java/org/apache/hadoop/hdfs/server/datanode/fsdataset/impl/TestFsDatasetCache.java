@@ -121,7 +121,7 @@ public class TestFsDatasetCache {
 
     private static FsDatasetSpi<?> fsd;
 
-    private static DatanodeProtocolClientSideTranslatorPBInterface spyNN;
+    private static DatanodeProtocolClientSideTranslatorPB spyNN;
 
     /**
      * Used to pause DN BPServiceActor threads. BPSA threads acquire the
@@ -549,7 +549,7 @@ public class TestFsDatasetCache {
                 RemoteIterator<CacheDirectiveEntry> iter;
                 try {
                     iter = dfs.listCacheDirectives(new CacheDirectiveInfo.Builder().build());
-                    CacheDirectiveEntryInterface entry;
+                    CacheDirectiveEntry entry;
                     do {
                         entry = iter.next();
                     } while (entry.getInfo().getId() != shortCacheDirectiveId);

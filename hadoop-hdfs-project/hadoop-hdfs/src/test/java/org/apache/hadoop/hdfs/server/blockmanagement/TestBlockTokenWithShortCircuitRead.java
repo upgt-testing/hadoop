@@ -20,11 +20,7 @@ package org.apache.hadoop.hdfs.server.blockmanagement;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DFSClient;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
@@ -47,6 +43,7 @@ import org.junit.Test;
 import org.slf4j.event.Level;
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +109,8 @@ public class TestBlockTokenWithShortCircuitRead {
             Path fileToRead = new Path(FILE_TO_SHORT_CIRCUIT_READ);
             DistributedFileSystem fs = cluster.getFileSystem();
             final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
-            final DatanodeInfoInterface datanode = new DatanodeInfo.DatanodeInfoBuilder().setNodeID(cluster.getDataNodes().get(0).getDatanodeId()).build();
+            DatanodeIDInterface dnId = cluster.getDataNodes().get(0).getDatanodeId();
+            final DatanodeInfo datanode = new DatanodeInfo.DatanodeInfoBuilder().setNodeID(dnId.getIpAddr(), dnId.getHostName(), dnId.getDatanodeUuid(), dnId.getXferPort(), dnId.getInfoPort(), dnId.getInfoSecurePort(), dnId.getIpcPort()).build();
             cache.getDfsClientShmManager().visit(new Visitor() {
 
                 @Override
@@ -130,7 +128,7 @@ public class TestBlockTokenWithShortCircuitRead {
                 List<LocatedBlock> locatedBlocks = nnProto.getBlockLocations(FILE_TO_SHORT_CIRCUIT_READ, 0, FILE_SIZE).getLocatedBlocks();
                 // first block
                 LocatedBlock lblock = locatedBlocks.get(0);
-                TokenInterface<BlockTokenIdentifier> myToken = lblock.getBlockToken();
+                Token<BlockTokenIdentifier> myToken = lblock.getBlockToken();
                 assertFalse(SecurityTestUtil.isBlockTokenExpired(myToken));
                 // check the number of slot objects
                 checkSlotsAfterSSRWithTokenExpiration(cache, datanode, in, myToken);

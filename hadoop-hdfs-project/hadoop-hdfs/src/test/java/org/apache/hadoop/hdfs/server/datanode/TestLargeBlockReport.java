@@ -56,7 +56,7 @@ public class TestLargeBlockReport {
 
     private DatanodeProtocolClientSideTranslatorPBInterface nnProxy;
 
-    private DatanodeRegistrationInterface bpRegistration;
+    private DatanodeRegistration bpRegistration;
 
     private String bpId;
 

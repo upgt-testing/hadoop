@@ -153,7 +153,7 @@ public class TestHSync {
         final Path p = new Path("/testSequenceFileSync/foo");
         final int len = 1 << 16;
         FSDataOutputStream out = fs.create(p, FsPermission.getDefault(), EnumSet.of(CreateFlag.CREATE, CreateFlag.OVERWRITE, CreateFlag.SYNC_BLOCK), 4096, (short) 1, len, null);
-        WriterInterface w = SequenceFile.createWriter(new Configuration(), Writer.stream(out), Writer.keyClass(RandomDatum.class), Writer.valueClass(RandomDatum.class), Writer.compression(CompressionType.NONE, new DefaultCodec()));
+        Writer w = SequenceFile.createWriter(new Configuration(), Writer.stream(out), Writer.keyClass(RandomDatum.class), Writer.valueClass(RandomDatum.class), Writer.compression(CompressionType.NONE, new DefaultCodec()));
         w.hflush();
         checkSyncMetric(cluster, 0);
         w.hsync();

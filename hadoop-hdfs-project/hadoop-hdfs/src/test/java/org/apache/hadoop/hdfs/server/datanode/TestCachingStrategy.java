@@ -121,7 +121,7 @@ public class TestCachingStrategy {
             if ((offset < 0) || (offset > Integer.MAX_VALUE)) {
                 throw new RuntimeException("invalid offset of " + offset + " passed to posixFadviseIfPossible");
             }
-            StatsInterface stats = map.get(name);
+            Stats stats = map.get(name);
             if (stats == null) {
                 stats = new Stats(name);
                 map.put(name, stats);
@@ -221,7 +221,7 @@ public class TestCachingStrategy {
             // verify that we dropped everything from the cache during file creation.
             ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
-            StatsInterface stats = tracker.getStats(fadvisedFileName);
+            Stats stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
             stats.clear();
             // read file
@@ -262,7 +262,7 @@ public class TestCachingStrategy {
             // verify that we dropped everything from the cache during file creation.
             ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
-            StatsInterface stats = tracker.getStats(fadvisedFileName);
+            Stats stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
             stats.clear();
             // read file
@@ -299,7 +299,7 @@ public class TestCachingStrategy {
             // specify any policy, we should have done drop-behind.
             ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
-            StatsInterface stats = tracker.getStats(fadvisedFileName);
+            Stats stats = tracker.getStats(fadvisedFileName);
             stats.assertDroppedInRange(0, TEST_PATH_LEN - WRITE_PACKET_SIZE);
             stats.clear();
             stats.assertNotDroppedInRange(0, TEST_PATH_LEN);
@@ -336,7 +336,7 @@ public class TestCachingStrategy {
             // verify that we did not drop everything from the cache during file creation.
             ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
             String fadvisedFileName = cluster.getBlockFile(0, block).getName();
-            StatsInterface stats = tracker.getStats(fadvisedFileName);
+            Stats stats = tracker.getStats(fadvisedFileName);
             Assert.assertNull(stats);
             // read file
             readHdfsFile(fs, new Path(TEST_PATH), Long.MAX_VALUE, false);

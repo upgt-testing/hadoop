@@ -59,10 +59,10 @@ public class TestRedundancyMonitor {
             FSNamesystemInterface fsn = miniCluster.getNamesystem();
             BlockManagerInterface blockManager = fsn.getBlockManager();
             BlockPlacementPolicyDefault replicator = (BlockPlacementPolicyDefault) blockManager.getBlockPlacementPolicy();
-            Set<DatanodeDescriptor> dns = blockManager.getDatanodeManager().getDatanodes();
+            Set<DatanodeDescriptorInterface> dns = blockManager.getDatanodeManager().getDatanodes();
             DelayAnswer delayer = new DelayAnswer(BlockPlacementPolicyDefault.LOG);
-            NetworkTopologyInterface clusterMap = replicator.clusterMap;
-            NetworkTopologyInterface spyClusterMap = spy(clusterMap);
+            NetworkTopology clusterMap = replicator.clusterMap;
+            NetworkTopology spyClusterMap = spy(clusterMap);
             replicator.clusterMap = spyClusterMap;
             doAnswer(delayer).when(spyClusterMap).getNumOfRacks();
             ExecutorService pool = Executors.newFixedThreadPool(2);

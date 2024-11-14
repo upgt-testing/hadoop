@@ -202,7 +202,7 @@ public class TestDataNodeVolumeFailure {
 
             @Override
             public Boolean get() {
-                final VolumeFailureSummaryInterface summary = dn.getFSDataset().getVolumeFailureSummary();
+                final VolumeFailureSummary summary = dn.getFSDataset().getVolumeFailureSummary();
                 return summary != null && summary.getFailedStorageLocations() != null && summary.getFailedStorageLocations().length == 1;
             }
         }, 10, 30 * 1000);
@@ -281,7 +281,7 @@ public class TestDataNodeVolumeFailure {
         DataStorageInterface storage = dn0.getStorage();
         assertEquals(1, storage.getNumStorageDirs());
         for (int i = 0; i < storage.getNumStorageDirs(); i++) {
-            Storage.StorageDirectoryInterface sd = storage.getStorageDir(i);
+            Storage.StorageDirectory sd = storage.getStorageDir(i);
             assertFalse(sd.getRoot().getAbsolutePath().startsWith(dn0Vol1.getAbsolutePath()));
         }
         final String bpid = cluster.getNamesystem().getBlockPoolId();

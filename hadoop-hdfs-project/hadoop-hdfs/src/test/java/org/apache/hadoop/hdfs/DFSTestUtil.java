@@ -659,6 +659,16 @@ public class DFSTestUtil {
         final List<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
         dm.fetchDatanodes(live, null, false);
         long capacity = 0;
+        for (final DatanodeDescriptor dn : live) {
+            capacity += dn.getCapacity();
+        }
+        return capacity;
+    }
+
+    public static long getLiveDatanodeCapacity(DatanodeManagerInterface dm) {
+        final List<DatanodeDescriptorInterface> live = new ArrayList<DatanodeDescriptorInterface>();
+        dm.fetchDatanodes(live, null, false);
+        long capacity = 0;
         for (final DatanodeDescriptorInterface dn : live) {
             capacity += dn.getCapacity();
         }
@@ -674,12 +684,44 @@ public class DFSTestUtil {
         return live.get(index).getCapacity();
     }
 
+    public static long getDatanodeCapacity(DatanodeManagerInterface dm, int index) {
+        final List<DatanodeDescriptorInterface> live = new ArrayList<DatanodeDescriptorInterface>();
+        dm.fetchDatanodes(live, null, false);
+        return live.get(index).getCapacity();
+    }
+
+
     /*
    * Wait for the given # live/dead DNs, total capacity, and # vol failures. 
    */
     public static void waitForDatanodeStatus(DatanodeManager dm, int expectedLive, int expectedDead, long expectedVolFails, long expectedTotalCapacity, long timeout) throws InterruptedException, TimeoutException {
         final List<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
         final List<DatanodeDescriptor> dead = new ArrayList<DatanodeDescriptor>();
+        final int ATTEMPTS = 10;
+        int count = 0;
+        long currTotalCapacity = 0;
+        int volFails = 0;
+        do {
+            Thread.sleep(timeout);
+            live.clear();
+            dead.clear();
+            dm.fetchDatanodes(live, dead, false);
+            currTotalCapacity = 0;
+            volFails = 0;
+            for (final DatanodeDescriptor dd : live) {
+                currTotalCapacity += dd.getCapacity();
+                volFails += dd.getVolumeFailures();
+            }
+            count++;
+        } while ((expectedLive != live.size() || expectedDead != dead.size() || expectedTotalCapacity != currTotalCapacity || expectedVolFails != volFails) && count < ATTEMPTS);
+        if (count == ATTEMPTS) {
+            throw new TimeoutException("Timed out waiting for capacity." + " Live = " + live.size() + " Expected = " + expectedLive + " Dead = " + dead.size() + " Expected = " + expectedDead + " Total capacity = " + currTotalCapacity + " Expected = " + expectedTotalCapacity + " Vol Fails = " + volFails + " Expected = " + expectedVolFails);
+        }
+    }
+
+    public static void waitForDatanodeStatus(DatanodeManagerInterface dm, int expectedLive, int expectedDead, long expectedVolFails, long expectedTotalCapacity, long timeout) throws InterruptedException, TimeoutException {
+        final List<DatanodeDescriptorInterface> live = new ArrayList<DatanodeDescriptorInterface>();
+        final List<DatanodeDescriptorInterface> dead = new ArrayList<DatanodeDescriptorInterface>();
         final int ATTEMPTS = 10;
         int count = 0;
         long currTotalCapacity = 0;
@@ -1821,6 +1863,15 @@ public class DFSTestUtil {
      * Set the datanode dead
      */
     public static void setDatanodeDead(DatanodeInfo dn) {
+        dn.setLastUpdate(0);
+        // Set this to a large negative value.
+        // On short-lived VMs, the monotonic time can be less than the heartbeat
+        // expiry time. Setting this to 0 will fail to immediately mark the DN as
+        // dead.
+        dn.setLastUpdateMonotonic(Long.MIN_VALUE / 2);
+    }
+
+    public static void setDatanodeDead(DatanodeInfoInterface dn) {
         dn.setLastUpdate(0);
         // Set this to a large negative value.
         // On short-lived VMs, the monotonic time can be less than the heartbeat

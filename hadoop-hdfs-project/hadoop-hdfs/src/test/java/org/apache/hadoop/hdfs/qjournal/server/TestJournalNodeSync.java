@@ -89,7 +89,8 @@ public class TestJournalNodeSync {
             conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, DFS_HA_TAILEDITS_PERIOD_SECONDS);
         }
         qjmhaCluster = new MiniQJMHACluster.Builder(conf).setNumNameNodes(2).build();
-        dfsCluster = qjmhaCluster.getDfsCluster();
+        //dfsCluster = qjmhaCluster.getDfsCluster();
+        dfsCluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
         jCluster = qjmhaCluster.getJournalCluster();
         dfsCluster.transitionToActive(0);
         namesystem = dfsCluster.getNamesystem(0);
@@ -308,7 +309,7 @@ public class TestJournalNodeSync {
         startTxIds[2] = generateEditLog(4);
         startTxIds[3] = generateEditLog(6);
         Journal journal1 = jCluster.getJournalNode(0).getOrCreateJournal(jid);
-        NamespaceInfoInterface nsInfo = journal1.getStorage().getNamespaceInfo();
+        NamespaceInfo nsInfo = journal1.getStorage().getNamespaceInfo();
         // Delete contents of current directory of one JN
         for (File file : firstJournalCurrentDir.listFiles()) {
             file.delete();
@@ -343,7 +344,7 @@ public class TestJournalNodeSync {
         }
         dfsActive = dfsCluster.getFileSystem(activeNNindex);
         // Prepare for rolling upgrade
-        final RollingUpgradeInfoInterface info = dfsActive.rollingUpgrade(HdfsConstants.RollingUpgradeAction.PREPARE);
+        final RollingUpgradeInfo info = dfsActive.rollingUpgrade(HdfsConstants.RollingUpgradeAction.PREPARE);
         //query rolling upgrade
         assertEquals(info, dfsActive.rollingUpgrade(HdfsConstants.RollingUpgradeAction.QUERY));
         // Restart the Standby NN with rollingUpgrade option
@@ -373,7 +374,7 @@ public class TestJournalNodeSync {
         // Check that JNSync downloaded the edit logs rolled during rolling upgrade.
         GenericTestUtils.waitFor(editLogExists(missingLogs), 500, 30000);
         //finalize rolling upgrade
-        final RollingUpgradeInfoInterface finalize = dfsActive.rollingUpgrade(HdfsConstants.RollingUpgradeAction.FINALIZE);
+        final RollingUpgradeInfo finalize = dfsActive.rollingUpgrade(HdfsConstants.RollingUpgradeAction.FINALIZE);
         Assert.assertTrue(finalize.isFinalized());
         // Check the missing edit logs exist after finalizing rolling upgrade
         for (File editLog : missingLogs) {

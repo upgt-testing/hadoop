@@ -459,7 +459,7 @@ public class TestBalancer {
             assertEquals(datanodeReport.length, cluster.getDataNodes().size());
             balanced = true;
             int actualExcludedNodeCount = 0;
-            for (DatanodeInfoInterface datanode : datanodeReport) {
+            for (DatanodeInfo datanode : datanodeReport) {
                 double nodeUtilization = ((double) datanode.getDfsUsed()) / datanode.getCapacity();
                 if (Dispatcher.Util.isExcluded(p.getExcludedNodes(), datanode)) {
                     if (checkExcludeNodesUtilization) {
@@ -1480,7 +1480,7 @@ public class TestBalancer {
             // get datanode report
             DatanodeInfo[] datanodeReport = client.getDatanodeReport(DatanodeReportType.ALL);
             long totalBlocks = 0;
-            for (DatanodeInfoInterface dn : datanodeReport) {
+            for (DatanodeInfo dn : datanodeReport) {
                 totalBlocks += dn.getNumBlocks();
             }
             // add datanode in new rack
@@ -1506,7 +1506,7 @@ public class TestBalancer {
                     Assert.fail(e.getMessage());
                 }
                 long blocksAfterBalancer = 0;
-                for (DatanodeInfoInterface dn : datanodeInfos) {
+                for (DatanodeInfo dn : datanodeInfos) {
                     blocksAfterBalancer += dn.getNumBlocks();
                 }
                 return blocksBeforeBalancer == blocksAfterBalancer;
@@ -1560,6 +1560,23 @@ public class TestBalancer {
     }
 
     private void spyFSNamesystem(NameNode nn) throws IOException {
+        FSNamesystem fsnSpy = NameNodeAdapter.spyOnNamesystem(nn);
+        doAnswer(new Answer<BlocksWithLocations>() {
+
+            @Override
+            public BlocksWithLocations answer(InvocationOnMock invocation) throws Throwable {
+                long startTime = Time.monotonicNow();
+                startGetBlocksTime.getAndUpdate((curr) -> Math.min(curr, startTime));
+                BlocksWithLocations blk = (BlocksWithLocations) invocation.callRealMethod();
+                long endTime = Time.monotonicNow();
+                endGetBlocksTime.getAndUpdate((curr) -> Math.max(curr, endTime));
+                numGetBlocksCalls.incrementAndGet();
+                return blk;
+            }
+        }).when(fsnSpy).getBlocks(any(DatanodeID.class), anyLong(), anyLong());
+    }
+
+    private void spyFSNamesystem(NameNodeInterface nn) throws IOException {
         FSNamesystemInterface fsnSpy = NameNodeAdapter.spyOnNamesystem(nn);
         doAnswer(new Answer<BlocksWithLocations>() {
 
@@ -1567,13 +1584,13 @@ public class TestBalancer {
             public BlocksWithLocations answer(InvocationOnMock invocation) throws Throwable {
                 long startTime = Time.monotonicNow();
                 startGetBlocksTime.getAndUpdate((curr) -> Math.min(curr, startTime));
-                BlocksWithLocationsInterface blk = (BlocksWithLocations) invocation.callRealMethod();
+                BlocksWithLocations blk = (BlocksWithLocations) invocation.callRealMethod();
                 long endTime = Time.monotonicNow();
                 endGetBlocksTime.getAndUpdate((curr) -> Math.max(curr, endTime));
                 numGetBlocksCalls.incrementAndGet();
                 return blk;
             }
-        }).when(fsnSpy).getBlocks(any(DatanodeID.class), anyLong(), anyLong());
+        }).when(fsnSpy).getBlocks(any(DatanodeIDInterface.class), anyLong(), anyLong());
     }
 
     /**

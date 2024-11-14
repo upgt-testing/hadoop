@@ -92,7 +92,7 @@ public class TestStorageReport {
         NameNodeInterface nn = cluster.getNameNode();
         DataNodeInterface dn = cluster.getDataNodes().get(0);
         // Insert a spy object for the NN RPC.
-        DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
+        DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn);
         // Trigger a heartbeat so there is an interaction with the spy
         // object.
         DataNodeTestUtils.triggerHeartbeat(dn);
@@ -100,7 +100,7 @@ public class TestStorageReport {
         ArgumentCaptor<StorageReport[]> captor = ArgumentCaptor.forClass(StorageReport[].class);
         Mockito.verify(nnSpy).sendHeartbeat(any(DatanodeRegistration.class), captor.capture(), anyLong(), anyLong(), anyInt(), anyInt(), anyInt(), any(), Mockito.anyBoolean(), Mockito.any(SlowPeerReports.class), Mockito.any(SlowDiskReports.class));
         StorageReport[] reports = captor.getValue();
-        for (StorageReportInterface report : reports) {
+        for (StorageReport report : reports) {
             assertThat(report.getStorage().getStorageType(), is(storageType));
             assertThat(report.getStorage().getState(), is(DatanodeStorage.State.NORMAL));
         }

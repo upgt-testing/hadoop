@@ -61,8 +61,8 @@ public final class TestTriggerBlockReport {
         cluster.waitActive();
         cluster.transitionToActive(0);
         FileSystem fs = cluster.getFileSystem(0);
-        DatanodeProtocolClientSideTranslatorPBInterface spyOnNn0 = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode(0));
-        DatanodeProtocolClientSideTranslatorPBInterface spyOnNn1 = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode(1));
+        DatanodeProtocolClientSideTranslatorPB spyOnNn0 = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode(0));
+        DatanodeProtocolClientSideTranslatorPB spyOnNn1 = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode(1));
         DFSTestUtil.createFile(fs, new Path("/abc"), 16, (short) 1, 1L);
         // We should get 1 incremental block report on both NNs.
         Mockito.verify(spyOnNn0, timeout(60000).times(1)).blockReceivedAndDeleted(any(DatanodeRegistration.class), anyString(), any(StorageReceivedDeletedBlocks[].class));

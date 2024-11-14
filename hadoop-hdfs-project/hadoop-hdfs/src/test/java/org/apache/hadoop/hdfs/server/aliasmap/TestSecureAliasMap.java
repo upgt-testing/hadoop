@@ -135,7 +135,7 @@ public class TestSecureAliasMap {
         String[] bps = providedVolume.getBlockPoolList();
         assertEquals("Missing provided volume", 1, bps.length);
         BlockAliasMapInterface aliasMap = blockManager.getProvidedStorageMap().getAliasMap();
-        BlockAliasMap.ReaderInterface reader = aliasMap.getReader(null, bps[0]);
+        ReaderInterface reader = aliasMap.getReader(null, bps[0]);
         assertNotNull("Failed to create blockAliasMap reader", reader);
     }
 }

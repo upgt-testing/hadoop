@@ -241,7 +241,7 @@ public class TestCacheByPmemMappableBlockLoader {
         assertEquals(blockKeyToVolume.size(), maxCacheBlocksNum);
         assertTrue(blockKeyToVolume.keySet().containsAll(blockKeys));
         // Test each replica's cache file path
-        for (ExtendedBlockIdInterface key : blockKeys) {
+        for (ExtendedBlockId key : blockKeys) {
             String cachePath = cacheManager.getReplicaCachePath(key.getBlockPoolId(), key.getBlockId());
             // The cachePath shouldn't be null if the replica has been cached
             // to pmem.

@@ -196,6 +196,18 @@ public class BlockManagerTestUtil {
     }
   }
 
+  public static void stopRedundancyThread(final BlockManagerInterface blockManager)
+          throws IOException {
+    blockManager.enableRMTerminationForTesting();
+    blockManager.getRedundancyThread().interrupt();
+    try {
+      blockManager.getRedundancyThread().join();
+    } catch (InterruptedException ie) {
+      throw new IOException(
+              "Interrupted while trying to stop RedundancyMonitor");
+    }
+  }
+
   /**
    * Wakeup the timer thread of PendingReconstructionBlocks.
    */
@@ -251,6 +263,11 @@ public class BlockManagerTestUtil {
    * @throws IOException
    */
   public static int getComputedDatanodeWork(final BlockManager blockManager) throws IOException
+  {
+    return blockManager.computeDatanodeWork();
+  }
+
+  public static int getComputedDatanodeWork(final BlockManagerInterface blockManager) throws IOException
   {
     return blockManager.computeDatanodeWork();
   }
@@ -327,6 +344,30 @@ public class BlockManagerTestUtil {
       namesystem.writeUnlock();
     }
   }
+
+  public static void noticeDeadDatanode(NameNodeInterface nn, String dnName) {
+    FSNamesystemInterface namesystem = nn.getNamesystem();
+    namesystem.writeLock();
+    try {
+      DatanodeManagerInterface dnm = namesystem.getBlockManager().getDatanodeManager();
+      HeartbeatManagerInterface hbm = dnm.getHeartbeatManager();
+      DatanodeDescriptorInterface[] dnds = hbm.getDatanodes();
+      DatanodeDescriptorInterface theDND = null;
+      for (DatanodeDescriptorInterface dnd : dnds) {
+        if (dnd.getXferAddr().equals(dnName)) {
+          theDND = dnd;
+        }
+      }
+      Assert.assertNotNull("Could not find DN with name: " + dnName, theDND);
+
+      synchronized (hbm) {
+        DFSTestUtil.setDatanodeDead(theDND);
+        hbm.heartbeatCheck();
+      }
+    } finally {
+      namesystem.writeUnlock();
+    }
+  }
   
   /**
    * Change whether the block placement policy will prefer the writer's
@@ -358,6 +399,13 @@ public class BlockManagerTestUtil {
     hbm.restartHeartbeatStopWatch();
     hbm.heartbeatCheck();
   }
+
+  public static void checkHeartbeat(BlockManagerInterface bm) {
+    HeartbeatManagerInterface hbm = bm.getDatanodeManager().getHeartbeatManager();
+    hbm.restartHeartbeatStopWatch();
+    hbm.heartbeatCheck();
+  }
+
 
   /**
    * Call heartbeat check function of HeartbeatManager and get
@@ -436,6 +484,21 @@ public class BlockManagerTestUtil {
           dns ,false, storage.getCapacity(),
           storage.getDfsUsed(), storage.getRemaining(),
           storage.getBlockPoolUsed(), 0);
+      reports.add(report);
+    }
+    return reports.toArray(StorageReport.EMPTY_ARRAY);
+  }
+
+  public static StorageReport[] getStorageReportsForDatanode(
+          DatanodeDescriptorInterface dnd) {
+    ArrayList<StorageReport> reports = new ArrayList<StorageReport>();
+    for (DatanodeStorageInfoInterface storage : dnd.getStorageInfos()) {
+      DatanodeStorage dns = new DatanodeStorage(
+              storage.getStorageID(), storage.getState(), storage.getStorageType());
+      StorageReport report = new StorageReport(
+              dns ,false, storage.getCapacity(),
+              storage.getDfsUsed(), storage.getRemaining(),
+              storage.getBlockPoolUsed(), 0);
       reports.add(report);
     }
     return reports.toArray(StorageReport.EMPTY_ARRAY);

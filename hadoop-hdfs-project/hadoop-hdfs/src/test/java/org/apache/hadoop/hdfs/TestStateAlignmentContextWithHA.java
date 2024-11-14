@@ -97,7 +97,8 @@ public class TestStateAlignmentContextWithHA {
         CONF.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, NUMDATANODES);
         CONF.setBoolean(DFSConfigKeys.DFS_NAMENODE_STATE_CONTEXT_ENABLED_KEY, true);
         qjmhaCluster = HATestUtil.setUpObserverCluster(CONF, 1, NUMDATANODES, true);
-        cluster = qjmhaCluster.getDfsCluster();
+        //cluster = qjmhaCluster.getDfsCluster();
+        cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(NUMDATANODES).build();
     }
 
     @Before

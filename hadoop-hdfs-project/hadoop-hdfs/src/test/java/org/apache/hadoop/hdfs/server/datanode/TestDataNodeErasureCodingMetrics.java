@@ -204,7 +204,7 @@ public class TestDataNodeErasureCodingMetrics {
         return workCount;
     }
 
-    private void setDataNodeDead(DatanodeID dnID) throws IOException {
+    private void setDataNodeDead(DatanodeIDInterface dnID) throws IOException {
         DatanodeDescriptorInterface dnd = NameNodeAdapter.getDatanode(cluster.getNamesystem(), dnID);
         DFSTestUtil.setDatanodeDead(dnd);
         BlockManagerTestUtil.checkHeartbeat(cluster.getNamesystem().getBlockManager());

@@ -151,7 +151,7 @@ public class TestBlockReaderLocal {
         FSDataInputStream fsIn = null;
         byte[] original = new byte[BlockReaderLocalTest.TEST_LENGTH];
         FileSystem fs = null;
-        ShortCircuitShmInterface shm = null;
+        ShortCircuitShm shm = null;
         RandomAccessFile raf = null;
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();

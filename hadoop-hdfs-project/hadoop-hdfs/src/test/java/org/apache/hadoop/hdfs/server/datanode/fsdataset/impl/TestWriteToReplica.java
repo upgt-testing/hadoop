@@ -471,9 +471,9 @@ public class TestWriteToReplica {
         // Traversing through newReplica map and remove the corresponding
         // replicaInfo from oldReplicaMap.
         for (String bpid : bpidList) {
-            for (ReplicaInfoInterface info : newReplicaMap.replicas(bpid)) {
+            for (ReplicaInfo info : newReplicaMap.replicas(bpid)) {
                 assertNotNull("Volume map before restart didn't contain the " + "blockpool: " + bpid, oldReplicaMap.replicas(bpid));
-                ReplicaInfoInterface oldReplicaInfo = oldReplicaMap.get(bpid, info.getBlockId());
+                ReplicaInfo oldReplicaInfo = oldReplicaMap.get(bpid, info.getBlockId());
                 // Volume map after restart contains a blockpool id which
                 assertNotNull("Old Replica Map didnt't contain block with blockId: " + info.getBlockId(), oldReplicaInfo);
                 ReplicaState oldState = oldReplicaInfo.getState();
@@ -492,7 +492,7 @@ public class TestWriteToReplica {
         // and if the old replica map contains any replica except ReplicaInPipeline
         // then we didn't persist that replica
         for (String bpid : bpidList) {
-            for (ReplicaInfoInterface replicaInfo : oldReplicaMap.replicas(bpid)) {
+            for (ReplicaInfo replicaInfo : oldReplicaMap.replicas(bpid)) {
                 if (replicaInfo.getState() != ReplicaState.TEMPORARY) {
                     Assert.fail("After datanode restart we lost the block with blockId: " + replicaInfo.getBlockId());
                 }

@@ -119,7 +119,7 @@ public abstract class FSImageTestUtil {
 
     public static StorageDirectory mockStorageDirectory(File currentDir, NameNodeDirType type) {
         // Mock the StorageDirectory interface to just point to this file
-        StorageDirectoryInterface sd = Mockito.mock(StorageDirectory.class);
+        StorageDirectory sd = Mockito.mock(StorageDirectory.class);
         Mockito.doReturn(type).when(sd).getStorageDirType();
         Mockito.doReturn(currentDir).when(sd).getCurrentDir();
         Mockito.doReturn(currentDir).when(sd).getRoot();
@@ -135,7 +135,7 @@ public abstract class FSImageTestUtil {
      * @param fileNames the names of files contained in current/
      */
     static StorageDirectory mockStorageDirectory(StorageDirType type, boolean previousExists, String... fileNames) {
-        StorageDirectoryInterface sd = mock(StorageDirectory.class);
+        StorageDirectory sd = mock(StorageDirectory.class);
         doReturn(type).when(sd).getStorageDirType();
         // Version file should always exist
         doReturn(mockFile(true)).when(sd).getVersionFile();
@@ -174,8 +174,8 @@ public abstract class FSImageTestUtil {
         if (!FileUtil.fullyDeleteContents(logDir)) {
             throw new IOException("Unable to delete contents of " + logDir);
         }
-        NNStorageInterface storage = Mockito.mock(NNStorage.class);
-        StorageDirectoryInterface sd = FSImageTestUtil.mockStorageDirectory(logDir, NameNodeDirType.EDITS);
+        NNStorage storage = Mockito.mock(NNStorage.class);
+        StorageDirectory sd = FSImageTestUtil.mockStorageDirectory(logDir, NameNodeDirType.EDITS);
         List<StorageDirectory> sds = Lists.newArrayList(sd);
         Mockito.doReturn(sds).when(storage).dirIterable(NameNodeDirType.EDITS);
         Mockito.doReturn(sd).when(storage).getStorageDirectory(any());
@@ -203,10 +203,10 @@ public abstract class FSImageTestUtil {
      * only a specified number of "mkdirs" operations.
      */
     public static void createAbortedLogWithMkdirs(File editsLogDir, int numDirs, long firstTxId, long newInodeId) throws IOException {
-        FSEditLogInterface editLog = FSImageTestUtil.createStandaloneEditLog(editsLogDir);
+        FSEditLog editLog = FSImageTestUtil.createStandaloneEditLog(editsLogDir);
         editLog.setNextTxId(firstTxId);
         editLog.openForWrite(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
-        PermissionStatusInterface perms = PermissionStatus.createImmutable("fakeuser", "fakegroup", FsPermission.createImmutable((short) 0755));
+        PermissionStatus perms = PermissionStatus.createImmutable("fakeuser", "fakegroup", FsPermission.createImmutable((short) 0755));
         for (int i = 1; i <= numDirs; i++) {
             String dirName = "dir" + i;
             INodeDirectory dir = new INodeDirectory(newInodeId + i - 1, DFSUtil.string2Bytes(dirName), perms, 0L);
@@ -235,7 +235,7 @@ public abstract class FSImageTestUtil {
      */
     public static EnumMap<FSEditLogOpCodes, Holder<Integer>> countEditLogOpTypes(EditLogInputStream elis) throws IOException {
         EnumMap<FSEditLogOpCodes, Holder<Integer>> opCounts = new EnumMap<FSEditLogOpCodes, Holder<Integer>>(FSEditLogOpCodes.class);
-        FSEditLogOpInterface op;
+        FSEditLogOp op;
         while ((op = elis.readOp()) != null) {
             Holder<Integer> i = opCounts.get(op.opCode);
             if (i == null) {
@@ -347,7 +347,7 @@ public abstract class FSImageTestUtil {
                 Set<Entry<Object, Object>> diff = Sets.symmetricDifference(prevProps, props.entrySet());
                 Iterator<Entry<Object, Object>> it = diff.iterator();
                 while (it.hasNext()) {
-                    EntryInterface<Object, Object> entry = it.next();
+                    Entry<Object, Object> entry = it.next();
                     if (ignoredProperties != null && ignoredProperties.contains(entry.getKey())) {
                         continue;
                     }
@@ -425,7 +425,7 @@ public abstract class FSImageTestUtil {
      * given 'current/' directory.
      */
     public static File findNewestImageFile(String currentDirPath) throws IOException {
-        StorageDirectoryInterface sd = FSImageTestUtil.mockStorageDirectory(new File(currentDirPath), NameNodeDirType.IMAGE);
+        StorageDirectory sd = FSImageTestUtil.mockStorageDirectory(new File(currentDirPath), NameNodeDirType.IMAGE);
         FSImageTransactionalStorageInspector inspector = new FSImageTransactionalStorageInspector();
         inspector.inspectDirectory(sd);
         List<FSImageFile> latestImages = inspector.getLatestImages();
@@ -510,7 +510,7 @@ public abstract class FSImageTestUtil {
 
     public static void logStorageContents(Logger log, NNStorage storage) {
         log.info("current storages and corresponding sizes:");
-        for (StorageDirectoryInterface sd : storage.dirIterable(null)) {
+        for (StorageDirectory sd : storage.dirIterable(null)) {
             File curDir = sd.getCurrentDir();
             log.info("In directory " + curDir);
             File[] files = curDir.listFiles();
@@ -557,7 +557,7 @@ public abstract class FSImageTestUtil {
     }
 
     public static long getStorageTxId(NameNode node, URI storageUri) throws IOException {
-        StorageDirectoryInterface sDir = getFSImage(node).getStorage().getStorageDirectory(storageUri);
+        StorageDirectory sDir = getFSImage(node).getStorage().getStorageDirectory(storageUri);
         return NNStorage.readTransactionIdFile(sDir);
     }
 

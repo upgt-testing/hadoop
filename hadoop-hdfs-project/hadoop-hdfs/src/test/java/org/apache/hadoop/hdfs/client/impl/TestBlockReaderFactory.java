@@ -408,7 +408,8 @@ public class TestBlockReaderFactory {
         byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
         Assert.assertTrue(Arrays.equals(contents, expected));
         final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache(0);
-        final DatanodeInfoInterface datanode = new DatanodeInfoBuilder().setNodeID(cluster.getDataNodes().get(0).getDatanodeId()).build();
+        DatanodeIDInterface dnId = cluster.getDataNodes().get(0).getDatanodeId();
+        final DatanodeInfo datanode = new DatanodeInfoBuilder().setNodeID(dnId.getIpAddr(), dnId.getHostName(), dnId.getDatanodeUuid(), dnId.getXferPort(), dnId.getInfoPort(), dnId.getInfoSecurePort(), dnId.getIpcPort()).build();
         cache.getDfsClientShmManager().visit(new Visitor() {
 
             @Override

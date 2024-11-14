@@ -64,7 +64,7 @@ public class TestBlockInfoStriped {
 
     private final int totalBlocks;
 
-    private final BlockInfoStripedInterface info;
+    private final BlockInfoStriped info;
 
     public TestBlockInfoStriped(ErasureCodingPolicy policy) {
         testECPolicy = policy;
@@ -112,21 +112,21 @@ public class TestBlockInfoStriped {
         Assert.assertEquals(totalBlocks, info.getCapacity());
         Assert.assertEquals(totalBlocks, indices.length);
         i = 0;
-        for (DatanodeStorageInfoInterface storage : storageInfos) {
+        for (DatanodeStorageInfo storage : storageInfos) {
             int index = info.findStorageInfo(storage);
             Assert.assertEquals(i++, index);
             Assert.assertEquals(index, indices[index]);
         }
         // the same block is reported from the same storage twice
         i = 0;
-        for (DatanodeStorageInfoInterface storage : storageInfos) {
+        for (DatanodeStorageInfo storage : storageInfos) {
             Assert.assertTrue(info.addStorage(storage, blocks[i++]));
         }
         Assert.assertEquals(totalBlocks, info.getCapacity());
         Assert.assertEquals(totalBlocks, info.numNodes());
         Assert.assertEquals(totalBlocks, indices.length);
         i = 0;
-        for (DatanodeStorageInfoInterface storage : storageInfos) {
+        for (DatanodeStorageInfo storage : storageInfos) {
             int index = info.findStorageInfo(storage);
             Assert.assertEquals(i++, index);
             Assert.assertEquals(index, indices[index]);
@@ -232,7 +232,7 @@ public class TestBlockInfoStriped {
             DFSTestUtil.createFile(fs, new Path("/ecDir/ecFile"), fs.getDefaultBlockSize() * dataBlocks, (short) 1, 1024);
             ExtendedBlock blk = DFSTestUtil.getAllBlocks(fs, new Path("/ecDir/ecFile")).get(0).getBlock();
             String id = "blk_" + Long.toString(blk.getBlockId());
-            BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(blk.getLocalBlock());
+            BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(blk.getLocalBlock());
             DatanodeStorageInfoInterface[] dnStorageInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStorages(bInfo);
             bInfo.removeStorage(dnStorageInfo[1]);
             ByteArrayOutputStream bStream = new ByteArrayOutputStream();
@@ -263,14 +263,14 @@ public class TestBlockInfoStriped {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddStorageWithReplicatedBlock() {
-        DatanodeStorageInfoInterface storage = DFSTestUtil.createDatanodeStorageInfo("storageID", "127.0.0.1");
+        DatanodeStorageInfo storage = DFSTestUtil.createDatanodeStorageInfo("storageID", "127.0.0.1");
         BlockInfo replica = new BlockInfoContiguous(new Block(1000L), (short) 3);
         info.addStorage(storage, replica);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddStorageWithDifferentBlockGroup() {
-        DatanodeStorageInfoInterface storage = DFSTestUtil.createDatanodeStorageInfo("storageID", "127.0.0.1");
+        DatanodeStorageInfo storage = DFSTestUtil.createDatanodeStorageInfo("storageID", "127.0.0.1");
         BlockInfo diffGroup = new BlockInfoStriped(new Block(BASE_ID + 100), testECPolicy);
         info.addStorage(storage, diffGroup);
     }

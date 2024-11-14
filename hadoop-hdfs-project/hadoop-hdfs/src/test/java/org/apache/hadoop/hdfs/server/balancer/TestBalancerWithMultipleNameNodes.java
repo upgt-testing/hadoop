@@ -243,7 +243,7 @@ public class TestBalancerWithMultipleNameNodes {
         // cluster is balanced, verify that only selected blockpools were touched
         Map<Integer, DatanodeStorageReport[]> postBalancerPoolUsages = getStorageReports(s);
         Assert.assertEquals(preBalancerPoolUsages.size(), postBalancerPoolUsages.size());
-        for (Map.EntryInterface<Integer, DatanodeStorageReport[]> entry : preBalancerPoolUsages.entrySet()) {
+        for (Map.Entry<Integer, DatanodeStorageReport[]> entry : preBalancerPoolUsages.entrySet()) {
             compareTotalPoolUsage(entry.getValue(), postBalancerPoolUsages.get(entry.getKey()));
         }
     }
@@ -259,9 +259,9 @@ public class TestBalancerWithMultipleNameNodes {
         Assert.assertNotNull(preReports);
         Assert.assertNotNull(postReports);
         Assert.assertEquals(preReports.length, postReports.length);
-        for (DatanodeStorageReportInterface preReport : preReports) {
+        for (DatanodeStorageReport preReport : preReports) {
             String dnUuid = preReport.getDatanodeInfo().getDatanodeUuid();
-            for (DatanodeStorageReportInterface postReport : postReports) {
+            for (DatanodeStorageReport postReport : postReports) {
                 if (postReport.getDatanodeInfo().getDatanodeUuid().equals(dnUuid)) {
                     Assert.assertEquals(getTotalPoolUsage(preReport), getTotalPoolUsage(postReport));
                     LOG.info("Comparision of datanode pool usage pre/post balancer run. " + "PrePoolUsage: " + getTotalPoolUsage(preReport) + ", PostPoolUsage: " + getTotalPoolUsage(postReport));
@@ -273,7 +273,7 @@ public class TestBalancerWithMultipleNameNodes {
 
     private static long getTotalPoolUsage(DatanodeStorageReport report) {
         long usage = 0L;
-        for (StorageReportInterface sr : report.getStorageReports()) {
+        for (StorageReport sr : report.getStorageReports()) {
             usage += sr.getBlockPoolUsed();
         }
         return usage;
