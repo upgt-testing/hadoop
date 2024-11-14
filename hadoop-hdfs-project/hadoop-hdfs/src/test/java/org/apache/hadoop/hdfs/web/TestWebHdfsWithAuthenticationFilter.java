@@ -18,12 +18,9 @@
 package org.apache.hadoop.hdfs.web;
 
 import java.io.IOException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import java.net.InetSocketAddress;
 import java.net.URI;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,12 +28,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.http.FilterContainer;
 import org.apache.hadoop.http.FilterInitializer;
 import org.apache.hadoop.http.HttpServer2;
@@ -45,80 +41,83 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestWebHdfsWithAuthenticationFilter {
-  private static boolean authorized = false;
 
-  public static final class CustomizedFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    private static boolean authorized = false;
+
+    public static final class CustomizedFilter implements Filter {
+
+        @Override
+        public void init(FilterConfig filterConfig) throws ServletException {
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+            if (authorized) {
+                chain.doFilter(request, response);
+            } else {
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+        }
+
+        @Override
+        public void destroy() {
+        }
+
+        /**
+         * Initializer for Custom Filter.
+         */
+        static public class Initializer extends FilterInitializer {
+
+            public Initializer() {
+            }
+
+            @Override
+            public void initFilter(FilterContainer container, Configuration config) {
+                container.addFilter("customFilter", TestWebHdfsWithAuthenticationFilter.CustomizedFilter.class.getName(), null);
+            }
+        }
     }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-        FilterChain chain) throws IOException, ServletException {
-      if (authorized) {
-        chain.doFilter(request, response);
-      } else {
-        ((HttpServletResponse) response)
-            .sendError(HttpServletResponse.SC_FORBIDDEN);
-      }
+    private static Configuration conf;
+
+    private static MiniDockerDFSCluster cluster;
+
+    private static FileSystem fs;
+
+    @BeforeClass
+    public static void setUp() throws IOException {
+        conf = new Configuration();
+        conf.set(HttpServer2.FILTER_INITIALIZER_PROPERTY, CustomizedFilter.Initializer.class.getName());
+        conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, "localhost:0");
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+        InetSocketAddress addr = cluster.getNameNode().getHttpAddress();
+        fs = FileSystem.get(URI.create("webhdfs://" + NetUtils.getHostPortString(addr)), conf);
+        cluster.waitActive();
     }
 
-    @Override
-    public void destroy() {
+    @AfterClass
+    public static void tearDown() throws IOException {
+        if (fs != null) {
+            fs.close();
+        }
+        if (cluster != null) {
+            cluster.shutdown();
+        }
     }
 
-    /** Initializer for Custom Filter. */
-    static public class Initializer extends FilterInitializer {
-      public Initializer() {}
-
-      @Override
-      public void initFilter(FilterContainer container, Configuration config) {
-        container.addFilter("customFilter",
-            TestWebHdfsWithAuthenticationFilter.CustomizedFilter.class.
-            getName(), null);
-      }
+    @Test
+    public void testWebHdfsAuthFilter() throws IOException {
+        // getFileStatus() is supposed to pass through with the default filter.
+        authorized = false;
+        try {
+            fs.getFileStatus(new Path("/"));
+            Assert.fail("The filter fails to block the request");
+        } catch (IOException e) {
+        }
+        authorized = true;
+        fs.getFileStatus(new Path("/"));
     }
-  }
-
-  private static Configuration conf;
-  private static MiniDockerDFSCluster cluster;
-  private static FileSystem fs;
-
-  @BeforeClass
-  public static void setUp() throws IOException {
-    conf = new Configuration();
-    conf.set(HttpServer2.FILTER_INITIALIZER_PROPERTY,
-        CustomizedFilter.Initializer.class.getName());
-    conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, "localhost:0");
-    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-    InetSocketAddress addr = cluster.getNameNode().getHttpAddress();
-    fs = FileSystem.get(
-        URI.create("webhdfs://" + NetUtils.getHostPortString(addr)), conf);
-    cluster.waitActive();
-  }
-
-  @AfterClass
-  public static void tearDown() throws IOException {
-    if (fs != null) {
-      fs.close();
-    }
-    if (cluster != null) {
-      cluster.shutdown();
-    }
-  }
-
-  @Test
-  public void testWebHdfsAuthFilter() throws IOException {
-    // getFileStatus() is supposed to pass through with the default filter.
-    authorized = false;
-    try {
-      fs.getFileStatus(new Path("/"));
-      Assert.fail("The filter fails to block the request");
-    } catch (IOException e) {
-    }
-    authorized = true;
-    fs.getFileStatus(new Path("/"));
-  }
 }

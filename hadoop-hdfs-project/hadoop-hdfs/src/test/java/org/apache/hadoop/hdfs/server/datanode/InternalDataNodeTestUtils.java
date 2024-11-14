@@ -33,6 +33,9 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB;
+import org.apache.hadoop.hdfs.remoteProxies.DataNodeInterface;
+import org.apache.hadoop.hdfs.remoteProxies.DatanodeRegistrationInterface;
+import org.apache.hadoop.hdfs.remoteProxies.NameNodeInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -63,6 +66,10 @@ public class InternalDataNodeTestUtils {
 
   public static DatanodeRegistration
   getDNRegistrationForBP(DataNode dn, String bpid) throws IOException {
+    return dn.getDNRegistrationForBP(bpid);
+  }
+
+  public static DatanodeRegistrationInterface getDNRegistrationForBP(DataNodeInterface dn, String bpid) throws IOException {
     return dn.getDNRegistrationForBP(bpid);
   }
 
@@ -115,6 +122,36 @@ public class InternalDataNodeTestUtils {
     }
     Preconditions.checkArgument(bpsa != null,
       "No service actor to NN at %s", nn.getServiceRpcAddress());
+
+    DatanodeProtocolClientSideTranslatorPB origNN = bpsa.getNameNodeProxy();
+    DatanodeProtocolClientSideTranslatorPB spy = Mockito.spy(origNN);
+    bpsa.setNameNode(spy);
+    return spy;
+  }
+
+  public static DatanodeProtocolClientSideTranslatorPB spyOnBposToNN(
+          DataNodeInterface dn, NameNodeInterface nn) {
+    String bpid = nn.getNamesystem().getBlockPoolId();
+
+    BPOfferService bpos = null;
+    for (BPOfferService thisBpos : dn.getAllBpOs()) {
+      if (thisBpos.getBlockPoolId().equals(bpid)) {
+        bpos = thisBpos;
+        break;
+      }
+    }
+    Preconditions.checkArgument(bpos != null,
+            "No such bpid: %s", bpid);
+
+    BPServiceActor bpsa = null;
+    for (BPServiceActor thisBpsa : bpos.getBPServiceActors()) {
+      if (thisBpsa.getNNSocketAddress().equals(nn.getServiceRpcAddress())) {
+        bpsa = thisBpsa;
+        break;
+      }
+    }
+    Preconditions.checkArgument(bpsa != null,
+            "No service actor to NN at %s", nn.getServiceRpcAddress());
 
     DatanodeProtocolClientSideTranslatorPB origNN = bpsa.getNameNodeProxy();
     DatanodeProtocolClientSideTranslatorPB spy = Mockito.spy(origNN);

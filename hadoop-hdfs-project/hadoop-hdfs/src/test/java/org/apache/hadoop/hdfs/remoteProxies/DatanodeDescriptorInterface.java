@@ -1,6 +1,6 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
-public interface DatanodeDescriptorInterface {
+public interface DatanodeDescriptorInterface extends DatanodeInfoInterface {
     void setXceiverCount(int arg0);
     void setNumBlocks(int arg0);
     boolean isDisallowed();

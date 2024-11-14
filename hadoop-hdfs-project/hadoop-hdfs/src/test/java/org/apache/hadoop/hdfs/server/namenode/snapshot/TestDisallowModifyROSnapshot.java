@@ -18,9 +18,7 @@
 package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import static org.junit.Assert.assertTrue;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import org.apache.hadoop.conf.Configuration;
@@ -29,12 +27,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.SnapshotAccessControlException;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * This class tests snapshot functionality. One or multiple snapshots are
@@ -42,117 +41,124 @@ import org.junit.Test;
  * ensure snapshots remain unchanges.
  */
 public class TestDisallowModifyROSnapshot {
-  private final static Path dir = new Path("/TestSnapshot");
-  private final static Path sub1 = new Path(dir, "sub1");
-  private final static Path sub2 = new Path(dir, "sub2");
 
-  protected static Configuration conf;
-  protected static MiniDockerDFSCluster cluster;
-  protected static FSNamesystemInterface fsn;
-  protected static DistributedFileSystem fs;
+    private final static PathInterface dir = new Path("/TestSnapshot");
 
-  /**
-   * The list recording all previous snapshots. Each element in the array
-   * records a snapshot root.
-   */
-  protected static ArrayList<Path> snapshotList = new ArrayList<Path>();
-  static Path objInSnapshot = null;
+    private final static PathInterface sub1 = new Path(dir, "sub1");
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    conf = new Configuration();
-    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
+    private final static PathInterface sub2 = new Path(dir, "sub2");
 
-    fsn = cluster.getNamesystem();
-    fs = cluster.getFileSystem();
+    protected static Configuration conf;
 
-    Path path1 = new Path(sub1, "dir1");
-    assertTrue(fs.mkdirs(path1));
-    Path path2 = new Path(sub2, "dir2");
-    assertTrue(fs.mkdirs(path2));
-    SnapshotTestHelper.createSnapshot(fs, sub1, "testSnapshot");
-    objInSnapshot = SnapshotTestHelper.getSnapshotPath(sub1, "testSnapshot",
-        "dir1");
-  }
+    protected static MiniDockerDFSCluster cluster;
 
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    protected static FSNamesystemInterface fsn;
+
+    protected static DistributedFileSystem fs;
+
+    /**
+     * The list recording all previous snapshots. Each element in the array
+     * records a snapshot root.
+     */
+    protected static ArrayList<Path> snapshotList = new ArrayList<Path>();
+
+    static PathInterface objInSnapshot = null;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        conf = new Configuration();
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        fsn = cluster.getNamesystem();
+        fs = cluster.getFileSystem();
+        Path path1 = new Path(sub1, "dir1");
+        assertTrue(fs.mkdirs(path1));
+        Path path2 = new Path(sub2, "dir2");
+        assertTrue(fs.mkdirs(path2));
+        SnapshotTestHelper.createSnapshot(fs, sub1, "testSnapshot");
+        objInSnapshot = SnapshotTestHelper.getSnapshotPath(sub1, "testSnapshot", "dir1");
     }
-  }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testSetReplication() throws Exception {
-    fs.setReplication(objInSnapshot, (short) 1);
-  }
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testSetPermission() throws Exception {
-    fs.setPermission(objInSnapshot, new FsPermission("777"));
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testSetReplication() throws Exception {
+        fs.setReplication(objInSnapshot, (short) 1);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testSetOwner() throws Exception {
-    fs.setOwner(objInSnapshot, "username", "groupname");
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testSetPermission() throws Exception {
+        fs.setPermission(objInSnapshot, new FsPermission("777"));
+    }
 
-  @Test (timeout=60000)
-  public void testRename() throws Exception {
-    try {
-      fs.rename(objInSnapshot, new Path("/invalid/path"));
-      fail("Didn't throw SnapshotAccessControlException");
-    } catch (SnapshotAccessControlException e) { /* Ignored */ }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testSetOwner() throws Exception {
+        fs.setOwner(objInSnapshot, "username", "groupname");
+    }
 
-    try {
-      fs.rename(sub2, objInSnapshot);
-      fail("Didn't throw SnapshotAccessControlException");
-    } catch (SnapshotAccessControlException e) { /* Ignored */ }
+    @Test(timeout = 60000)
+    public void testRename() throws Exception {
+        try {
+            fs.rename(objInSnapshot, new Path("/invalid/path"));
+            fail("Didn't throw SnapshotAccessControlException");
+        } catch (SnapshotAccessControlException e) {
+            /* Ignored */
+        }
+        try {
+            fs.rename(sub2, objInSnapshot);
+            fail("Didn't throw SnapshotAccessControlException");
+        } catch (SnapshotAccessControlException e) {
+            /* Ignored */
+        }
+        try {
+            fs.rename(sub2, objInSnapshot, (Options.Rename) null);
+            fail("Didn't throw SnapshotAccessControlException");
+        } catch (SnapshotAccessControlException e) {
+            /* Ignored */
+        }
+    }
 
-    try {
-      fs.rename(sub2, objInSnapshot, (Options.Rename) null);
-      fail("Didn't throw SnapshotAccessControlException");
-    } catch (SnapshotAccessControlException e) { /* Ignored */ }
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testDelete() throws Exception {
+        fs.delete(objInSnapshot, true);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testDelete() throws Exception {
-    fs.delete(objInSnapshot, true);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testQuota() throws Exception {
+        fs.setQuota(objInSnapshot, 100, 100);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testQuota() throws Exception {
-    fs.setQuota(objInSnapshot, 100, 100);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testSetTime() throws Exception {
+        fs.setTimes(objInSnapshot, 100, 100);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testSetTime() throws Exception {
-    fs.setTimes(objInSnapshot, 100, 100);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testCreate() throws Exception {
+        @SuppressWarnings("deprecation")
+        DFSClient dfsclient = new DFSClient(conf);
+        dfsclient.create(objInSnapshot.toString(), true);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testCreate() throws Exception {
-    @SuppressWarnings("deprecation")
-    DFSClient dfsclient = new DFSClient(conf);
-    dfsclient.create(objInSnapshot.toString(), true);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testAppend() throws Exception {
+        fs.append(objInSnapshot, 65535, null);
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testAppend() throws Exception {
-    fs.append(objInSnapshot, 65535, null);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testMkdir() throws Exception {
+        fs.mkdirs(objInSnapshot, new FsPermission("777"));
+    }
 
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testMkdir() throws Exception {
-    fs.mkdirs(objInSnapshot, new FsPermission("777"));
-  }
-
-  @Test(timeout=60000, expected = SnapshotAccessControlException.class)
-  public void testCreateSymlink() throws Exception {
-    @SuppressWarnings("deprecation")
-    DFSClient dfsclient = new DFSClient(conf);
-    dfsclient.createSymlink(sub2.toString(), "/TestSnapshot/sub1/.snapshot",
-        false);
-  }
+    @Test(timeout = 60000, expected = SnapshotAccessControlException.class)
+    public void testCreateSymlink() throws Exception {
+        @SuppressWarnings("deprecation")
+        DFSClient dfsclient = new DFSClient(conf);
+        dfsclient.createSymlink(sub2.toString(), "/TestSnapshot/sub1/.snapshot", false);
+    }
 }

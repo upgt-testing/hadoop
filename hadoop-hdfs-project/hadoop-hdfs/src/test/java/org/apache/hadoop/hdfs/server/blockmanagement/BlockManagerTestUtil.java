@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerSafeMode.BMSafeModeStatus;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -58,6 +59,16 @@ public class BlockManagerTestUtil {
     }
   }
 
+  public static DatanodeDescriptorInterface getDatanode(final FSNamesystemInterface ns,
+                                               final String storageID) {
+    ns.readLock();
+    try {
+      return ns.getBlockManager().getDatanodeManager().getDatanode(storageID);
+    } finally {
+      ns.readUnlock();
+    }
+  }
+
   public static Iterator<BlockInfo> getBlockIterator(final FSNamesystem ns,
       final String storageID, final int startBlock) {
     ns.readLock();
@@ -70,14 +81,36 @@ public class BlockManagerTestUtil {
     }
   }
 
+  public static Iterator<BlockInfo> getBlockIterator(final FSNamesystemInterface ns,
+                                                     final String storageID, final int startBlock) {
+    ns.readLock();
+    try {
+      DatanodeDescriptorInterface dn =
+              ns.getBlockManager().getDatanodeManager().getDatanode(storageID);
+      return dn.getBlockIterator(startBlock);
+    } finally {
+      ns.readUnlock();
+    }
+  }
+
+
   public static Iterator<BlockInfo> getBlockIterator(DatanodeStorageInfo s) {
     return s.getBlockIterator();
   }
+
+  public static Iterator<BlockInfo> getBlockIterator(DatanodeStorageInfoInterface s) {
+    return s.getBlockIterator();
+  }
+
 
   /**
    * Refresh block queue counts on the name-node.
    */
   public static void updateState(final BlockManager blockManager) {
+    blockManager.updateState();
+  }
+
+  public static void updateState(final BlockManagerInterface blockManager) {
     blockManager.updateState();
   }
 
@@ -176,6 +209,11 @@ public class BlockManagerTestUtil {
     return blockManager.getDatanodeManager().getHeartbeatManager();
   }
 
+  public static HeartbeatManagerInterface getHeartbeatManager(
+          final BlockManagerInterface blockManager) {
+    return blockManager.getDatanodeManager().getHeartbeatManager();
+  }
+
   /**
    * @return corruptReplicas from block manager
    */
@@ -197,6 +235,16 @@ public class BlockManagerTestUtil {
     }
   }
 
+  public static void waitForMarkedDeleteQueueIsEmpty(
+          BlockManagerInterface blockManager) throws InterruptedException {
+    while (true) {
+      if (blockManager.getMarkedDeleteQueue().isEmpty()) {
+        return;
+      }
+      Thread.sleep(SLEEP_TIME);
+    }
+  }
+
   /**
    * @return computed block replication and block invalidation work that can be
    *         scheduled on data-nodes.
@@ -208,6 +256,10 @@ public class BlockManagerTestUtil {
   }
   
   public static int computeInvalidationWork(BlockManager bm) {
+    return bm.computeInvalidateWork(Integer.MAX_VALUE);
+  }
+
+  public static int computeInvalidationWork(BlockManagerInterface bm) {
     return bm.computeInvalidateWork(Integer.MAX_VALUE);
   }
 
@@ -238,6 +290,13 @@ public class BlockManagerTestUtil {
     work += bm.computeBlockReconstructionWork(Integer.MAX_VALUE);
     return work;
   }
+
+  public static int computeAllPendingWork(BlockManagerInterface bm) {
+    int work = computeInvalidationWork(bm);
+    work += bm.computeBlockReconstructionWork(Integer.MAX_VALUE);
+    return work;
+  }
+
 
   /**
    * Ensure that the given NameNode marks the specified DataNode as
@@ -279,6 +338,14 @@ public class BlockManagerTestUtil {
     BlockPlacementPolicy bpp = bm.getBlockPlacementPolicy();
     Preconditions.checkState(bpp instanceof BlockPlacementPolicyDefault,
         "Must use default policy, got %s", bpp.getClass());
+    ((BlockPlacementPolicyDefault)bpp).setPreferLocalNode(prefer);
+  }
+
+  public static void setWritingPrefersLocalNode(
+          BlockManagerInterface bm, boolean prefer) {
+    BlockPlacementPolicyInterface bpp = bm.getBlockPlacementPolicy();
+    Preconditions.checkState(bpp instanceof BlockPlacementPolicyDefault,
+            "Must use default policy, got %s", bpp.getClass());
     ((BlockPlacementPolicyDefault)bpp).setPreferLocalNode(prefer);
   }
   

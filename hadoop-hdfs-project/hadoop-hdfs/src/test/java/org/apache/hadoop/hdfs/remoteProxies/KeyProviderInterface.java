@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.crypto.key.KeyProvider;
+
 public interface KeyProviderInterface {
     void deleteKey(java.lang.String arg0) throws java.io.IOException;
     java.lang.String getAlgorithm(java.lang.String arg0);
@@ -19,6 +21,7 @@ public interface KeyProviderInterface {
     ConfigurationInterface getConf();
     OptionsInterface options(ConfigurationInterface arg0);
     KeyVersionInterface createKey(java.lang.String arg0, OptionsInterface arg1) throws java.security.NoSuchAlgorithmException, java.io.IOException;
+    KeyVersionInterface createKey(java.lang.String arg0, KeyProvider.Options arg1) throws java.security.NoSuchAlgorithmException, java.io.IOException;
     byte[] generateKey(int arg0, java.lang.String arg1) throws java.security.NoSuchAlgorithmException;
     KeyProviderInterface findProvider(java.util.List<org.apache.hadoop.crypto.key.KeyProvider> arg0, java.lang.String arg1) throws java.io.IOException;
     MetadataInterface getMetadata(java.lang.String arg0) throws java.io.IOException;

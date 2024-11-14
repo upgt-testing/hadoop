@@ -18,43 +18,38 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import java.io.IOException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
-
 import java.io.PrintStream;
-
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.tools.GetGroups;
 import org.apache.hadoop.tools.GetGroupsTestBase;
 import org.apache.hadoop.util.Tool;
 import org.junit.After;
 import org.junit.Before;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestGetGroupsWithHA extends GetGroupsTestBase {
-  
-  private MiniDFSCluster cluster;
-  
-  @Before
-  public void setUpNameNode() throws IOException {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(0).build();
-    HATestUtil.setFailoverConfigurations(cluster, conf);
-  }
-  
-  @After
-  public void tearDownNameNode() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+
+    private MiniDockerDFSCluster cluster;
+
+    @Before
+    public void setUpNameNode() throws IOException {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDockerDFSCluster.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
     }
-  }
 
-  @Override
-  protected Tool getTool(PrintStream o) {
-    return new GetGroups(conf, o);
-  }
+    @After
+    public void tearDownNameNode() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
+    @Override
+    protected Tool getTool(PrintStream o) {
+        return new GetGroups(conf, o);
+    }
 }

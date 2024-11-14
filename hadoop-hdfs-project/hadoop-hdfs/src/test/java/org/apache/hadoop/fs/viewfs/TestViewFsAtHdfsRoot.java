@@ -18,13 +18,9 @@
 package org.apache.hadoop.fs.viewfs;
 
 import java.io.IOException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import java.net.URISyntaxException;
-
 import javax.security.auth.login.LoginException;
-
 import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileContextTestHelper;
 import org.apache.hadoop.fs.FileStatus;
@@ -32,74 +28,73 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * Make sure that ViewFs works when the root of an FS is mounted to a ViewFs
  * mount point.
  */
 public class TestViewFsAtHdfsRoot extends ViewFsBaseTest {
-  
-  private static MiniDockerDFSCluster cluster;
-  private static final HdfsConfiguration CONF = new HdfsConfiguration();
-  private static FileContext fc;
-  
-  @Override
-  protected FileContextTestHelper createFileContextHelper() {
-    return new FileContextTestHelper("/tmp/TestViewFsAtHdfsRoot");
-  }
 
-  @BeforeClass
-  public static void clusterSetupAtBegining() throws IOException,
-      LoginException, URISyntaxException {
-    SupportsBlocks = true;
-    CONF.setBoolean(
-        DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
+    private static MiniDockerDFSCluster cluster;
 
-    cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
-    cluster.waitClusterUp();
-    fc = FileContext.getFileContext(cluster.getURI(0), CONF);
-  }
+    private static final HdfsConfiguration CONF = new HdfsConfiguration();
 
-      
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    private static FileContext fc;
+
+    @Override
+    protected FileContextTestHelper createFileContextHelper() {
+        return new FileContextTestHelper("/tmp/TestViewFsAtHdfsRoot");
     }
-  }
 
-  @Override
-  @Before
-  public void setUp() throws Exception {
-    // create the test root on local_fs
-    fcTarget = fc;
-    super.setUp();    
-  }
-  
-  /**
-   * Override this so that we don't set the targetTestRoot to any path under the
-   * root of the FS, and so that we don't try to delete the test dir, but rather
-   * only its contents.
-   */
-  @Override
-  void initializeTargetTestRoot() throws IOException {
-    targetTestRoot = fc.makeQualified(new Path("/"));
-    RemoteIterator<FileStatus> dirContents = fc.listStatus(targetTestRoot);
-    while (dirContents.hasNext()) {
-      fc.delete(dirContents.next().getPath(), true);
+    @BeforeClass
+    public static void clusterSetupAtBegining() throws IOException, LoginException, URISyntaxException {
+        SupportsBlocks = true;
+        CONF.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
+        cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(2).build();
+        cluster.waitClusterUp();
+        fc = FileContext.getFileContext(cluster.getURI(0), CONF);
     }
-  }
-  
-  /**
-   * This overrides the default implementation since hdfs does have delegation
-   * tokens.
-   */
-  @Override
-  int getExpectedDelegationTokenCount() {
-    return 8;
-  }
+
+    @AfterClass
+    public static void ClusterShutdownAtEnd() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        // create the test root on local_fs
+        fcTarget = fc;
+        super.setUp();
+    }
+
+    /**
+     * Override this so that we don't set the targetTestRoot to any path under the
+     * root of the FS, and so that we don't try to delete the test dir, but rather
+     * only its contents.
+     */
+    @Override
+    void initializeTargetTestRoot() throws IOException {
+        targetTestRoot = fc.makeQualified(new Path("/"));
+        RemoteIterator<FileStatus> dirContents = fc.listStatus(targetTestRoot);
+        while (dirContents.hasNext()) {
+            fc.delete(dirContents.next().getPath(), true);
+        }
+    }
+
+    /**
+     * This overrides the default implementation since hdfs does have delegation
+     * tokens.
+     */
+    @Override
+    int getExpectedDelegationTokenCount() {
+        return 8;
+    }
 }

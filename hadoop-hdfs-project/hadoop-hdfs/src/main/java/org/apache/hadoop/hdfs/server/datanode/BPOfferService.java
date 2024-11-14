@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * It also maintains the state about which of the NNs is considered active.
  */
 @InterfaceAudience.Private
-class BPOfferService {
+public class BPOfferService {
   static final Logger LOG = DataNode.LOG;
   
   /**

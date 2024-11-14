@@ -18,6 +18,7 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.server.protocol.SlowDiskReports;
@@ -76,6 +77,10 @@ public class NameNodeAdapter {
     return namenode.getNamesystem();
   }
 
+  public static FSNamesystemInterface getNamesystem(NameNodeInterface namenode) {
+    return namenode.getNamesystem();
+  }
+
   /**
    * Get block locations within the specified range.
    */
@@ -84,7 +89,14 @@ public class NameNodeAdapter {
     return namenode.getNamesystem().getBlockLocations("foo",
         src, offset, length);
   }
-  
+
+  public static LocatedBlocksInterface getBlockLocations(NameNodeInterface namenode,
+                                                String src, long offset, long length) throws IOException {
+    return namenode.getNamesystem().getBlockLocations("foo",
+            src, offset, length);
+  }
+
+
   public static HdfsFileStatus getFileInfo(NameNode namenode, String src,
       boolean resolveLink, boolean needLocation, boolean needBlockToken)
       throws AccessControlException, UnresolvedLinkException, StandbyException,
@@ -114,9 +126,19 @@ public class NameNodeAdapter {
       throws AccessControlException, IOException {
     namenode.getNamesystem().saveNamespace(0, 0);
   }
+
+  public static void saveNamespace(NameNodeInterface namenode)
+          throws AccessControlException, IOException {
+    namenode.getNamesystem().saveNamespace(0, 0);
+  }
   
   public static void enterSafeMode(NameNode namenode, boolean resourcesLow)
       throws IOException {
+    namenode.getNamesystem().enterSafeMode(resourcesLow);
+  }
+
+  public static void enterSafeMode(NameNodeInterface namenode, boolean resourcesLow)
+          throws IOException {
     namenode.getNamesystem().enterSafeMode(resourcesLow);
   }
   
@@ -170,10 +192,19 @@ public class NameNodeAdapter {
     return ns.leaseManager;
   }
 
+  public static LeaseManagerInterface getLeaseManager(final FSNamesystemInterface ns) {
+    return ns.getLeaseManager();
+  }
+
   /** Set the softLimit and hardLimit of client lease periods. */
   public static void setLeasePeriod(final FSNamesystem namesystem, long soft, long hard) {
     getLeaseManager(namesystem).setLeasePeriod(soft, hard);
     namesystem.leaseManager.triggerMonitorCheckNow();
+  }
+
+  public static void setLeasePeriod(final FSNamesystemInterface namesystem, long soft, long hard) {
+    getLeaseManager(namesystem).setLeasePeriod(soft, hard);
+    namesystem.getLeaseManager().triggerMonitorCheckNow();
   }
 
   public static Lease getLeaseForPath(NameNode nn, String path) {
@@ -189,8 +220,26 @@ public class NameNodeAdapter {
     return inode == null ? null : fsn.leaseManager.getLease((INodeFile) inode);
   }
 
+  public static LeaseInterface getLeaseForPath(NameNodeInterface nn, String path) {
+    final FSNamesystemInterface fsn = nn.getNamesystem();
+    INodeInterface inode;
+    try {
+      inode = fsn.getFSDirectory().getINode(path, DirOp.READ);
+    } catch (UnresolvedLinkException e) {
+      throw new RuntimeException("Lease manager should not support symlinks");
+    } catch (IOException ioe) {
+      return null; // unresolvable path, ex. parent dir is a file
+    }
+    return inode == null ? null : fsn.getLeaseManager().getLease((INodeFileInterface) inode);
+  }
+
   public static String getLeaseHolderForPath(NameNode namenode, String path) {
     Lease l = getLeaseForPath(namenode, path);
+    return l == null? null: l.getHolder();
+  }
+
+  public static String getLeaseHolderForPath(NameNodeInterface namenode, String path) {
+    LeaseInterface l = getLeaseForPath(namenode, path);
     return l == null? null: l.getHolder();
   }
 
@@ -213,6 +262,16 @@ public class NameNodeAdapter {
    */
   public static DatanodeDescriptor getDatanode(final FSNamesystem ns,
       DatanodeID id) throws IOException {
+    ns.readLock();
+    try {
+      return ns.getBlockManager().getDatanodeManager().getDatanode(id);
+    } finally {
+      ns.readUnlock();
+    }
+  }
+
+  public static DatanodeDescriptorInterface getDatanode(final FSNamesystemInterface ns,
+                                                        DatanodeIDInterface id) throws IOException {
     ns.readLock();
     try {
       return ns.getBlockManager().getDatanodeManager().getDatanode(id);
@@ -297,6 +356,34 @@ public class NameNodeAdapter {
     return fsnSpy;
   }
 
+  public static FSNamesystemInterface spyOnNamesystem(NameNodeInterface nn) {
+    FSNamesystemInterface fsnSpy = Mockito.spy(nn.getNamesystem());
+    FSNamesystemInterface fsnOld = nn.getNamesystem();
+    fsnOld.writeLock();
+    fsnSpy.writeLock();
+    //nn.getNamesystem() = fsnSpy;
+    try {
+      FieldUtils.writeDeclaredField(
+              (NameNodeRpcServer)nn.getRpcServer(), "namesystem", fsnSpy, true);
+      FieldUtils.writeDeclaredField(
+              fsnSpy.getBlockManager(), "namesystem", fsnSpy, true);
+      FieldUtils.writeDeclaredField(
+              fsnSpy.getLeaseManager(), "fsnamesystem", fsnSpy, true);
+      FieldUtils.writeDeclaredField(
+              fsnSpy.getBlockManager().getDatanodeManager(),
+              "namesystem", fsnSpy, true);
+      FieldUtils.writeDeclaredField(
+              BlockManagerTestUtil.getHeartbeatManager(fsnSpy.getBlockManager()),
+              "namesystem", fsnSpy, true);
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException("Cannot set spy FSNamesystem", e);
+    } finally {
+      fsnSpy.writeUnlock();
+      fsnOld.writeUnlock();
+    }
+    return fsnSpy;
+  }
+
   public static BlockManager spyOnBlockManager(NameNode nn) {
     BlockManager bmSpy = Mockito.spy(nn.getNamesystem().getBlockManager());
     nn.getNamesystem().setBlockManagerForTesting(bmSpy);
@@ -304,6 +391,12 @@ public class NameNodeAdapter {
   }
 
   public static ReentrantReadWriteLock spyOnFsLock(FSNamesystem fsn) {
+    ReentrantReadWriteLock spy = Mockito.spy(fsn.getFsLockForTests());
+    fsn.setFsLockForTests(spy);
+    return spy;
+  }
+
+  public static ReentrantReadWriteLock spyOnFsLock(FSNamesystemInterface fsn) {
     ReentrantReadWriteLock spy = Mockito.spy(fsn.getFsLockForTests());
     fsn.setFsLockForTests(spy);
     return spy;
@@ -389,11 +482,24 @@ public class NameNodeAdapter {
         nn.getNamesystem().getBlockManager(), "bmSafeMode");
     return (long)Whitebox.getInternalState(bmSafeMode, "blockSafe");
   }
+
+  public static long getSafeModeSafeBlocks(NameNodeInterface nn) {
+    if (!nn.getNamesystem().isInSafeMode()) {
+      return -1;
+    }
+    Object bmSafeMode = Whitebox.getInternalState(
+            nn.getNamesystem().getBlockManager(), "bmSafeMode");
+    return (long)Whitebox.getInternalState(bmSafeMode, "blockSafe");
+  }
   
   /**
    * @return Replication queue initialization status
    */
   public static boolean safeModeInitializedReplQueues(NameNode nn) {
+    return nn.getNamesystem().getBlockManager().isPopulatingReplQueues();
+  }
+
+  public static boolean safeModeInitializedReplQueues(NameNodeInterface nn) {
     return nn.getNamesystem().getBlockManager().isPopulatingReplQueues();
   }
   

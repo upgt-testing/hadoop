@@ -15,47 +15,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.test;
 
 import org.apache.hadoop.hdfs.BenchmarkThroughput;
 import org.apache.hadoop.util.ProgramDriver;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * Driver for HDFS tests. The tests should NOT depend on map-reduce APIs.
  */
 public class HdfsTestDriver {
 
-  private final ProgramDriver pgd;
+    private final ProgramDriver pgd;
 
-  public HdfsTestDriver() {
-    this(new ProgramDriver());
-  }
-  
-  public HdfsTestDriver(ProgramDriver pgd) {
-    this.pgd = pgd;
-    try {
-      pgd.addClass("dfsthroughput", BenchmarkThroughput.class, 
-          "measure hdfs throughput");
-      pgd.addClass("minidfscluster", MiniDFSClusterManager.class, 
-          "Run a single-process mini DFS cluster");
-    } catch(Throwable e) {
-      e.printStackTrace();
-    }
-  }
-
-  public void run(String argv[]) {
-    int exitCode = -1;
-    try {
-      exitCode = pgd.run(argv);
-    } catch(Throwable e) {
-      e.printStackTrace();
+    public HdfsTestDriver() {
+        this(new ProgramDriver());
     }
 
-    System.exit(exitCode);
-  }
+    public HdfsTestDriver(ProgramDriver pgd) {
+        this.pgd = pgd;
+        try {
+            pgd.addClass("dfsthroughput", BenchmarkThroughput.class, "measure hdfs throughput");
+            pgd.addClass("minidfscluster", MiniDockerDFSClusterManager.class, "Run a single-process mini DFS cluster");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
 
-  public static void main(String argv[]){
-    new HdfsTestDriver().run(argv);
-  }
+    public void run(String[] argv) {
+        int exitCode = -1;
+        try {
+            exitCode = pgd.run(argv);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        System.exit(exitCode);
+    }
+
+    public static void main(String[] argv) {
+        new HdfsTestDriver().run(argv);
+    }
 }

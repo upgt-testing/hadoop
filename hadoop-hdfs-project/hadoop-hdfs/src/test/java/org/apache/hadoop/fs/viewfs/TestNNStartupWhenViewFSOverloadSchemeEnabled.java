@@ -18,74 +18,69 @@
 package org.apache.hadoop.fs.viewfs;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * Tests that the NN startup is successful with ViewFSOverloadScheme.
  */
 public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
-  private MiniDockerDFSCluster cluster;
-  private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
-  private static final String HDFS_SCHEME = "hdfs";
-  private static final Configuration CONF = new Configuration();
 
-  @BeforeClass
-  public static void setUp() {
-    CONF.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
-    CONF.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    CONF.setInt(
-        CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
-    CONF.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
-        ViewFileSystemOverloadScheme.class.getName());
-    CONF.set(String
-        .format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
-            HDFS_SCHEME), DistributedFileSystem.class.getName());
-    // By default trash interval is 0. To trigger TrashEmptier, let's set it to
-    // >0 value.
-    CONF.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 100);
-  }
+    private MiniDockerDFSCluster cluster;
 
-  /**
-   * Tests that the HA mode NameNodeInterface startup is successful when
-   * ViewFSOverloadScheme configured.
-   */
-  @Test(timeout = 30000)
-  public void testHANameNodeAndDataNodeStartup() throws Exception {
-    cluster = new MiniDockerDFSCluster.Builder(CONF)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
-        .waitSafeMode(false).build();
-    cluster.waitActive();
-    cluster.transitionToActive(0);
-  }
+    private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
 
-  /**
-   * Tests that the NameNodeInterface startup is successful when ViewFSOverloadScheme
-   * configured.
-   */
-  @Test(timeout = 30000)
-  public void testNameNodeAndDataNodeStartup() throws Exception {
-    cluster =
-        new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false)
-            .build();
-    cluster.waitActive();
-  }
+    private static final String HDFS_SCHEME = "hdfs";
 
-  @After
-  public void shutdownCluster() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private static final Configuration CONF = new Configuration();
+
+    @BeforeClass
+    public static void setUp() {
+        CONF.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        CONF.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        CONF.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
+        CONF.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME), ViewFileSystemOverloadScheme.class.getName());
+        CONF.set(String.format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN, HDFS_SCHEME), DistributedFileSystem.class.getName());
+        // By default trash interval is 0. To trigger TrashEmptier, let's set it to
+        // >0 value.
+        CONF.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 100);
     }
-  }
+
+    /**
+     * Tests that the HA mode NameNodeInterface startup is successful when
+     * ViewFSOverloadScheme configured.
+     */
+    @Test(timeout = 30000)
+    public void testHANameNodeAndDataNodeStartup() throws Exception {
+        cluster = new MiniDockerDFSCluster.Builder(CONF).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1).waitSafeMode(false).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+    }
+
+    /**
+     * Tests that the NameNodeInterface startup is successful when ViewFSOverloadScheme
+     * configured.
+     */
+    @Test(timeout = 30000)
+    public void testNameNodeAndDataNodeStartup() throws Exception {
+        cluster = new MiniDockerDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false).build();
+        cluster.waitActive();
+    }
+
+    @After
+    public void shutdownCluster() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 }

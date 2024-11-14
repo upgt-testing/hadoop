@@ -18,16 +18,12 @@
 package org.apache.hadoop.fs.viewfs;
 
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT;
 import static org.junit.Assume.assumeTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,7 +33,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.TestHDFSFileSystemContract;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -47,92 +43,79 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * Tests ViewFileSystemOverloadScheme with file system contract tests.
  */
-public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract
-    extends TestHDFSFileSystemContract {
+public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract extends TestHDFSFileSystemContract {
 
-  private static MiniDockerDFSCluster cluster;
-  private static String defaultWorkingDirectory;
-  private static Configuration conf = new HdfsConfiguration();
+    private static MiniDockerDFSCluster cluster;
 
-  @BeforeClass
-  public static void init() throws IOException {
-    final File basedir = GenericTestUtils.getRandomizedTestDir();
-    conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
-        FileSystemContractBaseTest.TEST_UMASK);
-    cluster = new MiniDockerDFSCluster.Builder(conf, basedir)
-        .numDataNodes(2)
-        .build();
-    defaultWorkingDirectory =
-        "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
-  }
+    private static String defaultWorkingDirectory;
 
-  @Before
-  public void setUp() throws Exception {
-    conf.set(String.format("fs.%s.impl", "hdfs"),
-        ViewFileSystemOverloadScheme.class.getName());
-    conf.set(String.format(
-        FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
-        "hdfs"),
-        DistributedFileSystem.class.getName());
-    conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
-        CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
-    URI defaultFSURI =
-        URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-    ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/user",
-        defaultFSURI);
-    ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/append",
-        defaultFSURI);
-    ConfigUtil.addLink(conf, defaultFSURI.getAuthority(),
-        "/FileSystemContractBaseTest/",
-        new URI(defaultFSURI.toString() + "/FileSystemContractBaseTest/"));
-    fs = FileSystem.get(conf);
-  }
+    private static Configuration conf = new HdfsConfiguration();
 
-  @AfterClass
-  public static void tearDownAfter() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    @BeforeClass
+    public static void init() throws IOException {
+        final File basedir = GenericTestUtils.getRandomizedTestDir();
+        conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY, FileSystemContractBaseTest.TEST_UMASK);
+        cluster = new MiniDockerDFSCluster.Builder(conf, basedir).numDataNodes(2).build();
+        defaultWorkingDirectory = "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
     }
-  }
 
-  @Override
-  protected String getDefaultWorkingDirectory() {
-    return defaultWorkingDirectory;
-  }
-
-  @Override
-  @Test
-  public void testAppend() throws IOException {
-    AppendTestUtil.testAppend(fs, new Path("/append/f"));
-  }
-
-  @Override
-  @Test(expected = AccessControlException.class)
-  public void testRenameRootDirForbidden() throws Exception {
-    super.testRenameRootDirForbidden();
-  }
-
-  @Override
-  @Test
-  public void testListStatusRootDir() throws Throwable {
-    assumeTrue(rootDirTestEnabled());
-    Path dir = path("/");
-    Path child = path("/FileSystemContractBaseTest");
-    try (FileSystem dfs = ((ViewFileSystemOverloadScheme) fs).getRawFileSystem(
-        new Path(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY), "/"),
-        conf)) {
-      dfs.mkdirs(child);
+    @Before
+    public void setUp() throws Exception {
+        conf.set(String.format("fs.%s.impl", "hdfs"), ViewFileSystemOverloadScheme.class.getName());
+        conf.set(String.format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN, "hdfs"), DistributedFileSystem.class.getName());
+        conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME, CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
+        URI defaultFSURI = URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+        ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/user", defaultFSURI);
+        ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/append", defaultFSURI);
+        ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/FileSystemContractBaseTest/", new URI(defaultFSURI.toString() + "/FileSystemContractBaseTest/"));
+        fs = FileSystem.get(conf);
     }
-    assertListStatusFinds(dir, child);
-  }
 
-  @Override
-  @Ignore // This test same as above in this case.
-  public void testLSRootDir() throws Throwable {
-  }
+    @AfterClass
+    public static void tearDownAfter() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    @Override
+    protected String getDefaultWorkingDirectory() {
+        return defaultWorkingDirectory;
+    }
+
+    @Override
+    @Test
+    public void testAppend() throws IOException {
+        AppendTestUtil.testAppend(fs, new Path("/append/f"));
+    }
+
+    @Override
+    @Test(expected = AccessControlException.class)
+    public void testRenameRootDirForbidden() throws Exception {
+        super.testRenameRootDirForbidden();
+    }
+
+    @Override
+    @Test
+    public void testListStatusRootDir() throws Throwable {
+        assumeTrue(rootDirTestEnabled());
+        PathInterface dir = path("/");
+        PathInterface child = path("/FileSystemContractBaseTest");
+        try (FileSystem dfs = ((ViewFileSystemOverloadScheme) fs).getRawFileSystem(new Path(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY), "/"), conf)) {
+            dfs.mkdirs(child);
+        }
+        assertListStatusFinds(dir, child);
+    }
+
+    @Override
+    // This test same as above in this case.
+    @Ignore
+    public void testLSRootDir() throws Throwable {
+    }
 }

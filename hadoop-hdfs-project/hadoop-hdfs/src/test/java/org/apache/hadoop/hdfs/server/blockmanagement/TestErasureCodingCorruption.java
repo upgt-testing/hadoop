@@ -21,12 +21,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
-
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * In case of Erasure Coding the entire block group is marked corrupted, in
@@ -41,51 +41,39 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_CORRUPT_BLOCK_DE
  */
 public class TestErasureCodingCorruption {
 
-  @Test
-  public void testCorruptionDuringFailover() throws Exception {
-    Configuration conf = new Configuration();
-    // Set removal of corrupt replicas immediately as false, to trigger this
-    // case.
-    conf.setBoolean(DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED,
-        false);
-    try (MiniDFSCluster cluster = new MiniDFSCluster
-        .Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(8)
-        .build()) {
-      cluster.transitionToActive(0);
-      cluster.waitActive();
-
-      DistributedFileSystem dfs = cluster.getFileSystem(0);
-      dfs.mkdirs(new Path("/dir"));
-      dfs.setErasureCodingPolicy(new Path("/dir"), "RS-6-3-1024k");
-
-      FSDataOutputStream out = dfs.create(new Path("/dir/file"));
-      // Write more than one stripe, so that data can get flushed to all
-      // datanodes.
-      for (int i = 0; i < 15 * 1024 * 1024; i++) {
-        out.write(i);
-      }
-
-      // Stop one datanode, so as to trigger update pipeline.
-      MiniDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
-      // Write some more data and close the file.
-      for (int i = 0; i < 7 * 1024 * 1024; i++) {
-        out.write(i);
-      }
-      out.close();
-
-      BlockManager bm = cluster.getNamesystem(0).getBlockManager();
-
-      // Transition to standby and then to active.
-      cluster.transitionToStandby(0);
-      cluster.transitionToActive(0);
-
-      // Restart the stopped Datanode, this datanode would report a replica
-      // that failed during write.
-      cluster.restartDataNode(dn);
-      GenericTestUtils
-          .waitFor(() -> bm.getCorruptECBlockGroups() == 0, 100, 10000);
+    @Test
+    public void testCorruptionDuringFailover() throws Exception {
+        Configuration conf = new Configuration();
+        // Set removal of corrupt replicas immediately as false, to trigger this
+        // case.
+        conf.setBoolean(DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED, false);
+        try (MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(8).build()) {
+            cluster.transitionToActive(0);
+            cluster.waitActive();
+            DistributedFileSystem dfs = cluster.getFileSystem(0);
+            dfs.mkdirs(new Path("/dir"));
+            dfs.setErasureCodingPolicy(new Path("/dir"), "RS-6-3-1024k");
+            FSDataOutputStream out = dfs.create(new Path("/dir/file"));
+            // Write more than one stripe, so that data can get flushed to all
+            // datanodes.
+            for (int i = 0; i < 15 * 1024 * 1024; i++) {
+                out.write(i);
+            }
+            // Stop one datanode, so as to trigger update pipeline.
+            MiniDockerDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
+            // Write some more data and close the file.
+            for (int i = 0; i < 7 * 1024 * 1024; i++) {
+                out.write(i);
+            }
+            out.close();
+            BlockManagerInterface bm = cluster.getNamesystem(0).getBlockManager();
+            // Transition to standby and then to active.
+            cluster.transitionToStandby(0);
+            cluster.transitionToActive(0);
+            // Restart the stopped Datanode, this datanode would report a replica
+            // that failed during write.
+            cluster.restartDataNode(dn);
+            GenericTestUtils.waitFor(() -> bm.getCorruptECBlockGroups() == 0, 100, 10000);
+        }
     }
-  }
 }

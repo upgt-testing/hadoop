@@ -13,7 +13,7 @@ public interface DatanodeManagerInterface {
     int getNumLiveDataNodes();
     void setHeartbeatExpireInterval(long arg0);
     boolean shouldCountVersion(DatanodeDescriptorInterface arg0);
-    void refreshNodes(ConfigurationInterface arg0) throws java.io.IOException;
+    void refreshNodes(org.apache.hadoop.conf.Configuration arg0) throws java.io.IOException;
     NetworkTopologyInterface getNetworkTopology();
     void addCacheCommands(java.lang.String arg0, DatanodeDescriptorInterface arg1, java.util.List<org.apache.hadoop.hdfs.server.protocol.DatanodeCommand> arg2);
     long getHeartbeatRecheckInterval();
@@ -88,12 +88,13 @@ public interface DatanodeManagerInterface {
     void addDatanode(DatanodeDescriptorInterface arg0);
     void setHeartbeatInterval(long arg0);
     boolean isNameResolved(java.net.InetAddress arg0);
-    java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> getDatanodeListForReport(org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType arg0);
+    //java.util.List<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> getDatanodeListForReport(org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType arg0);
+    java.util.List<DatanodeDescriptorInterface> getDatanodeListForReport(org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType arg0);
     void checkIfClusterIsNowMultiRack(DatanodeDescriptorInterface arg0);
     void clearPendingCachingCommands();
     int getNumDeadDataNodes();
     void refreshHostsReader(ConfigurationInterface arg0) throws java.io.IOException;
-    java.util.Set<org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor> getDatanodes();
+    java.util.Set<DatanodeDescriptorInterface> getDatanodes();
     DatanodeStorageInfoInterface[] getDatanodeStorageInfos(DatanodeIDInterface[] arg0, java.lang.String[] arg1, java.lang.String arg2, java.lang.Object... arg3) throws org.apache.hadoop.hdfs.protocol.UnregisteredNodeException;
     Host2NodesMapInterface getHost2DatanodeMap();
     void addSlowPeers(java.lang.String arg0);

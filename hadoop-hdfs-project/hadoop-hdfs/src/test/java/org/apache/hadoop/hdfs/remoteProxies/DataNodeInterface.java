@@ -8,7 +8,7 @@ public interface DataNodeInterface extends Remote {
     void scheduleAllBlockReport(long arg0);
     void removeVolumes(java.util.Collection<org.apache.hadoop.hdfs.server.datanode.StorageLocation> arg0, boolean arg1) throws java.io.IOException;
     void shutdownPeriodicScanners();
-//    java.util.List<org.apache.hadoop.hdfs.server.datanode.BPOfferService> getAllBpOs();
+    java.util.List<org.apache.hadoop.hdfs.server.datanode.BPOfferService> getAllBpOs();
     BlockScannerInterface getBlockScanner();
     java.lang.String getSoftwareVersion();
     void handleAddBlockPoolError(AddBlockPoolExceptionInterface arg0) throws java.io.IOException;

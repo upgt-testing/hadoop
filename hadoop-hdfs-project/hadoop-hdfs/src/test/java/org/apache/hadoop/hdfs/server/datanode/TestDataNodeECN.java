@@ -18,37 +18,35 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.protocol.datatransfer.PipelineAck;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-
 import java.io.IOException;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestDataNodeECN {
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
+    @Rule
+    public Timeout globalTimeout = new Timeout(300000);
 
-  @Test
-  public void testECNFlag() throws IOException {
-    Configuration conf = new Configuration();
-    conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
-    MiniDockerDFSCluster cluster = null;
-    try {
-      cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-      PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
-      Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Test
+    public void testECNFlag() throws IOException {
+        Configuration conf = new Configuration();
+        conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
+        MiniDockerDFSCluster cluster = null;
+        try {
+            cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
+            PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
+            Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 }

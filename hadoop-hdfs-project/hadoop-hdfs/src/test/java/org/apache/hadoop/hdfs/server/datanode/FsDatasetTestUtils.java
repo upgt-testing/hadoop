@@ -65,6 +65,8 @@ public interface FsDatasetTestUtils {
      */
     public abstract D newInstance(DataNode datanode);
 
+    public abstract D newInstance(DataNodeInterface datanode);
+
     /**
      * @return True for SimulatedFsDataset
      */

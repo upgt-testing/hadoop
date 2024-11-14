@@ -15,66 +15,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.fs;
 
 import java.io.IOException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
-
 import java.net.URISyntaxException;
-
 import javax.security.auth.login.LoginException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.apache.hadoop.hdfs.remoteProxies.*;
 
-public class TestFcHdfsCreateMkdir extends
-                    FileContextCreateMkdirBaseTest {
-  
-  private static MiniDockerDFSCluster cluster;
-  private static Path defaultWorkingDirectory;
-  
-  @Override
-  protected FileContextTestHelper createFileContextHelper() {
-    return new FileContextTestHelper("/tmp/TestFcHdfsCreateMkdir");
-  }
+public class TestFcHdfsCreateMkdir extends FileContextCreateMkdirBaseTest {
 
+    private static MiniDockerDFSCluster cluster;
 
-  @BeforeClass
-  public static void clusterSetupAtBegining()
-                                    throws IOException, LoginException, URISyntaxException  {
-    Configuration conf = new HdfsConfiguration();
-    cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
-    fc = FileContext.getFileContext(cluster.getURI(0), conf);
-    defaultWorkingDirectory = fc.makeQualified( new Path("/user/" + 
-        UserGroupInformation.getCurrentUser().getShortUserName()));
-    fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
-  }
+    private static PathInterface defaultWorkingDirectory;
 
-      
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    @Override
+    protected FileContextTestHelper createFileContextHelper() {
+        return new FileContextTestHelper("/tmp/TestFcHdfsCreateMkdir");
     }
-  }
-  
-  @Override
-  @Before
-  public void setUp() throws Exception {
-    super.setUp();
-  }
-  
-  @Override
-  @After
-  public void tearDown() throws Exception {
-    super.tearDown();
-  }
+
+    @BeforeClass
+    public static void clusterSetupAtBegining() throws IOException, LoginException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(2).build();
+        fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        defaultWorkingDirectory = fc.makeQualified(new Path("/user/" + UserGroupInformation.getCurrentUser().getShortUserName()));
+        fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
+    }
+
+    @AfterClass
+    public static void ClusterShutdownAtEnd() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 }

@@ -8,7 +8,7 @@ public interface LocatedBlocksInterface {
     java.lang.String toString();
     long getFileLength();
     int locatedBlockCount();
-    java.util.List<org.apache.hadoop.hdfs.protocol.LocatedBlock> getLocatedBlocks();
+    java.util.List<LocatedBlockInterface> getLocatedBlocks();
     LocatedBlockInterface get(int arg0);
     void insertRange(int arg0, java.util.List<org.apache.hadoop.hdfs.protocol.LocatedBlock> arg1);
     FileEncryptionInfoInterface getFileEncryptionInfo();
