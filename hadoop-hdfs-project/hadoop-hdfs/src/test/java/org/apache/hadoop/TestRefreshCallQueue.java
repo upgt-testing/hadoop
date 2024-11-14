@@ -141,7 +141,7 @@ public class TestRefreshCallQueue {
         // throw an error when we double-initialize JvmMetrics
         DefaultMetricsSystem.setMiniClusterMode(false);
         int serviceHandlerCount = config.getInt(DFSConfigKeys.DFS_NAMENODE_SERVICE_HANDLER_COUNT_KEY, DFSConfigKeys.DFS_NAMENODE_SERVICE_HANDLER_COUNT_DEFAULT);
-        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+        NameNodeRpcServer rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
         // check callqueue size
         assertEquals(CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_DEFAULT * serviceHandlerCount, rpcServer.getClientRpcServer().getMaxQueueSize());
         // Replace queue and update queue size

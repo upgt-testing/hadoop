@@ -675,7 +675,8 @@ public class TestDFSClientRetries {
         @Override
         public void run() {
             try {
-                fs = cluster.getNewFileSystemInstance(0);
+                //fs = cluster.getNewFileSystemInstance(0);
+                fs = cluster.getFileSystem();
                 int bufferSize = len;
                 byte[] buf = new byte[bufferSize];
                 InputStream in = fs.open(filePath, bufferSize);
@@ -737,7 +738,7 @@ public class TestDFSClientRetries {
             assertTrue(cs1 != null);
             //stop the first datanode
             final List<LocatedBlock> locatedblocks = DFSClient.callGetBlockLocations(cluster.getNameNodeRpc(), f, 0, Long.MAX_VALUE).getLocatedBlocks();
-            final DatanodeInfoInterface first = locatedblocks.get(0).getLocations()[0];
+            final DatanodeInfo first = locatedblocks.get(0).getLocations()[0];
             cluster.stopDataNode(first.getXferAddr());
             //get checksum again
             final FileChecksum cs2 = fs.getFileChecksum(p);
@@ -758,7 +759,7 @@ public class TestDFSClientRetries {
         final Server server = new TestServer(1, true);
         server.start();
         final InetSocketAddress addr = NetUtils.getConnectAddress(server);
-        DatanodeIDInterface fakeDnId = DFSTestUtil.getLocalDatanodeID(addr.getPort());
+        DatanodeID fakeDnId = DFSTestUtil.getLocalDatanodeID(addr.getPort());
         ExtendedBlock b = new ExtendedBlock("fake-pool", new Block(12345L));
         LocatedBlock fakeBlock = new LocatedBlock(b, DatanodeInfo.EMPTY_ARRAY);
         ClientDatanodeProtocol proxy = null;

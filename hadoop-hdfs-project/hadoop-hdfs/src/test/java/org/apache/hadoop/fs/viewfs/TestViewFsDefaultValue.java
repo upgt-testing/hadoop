@@ -141,7 +141,7 @@ public class TestViewFsDefaultValue {
             vfs.getServerDefaults(notInMountpointPath);
             fail("getServerDefaults on viewFs did not throw excetion!");
         } catch (NotInMountpointException e) {
-            FsServerDefaultsInterface serverDefaults = vfs.getServerDefaults(testFilePath);
+            FsServerDefaults serverDefaults = vfs.getServerDefaults(testFilePath);
             assertEquals(DFS_BLOCK_SIZE_DEFAULT, serverDefaults.getBlockSize());
             assertEquals(DFS_BYTES_PER_CHECKSUM_DEFAULT, serverDefaults.getBytesPerChecksum());
             assertEquals(DFS_CLIENT_WRITE_PACKET_SIZE_DEFAULT, serverDefaults.getWritePacketSize());
@@ -158,7 +158,7 @@ public class TestViewFsDefaultValue {
         FileSystem hFs = cluster.getFileSystem(0);
         final DistributedFileSystem dfs = (DistributedFileSystem) hFs;
         dfs.setQuota(testFileDirPath, 100, 500);
-        ContentSummaryInterface cs = vfs.getContentSummary(testFileDirPath);
+        ContentSummary cs = vfs.getContentSummary(testFileDirPath);
         assertEquals(100, cs.getQuota());
         assertEquals(500, cs.getSpaceQuota());
     }
@@ -171,7 +171,7 @@ public class TestViewFsDefaultValue {
         FileSystem hFs = cluster.getFileSystem(0);
         final DistributedFileSystem dfs = (DistributedFileSystem) hFs;
         dfs.setQuota(testFileDirPath, 100, 500);
-        QuotaUsageInterface qu = vfs.getQuotaUsage(testFileDirPath);
+        QuotaUsage qu = vfs.getQuotaUsage(testFileDirPath);
         assertEquals(100, qu.getQuota());
         assertEquals(500, qu.getSpaceQuota());
     }
@@ -186,7 +186,7 @@ public class TestViewFsDefaultValue {
         final DistributedFileSystem dfs = (DistributedFileSystem) hFs;
         dfs.setQuotaByStorageType(testFileDirPath, StorageType.SSD, 500);
         dfs.setQuotaByStorageType(testFileDirPath, StorageType.DISK, 600);
-        QuotaUsageInterface qu = vfs.getQuotaUsage(testFileDirPath);
+        QuotaUsage qu = vfs.getQuotaUsage(testFileDirPath);
         assertEquals(500, qu.getTypeQuota(StorageType.SSD));
         assertEquals(600, qu.getTypeQuota(StorageType.DISK));
     }
@@ -202,7 +202,7 @@ public class TestViewFsDefaultValue {
         dfs.setQuota(testFileDirPath, -1, -1);
         dfs.setQuotaByStorageType(testFileDirPath, StorageType.SSD, -1);
         dfs.setQuotaByStorageType(testFileDirPath, StorageType.DISK, -1);
-        QuotaUsageInterface qu = vfs.getQuotaUsage(testFileDirPath);
+        QuotaUsage qu = vfs.getQuotaUsage(testFileDirPath);
         assertEquals(-1, qu.getTypeQuota(StorageType.SSD));
         assertEquals(-1, qu.getQuota());
         assertEquals(-1, qu.getSpaceQuota());

@@ -135,7 +135,7 @@ public class TestDFSInputStream {
         try {
             fin.seekToNewSource(100);
             assertEquals(100, fin.getPos());
-            DatanodeInfoInterface firstNode = fin.getCurrentDatanode();
+            DatanodeInfo firstNode = fin.getCurrentDatanode();
             assertNotNull(firstNode);
             fin.seekToNewSource(100);
             assertEquals(100, fin.getPos());
@@ -223,7 +223,7 @@ public class TestDFSInputStream {
             DatanodeID nodeId = new DatanodeID("localhost", "localhost", "dn0", 1111, 1112, 1113, 1114);
             DatanodeInfo dnInfo = new DatanodeDescriptor(nodeId);
             when(lb.getCachedLocations()).thenReturn(new DatanodeInfo[] { dnInfo });
-            DatanodeInfoInterface retDNInfo = dfsInputStream.getBestNodeDNAddrPair(lb, null).info;
+            DatanodeInfo retDNInfo = dfsInputStream.getBestNodeDNAddrPair(lb, null).info;
             assertEquals(dnInfo, retDNInfo);
         } finally {
             fs.delete(filePath, true);
@@ -249,7 +249,7 @@ public class TestDFSInputStream {
             DatanodeInfo dnInfo = new DatanodeDescriptor(nodeId);
             DatanodeInfoWithStorage dnInfoStorage = new DatanodeInfoWithStorage(dnInfo, "DISK", StorageType.DISK);
             when(lb.getLocations()).thenReturn(new DatanodeInfoWithStorage[] { dnInfoStorage });
-            DatanodeInfoInterface retDNInfo = dfsInputStream.getBestNodeDNAddrPair(lb, null).info;
+            DatanodeInfo retDNInfo = dfsInputStream.getBestNodeDNAddrPair(lb, null).info;
             assertEquals(dnInfo, retDNInfo);
         } finally {
             fs.delete(filePath, true);

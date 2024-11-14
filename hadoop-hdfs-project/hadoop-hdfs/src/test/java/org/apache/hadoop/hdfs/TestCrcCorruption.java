@@ -167,7 +167,7 @@ public class TestCrcCorruption {
             List<ReplicaInfo> replicas = dn.getFSDataset().getFinalizedBlocks(bpid);
             assertTrue("Replicas do not exist", !replicas.isEmpty());
             for (int idx = 0; idx < replicas.size(); idx++) {
-                ReplicaInfoInterface replica = replicas.get(idx);
+                ReplicaInfo replica = replicas.get(idx);
                 ExtendedBlock eb = new ExtendedBlock(bpid, replica);
                 if (idx % 3 == 0) {
                     LOG.info("Deliberately removing meta for block " + eb);

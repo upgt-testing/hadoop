@@ -584,6 +584,13 @@ public class UpgradeUtilities {
     }
     return namenodeStorageBlockPoolID;
   }
+
+  public static String getCurrentBlockPoolID(MiniDockerDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getBlockPoolID();
+    }
+    return namenodeStorageBlockPoolID;
+  }
   
   /**
    * Return the File System State Creation Timestamp (FSSCTime) inherent

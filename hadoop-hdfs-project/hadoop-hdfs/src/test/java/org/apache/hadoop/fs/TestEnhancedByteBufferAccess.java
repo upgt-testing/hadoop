@@ -606,7 +606,7 @@ public class TestEnhancedByteBufferAccess {
                         Assert.assertEquals(expectedOutstandingMmaps, numOutstandingMmaps);
                         ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
                         Assert.assertNotNull(replica);
-                        SlotInterface slot = replica.getSlot();
+                        Slot slot = replica.getSlot();
                         if ((expectedIsAnchorable != slot.isAnchorable()) || (expectedIsAnchored != slot.isAnchored())) {
                             LOG.info("replica " + replica + " has isAnchorable = " + slot.isAnchorable() + ", isAnchored = " + slot.isAnchored() + ".  Waiting for isAnchorable = " + expectedIsAnchorable + ", isAnchored = " + expectedIsAnchored);
                             return;

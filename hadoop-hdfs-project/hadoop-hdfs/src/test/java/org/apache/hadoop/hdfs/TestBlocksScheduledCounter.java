@@ -75,7 +75,7 @@ public class TestBlocksScheduledCounter {
         ArrayList<DatanodeDescriptor> dnList = new ArrayList<DatanodeDescriptor>();
         final DatanodeManagerInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
         dm.fetchDatanodes(dnList, dnList, false);
-        DatanodeDescriptorInterface dn = dnList.get(0);
+        DatanodeDescriptor dn = dnList.get(0);
         assertEquals(1, dn.getBlocksScheduled());
         // close the file and the counter should go to zero.
         out.close();
@@ -93,7 +93,7 @@ public class TestBlocksScheduledCounter {
         DatanodeManagerInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
         ArrayList<DatanodeDescriptor> dnList = new ArrayList<DatanodeDescriptor>();
         datanodeManager.fetchDatanodes(dnList, dnList, false);
-        for (DatanodeDescriptorInterface descriptor : dnList) {
+        for (DatanodeDescriptor descriptor : dnList) {
             assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
         }
         cluster.getDataNodes().get(0).shutdown();
@@ -106,7 +106,7 @@ public class TestBlocksScheduledCounter {
         out.hflush();
         DatanodeDescriptorInterface abandonedDn = datanodeManager.getDatanode(cluster.getDataNodes().get(0).getDatanodeId());
         assertEquals("for the abandoned dn scheduled counts should be 0", 0, abandonedDn.getBlocksScheduled());
-        for (DatanodeDescriptorInterface descriptor : dnList) {
+        for (DatanodeDescriptor descriptor : dnList) {
             if (descriptor.equals(abandonedDn)) {
                 continue;
             }
@@ -114,7 +114,7 @@ public class TestBlocksScheduledCounter {
         }
         // close the file and the counter should go to zero.
         out.close();
-        for (DatanodeDescriptorInterface descriptor : dnList) {
+        for (DatanodeDescriptor descriptor : dnList) {
             assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
         }
     }
@@ -146,8 +146,8 @@ public class TestBlocksScheduledCounter {
             ArrayList<DatanodeDescriptor> dnList = new ArrayList<DatanodeDescriptor>();
             datanodeManager.fetchDatanodes(dnList, dnList, false);
             // 3. mark a couple of blocks as corrupt
-            LocatedBlock block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
-            DatanodeInfo[] locs = block.getLocations();
+            LocatedBlockInterface block = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), filePath.toString(), 0, 1).get(0);
+            DatanodeInfoInterface[] locs = block.getLocations();
             cluster.getNamesystem().writeLock();
             try {
                 bm.findAndMarkBlockAsCorrupt(block.getBlock(), locs[0], "STORAGE_ID", "TEST");
@@ -162,7 +162,7 @@ public class TestBlocksScheduledCounter {
             dfs.delete(filePath, true);
             BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(cluster.getNamesystem(0).getBlockManager());
             int blocksScheduled = 0;
-            for (DatanodeDescriptorInterface descriptor : dnList) {
+            for (DatanodeDescriptor descriptor : dnList) {
                 if (descriptor.getBlocksScheduled() != 0) {
                     blocksScheduled += descriptor.getBlocksScheduled();
                 }
@@ -211,7 +211,7 @@ public class TestBlocksScheduledCounter {
             // 5.truncate the file whose block exists in pending reconstruction
             dfs.truncate(filePath, 10);
             int blocksScheduled = 0;
-            for (DatanodeDescriptorInterface descriptor : dnList) {
+            for (DatanodeDescriptor descriptor : dnList) {
                 if (descriptor.getBlocksScheduled() != 0) {
                     blocksScheduled += descriptor.getBlocksScheduled();
                 }

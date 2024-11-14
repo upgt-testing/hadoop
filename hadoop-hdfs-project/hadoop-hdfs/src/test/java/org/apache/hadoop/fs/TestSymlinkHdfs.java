@@ -202,7 +202,7 @@ abstract public class TestSymlinkHdfs extends SymlinkBaseTest {
         wrapper.createSymlink(dir, linkToDir, false);
         // Changing the permissions using the link does not modify
         // the permissions of the link..
-        FsPermissionInterface perms = wrapper.getFileLinkStatus(linkToFile).getPermission();
+        FsPermission perms = wrapper.getFileLinkStatus(linkToFile).getPermission();
         wrapper.setPermission(linkToFile, new FsPermission((short) 0664));
         wrapper.setOwner(linkToFile, "user", "group");
         assertEquals(perms, wrapper.getFileLinkStatus(linkToFile).getPermission());

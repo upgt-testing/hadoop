@@ -47,7 +47,7 @@ public class TestDFSAddressConfig {
      *------------------------------------------------------------------------*/
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         cluster.waitActive();
-        ArrayList<DataNode> dns = cluster.getDataNodes();
+        ArrayList<DataNodeInterface> dns = cluster.getDataNodes();
         DataNodeInterface dn = dns.get(0);
         String selfSocketAddr = dn.getXferAddress().toString();
         System.out.println("DN Self Socket Addr == " + selfSocketAddr);

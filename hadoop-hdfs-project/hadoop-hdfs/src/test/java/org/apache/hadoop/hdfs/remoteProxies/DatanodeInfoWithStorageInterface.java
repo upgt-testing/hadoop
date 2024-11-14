@@ -1,6 +1,6 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
-public interface DatanodeInfoWithStorageInterface {
+public interface DatanodeInfoWithStorageInterface extends DatanodeInfoInterface {
     java.lang.String getXferAddr(boolean arg0);
     boolean equals(java.lang.Object arg0);
     int getInfoPort();

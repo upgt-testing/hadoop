@@ -129,7 +129,7 @@ public class TestHDFSFileContextMainOperations extends FileContextMainOperations
         FileStatus fileStatus = fc.getFileStatus(file);
         Assert.assertEquals(fileStatus.getLen(), newLength);
         AppendTestUtil.checkFullFile(fs, file, newLength, data, file.toString());
-        ContentSummaryInterface cs = fs.getContentSummary(dir);
+        ContentSummary cs = fs.getContentSummary(dir);
         Assert.assertEquals("Bad disk space usage", cs.getSpaceConsumed(), newLength * repl);
         Assert.assertTrue(fs.delete(dir, true));
     }

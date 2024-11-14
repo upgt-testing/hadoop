@@ -337,7 +337,7 @@ public class TestDFSOutputStream {
         assertEquals(3, cluster.getAllBlockReports(bpid).size());
         int numDataNodesWithData = 0;
         for (Map<DatanodeStorage, BlockListAsLongs> dnBlocks : cluster.getAllBlockReports(bpid)) {
-            for (BlockListAsLongsInterface blocks : dnBlocks.values()) {
+            for (BlockListAsLongs blocks : dnBlocks.values()) {
                 if (blocks.getNumberOfBlocks() > 0) {
                     numDataNodesWithData++;
                     break;

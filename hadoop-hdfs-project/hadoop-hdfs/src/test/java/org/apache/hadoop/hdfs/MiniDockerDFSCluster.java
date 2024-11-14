@@ -14,10 +14,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.ServiceFailedException;
-import org.apache.hadoop.hdfs.protocol.Block;
-import org.apache.hadoop.hdfs.protocol.DatanodeID;
-import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
-import org.apache.hadoop.hdfs.protocol.HdfsConstants;
+import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.rmi.client.RemoteObjectProxy;
 import org.apache.hadoop.hdfs.rmi.server.RemoteObject;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
@@ -30,6 +27,7 @@ import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
+import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
@@ -230,6 +228,7 @@ public class MiniDockerDFSCluster implements Closeable {
             throw new RuntimeException("Failed to read the log file");
         }
     }
+
 
     public static class Builder {
         private Configuration conf;
@@ -807,6 +806,13 @@ public class MiniDockerDFSCluster implements Closeable {
         return storagesPerDatanode;
     }
 
+
+
+    public void restartDataNode(int i, boolean b, boolean b1) {
+        LOG.warn("The restartDataNode(int i, boolean b, boolean b1) function is not implemented yet.");
+        System.out.println("The restartDataNode(int i, boolean b, boolean b1) function is not implemented yet.");
+    }
+
     public boolean restartDataNodes(boolean deleteBaseDir) {
         LOG.warn("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
         System.out.println("The restartDataNodes(boolean deleteBaseDir) function is not implemented yet.");
@@ -1159,8 +1165,18 @@ public class MiniDockerDFSCluster implements Closeable {
         return new DataNodeProperties(idx);
     }
 
+    public synchronized DataNodeProperties stopDataNodeForUpgrade(int i)
+            throws IOException {
+        return stopDataNode(i);
+    }
+
     public boolean restartDataNode(DataNodeProperties dp, Boolean keepPort ) throws IOException {
         int idx = dp.idx;
+        restartDataNode(idx);
+        return true;
+    }
+
+    public boolean restartDataNode(int idx, Boolean keepPort ) throws IOException {
         restartDataNode(idx);
         return true;
     }
@@ -1189,6 +1205,11 @@ public class MiniDockerDFSCluster implements Closeable {
         throw new UnsupportedOperationException("The setDataNodeDead(DatanodeIDInterface dnId) function is not implemented yet.");
     }
 
+    public void setDataNodeDead(DatanodeDescriptorInterface dnId) throws IOException {
+        LOG.warn("The setDataNodeDead(DatanodeDescriptorInterface dnId) function is not implemented yet.");
+        System.out.println("The setDataNodeDead(DatanodeDescriptorInterface dnId) function is not implemented yet.");
+        throw new UnsupportedOperationException("The setDataNodeDead(DatanodeDescriptorInterface dnId) function is not implemented yet.");
+    }
 
     public File getInstanceStorageDir(int dnIndex, int dirIndex) {
         return new File(base_dir, getStorageDirPath(dnIndex, dirIndex));
@@ -1506,6 +1527,65 @@ public class MiniDockerDFSCluster implements Closeable {
         public String getNamenodeId() {
             return this.nnId;
         }
+    }
+
+    public void corruptMeta(int i, ExtendedBlock blk) throws IOException {
+        getMaterializedReplica(i, blk).corruptMeta();
+    }
+
+    public void deleteMeta(int i, ExtendedBlock blk)
+            throws IOException {
+        getMaterializedReplica(i, blk).deleteMeta();
+    }
+
+    public void truncateMeta(int i, ExtendedBlock blk, int newSize)
+            throws IOException {
+        getMaterializedReplica(i, blk).truncateMeta(newSize);
+    }
+
+    /**
+     * Finalize cluster for the namenode at the given index
+     * @see MiniDFSCluster#finalizeCluster(Configuration)
+     * @param nnIndex index of the namenode
+     * @param conf configuration
+     * @throws Exception
+     */
+    public void finalizeCluster(int nnIndex, Configuration conf) throws Exception {
+        //finalizeNamenode(getNN(nnIndex).nameNode, getNN(nnIndex).conf);
+    }
+
+    /**
+     * If the NameNode is running, attempt to finalize a previous upgrade.
+     * When this method return, the NameNode should be finalized, but
+     * DataNodes may not be since that occurs asynchronously.
+     *
+     * @throws IllegalStateException if the Namenode is not running.
+     */
+    public void finalizeCluster(Configuration conf) throws Exception {
+        /*
+        for (NameNodeInfo nnInfo : namenodes.values()) {
+            if (nnInfo == null) {
+                throw new IllegalStateException("Attempting to finalize "
+                        + "Namenode but it is not running");
+            }
+            finalizeNamenode(nnInfo.nameNode, nnInfo.conf);
+        }
+         */
+    }
+
+    public List<Map<DatanodeStorage, BlockListAsLongs>> getAllBlockReports(String bpid) {
+        /*
+        int numDataNodes = dataNodes.size();
+        final List<Map<DatanodeStorage, BlockListAsLongs>> result
+                = new ArrayList<Map<DatanodeStorage, BlockListAsLongs>>(numDataNodes);
+        for (int i = 0; i < numDataNodes; ++i) {
+            result.add(getBlockReport(bpid, i));
+        }
+        return result;
+         */
+        LOG.warn("The getAllBlockReports function is not implemented yet.");
+        System.out.println("The getAllBlockReports function is not implemented yet.");
+        throw new UnsupportedOperationException("The getAllBlockReports function is not implemented yet.");
     }
 
 }

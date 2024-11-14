@@ -50,28 +50,28 @@ public class TestFcHdfsSetUMask {
     private static FileContext fc;
 
     // rwxrwx---
-    private static final FsPermissionInterface USER_GROUP_OPEN_PERMISSIONS = FsPermission.createImmutable((short) 0770);
+    private static final FsPermission USER_GROUP_OPEN_PERMISSIONS = FsPermission.createImmutable((short) 0770);
 
-    private static final FsPermissionInterface USER_GROUP_OPEN_FILE_PERMISSIONS = FsPermission.createImmutable((short) 0660);
+    private static final FsPermission USER_GROUP_OPEN_FILE_PERMISSIONS = FsPermission.createImmutable((short) 0660);
 
-    private static final FsPermissionInterface USER_GROUP_OPEN_TEST_UMASK = FsPermission.createImmutable((short) (0770 ^ 0777));
+    private static final FsPermission USER_GROUP_OPEN_TEST_UMASK = FsPermission.createImmutable((short) (0770 ^ 0777));
 
     // ---------
-    private static final FsPermissionInterface BLANK_PERMISSIONS = FsPermission.createImmutable((short) 0000);
+    private static final FsPermission BLANK_PERMISSIONS = FsPermission.createImmutable((short) 0000);
 
     // parent directory permissions when creating a directory with blank (000)
     // permissions - it always add the -wx------ bits to the parent so that
     // it can create the child
-    private static final FsPermissionInterface PARENT_PERMS_FOR_BLANK_PERMISSIONS = FsPermission.createImmutable((short) 0300);
+    private static final FsPermission PARENT_PERMS_FOR_BLANK_PERMISSIONS = FsPermission.createImmutable((short) 0300);
 
-    private static final FsPermissionInterface BLANK_TEST_UMASK = FsPermission.createImmutable((short) (0000 ^ 0777));
+    private static final FsPermission BLANK_TEST_UMASK = FsPermission.createImmutable((short) (0000 ^ 0777));
 
     // rwxrwxrwx
-    private static final FsPermissionInterface WIDE_OPEN_PERMISSIONS = FsPermission.createImmutable((short) 0777);
+    private static final FsPermission WIDE_OPEN_PERMISSIONS = FsPermission.createImmutable((short) 0777);
 
-    private static final FsPermissionInterface WIDE_OPEN_FILE_PERMISSIONS = FsPermission.createImmutable((short) 0666);
+    private static final FsPermission WIDE_OPEN_FILE_PERMISSIONS = FsPermission.createImmutable((short) 0666);
 
-    private static final FsPermissionInterface WIDE_OPEN_TEST_UMASK = FsPermission.createImmutable((short) (0777 ^ 0777));
+    private static final FsPermission WIDE_OPEN_TEST_UMASK = FsPermission.createImmutable((short) (0777 ^ 0777));
 
     @BeforeClass
     public static void clusterSetupAtBegining() throws IOException, LoginException, URISyntaxException {

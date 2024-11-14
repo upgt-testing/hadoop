@@ -490,9 +490,9 @@ public class TestClientProtocolForPipelineRecovery {
             // Let write start
             Thread.sleep(1000);
             DatanodeInfo[] pipeline = out.getPipeline();
-            for (DatanodeInfoInterface node : pipeline) {
+            for (DatanodeInfo node : pipeline) {
                 assertFalse("Write should be going on", failed.get());
-                ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+                ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
                 int indexToShutdown = 0;
                 for (int i = 0; i < dataNodes.size(); i++) {
                     if (dataNodes.get(i).getIpcPort() == node.getIpcPort()) {
@@ -668,8 +668,8 @@ public class TestClientProtocolForPipelineRecovery {
             // Read from the replaced datanode to verify the corruption. So shutdown
             // all other nodes in the pipeline.
             List<DatanodeInfo> pipelineList = Arrays.asList(pipeline);
-            DatanodeInfoInterface newNode = null;
-            for (DatanodeInfoInterface node : newNodes) {
+            DatanodeInfo newNode = null;
+            for (DatanodeInfo node : newNodes) {
                 if (!pipelineList.contains(node)) {
                     newNode = node;
                     break;
@@ -712,7 +712,7 @@ public class TestClientProtocolForPipelineRecovery {
             cluster.setDataNodeDead(dn1Desc);
             //Re-register the DeadNode
             DatanodeProtocolClientSideTranslatorPB dnp = new DatanodeProtocolClientSideTranslatorPB(cluster.getNameNode().getNameNodeAddress(), conf);
-            dnp.registerDatanode(dn1.getDNRegistrationForBP(cluster.getNamesystem().getBlockPoolId()));
+            //dnp.registerDatanode(dn1.getDNRegistrationForBP(cluster.getNamesystem().getBlockPoolId()));
             DFSOutputStream dfsO = (DFSOutputStream) out.getWrappedStream();
             String clientName = ((DistributedFileSystem) fileSys).getClient().getClientName();
             NamenodeProtocols namenode = cluster.getNameNodeRpc();

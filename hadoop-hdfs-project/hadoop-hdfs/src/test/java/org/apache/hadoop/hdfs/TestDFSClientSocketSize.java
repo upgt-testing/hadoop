@@ -86,7 +86,9 @@ public class TestDFSClientSocketSize {
         try {
             cluster.waitActive();
             LOG.info("MiniDockerDFSCluster started.");
-            try (Socket socket = DataStreamer.createSocketForPipeline(new DatanodeInfoBuilder().setNodeID(cluster.getDataNodes().get(0).getDatanodeId()).build(), 1, cluster.getFileSystem().getClient())) {
+            DatanodeIDInterface dnId = cluster.getDataNodes().get(0).getDatanodeId();
+            try (Socket socket = DataStreamer.createSocketForPipeline(new DatanodeInfoBuilder().setNodeID(dnId.getIpAddr(), dnId.getHostName(), dnId.getDatanodeUuid(), dnId.getXferPort(), dnId.getInfoPort(), dnId.getInfoSecurePort(), dnId.getIpcPort()).build(),
+                    1, cluster.getFileSystem().getClient())) {
                 return socket.getSendBufferSize();
             }
         } finally {
