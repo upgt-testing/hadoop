@@ -15,14 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.hadoop.cli;
 
 import java.io.File;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+
 import static org.junit.Assert.assertTrue;
+
 import org.apache.hadoop.cli.util.CLICommand;
 import org.apache.hadoop.cli.util.CLICommandCryptoAdmin;
 import org.apache.hadoop.cli.util.CLICommandTypes;
@@ -39,7 +41,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.tools.CryptoAdmin;
 import org.apache.hadoop.security.authorize.PolicyProvider;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -47,118 +49,126 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 
 public class TestCryptoAdminCLI extends CLITestHelperDFS {
+  protected MiniDFSCluster dfsCluster = null;
+  protected FileSystem fs = null;
+  protected String namenode = null;
+  private static File tmpDir;
 
-    protected MiniDockerDFSCluster dfsCluster = null;
+  @Before
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    conf.setClass(PolicyProvider.POLICY_PROVIDER_CONFIG,
+        HDFSPolicyProvider.class, PolicyProvider.class);
+    conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
+    conf.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 10);
 
-    protected FileSystem fs = null;
+    tmpDir = GenericTestUtils.getTestDir(UUID.randomUUID().toString());
+    final Path jksPath = new Path(tmpDir.toString(), "test.jks");
+    conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
+        JavaKeyStoreProvider.SCHEME_NAME + "://file" + jksPath.toUri());
 
-    protected String namenode = null;
+    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    dfsCluster.waitClusterUp();
+    createAKey("mykey", conf);
+    namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
 
-    private static File tmpDir;
+    username = System.getProperty("user.name");
 
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        conf.setClass(PolicyProvider.POLICY_PROVIDER_CONFIG, HDFSPolicyProvider.class, PolicyProvider.class);
-        conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-        conf.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 10);
-        tmpDir = GenericTestUtils.getTestDir(UUID.randomUUID().toString());
-        final Path jksPath = new Path(tmpDir.toString(), "test.jks");
-        conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH, JavaKeyStoreProvider.SCHEME_NAME + "://file" + jksPath.toUri());
-        dfsCluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(1).build();
-        dfsCluster.waitClusterUp();
-        createAKey("mykey", conf);
-        namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
-        username = System.getProperty("user.name");
-        fs = dfsCluster.getFileSystem();
-        assertTrue("Not an HDFS: " + fs.getUri(), fs instanceof DistributedFileSystem);
+    fs = dfsCluster.getFileSystem();
+    assertTrue("Not an HDFS: " + fs.getUri(),
+        fs instanceof DistributedFileSystem);
+  }
+
+  @After
+  @Override
+  public void tearDown() throws Exception {
+    if (fs != null) {
+      fs.close();
+      fs = null;
+    }
+    if (dfsCluster != null) {
+      dfsCluster.shutdown();
+      dfsCluster = null;
+    }
+    Thread.sleep(2000);
+    super.tearDown();
+  }
+
+  /* Helper function to create a key in the Key Provider. */
+  private void createAKey(String keyName, Configuration conf)
+    throws NoSuchAlgorithmException, IOException {
+    final KeyProvider provider =
+        dfsCluster.getNameNode().getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    provider.createKey(keyName, options);
+    provider.flush();
     }
 
-    @After
+  @Override
+  protected String getTestFile() {
+    return "testCryptoConf.xml";
+  }
+
+  @Override
+  protected String expandCommand(final String cmd) {
+    String expCmd = cmd;
+    expCmd = expCmd.replaceAll("NAMENODE", namenode);
+    expCmd = expCmd.replaceAll("#LF#",
+        System.getProperty("line.separator"));
+    expCmd = super.expandCommand(expCmd);
+    return expCmd;
+  }
+
+  @Override
+  protected TestConfigFileParser getConfigParser() {
+    return new TestConfigFileParserCryptoAdmin();
+  }
+
+  private class TestConfigFileParserCryptoAdmin extends
+      CLITestHelperDFS.TestConfigFileParserDFS {
     @Override
-    public void tearDown() throws Exception {
-        if (fs != null) {
-            fs.close();
-            fs = null;
+    public void endElement(String uri, String localName, String qName)
+        throws SAXException {
+      if (qName.equals("crypto-admin-command")) {
+        if (testCommands != null) {
+          testCommands.add(new CLITestCmdCryptoAdmin(charString,
+              new CLICommandCryptoAdmin()));
+        } else if (cleanupCommands != null) {
+          cleanupCommands.add(new CLITestCmdCryptoAdmin(charString,
+              new CLICommandCryptoAdmin()));
         }
-        if (dfsCluster != null) {
-            dfsCluster.shutdown();
-            dfsCluster = null;
-        }
-        Thread.sleep(2000);
-        super.tearDown();
+      } else {
+        super.endElement(uri, localName, qName);
+      }
     }
+  }
 
-    /* Helper function to create a key in the Key Provider. */
-    private void createAKey(String keyName, Configuration conf) throws NoSuchAlgorithmException, IOException {
-        final KeyProviderCryptoExtensionInterface provider = dfsCluster.getNameNode().getNamesystem().getProvider();
-        final KeyProvider.OptionsInterface options = KeyProvider.options(conf);
-        provider.createKey(keyName, options);
-        provider.flush();
+  private class CLITestCmdCryptoAdmin extends CLITestCmd {
+    public CLITestCmdCryptoAdmin(String str, CLICommandTypes type) {
+      super(str, type);
     }
 
     @Override
-    protected String getTestFile() {
-        return "testCryptoConf.xml";
+    public CommandExecutor getExecutor(String tag, Configuration conf)
+        throws IllegalArgumentException {
+      if (getType() instanceof CLICommandCryptoAdmin) {
+        return new CryptoAdminCmdExecutor(tag, new CryptoAdmin(conf));
+      }
+      return super.getExecutor(tag, conf);
     }
+  }
 
-    @Override
-    protected String expandCommand(final String cmd) {
-        String expCmd = cmd;
-        expCmd = expCmd.replaceAll("NAMENODE", namenode);
-        expCmd = expCmd.replaceAll("#LF#", System.getProperty("line.separator"));
-        expCmd = super.expandCommand(expCmd);
-        return expCmd;
-    }
+  @Override
+  protected Result execute(CLICommand cmd) throws Exception {
+    return cmd.getExecutor(namenode, conf).executeCommand(cmd.getCmd());
+  }
 
-    @Override
-    protected TestConfigFileParser getConfigParser() {
-        return new TestConfigFileParserCryptoAdmin();
-    }
-
-    private class TestConfigFileParserCryptoAdmin extends CLITestHelperDFS.TestConfigFileParserDFS {
-
-        @Override
-        public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (qName.equals("crypto-admin-command")) {
-                if (testCommands != null) {
-                    testCommands.add(new CLITestCmdCryptoAdmin(charString, new CLICommandCryptoAdmin()));
-                } else if (cleanupCommands != null) {
-                    cleanupCommands.add(new CLITestCmdCryptoAdmin(charString, new CLICommandCryptoAdmin()));
-                }
-            } else {
-                super.endElement(uri, localName, qName);
-            }
-        }
-    }
-
-    private class CLITestCmdCryptoAdmin extends CLITestCmd {
-
-        public CLITestCmdCryptoAdmin(String str, CLICommandTypes type) {
-            super(str, type);
-        }
-
-        @Override
-        public CommandExecutor getExecutor(String tag, Configuration conf) throws IllegalArgumentException {
-            if (getType() instanceof CLICommandCryptoAdmin) {
-                return new CryptoAdminCmdExecutor(tag, new CryptoAdmin(conf));
-            }
-            return super.getExecutor(tag, conf);
-        }
-    }
-
-    @Override
-    protected Result execute(CLICommand cmd) throws Exception {
-        return cmd.getExecutor(namenode, conf).executeCommand(cmd.getCmd());
-    }
-
-    @Test
-    @Override
-    public void testAll() {
-        super.testAll();
-    }
+  @Test
+  @Override
+  public void testAll () {
+    super.testAll();
+  }
 }

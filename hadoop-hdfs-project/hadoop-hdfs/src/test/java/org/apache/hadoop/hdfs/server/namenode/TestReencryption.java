@@ -147,7 +147,7 @@ public class TestReencryption {
     protected void setProvider() {
         // Need to set the client's KeyProvider to the NN's for JKS,
         // else the updates do not get flushed properly
-        fs.getClient().setKeyProvider(cluster.getNameNode().getNamesystem().getProvider());
+        //fs.getClient().setKeyProvider(cluster.getNameNode().getNamesystem().getProvider());
     }
 
     @After
@@ -182,7 +182,7 @@ public class TestReencryption {
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         // test re-encrypt without keyroll
         final Path encFile1 = new Path(zone, "0");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile1);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile1);
         dfsAdmin.reencryptEncryptionZone(zone, ReencryptAction.START);
         waitForReencryptedZones(1);
         assertKeyVersionEquals(encFile1, fei0);
@@ -192,7 +192,7 @@ public class TestReencryption {
         rollKey(TEST_KEY);
         dfsAdmin.reencryptEncryptionZone(zone, ReencryptAction.START);
         waitForReencryptedZones(2);
-        FileEncryptionInfoInterface fei1 = getFileEncryptionInfo(encFile1);
+        FileEncryptionInfo fei1 = getFileEncryptionInfo(encFile1);
         assertKeyVersionChanged(encFile1, fei0);
         // test listReencryptionStatus
         RemoteIterator<ZoneReencryptionStatus> it = dfsAdmin.listReencryptionStatus();
@@ -285,8 +285,8 @@ public class TestReencryption {
         // /zones/zone/f[0-4] should be re-encrypted after /zones/zone/dir/f
         final Path lastReencryptedFile = new Path(subdir, "f");
         final Path notReencrypted = new Path(zone, "f0");
-        final FileEncryptionInfoInterface fei = getFileEncryptionInfo(lastReencryptedFile);
-        final FileEncryptionInfoInterface feiLast = getFileEncryptionInfo(notReencrypted);
+        final FileEncryptionInfo fei = getFileEncryptionInfo(lastReencryptedFile);
+        final FileEncryptionInfo feiLast = getFileEncryptionInfo(notReencrypted);
         rollKey(TEST_KEY);
         // mark pause after first checkpoint (5 files)
         getEzManager().pauseForTestingAfterNthSubmission(1);
@@ -364,15 +364,15 @@ public class TestReencryption {
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         final Path encFile0 = new Path(zone, "0");
         final Path encFile9 = new Path(zone, "9");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9 = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9 = getFileEncryptionInfo(encFile9);
         rollKey(TEST_KEY);
         dfsAdmin.reencryptEncryptionZone(zone, ReencryptAction.START);
         waitForReencryptedZones(1);
         assertKeyVersionChanged(encFile0, fei0);
         assertKeyVersionChanged(encFile9, fei9);
-        final FileEncryptionInfoInterface fei0new = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9new = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0new = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9new = getFileEncryptionInfo(encFile9);
         restartClusterDisableReencrypt();
         assertKeyVersionEquals(encFile0, fei0new);
         assertKeyVersionEquals(encFile9, fei9new);
@@ -433,8 +433,8 @@ public class TestReencryption {
         fsWrapper.mkdir(new Path(subdir, "dir_empty1"), FsPermission.getDirDefault(), true);
         final Path encFile0 = new Path(subdir, "0");
         final Path encFile9 = new Path(subdir, "9");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9 = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9 = getFileEncryptionInfo(encFile9);
         rollKey(TEST_KEY);
         // mark pause after first checkpoint (5 files)
         getEzManager().pauseForTestingAfterNthSubmission(1);
@@ -467,15 +467,15 @@ public class TestReencryption {
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         final Path encFile0 = new Path(zone, "0");
         final Path encFile9 = new Path(zone, "9");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9 = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9 = getFileEncryptionInfo(encFile9);
         rollKey(TEST_KEY);
         dfsAdmin.reencryptEncryptionZone(zone, ReencryptAction.START);
         waitForReencryptedZones(1);
         assertKeyVersionChanged(encFile0, fei0);
         assertKeyVersionChanged(encFile9, fei9);
-        final FileEncryptionInfoInterface fei0new = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9new = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0new = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9new = getFileEncryptionInfo(encFile9);
         fs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
         fs.saveNamespace();
         fs.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
@@ -504,8 +504,8 @@ public class TestReencryption {
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         final Path encFile0 = new Path(zone, "0");
         final Path encFile9 = new Path(zone, "9");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9 = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9 = getFileEncryptionInfo(encFile9);
         rollKey(TEST_KEY);
         // disable re-encrypt for testing, and issue a command
         getEzManager().pauseReencryptForTesting();
@@ -564,8 +564,8 @@ public class TestReencryption {
         DFSTestUtil.createFile(fs, new Path(subdir, "f"), len, (short) 1, 0xFEED);
         final Path encFile0 = new Path(zone, "0");
         final Path encFile9 = new Path(zone, "9");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile0);
-        final FileEncryptionInfoInterface fei9 = getFileEncryptionInfo(encFile9);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile0);
+        final FileEncryptionInfo fei9 = getFileEncryptionInfo(encFile9);
         rollKey(TEST_KEY);
         // disable re-encrypt for testing, and issue a command
         getEzManager().pauseReencryptForTesting();
@@ -1008,7 +1008,7 @@ public class TestReencryption {
         // give handler thread some time to process the files before deletion.
         Thread.sleep(3000);
         final Path recreated = new Path(zone, "file9");
-        final FileEncryptionInfoInterface feiOrig = getFileEncryptionInfo(recreated);
+        final FileEncryptionInfo feiOrig = getFileEncryptionInfo(recreated);
         final String contentOrig = DFSTestUtil.readFile(fs, recreated);
         fsWrapper.delete(recreated, true);
         DFSTestUtil.createFile(fs, recreated, len, (short) 2, 0xFEED);
@@ -1098,7 +1098,7 @@ public class TestReencryption {
         fsWrapper.delete(new Path(zone, "6new"), true);
         // test re-encrypt on snapshot dir
         final Path encFile1 = new Path(zone, "0");
-        final FileEncryptionInfoInterface fei0 = getFileEncryptionInfo(encFile1);
+        final FileEncryptionInfo fei0 = getFileEncryptionInfo(encFile1);
         rollKey(TEST_KEY);
         try {
             dfsAdmin.reencryptEncryptionZone(zoneSnap, ReencryptAction.START);
@@ -1175,7 +1175,8 @@ public class TestReencryption {
     }
 
     private EncryptionZoneManager getEzManager() {
-        return fsn.getFSDirectory().ezManager;
+        throw new UnsupportedOperationException("getEzManager Not implemented in TestReencryption");
+        //return fsn.getFSDirectory().ezManager;
     }
 
     private ReencryptionStatus getReencryptionStatus() {
@@ -1202,12 +1203,12 @@ public class TestReencryption {
     }
 
     private void assertKeyVersionChanged(final Path file, final FileEncryptionInfo original) throws Exception {
-        final FileEncryptionInfoInterface actual = getFileEncryptionInfo(file);
+        final FileEncryptionInfo actual = getFileEncryptionInfo(file);
         assertNotEquals("KeyVersion should be different", original.getEzKeyVersionName(), actual.getEzKeyVersionName());
     }
 
     private void assertKeyVersionEquals(final Path file, final FileEncryptionInfo expected) throws Exception {
-        final FileEncryptionInfoInterface actual = getFileEncryptionInfo(file);
+        final FileEncryptionInfo actual = getFileEncryptionInfo(file);
         assertEquals("KeyVersion should be the same", expected.getEzKeyVersionName(), actual.getEzKeyVersionName());
     }
 

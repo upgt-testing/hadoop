@@ -98,19 +98,19 @@ public class DataNodeTestUtils {
     }
 
     public static void triggerDeletionReport(DataNodeInterface dn) throws IOException {
-        for (BPOfferService bpos : dn.getAllBpOs()) {
+        for (BPOfferServiceInterface bpos : dn.getAllBpOs()) {
             bpos.triggerDeletionReportForTests();
         }
     }
 
     public static void triggerHeartbeat(DataNodeInterface dn) throws IOException {
-        for (BPOfferService bpos : dn.getAllBpOs()) {
+        for (BPOfferServiceInterface bpos : dn.getAllBpOs()) {
             bpos.triggerHeartbeatForTests();
         }
     }
 
     public static void triggerBlockReport(DataNodeInterface dn) throws IOException {
-        for (BPOfferService bpos : dn.getAllBpOs()) {
+        for (BPOfferServiceInterface bpos : dn.getAllBpOs()) {
             bpos.triggerBlockReportForTests();
         }
     }

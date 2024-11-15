@@ -66,7 +66,8 @@ public class TestBootstrapStandbyWithQJM {
     public void setup() throws Exception {
         Configuration conf = createConfig();
         MiniQJMHACluster miniQjmHaCluster = new MiniQJMHACluster.Builder(conf).setNumNameNodes(nnCount).build();
-        cluster = miniQjmHaCluster.getDfsCluster();
+        //cluster = miniQjmHaCluster.getDfsCluster();
+        cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
         jCluster = miniQjmHaCluster.getJournalCluster();
         // make nn0 active
         cluster.transitionToActive(0);

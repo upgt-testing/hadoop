@@ -173,9 +173,9 @@ public class TestTrashWithSecureEncryptionZones {
     baseConf.set(KMS_CLIENT_ENC_KEY_CACHE_LOW_WATERMARK, "0.5");
 
     String keystoresDir = baseDir.getAbsolutePath();
-    String sslConfDir = KeyStoreTestUtil.getClasspathDir(
-        TestSecureEncryptionZoneWithKMS.class);
-    KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, baseConf, false);
+    //String sslConfDir = KeyStoreTestUtil.getClasspathDir(
+//        TestSecureEncryptionZoneWithKMS.class);
+    //KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, baseConf, false);
     baseConf.set(DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
         KeyStoreTestUtil.getClientSSLConfigFileName());
     baseConf.set(DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,

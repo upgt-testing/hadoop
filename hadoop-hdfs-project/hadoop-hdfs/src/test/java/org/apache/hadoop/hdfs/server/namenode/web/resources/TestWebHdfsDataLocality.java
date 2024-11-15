@@ -18,10 +18,12 @@
 package org.apache.hadoop.hdfs.server.namenode.web.resources;
 
 import static org.mockito.Mockito.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -30,7 +32,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
@@ -48,180 +50,225 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.apache.hadoop.hdfs.remoteProxies.*;
 
 /**
  * Test WebHDFS which provides data locality using HTTP redirection.
  */
 public class TestWebHdfsDataLocality {
+  static final Logger LOG =
+      LoggerFactory.getLogger(TestWebHdfsDataLocality.class);
+  {
+    DFSTestUtil.setNameNodeLogLevel(Level.ALL);
+  }
+  
+  private static final String RACK0 = "/rack0";
+  private static final String RACK1 = "/rack1";
+  private static final String RACK2 = "/rack2";
 
-    static final Logger LOG = LoggerFactory.getLogger(TestWebHdfsDataLocality.class);
+  private static final String LOCALHOST =
+      InetAddress.getLoopbackAddress().getHostName();
 
-    {
-        DFSTestUtil.setNameNodeLogLevel(Level.ALL);
-    }
+  @Rule
+  public final ExpectedException exception = ExpectedException.none();
 
-    private static final String RACK0 = "/rack0";
+  @Test
+  public void testDataLocality() throws Exception {
+    final Configuration conf = WebHdfsTestUtil.createConf();
+    final String[] racks = {RACK0, RACK0, RACK1, RACK1, RACK2, RACK2};
+    final int nDataNodes = racks.length;
+    LOG.info("nDataNodes=" + nDataNodes + ", racks=" + Arrays.asList(racks));
 
-    private static final String RACK1 = "/rack1";
+    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+        .numDataNodes(nDataNodes)
+        .racks(racks)
+        .build();
+    try {
+      cluster.waitActive();
 
-    private static final String RACK2 = "/rack2";
+      final DistributedFileSystem dfs = cluster.getFileSystem();
+      final NameNode namenode = cluster.getNameNode();
+      final DatanodeManager dm = namenode.getNamesystem().getBlockManager(
+          ).getDatanodeManager();
+      LOG.info("dm=" + dm);
+  
+      final long blocksize = DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT;
+      final String f = "/foo";
 
-    private static final String LOCALHOST = InetAddress.getLoopbackAddress().getHostName();
+      { //test CREATE
+        for(int i = 0; i < nDataNodes; i++) {
+          //set client address to a particular datanode
+          final DataNode dn = cluster.getDataNodes().get(i);
+          final String ipAddr = dm.getDatanode(dn.getDatanodeId()).getIpAddr();
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
-    @Test
-    public void testDataLocality() throws Exception {
-        final Configuration conf = WebHdfsTestUtil.createConf();
-        final String[] racks = { RACK0, RACK0, RACK1, RACK1, RACK2, RACK2 };
-        final int nDataNodes = racks.length;
-        LOG.info("nDataNodes=" + nDataNodes + ", racks=" + Arrays.asList(racks));
-        final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(nDataNodes).racks(racks).build();
-        try {
-            cluster.waitActive();
-            final DistributedFileSystem dfs = cluster.getFileSystem();
-            final NameNodeInterface namenode = cluster.getNameNode();
-            final DatanodeManagerInterface dm = namenode.getNamesystem().getBlockManager().getDatanodeManager();
-            LOG.info("dm=" + dm);
-            final long blocksize = DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT;
-            final String f = "/foo";
-            {
-                //test CREATE
-                for (int i = 0; i < nDataNodes; i++) {
-                    //set client address to a particular datanode
-                    final DataNodeInterface dn = cluster.getDataNodes().get(i);
-                    final String ipAddr = dm.getDatanode(dn.getDatanodeId()).getIpAddr();
-                    //The chosen datanode must be the same as the client address
-                    final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, PutOpParam.Op.CREATE, -1L, blocksize, null, LOCALHOST, null);
-                    Assert.assertEquals(ipAddr, chosen.getIpAddr());
-                }
-            }
-            //create a file with one replica.
-            final Path p = new Path(f);
-            final FSDataOutputStream out = dfs.create(p, (short) 1);
-            out.write(1);
-            out.close();
-            //get replica location.
-            final LocatedBlocks locatedblocks = NameNodeAdapter.getBlockLocations(namenode, f, 0, 1);
-            final List<LocatedBlock> lb = locatedblocks.getLocatedBlocks();
-            Assert.assertEquals(1, lb.size());
-            final DatanodeInfo[] locations = lb.get(0).getLocations();
-            Assert.assertEquals(1, locations.length);
-            final DatanodeInfoInterface expected = locations[0];
-            //For GETFILECHECKSUM, OPEN and APPEND,
-            //the chosen datanode must be the same as the replica location.
-            {
-                //test GETFILECHECKSUM
-                final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, GetOpParam.Op.GETFILECHECKSUM, -1L, blocksize, null, LOCALHOST, status);
-                Assert.assertEquals(expected, chosen);
-            }
-            {
-                //test OPEN
-                final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, GetOpParam.Op.OPEN, 0, blocksize, null, LOCALHOST, status);
-                Assert.assertEquals(expected, chosen);
-            }
-            {
-                //test APPEND
-                final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, PostOpParam.Op.APPEND, -1L, blocksize, null, LOCALHOST, status);
-                Assert.assertEquals(expected, chosen);
-            }
-        } finally {
-            cluster.shutdown();
+          //The chosen datanode must be the same as the client address
+          final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+              namenode, f, PutOpParam.Op.CREATE, -1L, blocksize, null,
+              LOCALHOST, null);
+          Assert.assertEquals(ipAddr, chosen.getIpAddr());
         }
-    }
+      }
+  
+      //create a file with one replica.
+      final Path p = new Path(f);
+      final FSDataOutputStream out = dfs.create(p, (short)1);
+      out.write(1);
+      out.close();
+  
+      //get replica location.
+      final LocatedBlocks locatedblocks = NameNodeAdapter.getBlockLocations(
+          namenode, f, 0, 1);
+      final List<LocatedBlock> lb = locatedblocks.getLocatedBlocks();
+      Assert.assertEquals(1, lb.size());
+      final DatanodeInfo[] locations = lb.get(0).getLocations();
+      Assert.assertEquals(1, locations.length);
+      final DatanodeInfo expected = locations[0];
+      
+      //For GETFILECHECKSUM, OPEN and APPEND,
+      //the chosen datanode must be the same as the replica location.
 
-    @Test
-    public void testExcludeDataNodes() throws Exception {
-        final Configuration conf = WebHdfsTestUtil.createConf();
-        final String[] racks = { RACK0, RACK0, RACK1, RACK1, RACK2, RACK2 };
-        final String[] hosts = { "DataNode1", "DataNode2", "DataNode3", "DataNode4", "DataNode5", "DataNode6" };
-        final int nDataNodes = hosts.length;
-        LOG.info("nDataNodes=" + nDataNodes + ", racks=" + Arrays.asList(racks) + ", hosts=" + Arrays.asList(hosts));
-        final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).hosts(hosts).numDataNodes(nDataNodes).racks(racks).build();
-        try {
-            cluster.waitActive();
-            final DistributedFileSystem dfs = cluster.getFileSystem();
-            final NameNodeInterface namenode = cluster.getNameNode();
-            final DatanodeManagerInterface dm = namenode.getNamesystem().getBlockManager().getDatanodeManager();
-            LOG.info("dm=" + dm);
-            final long blocksize = DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT;
-            final String f = "/foo";
-            //create a file with three replica.
-            final Path p = new Path(f);
-            final FSDataOutputStream out = dfs.create(p, (short) 3);
-            out.write(1);
-            out.close();
-            //get replica location.
-            final LocatedBlocks locatedblocks = NameNodeAdapter.getBlockLocations(namenode, f, 0, 1);
-            final List<LocatedBlock> lb = locatedblocks.getLocatedBlocks();
-            Assert.assertEquals(1, lb.size());
-            final DatanodeInfo[] locations = lb.get(0).getLocations();
-            Assert.assertEquals(3, locations.length);
-            //For GETFILECHECKSUM, OPEN and APPEND,
-            //the chosen datanode must be different with exclude nodes.
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < 2; i++) {
-                sb.append(locations[i].getXferAddr());
-                {
-                    // test GETFILECHECKSUM
-                    final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                    final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, GetOpParam.Op.GETFILECHECKSUM, -1L, blocksize, sb.toString(), LOCALHOST, status);
-                    for (int j = 0; j <= i; j++) {
-                        Assert.assertNotEquals(locations[j].getHostName(), chosen.getHostName());
-                    }
-                }
-                {
-                    // test OPEN
-                    final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                    final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, GetOpParam.Op.OPEN, 0, blocksize, sb.toString(), LOCALHOST, status);
-                    for (int j = 0; j <= i; j++) {
-                        Assert.assertNotEquals(locations[j].getHostName(), chosen.getHostName());
-                    }
-                }
-                {
-                    // test APPEND
-                    final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
-                    final DatanodeInfoInterface chosen = NamenodeWebHdfsMethods.chooseDatanode(namenode, f, PostOpParam.Op.APPEND, -1L, blocksize, sb.toString(), LOCALHOST, status);
-                    for (int j = 0; j <= i; j++) {
-                        Assert.assertNotEquals(locations[j].getHostName(), chosen.getHostName());
-                    }
-                }
-                sb.append(",");
-            }
-        } finally {
-            cluster.shutdown();
+      { //test GETFILECHECKSUM
+        final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+        final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+            namenode, f, GetOpParam.Op.GETFILECHECKSUM, -1L, blocksize, null,
+            LOCALHOST, status);
+        Assert.assertEquals(expected, chosen);
+      }
+  
+      { //test OPEN
+        final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+        final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+            namenode, f, GetOpParam.Op.OPEN, 0, blocksize, null,
+            LOCALHOST, status);
+        Assert.assertEquals(expected, chosen);
+      }
+
+      { //test APPEND
+        final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+        final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+            namenode, f, PostOpParam.Op.APPEND, -1L, blocksize, null,
+            LOCALHOST, status);
+        Assert.assertEquals(expected, chosen);
+      }
+    } finally {
+      cluster.shutdown();
+    }
+  }
+  
+  @Test
+  public void testExcludeDataNodes() throws Exception {
+    final Configuration conf = WebHdfsTestUtil.createConf();
+    final String[] racks = {RACK0, RACK0, RACK1, RACK1, RACK2, RACK2};
+    final String[] hosts = {"DataNode1", "DataNode2", "DataNode3","DataNode4","DataNode5","DataNode6"};
+    final int nDataNodes = hosts.length;
+    LOG.info("nDataNodes=" + nDataNodes + ", racks=" + Arrays.asList(racks)
+        + ", hosts=" + Arrays.asList(hosts));
+
+    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+        .hosts(hosts).numDataNodes(nDataNodes).racks(racks).build();
+    
+    try {
+      cluster.waitActive();
+
+      final DistributedFileSystem dfs = cluster.getFileSystem();
+      final NameNode namenode = cluster.getNameNode();
+      final DatanodeManager dm = namenode.getNamesystem().getBlockManager(
+          ).getDatanodeManager();
+      LOG.info("dm=" + dm);
+  
+      final long blocksize = DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT;
+      final String f = "/foo";
+      
+      //create a file with three replica.
+      final Path p = new Path(f);
+      final FSDataOutputStream out = dfs.create(p, (short)3);
+      out.write(1);
+      out.close(); 
+      
+      //get replica location.
+      final LocatedBlocks locatedblocks = NameNodeAdapter.getBlockLocations(
+          namenode, f, 0, 1);
+      final List<LocatedBlock> lb = locatedblocks.getLocatedBlocks();
+      Assert.assertEquals(1, lb.size());
+      final DatanodeInfo[] locations = lb.get(0).getLocations();
+      Assert.assertEquals(3, locations.length);
+      
+      
+      //For GETFILECHECKSUM, OPEN and APPEND,
+      //the chosen datanode must be different with exclude nodes.
+
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < 2; i++) {
+        sb.append(locations[i].getXferAddr());
+        { // test GETFILECHECKSUM
+          final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+          final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+              namenode, f, GetOpParam.Op.GETFILECHECKSUM, -1L, blocksize,
+              sb.toString(), LOCALHOST, status);
+          for (int j = 0; j <= i; j++) {
+            Assert.assertNotEquals(locations[j].getHostName(),
+                chosen.getHostName());
+          }
         }
-    }
 
-    @Test
-    public void testExcludeWrongDataNode() throws Exception {
-        final Configuration conf = WebHdfsTestUtil.createConf();
-        final String[] racks = { RACK0 };
-        final String[] hosts = { "DataNode1" };
-        final int nDataNodes = hosts.length;
-        final MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).hosts(hosts).numDataNodes(nDataNodes).racks(racks).build();
-        try {
-            cluster.waitActive();
-            final NameNodeInterface namenode = cluster.getNameNode();
-            NamenodeWebHdfsMethods.chooseDatanode(namenode, "/path", PutOpParam.Op.CREATE, 0, DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT, "DataNode2", LOCALHOST, null);
-        } catch (Exception e) {
-            Assert.fail("Failed to exclude DataNode2" + e.getMessage());
-        } finally {
-            cluster.shutdown();
+        { // test OPEN
+          final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+          final DatanodeInfo chosen = NamenodeWebHdfsMethods.chooseDatanode(
+              namenode, f, GetOpParam.Op.OPEN, 0, blocksize, sb.toString(),
+              LOCALHOST, status);
+          for (int j = 0; j <= i; j++) {
+            Assert.assertNotEquals(locations[j].getHostName(),
+                chosen.getHostName());
+          }
         }
+  
+        { // test APPEND
+          final HdfsFileStatus status = dfs.getClient().getFileInfo(f);
+          final DatanodeInfo chosen = NamenodeWebHdfsMethods
+              .chooseDatanode(namenode, f, PostOpParam.Op.APPEND, -1L,
+                  blocksize, sb.toString(), LOCALHOST, status);
+          for (int j = 0; j <= i; j++) {
+            Assert.assertNotEquals(locations[j].getHostName(),
+                chosen.getHostName());
+          }
+        }
+        
+        sb.append(",");
+      }
+    } finally {
+      cluster.shutdown();
     }
+  }
 
-    @Test
-    public void testChooseDatanodeBeforeNamesystemInit() throws Exception {
-        NameNodeInterface nn = mock(NameNode.class);
-        when(nn.getNamesystem()).thenReturn(null);
-        exception.expect(IOException.class);
-        exception.expectMessage("Namesystem has not been initialized yet.");
-        NamenodeWebHdfsMethods.chooseDatanode(nn, "/path", PutOpParam.Op.CREATE, 0, DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT, null, LOCALHOST, null);
+  @Test
+  public void testExcludeWrongDataNode() throws Exception {
+    final Configuration conf = WebHdfsTestUtil.createConf();
+    final String[] racks = {RACK0};
+    final String[] hosts = {"DataNode1"};
+    final int nDataNodes = hosts.length;
+
+    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+        .hosts(hosts).numDataNodes(nDataNodes).racks(racks).build();
+    try {
+      cluster.waitActive();
+      final NameNode namenode = cluster.getNameNode();
+      NamenodeWebHdfsMethods.chooseDatanode(
+          namenode, "/path", PutOpParam.Op.CREATE, 0,
+          DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT,
+          "DataNode2", LOCALHOST, null);
+    } catch (Exception e) {
+      Assert.fail("Failed to exclude DataNode2" + e.getMessage());
+    } finally {
+      cluster.shutdown();
     }
+  }
+
+  @Test
+  public void testChooseDatanodeBeforeNamesystemInit() throws Exception {
+    NameNode nn = mock(NameNode.class);
+    when(nn.getNamesystem()).thenReturn(null);
+    exception.expect(IOException.class);
+    exception.expectMessage("Namesystem has not been initialized yet.");
+    NamenodeWebHdfsMethods.chooseDatanode(nn, "/path", PutOpParam.Op.CREATE, 0,
+        DFSConfigKeys.DFS_BLOCK_SIZE_DEFAULT, null, LOCALHOST, null);
+  }
 }

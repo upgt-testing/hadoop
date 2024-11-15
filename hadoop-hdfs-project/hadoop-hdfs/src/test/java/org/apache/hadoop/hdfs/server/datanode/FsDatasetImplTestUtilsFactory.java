@@ -34,6 +34,11 @@ public final class FsDatasetImplTestUtilsFactory
   }
 
   @Override
+  public FsDatasetTestUtils newInstance(DataNodeInterface datanode) {
+    return null;
+  }
+
+  @Override
   public int getDefaultNumOfDataDirs() {
     return FsDatasetImplTestUtils.DEFAULT_NUM_OF_DATA_DIRS;
   }

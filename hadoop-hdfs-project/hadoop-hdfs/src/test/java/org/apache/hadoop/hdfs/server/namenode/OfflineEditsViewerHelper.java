@@ -22,16 +22,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.hadoop.hdfs.*;
+import org.apache.hadoop.hdfs.remoteProxies.FSImageInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.common.Util;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeDirType;
@@ -49,7 +47,7 @@ public class OfflineEditsViewerHelper {
       LoggerFactory.getLogger(OfflineEditsViewerHelper.class);
 
     final long           blockSize = 512;
-    MiniDFSCluster cluster   = null;
+    MiniDockerDFSCluster cluster   = null;
     final Configuration  config    = new Configuration();
 
   /**
@@ -66,15 +64,17 @@ public class OfflineEditsViewerHelper {
    * @return edits file name for cluster
    */
   private String getEditsFilename(CheckpointSignature sig) throws IOException {
-    FSImage image = cluster.getNameNode().getFSImage();
+    FSImageInterface image = cluster.getNameNode().getFSImage();
+    throw new UnsupportedOperationException("getEditsFilename Not implemented in OfflineEditsViewerHelper");
     // it was set up to only have ONE StorageDirectory
+    /*
     Iterator<StorageDirectory> it
       = image.getStorage().dirIterator(NameNodeDirType.EDITS);
     StorageDirectory sd = it.next();
     File ret = NNStorage.getFinalizedEditsFile(
         sd, 1, sig.curSegmentTxId - 1);
     assert ret.exists() : "expected " + ret + " exists";
-    return ret.getAbsolutePath();
+    return ret.getAbsolutePath(); */
   }
 
   /**
@@ -100,7 +100,7 @@ public class OfflineEditsViewerHelper {
     config.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     final int numDataNodes = 9;
     cluster =
-      new MiniDFSCluster.Builder(config).manageNameDfsDirs(false)
+      new MiniDockerDFSCluster.Builder(config).manageNameDfsDirs(false)
           .numDataNodes(numDataNodes).build();
     cluster.waitClusterUp();
   }

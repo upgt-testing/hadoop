@@ -134,6 +134,8 @@ public class InternalDataNodeTestUtils {
     String bpid = nn.getNamesystem().getBlockPoolId();
 
     BPOfferService bpos = null;
+    throw new UnsupportedOperationException("Not implemented spyOnBposToNN in DataNodeInterface");
+    /*
     for (BPOfferService thisBpos : dn.getAllBpOs()) {
       if (thisBpos.getBlockPoolId().equals(bpid)) {
         bpos = thisBpos;
@@ -157,6 +159,8 @@ public class InternalDataNodeTestUtils {
     DatanodeProtocolClientSideTranslatorPB spy = Mockito.spy(origNN);
     bpsa.setNameNode(spy);
     return spy;
+
+     */
   }
 
   /**

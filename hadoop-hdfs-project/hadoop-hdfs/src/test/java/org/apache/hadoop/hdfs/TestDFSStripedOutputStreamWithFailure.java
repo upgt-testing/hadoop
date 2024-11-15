@@ -96,7 +96,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
       // shutdown few datanodes to avoid getting sufficient data blocks number
       // of datanodes
       int numDatanodes = dataNodes.size();
@@ -210,7 +210,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeInterface> dataNodes = cluster.getDataNodes();
       // shutdown few data nodes to avoid writing parity blocks
       int killDns = (parityBlocks - 1);
       int numDatanodes = dataNodes.size() - killDns;
