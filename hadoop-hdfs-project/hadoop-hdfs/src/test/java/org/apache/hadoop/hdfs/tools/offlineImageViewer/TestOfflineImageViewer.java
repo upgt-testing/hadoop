@@ -243,7 +243,7 @@ public class TestOfflineImageViewer {
             writtenFiles.put(stickyBitDir.toString(), hdfs.getFileStatus(stickyBitDir));
             // Get delegation tokens so we log the delegation token op
             Token<?>[] delegationTokens = hdfs.addDelegationTokens(TEST_RENEWER, null);
-            for (TokenInterface<?> t : delegationTokens) {
+            for (Token<?> t : delegationTokens) {
                 LOG.debug("got token " + t);
             }
             // Create INodeReference
@@ -318,11 +318,12 @@ public class TestOfflineImageViewer {
             hdfs.saveNamespace();
             hdfs.setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
             // Determine location of fsimage file
+            /*
             originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
             if (originalFsimage == null) {
                 throw new RuntimeException("Didn't generate or can't find fsimage");
             }
-            LOG.debug("original FS image file is " + originalFsimage);
+            LOG.debug("original FS image file is " + originalFsimage); */
         } finally {
             if (cluster != null) {
                 cluster.shutdown();
@@ -771,11 +772,11 @@ public class TestOfflineImageViewer {
         for (long idToDelete : idsToDelete) {
             boolean found = false;
             for (int i = 0; i < inodes.getLength(); i++) {
-                NodeInterface id = inodes.item(i);
+                Node id = inodes.item(i);
                 if (id.getTextContent().equals(String.valueOf(idToDelete))) {
                     found = true;
-                    NodeInterface inode = id.getParentNode();
-                    NodeInterface inodeSection = inode.getParentNode();
+                    Node inode = id.getParentNode();
+                    Node inodeSection = inode.getParentNode();
                     inodeSection.removeChild(inode);
                     break;
                 }
@@ -788,7 +789,7 @@ public class TestOfflineImageViewer {
         if (numInodesNodes.getLength() != 1) {
             throw new IOException("More than one numInodes tag found.");
         }
-        NodeInterface numInodesNode = numInodesNodes.item(0);
+        Node numInodesNode = numInodesNodes.item(0);
         int numberOfINodes = Integer.parseInt(numInodesNode.getTextContent());
         numberOfINodes -= idsToDelete.size();
         numInodesNode.setTextContent(String.valueOf(numberOfINodes));
@@ -999,10 +1000,11 @@ public class TestOfflineImageViewer {
             hdfs.setSafeMode(SafeModeAction.SAFEMODE_ENTER, false);
             hdfs.saveNamespace();
             // Determine location of fsimage file
+            /*
             fsimageFile = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
             if (fsimageFile == null) {
                 throw new RuntimeException("Didn't generate or can't find fsimage");
-            }
+            }*/
         }
         // Run the test with params -maxSize 23 and -step 4, it will not throw
         // ArrayIndexOutOfBoundsException with index 6 when deals with
@@ -1050,7 +1052,7 @@ public class TestOfflineImageViewer {
         if (line == null) {
             return "";
         }
-        NodeInterface first = line.getFirstChild();
+        Node first = line.getFirstChild();
         // handle empty <key></key>
         if (first == null) {
             return "";

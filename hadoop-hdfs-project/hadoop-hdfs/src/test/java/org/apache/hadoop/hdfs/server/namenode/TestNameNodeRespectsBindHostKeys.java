@@ -61,17 +61,17 @@ public class TestNameNodeRespectsBindHostKeys {
     private static String sslConfDir;
 
     private static String getRpcServerAddress(MiniDockerDFSCluster cluster) {
-        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServerInterface) cluster.getNameNodeRpc();
         return rpcServer.getClientRpcServer().getListenerAddress().getAddress().toString();
     }
 
     private static String getServiceRpcServerAddress(MiniDockerDFSCluster cluster) {
-        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServerInterface) cluster.getNameNodeRpc();
         return rpcServer.getServiceRpcServer().getListenerAddress().getAddress().toString();
     }
 
     private static String getLifelineRpcServerAddress(MiniDockerDFSCluster cluster) {
-        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+        NameNodeRpcServerInterface rpcServer = (NameNodeRpcServerInterface) cluster.getNameNodeRpc();
         return rpcServer.getLifelineRpcServer().getListenerAddress().getAddress().toString();
     }
 

@@ -119,7 +119,7 @@ public class TestNameNodeMXBean {
             DatanodeDescriptorInterface maintenanceNode = dm.getDatanode(cluster.getDataNodes().get(1).getDatanodeId());
             maintenanceNode.setInMaintenance();
             String dnXferAddrInMaintenance = maintenanceNode.getXferAddr();
-            FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
             // get attribute "ClusterId"
@@ -261,7 +261,7 @@ public class TestNameNodeMXBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
             cluster.waitActive();
-            FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
             List<String> hosts = new ArrayList<>();
@@ -303,7 +303,7 @@ public class TestNameNodeMXBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
             cluster.waitActive();
-            FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
             List<String> hosts = new ArrayList<>();
@@ -386,7 +386,7 @@ public class TestNameNodeMXBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
             cluster.waitActive();
-            final FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            final FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             final ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystem");
             List<String> hosts = new ArrayList<>();
@@ -462,7 +462,7 @@ public class TestNameNodeMXBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(3).build();
             cluster.waitActive();
-            FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
             List<String> hosts = new ArrayList<>();

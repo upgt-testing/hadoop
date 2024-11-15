@@ -87,7 +87,7 @@ public interface FSEditLogInterface {
     boolean isSegmentOpenWithoutLock();
     void doPreUpgradeOfSharedLog() throws java.io.IOException;
     java.util.List<org.apache.hadoop.hdfs.server.common.Storage.FormatConfirmable> getFormatConfirmables();
-//    java.util.List<org.apache.hadoop.hdfs.server.namenode.JournalSet.JournalAndStream> getJournals();
+    java.util.List<org.apache.hadoop.hdfs.server.namenode.JournalSet.JournalAndStream> getJournals();
     void logStartRollingUpgrade(long arg0);
     long getSharedLogCTime() throws java.io.IOException;
     void logModifyCacheDirectiveInfo(CacheDirectiveInfoInterface arg0, boolean arg1);

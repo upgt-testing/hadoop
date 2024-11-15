@@ -177,7 +177,7 @@ public class TestWebHdfsTokens {
     public void testTokenForNonTokenOp() throws IOException {
         initEnv();
         WebHdfsFileSystem fs = spyWebhdfsInSecureSetup();
-        TokenInterface<?> token = mock(Token.class);
+        Token<?> token = mock(Token.class);
         doReturn(token).when(fs).getDelegationToken(null);
         // should get/set/renew token
         fs.toUrl(GetOpParam.Op.OPEN, null);
@@ -307,10 +307,10 @@ public class TestWebHdfsTokens {
                 }
             };
             Whitebox.setInternalState(fs, "connectionFactory", factory);
-            TokenInterface<?> token1 = fs.getDelegationToken();
+            Token<?> token1 = fs.getDelegationToken();
             Assert.assertEquals(new Text("bar"), token1.getKind());
             final HttpOpParam.Op op = GetOpParam.Op.GETDELEGATIONTOKEN;
-            TokenInterface<DelegationTokenIdentifier> token2 = fs.new FsPathResponseRunner<Token<DelegationTokenIdentifier>>(op, null, new RenewerParam(null)) {
+            Token<DelegationTokenIdentifier> token2 = fs.new FsPathResponseRunner<Token<DelegationTokenIdentifier>>(op, null, new RenewerParam(null)) {
 
                 @Override
                 Token<DelegationTokenIdentifier> decodeResponse(Map<?, ?> json) throws IOException {
@@ -337,7 +337,7 @@ public class TestWebHdfsTokens {
         });
         // verify token ops don't get a token
         Assert.assertNull(fs.getRenewToken());
-        TokenInterface<?> token = fs.getDelegationToken(null);
+        Token<?> token = fs.getDelegationToken(null);
         fs.renewDelegationToken(token);
         fs.cancelDelegationToken(token);
         verify(fs, never()).getDelegationToken();
@@ -363,7 +363,7 @@ public class TestWebHdfsTokens {
         verify(fs, never()).replaceExpiredDelegationToken();
         verify(fs, never()).getDelegationToken(anyString());
         verify(fs, never()).setDelegationToken(any());
-        TokenInterface<?> token2 = fs.getRenewToken();
+        Token<?> token2 = fs.getRenewToken();
         Assert.assertNotNull(token2);
         Assert.assertEquals(fs.getTokenKind(), token.getKind());
         Assert.assertSame(token, token2);

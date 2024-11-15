@@ -97,7 +97,7 @@ public class TestNameNodeRpcServer {
         final String[] racks = new String[] { "/rack1", "/rack2", "/rack3" };
         final String[] hosts = new String[] { "node1", "node2", "node3" };
         MiniDockerDFSCluster cluster = null;
-        final CallerContextInterface original = CallerContext.getCurrent();
+        final CallerContext original = CallerContext.getCurrent();
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).racks(racks).hosts(hosts).numDataNodes(hosts.length).build();
             cluster.waitActive();

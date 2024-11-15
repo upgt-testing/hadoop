@@ -90,7 +90,7 @@ public class TestNameNodeStatusMXBean {
         conf.setTimeDuration(DFSConfigKeys.DFS_DATANODE_OUTLIERS_REPORT_INTERVAL_KEY, 1000, TimeUnit.MILLISECONDS);
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).build();
         try {
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             Assert.assertEquals(datanodes.size(), 1);
             DataNodeInterface datanode = datanodes.get(0);
             String slowDiskPath = "test/data1/slowVolume";

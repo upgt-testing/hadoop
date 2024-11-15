@@ -104,7 +104,7 @@ public class TestWebHDFSForHA {
             fs = spy((WebHdfsFileSystem) FileSystem.get(WEBHDFS_URI, conf));
             FileSystemTestHelper.addFileSystemForTesting(WEBHDFS_URI, conf, fs);
             cluster.transitionToActive(0);
-            TokenInterface<?> token = fs.getDelegationToken(null);
+            Token<?> token = fs.getDelegationToken(null);
             cluster.shutdownNameNode(0);
             cluster.transitionToActive(1);
             token.renew(conf);
@@ -131,7 +131,7 @@ public class TestWebHDFSForHA {
             cluster.waitActive();
             fs = (WebHdfsFileSystem) FileSystem.get(WEBHDFS_URI, conf);
             cluster.transitionToActive(0);
-            TokenInterface<?> token = fs.getDelegationToken(null);
+            Token<?> token = fs.getDelegationToken(null);
             final DelegationTokenIdentifier identifier = new DelegationTokenIdentifier();
             identifier.readFields(new DataInputStream(new ByteArrayInputStream(token.getIdentifier())));
             cluster.transitionToStandby(0);

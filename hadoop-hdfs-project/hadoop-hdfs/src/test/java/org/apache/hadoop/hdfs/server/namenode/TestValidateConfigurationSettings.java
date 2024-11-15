@@ -51,7 +51,7 @@ public class TestValidateConfigurationSettings {
      */
     @Test(expected = BindException.class, timeout = 300000)
     public void testThatMatchingRPCandHttpPortsThrowException() throws IOException {
-        NameNodeInterface nameNode = null;
+        NameNode nameNode = null;
         try {
             Configuration conf = new HdfsConfiguration();
             File nameDir = new File(MiniDockerDFSCluster.getBaseDirectory(), "name");
@@ -87,7 +87,7 @@ public class TestValidateConfigurationSettings {
             FileSystem.setDefaultUri(conf, "hdfs://localhost:" + port1);
             conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, "127.0.0.1:" + port2);
             DFSTestUtil.formatNameNode(conf);
-            NameNodeInterface nameNode = null;
+            NameNode nameNode = null;
             try {
                 // should be OK!
                 nameNode = new NameNode(conf);

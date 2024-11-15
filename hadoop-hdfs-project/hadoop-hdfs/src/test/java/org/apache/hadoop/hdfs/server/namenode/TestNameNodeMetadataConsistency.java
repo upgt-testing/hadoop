@@ -92,7 +92,7 @@ public class TestNameNodeMetadataConsistency {
         // Simulate Namenode forgetting a Block
         cluster.restartNameNode(true);
         cluster.getNameNode().getNamesystem().writeLock();
-        BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
+        BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
         bInfo.delete();
         cluster.getNameNode().getNamesystem().getBlockManager().removeBlock(bInfo);
         cluster.getNameNode().getNamesystem().writeUnlock();
@@ -127,7 +127,7 @@ public class TestNameNodeMetadataConsistency {
         MiniDockerDFSCluster.DataNodeProperties dnProps = cluster.stopDataNode(0);
         // Simulate  Namenode forgetting a Block
         cluster.restartNameNode(true);
-        BlockInfo bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
+        BlockInfoInterface bInfo = cluster.getNameNode().getNamesystem().getBlockManager().getStoredBlock(block.getLocalBlock());
         cluster.getNameNode().getNamesystem().writeLock();
         bInfo.delete();
         cluster.getNameNode().getNamesystem().getBlockManager().removeBlock(bInfo);

@@ -92,7 +92,7 @@ public class TestFailoverWithBlockTokensEnabled {
         setAndCheckSerialNumber(Integer.MAX_VALUE / 171717, btsm1, btsm2, btsm3);
     }
 
-    private void setAndCheckSerialNumber(int serialNumber, BlockTokenSecretManager... btsms) {
+    private void setAndCheckSerialNumber(int serialNumber, BlockTokenSecretManagerInterface... btsms) {
         for (BlockTokenSecretManagerInterface btsm : btsms) {
             btsm.setSerialNo(serialNumber);
         }
@@ -122,8 +122,8 @@ public class TestFailoverWithBlockTokensEnabled {
             public LocatedBlocks answer(InvocationOnMock arg0) throws Throwable {
                 LocatedBlocks locatedBlocks = (LocatedBlocks) arg0.callRealMethod();
                 for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
-                    TokenInterface<BlockTokenIdentifier> token = lb.getBlockToken();
-                    BlockTokenIdentifierInterface id = lb.getBlockToken().decodeIdentifier();
+                    Token<BlockTokenIdentifier> token = lb.getBlockToken();
+                    BlockTokenIdentifier id = lb.getBlockToken().decodeIdentifier();
                     // This will make the token invalid, since the password
                     // won't match anymore
                     id.setExpiryDate(Time.now() + 10);
@@ -173,7 +173,7 @@ public class TestFailoverWithBlockTokensEnabled {
         }
     }
 
-    private static void lowerKeyUpdateIntervalAndClearKeys(FSNamesystem namesystem) {
+    private static void lowerKeyUpdateIntervalAndClearKeys(FSNamesystemInterface namesystem) {
         BlockTokenSecretManagerInterface btsm = namesystem.getBlockManager().getBlockTokenSecretManager();
         btsm.setKeyUpdateIntervalForTesting(2 * 1000);
         btsm.setTokenLifetime(2 * 1000);

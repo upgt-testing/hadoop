@@ -227,6 +227,11 @@ public class TestProcessCorruptBlocks {
     }
 
     private static NumberReplicas countReplicas(final FSNamesystem namesystem, ExtendedBlock block) {
+        final BlockManager blockManager = namesystem.getBlockManager();
+        return blockManager.countNodes(blockManager.getStoredBlock(block.getLocalBlock()));
+    }
+
+    private static NumberReplicasInterface countReplicas(final FSNamesystemInterface namesystem, ExtendedBlock block) {
         final BlockManagerInterface blockManager = namesystem.getBlockManager();
         return blockManager.countNodes(blockManager.getStoredBlock(block.getLocalBlock()));
     }

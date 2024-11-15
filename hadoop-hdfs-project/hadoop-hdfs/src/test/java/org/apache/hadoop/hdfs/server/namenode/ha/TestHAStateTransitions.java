@@ -72,7 +72,7 @@ public class TestHAStateTransitions {
 
     private static final String TEST_FILE_DATA = "Hello state transitioning world";
 
-    private static final StateChangeRequestInfoInterface REQ_INFO = new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED);
+    private static final StateChangeRequestInfo REQ_INFO = new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED);
 
     static {
         GenericTestUtils.setLogLevel(EditLogTailer.LOG, Level.TRACE);
@@ -304,7 +304,7 @@ public class TestHAStateTransitions {
             NameNodeInterface nn1 = cluster.getNameNode(0);
             NameNodeInterface nn2 = cluster.getNameNode(1);
             String renewer = UserGroupInformation.getLoginUser().getUserName();
-            TokenInterface<DelegationTokenIdentifier> token = nn1.getRpcServer().getDelegationToken(new Text(renewer));
+            Token<DelegationTokenIdentifier> token = nn1.getRpcServer().getDelegationToken(new Text(renewer));
             LOG.info("Failing over to NN 1");
             cluster.transitionToStandby(0);
             cluster.transitionToActive(1);
@@ -365,6 +365,20 @@ public class TestHAStateTransitions {
     }
 
     private static void createEmptyInProgressEditLog(MiniDockerDFSCluster cluster, NameNode nn, boolean writeHeader) throws IOException {
+        long txid = nn.getNamesystem().getEditLog().getLastWrittenTxId();
+        URI sharedEditsUri = cluster.getSharedEditsDir(0, 1);
+        File sharedEditsDir = new File(sharedEditsUri.getPath());
+        StorageDirectory storageDir = new StorageDirectory(sharedEditsDir);
+        File inProgressFile = NameNodeAdapter.getInProgressEditsFile(storageDir, txid + 1);
+        assertTrue("Failed to create in-progress edits file", inProgressFile.createNewFile());
+        if (writeHeader) {
+            DataOutputStream out = new DataOutputStream(new FileOutputStream(inProgressFile));
+            EditLogFileOutputStream.writeHeader(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION, out);
+            out.close();
+        }
+    }
+
+    private static void createEmptyInProgressEditLog(MiniDockerDFSCluster cluster, NameNodeInterface nn, boolean writeHeader) throws IOException {
         long txid = nn.getNamesystem().getEditLog().getLastWrittenTxId();
         URI sharedEditsUri = cluster.getSharedEditsDir(0, 1);
         File sharedEditsDir = new File(sharedEditsUri.getPath());
@@ -498,6 +512,11 @@ public class TestHAStateTransitions {
     private boolean isDTRunning(NameNode nn) {
         return NameNodeAdapter.getDtSecretManager(nn.getNamesystem()).isRunning();
     }
+
+    private boolean isDTRunning(NameNodeInterface nn) {
+        return NameNodeAdapter.getDtSecretManager(nn.getNamesystem()).isRunning();
+    }
+
 
     /**
      * Print a big banner in the test log to make debug easier.

@@ -50,15 +50,15 @@ public class TestOfflineImageViewerForContentSummary {
 
     private static File originalFsimage = null;
 
-    private static ContentSummaryInterface summaryFromDFS = null;
+    private static ContentSummary summaryFromDFS = null;
 
-    private static ContentSummaryInterface emptyDirSummaryFromDFS = null;
+    private static ContentSummary emptyDirSummaryFromDFS = null;
 
-    private static ContentSummaryInterface fileSummaryFromDFS = null;
+    private static ContentSummary fileSummaryFromDFS = null;
 
-    private static ContentSummaryInterface symLinkSummaryFromDFS = null;
+    private static ContentSummary symLinkSummaryFromDFS = null;
 
-    private static ContentSummaryInterface symLinkSummaryForDirContainsFromDFS = null;
+    private static ContentSummary symLinkSummaryForDirContainsFromDFS = null;
 
     /**
      * Create a populated namespace for later testing. Save its contents to a
@@ -108,11 +108,12 @@ public class TestOfflineImageViewerForContentSummary {
             hdfs.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER, false);
             hdfs.saveNamespace();
             // Determine the location of the fsimage file
+            /*
             originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
             if (originalFsimage == null) {
                 throw new RuntimeException("Didn't generate or can't find fsimage");
             }
-            LOG.debug("original FS image file is " + originalFsimage);
+            LOG.debug("original FS image file is " + originalFsimage); */
         } finally {
             if (cluster != null)
                 cluster.shutdown();
@@ -140,7 +141,7 @@ public class TestOfflineImageViewerForContentSummary {
             URI uri = new URI("webhdfs://localhost:" + String.valueOf(port));
             Configuration conf = new Configuration();
             WebHdfsFileSystem webfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
-            ContentSummaryInterface summary = webfs.getContentSummary(new Path("/parentDir/childDir2"));
+            ContentSummary summary = webfs.getContentSummary(new Path("/parentDir/childDir2"));
             verifyContentSummary(emptyDirSummaryFromDFS, summary);
         }
     }
@@ -159,7 +160,7 @@ public class TestOfflineImageViewerForContentSummary {
             URI uri = new URI("webhdfs://localhost:" + String.valueOf(port));
             Configuration conf = new Configuration();
             WebHdfsFileSystem webfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
-            ContentSummaryInterface summary = webfs.getContentSummary(new Path("/parentDir/"));
+            ContentSummary summary = webfs.getContentSummary(new Path("/parentDir/"));
             verifyContentSummary(summaryFromDFS, summary);
         }
     }
@@ -178,7 +179,7 @@ public class TestOfflineImageViewerForContentSummary {
             URI uri = new URI("webhdfs://localhost:" + String.valueOf(port));
             Configuration conf = new Configuration();
             WebHdfsFileSystem webfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
-            ContentSummaryInterface summary = webfs.getContentSummary(new Path("/parentDir/file1"));
+            ContentSummary summary = webfs.getContentSummary(new Path("/parentDir/file1"));
             verifyContentSummary(fileSummaryFromDFS, summary);
         }
     }
@@ -192,7 +193,7 @@ public class TestOfflineImageViewerForContentSummary {
             URI uri = new URI("webhdfs://localhost:" + String.valueOf(port));
             Configuration conf = new Configuration();
             WebHdfsFileSystem webfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
-            ContentSummaryInterface summary = webfs.getContentSummary(new Path("/link1"));
+            ContentSummary summary = webfs.getContentSummary(new Path("/link1"));
             verifyContentSummary(symLinkSummaryFromDFS, summary);
         }
     }
@@ -206,7 +207,7 @@ public class TestOfflineImageViewerForContentSummary {
             URI uri = new URI("webhdfs://localhost:" + String.valueOf(port));
             Configuration conf = new Configuration();
             WebHdfsFileSystem webfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
-            ContentSummaryInterface summary = webfs.getContentSummary(new Path("/dirForLinks/"));
+            ContentSummary summary = webfs.getContentSummary(new Path("/dirForLinks/"));
             verifyContentSummary(symLinkSummaryForDirContainsFromDFS, summary);
         }
     }

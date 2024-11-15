@@ -68,7 +68,8 @@ public interface FSDirectoryInterface {
     boolean isValidToCreate(java.lang.String arg0, INodesInPathInterface arg1) throws org.apache.hadoop.hdfs.protocol.SnapshotAccessControlException;
     INodesInPathInterface getINodesInPath(java.lang.String arg0, org.apache.hadoop.hdfs.server.namenode.FSDirectory.DirOp arg1) throws org.apache.hadoop.fs.UnresolvedLinkException, org.apache.hadoop.security.AccessControlException, org.apache.hadoop.fs.ParentNotDirectoryException;
     void writeLock();
-    void removeFromInodeMap(java.util.List<? extends org.apache.hadoop.hdfs.server.namenode.INode> arg0);
+    //void removeFromInodeMap(java.util.List<? extends org.apache.hadoop.hdfs.server.namenode.INode> arg0);
+    void removeFromInodeMap(java.util.List<? extends INodeInterface> arg0);
     java.lang.String resolvePath(java.lang.String arg0, FSDirectoryInterface arg1) throws java.io.FileNotFoundException;
     int getLsLimit();
     INodeDirectoryInterface getRoot();

@@ -136,8 +136,8 @@ public class TestNameEditsConfigs {
         final File checkpointNameDir = new File(base_dir, "secondname");
         final File checkpointEditsDir = new File(base_dir, "secondedits");
         final File checkpointNameAndEdits = new File(base_dir, "second_name_and_edits");
-        ImmutableListInterface<File> allCurrentDirs = ImmutableList.of(new File(nameAndEdits, "current"), new File(newNameDir, "current"), new File(newEditsDir, "current"), new File(checkpointNameAndEdits, "current"), new File(checkpointNameDir, "current"), new File(checkpointEditsDir, "current"));
-        ImmutableListInterface<File> imageCurrentDirs = ImmutableList.of(new File(nameAndEdits, "current"), new File(newNameDir, "current"), new File(checkpointNameAndEdits, "current"), new File(checkpointNameDir, "current"));
+        ImmutableList<File> allCurrentDirs = ImmutableList.of(new File(nameAndEdits, "current"), new File(newNameDir, "current"), new File(newEditsDir, "current"), new File(checkpointNameAndEdits, "current"), new File(checkpointNameDir, "current"), new File(checkpointEditsDir, "current"));
+        ImmutableList<File> imageCurrentDirs = ImmutableList.of(new File(nameAndEdits, "current"), new File(newNameDir, "current"), new File(checkpointNameAndEdits, "current"), new File(checkpointNameDir, "current"));
         // Start namenode with same dfs.namenode.name.dir and dfs.namenode.edits.dir
         conf = new HdfsConfiguration();
         conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameAndEdits.getPath());

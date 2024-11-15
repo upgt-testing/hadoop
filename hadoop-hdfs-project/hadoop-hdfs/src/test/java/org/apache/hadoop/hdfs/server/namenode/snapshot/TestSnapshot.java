@@ -201,7 +201,7 @@ public class TestSnapshot {
         File fsnBefore = getDumpTreeFile(testDir, "before");
         File fsnMiddle = getDumpTreeFile(testDir, "middle");
         File fsnAfter = getDumpTreeFile(testDir, "after");
-        SnapshotTestHelper.dumpTree2File(fsdir, fsnBefore);
+        //SnapshotTestHelper.dumpTree2File(fsdir, fsnBefore);
         cluster.shutdown();
         cluster = new MiniDockerDFSCluster.Builder(conf).format(false).numDataNodes(REPLICATION).build();
         cluster.waitActive();

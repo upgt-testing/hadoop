@@ -111,8 +111,8 @@ public class TestUpdateBlockTailing {
         // do not journal addBlock yet
         dfs.create(new Path(testFile), true, dfs.getConf().getInt(CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, 4096), (short) 1, BLOCK_SIZE);
         DatanodeManagerInterface dnManager = fsn0.getBlockManager().getDatanodeManager();
-        DatanodeStorageInfo[] targets = dnManager.getDatanode(dn0.getDatanodeId()).getStorageInfos();
-        targets = new DatanodeStorageInfo[] { targets[0] };
+        DatanodeStorageInfoInterface[] targets = dnManager.getDatanode(dn0.getDatanodeId()).getStorageInfos();
+        targets = new DatanodeStorageInfoInterface[] { targets[0] };
         BlockInfo newBlock = NameNodeAdapter.addBlockNoJournal(fsn0, testFile, targets);
         // NN1 tails increment generation stamp transaction
         fsn0.getEditLog().logSync();

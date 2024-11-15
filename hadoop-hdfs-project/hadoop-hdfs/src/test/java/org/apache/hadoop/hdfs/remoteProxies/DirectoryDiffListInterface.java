@@ -7,7 +7,7 @@ public interface DirectoryDiffListInterface {
 //    A getSnapshotINode(int arg0, A arg1);
 //    D saveSelf2Snapshot(int arg0, N arg1, A arg2);
     int getLastSnapshotId();
-//    org.apache.hadoop.hdfs.server.namenode.snapshot.DiffList<D> asList();
+    <D extends Comparable<Integer>> org.apache.hadoop.hdfs.server.namenode.snapshot.DiffList<D> asList();
     int[] changedBetweenSnapshots(SnapshotInterface arg0, SnapshotInterface arg1);
 //    void addFirst(D arg0);
 //    D addDiff(int arg0, N arg1);
@@ -21,7 +21,7 @@ public interface DirectoryDiffListInterface {
     int getDiffIndexById(int arg0);
     org.apache.hadoop.hdfs.server.namenode.snapshot.DiffList<org.apache.hadoop.hdfs.server.namenode.snapshot.DirectoryWithSnapshotFeature.DirectoryDiff> newDiffs();
     void createDiffsIfNeeded();
-//    D getLast();
+    <D> D getLast();
     int getPrior(int arg0);
     void clear();
 //    D createDiff(int arg0, N arg1);

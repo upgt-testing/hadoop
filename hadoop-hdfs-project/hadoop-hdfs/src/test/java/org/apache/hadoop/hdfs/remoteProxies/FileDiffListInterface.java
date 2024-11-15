@@ -25,9 +25,9 @@ public interface FileDiffListInterface {
 //    A createSnapshotCopy(N arg0);
 //    void deleteSnapshotDiff(ReclaimContextInterface arg0, int arg1, int arg2, N arg3);
 //    A getSnapshotINode(int arg0, A arg1);
-//    org.apache.hadoop.hdfs.server.namenode.snapshot.DiffList<D> asList();
+    <D extends Comparable<Integer>> org.apache.hadoop.hdfs.server.namenode.snapshot.DiffList<D> asList();
     int[] changedBetweenSnapshots(SnapshotInterface arg0, SnapshotInterface arg1);
-//    D getLast();
+    <D> D getLast();
 //    java.util.Iterator<D> iterator();
 //    void addFirst(D arg0);
     FileDiffInterface createDiff(int arg0, INodeFileInterface arg1);

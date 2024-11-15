@@ -227,7 +227,7 @@ public class TestRandomOpsWithSnapshots {
         createFiles(TESTDIRSTRING, fileLen);
         // Get list of snapshottable directories
         SnapshottableDirectoryStatus[] snapshottableDirectoryStatus = hdfs.getSnapshottableDirListing();
-        for (SnapshottableDirectoryStatusInterface ssds : snapshottableDirectoryStatus) {
+        for (SnapshottableDirectoryStatus ssds : snapshottableDirectoryStatus) {
             snapshottableDirectories.add(ssds.getFullPath());
         }
         if (snapshottableDirectories.size() == 0) {

@@ -59,6 +59,21 @@ public class TestFileLimit {
         }
     }
 
+    private void waitForLimit(FSNamesystemInterface namesys, long num) {
+        // wait for number of blocks to decrease
+        while (true) {
+            long total = namesys.getBlocksTotal() + namesys.getFSDirectory().totalInodes();
+            System.out.println("Comparing current nodes " + total + " to become " + num);
+            if (total == num) {
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
     /**
      * Test that file data becomes available before file is closed.
      */

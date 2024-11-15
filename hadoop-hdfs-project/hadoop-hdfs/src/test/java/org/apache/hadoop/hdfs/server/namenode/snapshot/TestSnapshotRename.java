@@ -109,6 +109,21 @@ public class TestSnapshotRename {
         DiffList<DirectoryDiff> listByTime = srcRoot.getDiffs().asList();
         assertEquals(names.length, listByTime.size());
         for (int i = 0; i < listByTime.size(); i++) {
+            Snapshot s = srcRoot.getDirectorySnapshottableFeature().getSnapshotById(listByTime.get(i).getSnapshotId());
+            assertEquals(names[i], s.getRoot().getLocalName());
+        }
+    }
+
+    private void checkSnapshotList(INodeDirectoryInterface srcRoot, String[] sortedNames, String[] names) {
+        assertTrue(srcRoot.isSnapshottable());
+        ReadOnlyList<Snapshot> listByName = srcRoot.getDirectorySnapshottableFeature().getSnapshotList();
+        assertEquals(sortedNames.length, listByName.size());
+        for (int i = 0; i < listByName.size(); i++) {
+            assertEquals(sortedNames[i], listByName.get(i).getRoot().getLocalName());
+        }
+        DiffList<DirectoryDiff> listByTime = srcRoot.getDiffs().asList();
+        assertEquals(names.length, listByTime.size());
+        for (int i = 0; i < listByTime.size(); i++) {
             SnapshotInterface s = srcRoot.getDirectorySnapshottableFeature().getSnapshotById(listByTime.get(i).getSnapshotId());
             assertEquals(names[i], s.getRoot().getLocalName());
         }

@@ -218,7 +218,7 @@ public class TestWebHdfsUrl {
     private WebHdfsFileSystem getWebHdfsFileSystem(UserGroupInformation ugi, Configuration conf) throws IOException {
         if (UserGroupInformation.isSecurityEnabled()) {
             DelegationTokenIdentifier dtId = new DelegationTokenIdentifier(new Text(ugi.getUserName()), null, null);
-            FSNamesystemInterface namesystem = mock(FSNamesystem.class);
+            FSNamesystem namesystem = mock(FSNamesystem.class);
             DelegationTokenSecretManager dtSecretManager = new DelegationTokenSecretManager(86400000, 86400000, 86400000, 86400000, namesystem);
             dtSecretManager.startThreads();
             Token<DelegationTokenIdentifier> token = new Token<DelegationTokenIdentifier>(dtId, dtSecretManager);

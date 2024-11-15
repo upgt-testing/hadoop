@@ -107,11 +107,11 @@ public class TestStorageRestore {
     /**
      * invalidate storage by removing the second and third storage directories
      */
-    public void invalidateStorage(FSImage fi, Set<File> filesToInvalidate) throws IOException {
+    public void invalidateStorage(FSImageInterface fi, Set<File> filesToInvalidate) throws IOException {
         ArrayList<StorageDirectory> al = new ArrayList<StorageDirectory>(2);
         Iterator<StorageDirectory> it = fi.getStorage().dirIterator();
         while (it.hasNext()) {
-            StorageDirectoryInterface sd = it.next();
+            StorageDirectory sd = it.next();
             if (filesToInvalidate.contains(sd.getRoot())) {
                 LOG.info("causing IO error on " + sd.getRoot());
                 al.add(sd);
@@ -123,7 +123,7 @@ public class TestStorageRestore {
             if (j.getManager() instanceof FileJournalManager) {
                 FileJournalManager fm = (FileJournalManager) j.getManager();
                 if (fm.getStorageDirectory().getRoot().equals(path2) || fm.getStorageDirectory().getRoot().equals(path3)) {
-                    EditLogOutputStreamInterface mockStream = spy(j.getCurrentStream());
+                    EditLogOutputStream mockStream = spy(j.getCurrentStream());
                     j.setCurrentStreamForTests(mockStream);
                     doThrow(new IOException("Injected fault: write")).when(mockStream).write(any());
                 }
@@ -157,13 +157,13 @@ public class TestStorageRestore {
         cluster.waitActive();
         SecondaryNameNode secondary = new SecondaryNameNode(config);
         System.out.println("****testStorageRestore: Cluster and SNN started");
-        printStorages(cluster.getNameNode().getFSImage());
+        //printStorages(cluster.getNameNode().getFSImage());
         FileSystem fs = cluster.getFileSystem();
         Path path = new Path("/", "test");
         assertTrue(fs.mkdirs(path));
         System.out.println("****testStorageRestore: dir 'test' created, invalidating storage...");
         invalidateStorage(cluster.getNameNode().getFSImage(), ImmutableSet.of(path2, path3));
-        printStorages(cluster.getNameNode().getFSImage());
+        //printStorages(cluster.getNameNode().getFSImage());
         System.out.println("****testStorageRestore: storage invalidated");
         path = new Path("/", "test1");
         assertTrue(fs.mkdirs(path));
@@ -259,20 +259,20 @@ public class TestStorageRestore {
             cluster.waitActive();
             secondary = new SecondaryNameNode(config);
             FSImageInterface fsImage = cluster.getNameNode().getFSImage();
-            printStorages(fsImage);
+            //printStorages(fsImage);
             FileSystem fs = cluster.getFileSystem();
             Path testPath = new Path("/", "test");
             assertTrue(fs.mkdirs(testPath));
-            printStorages(fsImage);
+            //printStorages(fsImage);
             // Take name1 offline
             invalidateStorage(fsImage, ImmutableSet.of(path1));
             // Simulate a 2NN beginning a checkpoint, but not finishing. This will
             // cause name1 to be restored.
             cluster.getNameNodeRpc().rollEditLog();
-            printStorages(fsImage);
+            //printStorages(fsImage);
             // Now another 2NN comes along to do a full checkpoint.
             secondary.doCheckpoint();
-            printStorages(fsImage);
+            //printStorages(fsImage);
             // The created file should still exist in the in-memory FS state after the
             // checkpoint.
             assertTrue("path exists before restart", fs.exists(testPath));
@@ -317,7 +317,7 @@ public class TestStorageRestore {
             cluster = new MiniDockerDFSCluster.Builder(config).numDataNodes(0).manageNameDfsDirs(false).build();
             cluster.waitActive();
             secondary = new SecondaryNameNode(config);
-            printStorages(cluster.getNameNode().getFSImage());
+            //printStorages(cluster.getNameNode().getFSImage());
             FileSystem fs = cluster.getFileSystem();
             Path path = new Path("/", "test");
             assertTrue(fs.mkdirs(path));
@@ -326,7 +326,7 @@ public class TestStorageRestore {
             assertTrue(FileUtil.chmod(nameDir3, "000") == 0);
             // should remove name2 and name3
             secondary.doCheckpoint();
-            printStorages(cluster.getNameNode().getFSImage());
+            //printStorages(cluster.getNameNode().getFSImage());
             path = new Path("/", "test1");
             assertTrue(fs.mkdirs(path));
             assert (cluster.getNameNode().getFSImage().getStorage().getNumStorageDirs() == 1);

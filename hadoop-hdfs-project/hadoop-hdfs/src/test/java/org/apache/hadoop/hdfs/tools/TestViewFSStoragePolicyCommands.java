@@ -87,8 +87,8 @@ public class TestViewFSStoragePolicyCommands extends TestStoragePolicyCommands {
     private void checkCommandsWithUriPath(String pathWithSchema) throws Exception {
         final StoragePolicyAdmin admin = new StoragePolicyAdmin(conf);
         DFSTestUtil.toolRun(admin, "-setStoragePolicy -path " + pathWithSchema + " -policy WARM", 0, "Set storage policy WARM on " + pathWithSchema);
-        final BlockStoragePolicySuiteInterface suite = BlockStoragePolicySuite.createDefaultSuite();
-        final BlockStoragePolicyInterface warm = suite.getPolicy("WARM");
+        final BlockStoragePolicySuite suite = BlockStoragePolicySuite.createDefaultSuite();
+        final BlockStoragePolicy warm = suite.getPolicy("WARM");
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path " + pathWithSchema, 0, "The storage policy of " + pathWithSchema + ":\n" + warm);
         DFSTestUtil.toolRun(admin, "-unsetStoragePolicy -path " + pathWithSchema, 0, "Unset storage policy from " + pathWithSchema);
     }

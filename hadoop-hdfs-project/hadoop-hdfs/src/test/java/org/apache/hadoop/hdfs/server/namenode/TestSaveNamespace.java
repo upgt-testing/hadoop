@@ -105,7 +105,7 @@ public class TestSaveNamespace {
         @Override
         public Void answer(InvocationOnMock invocation) throws Throwable {
             Object[] args = invocation.getArguments();
-            StorageDirectoryInterface sd = (StorageDirectory) args[1];
+            StorageDirectory sd = (StorageDirectory) args[1];
             if (count++ == 1) {
                 LOG.info("Injecting fault for sd: " + sd);
                 if (throwRTE) {
@@ -132,7 +132,7 @@ public class TestSaveNamespace {
         @Override
         public Void answer(InvocationOnMock invocation) throws Throwable {
             Object[] args = invocation.getArguments();
-            StorageDirectoryInterface sd = (StorageDirectory) args[0];
+            StorageDirectory sd = (StorageDirectory) args[0];
             if (faultType == Fault.WRITE_STORAGE_ALL || (faultType == Fault.WRITE_STORAGE_ONE && count++ == 1)) {
                 LOG.info("Injecting fault for sd: " + sd);
                 throw new IOException("Injected fault: writeProperties second time");
@@ -151,13 +151,13 @@ public class TestSaveNamespace {
         Configuration conf = getConf();
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         // Replace the FSImage with a spy
-        FSImageInterface originalImage = fsn.getFSImage();
-        NNStorageInterface storage = originalImage.getStorage();
-        NNStorageInterface spyStorage = spy(storage);
+        FSImage originalImage = fsn.getFSImage();
+        NNStorage storage = originalImage.getStorage();
+        NNStorage spyStorage = spy(storage);
         originalImage.storage = spyStorage;
-        FSImageInterface spyImage = spy(originalImage);
+        FSImage spyImage = spy(originalImage);
         Whitebox.setInternalState(fsn, "fsImage", spyImage);
         // should we expect the save operation to fail
         boolean shouldFail = false;
@@ -240,11 +240,11 @@ public class TestSaveNamespace {
         conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_RESTORE_KEY, true);
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         // Replace the FSImage with a spy
-        FSImageInterface originalImage = fsn.getFSImage();
-        NNStorageInterface storage = originalImage.getStorage();
-        FSImageInterface spyImage = spy(originalImage);
+        FSImage originalImage = fsn.getFSImage();
+        NNStorage storage = originalImage.getStorage();
+        FSImage spyImage = spy(originalImage);
         Whitebox.setInternalState(fsn, "fsImage", spyImage);
         FileSystem fs = FileSystem.getLocal(conf);
         File rootDir = storage.getStorageDir(0).getRoot();
@@ -352,16 +352,16 @@ public class TestSaveNamespace {
         Configuration conf = getConf();
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         // Replace the FSImage with a spy
-        final FSImageInterface originalImage = fsn.getFSImage();
-        NNStorageInterface storage = originalImage.getStorage();
+        final FSImage originalImage = fsn.getFSImage();
+        NNStorage storage = originalImage.getStorage();
         // unlock any directories that
         // FSNamesystem's initialization may have locked
         storage.close();
-        NNStorageInterface spyStorage = spy(storage);
+        NNStorage spyStorage = spy(storage);
         originalImage.storage = spyStorage;
-        FSImageInterface spyImage = spy(originalImage);
+        FSImage spyImage = spy(originalImage);
         Whitebox.setInternalState(fsn, "fsImage", spyImage);
         spyImage.storage.setStorageDirectories(FSNamesystem.getNamespaceDirs(conf), FSNamesystem.getNamespaceEditsDirs(conf));
         doThrow(new IOException("Injected fault: saveFSImage")).when(spyImage).saveFSImage(any(), any(), any());
@@ -403,10 +403,10 @@ public class TestSaveNamespace {
         Configuration conf = getConf();
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         try {
             doAnEdit(fsn, 1);
-            CheckpointSignatureInterface sig = fsn.rollEditLog();
+            CheckpointSignature sig = fsn.rollEditLog();
             LOG.warn("Checkpoint signature: " + sig);
             // Do another edit
             doAnEdit(fsn, 2);
@@ -434,7 +434,7 @@ public class TestSaveNamespace {
         Configuration conf = getConf();
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         try {
             // We have a BEGIN_LOG_SEGMENT txn to start
             assertEquals(1, fsn.getEditLog().getLastWrittenTxId());
@@ -465,18 +465,18 @@ public class TestSaveNamespace {
         Configuration conf = getConf();
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         // Replace the FSImage with a spy
-        final FSImageInterface image = fsn.getFSImage();
-        NNStorageInterface storage = image.getStorage();
+        final FSImage image = fsn.getFSImage();
+        NNStorage storage = image.getStorage();
         // unlock any directories that
         // FSNamesystem's initialization may have locked
         storage.close();
         storage.setStorageDirectories(FSNamesystem.getNamespaceDirs(conf), FSNamesystem.getNamespaceEditsDirs(conf));
-        FSNamesystemInterface spyFsn = spy(fsn);
-        final FSNamesystemInterface finalFsn = spyFsn;
+        FSNamesystem spyFsn = spy(fsn);
+        final FSNamesystem finalFsn = spyFsn;
         DelayAnswer delayer = new GenericTestUtils.DelayAnswer(LOG);
-        BlockIdManagerInterface bid = spy(spyFsn.getBlockManager().getBlockIdManager());
+        BlockIdManager bid = spy(spyFsn.getBlockManager().getBlockIdManager());
         Whitebox.setInternalState(finalFsn.getBlockManager(), "blockIdManager", bid);
         doAnswer(delayer).when(bid).getGenerationStamp();
         ExecutorService pool = Executors.newFixedThreadPool(2);
@@ -520,7 +520,7 @@ public class TestSaveNamespace {
             // Check that we have only the original image and not any
             // cruft left over from half-finished images
             FSImageTestUtil.logStorageContents(LOG, storage);
-            for (StorageDirectoryInterface sd : storage.dirIterable(null)) {
+            for (StorageDirectory sd : storage.dirIterable(null)) {
                 File curDir = sd.getCurrentDir();
                 GenericTestUtils.assertGlobEquals(curDir, "fsimage_.*", NNStorage.getImageFileName(0), NNStorage.getImageFileName(0) + MD5FileUtils.MD5_SUFFIX);
             }
@@ -560,7 +560,7 @@ public class TestSaveNamespace {
         cluster.waitActive();
         DistributedFileSystem fs = cluster.getFileSystem();
         try {
-            cluster.getNamesystem().leaseManager.addLease("me", INodeId.ROOT_INODE_ID + 1);
+            cluster.getNamesystem().getLeaseManager().addLease("me", INodeId.ROOT_INODE_ID + 1);
             fs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
             cluster.getNameNodeRpc().saveNamespace(0, 0);
             fs.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
@@ -655,7 +655,7 @@ public class TestSaveNamespace {
         conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, nameDirsStr);
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
         try {
             // We have a BEGIN_LOG_SEGMENT txn to start
             assertEquals(1, fsn.getEditLog().getLastWrittenTxId());

@@ -103,7 +103,7 @@ public class TestGetContentSummaryWithSnapshot {
         dfs.createSnapshot(foo, "s1");
         DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
         DFSTestUtil.createFile(dfs, qux, 10, REPLICATION, 0L);
-        ContentSummaryInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        ContentSummary summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
         Assert.assertEquals(1, summary.getDirectoryCount());
         Assert.assertEquals(2, summary.getFileCount());
         Assert.assertEquals(20, summary.getLength());

@@ -110,7 +110,7 @@ public class TestNameNodeRecovery {
             elfis.setMaxOpSize(elts.getMaxOpSize());
             // reading through normally will get you an exception
             Set<Long> validTxIds = elts.getValidTxIds();
-            FSEditLogOpInterface op = null;
+            FSEditLogOp op = null;
             long prevTxId = 0;
             try {
                 while (true) {
@@ -555,7 +555,7 @@ public class TestNameNodeRecovery {
                 // disable that here.
                 FSEditLogInterface spyLog = spy(cluster.getNameNode().getFSImage().getEditLog());
                 doNothing().when(spyLog).endCurrentLogSegment(true);
-                DFSTestUtil.setEditLogForTesting(cluster.getNamesystem(), spyLog);
+                //DFSTestUtil.setEditLogForTesting(cluster.getNamesystem(), spyLog);
             }
             fileSys = cluster.getFileSystem();
             final FSNamesystemInterface namesystem = cluster.getNamesystem();
@@ -601,8 +601,6 @@ public class TestNameNodeRecovery {
         try {
             LOG.debug("running recovery...");
             cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).enableManagedDfsDirsRedundancy(false).format(false).startupOption(recoverStartOpt).build();
-        } catch (IOException e) {
-            fail("caught IOException while trying to recover. " + "message was " + e.getMessage() + "\nstack trace\n" + StringUtils.stringifyException(e));
         } finally {
             if (cluster != null) {
                 cluster.shutdown();

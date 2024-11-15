@@ -75,7 +75,7 @@ public class TestWebHdfsCreatePermissions {
             conn.setRequestMethod("PUT");
             Assert.assertEquals(expectedResponse, conn.getResponseCode());
             NamenodeProtocols namenode = cluster.getNameNode().getRpcServer();
-            FsPermissionInterface resultingPermission = namenode.getFileInfo(path).getPermission();
+            FsPermission resultingPermission = namenode.getFileInfo(path).getPermission();
             Assert.assertEquals(expectedPermission, resultingPermission.toString());
         } finally {
             cluster.shutdown();

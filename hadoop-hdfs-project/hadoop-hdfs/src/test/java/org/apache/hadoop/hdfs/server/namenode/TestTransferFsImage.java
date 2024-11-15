@@ -60,7 +60,7 @@ public class TestTransferFsImage {
     public void testClientSideException() throws IOException {
         Configuration conf = new HdfsConfiguration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
-        NNStorageInterface mockStorage = Mockito.mock(NNStorage.class);
+        NNStorage mockStorage = Mockito.mock(NNStorage.class);
         List<File> localPath = Collections.singletonList(new File("/xxxxx-does-not-exist/blah"));
         try {
             URL fsName = DFSUtil.getInfoServer(cluster.getNameNode().getServiceRpcAddress(), conf, DFSUtil.getHttpClientScheme(conf)).toURL();
@@ -83,7 +83,7 @@ public class TestTransferFsImage {
     public void testClientSideExceptionOnJustOneDir() throws IOException {
         Configuration conf = new HdfsConfiguration();
         MiniDockerDFSCluster cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
-        NNStorageInterface mockStorage = Mockito.mock(NNStorage.class);
+        NNStorage mockStorage = Mockito.mock(NNStorage.class);
         List<File> localPaths = ImmutableList.of(new File("/xxxxx-does-not-exist/blah"), new File(TEST_DIR, "testfile"));
         try {
             URL fsName = DFSUtil.getInfoServer(cluster.getNameNode().getServiceRpcAddress(), conf, DFSUtil.getHttpClientScheme(conf)).toURL();
@@ -101,7 +101,7 @@ public class TestTransferFsImage {
      */
     @Test(timeout = 10000)
     public void testGetImageTimeout() throws Exception {
-        HttpServer2Interface testServer = HttpServerFunctionalTest.createServer("hdfs");
+        HttpServer2 testServer = HttpServerFunctionalTest.createServer("hdfs");
         try {
             testServer.addServlet("ImageTransfer", ImageServlet.PATH_SPEC, TestImageTransferServlet.class);
             testServer.start();
@@ -126,8 +126,8 @@ public class TestTransferFsImage {
     @Test(timeout = 10000)
     public void testImageUploadTimeout() throws Exception {
         Configuration conf = new HdfsConfiguration();
-        NNStorageInterface mockStorage = Mockito.mock(NNStorage.class);
-        HttpServer2Interface testServer = HttpServerFunctionalTest.createServer("hdfs");
+        NNStorage mockStorage = Mockito.mock(NNStorage.class);
+        HttpServer2 testServer = HttpServerFunctionalTest.createServer("hdfs");
         try {
             testServer.addServlet("ImageTransfer", ImageServlet.PATH_SPEC, TestImageTransferServlet.class);
             testServer.start();

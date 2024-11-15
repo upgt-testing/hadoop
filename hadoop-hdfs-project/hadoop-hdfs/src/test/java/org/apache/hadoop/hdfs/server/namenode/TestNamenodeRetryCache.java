@@ -87,7 +87,7 @@ public class TestNamenodeRetryCache {
 
     private static NamenodeProtocols nnRpc;
 
-    private static final FsPermissionInterface perm = FsPermission.getDefault();
+    private static final FsPermission perm = FsPermission.getDefault();
 
     private static DistributedFileSystem filesystem;
 
@@ -260,7 +260,7 @@ public class TestNamenodeRetryCache {
         DFSTestUtil.createFile(filesystem, new Path(src), 128, (short) 1, 0L);
         // Retried append requests succeed
         newCall();
-        LastBlockWithStatusInterface b = nnRpc.append(src, "holder", new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND)));
+        LastBlockWithStatus b = nnRpc.append(src, "holder", new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND)));
         Assert.assertEquals(b, nnRpc.append(src, "holder", new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND))));
         Assert.assertEquals(b, nnRpc.append(src, "holder", new EnumSetWritable<>(EnumSet.of(CreateFlag.APPEND))));
         // non-retried call fails
@@ -423,7 +423,7 @@ public class TestNamenodeRetryCache {
         Map<CacheEntry, CacheEntry> oldEntries = new HashMap<CacheEntry, CacheEntry>();
         Iterator<CacheEntry> iter = cacheSet.iterator();
         while (iter.hasNext()) {
-            CacheEntryInterface entry = iter.next();
+            CacheEntry entry = iter.next();
             oldEntries.put(entry, entry);
         }
         // restart NameNode
@@ -436,7 +436,7 @@ public class TestNamenodeRetryCache {
         assertEquals("Retry cache size is wrong", 39, cacheSet.size());
         iter = cacheSet.iterator();
         while (iter.hasNext()) {
-            CacheEntryInterface entry = iter.next();
+            CacheEntry entry = iter.next();
             assertTrue(oldEntries.containsKey(entry));
         }
     }

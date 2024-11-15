@@ -51,7 +51,7 @@ public interface INodeDirectoryInterface {
     INodeReferenceInterface asReference();
     DirectorySnapshottableFeatureInterface getDirectorySnapshottableFeature();
     int getChildrenNum(int arg0);
-    org.apache.hadoop.hdfs.util.ReadOnlyList<org.apache.hadoop.hdfs.server.namenode.INode> getChildrenList(int arg0);
+    org.apache.hadoop.hdfs.util.ReadOnlyList<INodeInterface> getChildrenList(int arg0);
     INodeInterface removeXAttrFeature(int arg0);
     java.lang.String getFullPathName();
     byte[][] getPathComponents();

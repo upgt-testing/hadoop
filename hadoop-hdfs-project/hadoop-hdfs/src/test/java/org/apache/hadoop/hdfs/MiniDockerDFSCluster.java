@@ -9,10 +9,7 @@ import edu.illinois.util.CommonUtil;
 import edu.illinois.util.config.ConfigTracker;
 import edu.illinois.util.config.HadoopXMLModifier;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileContext;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.StorageType;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.ServiceFailedException;
 import org.apache.hadoop.hdfs.protocol.*;
@@ -59,6 +56,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.hadoop.hdfs.DFSConfigKeys.*;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
+import static org.apache.hadoop.hdfs.server.common.Util.fileAsURI;
 
 
 public class MiniDockerDFSCluster implements Closeable {
@@ -1000,6 +998,18 @@ public class MiniDockerDFSCluster implements Closeable {
         return nameNode.getMappedPort(9000);
     }
 
+    public int getNameNodePort(int nnIndex) {
+        return getNameNodePort();
+    }
+
+    /**
+     * Returns true if the NameNode is running and is out of Safe Mode
+     * or if waiting for safe mode is disabled.
+     */
+    public boolean isNameNodeUp(int nnIndex) {
+        return true;
+    }
+
     public void restartNameNode() {
         //cluster.getMasterNode().restart();
 
@@ -1142,6 +1152,19 @@ public class MiniDockerDFSCluster implements Closeable {
     public ArrayList<DataNodeInterface> getDataNodes() {
         return dataNodeProxies;
     }
+
+    /**
+     * Shutdown the datanode at a given index.
+     */
+    public void shutdownDataNode(int dnIndex) {
+        LOG.info("Shutting down DataNode " + dnIndex);
+        try {
+            getDataNode(dnIndex).shutdown();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to shut down the DataNode at index " + dnIndex, e);
+        }
+    }
+
 
     public ArrayList<NameNodeInterface> getNameNodes() {
         return nameNodeProxies;
@@ -1845,4 +1868,79 @@ public class MiniDockerDFSCluster implements Closeable {
         System.out.println("The getNameNodeInfos(String nameservice) function is not implemented yet.");
         throw new UnsupportedOperationException("The getNameNodeInfos(String nameservice) function is not implemented yet.");
     }
+
+    public void setDataNodesDead() throws IOException {
+        LOG.warn("The setDataNodesDead() function is not implemented yet.");
+        System.out.println("The setDataNodesDead() function is not implemented yet.");
+        throw new UnsupportedOperationException("The setDataNodesDead() function is not implemented yet.");
+    }
+
+    /**
+     * Return all block metadata files in given directory (recursive search)
+     */
+    public static List<File> getAllBlockMetadataFiles(File storageDir) {
+        List<File> results = new ArrayList<File>();
+        File[] files = storageDir.listFiles();
+        if (files == null) {
+            return null;
+        }
+        for (File f : files) {
+            if (f.getName().startsWith(Block.BLOCK_FILE_PREFIX) &&
+                    f.getName().endsWith(Block.METADATA_EXTENSION)) {
+                results.add(f);
+            } else if (f.isDirectory()) {
+                List<File> subdirResults = getAllBlockMetadataFiles(f);
+                if (subdirResults != null) {
+                    results.addAll(subdirResults);
+                }
+            }
+        }
+        return results;
+    }
+
+    public void changeGenStampOfBlock(int dnIndex, ExtendedBlock blk,
+                                      long newGenStamp) throws IOException {
+        getFsDatasetTestUtils(dnIndex)
+                .changeStoredGenerationStamp(blk, newGenStamp);
+    }
+
+    public int getInstanceId() {
+        return 1;
+    }
+
+    public URI getSharedEditsDir(int minNN, int maxNN) throws IOException {
+        return formatSharedEditsDir(base_dir, minNN, maxNN);
+    }
+
+    public static URI formatSharedEditsDir(File baseDir, int minNN, int maxNN)
+            throws IOException {
+        return fileAsURI(new File(baseDir, "shared-edits-" +
+                minNN + "-through-" + maxNN));
+    }
+
+    public Collection<URI> getNameEditsDirs(int nnIndex) throws IOException {
+        return FSNamesystem.getNamespaceEditsDirs(getNN(nnIndex).conf);
+    }
+
+    public void formatDataNodeDirs() throws IOException {
+        base_dir = new File(determineDfsBaseDir());
+        data_dir = new File(base_dir, "data");
+        if (data_dir.exists() && !FileUtil.fullyDelete(data_dir)) {
+            throw new IOException("Cannot remove data directory: " + data_dir);
+        }
+    }
+
+    public void setBlockRecoveryTimeout(long timeout) {
+        for (int nnIndex = 0; nnIndex < getNumNameNodes(); nnIndex++) {
+            getNamesystem(nnIndex).getBlockManager().setBlockRecoveryTimeout(
+                    timeout);
+        }
+    }
+
+    public void transitionToObserver(int nnIndex) throws IOException,
+            ServiceFailedException {
+        getNameNode(nnIndex).getRpcServer().transitionToObserver(
+                new HAServiceProtocol.StateChangeRequestInfo(HAServiceProtocol.RequestSource.REQUEST_BY_USER_FORCED));
+    }
+
 }

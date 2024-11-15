@@ -67,7 +67,7 @@ public class TestSecondaryNameNodeUpgrade {
             List<File> versionFiles = snn.getFSImage().getStorage().getFiles(null, "VERSION");
             snn.shutdown();
             for (File versionFile : versionFiles) {
-                for (Map.EntryInterface<String, String> paramToCorrupt : paramsToCorrupt.entrySet()) {
+                for (Map.Entry<String, String> paramToCorrupt : paramsToCorrupt.entrySet()) {
                     String param = paramToCorrupt.getKey();
                     String val = paramToCorrupt.getValue();
                     System.out.println("Changing '" + param + "' to '" + val + "' in " + versionFile);

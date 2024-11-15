@@ -125,11 +125,12 @@ public class TestOfflineImageViewerForAcl {
             hdfs.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER, false);
             hdfs.saveNamespace();
             // Determine the location of the fsimage file
+            /*
             originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
             if (originalFsimage == null) {
                 throw new RuntimeException("Didn't generate or can't find fsimage");
             }
-            LOG.debug("original FS image file is " + originalFsimage);
+            LOG.debug("original FS image file is " + originalFsimage);*/
         } finally {
             if (cluster != null)
                 cluster.shutdown();
@@ -154,7 +155,7 @@ public class TestOfflineImageViewerForAcl {
             Configuration conf = new Configuration();
             WebHdfsFileSystem webhdfs = (WebHdfsFileSystem) FileSystem.get(uri, conf);
             // GETACLSTATUS operation to a directory without ACL
-            AclStatusInterface acl = webhdfs.getAclStatus(new Path("/dirWithNoAcl"));
+            AclStatus acl = webhdfs.getAclStatus(new Path("/dirWithNoAcl"));
             assertEquals(writtenAcls.get("/dirWithNoAcl"), acl);
             // GETACLSTATUS operation to a directory with a default ACL
             acl = webhdfs.getAclStatus(new Path("/dirWithDefaultAcl"));

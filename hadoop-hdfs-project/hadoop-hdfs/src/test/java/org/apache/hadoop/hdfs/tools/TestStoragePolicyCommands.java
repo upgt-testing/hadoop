@@ -90,10 +90,10 @@ public class TestStoragePolicyCommands {
         /*
      * test: get storage policy after set
      */
-        final BlockStoragePolicySuiteInterface suite = BlockStoragePolicySuite.createDefaultSuite();
-        final BlockStoragePolicyInterface warm = suite.getPolicy("WARM");
-        final BlockStoragePolicyInterface cold = suite.getPolicy("COLD");
-        final BlockStoragePolicyInterface hot = suite.getPolicy("HOT");
+        final BlockStoragePolicySuite suite = BlockStoragePolicySuite.createDefaultSuite();
+        final BlockStoragePolicy warm = suite.getPolicy("WARM");
+        final BlockStoragePolicy cold = suite.getPolicy("COLD");
+        final BlockStoragePolicy hot = suite.getPolicy("HOT");
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path " + fs.getUri() + "/foo", 0, "The storage policy of " + fs.getUri() + "/foo:\n" + warm);
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo/bar", 0, "The storage policy of " + bar.toString() + ":\n" + cold);
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo/bar/wow", 0, "The storage policy of " + wow.toString() + ":\n" + hot);
@@ -125,9 +125,9 @@ public class TestStoragePolicyCommands {
         DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /foo -policy WARM", 0, "Set storage policy WARM on " + foo.toString());
         DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /foo/bar -policy COLD", 0, "Set storage policy COLD on " + bar.toString());
         DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /fooz -policy WARM", 2, "File/Directory does not exist: /fooz");
-        final BlockStoragePolicySuiteInterface suite = BlockStoragePolicySuite.createDefaultSuite();
-        final BlockStoragePolicyInterface warm = suite.getPolicy("WARM");
-        final BlockStoragePolicyInterface cold = suite.getPolicy("COLD");
+        final BlockStoragePolicySuite suite = BlockStoragePolicySuite.createDefaultSuite();
+        final BlockStoragePolicy warm = suite.getPolicy("WARM");
+        final BlockStoragePolicy cold = suite.getPolicy("COLD");
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo", 0, "The storage policy of " + foo.toString() + ":\n" + warm);
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo/bar", 0, "The storage policy of " + bar.toString() + ":\n" + cold);
         DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /fooz", 2, "File/Directory does not exist: /fooz");

@@ -309,7 +309,7 @@ public class TestDFSAdmin {
      * @throws TimeoutException
      */
     private void testDataNodeGetReconfigurationStatus(boolean expectedSuccuss) throws IOException, InterruptedException, TimeoutException {
-        ReconfigurationUtilInterface ru = mock(ReconfigurationUtil.class);
+        ReconfigurationUtil ru = mock(ReconfigurationUtil.class);
         datanode.setReconfigurationUtil(ru);
         List<ReconfigurationUtil.PropertyChange> changes = new ArrayList<>();
         File newDir = new File(cluster.getDataDirectory(), "data_new");

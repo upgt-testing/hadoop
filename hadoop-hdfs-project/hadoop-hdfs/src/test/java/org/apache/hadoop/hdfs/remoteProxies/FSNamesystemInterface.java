@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.server.protocol.StorageReceivedDeletedBlocks;
 
 public interface FSNamesystemInterface {
@@ -124,6 +126,7 @@ public interface FSNamesystemInterface {
     java.lang.String getSafeModeTip();
     FSEditLogInterface getEditLog();
     boolean mkdirs(java.lang.String arg0, PermissionStatusInterface arg1, boolean arg2) throws java.io.IOException;
+    boolean mkdirs(java.lang.String arg0, PermissionStatus arg1, boolean arg2) throws java.io.IOException;
     AclStatusInterface getAclStatus(java.lang.String arg0) throws java.io.IOException;
     int getNumberOfDatanodes(org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType arg0);
     long getEstimatedCapacityLostTotal();
@@ -423,6 +426,7 @@ public interface FSNamesystemInterface {
     float getCapacityUsedGB();
     ReplicatedBlockStatsInterface getReplicatedBlockStats();
     PermissionStatusInterface createFsOwnerPermissions(FsPermissionInterface arg0);
+    PermissionStatusInterface createFsOwnerPermissions(FsPermission arg0);
     void registerDatanode(DatanodeRegistrationInterface arg0) throws java.io.IOException;
     java.lang.String getBlockPoolId();
     INodeFileInterface checkLease(INodesInPathInterface arg0, java.lang.String arg1, long arg2) throws org.apache.hadoop.hdfs.server.namenode.LeaseExpiredException, java.io.FileNotFoundException;

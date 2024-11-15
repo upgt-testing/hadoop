@@ -30,16 +30,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.function.Supplier;
+
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hdfs.ClientGSIContext;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDockerDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.Failover;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -142,6 +139,17 @@ public abstract class HATestUtil {
         }, 250, 10000);
     }
 
+    public static void waitForNNToIssueDeletions(final NameNodeInterface nn) throws Exception {
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                LOG.info("Waiting for NN to issue block deletions to DNs");
+                return nn.getNamesystem().getBlockManager().getPendingDeletionBlocksCount() == 0;
+            }
+        }, 250, 10000);
+    }
+
     public static class CouldNotCatchUpException extends IOException {
 
         private static final long serialVersionUID = 1L;
@@ -214,7 +222,7 @@ public abstract class HATestUtil {
         MiniQJMHACluster.Builder qjmBuilder = new MiniQJMHACluster.Builder(conf).setNumNameNodes(2 + numObservers);
         qjmBuilder.getDfsBuilder().numDataNodes(numDataNodes).simulatedCapacities(simulatedCapacities).racks(racks);
         MiniQJMHACluster qjmhaCluster = qjmBuilder.build();
-        MiniDockerDFSCluster dfsCluster = qjmhaCluster.getDfsCluster();
+        MiniDFSCluster dfsCluster = qjmhaCluster.getDfsCluster();
         dfsCluster.transitionToActive(0);
         dfsCluster.waitActive(0);
         for (int i = 0; i < numObservers; i++) {

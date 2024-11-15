@@ -91,7 +91,7 @@ public class TestFSDirectory {
 
     private static final int numGeneratedXAttrs = 256;
 
-    private static final ImmutableListInterface<XAttr> generatedXAttrs = ImmutableList.copyOf(generateXAttrs(numGeneratedXAttrs));
+    private static final ImmutableList<XAttr> generatedXAttrs = ImmutableList.copyOf(generateXAttrs(numGeneratedXAttrs));
 
     @Before
     public void setUp() throws Exception {
@@ -183,21 +183,21 @@ public class TestFSDirectory {
     @Test
     public void testINodeXAttrsLimit() throws Exception {
         List<XAttr> existingXAttrs = Lists.newArrayListWithCapacity(2);
-        XAttrInterface xAttr1 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.USER).setName("a1").setValue(new byte[] { 0x31, 0x32, 0x33 }).build();
-        XAttrInterface xAttr2 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.USER).setName("a2").setValue(new byte[] { 0x31, 0x31, 0x31 }).build();
+        XAttr xAttr1 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.USER).setName("a1").setValue(new byte[] { 0x31, 0x32, 0x33 }).build();
+        XAttr xAttr2 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.USER).setName("a2").setValue(new byte[] { 0x31, 0x31, 0x31 }).build();
         existingXAttrs.add(xAttr1);
         existingXAttrs.add(xAttr2);
         // Adding system and raw namespace xAttrs aren't affected by inode
         // xAttrs limit.
-        XAttrInterface newSystemXAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a3").setValue(new byte[] { 0x33, 0x33, 0x33 }).build();
-        XAttrInterface newRawXAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.RAW).setName("a3").setValue(new byte[] { 0x33, 0x33, 0x33 }).build();
+        XAttr newSystemXAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a3").setValue(new byte[] { 0x33, 0x33, 0x33 }).build();
+        XAttr newRawXAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.RAW).setName("a3").setValue(new byte[] { 0x33, 0x33, 0x33 }).build();
         List<XAttr> newXAttrs = Lists.newArrayListWithCapacity(2);
         newXAttrs.add(newSystemXAttr);
         newXAttrs.add(newRawXAttr);
         List<XAttr> xAttrs = FSDirXAttrOp.setINodeXAttrs(fsdir, existingXAttrs, newXAttrs, EnumSet.of(XAttrSetFlag.CREATE, XAttrSetFlag.REPLACE));
         assertEquals(xAttrs.size(), 4);
         // Adding a trusted namespace xAttr, is affected by inode xAttrs limit.
-        XAttrInterface newXAttr1 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.TRUSTED).setName("a4").setValue(new byte[] { 0x34, 0x34, 0x34 }).build();
+        XAttr newXAttr1 = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.TRUSTED).setName("a4").setValue(new byte[] { 0x34, 0x34, 0x34 }).build();
         newXAttrs.set(0, newXAttr1);
         try {
             FSDirXAttrOp.setINodeXAttrs(fsdir, existingXAttrs, newXAttrs, EnumSet.of(XAttrSetFlag.CREATE, XAttrSetFlag.REPLACE));
@@ -214,7 +214,7 @@ public class TestFSDirectory {
     private static void verifyXAttrsPresent(List<XAttr> newXAttrs, final int num) {
         assertEquals("Unexpected number of XAttrs after multiset", num, newXAttrs.size());
         for (int i = 0; i < num; i++) {
-            XAttrInterface search = generatedXAttrs.get(i);
+            XAttr search = generatedXAttrs.get(i);
             assertTrue("Did not find set XAttr " + search + " + after multiset", newXAttrs.contains(search));
         }
     }
@@ -222,7 +222,7 @@ public class TestFSDirectory {
     private static List<XAttr> generateXAttrs(final int numXAttrs) {
         List<XAttr> generatedXAttrs = Lists.newArrayListWithCapacity(numXAttrs);
         for (int i = 0; i < numXAttrs; i++) {
-            XAttrInterface xAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a" + i).setValue(new byte[] { (byte) i, (byte) (i + 1), (byte) (i + 2) }).build();
+            XAttr xAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a" + i).setValue(new byte[] { (byte) i, (byte) (i + 1), (byte) (i + 2) }).build();
             generatedXAttrs.add(xAttr);
         }
         return generatedXAttrs;
@@ -312,14 +312,14 @@ public class TestFSDirectory {
         toAdd.remove(generatedXAttrs.get(0));
         List<XAttr> newXAttrs = FSDirXAttrOp.setINodeXAttrs(fsdir, existingXAttrs, toAdd, EnumSet.of(XAttrSetFlag.CREATE));
         assertEquals("Unexpected toAdd size", 2, toAdd.size());
-        for (XAttrInterface x : toAdd) {
+        for (XAttr x : toAdd) {
             assertTrue("Did not find added XAttr " + x, newXAttrs.contains(x));
         }
         existingXAttrs = newXAttrs;
         // Sanity test for REPLACE
         toAdd = Lists.newArrayList();
         for (int i = 0; i < 3; i++) {
-            XAttrInterface xAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a" + i).setValue(new byte[] { (byte) (i * 2) }).build();
+            XAttr xAttr = (new XAttr.Builder()).setNameSpace(XAttr.NameSpace.SYSTEM).setName("a" + i).setValue(new byte[] { (byte) (i * 2) }).build();
             toAdd.add(xAttr);
         }
         newXAttrs = FSDirXAttrOp.setINodeXAttrs(fsdir, existingXAttrs, toAdd, EnumSet.of(XAttrSetFlag.REPLACE));

@@ -274,14 +274,14 @@ public class TestListOpenFiles {
         String path = openFileEntryBatchedEntries.get(0).getFilePath();
         FSNamesystemInterface fsNamesystem = cluster.getNamesystem();
         FSDirectoryInterface dir = fsNamesystem.getFSDirectory();
-        List<INode> removedINodes = new ChunkedArrayList<>();
+        List<INodeInterface> removedINodes = new ChunkedArrayList<>();
         removedINodes.add(dir.getINode(path));
         fsNamesystem.writeLock();
         try {
             dir.removeFromInodeMap(removedINodes);
             openFileEntryBatchedEntries = nnRpc.listOpenFiles(0, EnumSet.of(OpenFilesType.ALL_OPEN_FILES), OpenFilesIterator.FILTER_PATH_DEFAULT);
             assertEquals(0, openFileEntryBatchedEntries.size());
-            fsNamesystem.leaseManager.removeLease(dir.getINode(path).getId());
+            fsNamesystem.getLeaseManager().removeLease(dir.getINode(path).getId());
         } catch (NullPointerException e) {
             Assert.fail("Should not throw NPE when the file is deleted but has lease!");
         } finally {

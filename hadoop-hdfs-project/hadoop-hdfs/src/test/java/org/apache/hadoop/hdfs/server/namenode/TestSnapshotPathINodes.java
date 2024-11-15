@@ -113,7 +113,7 @@ public class TestSnapshotPathINodes {
         if (name == null) {
             return null;
         }
-        final INodeInterface inode = inodesInPath.getINode(index - 1);
+        final INode inode = inodesInPath.getINode(index - 1);
         return inode.asDirectory().getSnapshot(DFSUtil.string2Bytes(name));
     }
 

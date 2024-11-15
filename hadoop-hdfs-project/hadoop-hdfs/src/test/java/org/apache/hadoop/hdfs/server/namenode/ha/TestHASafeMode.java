@@ -446,6 +446,22 @@ public class TestHASafeMode {
         }
     }
 
+    private static void assertSafeMode(NameNodeInterface nn, int safe, int total, int numNodes, int nodeThresh) {
+        String status = nn.getNamesystem().getSafemode();
+        if (total == 0 && nodeThresh == 0) {
+            assertTrue("Bad safemode status: '" + status + "'", status.isEmpty() || status.startsWith("Safe mode is ON. The reported blocks 0 " + "has reached the threshold 0.9990 of total blocks 0. The " + "minimum number of live datanodes is not required. In safe " + "mode extension. Safe mode will be turned off automatically " + "in 0 seconds."));
+        } else if (safe == total) {
+            if (nodeThresh == 0) {
+                assertTrue("Bad safemode status: '" + status + "'", status.startsWith("Safe mode is ON. The reported blocks " + safe + " has reached the " + "threshold 0.9990 of total blocks " + total + ". The minimum number of live datanodes is not " + "required. In safe mode extension. Safe mode will be turned " + "off automatically"));
+            } else {
+                assertTrue("Bad safemode status: '" + status + "'", status.startsWith("Safe mode is ON. The reported blocks " + safe + " has reached " + "the threshold 0.9990 of total blocks " + total + ". The " + "number of live datanodes " + numNodes + " has reached " + "the minimum number " + nodeThresh + ". In safe mode " + "extension. Safe mode will be turned off automatically"));
+            }
+        } else {
+            int additional = (int) (total * 0.9990) - safe;
+            assertTrue("Bad safemode status: '" + status + "'", status.startsWith("Safe mode is ON. " + "The reported blocks " + safe + " needs additional " + additional + " blocks"));
+        }
+    }
+
     /**
      * Set up a namesystem with several edits, both deletions and
      * additions, and failover to a new NN while that NN is in

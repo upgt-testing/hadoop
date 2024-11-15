@@ -158,14 +158,14 @@ public class TestINodeAttributeProvider {
 
                 @Override
                 public AclFeature getAclFeature() {
-                    AclFeatureInterface f;
+                    AclFeature f;
                     if (useNullAcl) {
                         int[] entries = new int[0];
                         f = new AclFeature(entries);
                     } else if (useDefault) {
                         f = inode.getAclFeature();
                     } else {
-                        AclEntryInterface acl = new AclEntry.Builder().setType(AclEntryType.GROUP).setPermission(FsAction.ALL).setName("xxx").build();
+                        AclEntry acl = new AclEntry.Builder().setType(AclEntryType.GROUP).setPermission(FsAction.ALL).setName("xxx").build();
                         f = new AclFeature(AclEntryStatusFormat.toInt(Lists.newArrayList(acl)));
                     }
                     return f;
@@ -173,7 +173,7 @@ public class TestINodeAttributeProvider {
 
                 @Override
                 public XAttrFeature getXAttrFeature() {
-                    XAttrFeatureInterface x;
+                    XAttrFeature x;
                     if (useDefault) {
                         x = inode.getXAttrFeature();
                     } else {
@@ -347,7 +347,7 @@ public class TestINodeAttributeProvider {
         Assert.assertEquals("foo", status.getOwner());
         Assert.assertEquals("bar", status.getGroup());
         Assert.assertEquals(new FsPermission((short) 0770), status.getPermission());
-        AclStatusInterface aclStatus = fs.getAclStatus(authzDir);
+        AclStatus aclStatus = fs.getAclStatus(authzDir);
         Assert.assertEquals(1, aclStatus.getEntries().size());
         Assert.assertEquals(AclEntryType.GROUP, aclStatus.getEntries().get(0).getType());
         Assert.assertEquals("xxx", aclStatus.getEntries().get(0).getName());
@@ -382,7 +382,7 @@ public class TestINodeAttributeProvider {
             fs.mkdirs(aclDir);
             Path aclChildDir = new Path(aclDir, "subdir");
             fs.mkdirs(aclChildDir);
-            AclStatusInterface aclStatus = fs.getAclStatus(aclDir);
+            AclStatus aclStatus = fs.getAclStatus(aclDir);
             Assert.assertEquals(0, aclStatus.getEntries().size());
             return null;
         });

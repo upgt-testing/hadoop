@@ -102,7 +102,7 @@ public class TestPendingCorruptDnMessages {
     }
 
     private static String getRegisteredDatanodeUid(MiniDockerDFSCluster cluster, int nnIndex) {
-        List<DatanodeDescriptor> registeredDatanodes = cluster.getNamesystem(nnIndex).getBlockManager().getDatanodeManager().getDatanodeListForReport(DatanodeReportType.ALL);
+        List<DatanodeDescriptorInterface> registeredDatanodes = cluster.getNamesystem(nnIndex).getBlockManager().getDatanodeManager().getDatanodeListForReport(DatanodeReportType.ALL);
         return registeredDatanodes.isEmpty() ? null : registeredDatanodes.get(0).getDatanodeUuid();
     }
 

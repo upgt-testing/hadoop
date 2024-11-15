@@ -279,7 +279,7 @@ public class SnapshotTestHelper {
         /**
          * Top node of the directory tree
          */
-        final NodeInterface topNode;
+        final Node topNode;
 
         /**
          * A map recording nodes for each tree level
@@ -344,7 +344,7 @@ public class SnapshotTestHelper {
                 int level = random.nextInt(height);
                 ArrayList<Node> levelList = levelMap.get(level);
                 int index = random.nextInt(levelList.size());
-                NodeInterface randomNode = levelList.get(index);
+                Node randomNode = levelList.get(index);
                 if (excludedList == null || !excludedList.contains(randomNode)) {
                     return randomNode;
                 }
@@ -374,14 +374,14 @@ public class SnapshotTestHelper {
             /**
              * Children
              */
-            NodeInterface leftChild;
+            Node leftChild;
 
-            NodeInterface rightChild;
+            Node rightChild;
 
             /**
              * Parent node of the node
              */
-            final NodeInterface parent;
+            final Node parent;
 
             /**
              * File path of the node
@@ -435,7 +435,7 @@ public class SnapshotTestHelper {
             @Override
             public boolean equals(Object o) {
                 if (o != null && o instanceof Node) {
-                    NodeInterface node = (Node) o;
+                    Node node = (Node) o;
                     return node.nodePath.equals(nodePath);
                 }
                 return false;

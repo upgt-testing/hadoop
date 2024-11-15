@@ -363,7 +363,7 @@ public class TestShortCircuitCache {
     }
 
     private static DomainPeer getDomainPeerToDn(Configuration conf) throws IOException {
-        DomainSocketInterface sock = DomainSocket.connect(conf.get(DFS_DOMAIN_SOCKET_PATH_KEY));
+        DomainSocket sock = DomainSocket.connect(conf.get(DFS_DOMAIN_SOCKET_PATH_KEY));
         return new DomainPeer(sock);
     }
 

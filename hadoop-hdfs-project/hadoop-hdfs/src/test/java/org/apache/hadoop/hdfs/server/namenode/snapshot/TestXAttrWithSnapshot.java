@@ -150,7 +150,7 @@ public class TestXAttrWithSnapshot {
         hdfs.setXAttr(path, name1, value1);
         hdfs.allowSnapshot(path);
         hdfs.createSnapshot(path, snapshotName);
-        SnapshotDiffReportInterface report = hdfs.getSnapshotDiffReport(path, snapshotName, "");
+        SnapshotDiffReport report = hdfs.getSnapshotDiffReport(path, snapshotName, "");
         System.out.println(report);
         Assert.assertEquals(0, report.getDiffList().size());
         report = hdfs.getSnapshotDiffReport(path, snapshotName, "");

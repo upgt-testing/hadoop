@@ -65,7 +65,7 @@ public class TestFavoredNodesEndToEnd {
 
     private static DistributedFileSystem dfs;
 
-    private static ArrayList<DataNode> datanodes;
+    private static ArrayList<DataNodeInterface> datanodes;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {

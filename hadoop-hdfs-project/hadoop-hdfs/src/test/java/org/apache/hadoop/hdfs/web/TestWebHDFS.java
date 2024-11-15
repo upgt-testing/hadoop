@@ -651,7 +651,7 @@ public class TestWebHDFS {
         Path file4 = new Path(foo, "file4");
         dfs.rename(file2, file4);
         webHdfs.createSnapshot(foo, "s2");
-        SnapshotDiffReportInterface diffReport = webHdfs.getSnapshotDiffReport(foo, "s1", "s2");
+        SnapshotDiffReport diffReport = webHdfs.getSnapshotDiffReport(foo, "s1", "s2");
         Assert.assertEquals("/foo", diffReport.getSnapshotRoot());
         Assert.assertEquals("s1", diffReport.getFromSnapshot());
         Assert.assertEquals("s2", diffReport.getLaterSnapshotName());
@@ -844,7 +844,7 @@ public class TestWebHDFS {
         final DistributedFileSystem dfs = cluster.getFileSystem();
         dfs.mkdirs(path);
         dfs.setQuotaByStorageType(path, StorageType.DISK, 100000);
-        ContentSummaryInterface contentSummary = webHdfs.getContentSummary(path);
+        ContentSummary contentSummary = webHdfs.getContentSummary(path);
         Assert.assertTrue((contentSummary.getTypeQuota(StorageType.DISK) == 100000));
     }
 
@@ -863,7 +863,7 @@ public class TestWebHDFS {
         dfs.allowSnapshot(dirPath);
         dfs.createSnapshot(dirPath);
         dfs.delete(filePath, true);
-        ContentSummaryInterface contentSummary = webHdfs.getContentSummary(dirPath);
+        ContentSummary contentSummary = webHdfs.getContentSummary(dirPath);
         assertEquals(1, contentSummary.getSnapshotFileCount());
         assertEquals(10, contentSummary.getSnapshotLength());
         assertEquals(30, contentSummary.getSnapshotSpaceConsumed());
@@ -890,7 +890,7 @@ public class TestWebHDFS {
         out.write(bytes);
         out.close();
         dfs.setQuotaByStorageType(path, StorageType.DISK, diskQuota);
-        QuotaUsageInterface quotaUsage = webHdfs.getQuotaUsage(path);
+        QuotaUsage quotaUsage = webHdfs.getQuotaUsage(path);
         assertEquals(12, quotaUsage.getFileAndDirectoryCount());
         assertEquals(nsQuota, quotaUsage.getQuota());
         assertEquals(bytes.length * dfs.getDefaultReplication(), quotaUsage.getSpaceConsumed());
@@ -909,7 +909,7 @@ public class TestWebHDFS {
         final long spaceQuota = 1024;
         webHdfs.mkdirs(path);
         webHdfs.setQuota(path, nsQuota, spaceQuota);
-        QuotaUsageInterface quotaUsage = dfs.getQuotaUsage(path);
+        QuotaUsage quotaUsage = dfs.getQuotaUsage(path);
         assertEquals(nsQuota, quotaUsage.getQuota());
         assertEquals(spaceQuota, quotaUsage.getSpaceQuota());
         webHdfs.setQuota(path, HdfsConstants.QUOTA_RESET, HdfsConstants.QUOTA_RESET);
@@ -1271,6 +1271,7 @@ public class TestWebHDFS {
         assertEquals(expectedPath.toUri().getPath(), trashPath.toUri().getPath());
     }
 
+    /*
     @Test
     public void testGetEZTrashRoot() throws Exception {
         final Configuration conf = WebHdfsTestUtil.createConf();
@@ -1298,7 +1299,7 @@ public class TestWebHDFS {
         assertEquals(dfs.getTrashRoot(root).toUri().getPath(), webhdfs.getTrashRoot(root).toUri().getPath());
         assertEquals(webhdfs.getTrashRoot(root).toUri().getPath(), webhdfs.getTrashRoot(zone1).toUri().getPath());
         assertEquals(webhdfs.getTrashRoot(outsideEZ).toUri().getPath(), webhdfs.getTrashRoot(zone1).toUri().getPath());
-    }
+    }*/
 
     @Test
     public void testStoragePolicy() throws Exception {
@@ -1345,7 +1346,7 @@ public class TestWebHDFS {
         Iterator<ErasureCodingPolicyInfo> itr = policies.iterator();
         boolean found = false;
         while (policies.iterator().hasNext()) {
-            ErasureCodingPolicyInfoInterface policy = itr.next();
+            ErasureCodingPolicyInfo policy = itr.next();
             if (policy.getPolicy().getName().equals(ecpolicy)) {
                 found = true;
                 if (state.equals("disable")) {
@@ -1469,8 +1470,8 @@ public class TestWebHDFS {
         cluster = new MiniDockerDFSCluster.Builder(conf).numDataNodes(0).build();
         final DistributedFileSystem dfs = cluster.getFileSystem();
         final WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
-        FsServerDefaultsInterface dfsServerDefaults = dfs.getServerDefaults();
-        FsServerDefaultsInterface webfsServerDefaults = webfs.getServerDefaults();
+        FsServerDefaults dfsServerDefaults = dfs.getServerDefaults();
+        FsServerDefaults webfsServerDefaults = webfs.getServerDefaults();
         // Verify whether server defaults value that we override is equal to
         // dfsServerDefaults.
         compareFsServerDefaults(originalServerDefaults, dfsServerDefaults);

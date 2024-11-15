@@ -75,7 +75,7 @@ public class JournalSet implements JournalManager {
    * If a Journal gets disabled due to an error writing to its
    * stream, then the stream will be aborted and set to null.
    */
-  static class JournalAndStream implements CheckableNameNodeResource {
+  public static class JournalAndStream implements CheckableNameNodeResource {
     private JournalManager journal;
     private boolean disabled = false;
     private EditLogOutputStream stream;

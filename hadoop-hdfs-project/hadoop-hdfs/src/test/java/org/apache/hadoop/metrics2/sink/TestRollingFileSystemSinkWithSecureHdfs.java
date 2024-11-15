@@ -151,7 +151,7 @@ public class TestRollingFileSystemSinkWithSecureHdfs extends RollingFileSystemSi
     @Test
     public void testWithSecureHDFS() throws Exception {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp/test";
-        final MetricsSystemInterface ms = initMetricsSystem(path, true, false, true);
+        final MetricsSystem ms = initMetricsSystem(path, true, false, true);
         assertMetricsContents(sink.doAs(new PrivilegedExceptionAction<String>() {
 
             @Override

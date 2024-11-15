@@ -452,7 +452,7 @@ public class TestDNFencing {
             AppendTestUtil.write(out, 0, 10);
             out.hflush();
             DataNodeInterface dn = cluster.getDataNodes().get(0);
-            DatanodeProtocolClientSideTranslatorPBInterface spy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn2);
+            DatanodeProtocolClientSideTranslatorPB spy = InternalDataNodeTestUtils.spyOnBposToNN(dn, nn2);
             Mockito.doAnswer(delayer).when(spy).blockReport(any(), anyString(), any(), any());
             dn.scheduleAllBlockReport(0);
             delayer.waitForCall();
@@ -480,6 +480,17 @@ public class TestDNFencing {
     }
 
     private void doMetasave(NameNode nn2) {
+        nn2.getNamesystem().writeLock();
+        try {
+            PrintWriter pw = new PrintWriter(System.err);
+            nn2.getNamesystem().getBlockManager().metaSave(pw);
+            pw.flush();
+        } finally {
+            nn2.getNamesystem().writeUnlock();
+        }
+    }
+
+    private void doMetasave(NameNodeInterface nn2) {
         nn2.getNamesystem().writeLock();
         try {
             PrintWriter pw = new PrintWriter(System.err);

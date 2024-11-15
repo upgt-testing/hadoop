@@ -110,7 +110,7 @@ public class TestINodeFileUnderConstructionWithSnapshot {
         SnapshotTestHelper.createSnapshot(hdfs, dir, "s0");
         DFSTestUtil.createFile(hdfs, file, BLOCKSIZE, REPLICATION, seed);
         DFSTestUtil.appendFile(hdfs, file, BLOCKSIZE);
-        INodeFileInterface fileNode = (INodeFile) fsdir.getINode(file.toString());
+        INodeFile fileNode = (INodeFile) fsdir.getINode(file.toString());
         // 2. create snapshot --> modify the file --> append
         hdfs.createSnapshot(dir, "s1");
         hdfs.setReplication(file, (short) (REPLICATION - 1));
@@ -152,7 +152,7 @@ public class TestINodeFileUnderConstructionWithSnapshot {
         out.close();
         // check: an INodeFileUnderConstructionWithSnapshot should be stored into s0's
         // deleted list, with size BLOCKSIZE*2
-        INodeFileInterface fileNode = (INodeFile) fsdir.getINode(file.toString());
+        INodeFile fileNode = (INodeFile) fsdir.getINode(file.toString());
         assertEquals(BLOCKSIZE * 2, fileNode.computeFileSize());
         INodeDirectoryInterface dirNode = fsdir.getINode(dir.toString()).asDirectory();
         DirectoryDiffInterface last = dirNode.getDiffs().getLast();

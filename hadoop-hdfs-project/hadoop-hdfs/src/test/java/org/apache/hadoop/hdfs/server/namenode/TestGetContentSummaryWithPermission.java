@@ -83,7 +83,7 @@ public class TestGetContentSummaryWithPermission {
         final Path baz = new Path(bar, "bazSuper");
         dfs.mkdirs(bar);
         DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
-        ContentSummaryInterface summary;
+        ContentSummary summary;
         summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
         verifySummary(summary, 2, 1, 10);
         dfs.setPermission(foo, new FsPermission((short) 0));
@@ -124,7 +124,7 @@ public class TestGetContentSummaryWithPermission {
         fileStatus = dfs.getFileStatus(baz);
         assertEquals((short) 644, fileStatus.getPermission().toOctal());
         // by default, can get content summary
-        ContentSummaryInterface summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummary>) () -> cluster.getNameNodeRpc().getContentSummary(foo.toString()));
+        ContentSummary summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummary>) () -> cluster.getNameNodeRpc().getContentSummary(foo.toString()));
         verifySummary(summary, 2, 1, 10);
         // set empty access on root dir, should disallow content summary
         dfs.setPermission(foo, new FsPermission((short) 0));

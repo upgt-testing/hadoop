@@ -444,6 +444,10 @@ public class BlockManagerTestUtil {
     bm.rescanPostponedMisreplicatedBlocks();
   }
 
+  public static void rescanPostponedMisreplicatedBlocks(BlockManagerInterface bm) {
+    bm.rescanPostponedMisreplicatedBlocks();
+  }
+
   public static DatanodeDescriptor getLocalDatanodeDescriptor(
       boolean initializeStorage) {
     DatanodeDescriptor dn = new DatanodeDescriptor(DFSTestUtil.getLocalDatanodeID());
@@ -518,6 +522,11 @@ public class BlockManagerTestUtil {
     dm.getDatanodeAdminManager().runMonitorForTest();
   }
 
+  public static void recheckDecommissionState(DatanodeManagerInterface dm)
+          throws ExecutionException, InterruptedException {
+    dm.getDatanodeAdminManager().runMonitorForTest();
+  }
+
   /**
    * Have BlockManager check isNodeHealthyForDecommissionOrMaintenance for a given datanode.
    * @param blockManager the BlockManager to check against
@@ -539,6 +548,13 @@ public class BlockManagerTestUtil {
   public static void setStartupSafeModeForTest(BlockManager bm) {
     BlockManagerSafeMode bmSafeMode = (BlockManagerSafeMode)Whitebox
         .getInternalState(bm, "bmSafeMode");
+    Whitebox.setInternalState(bmSafeMode, "extension", Integer.MAX_VALUE);
+    Whitebox.setInternalState(bmSafeMode, "status", BMSafeModeStatus.EXTENSION);
+  }
+
+  public static void setStartupSafeModeForTest(BlockManagerInterface bm) {
+    BlockManagerSafeMode bmSafeMode = (BlockManagerSafeMode)Whitebox
+            .getInternalState(bm, "bmSafeMode");
     Whitebox.setInternalState(bmSafeMode, "extension", Integer.MAX_VALUE);
     Whitebox.setInternalState(bmSafeMode, "status", BMSafeModeStatus.EXTENSION);
   }

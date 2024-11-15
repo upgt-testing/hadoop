@@ -1690,6 +1690,25 @@ public class DFSTestUtil {
         return expectedPrimary.getDatanodeDescriptor();
     }
 
+    public static DatanodeDescriptorInterface getExpectedPrimaryNode(NameNodeInterface nn, ExtendedBlock blk) {
+        BlockManagerInterface bm0 = nn.getNamesystem().getBlockManager();
+        BlockInfoInterface storedBlock = bm0.getStoredBlock(blk.getLocalBlock());
+        assertTrue("Block " + blk + " should be under construction, " + "got: " + storedBlock, !storedBlock.isComplete());
+        // We expect that the replica with the most recent heart beat will be
+        // the one to be in charge of the synchronization / recovery protocol.
+        final DatanodeStorageInfoInterface[] storages = storedBlock.getUnderConstructionFeature().getExpectedStorageLocations();
+        DatanodeStorageInfoInterface expectedPrimary = storages[0];
+        long mostRecentLastUpdate = expectedPrimary.getDatanodeDescriptor().getLastUpdateMonotonic();
+        for (int i = 1; i < storages.length; i++) {
+            final long lastUpdate = storages[i].getDatanodeDescriptor().getLastUpdateMonotonic();
+            if (lastUpdate > mostRecentLastUpdate) {
+                expectedPrimary = storages[i];
+                mostRecentLastUpdate = lastUpdate;
+            }
+        }
+        return expectedPrimary.getDatanodeDescriptor();
+    }
+
     public static void toolRun(Tool tool, String cmd, int retcode, String contain) throws Exception {
         String[] cmds = StringUtils.split(cmd, ' ');
         System.out.flush();
@@ -2004,6 +2023,38 @@ public class DFSTestUtil {
     public static Block addBlockToFile(boolean isStripedBlock, List<DataNodeInterface> dataNodes, DistributedFileSystem fs, FSNamesystemInterface ns, String file, INodeFile fileNode, String clientName, ExtendedBlock previous, int numStripes, int len) throws Exception {
         fs.getClient().namenode.addBlock(file, clientName, previous, null, fileNode.getId(), null, null);
         final BlockInfo lastBlock = fileNode.getLastBlock();
+        final int groupSize = fileNode.getPreferredBlockReplication();
+        assert dataNodes.size() >= groupSize;
+        // 1. RECEIVING_BLOCK IBR
+        for (int i = 0; i < groupSize; i++) {
+            DataNodeInterface dn = dataNodes.get(i);
+            final Block block = new Block(lastBlock.getBlockId() + i, 0, lastBlock.getGenerationStamp());
+            DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
+            StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVING_BLOCK, storage);
+            for (StorageReceivedDeletedBlocks report : reports) {
+                ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
+            }
+        }
+        final ErasureCodingPolicy ecPolicy = fs.getErasureCodingPolicy(new Path(file));
+        // 2. RECEIVED_BLOCK IBR
+        long blockSize = isStripedBlock ? numStripes * ecPolicy.getCellSize() : len;
+        for (int i = 0; i < groupSize; i++) {
+            DataNodeInterface dn = dataNodes.get(i);
+            final Block block = new Block(lastBlock.getBlockId() + i, blockSize, lastBlock.getGenerationStamp());
+            DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
+            StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, storage);
+            for (StorageReceivedDeletedBlocks report : reports) {
+                ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
+            }
+        }
+        long bytes = isStripedBlock ? numStripes * ecPolicy.getCellSize() * ecPolicy.getNumDataUnits() : len;
+        lastBlock.setNumBytes(bytes);
+        return lastBlock;
+    }
+
+    public static BlockInterface addBlockToFile(boolean isStripedBlock, List<DataNodeInterface> dataNodes, DistributedFileSystem fs, FSNamesystemInterface ns, String file, INodeFileInterface fileNode, String clientName, ExtendedBlock previous, int numStripes, int len) throws Exception {
+        fs.getClient().namenode.addBlock(file, clientName, previous, null, fileNode.getId(), null, null);
+        final BlockInfoInterface lastBlock = fileNode.getLastBlock();
         final int groupSize = fileNode.getPreferredBlockReplication();
         assert dataNodes.size() >= groupSize;
         // 1. RECEIVING_BLOCK IBR

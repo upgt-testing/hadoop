@@ -96,7 +96,7 @@ public class TestQuotasWithHA {
         long expectedSize = 3 * BLOCK_SIZE + BLOCK_SIZE / 2;
         DFSTestUtil.createFile(fs, TEST_FILE, expectedSize, (short) 1, 1L);
         HATestUtil.waitForStandbyToCatchUp(nn0, nn1);
-        ContentSummaryInterface cs = nn1.getRpcServer().getContentSummary(TEST_DIR_STR);
+        ContentSummary cs = nn1.getRpcServer().getContentSummary(TEST_DIR_STR);
         assertEquals(NS_QUOTA, cs.getQuota());
         assertEquals(DS_QUOTA, cs.getSpaceQuota());
         assertEquals(expectedSize, cs.getSpaceConsumed());

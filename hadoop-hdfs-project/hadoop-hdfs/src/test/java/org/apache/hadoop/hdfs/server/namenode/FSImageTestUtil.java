@@ -470,6 +470,12 @@ public abstract class FSImageTestUtil {
         return Collections.max(foundEditLogs, EditLogFile.COMPARE_BY_START_TXID);
     }
 
+    public static EditLogFile findLatestEditsLog(StorageDirectoryInterface sd) throws IOException {
+        File currentDir = sd.getCurrentDir();
+        List<EditLogFile> foundEditLogs = Lists.newArrayList(FileJournalManager.matchEditLogs(currentDir));
+        return Collections.max(foundEditLogs, EditLogFile.COMPARE_BY_START_TXID);
+    }
+
     /**
      * Corrupt the given VERSION file by replacing a given
      * key with a new value and re-writing the file.

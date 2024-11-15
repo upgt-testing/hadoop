@@ -73,7 +73,7 @@ public class TestStandbyCheckpoints {
 
     protected MiniDockerDFSCluster cluster;
 
-    protected NameNode[] nns = new NameNode[NUM_NNS];
+    protected NameNodeInterface[] nns = new NameNodeInterface[NUM_NNS];
 
     protected FileSystem fs;
 

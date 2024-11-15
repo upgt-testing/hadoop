@@ -120,6 +120,6 @@ public interface NNStorageInterface {
     java.io.File findFile(org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeDirType arg0, java.lang.String arg1);
     java.util.Collection<java.net.URI> getEditsDirectories() throws java.io.IOException;
     void readProperties(StorageDirectoryInterface arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1) throws java.io.IOException;
-    java.util.Iterator<org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory> dirIterator(org.apache.hadoop.hdfs.server.common.Storage.StorageDirType arg0);
+    java.util.Iterator<StorageDirectoryInterface> dirIterator(org.apache.hadoop.hdfs.server.common.Storage.StorageDirType arg0);
     java.lang.String getRegistrationID(StorageInfoInterface arg0);
 }

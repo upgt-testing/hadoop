@@ -151,7 +151,7 @@ public class TestParallelImageWrite {
         FSImageTestUtil.assertParallelFilesAreIdentical(dirs, Collections.<String>emptySet());
         FSImageTestUtil.assertSameNewestImage(dirs);
         // Return the hash of the newest image file
-        StorageDirectory firstSd = stg.dirIterator(NameNodeDirType.IMAGE).next();
+        StorageDirectoryInterface firstSd = stg.dirIterator(NameNodeDirType.IMAGE).next();
         File latestImage = FSImageTestUtil.findLatestImageFile(firstSd);
         String md5 = FSImageTestUtil.getImageFileMD5IgnoringTxId(latestImage);
         System.err.println("md5 of " + latestImage + ": " + md5);

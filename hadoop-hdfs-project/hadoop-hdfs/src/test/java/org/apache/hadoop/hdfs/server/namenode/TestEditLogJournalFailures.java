@@ -255,7 +255,7 @@ public class TestEditLogJournalFailures {
         assertTrue(doAnEdit());
         // The NN has not terminated (no ExitException thrown)
         spyOnJASjournal(3);
-        RemoteExceptionInterface re = intercept(RemoteException.class, "too few journals successfully started.", () -> ((DistributedFileSystem) fs).rollEdits());
+        RemoteException re = intercept(RemoteException.class, "too few journals successfully started.", () -> ((DistributedFileSystem) fs).rollEdits());
         GenericTestUtils.assertExceptionContains("ExitException", re);
     }
 

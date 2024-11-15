@@ -80,7 +80,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
     @Test
     public void testWrite() throws Exception {
         String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, false, true);
+        MetricsSystem ms = initMetricsSystem(path, false, true);
         assertMetricsContents(doWriteTest(ms, path, 1));
     }
 
@@ -140,7 +140,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
     @Test
     public void testFailedWrite() throws IOException {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, false, false);
+        MetricsSystem ms = initMetricsSystem(path, false, false);
         new MyMetrics1().registerWith(ms);
         shutdownHdfs();
         MockSink.errored = false;
@@ -162,7 +162,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
     @Test
     public void testFailedClose() throws IOException {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, false, false);
+        MetricsSystem ms = initMetricsSystem(path, false, false);
         new MyMetrics1().registerWith(ms);
         // publish the metrics
         ms.publishMetricsNow();
@@ -187,7 +187,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
     @Test
     public void testSilentFailedWrite() throws IOException, InterruptedException {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, true, false);
+        MetricsSystem ms = initMetricsSystem(path, true, false);
         new MyMetrics1().registerWith(ms);
         shutdownHdfs();
         MockSink.errored = false;
@@ -209,7 +209,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
     @Test
     public void testSilentFailedClose() throws IOException {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, true, false);
+        MetricsSystem ms = initMetricsSystem(path, true, false);
         new MyMetrics1().registerWith(ms);
         // publish the metrics
         ms.publishMetricsNow();
@@ -236,7 +236,7 @@ public class TestRollingFileSystemSinkWithHdfs extends RollingFileSystemSinkTest
         // metrics log is written
         RollingFileSystemSink.forceFlush = true;
         String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp";
-        MetricsSystemInterface ms = initMetricsSystem(path, true, false, false);
+        MetricsSystem ms = initMetricsSystem(path, true, false, false);
         new MyMetrics1().registerWith(ms);
         // Publish the metrics
         ms.publishMetricsNow();

@@ -80,7 +80,7 @@ public class InternalDataNodeTestUtils {
    * @param pinned true if the block is pinned, false otherwise
    * @throws IOException
    */
-  public static void mockDatanodeBlkPinning(final DataNode dn,
+  public static void ImockDatanodeBlkPinning(final DataNode dn,
       final boolean pinned) throws IOException {
     final FsDatasetSpi<? extends FsVolumeSpi> data = dn.data;
     dn.data = Mockito.spy(data);

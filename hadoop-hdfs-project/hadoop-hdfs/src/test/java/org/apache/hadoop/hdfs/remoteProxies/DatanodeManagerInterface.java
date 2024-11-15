@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+
 public interface DatanodeManagerInterface {
     void resetLastCachingDirectiveSentTime();
     java.lang.String resolveNetworkLocationWithFallBackToDefaultLocation(DatanodeIDInterface arg0);
@@ -23,6 +25,8 @@ public interface DatanodeManagerInterface {
     HostConfigManagerInterface getHostConfigManager();
     java.util.function.Consumer<java.util.List<org.apache.hadoop.hdfs.protocol.DatanodeInfoWithStorage>> createSecondaryNodeSorter();
     DatanodeDescriptorInterface getDatanode(java.lang.String arg0);
+    DatanodeDescriptorInterface getDatanode(DatanodeInfo arg0);
+    NodeInterface getDatanode(DatanodeRegistrationInterface arg0);
     void setHeartbeatRecheckInterval(int arg0);
     void setNumStaleNodes(int arg0);
     void startAdminOperationIfNecessary(DatanodeDescriptorInterface arg0);

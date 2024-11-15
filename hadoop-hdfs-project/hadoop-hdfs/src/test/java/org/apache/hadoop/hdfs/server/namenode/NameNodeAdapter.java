@@ -145,12 +145,21 @@ public class NameNodeAdapter {
   public static void leaveSafeMode(NameNode namenode) {
     namenode.getNamesystem().leaveSafeMode(false);
   }
+
+  public static void leaveSafeMode(NameNodeInterface namenode) {
+    namenode.getNamesystem().leaveSafeMode(false);
+  }
   
   public static void abortEditLogs(NameNode nn) {
     FSEditLog el = nn.getFSImage().getEditLog();
     el.abortCurrentLogSegment();
   }
-  
+
+  public static void abortEditLogs(NameNodeInterface nn) {
+    FSEditLogInterface el = nn.getFSImage().getEditLog();
+    el.abortCurrentLogSegment();
+  }
+
   /**
    * Get the internal RPC server instance.
    * @return rpc server
@@ -259,6 +268,11 @@ public class NameNodeAdapter {
    */
   public static long getLeaseRenewalTime(NameNode nn, String path) {
     Lease l = getLeaseForPath(nn, path);
+    return l == null ? -1 : l.getLastUpdate();
+  }
+
+  public static long getLeaseRenewalTime(NameNodeInterface nn, String path) {
+    LeaseInterface l = getLeaseForPath(nn, path);
     return l == null ? -1 : l.getLastUpdate();
   }
 
@@ -459,6 +473,13 @@ public class NameNodeAdapter {
   public static JournalSet spyOnJournalSet(NameNode nn) {
     FSEditLog editLog = nn.getFSImage().getEditLog();
     JournalSet js = Mockito.spy(editLog.getJournalSet());
+    editLog.setJournalSetForTesting(js);
+    return js;
+  }
+
+  public static JournalSetInterface spyOnJournalSet(NameNodeInterface nn) {
+    FSEditLogInterface editLog = nn.getFSImage().getEditLog();
+    JournalSetInterface js = Mockito.spy(editLog.getJournalSet());
     editLog.setJournalSetForTesting(js);
     return js;
   }

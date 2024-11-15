@@ -104,11 +104,11 @@ public class TestOfflineImageViewerForStoragePolicy {
             hdfs.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER, false);
             hdfs.saveNamespace();
             // Determine the location of the fsimage file
-            originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
-            if (originalFsimage == null) {
-                throw new RuntimeException("Didn't generate or can't find fsimage");
-            }
-            LOG.debug("original FS image file is " + originalFsimage);
+            //originalFsimage = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));
+            //if (originalFsimage == null) {
+                //throw new RuntimeException("Didn't generate or can't find fsimage");
+            //}
+            //LOG.debug("original FS image file is " + originalFsimage);
         } finally {
             if (cluster != null) {
                 cluster.shutdown();

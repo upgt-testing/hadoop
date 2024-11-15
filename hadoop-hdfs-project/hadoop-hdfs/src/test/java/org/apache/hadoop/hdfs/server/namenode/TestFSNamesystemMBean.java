@@ -87,7 +87,7 @@ public class TestFSNamesystemMBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).build();
             cluster.waitActive();
-            FSNamesystemInterface fsn = cluster.getNameNode().namesystem;
+            FSNamesystemInterface fsn = cluster.getNameNode().getNamesystem();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
             String snapshotStats = (String) (mbs.getAttribute(mxbeanName, "SnapshotStats"));
@@ -120,7 +120,7 @@ public class TestFSNamesystemMBean {
         try {
             cluster = new MiniDockerDFSCluster.Builder(conf).build();
             cluster.waitActive();
-            fsn = cluster.getNameNode().namesystem;
+            fsn = cluster.getNameNode().getNamesystem();
             fsn.writeLock();
             Thread.sleep(jmxCachePeriod * 1000);
             MBeanClient client = new MBeanClient();

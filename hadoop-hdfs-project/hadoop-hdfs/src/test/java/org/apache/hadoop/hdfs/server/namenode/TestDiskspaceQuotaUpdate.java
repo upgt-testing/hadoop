@@ -103,7 +103,7 @@ public class TestDiskspaceQuotaUpdate {
         return new Path(BASE_DIR, testName);
     }
 
-    private FSDirectory getFSDirectory() {
+    private FSDirectoryInterface getFSDirectory() {
         return cluster.getNamesystem().getFSDirectory();
     }
 
@@ -152,7 +152,7 @@ public class TestDiskspaceQuotaUpdate {
         // foo and bar
         assertEquals(2, ns);
         assertEquals(currentFileLen * REPLICATION, ds);
-        ContentSummaryInterface c = getDFS().getContentSummary(foo);
+        ContentSummary c = getDFS().getContentSummary(foo);
         assertEquals(c.getSpaceConsumed(), ds);
         // append another block, the previous file length is not at block boundary
         DFSTestUtil.appendFile(getDFS(), bar, BLOCKSIZE);
@@ -362,7 +362,7 @@ public class TestDiskspaceQuotaUpdate {
         }
     }
 
-    private void scanDirsWithQuota(INodeDirectory dir, HashMap<String, Long> nsMap, HashMap<String, Long> dsMap, boolean verify) {
+    private void scanDirsWithQuota(INodeDirectoryInterface dir, HashMap<String, Long> nsMap, HashMap<String, Long> dsMap, boolean verify) {
         if (dir.isQuotaSet()) {
             // get the current consumption
             QuotaCountsInterface q = dir.getDirectoryWithQuotaFeature().getSpaceConsumed();
@@ -376,8 +376,8 @@ public class TestDiskspaceQuotaUpdate {
             }
         }
         for (INodeInterface child : dir.getChildrenList(Snapshot.CURRENT_STATE_ID)) {
-            if (child instanceof INodeDirectory) {
-                scanDirsWithQuota((INodeDirectory) child, nsMap, dsMap, verify);
+            if (child instanceof INodeDirectoryInterface) {
+                scanDirsWithQuota((INodeDirectoryInterface) child, nsMap, dsMap, verify);
             }
         }
     }
@@ -396,7 +396,7 @@ public class TestDiskspaceQuotaUpdate {
             for (int i = REPLICATION - 1; i > 0; i--) {
                 dnprops.add(cluster.stopDataNode(i));
             }
-            DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode());
+            DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(cluster.getDataNodes().get(0), cluster.getNameNode());
             testQuotaIssuesWhileCommittingHelper(nnSpy, (short) 1, (short) 4);
             testQuotaIssuesWhileCommittingHelper(nnSpy, (short) 4, (short) 1);
             // Don't actually change replication; just check that the sizes

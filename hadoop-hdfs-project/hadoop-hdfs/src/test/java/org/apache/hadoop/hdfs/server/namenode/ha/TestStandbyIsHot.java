@@ -173,6 +173,33 @@ public class TestStandbyIsHot {
                 try {
                     LocatedBlocks locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
                     DatanodeInfo[] dnis = locs.getLastLocatedBlock().getLocations();
+                    for (DatanodeInfo dni : dnis) {
+                        Assert.assertNotNull(dni);
+                    }
+                    int numReplicas = dnis.length;
+                    LOG.info("Got " + numReplicas + " locs: " + locs);
+                    if (numReplicas > expectedReplicas) {
+                        cluster.triggerDeletionReports();
+                    }
+                    cluster.triggerHeartbeats();
+                    return numReplicas == expectedReplicas;
+                } catch (IOException e) {
+                    LOG.warn("No block locations yet: " + e.getMessage());
+                    return false;
+                }
+            }
+        }, 500, 20000);
+    }
+
+
+    static void waitForBlockLocations(final MiniDockerDFSCluster cluster, final NameNodeInterface nn, final String path, final int expectedReplicas) throws Exception {
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                try {
+                    LocatedBlocksInterface locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
+                    DatanodeInfoInterface[] dnis = locs.getLastLocatedBlock().getLocations();
                     for (DatanodeInfoInterface dni : dnis) {
                         Assert.assertNotNull(dni);
                     }

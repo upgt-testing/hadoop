@@ -158,7 +158,7 @@ public class TestRenameWithSnapshots {
         final INodeInterface fooRef = fsdir.getINode(SnapshotTestHelper.getSnapshotPath(abc, "s0", "foo").toString());
         Assert.assertTrue(fooRef.isReference());
         Assert.assertTrue(fooRef.asReference() instanceof INodeReference.WithName);
-        final INodeReference.WithCountInterface withCount = (INodeReference.WithCount) fooRef.asReference().getReferredINode();
+        final INodeReference.WithCount withCount = (INodeReference.WithCount) fooRef.asReference().getReferredINode();
         Assert.assertEquals(2, withCount.getReferenceCount());
         final INodeInterface barRef = fsdir.getINode(bar.toString());
         Assert.assertTrue(barRef.isReference());
@@ -188,7 +188,7 @@ public class TestRenameWithSnapshots {
         DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPL, SEED);
         hdfs.rename(file1, file2);
         // Query the diff report and make sure it looks as expected.
-        SnapshotDiffReportInterface diffReport = hdfs.getSnapshotDiffReport(sub1, snap1, "");
+        SnapshotDiffReport diffReport = hdfs.getSnapshotDiffReport(sub1, snap1, "");
         List<DiffReportEntry> entries = diffReport.getDiffList();
         assertTrue(entries.size() == 2);
         assertTrue(existsInDiffReport(entries, DiffType.MODIFY, "", null));
@@ -207,7 +207,7 @@ public class TestRenameWithSnapshots {
         hdfs.createSnapshot(sub1, snap1);
         hdfs.rename(file1, file2);
         // Query the diff report and make sure it looks as expected.
-        SnapshotDiffReportInterface diffReport = hdfs.getSnapshotDiffReport(sub1, snap1, "");
+        SnapshotDiffReport diffReport = hdfs.getSnapshotDiffReport(sub1, snap1, "");
         System.out.println("DiffList is " + diffReport.toString());
         List<DiffReportEntry> entries = diffReport.getDiffList();
         assertTrue(entries.size() == 2);
@@ -224,7 +224,7 @@ public class TestRenameWithSnapshots {
         hdfs.rename(file1, file2);
         hdfs.createSnapshot(sub1, snap2);
         hdfs.rename(file2, file3);
-        SnapshotDiffReportInterface diffReport;
+        SnapshotDiffReport diffReport;
         // Query the diff report and make sure it looks as expected.
         diffReport = hdfs.getSnapshotDiffReport(sub1, snap1, snap2);
         LOG.info("DiffList is " + diffReport.toString());
@@ -259,7 +259,7 @@ public class TestRenameWithSnapshots {
         // Rename the file in the subdirectory.
         hdfs.rename(sub2file1, sub2file2);
         // Query the diff report and make sure it looks as expected.
-        SnapshotDiffReportInterface diffReport = hdfs.getSnapshotDiffReport(sub1, sub1snap1, "");
+        SnapshotDiffReport diffReport = hdfs.getSnapshotDiffReport(sub1, sub1snap1, "");
         LOG.info("DiffList is \n\"" + diffReport.toString() + "\"");
         List<DiffReportEntry> entries = diffReport.getDiffList();
         assertTrue(existsInDiffReport(entries, DiffType.MODIFY, sub2.getName(), null));
@@ -279,7 +279,7 @@ public class TestRenameWithSnapshots {
         // First rename the sub-directory.
         hdfs.rename(sub2, sub3);
         // Query the diff report and make sure it looks as expected.
-        SnapshotDiffReportInterface diffReport = hdfs.getSnapshotDiffReport(sub1, sub1snap1, "");
+        SnapshotDiffReport diffReport = hdfs.getSnapshotDiffReport(sub1, sub1snap1, "");
         LOG.info("DiffList is \n\"" + diffReport.toString() + "\"");
         List<DiffReportEntry> entries = diffReport.getDiffList();
         assertEquals(2, entries.size());
@@ -316,7 +316,7 @@ public class TestRenameWithSnapshots {
         // check the internal details
         INodeInterface sub3file3Inode = fsdir.getINode4Write(sub3file3.toString());
         INodeReferenceInterface ref = sub3file3Inode.asReference();
-        INodeReference.WithCountInterface withCount = (WithCount) ref.getReferredINode();
+        INodeReference.WithCount withCount = (WithCount) ref.getReferredINode();
         Assert.assertEquals(withCount.getReferenceCount(), 1);
         // Ensure name list is empty for the reference sub3file3Inode
         Assert.assertNull(withCount.getLastWithName());
@@ -485,7 +485,7 @@ public class TestRenameWithSnapshots {
         File fsnBefore = new File(testDir, "dumptree_before");
         File fsnMiddle = new File(testDir, "dumptree_middle");
         File fsnAfter = new File(testDir, "dumptree_after");
-        SnapshotTestHelper.dumpTree2File(fsdir, fsnBefore);
+        //SnapshotTestHelper.dumpTree2File(fsdir, fsnBefore);
         cluster.shutdown(false, false);
         cluster = new MiniDockerDFSCluster.Builder(conf).format(false).numDataNodes(REPL).build();
         cluster.waitActive();
@@ -493,7 +493,7 @@ public class TestRenameWithSnapshots {
         fsdir = fsn.getFSDirectory();
         hdfs = cluster.getFileSystem();
         // later check fsnMiddle to see if the edit log is applied correctly
-        SnapshotTestHelper.dumpTree2File(fsdir, fsnMiddle);
+        //SnapshotTestHelper.dumpTree2File(fsdir, fsnMiddle);
         // save namespace and restart cluster
         hdfs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
         hdfs.saveNamespace();
@@ -505,7 +505,7 @@ public class TestRenameWithSnapshots {
         fsdir = fsn.getFSDirectory();
         hdfs = cluster.getFileSystem();
         // dump the namespace loaded from fsimage
-        SnapshotTestHelper.dumpTree2File(fsdir, fsnAfter);
+        //SnapshotTestHelper.dumpTree2File(fsdir, fsnAfter);
         SnapshotTestHelper.compareDumpedTreeInFile(fsnBefore, fsnMiddle, compareQuota);
         SnapshotTestHelper.compareDumpedTreeInFile(fsnBefore, fsnAfter, compareQuota);
     }
@@ -679,11 +679,11 @@ public class TestRenameWithSnapshots {
         hdfs.rename(bar2_dir2, bar2_dir1);
         // check the internal details
         INodeReferenceInterface fooRef = fsdir.getINode4Write(foo_dir1.toString()).asReference();
-        INodeReference.WithCountInterface fooWithCount = (WithCount) fooRef.getReferredINode();
+        INodeReference.WithCount fooWithCount = (WithCount) fooRef.getReferredINode();
         // only 2 references: one in deleted list of sdir1, one in created list of
         // sdir1
         assertEquals(2, fooWithCount.getReferenceCount());
-        INodeDirectoryInterface foo = fooWithCount.asDirectory();
+        INodeDirectory foo = fooWithCount.asDirectory();
         assertEquals(1, foo.getDiffs().asList().size());
         INodeDirectoryInterface sdir1Node = fsdir.getINode(sdir1.toString()).asDirectory();
         SnapshotInterface s1 = sdir1Node.getSnapshot(DFSUtil.string2Bytes("s1"));
@@ -692,9 +692,9 @@ public class TestRenameWithSnapshots {
         assertEquals(1, bar1.getDiffs().asList().size());
         assertEquals(s1.getId(), bar1.getDiffs().getLastSnapshotId());
         INodeReferenceInterface barRef = fsdir.getINode4Write(bar2_dir1.toString()).asReference();
-        INodeReference.WithCountInterface barWithCount = (WithCount) barRef.getReferredINode();
+        INodeReference.WithCount barWithCount = (WithCount) barRef.getReferredINode();
         assertEquals(2, barWithCount.getReferenceCount());
-        INodeFileInterface bar = barWithCount.asFile();
+        INodeFile bar = barWithCount.asFile();
         assertEquals(1, bar.getDiffs().asList().size());
         assertEquals(s1.getId(), bar.getDiffs().getLastSnapshotId());
         // restart the cluster and check fsimage
@@ -859,10 +859,10 @@ public class TestRenameWithSnapshots {
         INodeDirectoryInterface sdir2Node = fsdir.getINode(sdir2.toString()).asDirectory();
         INodeDirectoryInterface sdir3Node = fsdir.getINode(sdir3.toString()).asDirectory();
         INodeReferenceInterface fooRef = fsdir.getINode4Write(foo_dir1.toString()).asReference();
-        INodeReference.WithCountInterface fooWithCount = (WithCount) fooRef.getReferredINode();
+        INodeReference.WithCount fooWithCount = (WithCount) fooRef.getReferredINode();
         // 5 references: s1, s22, s333, s2222, current tree of sdir1
         assertEquals(5, fooWithCount.getReferenceCount());
-        INodeDirectoryInterface foo = fooWithCount.asDirectory();
+        INodeDirectory foo = fooWithCount.asDirectory();
         DiffList<DirectoryDiff> fooDiffs = foo.getDiffs().asList();
         assertEquals(4, fooDiffs.size());
         SnapshotInterface s2222 = sdir2Node.getSnapshot(DFSUtil.string2Bytes("s2222"));
@@ -880,10 +880,10 @@ public class TestRenameWithSnapshots {
         assertEquals(s22.getId(), bar1Diffs.get(1).getSnapshotId());
         assertEquals(s1.getId(), bar1Diffs.get(0).getSnapshotId());
         INodeReferenceInterface barRef = fsdir.getINode4Write(bar_dir1.toString()).asReference();
-        INodeReference.WithCountInterface barWithCount = (WithCount) barRef.getReferredINode();
+        INodeReference.WithCount barWithCount = (WithCount) barRef.getReferredINode();
         // 5 references: s1, s22, s333, s2222, current tree of sdir1
         assertEquals(5, barWithCount.getReferenceCount());
-        INodeFileInterface bar = barWithCount.asFile();
+        INodeFile bar = barWithCount.asFile();
         DiffList<FileDiff> barDiffs = bar.getDiffs().asList();
         assertEquals(4, barDiffs.size());
         assertEquals(s2222.getId(), barDiffs.get(3).getSnapshotId());
@@ -975,7 +975,7 @@ public class TestRenameWithSnapshots {
         }
         hdfs.deleteSnapshot(bar, snap1);
         hdfs.rename(foo, bar, Rename.OVERWRITE);
-        SnapshottableDirectoryStatus[] dirs = fsn.getSnapshottableDirListing();
+        SnapshottableDirectoryStatusInterface[] dirs = fsn.getSnapshottableDirListing();
         assertEquals(1, dirs.length);
         assertEquals(bar, dirs[0].getFullPath());
         assertEquals(fooId, dirs[0].getDirStatus().getFileId());
@@ -1004,7 +1004,7 @@ public class TestRenameWithSnapshots {
         }
         hdfs.disallowSnapshot(foo);
         hdfs.rename(foo, bar, Rename.OVERWRITE);
-        SnapshottableDirectoryStatus[] dirs = fsn.getSnapshottableDirListing();
+        SnapshottableDirectoryStatusInterface[] dirs = fsn.getSnapshottableDirListing();
         assertEquals(1, dirs.length);
         assertEquals(sdir2, dirs[0].getFullPath());
     }
@@ -1058,9 +1058,9 @@ public class TestRenameWithSnapshots {
         final Path foo_s2 = SnapshotTestHelper.getSnapshotPath(sdir2, "s2", "foo");
         INodeReferenceInterface fooRef = fsdir.getINode(foo_s2.toString()).asReference();
         assertTrue(fooRef instanceof INodeReference.WithName);
-        INodeReference.WithCountInterface fooWC = (WithCount) fooRef.getReferredINode();
+        INodeReference.WithCount fooWC = (WithCount) fooRef.getReferredINode();
         assertEquals(1, fooWC.getReferenceCount());
-        INodeDirectoryInterface fooDir = fooWC.getReferredINode().asDirectory();
+        INodeDirectory fooDir = fooWC.getReferredINode().asDirectory();
         DiffList<DirectoryDiff> diffs = fooDir.getDiffs().asList();
         assertEquals(1, diffs.size());
         assertEquals(s2.getId(), diffs.get(0).getSnapshotId());
@@ -1147,7 +1147,7 @@ public class TestRenameWithSnapshots {
         // check the current internal details
         INodeDirectoryInterface dir1Node = fsdir.getINode4Write(sdir1.toString()).asDirectory();
         SnapshotInterface s1 = dir1Node.getSnapshot(DFSUtil.string2Bytes("s1"));
-        ReadOnlyList<INode> dir1Children = dir1Node.getChildrenList(Snapshot.CURRENT_STATE_ID);
+        ReadOnlyList<INodeInterface> dir1Children = dir1Node.getChildrenList(Snapshot.CURRENT_STATE_ID);
         assertEquals(1, dir1Children.size());
         assertEquals(foo.getName(), dir1Children.get(0).getLocalName());
         DiffList<DirectoryDiff> dir1Diffs = dir1Node.getDiffs().asList();

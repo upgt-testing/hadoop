@@ -15,8 +15,11 @@ public interface ConfigurationInterface extends Remote {
     void checkPermission(java.lang.String arg0);
     void setConfiguration(ConfigurationInterface arg0);
     String get(String arg0);
+    String get(String arg0, String arg1);
     String set(String arg0, String arg1);
     int getInt(String arg0, int arg1);
+    long getLong(String arg0, long arg1);
+    Boolean getBoolean(String arg0, boolean arg1);
     AppConfigurationEntryInterface[] getAppConfigurationEntry(java.lang.String arg0);
     javax.security.auth.login.Configuration.Parameters getParameters();
     ConfigurationInterface getInstance(java.lang.String arg0, javax.security.auth.login.Configuration.Parameters arg1, java.security.Provider arg2) throws java.security.NoSuchAlgorithmException;

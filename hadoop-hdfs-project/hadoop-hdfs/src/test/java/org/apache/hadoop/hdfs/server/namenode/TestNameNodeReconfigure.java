@@ -96,13 +96,18 @@ public class TestNameNodeReconfigure {
         assertEquals(HADOOP_CALLER_CONTEXT_ENABLED_KEY + " has wrong value", expected, nameNode.getConf().getBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, HADOOP_CALLER_CONTEXT_ENABLED_DEFAULT));
     }
 
+    void verifyReconfigureCallerContextEnabled(final NameNodeInterface nameNode, final FSNamesystemInterface nameSystem, boolean expected) {
+        assertEquals(HADOOP_CALLER_CONTEXT_ENABLED_KEY + " has wrong value", expected, nameNode.getNamesystem().getCallerContextEnabled());
+        assertEquals(HADOOP_CALLER_CONTEXT_ENABLED_KEY + " has wrong value", expected, nameNode.getConf().getBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, HADOOP_CALLER_CONTEXT_ENABLED_DEFAULT));
+    }
+
     /**
      * Test to reconfigure enable/disable IPC backoff
      */
     @Test
     public void testReconfigureIPCBackoff() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        NameNodeRpcServerInterface nnrs = (NameNodeRpcServer) nameNode.getRpcServer();
+        NameNodeRpcServer nnrs = (NameNodeRpcServer) nameNode.getRpcServer();
         String ipcClientRPCBackoffEnable = NameNode.buildBackoffEnableKey(nnrs.getClientRpcServer().getPort());
         // try invalid values
         verifyReconfigureIPCBackoff(nameNode, nnrs, ipcClientRPCBackoffEnable, false);
@@ -123,13 +128,18 @@ public class TestNameNodeReconfigure {
         assertEquals(property + " has wrong value", expected, nameNode.getConf().getBoolean(property, IPC_BACKOFF_ENABLE_DEFAULT));
     }
 
+    void verifyReconfigureIPCBackoff(final NameNodeInterface nameNode, final NameNodeRpcServer nnrs, String property, boolean expected) {
+        assertEquals(property + " has wrong value", expected, nnrs.getClientRpcServer().isClientBackoffEnabled());
+        assertEquals(property + " has wrong value", expected, nameNode.getConf().getBoolean(property, IPC_BACKOFF_ENABLE_DEFAULT));
+    }
+
     /**
      * Test to reconfigure interval of heart beat check and re-check.
      */
     @Test
     public void testReconfigureHearbeatCheck() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final DatanodeManagerInterface datanodeManager = nameNode.namesystem.getBlockManager().getDatanodeManager();
+        final DatanodeManagerInterface datanodeManager = nameNode.getNamesystem().getBlockManager().getDatanodeManager();
         // change properties
         nameNode.reconfigureProperty(DFS_HEARTBEAT_INTERVAL_KEY, "" + 6);
         nameNode.reconfigureProperty(DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, "" + (10 * 60 * 1000));
@@ -235,6 +245,14 @@ public class TestNameNodeReconfigure {
     }
 
     void verifySPSEnabled(final NameNode nameNode, String property, StoragePolicySatisfierMode expected, boolean isSatisfierRunning) {
+        StoragePolicySatisfyManager spsMgr = nameNode.getNamesystem().getBlockManager().getSPSManager();
+        boolean isSPSRunning = spsMgr != null ? spsMgr.isSatisfierRunning() : false;
+        assertEquals(property + " has wrong value", isSPSRunning, isSPSRunning);
+        String actual = nameNode.getConf().get(property, DFS_STORAGE_POLICY_SATISFIER_MODE_DEFAULT);
+        assertEquals(property + " has wrong value", expected, StoragePolicySatisfierMode.fromString(actual));
+    }
+
+    void verifySPSEnabled(final NameNodeInterface nameNode, String property, StoragePolicySatisfierMode expected, boolean isSatisfierRunning) {
         StoragePolicySatisfyManagerInterface spsMgr = nameNode.getNamesystem().getBlockManager().getSPSManager();
         boolean isSPSRunning = spsMgr != null ? spsMgr.isSatisfierRunning() : false;
         assertEquals(property + " has wrong value", isSPSRunning, isSPSRunning);
@@ -245,7 +263,7 @@ public class TestNameNodeReconfigure {
     @Test
     public void testBlockInvalidateLimitAfterReconfigured() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final DatanodeManagerInterface datanodeManager = nameNode.namesystem.getBlockManager().getDatanodeManager();
+        final DatanodeManagerInterface datanodeManager = nameNode.getNamesystem().getBlockManager().getDatanodeManager();
         assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not correctly set", customizedBlockInvalidateLimit, datanodeManager.getBlockInvalidateLimit());
         nameNode.reconfigureProperty(DFS_HEARTBEAT_INTERVAL_KEY, Integer.toString(6));
         // 20 * 6 = 120 < 500
@@ -270,7 +288,7 @@ public class TestNameNodeReconfigure {
     @Test
     public void testEnableSlowNodesParametersAfterReconfigured() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final BlockManagerInterface blockManager = nameNode.namesystem.getBlockManager();
+        final BlockManagerInterface blockManager = nameNode.getNamesystem().getBlockManager();
         final DatanodeManagerInterface datanodeManager = blockManager.getDatanodeManager();
         // By default, avoidSlowDataNodesForRead is false.
         assertEquals(false, datanodeManager.getEnableAvoidSlowDataNodesForRead());
@@ -289,7 +307,7 @@ public class TestNameNodeReconfigure {
     @Test
     public void testReconfigureMaxSlowpeerCollectNodes() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final DatanodeManagerInterface datanodeManager = nameNode.namesystem.getBlockManager().getDatanodeManager();
+        final DatanodeManagerInterface datanodeManager = nameNode.getNamesystem().getBlockManager().getDatanodeManager();
         // By default, DFS_NAMENODE_MAX_SLOWPEER_COLLECT_NODES_KEY is 5.
         assertEquals(5, datanodeManager.getMaxSlowpeerCollectNodes());
         // Reconfigure.
@@ -301,7 +319,7 @@ public class TestNameNodeReconfigure {
     @Test
     public void testBlockInvalidateLimit() throws ReconfigurationException {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final DatanodeManagerInterface datanodeManager = nameNode.namesystem.getBlockManager().getDatanodeManager();
+        final DatanodeManagerInterface datanodeManager = nameNode.getNamesystem().getBlockManager().getDatanodeManager();
         assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not correctly set", customizedBlockInvalidateLimit, datanodeManager.getBlockInvalidateLimit());
         try {
             nameNode.reconfigureProperty(DFS_BLOCK_INVALIDATE_LIMIT_KEY, "non-numeric");
@@ -320,7 +338,7 @@ public class TestNameNodeReconfigure {
     @Test
     public void testSlowPeerTrackerEnabled() throws Exception {
         final NameNodeInterface nameNode = cluster.getNameNode();
-        final DatanodeManagerInterface datanodeManager = nameNode.namesystem.getBlockManager().getDatanodeManager();
+        final DatanodeManagerInterface datanodeManager = nameNode.getNamesystem().getBlockManager().getDatanodeManager();
         assertFalse("SlowNode tracker is already enabled. It should be disabled by default", datanodeManager.getSlowPeerTracker().isSlowPeerTrackerEnabled());
         try {
             nameNode.reconfigurePropertyImpl(DFS_DATANODE_PEER_STATS_ENABLED_KEY, "non-boolean");

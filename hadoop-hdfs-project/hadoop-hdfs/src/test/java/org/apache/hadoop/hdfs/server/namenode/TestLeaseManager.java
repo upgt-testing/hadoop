@@ -61,7 +61,7 @@ public class TestLeaseManager {
 
     @Test
     public void testRemoveLeases() throws Exception {
-        FSNamesystemInterface fsn = mock(FSNamesystem.class);
+        FSNamesystem fsn = mock(FSNamesystem.class);
         LeaseManager lm = new LeaseManager(fsn);
         ArrayList<Long> ids = Lists.newArrayList(INodeId.ROOT_INODE_ID + 1, INodeId.ROOT_INODE_ID + 2, INodeId.ROOT_INODE_ID + 3, INodeId.ROOT_INODE_ID + 4);
         for (long id : ids) {
@@ -124,7 +124,7 @@ public class TestLeaseManager {
         lm.removeLease("holder2", stubInodeFile(3));
         lm.removeLease("InvalidLeaseHolder", stubInodeFile(1));
         assertThat(lm.countPath(), is(2L));
-        INodeFileInterface file = stubInodeFile(1);
+        INodeFile file = stubInodeFile(1);
         lm.reassignLease(lm.getLease(file), file, "holder2");
         // Count unchanged on reassign
         assertThat(lm.countPath(), is(2L));
@@ -148,7 +148,7 @@ public class TestLeaseManager {
             // Remove the lease from the lease manager, but leave it in the inode.
             FSDirectoryInterface dir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface file = dir.getINode(path).asFile();
-            cluster.getNamesystem().leaseManager.removeLease(file.getFileUnderConstructionFeature().getClientName(), file);
+            cluster.getNamesystem().getLeaseManager().removeLease(file.getFileUnderConstructionFeature().getClientName(), file);
             // Save a fsimage.
             dfs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
             cluster.getNameNodeRpc().saveNamespace(0, 0);
@@ -158,7 +158,7 @@ public class TestLeaseManager {
             // Check whether the lease manager has the lease
             dir = cluster.getNamesystem().getFSDirectory();
             file = dir.getINode(path).asFile();
-            assertTrue("Lease should exist.", cluster.getNamesystem().leaseManager.getLease(file) != null);
+            assertTrue("Lease should exist.", cluster.getNamesystem().getLeaseManager().getLease(file) != null);
         } finally {
             if (cluster != null) {
                 cluster.shutdown();
@@ -174,17 +174,17 @@ public class TestLeaseManager {
      */
     @Test(timeout = 60000)
     public void testInodeWithLeases() throws Exception {
-        FSNamesystemInterface fsNamesystem = makeMockFsNameSystem();
+        FSNamesystem fsNamesystem = makeMockFsNameSystem();
         when(fsNamesystem.getMaxListOpenFilesResponses()).thenReturn(1024);
-        FSDirectoryInterface fsDirectory = fsNamesystem.getFSDirectory();
+        FSDirectory fsDirectory = fsNamesystem.getFSDirectory();
         LeaseManager lm = new LeaseManager(fsNamesystem);
         Set<Long> iNodeIds = new HashSet<>(Arrays.asList(INodeId.ROOT_INODE_ID + 1, INodeId.ROOT_INODE_ID + 2, INodeId.ROOT_INODE_ID + 3, INodeId.ROOT_INODE_ID + 4));
-        final PermissionStatusInterface perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
+        final PermissionStatus perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
         INodeDirectory rootInodeDirectory = new INodeDirectory(HdfsConstants.GRANDFATHER_INODE_ID, DFSUtil.string2Bytes(""), perm, 0L);
         when(fsDirectory.getRoot()).thenReturn(rootInodeDirectory);
         verifyINodeLeaseCounts(fsNamesystem, lm, rootInodeDirectory, 0, 0, 0);
         for (Long iNodeId : iNodeIds) {
-            INodeFileInterface iNodeFile = stubInodeFile(iNodeId);
+            INodeFile iNodeFile = stubInodeFile(iNodeId);
             iNodeFile.toUnderConstruction("hbase", "gce-100");
             iNodeFile.setParent(rootInodeDirectory);
             when(fsDirectory.getInode(iNodeId)).thenReturn(iNodeFile);
@@ -205,11 +205,11 @@ public class TestLeaseManager {
      */
     @Test(timeout = 240000)
     public void testInodeWithLeasesAtScale() throws Exception {
-        FSNamesystemInterface fsNamesystem = makeMockFsNameSystem();
+        FSNamesystem fsNamesystem = makeMockFsNameSystem();
         when(fsNamesystem.getMaxListOpenFilesResponses()).thenReturn(4096);
-        FSDirectoryInterface fsDirectory = fsNamesystem.getFSDirectory();
+        FSDirectory fsDirectory = fsNamesystem.getFSDirectory();
         LeaseManager lm = new LeaseManager(fsNamesystem);
-        final PermissionStatusInterface perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
+        final PermissionStatus perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
         INodeDirectory rootInodeDirectory = new INodeDirectory(HdfsConstants.GRANDFATHER_INODE_ID, DFSUtil.string2Bytes(""), perm, 0L);
         when(fsDirectory.getRoot()).thenReturn(rootInodeDirectory);
         // Case 1: No open files
@@ -241,7 +241,7 @@ public class TestLeaseManager {
             iNodeIds.add(INodeId.ROOT_INODE_ID + i);
         }
         for (Long iNodeId : iNodeIds) {
-            INodeFileInterface iNodeFile = stubInodeFile(iNodeId);
+            INodeFile iNodeFile = stubInodeFile(iNodeId);
             iNodeFile.toUnderConstruction("hbase", "gce-100");
             iNodeFile.setParent(ancestorDirectory);
             when(fsDirectory.getInode(iNodeId)).thenReturn(iNodeFile);
@@ -259,17 +259,17 @@ public class TestLeaseManager {
      */
     @Test(timeout = 60000)
     public void testInodeWithLeasesForAncestorDir() throws Exception {
-        FSNamesystemInterface fsNamesystem = makeMockFsNameSystem();
-        FSDirectoryInterface fsDirectory = fsNamesystem.getFSDirectory();
+        FSNamesystem fsNamesystem = makeMockFsNameSystem();
+        FSDirectory fsDirectory = fsNamesystem.getFSDirectory();
         LeaseManager lm = new LeaseManager(fsNamesystem);
-        final PermissionStatusInterface perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
+        final PermissionStatus perm = PermissionStatus.createImmutable("user", "group", FsPermission.createImmutable((short) 0755));
         INodeDirectory rootInodeDirectory = new INodeDirectory(HdfsConstants.GRANDFATHER_INODE_ID, DFSUtil.string2Bytes(""), perm, 0L);
         when(fsDirectory.getRoot()).thenReturn(rootInodeDirectory);
         AtomicInteger inodeIds = new AtomicInteger((int) (HdfsConstants.GRANDFATHER_INODE_ID + 1234));
         String[] pathTree = new String[] { "/root.log", "/ENG/a/a1.log", "/ENG/a/b/b1.log", "/ENG/a/b/c/c1.log", "/ENG/a/b/c/c2.log", "/OPS/m/m1.log", "/OPS/m/n/n1.log", "/OPS/m/n/n2.log" };
         Map<String, INode> pathINodeMap = createINodeTree(rootInodeDirectory, pathTree, inodeIds);
         assertEquals(0, lm.getINodeIdWithLeases().size());
-        for (EntryInterface<String, INode> entry : pathINodeMap.entrySet()) {
+        for (Entry<String, INode> entry : pathINodeMap.entrySet()) {
             long iNodeId = entry.getValue().getId();
             when(fsDirectory.getInode(iNodeId)).thenReturn(entry.getValue());
             if (entry.getKey().contains("log")) {
@@ -318,16 +318,16 @@ public class TestLeaseManager {
         HashMap<String, INode> pathINodeMap = new HashMap<>();
         for (String path : pathTree) {
             byte[][] components = INode.getPathComponents(path);
-            FsPermissionInterface perm = FsPermission.createImmutable((short) 0755);
-            PermissionStatusInterface permStatus = PermissionStatus.createImmutable("", "", perm);
-            INodeDirectoryInterface prev = parentDir;
-            INodeDirectoryInterface dir = null;
+            FsPermission perm = FsPermission.createImmutable((short) 0755);
+            PermissionStatus permStatus = PermissionStatus.createImmutable("", "", perm);
+            INodeDirectory prev = parentDir;
+            INodeDirectory dir = null;
             for (int i = 0; i < components.length - 1; i++) {
                 byte[] component = components[i];
                 if (component.length == 0) {
                     continue;
                 }
-                INodeInterface existingChild = prev.getChild(component, Snapshot.CURRENT_STATE_ID);
+                INode existingChild = prev.getChild(component, Snapshot.CURRENT_STATE_ID);
                 if (existingChild == null) {
                     String dirName = DFSUtil.bytes2String(component);
                     dir = new INodeDirectory(inodeId.incrementAndGet(), component, permStatus, 0);
@@ -350,8 +350,8 @@ public class TestLeaseManager {
     }
 
     private static FSNamesystem makeMockFsNameSystem() {
-        FSDirectoryInterface dir = mock(FSDirectory.class);
-        FSNamesystemInterface fsn = mock(FSNamesystem.class);
+        FSDirectory dir = mock(FSDirectory.class);
+        FSNamesystem fsn = mock(FSNamesystem.class);
         when(fsn.isRunning()).thenReturn(true);
         when(fsn.hasReadLock()).thenReturn(true);
         when(fsn.hasWriteLock()).thenReturn(true);

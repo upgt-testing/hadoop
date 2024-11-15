@@ -304,4 +304,19 @@ public class DataNodeTestUtils {
             }
         }, 100, 10000);
     }
+
+    public static void waitForDiskError(DataNodeInterface dn, FsVolumeSpi volume) throws Exception {
+        LOG.info("Starting to wait for datanode to detect disk failure.");
+        final long lastDiskErrorCheck = dn.getLastDiskErrorCheck();
+        dn.checkDiskErrorAsync(volume);
+        // Wait 10 seconds for checkDiskError thread to finish and discover volume
+        // failures.
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                return dn.getLastDiskErrorCheck() != lastDiskErrorCheck;
+            }
+        }, 100, 10000);
+    }
 }

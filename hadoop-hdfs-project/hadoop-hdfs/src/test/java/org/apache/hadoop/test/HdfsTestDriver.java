@@ -37,7 +37,7 @@ public class HdfsTestDriver {
         this.pgd = pgd;
         try {
             pgd.addClass("dfsthroughput", BenchmarkThroughput.class, "measure hdfs throughput");
-            pgd.addClass("minidfscluster", MiniDockerDFSClusterManager.class, "Run a single-process mini DFS cluster");
+            pgd.addClass("minidfscluster",MiniDockerDFSCluster.class, "Run a single-process mini DFS cluster");
         } catch (Throwable e) {
             e.printStackTrace();
         }

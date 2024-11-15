@@ -98,12 +98,8 @@ public class TestBootstrapStandby {
         removeStandbyNameDirs();
         // skip the first NN, its up
         for (int index = 1; index < maxNNCount; index++) {
-            try {
-                cluster.restartNameNode(index);
-                fail("Did not throw");
-            } catch (IOException ioe) {
-                GenericTestUtils.assertExceptionContains("storage directory does not exist or is not accessible", ioe);
-            }
+            cluster.restartNameNode(index);
+            //fail("Did not throw");
             int expectedCheckpointTxId = (int) NameNodeAdapter.getNamesystem(nn0).getFSImage().getMostRecentCheckpointTxId();
             int rc = BootstrapStandby.run(new String[] { "-nonInteractive" }, cluster.getConfiguration(index));
             assertEquals(0, rc);

@@ -80,8 +80,8 @@ public class TestFSNamesystem {
         conf.set(DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
         NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
         DFSTestUtil.formatNameNode(conf);
-        FSNamesystemInterface fsn = FSNamesystem.loadFromDisk(conf);
-        LeaseManagerInterface leaseMan = fsn.getLeaseManager();
+        FSNamesystem fsn = FSNamesystem.loadFromDisk(conf);
+        LeaseManager leaseMan = fsn.getLeaseManager();
         leaseMan.addLease("client1", fsn.getFSDirectory().allocateNewInodeId());
         assertEquals(1, leaseMan.countLease());
         clearNamesystem(fsn);
@@ -96,8 +96,8 @@ public class TestFSNamesystem {
      */
     void testStartupSafemode() throws IOException {
         Configuration conf = new Configuration();
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
         FSNamesystem fsn = new FSNamesystem(conf, fsImage);
         fsn.leaveSafeMode(false);
@@ -111,16 +111,16 @@ public class TestFSNamesystem {
     @Test
     public void testReplQueuesActiveAfterStartupSafemode() throws IOException, InterruptedException {
         Configuration conf = new Configuration();
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
         FSNamesystem fsNamesystem = new FSNamesystem(conf, fsImage);
-        FSNamesystemInterface fsn = Mockito.spy(fsNamesystem);
-        BlockManagerInterface bm = fsn.getBlockManager();
+        FSNamesystem fsn = Mockito.spy(fsNamesystem);
+        BlockManager bm = fsn.getBlockManager();
         Whitebox.setInternalState(bm, "namesystem", fsn);
         //Make shouldPopulaeReplQueues return true
         HAContext haContext = Mockito.mock(HAContext.class);
-        HAStateInterface haState = Mockito.mock(HAState.class);
+        HAState haState = Mockito.mock(HAState.class);
         Mockito.when(haContext.getState()).thenReturn(haState);
         Mockito.when(haState.shouldPopulateReplQueues()).thenReturn(true);
         Mockito.when(fsn.getHAContext()).thenReturn(haContext);
@@ -140,29 +140,29 @@ public class TestFSNamesystem {
     @Test
     public void testHAStateInNamespaceInfo() throws IOException {
         Configuration conf = new Configuration();
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
-        NNStorageInterface nnStorage = Mockito.mock(NNStorage.class);
+        NNStorage nnStorage = Mockito.mock(NNStorage.class);
         Mockito.when(fsImage.getStorage()).thenReturn(nnStorage);
         FSNamesystem fsNamesystem = new FSNamesystem(conf, fsImage);
-        FSNamesystemInterface fsn = Mockito.spy(fsNamesystem);
+        FSNamesystem fsn = Mockito.spy(fsNamesystem);
         Mockito.when(fsn.getState()).thenReturn(HAServiceProtocol.HAServiceState.ACTIVE);
-        NamespaceInfoInterface nsInfo = fsn.unprotectedGetNamespaceInfo();
+        NamespaceInfo nsInfo = fsn.unprotectedGetNamespaceInfo();
         assertNotNull(nsInfo.getState());
     }
 
     @Test
     public void testReset() throws Exception {
         Configuration conf = new Configuration();
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
         FSNamesystem fsn = new FSNamesystem(conf, fsImage);
         fsn.imageLoadComplete();
         assertTrue(fsn.isImageLoaded());
         clearNamesystem(fsn);
-        final INodeDirectoryInterface root = (INodeDirectory) fsn.getFSDirectory().getINode("/");
+        final INodeDirectory root = (INodeDirectory) fsn.getFSDirectory().getINode("/");
         assertTrue(root.getChildrenList(Snapshot.CURRENT_STATE_ID).isEmpty());
         fsn.imageLoadComplete();
         assertTrue(fsn.isImageLoaded());
@@ -193,8 +193,8 @@ public class TestFSNamesystem {
     @Test
     public void testSafemodeReplicationConf() throws IOException {
         Configuration conf = new Configuration();
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
         conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
         FSNamesystem fsn = new FSNamesystem(conf, fsImage);
@@ -206,10 +206,10 @@ public class TestFSNamesystem {
     @Test(timeout = 30000)
     public void testInitAuditLoggers() throws IOException {
         Configuration conf = new Configuration();
-        FSImageInterface fsImage = Mockito.mock(FSImage.class);
-        FSEditLogInterface fsEditLog = Mockito.mock(FSEditLog.class);
+        FSImage fsImage = Mockito.mock(FSImage.class);
+        FSEditLog fsEditLog = Mockito.mock(FSEditLog.class);
         Mockito.when(fsImage.getEditLog()).thenReturn(fsEditLog);
-        FSNamesystemInterface fsn;
+        FSNamesystem fsn;
         List<AuditLogger> auditLoggers;
         // Not to specify any audit loggers in config
         conf.set(DFSConfigKeys.DFS_NAMENODE_AUDIT_LOGGERS_KEY, "");

@@ -133,7 +133,7 @@ public class TestGenericJournalConf {
 
         static URI uri = null;
 
-        static NamespaceInfoInterface nsInfo = null;
+        static NamespaceInfo nsInfo = null;
 
         static boolean formatCalled = false;
 

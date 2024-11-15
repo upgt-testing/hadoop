@@ -65,11 +65,11 @@ public class TestStripedINodeFile {
 
     public static final Logger LOG = LoggerFactory.getLogger(TestINodeFile.class);
 
-    private static final PermissionStatusInterface perm = new PermissionStatus("userName", null, FsPermission.getDefault());
+    private static final PermissionStatus perm = new PermissionStatus("userName", null, FsPermission.getDefault());
 
-    private final BlockStoragePolicySuiteInterface defaultSuite = BlockStoragePolicySuite.createDefaultSuite();
+    private final BlockStoragePolicySuite defaultSuite = BlockStoragePolicySuite.createDefaultSuite();
 
-    private final BlockStoragePolicyInterface defaultPolicy = defaultSuite.getDefaultPolicy();
+    private final BlockStoragePolicy defaultPolicy = defaultSuite.getDefaultPolicy();
 
     // use hard coded policy - see HDFS-9816
     private static final ErasureCodingPolicy testECPolicy = StripedFileTestUtil.getDefaultECPolicy();
@@ -99,7 +99,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedFeature() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         assertTrue(inf.isStriped());
     }
 
@@ -112,7 +112,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testStripedLayoutRedundancy() {
-        INodeFileInterface inodeFile;
+        INodeFile inodeFile;
         try {
             new INodeFile(HdfsConstants.GRANDFATHER_INODE_ID, null, perm, 0L, 0L, null, new Short((short) 3), /*replication*/
             StripedFileTestUtil.getDefaultECPolicy().getId(), /*ec policy*/
@@ -153,7 +153,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedLength() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped blockInfoStriped = new BlockInfoStriped(blk, testECPolicy);
         inf.addBlock(blockInfoStriped);
@@ -162,7 +162,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedConsumedSpace() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped blockInfoStriped = new BlockInfoStriped(blk, testECPolicy);
         blockInfoStriped.setNumBytes(1);
@@ -185,7 +185,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testMultipleBlockStripedConsumedSpace() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk1 = new Block(1);
         BlockInfoStriped blockInfoStriped1 = new BlockInfoStriped(blk1, testECPolicy);
         blockInfoStriped1.setNumBytes(1);
@@ -201,7 +201,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedFileSize() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped blockInfoStriped = new BlockInfoStriped(blk, testECPolicy);
         blockInfoStriped.setNumBytes(100);
@@ -214,7 +214,7 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedUCFileSize() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped bInfoUCStriped = new BlockInfoStriped(blk, testECPolicy);
         bInfoUCStriped.convertToBlockUnderConstruction(HdfsServerConstants.BlockUCState.UNDER_CONSTRUCTION, null);
@@ -226,12 +226,12 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedComputeQuotaUsage() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped blockInfoStriped = new BlockInfoStriped(blk, testECPolicy);
         blockInfoStriped.setNumBytes(100);
         inf.addBlock(blockInfoStriped);
-        QuotaCountsInterface counts = inf.computeQuotaUsageWithStriped(defaultPolicy, new QuotaCounts.Builder().build());
+        QuotaCounts counts = inf.computeQuotaUsageWithStriped(defaultPolicy, new QuotaCounts.Builder().build());
         assertEquals(1, counts.getNameSpace());
         // The total consumed space is the sum of
         //  a. <Cell Size> * (<Num Stripes> - 1) * <Total Block Num> = 0
@@ -242,13 +242,13 @@ public class TestStripedINodeFile {
 
     @Test
     public void testBlockStripedUCComputeQuotaUsage() throws IOException, InterruptedException {
-        INodeFileInterface inf = createStripedINodeFile();
+        INodeFile inf = createStripedINodeFile();
         Block blk = new Block(1);
         BlockInfoStriped bInfoUCStriped = new BlockInfoStriped(blk, testECPolicy);
         bInfoUCStriped.convertToBlockUnderConstruction(HdfsServerConstants.BlockUCState.UNDER_CONSTRUCTION, null);
         bInfoUCStriped.setNumBytes(100);
         inf.addBlock(bInfoUCStriped);
-        QuotaCountsInterface counts = inf.computeQuotaUsageWithStriped(defaultPolicy, new QuotaCounts.Builder().build());
+        QuotaCounts counts = inf.computeQuotaUsageWithStriped(defaultPolicy, new QuotaCounts.Builder().build());
         assertEquals(1024, inf.getPreferredBlockSize());
         assertEquals(1, counts.getNameSpace());
         // Consumed space in the case of BlockInfoStripedUC can be calculated
@@ -288,7 +288,7 @@ public class TestStripedINodeFile {
             // Get blocks of striped file
             INodeInterface inodeStriped = fsd.getINode("/parentDir/ecDir/ecFile");
             assertTrue("Failed to get INodeFile for /parentDir/ecDir/ecFile", inodeStriped instanceof INodeFile);
-            INodeFileInterface inodeStripedFile = (INodeFile) inodeStriped;
+            INodeFile inodeStripedFile = (INodeFile) inodeStriped;
             BlockInfo[] stripedBlks = inodeStripedFile.getBlocks();
             for (BlockInfo blockInfo : stripedBlks) {
                 assertFalse("Mistakenly marked the block as deleted!", blockInfo.isDeleted());
@@ -302,7 +302,7 @@ public class TestStripedINodeFile {
             // Get blocks of contiguous file
             INodeInterface inode = fsd.getINode("/parentDir/someFile");
             assertTrue("Failed to get INodeFile for /parentDir/someFile", inode instanceof INodeFile);
-            INodeFileInterface inodeFile = (INodeFile) inode;
+            INodeFile inodeFile = (INodeFile) inode;
             BlockInfo[] contiguousBlks = inodeFile.getBlocks();
             for (BlockInfo blockInfo : contiguousBlks) {
                 assertFalse("Mistakenly marked the block as deleted!", blockInfo.isDeleted());

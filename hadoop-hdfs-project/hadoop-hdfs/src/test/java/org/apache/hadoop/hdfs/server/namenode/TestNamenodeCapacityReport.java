@@ -69,8 +69,8 @@ public class TestNamenodeCapacityReport {
             final FSNamesystemInterface namesystem = cluster.getNamesystem();
             final DatanodeManagerInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
             // Ensure the data reported for each data node is right
-            final List<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
-            final List<DatanodeDescriptor> dead = new ArrayList<DatanodeDescriptor>();
+            final List<DatanodeDescriptorInterface> live = new ArrayList<DatanodeDescriptorInterface>();
+            final List<DatanodeDescriptorInterface> dead = new ArrayList<DatanodeDescriptorInterface>();
             dm.fetchDatanodes(live, dead, false);
             assertTrue(live.size() == 1);
             long used, remaining, configCapacity, nonDFSUsed, bpUsed;
@@ -173,7 +173,7 @@ public class TestNamenodeCapacityReport {
             cluster.waitActive();
             final FSNamesystemInterface namesystem = cluster.getNamesystem();
             final DatanodeManagerInterface dnm = namesystem.getBlockManager().getDatanodeManager();
-            List<DataNode> datanodes = cluster.getDataNodes();
+            List<DataNodeInterface> datanodes = cluster.getDataNodes();
             final DistributedFileSystem fs = cluster.getFileSystem();
             // trigger heartbeats in case not already sent
             triggerHeartbeats(datanodes);
@@ -235,7 +235,7 @@ public class TestNamenodeCapacityReport {
             // load based on whether the nodes in the pipeline are decomm
             for (int i = 0; i < fileCount; i++) {
                 int adminOps = 0;
-                for (DatanodeInfoInterface dni : streams[i].getPipeline()) {
+                for (DatanodeInfo dni : streams[i].getPipeline()) {
                     DatanodeDescriptorInterface dnd = dnm.getDatanode(dni);
                     expectedTotalLoad -= 2;
                     if (!dnd.isInService()) {
@@ -291,7 +291,23 @@ public class TestNamenodeCapacityReport {
         }
     }
 
+    private void startDecommissionOrMaintenance(DatanodeManagerInterface dnm, DatanodeDescriptorInterface dnd, boolean decomm) {
+        if (decomm) {
+            dnm.getDatanodeAdminManager().startDecommission(dnd);
+        } else {
+            dnm.getDatanodeAdminManager().startMaintenance(dnd, Long.MAX_VALUE);
+        }
+    }
+
     private void stopDecommissionOrMaintenance(DatanodeManager dnm, DatanodeDescriptor dnd, boolean decomm) {
+        if (decomm) {
+            dnm.getDatanodeAdminManager().stopDecommission(dnd);
+        } else {
+            dnm.getDatanodeAdminManager().stopMaintenance(dnd);
+        }
+    }
+
+    private void stopDecommissionOrMaintenance(DatanodeManagerInterface dnm, DatanodeDescriptorInterface dnd, boolean decomm) {
         if (decomm) {
             dnm.getDatanodeAdminManager().stopDecommission(dnd);
         } else {
@@ -310,7 +326,23 @@ public class TestNamenodeCapacityReport {
         }
     }
 
+    private static void checkClusterHealth(int numOfLiveNodes, FSNamesystemInterface namesystem, double expectedTotalLoad, int expectedInServiceNodes, double expectedInServiceLoad) {
+        assertEquals(numOfLiveNodes, namesystem.getNumLiveDataNodes());
+        assertEquals(expectedInServiceNodes, getNumDNInService(namesystem));
+        assertEquals(expectedTotalLoad, namesystem.getTotalLoad(), EPSILON);
+        if (expectedInServiceNodes != 0) {
+            assertEquals(expectedInServiceLoad / expectedInServiceNodes, getInServiceXceiverAverage(namesystem), EPSILON);
+        } else {
+            assertEquals(0.0, getInServiceXceiverAverage(namesystem), EPSILON);
+        }
+    }
+
+
     private static int getNumDNInService(FSNamesystem fsn) {
+        return fsn.getBlockManager().getDatanodeManager().getFSClusterStats().getNumDatanodesInService();
+    }
+
+    private static int getNumDNInService(FSNamesystemInterface fsn) {
         return fsn.getBlockManager().getDatanodeManager().getFSClusterStats().getNumDatanodesInService();
     }
 
@@ -318,7 +350,11 @@ public class TestNamenodeCapacityReport {
         return fsn.getBlockManager().getDatanodeManager().getFSClusterStats().getInServiceXceiverAverage();
     }
 
-    private void triggerHeartbeats(List<DataNode> datanodes) throws IOException, InterruptedException {
+    private static double getInServiceXceiverAverage(FSNamesystemInterface fsn) {
+        return fsn.getBlockManager().getDatanodeManager().getFSClusterStats().getInServiceXceiverAverage();
+    }
+
+    private void triggerHeartbeats(List<DataNodeInterface> datanodes) throws IOException, InterruptedException {
         for (DataNodeInterface dn : datanodes) {
             DataNodeTestUtils.triggerHeartbeat(dn);
         }

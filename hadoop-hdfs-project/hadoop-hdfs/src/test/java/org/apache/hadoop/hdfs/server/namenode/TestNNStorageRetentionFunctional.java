@@ -111,4 +111,11 @@ public class TestNNStorageRetentionFunctional {
         nn.getRpcServer().saveNamespace(0, 0);
         nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
     }
+
+    private static void doSaveNamespace(NameNodeInterface nn) throws IOException {
+        LOG.info("Saving namespace...");
+        nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_ENTER, false);
+        nn.getRpcServer().saveNamespace(0, 0);
+        nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
+    }
 }

@@ -44,15 +44,15 @@ public class TestFsLimits {
 
     static Configuration conf;
 
-    static FSNamesystemInterface fs;
+    static FSNamesystem fs;
 
     static boolean fsIsReady;
 
-    static final PermissionStatusInterface perms = new PermissionStatus("admin", "admin", FsPermission.getDefault());
+    static final PermissionStatus perms = new PermissionStatus("admin", "admin", FsPermission.getDefault());
 
     static private FSNamesystem getMockNamesystem() throws IOException {
-        FSImageInterface fsImage = mock(FSImage.class);
-        FSEditLogInterface editLog = mock(FSEditLog.class);
+        FSImage fsImage = mock(FSImage.class);
+        FSEditLog editLog = mock(FSEditLog.class);
         doReturn(editLog).when(fsImage).getEditLog();
         FSNamesystem fsn = new FSNamesystem(conf, fsImage);
         fsn.setImageLoaded(fsIsReady);

@@ -62,7 +62,7 @@ public class TestCheckpointsWithSnapshots {
             cluster.waitActive();
             secondary = new SecondaryNameNode(conf);
             SnapshotManagerInterface nnSnapshotManager = cluster.getNamesystem().getSnapshotManager();
-            SnapshotManagerInterface secondarySnapshotManager = secondary.getFSNamesystem().getSnapshotManager();
+            SnapshotManager secondarySnapshotManager = secondary.getFSNamesystem().getSnapshotManager();
             FileSystem fs = cluster.getFileSystem();
             HdfsAdmin admin = new HdfsAdmin(FileSystem.getDefaultUri(conf), conf);
             assertEquals(0, nnSnapshotManager.getNumSnapshots());

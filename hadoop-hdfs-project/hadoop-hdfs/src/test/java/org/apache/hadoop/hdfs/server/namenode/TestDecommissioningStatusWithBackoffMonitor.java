@@ -110,7 +110,7 @@ public class TestDecommissioningStatusWithBackoffMonitor extends TestDecommissio
                 // Due to how the alternative decom monitor works, we need to run
                 // through the check loop a second time to get stats updated
                 BlockManagerTestUtil.recheckDecommissionState(dm);
-                DatanodeDescriptorInterface decommNode = decommissioningNodes.get(0);
+                DatanodeDescriptor decommNode = decommissioningNodes.get(0);
                 checkDecommissionStatus(decommNode, 3, 0, 1);
                 checkDFSAdminDecommissionStatus(decommissioningNodes.subList(0, 1), distFileSys, admin);
             } else {
@@ -118,8 +118,8 @@ public class TestDecommissioningStatusWithBackoffMonitor extends TestDecommissio
                 // Due to how the alternative decom monitor works, we need to run
                 // through the check loop a second time to get stats updated
                 BlockManagerTestUtil.recheckDecommissionState(dm);
-                DatanodeDescriptorInterface decommNode1 = decommissioningNodes.get(0);
-                DatanodeDescriptorInterface decommNode2 = decommissioningNodes.get(1);
+                DatanodeDescriptor decommNode1 = decommissioningNodes.get(0);
+                DatanodeDescriptor decommNode2 = decommissioningNodes.get(1);
                 // This one is still 3,3,1 since it passed over the UC block
                 // earlier, before node 2 was decommed
                 checkDecommissionStatus(decommNode1, 3, 3, 1);

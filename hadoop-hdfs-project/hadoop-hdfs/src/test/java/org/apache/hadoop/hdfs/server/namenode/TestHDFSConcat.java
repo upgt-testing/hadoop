@@ -147,7 +147,7 @@ public class TestHDFSConcat {
             // expected
         }
         // check count update
-        ContentSummaryInterface cBefore = dfs.getContentSummary(trgPath.getParent());
+        ContentSummary cBefore = dfs.getContentSummary(trgPath.getParent());
         // resort file array, make INode id not sorted.
         for (int j = 0; j < files.length / 2; j++) {
             Path tempPath = files[j];
@@ -160,7 +160,7 @@ public class TestHDFSConcat {
         // now concatenate
         dfs.concat(trgPath, files);
         // verify  count
-        ContentSummaryInterface cAfter = dfs.getContentSummary(trgPath.getParent());
+        ContentSummary cAfter = dfs.getContentSummary(trgPath.getParent());
         assertEquals(cBefore.getFileCount(), cAfter.getFileCount() + files.length);
         // verify other stuff
         long totalLen = trgLen;
@@ -387,7 +387,7 @@ public class TestHDFSConcat {
             srcs[i] = new Path(foo, "src" + i);
             DFSTestUtil.createFile(dfs, srcs[i], blockSize * 2, srcRepl, 0L);
         }
-        ContentSummaryInterface summary = dfs.getContentSummary(foo);
+        ContentSummary summary = dfs.getContentSummary(foo);
         Assert.assertEquals(11, summary.getFileCount());
         Assert.assertEquals(blockSize * REPL_FACTOR + blockSize * 2 * srcRepl * srcNum, summary.getSpaceConsumed());
         dfs.concat(target, srcs);
@@ -411,7 +411,7 @@ public class TestHDFSConcat {
             srcs[i] = new Path(bar, "src" + i);
             DFSTestUtil.createFile(dfs, srcs[i], blockSize, REPL_FACTOR, 0L);
         }
-        ContentSummaryInterface summary = dfs.getContentSummary(bar);
+        ContentSummary summary = dfs.getContentSummary(bar);
         Assert.assertEquals(11, summary.getFileCount());
         Assert.assertEquals(dsQuota, summary.getSpaceConsumed());
         try {

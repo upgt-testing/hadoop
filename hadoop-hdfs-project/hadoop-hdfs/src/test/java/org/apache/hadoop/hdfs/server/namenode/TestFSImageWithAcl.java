@@ -65,7 +65,7 @@ public class TestFSImageWithAcl {
         DistributedFileSystem fs = cluster.getFileSystem();
         fs.create(p).close();
         fs.mkdirs(new Path("/23"));
-        AclEntryInterface e = new AclEntry.Builder().setName("foo").setPermission(READ_EXECUTE).setScope(ACCESS).setType(USER).build();
+        AclEntry e = new AclEntry.Builder().setName("foo").setPermission(READ_EXECUTE).setScope(ACCESS).setType(USER).build();
         fs.modifyAclEntries(p, Lists.newArrayList(e));
         restart(fs, persistNamespace);
         AclStatusInterface s = cluster.getNamesystem().getAclStatus(p.toString());
@@ -163,8 +163,8 @@ public class TestFSImageWithAcl {
     public void testRootACLAfterLoadingFsImage() throws IOException {
         DistributedFileSystem fs = cluster.getFileSystem();
         Path rootdir = new Path("/");
-        AclEntryInterface e1 = new AclEntry.Builder().setName("foo").setPermission(ALL).setScope(ACCESS).setType(GROUP).build();
-        AclEntryInterface e2 = new AclEntry.Builder().setName("bar").setPermission(READ).setScope(ACCESS).setType(GROUP).build();
+        AclEntry e1 = new AclEntry.Builder().setName("foo").setPermission(ALL).setScope(ACCESS).setType(GROUP).build();
+        AclEntry e2 = new AclEntry.Builder().setName("bar").setPermission(READ).setScope(ACCESS).setType(GROUP).build();
         fs.modifyAclEntries(rootdir, Lists.newArrayList(e1, e2));
         AclStatusInterface s = cluster.getNamesystem().getAclStatus(rootdir.toString());
         AclEntry[] returned = Lists.newArrayList(s.getEntries()).toArray(new AclEntry[0]);

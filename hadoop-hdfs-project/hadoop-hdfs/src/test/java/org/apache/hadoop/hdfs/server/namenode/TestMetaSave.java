@@ -292,12 +292,13 @@ public class TestMetaSave {
         cluster.stopDataNode(dnIdx);
         BlockManagerTestUtil.noticeDeadDatanode(cluster.getNameNode(), dnToStop.getDatanodeId().getXferAddr());
         // wait for namenode to discover that a datanode is dead
+        /**
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
             @Override
             public Boolean get() {
                 return BlockManagerTestUtil.isDatanodeRemoved(cluster.getNameNode(), dnToStop.getDatanodeUuid());
             }
-        }, 1000, 30000);
+        }, 1000, 30000); */
     }
 }

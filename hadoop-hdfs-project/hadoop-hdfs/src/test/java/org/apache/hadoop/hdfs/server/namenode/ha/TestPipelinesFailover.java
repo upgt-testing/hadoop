@@ -316,7 +316,7 @@ public class TestPipelinesFailover {
             // Find the corresponding DN daemon, and spy on its connection to the
             // active.
             DataNodeInterface primaryDN = cluster.getDataNode(expectedPrimary.getIpcPort());
-            DatanodeProtocolClientSideTranslatorPBInterface nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(primaryDN, nn0);
+            DatanodeProtocolClientSideTranslatorPB nnSpy = InternalDataNodeTestUtils.spyOnBposToNN(primaryDN, nn0);
             // Delay the commitBlockSynchronization call
             DelayAnswer delayer = new DelayAnswer(LOG);
             Mockito.doAnswer(delayer).when(nnSpy).commitBlockSynchronization(Mockito.eq(blk), // new genstamp

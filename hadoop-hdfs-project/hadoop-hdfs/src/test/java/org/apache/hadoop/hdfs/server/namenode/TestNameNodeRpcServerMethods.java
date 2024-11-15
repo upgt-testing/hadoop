@@ -106,7 +106,7 @@ public class TestNameNodeRpcServerMethods {
         outputStream.close();
         int numBlocks = 0;
         DatanodeStorageReport[] reports = nnRpc.getDatanodeStorageReport(HdfsConstants.DatanodeReportType.ALL);
-        for (DatanodeStorageReportInterface r : reports) {
+        for (DatanodeStorageReport r : reports) {
             numBlocks += r.getDatanodeInfo().getNumBlocks();
         }
         assertEquals(1, numBlocks);

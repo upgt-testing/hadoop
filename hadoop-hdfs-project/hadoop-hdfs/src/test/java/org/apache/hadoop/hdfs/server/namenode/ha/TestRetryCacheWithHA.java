@@ -174,7 +174,7 @@ public class TestRetryCacheWithHA {
         Map<CacheEntry, CacheEntry> oldEntries = new HashMap<CacheEntry, CacheEntry>();
         Iterator<CacheEntry> iter = cacheSet.iterator();
         while (iter.hasNext()) {
-            CacheEntryInterface entry = iter.next();
+            CacheEntry entry = iter.next();
             oldEntries.put(entry, entry);
         }
         // 2. Failover the current standby to active.
@@ -188,7 +188,7 @@ public class TestRetryCacheWithHA {
         assertEquals("Retry cache size is wrong", 39, cacheSet.size());
         iter = cacheSet.iterator();
         while (iter.hasNext()) {
-            CacheEntryInterface entry = iter.next();
+            CacheEntry entry = iter.next();
             assertTrue(oldEntries.containsKey(entry));
         }
     }
@@ -435,7 +435,7 @@ public class TestRetryCacheWithHA {
 
         private final String fileName;
 
-        private LastBlockWithStatusInterface lbk;
+        private LastBlockWithStatus lbk;
 
         AppendOp(DFSClient client, String fileName) {
             super("append", client);
@@ -778,7 +778,7 @@ public class TestRetryCacheWithHA {
         @Override
         boolean checkNamenodeBeforeReturn() throws Exception {
             INodeFileInterface fileNode = cluster.getNamesystem(0).getFSDirectory().getINode4Write(file).asFile();
-            BlockInfo blkUC = (fileNode.getBlocks())[1];
+            BlockInfoInterface blkUC = (fileNode.getBlocks())[1];
             int datanodeNum = blkUC.getUnderConstructionFeature().getExpectedStorageLocations().length;
             for (int i = 0; i < CHECKTIMES && datanodeNum != 2; i++) {
                 Thread.sleep(1000);
@@ -798,7 +798,7 @@ public class TestRetryCacheWithHA {
      */
     class AddCacheDirectiveInfoOp extends AtMostOnceOp {
 
-        private final CacheDirectiveInfoInterface directive;
+        private final CacheDirectiveInfo directive;
 
         private Long result;
 
@@ -842,7 +842,7 @@ public class TestRetryCacheWithHA {
      */
     class ModifyCacheDirectiveInfoOp extends AtMostOnceOp {
 
-        private final CacheDirectiveInfoInterface directive;
+        private final CacheDirectiveInfo directive;
 
         private final short newReplication;
 
@@ -873,7 +873,7 @@ public class TestRetryCacheWithHA {
             for (int i = 0; i < CHECKTIMES; i++) {
                 RemoteIterator<CacheDirectiveEntry> iter = dfs.listCacheDirectives(new CacheDirectiveInfo.Builder().setPool(directive.getPool()).setPath(directive.getPath()).build());
                 while (iter.hasNext()) {
-                    CacheDirectiveInfoInterface result = iter.next().getInfo();
+                    CacheDirectiveInfo result = iter.next().getInfo();
                     if ((result.getId() == id) && (result.getReplication().shortValue() == newReplication)) {
                         return true;
                     }
@@ -894,7 +894,7 @@ public class TestRetryCacheWithHA {
      */
     class RemoveCacheDirectiveInfoOp extends AtMostOnceOp {
 
-        private final CacheDirectiveInfoInterface directive;
+        private final CacheDirectiveInfo directive;
 
         private long id;
 
@@ -1379,7 +1379,7 @@ public class TestRetryCacheWithHA {
         Path path = new Path("/p");
         for (int i = 0; i < poolCount; i++) {
             String poolName = "testListCacheDirectives-" + i;
-            CacheDirectiveInfoInterface directiveInfo = new CacheDirectiveInfo.Builder().setPool(poolName).setPath(path).build();
+            CacheDirectiveInfo directiveInfo = new CacheDirectiveInfo.Builder().setPool(poolName).setPath(path).build();
             dfs.addCachePool(new CachePoolInfo(poolName));
             dfs.addCacheDirective(directiveInfo, EnumSet.of(CacheFlag.FORCE));
             poolNames.add(poolName);
@@ -1397,7 +1397,7 @@ public class TestRetryCacheWithHA {
         RemoteIterator<CachePoolEntry> pools = dfs.listCachePools();
         int poolCount = poolNames.size();
         for (int i = 0; i < poolCount; i++) {
-            CachePoolEntryInterface pool = pools.next();
+            CachePoolEntry pool = pools.next();
             String pollName = pool.getInfo().getPoolName();
             assertTrue("The pool name should be expected", tmpNames.remove(pollName));
             if (i % 2 == 0) {
@@ -1417,7 +1417,7 @@ public class TestRetryCacheWithHA {
         RemoteIterator<CacheDirectiveEntry> directives = dfs.listCacheDirectives(null);
         int poolCount = poolNames.size();
         for (int i = 0; i < poolCount; i++) {
-            CacheDirectiveEntryInterface directive = directives.next();
+            CacheDirectiveEntry directive = directives.next();
             String pollName = directive.getInfo().getPool();
             assertTrue("The pool name should be expected", tmpNames.remove(pollName));
             if (i % 2 == 0) {

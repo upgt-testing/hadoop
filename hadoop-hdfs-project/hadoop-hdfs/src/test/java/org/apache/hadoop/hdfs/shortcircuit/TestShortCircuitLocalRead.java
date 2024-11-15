@@ -321,8 +321,8 @@ public class TestShortCircuitLocalRead {
             // Create a new block object, because the block inside LocatedBlock at
             // namenode is of type BlockInfo.
             ExtendedBlock blk = new ExtendedBlock(lb.get(0).getBlock());
-            TokenInterface<BlockTokenIdentifier> token = lb.get(0).getBlockToken();
-            final DatanodeInfoInterface dnInfo = lb.get(0).getLocations()[0];
+            Token<BlockTokenIdentifier> token = lb.get(0).getBlockToken();
+            final DatanodeInfo dnInfo = lb.get(0).getLocations()[0];
             ClientDatanodeProtocol proxy = DFSUtilClient.createClientDatanodeProtocolProxy(dnInfo, conf, 60000, false);
             try {
                 proxy.getBlockLocalPathInfo(blk, token);
