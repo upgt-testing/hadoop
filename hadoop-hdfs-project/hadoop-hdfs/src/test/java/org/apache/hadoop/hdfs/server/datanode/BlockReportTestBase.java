@@ -37,6 +37,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.hadoop.hdfs.server.namenode.UnsupportedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -773,8 +775,9 @@ public abstract class BlockReportTestBase {
         List<LocatedBlock> lbs = cluster.getNameNodeRpc().getBlockLocations(path.toString(), FILE_START, size).getLocatedBlocks();
         LocatedBlock lb = lbs.get(lbs.size() - 1);
         // Get block from the first DN
-        ret = cluster.getDataNodes().get(DN_N0).data.getStoredBlock(lb.getBlock().getBlockPoolId(), lb.getBlock().getBlockId());
-        return ret;
+        throw new UnsupportedActionException("Not implemented findBlock in BlockReportTestBase");
+        //ret = cluster.getDataNodes().get(DN_N0).data.getStoredBlock(lb.getBlock().getBlockPoolId(), lb.getBlock().getBlockId());
+        //return ret;
     }
 
     private class BlockChecker extends Thread {

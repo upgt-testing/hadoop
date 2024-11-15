@@ -1967,11 +1967,14 @@ public class DFSTestUtil {
         FSDirectoryInterface fsdir = ns.getFSDirectory();
         INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
         ExtendedBlock previous = null;
+        /*
         for (int i = 0; i < numBlocks; i++) {
             Block newBlock = addBlockToFile(true, cluster.getDataNodes(), dfs, ns, file.toString(), fileNode, dfs.getClient().getClientName(), previous, numStripesPerBlk, 0);
             previous = new ExtendedBlock(ns.getBlockPoolId(), newBlock);
         }
         dfs.getClient().namenode.complete(file.toString(), dfs.getClient().getClientName(), previous, fileNode.getId());
+         */
+        throw new UnsupportedOperationException("createStripedFile is not supported in MiniDockerDFSCluster in DFSTestUtil");
     }
 
     /**

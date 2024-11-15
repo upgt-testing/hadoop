@@ -295,14 +295,14 @@ public class TestDecommissionWithStriped {
         FileChecksum fileChecksum1 = dfs.getFileChecksum(ecFile, writeBytes);
         //2. make once DN busy
         final INodeFileInterface fileNode = cluster.getNamesystem().getFSDirectory().getINode4Write(ecFile.toString()).asFile();
-        BlockInfo firstBlock = fileNode.getBlocks()[0];
+        BlockInfoInterface firstBlock = fileNode.getBlocks()[0];
         DatanodeStorageInfoInterface[] dnStorageInfos = bm.getStorages(firstBlock);
         DatanodeDescriptorInterface busyNode = dnStorageInfos[busyDNIndex].getDatanodeDescriptor();
         for (int j = 0; j < replicationStreamsHardLimit; j++) {
             busyNode.incrementPendingReplicationWithoutTargets();
         }
         //3. decomission one node
-        List<DatanodeInfo> decommisionNodes = new ArrayList<>();
+        List<DatanodeInfoInterface> decommisionNodes = new ArrayList<>();
         decommisionNodes.add(dnStorageInfos[decommisionDNIndex].getDatanodeDescriptor());
         decommissionNode(0, decommisionNodes, AdminStates.DECOMMISSIONED);
         assertEquals(decommisionNodes.size(), fsn.getNumDecomLiveDataNodes());
@@ -521,8 +521,8 @@ public class TestDecommissionWithStriped {
    * decommission the DN at index dnIndex or one random node if dnIndex is set
    * to -1 and wait for the node to reach the given {@code waitForState}.
    */
-    private void decommissionNode(int nnIndex, List<DatanodeInfo> decommissionedNodes, AdminStates waitForState) throws IOException {
-        DFSClient client = getDfsClient(cluster.getNameNode(nnIndex), conf);
+    private void decommissionNode(int nnIndex, List<DatanodeInfoInterface> decommissionedNodes, AdminStates waitForState) throws IOException {
+        DFSClient client = cluster.getDFSClient();
         DatanodeInfo[] info = client.datanodeReport(DatanodeReportType.LIVE);
         // write nodename into the exclude file.
         ArrayList<String> excludeNodes = new ArrayList<String>();

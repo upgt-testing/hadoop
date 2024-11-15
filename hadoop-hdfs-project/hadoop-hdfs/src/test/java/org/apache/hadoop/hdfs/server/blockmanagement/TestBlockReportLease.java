@@ -103,7 +103,7 @@ public class TestBlockReportLease {
             // Allow blockreport to proceed
             delayer.proceed();
             // Get result, it will not null if process successfully
-            DatanodeCommandInterface datanodeCommand = sendBRfuturea.get();
+            DatanodeCommand datanodeCommand = sendBRfuturea.get();
             assertTrue(datanodeCommand instanceof FinalizeCommand);
             assertEquals(poolId, ((FinalizeCommand) datanodeCommand).getBlockPoolId());
         }
@@ -121,7 +121,7 @@ public class TestBlockReportLease {
             for (int j = 0; j < blockListSize; ++j) {
                 longs.add(Long.valueOf(j));
             }
-            BlockListAsLongsInterface blockList = BlockListAsLongs.decodeLongs(longs);
+            BlockListAsLongs blockList = BlockListAsLongs.decodeLongs(longs);
             storageBlockReports[i] = new StorageBlockReport(dnStorages[i], blockList);
         }
         return storageBlockReports;

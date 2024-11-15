@@ -187,7 +187,7 @@ public class TestBlockManager {
     private void addNodes(Iterable<DatanodeDescriptor> nodesToAdd) {
         NetworkTopologyInterface cluster = bm.getDatanodeManager().getNetworkTopology();
         // construct network topology
-        for (DatanodeDescriptorInterface dn : nodesToAdd) {
+        for (DatanodeDescriptor dn : nodesToAdd) {
             cluster.add(dn);
             dn.getStorageInfos()[0].setUtilizationForTesting(2 * HdfsServerConstants.MIN_BLOCKS_FOR_WRITE * BLOCK_SIZE, 0L, 2 * HdfsServerConstants.MIN_BLOCKS_FOR_WRITE * BLOCK_SIZE, 0L);
             dn.updateHeartbeat(BlockManagerTestUtil.getStorageReportsForDatanode(dn), 0L, 0L, 0, 0, null);
@@ -250,7 +250,7 @@ public class TestBlockManager {
         assertEquals("Should have three targets", 3, pipeline.length);
         boolean foundOneOnRackA = false;
         for (int i = 1; i < pipeline.length; i++) {
-            DatanodeDescriptorInterface target = pipeline[i].getDatanodeDescriptor();
+            DatanodeDescriptor target = pipeline[i].getDatanodeDescriptor();
             if (rackA.contains(target)) {
                 foundOneOnRackA = true;
             }
@@ -286,7 +286,7 @@ public class TestBlockManager {
         boolean foundOneOnRackA = false;
         boolean foundOneOnRackB = false;
         for (int i = 1; i < pipeline.length; i++) {
-            DatanodeDescriptorInterface target = pipeline[i].getDatanodeDescriptor();
+            DatanodeDescriptor target = pipeline[i].getDatanodeDescriptor();
             if (rackA.contains(target)) {
                 foundOneOnRackA = true;
             } else if (rackB.contains(target)) {
@@ -330,7 +330,7 @@ public class TestBlockManager {
         assertEquals("Should have two targets", 2, pipeline.length);
         boolean foundOneOnRackB = false;
         for (int i = 1; i < pipeline.length; i++) {
-            DatanodeDescriptorInterface target = pipeline[i].getDatanodeDescriptor();
+            DatanodeDescriptor target = pipeline[i].getDatanodeDescriptor();
             if (rackB.contains(target)) {
                 foundOneOnRackB = true;
             }
@@ -342,7 +342,7 @@ public class TestBlockManager {
         fulfillPipeline(blockInfo, pipeline);
         // the block is still under-replicated. Add a new node. This should allow
         // the third off-rack replica.
-        DatanodeDescriptorInterface rackCNode = DFSTestUtil.getDatanodeDescriptor("7.7.7.7", "/rackC");
+        DatanodeDescriptor rackCNode = DFSTestUtil.getDatanodeDescriptor("7.7.7.7", "/rackC");
         rackCNode.updateStorage(new DatanodeStorage(DatanodeStorage.generateUuid()));
         addNodes(ImmutableList.of(rackCNode));
         try {
@@ -473,7 +473,7 @@ public class TestBlockManager {
      */
     private void fulfillPipeline(BlockInfo blockInfo, DatanodeStorageInfo[] pipeline) throws IOException {
         for (int i = 1; i < pipeline.length; i++) {
-            DatanodeStorageInfoInterface storage = pipeline[i];
+            DatanodeStorageInfo storage = pipeline[i];
             bm.addBlock(storage, blockInfo, null);
             blockInfo.addStorage(storage, blockInfo);
         }
@@ -482,8 +482,8 @@ public class TestBlockManager {
     private BlockInfo blockOnNodes(long blkId, List<DatanodeDescriptor> nodes) {
         Block block = new Block(blkId);
         BlockInfo blockInfo = new BlockInfoContiguous(block, (short) 3);
-        for (DatanodeDescriptorInterface dn : nodes) {
-            for (DatanodeStorageInfoInterface storage : dn.getStorageInfos()) {
+        for (DatanodeDescriptor dn : nodes) {
+            for (DatanodeStorageInfo storage : dn.getStorageInfos()) {
                 blockInfo.addStorage(storage, blockInfo);
             }
         }
@@ -500,7 +500,7 @@ public class TestBlockManager {
 
     private List<DatanodeDescriptor> getNodes(List<DatanodeStorageInfo> storages) {
         List<DatanodeDescriptor> ret = Lists.newArrayList();
-        for (DatanodeStorageInfoInterface s : storages) {
+        for (DatanodeStorageInfo s : storages) {
             ret.add(s.getDatanodeDescriptor());
         }
         return ret;
@@ -516,7 +516,7 @@ public class TestBlockManager {
 
     private List<DatanodeDescriptor> startDecommission(int... indexes) {
         List<DatanodeDescriptor> nodes = getNodes(indexes);
-        for (DatanodeDescriptorInterface node : nodes) {
+        for (DatanodeDescriptor node : nodes) {
             node.startDecommission();
         }
         return nodes;
@@ -570,10 +570,10 @@ public class TestBlockManager {
 
     private LinkedListMultimap<DatanodeStorageInfo, BlockTargetPair> getAllPendingReconstruction() {
         LinkedListMultimap<DatanodeStorageInfo, BlockTargetPair> repls = LinkedListMultimap.create();
-        for (DatanodeDescriptorInterface dn : nodes) {
+        for (DatanodeDescriptor dn : nodes) {
             List<BlockTargetPair> thisRepls = dn.getReplicationCommand(10);
             if (thisRepls != null) {
-                for (DatanodeStorageInfoInterface storage : dn.getStorageInfos()) {
+                for (DatanodeStorageInfo storage : dn.getStorageInfos()) {
                     repls.putAll(storage, thisRepls);
                 }
             }
@@ -619,11 +619,11 @@ public class TestBlockManager {
         // striped blockInfo
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlock, ecPolicy);
         // ec storageInfo
-        DatanodeStorageInfoInterface ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
-        DatanodeStorageInfoInterface ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
-        DatanodeStorageInfoInterface ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
-        DatanodeStorageInfoInterface ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
-        DatanodeStorageInfoInterface ds5 = DFSTestUtil.createDatanodeStorageInfo("storage5", "5.5.5.5", "rack5", "host5");
+        DatanodeStorageInfo ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
+        DatanodeStorageInfo ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
+        DatanodeStorageInfo ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
+        DatanodeStorageInfo ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
+        DatanodeStorageInfo ds5 = DFSTestUtil.createDatanodeStorageInfo("storage5", "5.5.5.5", "rack5", "host5");
         // link block with storage
         aBlockInfoStriped.addStorage(ds1, aBlock);
         aBlockInfoStriped.addStorage(ds2, new Block(blockId + 1, 0, 0));
@@ -656,12 +656,12 @@ public class TestBlockManager {
         // striped blockInfo
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlock, ecPolicy);
         // ec storageInfo
-        DatanodeStorageInfoInterface ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
-        DatanodeStorageInfoInterface ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
-        DatanodeStorageInfoInterface ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
-        DatanodeStorageInfoInterface ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
-        DatanodeStorageInfoInterface ds5 = DFSTestUtil.createDatanodeStorageInfo("storage5", "5.5.5.5", "rack5", "host5");
-        DatanodeStorageInfoInterface ds6 = DFSTestUtil.createDatanodeStorageInfo("storage6", "6.6.6.6", "rack6", "host6");
+        DatanodeStorageInfo ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
+        DatanodeStorageInfo ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
+        DatanodeStorageInfo ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
+        DatanodeStorageInfo ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
+        DatanodeStorageInfo ds5 = DFSTestUtil.createDatanodeStorageInfo("storage5", "5.5.5.5", "rack5", "host5");
+        DatanodeStorageInfo ds6 = DFSTestUtil.createDatanodeStorageInfo("storage6", "6.6.6.6", "rack6", "host6");
         // link block with storage
         aBlockInfoStriped.addStorage(ds1, aBlock);
         aBlockInfoStriped.addStorage(ds2, new Block(blockId + 1, 0, 0));
@@ -694,10 +694,10 @@ public class TestBlockManager {
         Block aBlockGroup = new Block(blockId, ecPolicy.getCellSize() * ecPolicy.getNumDataUnits(), 0);
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlockGroup, ecPolicy);
         // create 4 storageInfo, which means 1 block is missing
-        DatanodeStorageInfoInterface ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
-        DatanodeStorageInfoInterface ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
-        DatanodeStorageInfoInterface ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
-        DatanodeStorageInfoInterface ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
+        DatanodeStorageInfo ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
+        DatanodeStorageInfo ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
+        DatanodeStorageInfo ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
+        DatanodeStorageInfo ds4 = DFSTestUtil.createDatanodeStorageInfo("storage4", "4.4.4.4", "rack4", "host4");
         // link block with storage
         aBlockInfoStriped.addStorage(ds1, aBlockGroup);
         aBlockInfoStriped.addStorage(ds2, new Block(blockId + 1, 0, 0));
@@ -729,9 +729,9 @@ public class TestBlockManager {
         Block aBlockGroup = new Block(blockId, ecPolicy.getCellSize() * (ecPolicy.getNumDataUnits() - 1), 0);
         BlockInfoStriped aBlockInfoStriped = new BlockInfoStriped(aBlockGroup, ecPolicy);
         // create 3 storageInfo, which means 1 block is missing
-        DatanodeStorageInfoInterface ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
-        DatanodeStorageInfoInterface ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
-        DatanodeStorageInfoInterface ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
+        DatanodeStorageInfo ds1 = DFSTestUtil.createDatanodeStorageInfo("storage1", "1.1.1.1", "rack1", "host1");
+        DatanodeStorageInfo ds2 = DFSTestUtil.createDatanodeStorageInfo("storage2", "2.2.2.2", "rack2", "host2");
+        DatanodeStorageInfo ds3 = DFSTestUtil.createDatanodeStorageInfo("storage3", "3.3.3.3", "rack3", "host3");
         // link block with storage
         aBlockInfoStriped.addStorage(ds1, aBlockGroup);
         aBlockInfoStriped.addStorage(ds2, new Block(blockId + 1, 0, 0));
@@ -779,8 +779,8 @@ public class TestBlockManager {
 
     @Test
     public void testSafeModeIBR() throws Exception {
-        DatanodeDescriptorInterface node = spy(nodes.get(0));
-        DatanodeStorageInfoInterface ds = node.getStorageInfos()[0];
+        DatanodeDescriptor node = spy(nodes.get(0));
+        DatanodeStorageInfo ds = node.getStorageInfos()[0];
         node.setAlive(true);
         DatanodeRegistration nodeReg = new DatanodeRegistration(node, null, null, "");
         // pretend to be in safemode
@@ -815,8 +815,8 @@ public class TestBlockManager {
 
     @Test
     public void testSafeModeIBRAfterIncremental() throws Exception {
-        DatanodeDescriptorInterface node = spy(nodes.get(0));
-        DatanodeStorageInfoInterface ds = node.getStorageInfos()[0];
+        DatanodeDescriptor node = spy(nodes.get(0));
+        DatanodeStorageInfo ds = node.getStorageInfos()[0];
         node.setAlive(true);
         DatanodeRegistration nodeReg = new DatanodeRegistration(node, null, null, "");
         // pretend to be in safemode
@@ -842,8 +842,8 @@ public class TestBlockManager {
     public void testSafeModeIBRBeforeFirstFullBR() throws Exception {
         // pretend to be in safemode
         doReturn(true).when(fsn).isInStartupSafeMode();
-        DatanodeDescriptorInterface node = nodes.get(0);
-        DatanodeStorageInfoInterface ds = node.getStorageInfos()[0];
+        DatanodeDescriptor node = nodes.get(0);
+        DatanodeStorageInfo ds = node.getStorageInfos()[0];
         node.setAlive(true);
         DatanodeRegistration nodeReg = new DatanodeRegistration(node, null, null, "");
         // register new node
@@ -897,11 +897,11 @@ public class TestBlockManager {
 
     @Test
     public void testSafeModeWithProvidedStorageBR() throws Exception {
-        DatanodeDescriptorInterface node0 = spy(nodes.get(0));
-        DatanodeStorageInfoInterface ds0 = node0.getStorageInfos()[0];
+        DatanodeDescriptor node0 = spy(nodes.get(0));
+        DatanodeStorageInfo ds0 = node0.getStorageInfos()[0];
         node0.setAlive(true);
-        DatanodeDescriptorInterface node1 = spy(nodes.get(1));
-        DatanodeStorageInfoInterface ds1 = node1.getStorageInfos()[0];
+        DatanodeDescriptor node1 = spy(nodes.get(1));
+        DatanodeStorageInfo ds1 = node1.getStorageInfos()[0];
         node1.setAlive(true);
         String providedStorageID = DFSConfigKeys.DFS_PROVIDER_STORAGEUUID_DEFAULT;
         DatanodeStorage providedStorage = new DatanodeStorage(providedStorageID, DatanodeStorage.State.NORMAL, StorageType.PROVIDED);
@@ -926,7 +926,7 @@ public class TestBlockManager {
         bmPs.processReport(node1, providedStorage, BlockListAsLongs.EMPTY, null);
         bmPs.processReport(node1, new DatanodeStorage(ds1.getStorageID()), BlockListAsLongs.EMPTY, null);
         // The provided stoage report should not affect disk storage report
-        DatanodeStorageInfoInterface dsPs = bmPs.getProvidedStorageMap().getProvidedStorageInfo();
+        DatanodeStorageInfo dsPs = bmPs.getProvidedStorageMap().getProvidedStorageInfo();
         assertEquals(2, dsPs.getBlockReportCount());
         assertEquals(1, ds0.getBlockReportCount());
         assertEquals(1, ds1.getBlockReportCount());
@@ -934,8 +934,8 @@ public class TestBlockManager {
 
     @Test
     public void testUCBlockNotConsideredMissing() throws Exception {
-        DatanodeDescriptorInterface node = nodes.get(0);
-        DatanodeStorageInfoInterface ds = node.getStorageInfos()[0];
+        DatanodeDescriptor node = nodes.get(0);
+        DatanodeStorageInfo ds = node.getStorageInfos()[0];
         node.setAlive(true);
         DatanodeRegistration nodeReg = new DatanodeRegistration(node, null, null, "");
         // register new node
@@ -1009,11 +1009,11 @@ public class TestBlockManager {
             final FSNamesystemInterface namesystem = cluster.getNamesystem();
             final String poolId = namesystem.getBlockPoolId();
             final DatanodeRegistrationInterface nodeReg = InternalDataNodeTestUtils.getDNRegistrationForBP(cluster.getDataNodes().get(0), poolId);
-            final DatanodeDescriptorInterface dd = NameNodeAdapter.getDatanode(namesystem, nodeReg);
+            final DatanodeDescriptor dd = NameNodeAdapter.getDatanode(namesystem, nodeReg);
             // By default, MiniDockerDFSCluster will create 1 datanode with 2 storages.
             // Assigning 64k for remaining storage capacity and will
             //create a file with 100k.
-            for (DatanodeStorageInfoInterface storage : dd.getStorageInfos()) {
+            for (DatanodeStorageInfo storage : dd.getStorageInfos()) {
                 storage.setUtilizationForTesting(65536, 0, 65536, 0);
             }
             //sum of the remaining capacity of both the storages
@@ -1220,11 +1220,11 @@ public class TestBlockManager {
             assertTrue("Data directory does not exist", dataDir.exists());
             BlockInfo blockInfo = blockManager.blocksMap.getBlocks().iterator().next();
             ExtendedBlock blk = new ExtendedBlock(bpid, blockInfo.getBlockId(), blockInfo.getNumBytes(), blockInfo.getGenerationStamp());
-            DatanodeDescriptorInterface failedStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(0);
-            DatanodeDescriptorInterface corruptStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(1);
+            DatanodeDescriptor failedStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(0);
+            DatanodeDescriptor corruptStorageDataNode = blockManager.getStoredBlock(blockInfo).getDatanode(1);
             ArrayList<StorageReport> reports = new ArrayList<StorageReport>();
             for (int i = 0; i < failedStorageDataNode.getStorageInfos().length; i++) {
-                DatanodeStorageInfoInterface storageInfo = failedStorageDataNode.getStorageInfos()[i];
+                DatanodeStorageInfo storageInfo = failedStorageDataNode.getStorageInfos()[i];
                 DatanodeStorage dns = new DatanodeStorage(failedStorageDataNode.getStorageInfos()[i].getStorageID(), DatanodeStorage.State.FAILED, failedStorageDataNode.getStorageInfos()[i].getStorageType());
                 while (storageInfo.getBlockIterator().hasNext()) {
                     BlockInfo blockInfo1 = storageInfo.getBlockIterator().next();
@@ -1237,7 +1237,7 @@ public class TestBlockManager {
             }
             failedStorageDataNode.updateHeartbeat(reports.toArray(StorageReport.EMPTY_ARRAY), 0L, 0L, 0, 0, null);
             ns.writeLock();
-            DatanodeStorageInfoInterface corruptStorageInfo = null;
+            DatanodeStorageInfo corruptStorageInfo = null;
             for (int i = 0; i < corruptStorageDataNode.getStorageInfos().length; i++) {
                 corruptStorageInfo = corruptStorageDataNode.getStorageInfos()[i];
                 while (corruptStorageInfo.getBlockIterator().hasNext()) {
@@ -1375,7 +1375,7 @@ public class TestBlockManager {
         LOG.info("Block " + blockInfo + " storages: ");
         Iterator<DatanodeStorageInfo> itr = blockInfo.getStorageInfos();
         while (itr.hasNext()) {
-            DatanodeStorageInfoInterface dn = itr.next();
+            DatanodeStorageInfo dn = itr.next();
             LOG.info(" Rack: " + dn.getDatanodeDescriptor().getNetworkLocation() + ", DataNode: " + dn.getDatanodeDescriptor().getXferAddr());
         }
         if (isBlockPlacementSatisfied) {

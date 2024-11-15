@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -576,6 +577,10 @@ public abstract class FSImageTestUtil {
      * @throws IOException
      */
     public static FsImageProto.FileSummary getLatestImageSummary(MiniDockerDFSCluster cluster) throws IOException {
+        throw new UnsupportedActionException("getLatestImageSummary is not implmeneted in FSImageTestUtil");
+    }
+
+    public static FsImageProto.FileSummary getLatestImageSummary(MiniDFSCluster cluster) throws IOException {
         RandomAccessFile raFile = null;
         try {
             File image = FSImageTestUtil.findLatestImageFile(FSImageTestUtil.getFSImage(cluster.getNameNode()).getStorage().getStorageDir(0));

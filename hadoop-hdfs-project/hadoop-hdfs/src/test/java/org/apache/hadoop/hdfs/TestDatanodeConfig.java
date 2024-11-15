@@ -83,7 +83,7 @@ public class TestDatanodeConfig {
         // 1. Test unsupported ecPolicy. Only "file:" is supported.
         String dnDir = makeURI("shv", null, fileAsURI(dataDir).getPath());
         conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, dnDir);
-        DataNodeInterface dn = null;
+        DataNode dn = null;
         try {
             dn = DataNode.createDataNode(new String[] {}, conf);
             fail();
@@ -129,7 +129,7 @@ public class TestDatanodeConfig {
         Configuration conf = cluster.getConfiguration(0);
         conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, makeURI("file", null, fileAsURI(dataDir).getPath()));
         long prevLimit = conf.getLong(DFSConfigKeys.DFS_DATANODE_MAX_LOCKED_MEMORY_KEY, DFSConfigKeys.DFS_DATANODE_MAX_LOCKED_MEMORY_DEFAULT);
-        DataNodeInterface dn = null;
+        DataNode dn = null;
         try {
             // Try starting the DN with limit configured to the ulimit
             conf.setLong(DFSConfigKeys.DFS_DATANODE_MAX_LOCKED_MEMORY_KEY, memlockLimit);

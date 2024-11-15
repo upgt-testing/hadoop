@@ -107,7 +107,7 @@ public class TestReconstructStripedFile {
     private DistributedFileSystem fs;
 
     // Map: DatanodeID -> datanode index in cluster
-    private Map<DatanodeID, Integer> dnMap = new HashMap<>();
+    private Map<DatanodeIDInterface, Integer> dnMap = new HashMap<>();
 
     private final Random random = new Random();
 
@@ -155,7 +155,7 @@ public class TestReconstructStripedFile {
         fs = cluster.getFileSystem();
         fs.enableErasureCodingPolicy(ecPolicy.getName());
         fs.getClient().setErasureCodingPolicy("/", ecPolicy.getName());
-        List<DataNode> datanodes = cluster.getDataNodes();
+        List<DataNodeInterface> datanodes = cluster.getDataNodes();
         for (int i = 0; i < dnNum; i++) {
             dnMap.put(datanodes.get(i).getDatanodeId(), i);
         }
@@ -274,7 +274,7 @@ public class TestReconstructStripedFile {
 
     private int generateErrors(Map<ExtendedBlock, DataNode> corruptTargets, ReconstructionType type) throws IOException {
         int stoppedDNs = 0;
-        for (Map.EntryInterface<ExtendedBlock, DataNode> target : corruptTargets.entrySet()) {
+        for (Map.Entry<ExtendedBlock, DataNode> target : corruptTargets.entrySet()) {
             if (stoppedDNs == 0 || type != ReconstructionType.DataOnly || random.nextBoolean()) {
                 // stop at least one DN to trigger reconstruction
                 LOG.info("Note: stop DataNode " + target.getValue().getDisplayName() + " with internal block " + target.getKey());

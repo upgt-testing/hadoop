@@ -141,7 +141,7 @@ public class TestBlockStoragePolicy {
         expectedPolicyStrings.put(ALLSSD, "BlockStoragePolicy{ALL_SSD:" + ALLSSD + ", storageTypes=[SSD], creationFallbacks=[DISK], " + "replicationFallbacks=[DISK]}");
         expectedPolicyStrings.put(PROVIDED, "BlockStoragePolicy{PROVIDED:" + PROVIDED + ", storageTypes=[PROVIDED, DISK], " + "creationFallbacks=[PROVIDED, DISK], " + "replicationFallbacks=[PROVIDED, DISK]}");
         for (byte i = 1; i < 16; i++) {
-            final BlockStoragePolicyInterface policy = POLICY_SUITE.getPolicy(i);
+            final BlockStoragePolicy policy = POLICY_SUITE.getPolicy(i);
             if (policy != null) {
                 final String s = policy.toString();
                 Assert.assertEquals(expectedPolicyStrings.get(i), s);
@@ -150,7 +150,7 @@ public class TestBlockStoragePolicy {
         Assert.assertEquals(POLICY_SUITE.getPolicy(HOT), POLICY_SUITE.getDefaultPolicy());
         {
             // check Cold policy
-            final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+            final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = cold.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.ARCHIVE);
@@ -160,7 +160,7 @@ public class TestBlockStoragePolicy {
         }
         {
             // check Warm policy
-            final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
+            final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = warm.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.DISK, StorageType.ARCHIVE);
@@ -170,7 +170,7 @@ public class TestBlockStoragePolicy {
         }
         {
             // check Hot policy
-            final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
+            final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = hot.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.DISK);
@@ -180,7 +180,7 @@ public class TestBlockStoragePolicy {
         }
         {
             // check ONE_SSD policy
-            final BlockStoragePolicyInterface onessd = POLICY_SUITE.getPolicy(ONESSD);
+            final BlockStoragePolicy onessd = POLICY_SUITE.getPolicy(ONESSD);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = onessd.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.SSD, StorageType.DISK);
@@ -190,7 +190,7 @@ public class TestBlockStoragePolicy {
         }
         {
             // check ALL_SSD policy
-            final BlockStoragePolicyInterface allssd = POLICY_SUITE.getPolicy(ALLSSD);
+            final BlockStoragePolicy allssd = POLICY_SUITE.getPolicy(ALLSSD);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = allssd.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.SSD);
@@ -200,7 +200,7 @@ public class TestBlockStoragePolicy {
         }
         {
             // check LAZY_PERSIST policy
-            final BlockStoragePolicyInterface lazyPersist = POLICY_SUITE.getPolicy(LAZY_PERSIST);
+            final BlockStoragePolicy lazyPersist = POLICY_SUITE.getPolicy(LAZY_PERSIST);
             for (short replication = 1; replication < 6; replication++) {
                 final List<StorageType> computed = lazyPersist.chooseStorageTypes(replication);
                 assertStorageType(computed, replication, StorageType.DISK);
@@ -344,9 +344,9 @@ public class TestBlockStoragePolicy {
     }
 
     private static void run(CheckChooseStorageTypes method) {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         {
             final List<StorageType> chosen = Lists.newArrayList();
@@ -417,9 +417,9 @@ public class TestBlockStoragePolicy {
     }
 
     private static void runWithBothUnavailable(CheckChooseStorageTypes method) {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         for (int n = 0; n <= 3; n++) {
             for (int d = 0; d <= n; d++) {
@@ -434,9 +434,9 @@ public class TestBlockStoragePolicy {
 
     @Test
     public void testChooseStorageTypesWithDiskUnavailableAndNewBlock() {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         final EnumSet<StorageType> unavailables = disk;
         final boolean isNewBlock = true;
@@ -509,9 +509,9 @@ public class TestBlockStoragePolicy {
     }
 
     private static void runWithArchiveUnavailable(CheckChooseStorageTypes method) {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         {
             final List<StorageType> chosen = Lists.newArrayList();
@@ -577,9 +577,9 @@ public class TestBlockStoragePolicy {
 
     @Test
     public void testChooseStorageTypesWithDiskUnavailableAndNonNewBlock() {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         final EnumSet<StorageType> unavailables = disk;
         final boolean isNewBlock = false;
@@ -662,9 +662,9 @@ public class TestBlockStoragePolicy {
 
     @Test
     public void testChooseExcess() {
-        final BlockStoragePolicyInterface hot = POLICY_SUITE.getPolicy(HOT);
-        final BlockStoragePolicyInterface warm = POLICY_SUITE.getPolicy(WARM);
-        final BlockStoragePolicyInterface cold = POLICY_SUITE.getPolicy(COLD);
+        final BlockStoragePolicy hot = POLICY_SUITE.getPolicy(HOT);
+        final BlockStoragePolicy warm = POLICY_SUITE.getPolicy(WARM);
+        final BlockStoragePolicy cold = POLICY_SUITE.getPolicy(COLD);
         final short replication = 3;
         for (int n = 0; n <= 6; n++) {
             for (int d = 0; d <= n; d++) {
@@ -820,7 +820,7 @@ public class TestBlockStoragePolicy {
             // check the policy for /dir/.snapshot/s1/foo/f1. Note we always return
             // the latest storage policy for a file/directory.
             Path s1f1 = SnapshotTestHelper.getSnapshotPath(dir, "s1", "foo/f1");
-            DirectoryListingInterface f1Listing = fs.getClient().listPaths(s1f1.toString(), HdfsFileStatus.EMPTY_NAME);
+            DirectoryListing f1Listing = fs.getClient().listPaths(s1f1.toString(), HdfsFileStatus.EMPTY_NAME);
             checkDirectoryListing(f1Listing.getPartialListing(), COLD);
             // delete f1
             fs.delete(fooFile1, true);
@@ -965,10 +965,10 @@ public class TestBlockStoragePolicy {
         DFSTestUtil.formatNameNode(conf);
         NameNode namenode = new NameNode(conf);
         try {
-            final BlockManagerInterface bm = namenode.getNamesystem().getBlockManager();
-            BlockPlacementPolicyInterface replicator = bm.getBlockPlacementPolicy();
-            NetworkTopologyInterface cluster = bm.getDatanodeManager().getNetworkTopology();
-            for (DatanodeDescriptorInterface datanode : dataNodes) {
+            final BlockManager bm = namenode.getNamesystem().getBlockManager();
+            BlockPlacementPolicy replicator = bm.getBlockPlacementPolicy();
+            NetworkTopology cluster = bm.getDatanodeManager().getNetworkTopology();
+            for (DatanodeDescriptor datanode : dataNodes) {
                 cluster.add(datanode);
             }
             DatanodeStorageInfo[] targets = replicator.chooseTarget("/foo", 3, dataNodes[0], Collections.<DatanodeStorageInfo>emptyList(), false, new HashSet<Node>(), 0, policy1, null);
@@ -1002,10 +1002,10 @@ public class TestBlockStoragePolicy {
         DFSTestUtil.formatNameNode(conf);
         NameNode namenode = new NameNode(conf);
         try {
-            final BlockManagerInterface bm = namenode.getNamesystem().getBlockManager();
-            BlockPlacementPolicyInterface replicator = bm.getBlockPlacementPolicy();
-            NetworkTopologyInterface cluster = bm.getDatanodeManager().getNetworkTopology();
-            for (DatanodeDescriptorInterface datanode : dataNodes) {
+            final BlockManager bm = namenode.getNamesystem().getBlockManager();
+            BlockPlacementPolicy replicator = bm.getBlockPlacementPolicy();
+            NetworkTopology cluster = bm.getDatanodeManager().getNetworkTopology();
+            for (DatanodeDescriptor datanode : dataNodes) {
                 cluster.add(datanode);
             }
             DatanodeStorageInfo[] targets = replicator.chooseTarget("/foo", 3, dataNodes[0], Collections.<DatanodeStorageInfo>emptyList(), false, new HashSet<Node>(), 0, policy, null);
@@ -1031,7 +1031,7 @@ public class TestBlockStoragePolicy {
      */
     @Test
     public void testAddDatanode2ExistingPipelineInSsd() throws Exception {
-        BlockStoragePolicyInterface policy = POLICY_SUITE.getPolicy(ALLSSD);
+        BlockStoragePolicy policy = POLICY_SUITE.getPolicy(ALLSSD);
         final String[] racks = { "/d1/r1", "/d2/r2", "/d3/r3", "/d4/r4", "/d5/r5", "/d6/r6", "/d7/r7" };
         final String[] hosts = { "host1", "host2", "host3", "host4", "host5", "host6", "host7" };
         final StorageType[] disks = { StorageType.DISK, StorageType.DISK, StorageType.DISK };
@@ -1047,10 +1047,10 @@ public class TestBlockStoragePolicy {
         DFSTestUtil.formatNameNode(conf);
         NameNode namenode = new NameNode(conf);
         try {
-            final BlockManagerInterface bm = namenode.getNamesystem().getBlockManager();
-            BlockPlacementPolicyInterface replicator = bm.getBlockPlacementPolicy();
-            NetworkTopologyInterface cluster = bm.getDatanodeManager().getNetworkTopology();
-            for (DatanodeDescriptorInterface datanode : dataNodes) {
+            final BlockManager bm = namenode.getNamesystem().getBlockManager();
+            BlockPlacementPolicy replicator = bm.getBlockPlacementPolicy();
+            NetworkTopology cluster = bm.getDatanodeManager().getNetworkTopology();
+            for (DatanodeDescriptor datanode : dataNodes) {
                 cluster.add(datanode);
             }
             // chsenDs are DISK StorageType to simulate not enough SDD Storage
@@ -1114,9 +1114,9 @@ public class TestBlockStoragePolicy {
                 policyNamesSet1.add(policy.getName());
             }
             // Get policies from the default BlockStoragePolicySuite.
-            BlockStoragePolicySuiteInterface suite = BlockStoragePolicySuite.createDefaultSuite();
+            BlockStoragePolicySuite suite = BlockStoragePolicySuite.createDefaultSuite();
             Set<String> policyNamesSet2 = new HashSet<>();
-            for (BlockStoragePolicyInterface policy : suite.getAllPolicies()) {
+            for (BlockStoragePolicy policy : suite.getAllPolicies()) {
                 policyNamesSet2.add(policy.getName());
             }
             // Ensure that we got the same set of policies in both cases.

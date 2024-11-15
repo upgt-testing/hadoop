@@ -120,7 +120,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas, 1);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
         // When node is in ENTERING_MAINTENANCE state, it can still serve read
         // requests
         checkWithRetry(ns, fileSys, file, replicas, null, nodeOutofService);
@@ -140,7 +140,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         startCluster(1, 1);
         final FileSystem fileSys = getCluster().getFileSystem(0);
         writeFile(fileSys, file, replicas, 1);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
         // Adjust the expiration.
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Time.now() + EXPIRATION_IN_MS, null, AdminStates.NORMAL);
         cleanupFile(fileSys, file);
@@ -202,7 +202,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         DFSTestUtil.waitForDatanodeState(getCluster(), dnProp.datanode.getDatanodeUuid(), false, 20000);
         int deadInMaintenance = ns.getNumInMaintenanceDeadDataNodes();
         int liveInMaintenance = ns.getNumInMaintenanceLiveDataNodes();
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, dnProp.datanode.getDatanodeUuid(), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, dnProp.datanode.getDatanodeUuid(), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         // Adjust the expiration.
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Time.now() + EXPIRATION_IN_MS, null, AdminStates.NORMAL);
         // no change
@@ -221,7 +221,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         startCluster(1, 4);
         final FileSystem fileSys = getCluster().getFileSystem(0);
         writeFile(fileSys, file, 3, 1);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSIONED);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSIONED);
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         cleanupFile(fileSys, file);
     }
@@ -237,7 +237,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         startCluster(1, 4);
         final FileSystem fileSys = getCluster().getFileSystem(0);
         writeFile(fileSys, file, 3, 1);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSIONED);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSIONED);
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         // Adjust the expiration.
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Time.now() + EXPIRATION_IN_MS, null, AdminStates.NORMAL);
@@ -262,7 +262,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas, 1);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.ENTERING_MAINTENANCE);
         assertEquals(1, ns.getNumEnteringMaintenanceDataNodes());
         MiniDockerDFSCluster.DataNodeProperties dnProp = getCluster().stopDataNode(nodeOutofService.getXferAddr());
         DFSTestUtil.waitForDatanodeState(getCluster(), nodeOutofService.getDatanodeUuid(), false, 20000);
@@ -306,7 +306,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicationFactor, 1);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         // The block should be replicated to another datanode to meet
         // expected replication count.
         checkWithRetry(ns, fileSys, file, expectedReplicasInRead, nodeOutofService);
@@ -344,7 +344,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final Path file = new Path("/testZeroMinMaintenanceReplicationWithExpiration.dat");
         FileSystem fileSys = getCluster().getFileSystem(0);
         writeFile(fileSys, file, 1, 1);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         // Adjust the expiration.
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Time.now() + EXPIRATION_IN_MS, null, AdminStates.NORMAL);
         cleanupFile(fileSys, file);
@@ -421,7 +421,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         FileSystem fileSys = getCluster().getFileSystem(0);
         FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas, 25);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         DFSClient client = getDfsClient(0);
         assertEquals("All datanodes must be alive", numDatanodes, client.datanodeReport(DatanodeReportType.LIVE).length);
         // test 1, verify the replica in IN_MAINTENANCE state isn't in LocatedBlock
@@ -448,7 +448,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSION_INPROGRESS);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, 0, null, AdminStates.DECOMMISSION_INPROGRESS);
         takeNodeOutofService(0, nodeOutofService.getDatanodeUuid(), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         checkWithRetry(ns, fileSys, file, replicas - 1, nodeOutofService);
         cleanupFile(fileSys, file);
@@ -476,7 +476,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final DatanodeInfo[] nodes = getFirstBlockReplicasDatanodeInfos(fileSys, file);
         String maintenanceDNUuid = nodes[0].getDatanodeUuid();
         String decommissionDNUuid = nodes[1].getDatanodeUuid();
-        DatanodeInfoInterface maintenanceDN = takeNodeOutofService(0, maintenanceDNUuid, Long.MAX_VALUE, null, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo maintenanceDN = takeNodeOutofService(0, maintenanceDNUuid, Long.MAX_VALUE, null, null, AdminStates.IN_MAINTENANCE);
         Map<DatanodeInfo, Long> maintenanceNodes = new HashMap<>();
         maintenanceNodes.put(nodes[0], Long.MAX_VALUE);
         takeNodeOutofService(0, decommissionDNUuid, 0, null, maintenanceNodes, AdminStates.DECOMMISSIONED);
@@ -507,7 +507,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         // Verify file replication matches maintenance state min replication
         checkWithRetry(ns, fileSys, file, 1, null, nodes[0]);
         // Put the maintenance nodes back in service
-        for (DatanodeInfoInterface datanodeInfo : maintenanceDN) {
+        for (DatanodeInfo datanodeInfo : maintenanceDN) {
             putNodeInService(0, datanodeInfo);
         }
         // Verify file replication catching up to the old state
@@ -544,7 +544,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, oldFactor, 1);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         // Verify that the nodeOutofService remains in blocksMap and
         // # of live replicas For read operation is expected.
         checkWithRetry(ns, fileSys, file, oldFactor - 1, nodeOutofService);
@@ -578,7 +578,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         final FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas, 1);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         checkWithRetry(ns, fileSys, file, replicas - 1, nodeOutofService);
         final DFSClient client = getDfsClient(0);
         assertEquals("All datanodes must be alive", numDatanodes, client.datanodeReport(DatanodeReportType.LIVE).length);
@@ -616,7 +616,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         final FileSystem fileSys = getCluster().getFileSystem(0);
         FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas, 1);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, getFirstBlockFirstReplicaUuid(fileSys, file), Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         checkWithRetry(ns, fileSys, file, replicas - 1, nodeOutofService);
         DFSClient client = getDfsClient(0);
         assertEquals("All datanodes must be alive", numDatanodes, client.datanodeReport(DatanodeReportType.LIVE).length);
@@ -651,7 +651,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         int replicas = 3;
         final FileSystem fileSys = getCluster().getFileSystem(0);
         FSNamesystemInterface ns = getCluster().getNamesystem(0);
-        final DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        final DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         writeFile(fileSys, file, replicas, 2);
         // Verify nodeOutofService wasn't chosen for write operation.
         checkWithRetry(ns, fileSys, file, replicas - 1, nodeOutofService, null);
@@ -691,7 +691,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         FileSystem fileSys = getCluster().getFileSystem(0);
         FSNamesystemInterface ns = getCluster().getNamesystem(0);
         writeFile(fileSys, file, replicas);
-        DatanodeInfoInterface nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
+        DatanodeInfo nodeOutofService = takeNodeOutofService(0, null, Long.MAX_VALUE, null, AdminStates.IN_MAINTENANCE);
         DFSClient client = getDfsClient(0);
         client.setReplication(file.toString(), (short) 1);
         // Verify the nodeOutofService remains in blocksMap.
@@ -727,8 +727,8 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         byte[] bytes = new byte[1024];
         fsDataOutputStream.write(bytes);
         fsDataOutputStream.hsync();
-        LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile.toString(), 0, 3 * blockSize);
-        DatanodeInfo[] dnInfos4LastBlock = lbs.getLastLocatedBlock().getLocations();
+        LocatedBlocksInterface lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFile.toString(), 0, 3 * blockSize);
+        DatanodeInfoInterface[] dnInfos4LastBlock = lbs.getLastLocatedBlock().getLocations();
         // Request maintenance for DataNodes 1 and 2 which has the last block.
         takeNodeOutofService(0, Lists.newArrayList(dnInfos4LastBlock[0].getDatanodeUuid(), dnInfos4LastBlock[1].getDatanodeUuid()), Time.now() + expirationInMs, null, null, AdminStates.ENTERING_MAINTENANCE);
         // Closing the file should succeed even when the
@@ -752,7 +752,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
   *
   * @return - null if no failure found, else an error message string.
   */
-    static String checkFile(FSNamesystem ns, FileSystem fileSys, Path name, int repl, DatanodeInfo expectedExcludedNode, DatanodeInfo expectedMaintenanceNode) throws IOException {
+    static String checkFile(FSNamesystemInterface ns, FileSystem fileSys, Path name, int repl, DatanodeInfo expectedExcludedNode, DatanodeInfo expectedMaintenanceNode) throws IOException {
         // need a raw stream
         assertTrue("Not HDFS:" + fileSys.getUri(), fileSys instanceof DistributedFileSystem);
         HdfsDataInputStream dis = (HdfsDataInputStream) fileSys.open(name);
@@ -796,7 +796,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
             Iterator<DatanodeStorageInfo> storageInfoIter = bm.getStorages(blk.getBlock().getLocalBlock()).iterator();
             List<DatanodeInfo> maintenanceNodes = new ArrayList<>();
             while (storageInfoIter.hasNext()) {
-                DatanodeInfoInterface node = storageInfoIter.next().getDatanodeDescriptor();
+                DatanodeInfo node = storageInfoIter.next().getDatanodeDescriptor();
                 if (node.isMaintenance()) {
                     maintenanceNodes.add(node);
                 }
@@ -818,11 +818,11 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         return null;
     }
 
-    static void checkWithRetry(FSNamesystem ns, FileSystem fileSys, Path name, int repl, DatanodeInfo inMaintenanceNode) {
+    static void checkWithRetry(FSNamesystemInterface ns, FileSystem fileSys, Path name, int repl, DatanodeInfo inMaintenanceNode) {
         checkWithRetry(ns, fileSys, name, repl, inMaintenanceNode, inMaintenanceNode);
     }
 
-    static void checkWithRetry(final FSNamesystem ns, final FileSystem fileSys, final Path name, final int repl, final DatanodeInfo excludedNode, final DatanodeInfo underMaintenanceNode) {
+    static void checkWithRetry(final FSNamesystemInterface ns, final FileSystem fileSys, final Path name, final int repl, final DatanodeInfo excludedNode, final DatanodeInfo underMaintenanceNode) {
         try {
             GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
@@ -880,7 +880,7 @@ public class TestMaintenanceState extends AdminStatesBaseTest {
         // to the next state AdminStates.IN_MAINTENANCE immediately since there
         // are not enough candidate nodes to satisfy the min maintenance
         // replication.
-        DatanodeInfoInterface maintenanceDN = takeNodeOutofService(0, nodes[0].getDatanodeUuid(), Time.now() + expirationInMs, null, null, AdminStates.ENTERING_MAINTENANCE);
+        DatanodeInfo maintenanceDN = takeNodeOutofService(0, nodes[0].getDatanodeUuid(), Time.now() + expirationInMs, null, null, AdminStates.ENTERING_MAINTENANCE);
         assertEquals(1, fsn.getNumEnteringMaintenanceDataNodes());
         // reset stream
         out.reset();

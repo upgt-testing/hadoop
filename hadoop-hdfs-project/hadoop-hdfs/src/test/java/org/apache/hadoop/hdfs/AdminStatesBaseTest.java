@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import org.apache.hadoop.hdfs.server.namenode.UnsupportedActionException;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,6 +199,8 @@ public class AdminStatesBaseTest {
      * @throws IOException
      */
     protected List<DatanodeInfo> takeNodeOutofService(int nnIndex, List<String> dataNodeUuids, long maintenanceExpirationInMS, List<DatanodeInfo> decommissionedNodes, Map<DatanodeInfo, Long> inMaintenanceNodes, AdminStates waitForState) throws IOException {
+        throw new UnsupportedActionException("takeNodeOutofService is not supported");
+        /*
         DFSClient client = getDfsClient(nnIndex);
         DatanodeInfo[] info = client.datanodeReport(DatanodeReportType.ALL);
         boolean isDecommissionRequest = waitForState == AdminStates.DECOMMISSION_INPROGRESS || waitForState == AdminStates.DECOMMISSIONED;
@@ -257,6 +261,7 @@ public class AdminStatesBaseTest {
         refreshNodes(nnIndex);
         waitNodeState(datanodeInfos, waitForState);
         return datanodeInfos;
+         */
     }
 
     /* Ask a specific NN to put the datanode in service and wait for it
@@ -267,7 +272,27 @@ public class AdminStatesBaseTest {
         ArrayList<String> decommissionNodes = new ArrayList<>();
         Map<String, Long> maintenanceNodes = new HashMap<>();
         DatanodeManagerInterface dm = cluster.getNamesystem(nnIndex).getBlockManager().getDatanodeManager();
-        List<DatanodeDescriptor> nodes = dm.getDatanodeListForReport(DatanodeReportType.ALL);
+        List<DatanodeDescriptorInterface> nodes = dm.getDatanodeListForReport(DatanodeReportType.ALL);
+        for (DatanodeDescriptorInterface node : nodes) {
+            if (node.isMaintenance()) {
+                maintenanceNodes.put(node.getName(), node.getMaintenanceExpireTimeInMS());
+            } else if (node.isDecommissionInProgress() || node.isDecommissioned()) {
+                decommissionNodes.add(node.getName());
+            }
+        }
+        decommissionNodes.remove(outOfServiceNode.getName());
+        maintenanceNodes.remove(outOfServiceNode.getName());
+        hostsFileWriter.initOutOfServiceHosts(decommissionNodes, maintenanceNodes);
+        refreshNodes(nnIndex);
+        waitNodeState(outOfServiceNode, AdminStates.NORMAL);
+    }
+
+    protected void putNodeInService(int nnIndex, DatanodeInfoInterface outOfServiceNode) throws IOException {
+        LOG.info("Putting node: " + outOfServiceNode + " in service");
+        ArrayList<String> decommissionNodes = new ArrayList<>();
+        Map<String, Long> maintenanceNodes = new HashMap<>();
+        DatanodeManagerInterface dm = cluster.getNamesystem(nnIndex).getBlockManager().getDatanodeManager();
+        List<DatanodeDescriptorInterface> nodes = dm.getDatanodeListForReport(DatanodeReportType.ALL);
         for (DatanodeDescriptorInterface node : nodes) {
             if (node.isMaintenance()) {
                 maintenanceNodes.put(node.getName(), node.getMaintenanceExpireTimeInMS());
@@ -294,10 +319,30 @@ public class AdminStatesBaseTest {
         waitNodeState(Lists.newArrayList(node), state);
     }
 
+    protected void waitNodeState(DatanodeInfoInterface node, AdminStates state) {
+        waitNodeStateInterface(Lists.newArrayList(node), state);
+    }
+
     /**
      * Wait till all DataNodes are transitioned to the expected state.
      */
     protected void waitNodeState(List<DatanodeInfo> nodes, AdminStates state) {
+        for (DatanodeInfo node : nodes) {
+            boolean done = (state == node.getAdminState());
+            while (!done) {
+                LOG.info("Waiting for node " + node + " to change state to " + state + " current state: " + node.getAdminState());
+                try {
+                    Thread.sleep(HEARTBEAT_INTERVAL * 500);
+                } catch (InterruptedException e) {
+                    // nothing
+                }
+                done = (state == node.getAdminState());
+            }
+            LOG.info("node " + node + " reached the state " + state);
+        }
+    }
+
+    protected void waitNodeStateInterface(List<DatanodeInfoInterface> nodes, AdminStates state) {
         for (DatanodeInfoInterface node : nodes) {
             boolean done = (state == node.getAdminState());
             while (!done) {
@@ -397,6 +442,11 @@ public class AdminStatesBaseTest {
     static DatanodeDescriptor getDatanodeDesriptor(final FSNamesystem ns, final String datanodeUuid) {
         return ns.getBlockManager().getDatanodeManager().getDatanode(datanodeUuid);
     }
+
+    static DatanodeDescriptorInterface getDatanodeDesriptor(final FSNamesystemInterface ns, final String datanodeUuid) {
+        return ns.getBlockManager().getDatanodeManager().getDatanode(datanodeUuid);
+    }
+
 
     static public void cleanupFile(FileSystem fileSys, Path name) throws IOException {
         assertTrue(fileSys.exists(name));

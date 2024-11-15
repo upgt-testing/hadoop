@@ -300,8 +300,8 @@ public class TestEncryptedTransfer {
         btsm.clearAllKeysForTesting();
         // Wait until the encryption key becomes invalid.
         LOG.info("Wait until encryption keys become invalid...");
-        DataEncryptionKeyInterface encryptionKey = spyClient.getEncryptionKey();
-        List<DataNode> dataNodes = cluster.getDataNodes();
+        DataEncryptionKey encryptionKey = spyClient.getEncryptionKey();
+        List<DataNodeInterface> dataNodes = cluster.getDataNodes();
         for (DataNodeInterface dn : dataNodes) {
             GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
@@ -344,8 +344,8 @@ public class TestEncryptedTransfer {
         btsm.clearAllKeysForTesting();
         // Wait until the encryption key becomes invalid.
         LOG.info("Wait until encryption keys become invalid...");
-        DataEncryptionKeyInterface encryptionKey = spyClient.getEncryptionKey();
-        List<DataNode> dataNodes = cluster.getDataNodes();
+        DataEncryptionKey encryptionKey = spyClient.getEncryptionKey();
+        List<DataNodeInterface> dataNodes = cluster.getDataNodes();
         for (DataNodeInterface dn : dataNodes) {
             GenericTestUtils.waitFor(new Supplier<Boolean>() {
 

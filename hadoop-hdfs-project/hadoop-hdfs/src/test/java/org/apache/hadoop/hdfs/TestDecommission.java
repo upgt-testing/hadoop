@@ -164,6 +164,23 @@ public class TestDecommission extends AdminStatesBaseTest {
         }
     }
 
+    private void verifyStats(NameNodeInterface namenode, FSNamesystemInterface fsn, DatanodeInfo info, DataNodeInterface node, boolean decommissioning) throws InterruptedException, IOException {
+        // Do the stats check over 10 heartbeats
+        for (int i = 0; i < 10; i++) {
+            long[] newStats = namenode.getRpcServer().getStats();
+            // For decommissioning nodes, ensure capacity of the DN and dfsUsed
+            //  is no longer counted towards total
+            assertEquals(newStats[0], decommissioning ? 0 : info.getCapacity());
+            // Ensure cluster used capacity is counted for normal nodes only
+            assertEquals(newStats[1], decommissioning ? 0 : info.getDfsUsed());
+            // For decommissioning nodes, remaining space from the DN is not counted
+            assertEquals(newStats[2], decommissioning ? 0 : info.getRemaining());
+            // Ensure transceiver count is same as that DN
+            assertEquals(fsn.getTotalLoad(), info.getXceiverCount());
+            DataNodeTestUtils.triggerHeartbeat(node);
+        }
+    }
+
     /**
      * Tests decommission for non federated cluster
      */
@@ -196,7 +213,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         int deadDecommissioned = ns.getNumDecomDeadDataNodes();
         int liveDecommissioned = ns.getNumDecomLiveDataNodes();
         // Decommission one node. Verify that node is decommissioned.
-        DatanodeInfoInterface decomNode = takeNodeOutofService(0, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
+        DatanodeInfo decomNode = takeNodeOutofService(0, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
         decommissionedNodes.add(decomNode);
         assertEquals(deadDecommissioned, ns.getNumDecomDeadDataNodes());
         assertEquals(liveDecommissioned + 1, ns.getNumDecomLiveDataNodes());
@@ -259,9 +276,9 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Step 2, decommission the first DN at both ANN and SBN.
         DataNodeInterface firstDN = getCluster().getDataNodes().get(0);
         // Step 2.a, ask ANN to decomm the first DN
-        DatanodeInfoInterface decommissionedNodeFromANN = takeNodeOutofService(0, firstDN.getDatanodeUuid(), 0, null, AdminStates.DECOMMISSIONED);
+        DatanodeInfo decommissionedNodeFromANN = takeNodeOutofService(0, firstDN.getDatanodeUuid(), 0, null, AdminStates.DECOMMISSIONED);
         // Step 2.b, ask SBN to decomm the first DN
-        DatanodeInfoInterface decomNodeFromSBN = takeNodeOutofService(1, firstDN.getDatanodeUuid(), 0, null, AdminStates.DECOMMISSIONED);
+        DatanodeInfo decomNodeFromSBN = takeNodeOutofService(1, firstDN.getDatanodeUuid(), 0, null, AdminStates.DECOMMISSIONED);
         // Step 3, recommission the first DN on SBN and ANN to create excess replica
         // It recommissions the node on SBN first to create potential
         // inconsistent state. In production cluster, such insistent state can
@@ -327,7 +344,7 @@ public class TestDecommission extends AdminStatesBaseTest {
                 int deadDecommissioned = ns.getNumDecomDeadDataNodes();
                 int liveDecommissioned = ns.getNumDecomLiveDataNodes();
                 // Decommission one node. Verify that node is decommissioned.
-                DatanodeInfoInterface decomNode = takeNodeOutofService(i, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
+                DatanodeInfo decomNode = takeNodeOutofService(i, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
                 decommissionedNodes.add(decomNode);
                 assertEquals(deadDecommissioned, ns.getNumDecomDeadDataNodes());
                 assertEquals(liveDecommissioned + 1, ns.getNumDecomLiveDataNodes());
@@ -382,7 +399,7 @@ public class TestDecommission extends AdminStatesBaseTest {
                 }
             }
             assertNotNull("Could not find a dn with the block!", toDecomUuid);
-            final DatanodeInfoInterface decomNode = takeNodeOutofService(0, toDecomUuid, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
+            final DatanodeInfo decomNode = takeNodeOutofService(0, toDecomUuid, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
             decommissionedNodes.add(decomNode);
             final BlockManagerInterface blockManager = getCluster().getNamesystem().getBlockManager();
             final DatanodeManagerInterface datanodeManager = blockManager.getDatanodeManager();
@@ -397,7 +414,7 @@ public class TestDecommission extends AdminStatesBaseTest {
 
                 @Override
                 public Boolean get() {
-                    BlockInfo info = blockManager.getStoredBlock(b.getLocalBlock());
+                    BlockInfoInterface info = blockManager.getStoredBlock(b.getLocalBlock());
                     int count = 0;
                     StringBuilder sb = new StringBuilder("Replica locations: ");
                     for (int i = 0; i < info.numNodes(); i++) {
@@ -450,19 +467,19 @@ public class TestDecommission extends AdminStatesBaseTest {
             writeFile(fileSys, file, 1);
             FSNamesystemInterface fsn = getCluster().getNamesystem(i);
             NameNodeInterface namenode = getCluster().getNameNode(i);
-            DatanodeInfoInterface decomInfo = takeNodeOutofService(i, null, 0, null, AdminStates.DECOMMISSION_INPROGRESS);
+            DatanodeInfo decomInfo = takeNodeOutofService(i, null, 0, null, AdminStates.DECOMMISSION_INPROGRESS);
             DataNodeInterface decomNode = getDataNode(decomInfo);
             // Check namenode stats for multiple datanode heartbeats
             verifyStats(namenode, fsn, decomInfo, decomNode, true);
             // Stop decommissioning and verify stats
-            DatanodeInfoInterface retInfo = NameNodeAdapter.getDatanode(fsn, decomInfo);
+            DatanodeInfo retInfo = NameNodeAdapter.getDatanode(fsn, decomInfo);
             putNodeInService(i, retInfo);
             DataNodeInterface retNode = getDataNode(decomInfo);
             verifyStats(namenode, fsn, retInfo, retNode, false);
         }
     }
 
-    private DataNode getDataNode(DatanodeInfo decomInfo) {
+    private DataNodeInterface getDataNode(DatanodeInfo decomInfo) {
         DataNodeInterface decomNode = null;
         for (DataNodeInterface dn : getCluster().getDataNodes()) {
             if (decomInfo.equals(dn.getDatanodeId())) {
@@ -540,9 +557,9 @@ public class TestDecommission extends AdminStatesBaseTest {
         ArrayList<String> nodes = new ArrayList<String>();
         ArrayList<DatanodeInfo> dnInfos = new ArrayList<DatanodeInfo>();
         DatanodeManagerInterface dm = ns.getBlockManager().getDatanodeManager();
-        for (DatanodeInfoInterface datanodeInfo : dnInfos4FirstBlock) {
-            DatanodeInfoInterface found = datanodeInfo;
-            for (DatanodeInfoInterface dif : dnInfos4LastBlock) {
+        for (DatanodeInfo datanodeInfo : dnInfos4FirstBlock) {
+            DatanodeInfo found = datanodeInfo;
+            for (DatanodeInfo dif : dnInfos4LastBlock) {
                 if (datanodeInfo.equals(dif)) {
                     found = null;
                 }
@@ -557,7 +574,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         dnInfos.add(dm.getDatanode(dnInfos4LastBlock[0]));
         initExcludeHosts(nodes);
         refreshNodes(0);
-        for (DatanodeInfoInterface dn : dnInfos) {
+        for (DatanodeInfo dn : dnInfos) {
             waitNodeState(dn, AdminStates.DECOMMISSIONED);
         }
         fdos.close();
@@ -687,7 +704,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         HashMap<DatanodeInfo, Integer> dnInfoMap = new HashMap<>();
         for (int i = 0; i < 3; i++) {
             LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), openFiles[i], 0, blockSize * 10);
-            for (DatanodeInfoInterface dn : lbs.getLastLocatedBlock().getLocations()) {
+            for (DatanodeInfo dn : lbs.getLastLocatedBlock().getLocations()) {
                 if (dnInfoMap.containsKey(dn)) {
                     dnInfoMap.put(dn, dnInfoMap.get(dn) + 1);
                 } else {
@@ -695,7 +712,7 @@ public class TestDecommission extends AdminStatesBaseTest {
                 }
             }
         }
-        DatanodeInfoInterface dnToDecommission = null;
+        DatanodeInfo dnToDecommission = null;
         int maxDnOccurance = 0;
         for (Map.EntryInterface<DatanodeInfo, Integer> entry : dnInfoMap.entrySet()) {
             if (entry.getValue() > maxDnOccurance) {
@@ -762,7 +779,7 @@ public class TestDecommission extends AdminStatesBaseTest {
             DataNodeTestUtils.triggerBlockReport(d);
         }
         LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(0), file.toUri().getPath(), 0, blockSize * 10);
-        DatanodeInfoInterface dnToDecommission = lbs.getLastLocatedBlock().getLocations()[0];
+        DatanodeInfo dnToDecommission = lbs.getLastLocatedBlock().getLocations()[0];
         DatanodeManagerInterface dm = ns.getBlockManager().getDatanodeManager();
         dnToDecommission = dm.getDatanode(dnToDecommission.getDatanodeUuid());
         initExcludeHost(dnToDecommission.getXferAddr());
@@ -804,7 +821,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         DatanodeInfo[] lastBlockLocations = NameNodeAdapter.getBlockLocations(getCluster().getNameNode(), "/testRecoveryDecommission", 0, fileSize).getLastLocatedBlock().getLocations();
         // Decommission all nodes of the last block
         ArrayList<String> toDecom = new ArrayList<>();
-        for (DatanodeInfoInterface dnDecom : lastBlockLocations) {
+        for (DatanodeInfo dnDecom : lastBlockLocations) {
             toDecom.add(dnDecom.getXferAddr());
         }
         initExcludeHosts(toDecom);
@@ -812,8 +829,8 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Make sure hard lease expires to trigger replica recovery
         getCluster().setLeasePeriod(300L, 300L);
         Thread.sleep(2 * BLOCKREPORT_INTERVAL_MSEC);
-        for (DatanodeInfoInterface dnDecom : lastBlockLocations) {
-            DatanodeInfoInterface datanode = NameNodeAdapter.getDatanode(getCluster().getNamesystem(), dnDecom);
+        for (DatanodeInfo dnDecom : lastBlockLocations) {
+            DatanodeInfo datanode = NameNodeAdapter.getDatanode(getCluster().getNamesystem(), dnDecom);
             waitNodeState(datanode, AdminStates.DECOMMISSIONED);
         }
         assertEquals(dfs.getFileStatus(file).getLen(), writtenBytes);
@@ -889,7 +906,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Close first block's datanode IBR.
         ArrayList<String> toDecom = new ArrayList<>();
         ArrayList<DatanodeInfo> decomDNInfos = new ArrayList<>();
-        for (DatanodeInfoInterface datanodeInfo : firstBlockLocations) {
+        for (DatanodeInfo datanodeInfo : firstBlockLocations) {
             toDecom.add(datanodeInfo.getXferAddr());
             decomDNInfos.add(dm.getDatanode(datanodeInfo));
             DataNodeInterface dn = getDataNode(datanodeInfo);
@@ -909,7 +926,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         initExcludeHosts(toDecom);
         refreshNodes(0);
         // Waiting nodes at DECOMMISSION_INPROGRESS state and then resume IBR.
-        for (DatanodeInfoInterface dnDecom : decomDNInfos) {
+        for (DatanodeInfo dnDecom : decomDNInfos) {
             waitNodeState(dnDecom, AdminStates.DECOMMISSION_INPROGRESS);
             DataNodeTestUtils.resumeIBR(getDataNode(dnDecom));
         }
@@ -951,7 +968,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         assertEquals("Number of datanodes should be 2 ", 2, getCluster().getDataNodes().size());
         //Restart the namenode
         getCluster().restartNameNode();
-        DatanodeInfoInterface datanodeInfo = NameNodeAdapter.getDatanode(getCluster().getNamesystem(), excludedDatanodeID);
+        DatanodeInfo datanodeInfo = NameNodeAdapter.getDatanode(getCluster().getNamesystem(), excludedDatanodeID);
         waitNodeState(datanodeInfo, AdminStates.DECOMMISSIONED);
         // Ensure decommissioned datanode is not automatically shutdown
         assertEquals("All datanodes must be alive", numDatanodes, client.datanodeReport(DatanodeReportType.LIVE).length);
@@ -974,7 +991,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         startCluster(numNamenodes, numDatanodes);
         DFSClient client = getDfsClient(0);
         DatanodeInfo[] info = client.datanodeReport(DatanodeReportType.LIVE);
-        DatanodeInfoInterface excludedDatanode = info[0];
+        DatanodeInfo excludedDatanode = info[0];
         String excludedDatanodeName = info[0].getXferAddr();
         List<String> hosts = new ArrayList<String>(Arrays.asList(excludedDatanodeName, info[1].getXferAddr()));
         initIncludeHosts(hosts.toArray(new String[hosts.size()]));
@@ -1093,14 +1110,14 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Decom all nodes
         ArrayList<DatanodeInfo> decommissionedNodes = Lists.newArrayList();
         for (DataNodeInterface d : getCluster().getDataNodes()) {
-            DatanodeInfoInterface dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
+            DatanodeInfo dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
             decommissionedNodes.add(dn);
         }
         // Run decom scan and check
         BlockManagerTestUtil.recheckDecommissionState(datanodeManager);
         assertEquals("Unexpected # of nodes checked", expectedNumCheckedNodes, decomManager.getNumNodesChecked());
         // Recommission all nodes
-        for (DatanodeInfoInterface dn : decommissionedNodes) {
+        for (DatanodeInfo dn : decommissionedNodes) {
             putNodeInService(0, dn);
         }
     }
@@ -1122,7 +1139,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Try to decommission 2 datanodes
         for (int i = 0; i < 2; i++) {
             DataNodeInterface d = dns.get(i);
-            DatanodeInfoInterface dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
+            DatanodeInfo dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
             decommissionedNodes.add(dn);
         }
         assertEquals(2, decomManager.getNumPendingNodes());
@@ -1164,7 +1181,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         ArrayList<DatanodeInfo> decommissionedNodes = Lists.newArrayList();
         for (int i = 0; i < 2; i++) {
             final DataNodeInterface d = getCluster().getDataNodes().get(i);
-            DatanodeInfoInterface dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
+            DatanodeInfo dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
             decommissionedNodes.add(dn);
         }
         for (int i = 2; i >= 0; i--) {
@@ -1174,7 +1191,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         // Close file, try to decom the last node, should get stuck in tracked
         open1.close();
         final DataNodeInterface d = getCluster().getDataNodes().get(2);
-        DatanodeInfoInterface dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
+        DatanodeInfo dn = takeNodeOutofService(0, d.getDatanodeUuid(), 0, decommissionedNodes, AdminStates.DECOMMISSION_INPROGRESS);
         decommissionedNodes.add(dn);
         BlockManagerTestUtil.recheckDecommissionState(datanodeManager);
         assertTrackedAndPending(decomManager, 1, 0);
@@ -1238,7 +1255,7 @@ public class TestDecommission extends AdminStatesBaseTest {
     @SuppressWarnings({ "unchecked" })
     public void nodeUsageVerification(int numDatanodes, long[] nodesCapacity, AdminStates decommissionState) throws IOException, InterruptedException {
         Map<String, Map<String, String>> usage = null;
-        DatanodeInfoInterface decommissionedNodeInfo = null;
+        DatanodeInfo decommissionedNodeInfo = null;
         String zeroNodeUsage = "0.00%";
         getConf().setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
         getConf().setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
@@ -1298,7 +1315,7 @@ public class TestDecommission extends AdminStatesBaseTest {
         namenodeDecomList.add(0, new ArrayList<>(numDatanodes));
         ArrayList<DatanodeInfo> decommissionedNodes = namenodeDecomList.get(0);
         //decommission one node
-        DatanodeInfoInterface decomNode = takeNodeOutofService(0, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
+        DatanodeInfo decomNode = takeNodeOutofService(0, null, 0, decommissionedNodes, AdminStates.DECOMMISSIONED);
         decommissionedNodes.add(decomNode);
         long newUsedCapacity = datanodeStatistics.getCapacityUsed();
         long newTotalCapacity = datanodeStatistics.getCapacityTotal();
@@ -1338,7 +1355,7 @@ public class TestDecommission extends AdminStatesBaseTest {
             }
         }, 500, 30000);
         // Put the decommissioned nodes back in service.
-        for (DatanodeInfoInterface datanodeInfo : decomDataNodes) {
+        for (DatanodeInfo datanodeInfo : decomDataNodes) {
             putNodeInService(0, datanodeInfo);
         }
         cleanupFile(fileSys, file);

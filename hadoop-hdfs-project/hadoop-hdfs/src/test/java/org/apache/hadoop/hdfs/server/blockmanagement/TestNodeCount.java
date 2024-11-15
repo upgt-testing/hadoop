@@ -73,7 +73,7 @@ public class TestNodeCount {
             DFSTestUtil.waitReplication(fs, FILE_PATH, REPLICATION_FACTOR);
             ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
             // keep a copy of all datanode descriptor
-            final DatanodeDescriptor[] datanodes = hm.getDatanodes();
+            final DatanodeDescriptorInterface[] datanodes = hm.getDatanodes();
             // start two new nodes
             cluster.startDataNodes(conf, 2, true, null, null);
             cluster.waitActive();
