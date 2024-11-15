@@ -10,7 +10,7 @@ public interface NNStorageInterface {
     java.lang.String getImageFileName(long arg0);
     java.io.File getFsImage(long arg0, java.util.EnumSet<org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeFile> arg1);
     void setClusterID(java.lang.String arg0);
-    java.lang.Iterable<org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory> dirIterable(org.apache.hadoop.hdfs.server.common.Storage.StorageDirType arg0);
+    java.lang.Iterable<StorageDirectoryInterface> dirIterable(org.apache.hadoop.hdfs.server.common.Storage.StorageDirType arg0);
     java.lang.String listStorageDirectories();
     java.io.File getTemporaryEditsFile(StorageDirectoryInterface arg0, long arg1, long arg2, long arg3);
     void readPreviousVersionProperties(StorageDirectoryInterface arg0) throws java.io.IOException;

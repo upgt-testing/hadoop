@@ -1800,4 +1800,49 @@ public class MiniDockerDFSCluster implements Closeable {
                 + DataStorage.STORAGE_DIR_RBW );
     }
 
+    public String readBlockOnDataNode(int i, ExtendedBlock block)
+            throws IOException {
+        assert (i >= 0 && i < dataNodes.size()) : "Invalid datanode "+i;
+        File blockFile = getBlockFile(i, block);
+        if (blockFile != null && blockFile.exists()) {
+            return DFSTestUtil.readFile(blockFile);
+        }
+        return null;
+    }
+
+    public byte[] readBlockOnDataNodeAsBytes(int i, ExtendedBlock block)
+            throws IOException {
+        assert (i >= 0 && i < dataNodes.size()) : "Invalid datanode "+i;
+        File blockFile = getBlockFile(i, block);
+        if (blockFile != null && blockFile.exists()) {
+            return DFSTestUtil.readFileAsBytes(blockFile);
+        }
+        return null;
+    }
+
+    public NameNodeInfo[] getNameNodeInfos() {
+        LOG.warn("The getNameNodeInfos() function is not implemented yet.");
+        System.out.println("The getNameNodeInfos() function is not implemented yet.");
+        throw new UnsupportedOperationException("The getNameNodeInfos() function is not implemented yet.");
+    }
+
+    /**
+     * @param nsIndex index of the namespace id to check
+     * @return all the namenodes bound to the given namespace index
+     */
+    public NameNodeInfo[] getNameNodeInfos(int nsIndex) {
+        LOG.warn("The getNameNodeInfos(int nsIndex) function is not implemented yet.");
+        System.out.println("The getNameNodeInfos(int nsIndex) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getNameNodeInfos(int nsIndex) function is not implemented yet.");
+    }
+
+    /**
+     * @param nameservice id of nameservice to read
+     * @return all the namenodes bound to the given namespace index
+     */
+    public NameNodeInfo[] getNameNodeInfos(String nameservice) {
+        LOG.warn("The getNameNodeInfos(String nameservice) function is not implemented yet.");
+        System.out.println("The getNameNodeInfos(String nameservice) function is not implemented yet.");
+        throw new UnsupportedOperationException("The getNameNodeInfos(String nameservice) function is not implemented yet.");
+    }
 }

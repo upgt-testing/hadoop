@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.hdfs.server.protocol.StorageReceivedDeletedBlocks;
+
 public interface FSNamesystemInterface {
     void setEditLogTailerForTests(EditLogTailerInterface arg0);
     long getBlockDeletionStartTime();
@@ -104,6 +106,7 @@ public interface FSNamesystemInterface {
     long getScheduledReplicationBlocks();
     long getPostponedMisreplicatedBlocks();
     void processIncrementalBlockReport(DatanodeIDInterface arg0, StorageReceivedDeletedBlocksInterface arg1) throws java.io.IOException;
+    void processIncrementalBlockReport(DatanodeIDInterface arg0, StorageReceivedDeletedBlocks arg1) throws java.io.IOException;
     java.lang.String getTotalSyncTimes();
     void verifyToken(DelegationTokenIdentifierInterface arg0, byte[] arg1) throws org.apache.hadoop.security.token.SecretManager.InvalidToken, org.apache.hadoop.ipc.RetriableException;
     void checkFsObjectLimit() throws java.io.IOException;
@@ -132,7 +135,7 @@ public interface FSNamesystemInterface {
     int getNumEnteringMaintenanceDataNodes();
     java.lang.String createSnapshot(java.lang.String arg0, java.lang.String arg1, boolean arg2) throws java.io.IOException;
     java.lang.String metaSaveAsString();
-    KeyProviderCryptoExtensionInterface getProvider();
+    KeyProviderInterface getProvider();
     void createEncryptionZone(java.lang.String arg0, java.lang.String arg1, boolean arg2) throws java.io.IOException, org.apache.hadoop.fs.UnresolvedLinkException, org.apache.hadoop.hdfs.server.namenode.SafeModeException, org.apache.hadoop.security.AccessControlException;
     boolean hasRetryCache();
     void setOwner(java.lang.String arg0, java.lang.String arg1, java.lang.String arg2) throws java.io.IOException;

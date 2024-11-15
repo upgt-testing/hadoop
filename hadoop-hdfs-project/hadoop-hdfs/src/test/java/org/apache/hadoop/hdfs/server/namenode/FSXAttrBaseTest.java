@@ -179,12 +179,12 @@ public class FSXAttrBaseTest {
         }
         fs.removeXAttr(usePath, name1);
         // Create the xattrs
-        for (Map.EntryInterface<String, byte[]> ent : expectedXAttrs.entrySet()) {
+        for (Map.Entry<String, byte[]> ent : expectedXAttrs.entrySet()) {
             fs.setXAttr(usePath, ent.getKey(), ent.getValue(), EnumSet.of(XAttrSetFlag.CREATE));
         }
         xattrs = fs.getXAttrs(usePath);
         Assert.assertEquals(xattrs.size(), expectedXAttrs.size());
-        for (Map.EntryInterface<String, byte[]> ent : expectedXAttrs.entrySet()) {
+        for (Map.Entry<String, byte[]> ent : expectedXAttrs.entrySet()) {
             final byte[] val = (ent.getValue() == null) ? new byte[0] : ent.getValue();
             Assert.assertArrayEquals(val, xattrs.get(ent.getKey()));
         }
@@ -192,7 +192,7 @@ public class FSXAttrBaseTest {
         initFileSystem();
         xattrs = fs.getXAttrs(usePath);
         Assert.assertEquals(xattrs.size(), expectedXAttrs.size());
-        for (Map.EntryInterface<String, byte[]> ent : expectedXAttrs.entrySet()) {
+        for (Map.Entry<String, byte[]> ent : expectedXAttrs.entrySet()) {
             final byte[] val = (ent.getValue() == null) ? new byte[0] : ent.getValue();
             Assert.assertArrayEquals(val, xattrs.get(ent.getKey()));
         }
@@ -200,7 +200,7 @@ public class FSXAttrBaseTest {
         initFileSystem();
         xattrs = fs.getXAttrs(usePath);
         Assert.assertEquals(xattrs.size(), expectedXAttrs.size());
-        for (Map.EntryInterface<String, byte[]> ent : expectedXAttrs.entrySet()) {
+        for (Map.Entry<String, byte[]> ent : expectedXAttrs.entrySet()) {
             final byte[] val = (ent.getValue() == null) ? new byte[0] : ent.getValue();
             Assert.assertArrayEquals(val, xattrs.get(ent.getKey()));
         }

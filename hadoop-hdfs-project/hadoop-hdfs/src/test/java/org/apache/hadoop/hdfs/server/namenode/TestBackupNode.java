@@ -146,7 +146,7 @@ public class TestBackupNode {
         c.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, "${" + DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY + "}");
         c.set(DFSConfigKeys.DFS_NAMENODE_BACKUP_ADDRESS_KEY, "127.0.0.1:0");
         c.set(DFSConfigKeys.DFS_NAMENODE_BACKUP_HTTP_ADDRESS_KEY, "127.0.0.1:0");
-        NameNodeInterface nn;
+        NameNode nn;
         try {
             Configuration nnconf = new HdfsConfiguration(c);
             DFSTestUtil.formatNameNode(nnconf);
@@ -217,7 +217,7 @@ public class TestBackupNode {
             // BN should stay in sync after checkpoint
             testBNInSync(cluster, backup, 3);
             // Stop BN
-            StorageDirectoryInterface sd = bnImage.getStorage().getStorageDir(0);
+            StorageDirectory sd = bnImage.getStorage().getStorageDir(0);
             backup.stop();
             backup = null;
             // When shutting down the BN, it shouldn't finalize logs that are
@@ -278,7 +278,7 @@ public class TestBackupNode {
         assertStorageDirsMatch(nn, backup);
     }
 
-    private void assertStorageDirsMatch(final NameNode nn, final BackupNode backup) throws Exception {
+    private void assertStorageDirsMatch(final NameNodeInterface nn, final BackupNode backup) throws Exception {
         // Check that the stored files in the name dirs are identical
         List<File> dirs = Lists.newArrayList(FSImageTestUtil.getCurrentDirs(nn.getFSImage().getStorage(), null));
         dirs.addAll(FSImageTestUtil.getCurrentDirs(backup.getFSImage().getStorage(), null));

@@ -1,6 +1,6 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
-public interface BlockInfoInterface extends BlockInterface{
+public interface BlockInfoInterface extends BlockInterface {
     void readId(java.io.DataInput arg0) throws java.io.IOException;
     void delete();
     BlockUnderConstructionFeatureInterface getUnderConstructionFeature();

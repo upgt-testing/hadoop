@@ -85,7 +85,7 @@ public class TestAddBlockRetry {
         LocatedBlock[] onRetryBlock = new LocatedBlock[1];
         ns.readLock();
         FSDirWriteFileOp.ValidateAddBlockResult r;
-        FSPermissionCheckerInterface pc = Mockito.mock(FSPermissionChecker.class);
+        FSPermissionChecker pc = Mockito.mock(FSPermissionChecker.class);
         try {
             r = FSDirWriteFileOp.validateAddBlock(ns, pc, src, HdfsConstants.GRANDFATHER_INODE_ID, "clientName", null, onRetryBlock);
         } finally {

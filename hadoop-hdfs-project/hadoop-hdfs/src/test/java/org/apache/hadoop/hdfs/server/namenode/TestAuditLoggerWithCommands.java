@@ -294,7 +294,7 @@ public class TestAuditLoggerWithCommands {
     public void testAddCacheDirective() throws Exception {
         removeExistingCachePools(null);
         proto.addCachePool(new CachePoolInfo("pool1").setMode(new FsPermission((short) 0)));
-        CacheDirectiveInfoInterface alpha = new CacheDirectiveInfo.Builder().setPath(new Path(System.getProperty("user.dir"), "/alpha")).setPool("pool1").build();
+        CacheDirectiveInfo alpha = new CacheDirectiveInfo.Builder().setPath(new Path(System.getProperty("user.dir"), "/alpha")).setPool("pool1").build();
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         try {
             ((DistributedFileSystem) fileSys).addCacheDirective(alpha);
@@ -316,7 +316,7 @@ public class TestAuditLoggerWithCommands {
     public void testModifyCacheDirective() throws Exception {
         removeExistingCachePools(null);
         proto.addCachePool(new CachePoolInfo("pool1").setMode(new FsPermission((short) 0)));
-        CacheDirectiveInfoInterface alpha = new CacheDirectiveInfo.Builder().setPath(new Path("/alpha")).setPool("pool1").build();
+        CacheDirectiveInfo alpha = new CacheDirectiveInfo.Builder().setPath(new Path("/alpha")).setPool("pool1").build();
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         Long id = ((DistributedFileSystem) fs).addCacheDirective(alpha);
         try {
@@ -338,7 +338,7 @@ public class TestAuditLoggerWithCommands {
     public void testRemoveCacheDirective() throws Exception {
         removeExistingCachePools(null);
         proto.addCachePool(new CachePoolInfo("pool1").setMode(new FsPermission((short) 0)));
-        CacheDirectiveInfoInterface alpha = new CacheDirectiveInfo.Builder().setPath(new Path("/alpha")).setPool("pool1").build();
+        CacheDirectiveInfo alpha = new CacheDirectiveInfo.Builder().setPath(new Path("/alpha")).setPool("pool1").build();
         String aceRemoveCachePattern = ".*allowed=false.*ugi=theDoctor.*cmd=removeCache.*";
         int length = -1;
         Long id = ((DistributedFileSystem) fs).addCacheDirective(alpha);
@@ -407,7 +407,7 @@ public class TestAuditLoggerWithCommands {
     @Test
     public void testAddCachePool() throws Exception {
         removeExistingCachePools(null);
-        CachePoolInfoInterface cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
+        CachePoolInfo cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         try {
             ((DistributedFileSystem) fileSys).addCachePool(cacheInfo);
@@ -428,7 +428,7 @@ public class TestAuditLoggerWithCommands {
     @Test
     public void testModifyCachePool() throws Exception {
         removeExistingCachePools(null);
-        CachePoolInfoInterface cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
+        CachePoolInfo cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
         ((DistributedFileSystem) fs).addCachePool(cacheInfo);
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         try {
@@ -450,7 +450,7 @@ public class TestAuditLoggerWithCommands {
     @Test
     public void testRemoveCachePool() throws Exception {
         removeExistingCachePools(null);
-        CachePoolInfoInterface cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
+        CachePoolInfo cacheInfo = new CachePoolInfo("pool1").setMode(new FsPermission((short) 0));
         ((DistributedFileSystem) fs).addCachePool(cacheInfo);
         fileSys = DFSTestUtil.getFileSystemAs(user1, conf);
         try {
@@ -575,7 +575,7 @@ public class TestAuditLoggerWithCommands {
 
     @Test
     public void testDelegationTokens() throws Exception {
-        TokenInterface dt = fs.getDelegationToken("foo");
+        Token dt = fs.getDelegationToken("foo");
         final String getDT = ".*src=HDFS_DELEGATION_TOKEN token 1.*with renewer foo.*";
         verifyAuditLogs(true, ".*cmd=getDelegationToken" + getDT);
         // renew
@@ -642,7 +642,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=startNamenodeReconfiguration.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -666,7 +666,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=getNamenodeReconfigurationStatus.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -690,7 +690,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=listNamenodeReconfigurableProperties.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -714,7 +714,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=refreshUserToGroupsMappings.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         ((NameNodeRpcServer) cluster.getNameNodeRpc()).refreshUserToGroupsMappings();
@@ -726,7 +726,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=refreshSuperUserGroupsConfiguration.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -742,7 +742,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=refreshCallQueue.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -758,7 +758,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=refreshServiceAcl.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -774,7 +774,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=finalizeRollingUpgrade.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         fsNamesystem.setRollingUpgradeInfo(false, System.currentTimeMillis());
@@ -799,7 +799,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=queryRollingUpgrade.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         fsNamesystem.setRollingUpgradeInfo(false, System.currentTimeMillis());
@@ -824,7 +824,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=rollEditLog.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -847,7 +847,7 @@ public class TestAuditLoggerWithCommands {
     public void testSetSafeMode() throws Exception {
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         verifySuccessfulSetSafeMode(fsNamesystem, HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
@@ -876,7 +876,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=setBalancerBandwidth.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -900,7 +900,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=refreshNodes.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -924,7 +924,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=finalizeUpgrade.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -948,7 +948,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=saveNamespace.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         fsNamesystem.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
@@ -973,7 +973,7 @@ public class TestAuditLoggerWithCommands {
         String auditLogString = ".*allowed=true.*cmd=datanodeReport.*";
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         try {
@@ -996,7 +996,7 @@ public class TestAuditLoggerWithCommands {
     public void testRestoreFailedStorage() throws Exception {
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
         verifyAuditRestoreFailedStorage(fsNamesystem, "check");
@@ -1012,10 +1012,10 @@ public class TestAuditLoggerWithCommands {
     public void testGetDatanodeStorageReport() throws Exception {
         FSNamesystemInterface fsNamesystem = spy(cluster.getNamesystem());
         when(fsNamesystem.isExternalInvocation()).thenReturn(true);
-        Server.CallInterface call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
+        Server.Call call = spy(new Server.Call(1, 1, null, null, RPC.RpcKind.RPC_BUILTIN, new byte[] { 1, 2, 3 }));
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser(System.getProperty("user.name")));
         Server.getCurCall().set(call);
-        DatanodeStorageReport[] reports = fsNamesystem.getDatanodeStorageReport(HdfsConstants.DatanodeReportType.ALL);
+        DatanodeStorageReportInterface[] reports = fsNamesystem.getDatanodeStorageReport(HdfsConstants.DatanodeReportType.ALL);
         String auditLogString = ".*allowed=true.*cmd=" + "getDatanodeStorageReport" + ".*";
         verifyAuditLogs(auditLogString);
         when(call.getRemoteUser()).thenReturn(UserGroupInformation.createRemoteUser("theDoctor"));
@@ -1039,7 +1039,7 @@ public class TestAuditLoggerWithCommands {
         verifyAuditLogs(aceDeletePattern);
     }
 
-    private void verifyAuditRestoreFailedStorageACE(FSNamesystem fsNamesystem, String arg) throws IOException {
+    private void verifyAuditRestoreFailedStorageACE(FSNamesystemInterface fsNamesystem, String arg) throws IOException {
         String operationName = fsNamesystem.getFailedStorageCommand(arg);
         try {
             fsNamesystem.restoreFailedStorage(arg);
@@ -1051,7 +1051,7 @@ public class TestAuditLoggerWithCommands {
         }
     }
 
-    private void verifyAuditRestoreFailedStorage(FSNamesystem fsNamesystem, String arg) throws IOException {
+    private void verifyAuditRestoreFailedStorage(FSNamesystemInterface fsNamesystem, String arg) throws IOException {
         String operationName = fsNamesystem.getFailedStorageCommand(arg);
         String auditLogString = ".*allowed=true.*cmd=" + operationName + ".*";
         try {
@@ -1062,7 +1062,7 @@ public class TestAuditLoggerWithCommands {
         }
     }
 
-    private void verifySuccessfulSetSafeMode(FSNamesystem fsNamesystem, HdfsConstants.SafeModeAction safeModeAction) throws IOException {
+    private void verifySuccessfulSetSafeMode(FSNamesystemInterface fsNamesystem, HdfsConstants.SafeModeAction safeModeAction) throws IOException {
         String operationName = safeModeAction.toString().toLowerCase();
         String auditLogString = ".*allowed=true.*cmd=" + operationName + ".*";
         try {
@@ -1073,7 +1073,7 @@ public class TestAuditLoggerWithCommands {
         }
     }
 
-    private void verifySafeModeAction(FSNamesystem fsNamesystem, HdfsConstants.SafeModeAction safeModeAction) throws IOException {
+    private void verifySafeModeAction(FSNamesystemInterface fsNamesystem, HdfsConstants.SafeModeAction safeModeAction) throws IOException {
         String operationName = safeModeAction.toString().toLowerCase();
         String auditLogString;
         try {

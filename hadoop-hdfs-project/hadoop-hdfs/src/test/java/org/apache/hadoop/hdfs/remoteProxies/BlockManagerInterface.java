@@ -1,5 +1,8 @@
 package org.apache.hadoop.hdfs.remoteProxies;
 
+import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
+
 public interface BlockManagerInterface {
     void processFirstBlockReport(DatanodeStorageInfoInterface arg0, BlockListAsLongsInterface arg1) throws java.io.IOException;
     BlockInterface getBlockOnStorage(BlockInfoInterface arg0, DatanodeStorageInfoInterface arg1);
@@ -144,6 +147,7 @@ public interface BlockManagerInterface {
     long addBlock(BlockInfoInterface arg0, java.util.List<org.apache.hadoop.hdfs.server.protocol.BlocksWithLocations.BlockWithLocations> arg1);
     long getCorruptECBlockGroups();
     void findAndMarkBlockAsCorrupt(ExtendedBlockInterface arg0, DatanodeInfoInterface arg1, java.lang.String arg2, java.lang.String arg3) throws java.io.IOException;
+    void findAndMarkBlockAsCorrupt(ExtendedBlock arg0, DatanodeInfo arg1, java.lang.String arg2, java.lang.String arg3) throws java.io.IOException;
     BlockTokenSecretManagerInterface getBlockTokenSecretManager();
     short getMinReplicationToBeInMaintenance();
     int setBlockIndices(BlockInfoInterface arg0, byte[] arg1, int arg2, DatanodeStorageInfoInterface arg3);

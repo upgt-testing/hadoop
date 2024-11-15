@@ -155,7 +155,7 @@ public class TestAddOverReplicatedStripedBlocks {
         // let a internal block be over replicated with (numDNs - GROUP_SIZE + 1)
         // redundant blocks. Therefor number of internal blocks is over GROUP_SIZE.
         blk.setBlockId(groupId);
-        List<DataNode> dataNodeList = cluster.getDataNodes();
+        List<DataNodeInterface> dataNodeList = cluster.getDataNodes();
         for (int i = 0; i < numDNs; i++) {
             if (!infos.contains(dataNodeList.get(i).getDatanodeId())) {
                 cluster.injectBlocks(i, Arrays.asList(blk), bpid);

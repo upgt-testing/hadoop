@@ -232,7 +232,7 @@ public class TestAuditLogger {
             final Path p = new Path("/");
             assertNull(CallerContext.getCurrent());
             // context-only
-            CallerContextInterface context = new CallerContext.Builder("setTimes").build();
+            CallerContext context = new CallerContext.Builder("setTimes").build();
             CallerContext.setCurrent(context);
             LOG.info("Set current caller context as {}", CallerContext.getCurrent());
             fs.setTimes(p, time, time);
@@ -284,7 +284,7 @@ public class TestAuditLogger {
             assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
             auditlog.clearOutput();
             // caller context is overridden in child thread
-            final CallerContextInterface childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
             LOG.info("Set current caller context as {}", CallerContext.getCurrent());
             child = new Thread(new Runnable() {
 
@@ -519,7 +519,7 @@ public class TestAuditLogger {
             final long time = System.currentTimeMillis();
             final Path p = new Path("/");
             assertNull(CallerContext.getCurrent());
-            CallerContextInterface context = new CallerContext.Builder("c1\nc2").append("c3\tc4").setSignature("s1\ns2".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext context = new CallerContext.Builder("c1\nc2").append("c3\tc4").setSignature("s1\ns2".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
             CallerContext.setCurrent(context);
             LOG.info("Set current caller context as {}", CallerContext.getCurrent());
             fs.setTimes(p, time, time);

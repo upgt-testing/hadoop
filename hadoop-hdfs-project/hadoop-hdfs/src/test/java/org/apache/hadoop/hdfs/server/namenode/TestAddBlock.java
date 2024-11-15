@@ -85,19 +85,19 @@ public class TestAddBlock {
         FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
         // check file1
         INodeFileInterface file1Node = fsdir.getINode4Write(file1.toString()).asFile();
-        BlockInfo[] file1Blocks = file1Node.getBlocks();
+        BlockInfoInterface[] file1Blocks = file1Node.getBlocks();
         assertEquals(1, file1Blocks.length);
         assertEquals(BLOCKSIZE - 1, file1Blocks[0].getNumBytes());
         assertEquals(BlockUCState.COMPLETE, file1Blocks[0].getBlockUCState());
         // check file2
         INodeFileInterface file2Node = fsdir.getINode4Write(file2.toString()).asFile();
-        BlockInfo[] file2Blocks = file2Node.getBlocks();
+        BlockInfoInterface[] file2Blocks = file2Node.getBlocks();
         assertEquals(1, file2Blocks.length);
         assertEquals(BLOCKSIZE, file2Blocks[0].getNumBytes());
         assertEquals(BlockUCState.COMPLETE, file2Blocks[0].getBlockUCState());
         // check file3
         INodeFileInterface file3Node = fsdir.getINode4Write(file3.toString()).asFile();
-        BlockInfo[] file3Blocks = file3Node.getBlocks();
+        BlockInfoInterface[] file3Blocks = file3Node.getBlocks();
         assertEquals(2, file3Blocks.length);
         assertEquals(BLOCKSIZE, file3Blocks[0].getNumBytes());
         assertEquals(BlockUCState.COMPLETE, file3Blocks[0].getBlockUCState());
@@ -105,7 +105,7 @@ public class TestAddBlock {
         assertEquals(BlockUCState.COMPLETE, file3Blocks[1].getBlockUCState());
         // check file4
         INodeFileInterface file4Node = fsdir.getINode4Write(file4.toString()).asFile();
-        BlockInfo[] file4Blocks = file4Node.getBlocks();
+        BlockInfoInterface[] file4Blocks = file4Node.getBlocks();
         assertEquals(2, file4Blocks.length);
         assertEquals(BLOCKSIZE, file4Blocks[0].getNumBytes());
         assertEquals(BlockUCState.COMPLETE, file4Blocks[0].getBlockUCState());
@@ -132,7 +132,7 @@ public class TestAddBlock {
             cluster.restartNameNode(true);
             FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface fileNode = fsdir.getINode4Write(file1.toString()).asFile();
-            BlockInfo[] fileBlocks = fileNode.getBlocks();
+            BlockInfoInterface[] fileBlocks = fileNode.getBlocks();
             assertEquals(2, fileBlocks.length);
             assertEquals(BLOCKSIZE, fileBlocks[0].getNumBytes());
             assertEquals(BlockUCState.COMPLETE, fileBlocks[0].getBlockUCState());

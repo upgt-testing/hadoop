@@ -116,7 +116,7 @@ public class TestAddStripedBlocks {
             writeAndFlushStripedOutputStream(sout, DFS_BYTES_PER_CHECKSUM_DEFAULT);
             // make sure the scheduled block size has been updated for each DN storage
             // in NN
-            final List<DatanodeDescriptor> dnList = new ArrayList<>();
+            final List<DatanodeDescriptorInterface> dnList = new ArrayList<>();
             fsn.getBlockManager().getDatanodeManager().fetchDatanodes(dnList, null, false);
             for (DatanodeDescriptorInterface dn : dnList) {
                 assertEquals(1, dn.getBlocksScheduled());
@@ -127,7 +127,7 @@ public class TestAddStripedBlocks {
             DataNodeTestUtils.triggerBlockReport(dn);
         }
         // check the scheduled block size again
-        final List<DatanodeDescriptor> dnList = new ArrayList<>();
+        final List<DatanodeDescriptorInterface> dnList = new ArrayList<>();
         fsn.getBlockManager().getDatanodeManager().fetchDatanodes(dnList, null, false);
         for (DatanodeDescriptorInterface dn : dnList) {
             assertEquals(0, dn.getBlocksScheduled());
@@ -171,7 +171,7 @@ public class TestAddStripedBlocks {
             writeAndFlushStripedOutputStream((DFSStripedOutputStream) out.getWrappedStream(), DFS_BYTES_PER_CHECKSUM_DEFAULT);
             FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
-            BlockInfo[] blocks = fileNode.getBlocks();
+            BlockInfoInterface[] blocks = fileNode.getBlocks();
             assertEquals(1, blocks.length);
             assertTrue(blocks[0].isStriped());
             checkStripedBlockUC((BlockInfoStriped) fileNode.getLastBlock(), true);
@@ -216,8 +216,8 @@ public class TestAddStripedBlocks {
         }
     }
 
-    private boolean includeDataNode(DatanodeID dn, DatanodeStorageInfo[] storages) {
-        for (DatanodeStorageInfoInterface storage : storages) {
+    private boolean includeDataNode(DatanodeIDInterface dn, DatanodeStorageInfo[] storages) {
+        for (DatanodeStorageInfo storage : storages) {
             if (storage.getDatanodeDescriptor().equals(dn)) {
                 return true;
             }
@@ -235,7 +235,7 @@ public class TestAddStripedBlocks {
             writeAndFlushStripedOutputStream((DFSStripedOutputStream) out.getWrappedStream(), DFS_BYTES_PER_CHECKSUM_DEFAULT);
             FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
-            BlockInfoStripedInterface lastBlk = (BlockInfoStriped) fileNode.getLastBlock();
+            BlockInfoStriped lastBlk = (BlockInfoStriped) fileNode.getLastBlock();
             DatanodeInfo[] expectedDNs = DatanodeStorageInfo.toDatanodeInfos(lastBlk.getUnderConstructionFeature().getExpectedStorageLocations());
             byte[] indices = lastBlk.getUnderConstructionFeature().getBlockIndices();
             LocatedBlocks blks = dfs.getClient().getLocatedBlocks(file.toString(), 0L);
@@ -269,8 +269,8 @@ public class TestAddStripedBlocks {
             FSDirectoryInterface fsdir = cluster.getNamesystem().getFSDirectory();
             INodeFileInterface fileNode = fsdir.getINode4Write(file.toString()).asFile();
             cluster.getNamesystem().getAdditionalBlock(file.toString(), fileNode.getId(), dfs.getClient().getClientName(), null, null, null, null);
-            BlockInfo lastBlock = fileNode.getLastBlock();
-            DatanodeStorageInfo[] locs = lastBlock.getUnderConstructionFeature().getExpectedStorageLocations();
+            BlockInfoInterface lastBlock = fileNode.getLastBlock();
+            DatanodeStorageInfoInterface[] locs = lastBlock.getUnderConstructionFeature().getExpectedStorageLocations();
             byte[] indices = lastBlock.getUnderConstructionFeature().getBlockIndices();
             assertEquals(groupSize, locs.length);
             assertEquals(groupSize, indices.length);
@@ -282,7 +282,7 @@ public class TestAddStripedBlocks {
                 DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
                 storageIDs.add(storage.getStorageID());
                 StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, BlockStatus.RECEIVING_BLOCK, storage);
-                for (StorageReceivedDeletedBlocksInterface report : reports) {
+                for (StorageReceivedDeletedBlocks report : reports) {
                     cluster.getNamesystem().processIncrementalBlockReport(dn.getDatanodeId(), report);
                 }
             }
@@ -302,7 +302,7 @@ public class TestAddStripedBlocks {
         cluster.restartNameNode(true);
         final String bpId = cluster.getNamesystem().getBlockPoolId();
         INodeFileInterface fileNode = cluster.getNamesystem().getFSDirectory().getINode4Write(file.toString()).asFile();
-        BlockInfo lastBlock = fileNode.getLastBlock();
+        BlockInfoInterface lastBlock = fileNode.getLastBlock();
         int i = groupSize - 1;
         for (DataNodeInterface dn : cluster.getDataNodes()) {
             String storageID = storageIDs.get(i);
@@ -311,7 +311,7 @@ public class TestAddStripedBlocks {
             List<ReplicaBeingWritten> blocks = new ArrayList<>();
             ReplicaBeingWritten replica = new ReplicaBeingWritten(block, null, null, null);
             blocks.add(replica);
-            BlockListAsLongsInterface bll = BlockListAsLongs.encode(blocks);
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
             StorageBlockReport[] reports = { new StorageBlockReport(storage, bll) };
             cluster.getNameNodeRpc().blockReport(dn.getDNRegistrationForBP(bpId), bpId, reports, null);
         }

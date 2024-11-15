@@ -133,6 +133,11 @@ public class BlockManagerTestUtil {
     }
   }
 
+  public static int[] getReplicaInfo(final FSNamesystemInterface namesystem, final Block b) {
+    System.out.println("Not implemented");
+    throw new UnsupportedOperationException("getReplicaInfo not implemented");
+  }
+
   /**
    * @return the number of racks over which a given block is replicated
    * decommissioning/decommissioned nodes are not counted. corrupt replicas 

@@ -619,13 +619,13 @@ public class DFSTestUtil {
    * Wait up to 20s for the given DN (IP:port) to be decommissioned
    */
     public static void waitForDecommission(FileSystem fs, String name) throws IOException, InterruptedException, TimeoutException {
-        DatanodeInfoInterface dn = null;
+        DatanodeInfo dn = null;
         int count = 0;
         final int ATTEMPTS = 20;
         do {
             Thread.sleep(1000);
             DistributedFileSystem dfs = (DistributedFileSystem) fs;
-            for (DatanodeInfoInterface info : dfs.getDataNodeStats()) {
+            for (DatanodeInfo info : dfs.getDataNodeStats()) {
                 if (name.equals(info.getXferAddr())) {
                     dn = info;
                 }
@@ -1106,7 +1106,7 @@ public class DFSTestUtil {
             conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_RPC_ADDRESS_KEY, info.nameserviceId, info.nnId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME, info.nameNode.getNameNodeAddress()).toString());
             conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY, info.nameserviceId, info.nnId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME, info.nameNode.getNameNodeAddress()).toString());
         }
-        for (Map.EntryInterface<String, List<String>> entry : nameservices.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : nameservices.entrySet()) {
             conf.set(DFSUtil.addKeySuffixes(DFS_HA_NAMENODES_KEY_PREFIX, entry.getKey()), Joiner.on(",").join(entry.getValue()));
             conf.set(HdfsClientConfigKeys.Failover.PROXY_PROVIDER_KEY_PREFIX + "." + entry.getKey(), ConfiguredFailoverProxyProvider.class.getName());
         }
@@ -1197,7 +1197,7 @@ public class DFSTestUtil {
 
     public static DatanodeStorageInfo createDatanodeStorageInfo(String storageID, String ip, String rack, String hostname, StorageType type, String upgradeDomain) {
         final DatanodeStorage storage = new DatanodeStorage(storageID, DatanodeStorage.State.NORMAL, type);
-        final DatanodeDescriptorInterface dn = BlockManagerTestUtil.getDatanodeDescriptor(ip, rack, storage, hostname);
+        final DatanodeDescriptor dn = BlockManagerTestUtil.getDatanodeDescriptor(ip, rack, storage, hostname);
         if (upgradeDomain != null) {
             dn.setUpgradeDomain(upgradeDomain);
         }
@@ -1624,8 +1624,8 @@ public class DFSTestUtil {
     public static void verifyClientStats(Configuration conf, MiniDockerDFSCluster cluster) throws Exception {
         ClientProtocol client = NameNodeProxies.createProxy(conf, cluster.getFileSystem(0).getUri(), ClientProtocol.class).getProxy();
         long[] aggregatedStats = cluster.getNameNode().getRpcServer().getStats();
-        ReplicatedBlockStatsInterface replicatedBlockStats = client.getReplicatedBlockStats();
-        ECBlockGroupStatsInterface ecBlockGroupStats = client.getECBlockGroupStats();
+        ReplicatedBlockStats replicatedBlockStats = client.getReplicatedBlockStats();
+        ECBlockGroupStats ecBlockGroupStats = client.getECBlockGroupStats();
         assertEquals("Under replicated stats not matching!", aggregatedStats[ClientProtocol.GET_STATS_LOW_REDUNDANCY_IDX], aggregatedStats[ClientProtocol.GET_STATS_UNDER_REPLICATED_IDX]);
         assertEquals("Low redundancy stats not matching!", aggregatedStats[ClientProtocol.GET_STATS_LOW_REDUNDANCY_IDX], replicatedBlockStats.getLowRedundancyBlocks() + ecBlockGroupStats.getLowRedundancyBlockGroups());
         assertEquals("Corrupt blocks stats not matching!", aggregatedStats[ClientProtocol.GET_STATS_CORRUPT_BLOCKS_IDX], replicatedBlockStats.getCorruptBlocks() + ecBlockGroupStats.getCorruptBlockGroups());
@@ -1665,27 +1665,6 @@ public class DFSTestUtil {
         provider.flush();
     }
 
-    public static void createKey(String keyName, MiniDockerDFSCluster cluster, Configuration conf) throws NoSuchAlgorithmException, IOException {
-        createKey(keyName, cluster, 0, conf);
-    }
-
-    /**
-     * Helper function to create a key in the Key Provider.
-     *
-     * @param keyName The name of the key to create
-     * @param cluster The cluster to create it in
-     * @param idx The NameNode index
-     * @param conf Configuration to use
-     */
-    public static void createKey(String keyName, MiniDockerDFSCluster cluster, int idx, Configuration conf) throws NoSuchAlgorithmException, IOException {
-        NameNodeInterface nn = cluster.getNameNode(idx);
-        KeyProviderCryptoExtensionInterface provider = nn.getNamesystem().getProvider();
-        final KeyProvider.OptionsInterface options = KeyProvider.options(conf);
-        options.setDescription(keyName);
-        options.setBitLength(128);
-        provider.createKey(keyName, options);
-        provider.flush();
-    }
 
     /**
      * @return the node which is expected to run the recovery of the
@@ -1693,13 +1672,13 @@ public class DFSTestUtil {
      * given NameNOde.
      */
     public static DatanodeDescriptor getExpectedPrimaryNode(NameNode nn, ExtendedBlock blk) {
-        BlockManagerInterface bm0 = nn.getNamesystem().getBlockManager();
+        BlockManager bm0 = nn.getNamesystem().getBlockManager();
         BlockInfo storedBlock = bm0.getStoredBlock(blk.getLocalBlock());
         assertTrue("Block " + blk + " should be under construction, " + "got: " + storedBlock, !storedBlock.isComplete());
         // We expect that the replica with the most recent heart beat will be
         // the one to be in charge of the synchronization / recovery protocol.
         final DatanodeStorageInfo[] storages = storedBlock.getUnderConstructionFeature().getExpectedStorageLocations();
-        DatanodeStorageInfoInterface expectedPrimary = storages[0];
+        DatanodeStorageInfo expectedPrimary = storages[0];
         long mostRecentLastUpdate = expectedPrimary.getDatanodeDescriptor().getLastUpdateMonotonic();
         for (int i = 1; i < storages.length; i++) {
             final long lastUpdate = storages[i].getDatanodeDescriptor().getLastUpdateMonotonic();
@@ -1989,7 +1968,40 @@ public class DFSTestUtil {
      * @param len block size for a non striped block added
      * @return The added block or block group
      */
+    /*
     public static Block addBlockToFile(boolean isStripedBlock, List<DataNode> dataNodes, DistributedFileSystem fs, FSNamesystem ns, String file, INodeFile fileNode, String clientName, ExtendedBlock previous, int numStripes, int len) throws Exception {
+        fs.getClient().namenode.addBlock(file, clientName, previous, null, fileNode.getId(), null, null);
+        final BlockInfo lastBlock = fileNode.getLastBlock();
+        final int groupSize = fileNode.getPreferredBlockReplication();
+        assert dataNodes.size() >= groupSize;
+        // 1. RECEIVING_BLOCK IBR
+        for (int i = 0; i < groupSize; i++) {
+            DataNode dn = dataNodes.get(i);
+            final Block block = new Block(lastBlock.getBlockId() + i, 0, lastBlock.getGenerationStamp());
+            DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
+            StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVING_BLOCK, storage);
+            for (StorageReceivedDeletedBlocks report : reports) {
+                ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
+            }
+        }
+        final ErasureCodingPolicy ecPolicy = fs.getErasureCodingPolicy(new Path(file));
+        // 2. RECEIVED_BLOCK IBR
+        long blockSize = isStripedBlock ? numStripes * ecPolicy.getCellSize() : len;
+        for (int i = 0; i < groupSize; i++) {
+            DataNode dn = dataNodes.get(i);
+            final Block block = new Block(lastBlock.getBlockId() + i, blockSize, lastBlock.getGenerationStamp());
+            DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
+            StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, storage);
+            for (StorageReceivedDeletedBlocks report : reports) {
+                ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
+            }
+        }
+        long bytes = isStripedBlock ? numStripes * ecPolicy.getCellSize() * ecPolicy.getNumDataUnits() : len;
+        lastBlock.setNumBytes(bytes);
+        return lastBlock;
+    }*/
+
+    public static Block addBlockToFile(boolean isStripedBlock, List<DataNodeInterface> dataNodes, DistributedFileSystem fs, FSNamesystemInterface ns, String file, INodeFile fileNode, String clientName, ExtendedBlock previous, int numStripes, int len) throws Exception {
         fs.getClient().namenode.addBlock(file, clientName, previous, null, fileNode.getId(), null, null);
         final BlockInfo lastBlock = fileNode.getLastBlock();
         final int groupSize = fileNode.getPreferredBlockReplication();
@@ -2000,7 +2012,7 @@ public class DFSTestUtil {
             final Block block = new Block(lastBlock.getBlockId() + i, 0, lastBlock.getGenerationStamp());
             DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
             StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVING_BLOCK, storage);
-            for (StorageReceivedDeletedBlocksInterface report : reports) {
+            for (StorageReceivedDeletedBlocks report : reports) {
                 ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
             }
         }
@@ -2012,7 +2024,7 @@ public class DFSTestUtil {
             final Block block = new Block(lastBlock.getBlockId() + i, blockSize, lastBlock.getGenerationStamp());
             DatanodeStorage storage = new DatanodeStorage(UUID.randomUUID().toString());
             StorageReceivedDeletedBlocks[] reports = DFSTestUtil.makeReportForReceivedBlock(block, ReceivedDeletedBlockInfo.BlockStatus.RECEIVED_BLOCK, storage);
-            for (StorageReceivedDeletedBlocksInterface report : reports) {
+            for (StorageReceivedDeletedBlocks report : reports) {
                 ns.processIncrementalBlockReport(dn.getDatanodeId(), report);
             }
         }
@@ -2020,6 +2032,7 @@ public class DFSTestUtil {
         lastBlock.setNumBytes(bytes);
         return lastBlock;
     }
+
 
     /*
    * Copy a block from sourceProxy to destination. If the block becomes
@@ -2106,7 +2119,7 @@ public class DFSTestUtil {
             if (!Strings.isNullOrEmpty(group)) {
                 assertEquals(group, stat.getGroup());
             }
-            FsPermissionInterface permission = stat.getPermission();
+            FsPermission permission = stat.getPermission();
             if (u != null) {
                 assertEquals(u, permission.getUserAction());
             }
@@ -2176,7 +2189,7 @@ public class DFSTestUtil {
     public static HashSet<Path> closeOpenFiles(HashMap<Path, FSDataOutputStream> openFilesMap, int numFilesToClose) throws IOException {
         HashSet<Path> closedFiles = new HashSet<>();
         for (Iterator<Entry<Path, FSDataOutputStream>> it = openFilesMap.entrySet().iterator(); it.hasNext(); ) {
-            EntryInterface<Path, FSDataOutputStream> entry = it.next();
+            Entry<Path, FSDataOutputStream> entry = it.next();
             LOG.info("Closing file: " + entry.getKey());
             entry.getValue().close();
             closedFiles.add(entry.getKey());
@@ -2238,9 +2251,9 @@ public class DFSTestUtil {
      * report.
      */
     public static void verifySnapshotDiffReport(DistributedFileSystem fs, Path dir, String from, String to, DiffReportEntry... entries) throws IOException {
-        SnapshotDiffReportInterface report = fs.getSnapshotDiffReport(dir, from, to);
+        SnapshotDiffReport report = fs.getSnapshotDiffReport(dir, from, to);
         // reverse the order of from and to
-        SnapshotDiffReportInterface inverseReport = fs.getSnapshotDiffReport(dir, to, from);
+        SnapshotDiffReport inverseReport = fs.getSnapshotDiffReport(dir, to, from);
         LOG.info(report.toString());
         LOG.info(inverseReport.toString() + "\n");
         assertEquals(entries.length, report.getDiffList().size());
@@ -2307,8 +2320,8 @@ public class DFSTestUtil {
      * @throws Exception
      */
     public static void waitForXattrRemoved(String srcPath, String xattr, Namesystem ns, int timeout) throws TimeoutException, InterruptedException, UnresolvedLinkException, AccessControlException, ParentNotDirectoryException {
-        final INodeInterface inode = ns.getFSDirectory().getINode(srcPath);
-        final XAttrInterface satisfyXAttr = XAttrHelper.buildXAttr(xattr);
+        final INode inode = ns.getFSDirectory().getINode(srcPath);
+        final XAttr satisfyXAttr = XAttrHelper.buildXAttr(xattr);
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
             @Override
