@@ -86,7 +86,7 @@ import org.apache.hadoop.util.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class FSImage implements Closeable {
+public class FSImage implements Closeable, FSImageInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(FSImage.class.getName());
 

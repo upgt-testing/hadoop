@@ -272,7 +272,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DE
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class NameNode extends ReconfigurableBase implements
-    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier> {
+    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier>, NameNodeInterface {
   static{
     HdfsConfiguration.init();
   }

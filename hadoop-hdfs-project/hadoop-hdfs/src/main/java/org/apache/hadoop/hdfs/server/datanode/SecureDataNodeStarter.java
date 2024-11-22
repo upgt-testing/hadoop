@@ -42,7 +42,7 @@ public class SecureDataNodeStarter implements Daemon {
   /**
    * Stash necessary resources needed for datanode operation in a secure env.
    */
-  public static class SecureResources {
+  public static class SecureResources implements SecureResourcesInterface {
     private final boolean isSaslEnabled;
     private final boolean isRpcPortPrivileged;
     private final boolean isHttpPortPrivileged;
