@@ -2,6 +2,7 @@ package org.apache.hadoop.hdfs;
 
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
@@ -30,17 +31,24 @@ public class TestUpgtDemo {
     }
 
     @Test
+    public void testMiniClusterInJVM() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
+        System.out.println("NameNode address: " + cluster.fakeGetNameNode().getHostAndPort());
+        System.out.println("DataNode address: " + cluster.getDataNodes().get(0).getDatanodeHostname() + ":" + cluster.getDataNodes().get(0).getIpcPort());
+    }
+
+    @Test
     public void testNameNodeCreation() throws Exception {
         NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(null);
 
-        FSImageInterface fsImage = nn.getFSImage();
-        System.out.println(fsImage.getBlockPoolID());
+        //FSImageInterface fsImage = nn.getFSImage();
+        //System.out.println(fsImage.getBlockPoolID());
         DataNodeInterface dn = MiniDFSClusterHelper.createDataNode();
 
         InetSocketAddress addr = nn.getServiceRpcAddress();
         assert addr.getPort() != 0;
         System.out.println("DN port is : " + dn.getIpcPort());
-        System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
+        //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
 
         MiniDFSClusterHelper.createFileWithDFS();
 
@@ -142,8 +150,8 @@ public class TestUpgtDemo {
                 InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
                 System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
 
-                FSImageInterface fsImage = nameNodeInstance.getFSImage();
-                System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
+                //FSImageInterface fsImage = nameNodeInstance.getFSImage();
+                //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
 
             } catch (Exception e) {
                 throw new RuntimeException(e);

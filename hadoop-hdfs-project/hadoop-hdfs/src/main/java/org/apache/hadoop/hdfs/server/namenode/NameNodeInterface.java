@@ -1,15 +1,13 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.http.HttpServer2;
 
 import java.net.InetSocketAddress;
 
 public interface NameNodeInterface {
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     InetSocketAddress getHttpAddress();
-    FSNamesystem getNamesystem();
-    HttpServer2 getHttpServer();
+    //FSNamesystem getNamesystem();
+    //HttpServer2 getHttpServer();
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();
     //void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
@@ -21,14 +19,14 @@ public interface NameNodeInterface {
     java.net.InetSocketAddress getNameNodeAddress();
     //java.lang.String getLifelineRpcServerBindHost(Configuration arg0);
     //boolean isStarted();
-    org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NamenodeRole getRole();
+    //org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NamenodeRole getRole();
     //void startTrashEmptier(Configuration arg0) throws java.io.IOException;
     //java.lang.String reconfigureParallelLoad(java.lang.String arg0);
     java.lang.String getSlowPeersReport();
     //void setStartupOption(Configuration arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1);
     //void stopHttpServer();
     //ReconfigurationTaskStatusInterface getReconfigurationTaskStatus();
-    FSImage getFSImage();
+    //FSImage getFSImage();
     boolean isActiveState();
     void joinHttpServer();
     //java.lang.String reconfigureSlowNodesParameters(DatanodeManagerInterface arg0, java.lang.String arg1, java.lang.String arg2) throws org.apache.hadoop.conf.ReconfigurationException;
@@ -47,7 +45,7 @@ public interface NameNodeInterface {
     //java.net.InetSocketAddress getHttpServerAddress(Configuration arg0);
     //boolean initializeSharedEdits(Configuration arg0, boolean arg1, boolean arg2) throws java.io.IOException;
     //java.net.InetSocketAddress getServiceAddress(Configuration arg0, boolean arg1);
-    org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols getRpcServer();
+    //org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols getRpcServer();
     long getProtocolVersion(java.lang.String arg0, long arg1) throws java.io.IOException;
     //HAServiceStatusInterface getServiceStatus() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
     boolean isObserverState();

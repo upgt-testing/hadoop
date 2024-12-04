@@ -79,13 +79,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
-
-import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.thirdparty.com.google.common.collect.ArrayListMultimap;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Multimap;
 import org.apache.hadoop.hdfs.server.common.blockaliasmap.BlockAliasMap;
 import org.apache.hadoop.hdfs.server.common.blockaliasmap.impl.InMemoryLevelDBAliasMapClient;
 import org.apache.hadoop.hdfs.server.datanode.VolumeScanner;
+import org.apache.hadoop.hdfs.server.namenode.ImageServlet;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.util.Lists;
@@ -128,6 +127,10 @@ import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
+import org.apache.hadoop.hdfs.server.namenode.EditLogFileOutputStream;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
@@ -669,16 +672,14 @@ public class MiniDFSCluster implements AutoCloseable {
    * Stores the information related to a namenode in the cluster
    */
   public static class NameNodeInfo {
-    public NameNodeInterface nameNodeInterface;
     public NameNode nameNode;
     Configuration conf;
     String nameserviceId;
     String nnId;
     StartupOption startOpt;
-    NameNodeInfo(NameNodeInterface nn, String nameserviceId, String nnId,
+    NameNodeInfo(NameNode nn, String nameserviceId, String nnId,
         StartupOption startOpt, Configuration conf) {
-      this.nameNodeInterface = nn;
-      this.nameNode = null;
+      this.nameNode = nn;
       this.nameserviceId = nameserviceId;
       this.nnId = nnId;
       this.startOpt = startOpt;
@@ -1396,10 +1397,7 @@ public class MiniDFSCluster implements AutoCloseable {
     }
 
     String[] args = createArgs(operation);
-
-    //Shuai: We load NameNode from another version of the code
     NameNode nn =  NameNode.createNameNode(args, hdfsConf);
-    //NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(args, hdfsConf);
     if (operation == StartupOption.RECOVER) {
       return;
     }
@@ -1967,7 +1965,7 @@ public class MiniDFSCluster implements AutoCloseable {
    * Finalize the namenode. Block pools corresponding to the namenode are
    * finalized on the datanode.
    */
-  private void finalizeNamenode(NameNodeInterface nn, Configuration conf) throws Exception {
+  private void finalizeNamenode(NameNode nn, Configuration conf) throws Exception {
     if (nn == null) {
       throw new IllegalStateException("Attempting to finalize "
                                       + "Namenode but it is not running");
@@ -2010,15 +2008,9 @@ public class MiniDFSCluster implements AutoCloseable {
   /**
    * Gets the started NameNode.  May be null.
    */
-  public NameNodeInterface getNameNodeInterface() {
-    checkSingleNameNode();
-    return getNameNodeInterface(0);
-  }
-
   public NameNode getNameNode() {
-    return null;
-    //checkSingleNameNode();
-    //return getNameNode(0);
+    checkSingleNameNode();
+    return getNameNode(0);
   }
   
   /**
@@ -2041,10 +2033,6 @@ public class MiniDFSCluster implements AutoCloseable {
    */
   public NameNode getNameNode(int nnIndex) {
     return getNN(nnIndex).nameNode;
-  }
-
-  public NameNodeInterface getNameNodeInterface(int nnIndex) {
-    return getNN(nnIndex).nameNodeInterface;
   }
   
   /**
@@ -2268,7 +2256,7 @@ public class MiniDFSCluster implements AutoCloseable {
   /**
    * Fully stop the NameNode by stop and join.
    */
-  private void stopAndJoinNameNode(NameNodeInterface nn) {
+  private void stopAndJoinNameNode(NameNode nn) {
     if (nn == null) {
       return;
     }
@@ -2342,7 +2330,7 @@ public class MiniDFSCluster implements AutoCloseable {
     NameNode nn = NameNode.createNameNode(args, info.conf);
     nn.getHttpServer()
         .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
-    info.nameNodeInterface = nn;
+    info.nameNode = nn;
     info.nameserviceId = info.conf.get(DFS_NAMESERVICE_ID);
     info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
     info.setStartOpt(startOpt);
@@ -2709,7 +2697,7 @@ public class MiniDFSCluster implements AutoCloseable {
    * or if waiting for safe mode is disabled.
    */
   public boolean isNameNodeUp(int nnIndex) {
-    NameNodeInterface nameNode = getNN(nnIndex).nameNode;
+    NameNode nameNode = getNN(nnIndex).nameNode;
     if (nameNode == null) {
       return false;
     }

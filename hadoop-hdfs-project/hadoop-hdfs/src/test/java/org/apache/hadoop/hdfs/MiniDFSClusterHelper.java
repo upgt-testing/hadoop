@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Map;
 
 public class MiniDFSClusterHelper {
     private static VersionClassLoader nnClassLoader = null;
@@ -126,6 +127,98 @@ public class MiniDFSClusterHelper {
         //return null;
     }
 
+    public static NameNodeInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) {
+
+        VersionSelector versionSelector = new VersionSelector();
+
+        String classPath = System.getProperty("java.class.path");
+        //String[] versions = {"3.5.0-SNAPSHOT"};
+        String version = "3.5.0-SNAPSHOT";
+
+        //print the classpath from the thread context class loader
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        System.out.println("Classpath from the thread context class loader: " + cl);
+
+        //for (String version : versions) {
+        File hcommonJar = versionSelector.getJarByVersion("hadoop-common", version);
+        File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
+
+        try {
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
+
+            VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
+            nnClassLoader = versionClassLoader;
+            versionClassLoader.setCurrentThreadClassLoader();
+            Class<?> configClass = versionClassLoader.loadClass("org.apache.hadoop.conf.Configuration");
+
+            Constructor<?>[] configConstructors = configClass.getConstructors();
+            // get the first constructor
+            Constructor<?> configConstructor = null;
+            for (Constructor<?> constructor : configConstructors) {
+                if (constructor.getParameterCount() == 0) {
+                    configConstructor = constructor;
+                    break;
+                }
+            }
+
+            // create an instance of Configuration
+            assert configConstructor != null;
+            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+            // call conf.set function with key and value
+            //Method setMethod = configClass.getMethod("set", String.class, String.class);
+            //setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+            //NameNode nameNode = new NameNode(conf);
+            NameNodeConfiguration = conf;
+            Map<String, String> hdfsConfMap = hdfsConf.getSetParameters();
+            conf.setAllParameters(hdfsConfMap);
+
+            //
+            //NameNode namenode = new NameNode(conf);
+
+
+
+            // Reset MetricsSystem
+            DefaultMetricsSystem.shutdown();
+            DefaultMetricsSystem.initialize("NameNode");
+
+            Class<?> nameNodeClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.namenode.NameNode");
+
+            // Call the NameNode.createNameNode(args, hdfsConf);
+            Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
+            NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, args, conf);
+
+
+
+            String s = nameNodeInstance.getClientNamenodeAddress();
+
+            System.out.println("Client namenode address: " + s);
+
+            System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
+            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
+            System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
+            System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
+            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+
+            InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
+            System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
+
+            //FSImageInterface fsImage = nameNodeInstance.getFSImage();
+            //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
+
+            nnInstance = nameNodeInstance;
+            versionClassLoader.resetCurrentThreadClassLoader();
+            Thread.sleep(5000);
+            return nameNodeInstance;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //}
+        //return null;
+    }
+
     public static NameNodeInterface createNameNode(String[] args) {
 
         VersionSelector versionSelector = new VersionSelector();
@@ -223,8 +316,8 @@ public class MiniDFSClusterHelper {
                 InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
                 System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
 
-                FSImageInterface fsImage = nameNodeInstance.getFSImage();
-                System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
+                //FSImageInterface fsImage = nameNodeInstance.getFSImage();
+                //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
 
 
 
