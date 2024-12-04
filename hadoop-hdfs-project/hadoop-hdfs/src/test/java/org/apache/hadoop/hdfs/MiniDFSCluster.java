@@ -1398,8 +1398,8 @@ public class MiniDFSCluster implements AutoCloseable {
     String[] args = createArgs(operation);
 
     //Shuai: We load NameNode from another version of the code
-    //NameNode nn =  NameNode.createNameNode(args, hdfsConf);
-    NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(args, hdfsConf);
+    NameNode nn =  NameNode.createNameNode(args, hdfsConf);
+    //NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(args, hdfsConf);
     if (operation == StartupOption.RECOVER) {
       return;
     }
@@ -2339,8 +2339,7 @@ public class MiniDFSCluster implements AutoCloseable {
       args = createArgs(startOpt);
     }
 
-    //NameNode nn = NameNode.createNameNode(args, info.conf);
-    NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(args, info.conf);
+    NameNode nn = NameNode.createNameNode(args, info.conf);
     nn.getHttpServer()
         .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
     info.nameNodeInterface = nn;
