@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 public class NameNodeInstance extends Instance {
@@ -96,6 +98,46 @@ public class NameNodeInstance extends Instance {
             throw new RuntimeException(e);
         }
     }
+
+    public Collection<URI> getNamespaceDirs(Configuration targetConf) {
+        //FSNamesystem.getNamespaceDirs(conf);
+        // First load the FSNamesystem class and configuration class
+        try {
+            versionClassLoader.setCurrentThreadClassLoader();
+            Class<?> fsNamesystemClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.namenode.FSNamesystem");
+            Class<?> configClass = versionClassLoader.loadClass("org.apache.hadoop.conf.Configuration");
+
+            Constructor<?>[] configConstructors = configClass.getConstructors();
+            // get the first constructor
+            Constructor<?> configConstructor = null;
+            for (Constructor<?> constructor : configConstructors) {
+                if (constructor.getParameterCount() == 0) {
+                    configConstructor = constructor;
+                    break;
+                }
+            }
+
+            // create an instance of Configuration
+            assert configConstructor != null;
+            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+            // call conf.set function with key and value
+            //Method setMethod = configClass.getMethod("set", String.class, String.class);
+            //setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+            //NameNode nameNode = new NameNode(conf);
+            Map<String, String> targetConfMap = targetConf.getSetParameters();
+            conf.setAllParameters(targetConfMap);
+
+            // invoke FSNamesystem.getNamespaceDirs(conf);
+            Method getNamespaceDirsMethod = fsNamesystemClass.getMethod("getNamespaceDirs", configClass);
+            Collection<URI> namespaceDirs = (Collection<URI>) getNamespaceDirsMethod.invoke(null, conf);
+            versionClassLoader.resetCurrentThreadClassLoader();
+            return namespaceDirs;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public NameNodeInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
         try {

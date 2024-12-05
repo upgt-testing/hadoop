@@ -378,9 +378,13 @@ import org.apache.hadoop.thirdparty.com.google.common.util.concurrent.ThreadFact
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class FSNamesystem implements Namesystem, FSNamesystemMBean,
-    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean {
+    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean, FSNamesystemInterface {
 
   public static final Logger LOG = LoggerFactory.getLogger(FSNamesystem.class);
+
+  static {
+    System.out.println("FSNamesystem is loaded by " + FSNamesystem.class.getClassLoader());
+  }
 
   // The following are private configurations
   public static final String DFS_NAMENODE_SNAPSHOT_TRASHROOT_ENABLED =
@@ -733,7 +737,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   @VisibleForTesting
-  LeaseManager getLeaseManager() {
+  public LeaseManager getLeaseManager() {
     return leaseManager;
   }
 
