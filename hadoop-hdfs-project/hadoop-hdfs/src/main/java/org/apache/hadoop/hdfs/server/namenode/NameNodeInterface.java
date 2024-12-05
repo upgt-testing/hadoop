@@ -26,7 +26,7 @@ public interface NameNodeInterface {
     //void setStartupOption(Configuration arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1);
     //void stopHttpServer();
     //ReconfigurationTaskStatusInterface getReconfigurationTaskStatus();
-    //FSImage getFSImage();
+    FSImage getFSImage();
     boolean isActiveState();
     void joinHttpServer();
     //java.lang.String reconfigureSlowNodesParameters(DatanodeManagerInterface arg0, java.lang.String arg1, java.lang.String arg2) throws org.apache.hadoop.conf.ReconfigurationException;

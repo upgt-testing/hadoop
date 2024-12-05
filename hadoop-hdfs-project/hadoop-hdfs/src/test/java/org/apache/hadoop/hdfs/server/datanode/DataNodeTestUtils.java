@@ -22,6 +22,7 @@ package org.apache.hadoop.hdfs.server.datanode;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -126,6 +127,16 @@ public class DataNodeTestUtils {
   public static FsDatasetSpi<?> getFSDataset(DataNode dn) {
     return dn.getFSDataset();
   }
+
+
+  public static FsDatasetSpiInterface getFSDataset(DataNodeInterface dn) {
+    //return dn.getFSDataset();
+    // TODO: FIX ME
+    throw new UnsupportedOperationException("Not implemented");
+    //return null;
+  }
+
+
 
   /**
    * Fetch a copy of ReplicaInfo from a datanode by block id

@@ -136,6 +136,9 @@ import org.slf4j.LoggerFactory;
  ***************************************************/
 @InterfaceAudience.Private
 class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl> {
+  static {
+    System.out.println("This FsDatasetImpl class is loaded by: " + FsDatasetImpl.class.getClassLoader());
+  }
   static final Logger LOG = LoggerFactory.getLogger(FsDatasetImpl.class);
   private final static boolean isNativeIOAvailable;
   private Timer timer;

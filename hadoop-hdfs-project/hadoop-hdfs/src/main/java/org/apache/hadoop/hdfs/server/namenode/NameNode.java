@@ -1392,6 +1392,8 @@ public class NameNode extends ReconfigurableBase implements
 
     LOG.info("Formatting using clusterid: {}", clusterId);
     FSNamesystem fsn = null;
+    System.out.println("Here we probably load the FSImage class");
+    System.out.println("Here the NameNode class is loaded by " + NameNode.class.getClassLoader());
     try (FSImage fsImage = new FSImage(conf, nameDirsToFormat, editDirsToFormat)) {
       fsn = new FSNamesystem(conf, fsImage);
       fsImage.getEditLog().initJournalsForWrite();

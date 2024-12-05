@@ -2,10 +2,13 @@ package org.apache.hadoop.hdfs;
 
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
+import edu.illinois.instance.InstanceTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationInterface;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.junit.Before;
@@ -32,16 +35,33 @@ public class TestUpgtDemo {
 
     @Test
     public void testMiniClusterInJVM() throws IOException {
-        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(2).build();
         System.out.println("NameNode address: " + cluster.fakeGetNameNode().getHostAndPort());
-        System.out.println("DataNode address: " + cluster.getDataNodes().get(0).getDatanodeHostname() + ":" + cluster.getDataNodes().get(0).getIpcPort());
+        System.out.println("DataNode1 address: " + cluster.getDataNodes().get(0).getDatanodeHostname() + ":" + cluster.getDataNodes().get(0).getIpcPort());
+        System.out.println("DataNode2 address: " + cluster.getDataNodes().get(1).getDatanodeHostname() + ":" + cluster.getDataNodes().get(1).getIpcPort());
+        System.out.println(InstanceTable.printString());
+    }
+
+    @Test
+    public void testInstances() {
+        NameNodeInstance nameNodeInstance = new NameNodeInstance();
+        DataNodeInstance dataNodeInstance = new DataNodeInstance();
+
+        NameNodeInterface nameNode = nameNodeInstance.createNameNode(new String[]{});
+        DataNodeInterface dataNode = dataNodeInstance.createDataNode();
+        System.out.println(InstanceTable.printString());
+        System.out.println("NameNode address: " + nameNode.getNameNodeAddress());
+        System.out.println("DataNode address: " + dataNode.getXferAddress());
+
     }
 
     @Test
     public void testNameNodeCreation() throws Exception {
         NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(null);
 
-        //FSImageInterface fsImage = nn.getFSImage();
+        FSImageInterface fsImage = nn.getFSImage();
+        System.out.println("FSImage is loaded by " + fsImage.getClass().getClassLoader());
+        System.out.println("FSImageInterface is loaded by " + FSImageInterface.class.getClassLoader());
         //System.out.println(fsImage.getBlockPoolID());
         DataNodeInterface dn = MiniDFSClusterHelper.createDataNode();
 

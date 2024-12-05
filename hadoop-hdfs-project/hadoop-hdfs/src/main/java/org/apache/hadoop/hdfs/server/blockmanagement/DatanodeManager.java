@@ -797,6 +797,21 @@ public class DatanodeManager {
     return node;
   }
 
+  public DatanodeDescriptor getDatanode(DatanodeIDInterface nodeID)
+          throws UnregisteredNodeException {
+    final DatanodeDescriptor node = getDatanode(nodeID.getDatanodeUuid());
+    if (node == null)
+      return null;
+    if (!node.getXferAddr().equals(nodeID.getXferAddr())) {
+      final UnregisteredNodeException e = new UnregisteredNodeException(
+              nodeID, node);
+      NameNode.stateChangeLog.error("BLOCK* NameSystem.getDatanode: "
+              + e.getLocalizedMessage());
+      throw e;
+    }
+    return node;
+  }
+
   public DatanodeStorageInfo[] getDatanodeStorageInfos(
       DatanodeID[] datanodeID, String[] storageIDs,
       String format, Object... args) throws UnregisteredNodeException {
