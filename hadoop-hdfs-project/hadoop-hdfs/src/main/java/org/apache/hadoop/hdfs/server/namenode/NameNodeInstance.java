@@ -3,9 +3,8 @@ package org.apache.hadoop.hdfs.server.namenode;
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import edu.illinois.instance.Instance;
-import org.apache.hadoop.classification.VisibleForTesting;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ConfigurationInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 
 import java.io.File;
@@ -81,7 +80,7 @@ public class NameNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
             // call conf.set function with key and value
             //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -119,7 +118,7 @@ public class NameNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
             // call conf.set function with key and value
             //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -139,9 +138,9 @@ public class NameNodeInstance extends Instance {
     }
 
 
-    public NameNodeInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
+    public NameNodeJVMInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             versionClassLoader.setCurrentThreadClassLoader();
@@ -159,7 +158,7 @@ public class NameNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
             // call conf.set function with key and value
             //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -180,7 +179,7 @@ public class NameNodeInstance extends Instance {
 
             // Call the NameNode.createNameNode(args, hdfsConf);
             Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
-            NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, args, conf);
+            NameNodeJVMInterface nameNodeInstance = (NameNodeJVMInterface) createNameNodeMethod.invoke(null, args, conf);
 
 
 
@@ -189,11 +188,11 @@ public class NameNodeInstance extends Instance {
             System.out.println("Client namenode address: " + s);
 
             System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
-            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
             System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
             System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
-            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationJVMInterface.class.getClassLoader());
 
             InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
             System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
@@ -212,9 +211,9 @@ public class NameNodeInstance extends Instance {
 
 
     // This is for upgt testing, not for actual MiniCluster usage.
-    public NameNodeInterface createNameNode(String[] args) {
+    public NameNodeJVMInterface createNameNode(String[] args) {
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             versionClassLoader.setCurrentThreadClassLoader();
@@ -232,7 +231,7 @@ public class NameNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
             // call conf.set function with key and value
             //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -271,7 +270,7 @@ public class NameNodeInstance extends Instance {
 
 
             Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
-            NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
+            NameNodeJVMInterface nameNodeInstance = (NameNodeJVMInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
 
 
             //Constructor<?> nameNodeConstructor = nameNodeClass.getConstructor(configClass); // Use the same Configuration class
@@ -283,11 +282,11 @@ public class NameNodeInstance extends Instance {
             System.out.println("Client namenode address: " + s);
 
             System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
-            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
             System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
             System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
-            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationJVMInterface.class.getClassLoader());
 
             InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
             System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());

@@ -22,7 +22,7 @@ package org.apache.hadoop.hdfs.server.datanode;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -71,6 +71,11 @@ public class DataNodeTestUtils {
     dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
   }
 
+  public static void setHeartbeatsDisabledForTests(DataNodeJVMInterface dn,
+                                                   boolean heartbeatsDisabledForTests) {
+    dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
+  }
+
   /**
    * Set if cache reports are disabled for all DNs in a mini cluster.
    */
@@ -89,6 +94,12 @@ public class DataNodeTestUtils {
 
   public static void triggerHeartbeat(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
+      bpos.triggerHeartbeatForTests();
+    }
+  }
+
+  public static void triggerHeartbeat(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
       bpos.triggerHeartbeatForTests();
     }
   }
@@ -129,7 +140,7 @@ public class DataNodeTestUtils {
   }
 
 
-  public static FsDatasetSpiInterface<?> getFSDataset(DataNodeInterface dn) {
+  public static FsDatasetSpiJVMInterface<?> getFSDataset(DataNodeJVMInterface dn) {
     return dn.getFSDataset();
     // TODO: FIX ME
     //throw new UnsupportedOperationException("Not implemented");

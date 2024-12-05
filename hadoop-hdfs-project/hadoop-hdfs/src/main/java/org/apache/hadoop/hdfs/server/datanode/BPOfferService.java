@@ -55,7 +55,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * It also maintains the state about which of the NNs is considered active.
  */
 @InterfaceAudience.Private
-class BPOfferService {
+class BPOfferService implements BPOfferServiceJVMInterface {
   static final Logger LOG = DataNode.LOG;
   
   /**
@@ -655,7 +655,7 @@ class BPOfferService {
    * Run an immediate heartbeat from all actors. Used by tests.
    */
   @VisibleForTesting
-  void triggerHeartbeatForTests() throws IOException {
+  public void triggerHeartbeatForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.triggerHeartbeatForTests();
     }

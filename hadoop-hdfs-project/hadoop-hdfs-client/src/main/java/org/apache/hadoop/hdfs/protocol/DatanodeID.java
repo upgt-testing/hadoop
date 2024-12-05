@@ -39,7 +39,7 @@ import java.net.InetSocketAddress;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DatanodeID implements Comparable<DatanodeID> {
+public class DatanodeID implements Comparable<DatanodeID>, DatanodeIDJVMInterface {
   public static final DatanodeID[] EMPTY_ARRAY = {};
   public static final DatanodeID EMPTY_DATANODE_ID = new DatanodeID("null",
       "null", "null", 0, 0, 0, 0);

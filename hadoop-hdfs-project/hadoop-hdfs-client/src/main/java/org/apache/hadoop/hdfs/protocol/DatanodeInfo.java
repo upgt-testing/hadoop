@@ -738,6 +738,17 @@ public class DatanodeInfo extends DatanodeID implements Node {
       return this;
     }
 
+    public DatanodeInfoBuilder setNodeID(DatanodeIDJVMInterface nodeID) {
+      this.ipAddr = nodeID.getIpAddr();
+      this.hostName = nodeID.getHostName();
+      this.datanodeUuid = nodeID.getDatanodeUuid();
+      this.xferPort = nodeID.getXferPort();
+      this.infoPort = nodeID.getInfoPort();
+      this.infoSecurePort = nodeID.getInfoSecurePort();
+      this.ipcPort = nodeID.getIpcPort();
+      return this;
+    }
+
     public DatanodeInfoBuilder setCapacity(long capacity) {
       this.capacity = capacity;
       return this;

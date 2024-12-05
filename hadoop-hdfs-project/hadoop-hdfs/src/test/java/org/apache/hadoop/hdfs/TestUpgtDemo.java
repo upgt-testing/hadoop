@@ -4,12 +4,12 @@ import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import edu.illinois.instance.InstanceTable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ConfigurationInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeInterface;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,8 +55,8 @@ public class TestUpgtDemo {
         NameNodeInstance nameNodeInstance = new NameNodeInstance();
         DataNodeInstance dataNodeInstance = new DataNodeInstance();
 
-        NameNodeInterface nameNode = nameNodeInstance.createNameNode(new String[]{});
-        DataNodeInterface dataNode = dataNodeInstance.createDataNode();
+        NameNodeJVMInterface nameNode = nameNodeInstance.createNameNode(new String[]{});
+        DataNodeJVMInterface dataNode = dataNodeInstance.createDataNode();
         System.out.println(InstanceTable.printString());
         System.out.println("NameNode address: " + nameNode.getNameNodeAddress());
         System.out.println("DataNode address: " + dataNode.getXferAddress());
@@ -65,13 +65,13 @@ public class TestUpgtDemo {
 
     @Test
     public void testNameNodeCreation() throws Exception {
-        NameNodeInterface nn = MiniDFSClusterHelper.createNameNode(null);
+        NameNodeJVMInterface nn = MiniDFSClusterHelper.createNameNode(null);
 
         FSImageInterface fsImage = nn.getFSImage();
         System.out.println("FSImage is loaded by " + fsImage.getClass().getClassLoader());
         System.out.println("FSImageInterface is loaded by " + FSImageInterface.class.getClassLoader());
         //System.out.println(fsImage.getBlockPoolID());
-        DataNodeInterface dn = MiniDFSClusterHelper.createDataNode();
+        DataNodeJVMInterface dn = MiniDFSClusterHelper.createDataNode();
 
         InetSocketAddress addr = nn.getServiceRpcAddress();
         assert addr.getPort() != 0;
@@ -109,7 +109,7 @@ public class TestUpgtDemo {
             File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
 
             try {
-                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
                 //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
                 VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
@@ -128,7 +128,7 @@ public class TestUpgtDemo {
 
                 // create an instance of Configuration
                 assert configConstructor != null;
-                ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+                ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
                 //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
                 // call conf.set function with key and value
                 //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -157,7 +157,7 @@ public class TestUpgtDemo {
 
 
                 Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
-                NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
+                NameNodeJVMInterface nameNodeInstance = (NameNodeJVMInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
 
 
                 //Constructor<?> nameNodeConstructor = nameNodeClass.getConstructor(configClass); // Use the same Configuration class
@@ -169,11 +169,11 @@ public class TestUpgtDemo {
                 System.out.println("Client namenode address: " + s);
 
                 System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
-                System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+                System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
                 System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
                 System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
                 System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
-                System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+                System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationJVMInterface.class.getClassLoader());
 
                 InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
                 System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());

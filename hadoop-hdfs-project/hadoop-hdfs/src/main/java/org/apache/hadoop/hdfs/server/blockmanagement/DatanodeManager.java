@@ -797,7 +797,7 @@ public class DatanodeManager {
     return node;
   }
 
-  public DatanodeDescriptor getDatanode(DatanodeIDInterface nodeID)
+  public DatanodeDescriptor getDatanode(DatanodeIDJVMInterface nodeID)
           throws UnregisteredNodeException {
     final DatanodeDescriptor node = getDatanode(nodeID.getDatanodeUuid());
     if (node == null)

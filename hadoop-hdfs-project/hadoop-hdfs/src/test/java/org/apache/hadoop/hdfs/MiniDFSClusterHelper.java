@@ -3,15 +3,12 @@ package org.apache.hadoop.hdfs;
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ConfigurationInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.fs.*;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeInterface;
-import org.apache.hadoop.hdfs.server.datanode.SecureResourcesInterface;
-import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeInterface;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.SecureResourcesJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
-import org.apache.hadoop.test.GenericTestUtils;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -24,9 +21,9 @@ import java.util.Map;
 public class MiniDFSClusterHelper {
     private static VersionClassLoader nnClassLoader = null;
     private static VersionClassLoader dnClassLoader = null;
-    private static NameNodeInterface nnInstance = null;
-    private static DataNodeInterface dnInstance = null;
-    private static ConfigurationInterface NameNodeConfiguration = null;
+    private static NameNodeJVMInterface nnInstance = null;
+    private static DataNodeJVMInterface dnInstance = null;
+    private static ConfigurationJVMInterface NameNodeConfiguration = null;
     private static Class<?> FileSystemClass = null;
 
     /*
@@ -44,7 +41,7 @@ public class MiniDFSClusterHelper {
     } */
 
 
-    public static DataNodeInterface createDataNode() {
+    public static DataNodeJVMInterface createDataNode() {
 
         VersionSelector versionSelector = new VersionSelector();
 
@@ -62,7 +59,7 @@ public class MiniDFSClusterHelper {
             File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
 
             try {
-                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
                 //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
                 VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
@@ -82,7 +79,7 @@ public class MiniDFSClusterHelper {
 
                 // create an instance of Configuration
                 assert configConstructor != null;
-                ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+                ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
                 conf.set("fs.defaultFS", "hdfs://127.0.0.1:9000");
                 conf.set("dfs.namenode.rpc-address", "127.0.0.1:9000");
                 conf.set("dfs.namenode.http-address", "127.0.0.1:50070");
@@ -97,7 +94,7 @@ public class MiniDFSClusterHelper {
 
                 Class<?> HdfsConfigurationClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.HdfsConfiguration");
                 Constructor<?> HdfsConfigurationConstructor = HdfsConfigurationClass.getConstructor(configClass);
-                ConfigurationInterface dnConf = (ConfigurationInterface) HdfsConfigurationConstructor.newInstance(conf);
+                ConfigurationJVMInterface dnConf = (ConfigurationJVMInterface) HdfsConfigurationConstructor.newInstance(conf);
 
                 // get SecureDataNodeStarter.SecureResources  and create an instance of it
 
@@ -106,13 +103,13 @@ public class MiniDFSClusterHelper {
 
                 Class<?> SecureDataNodeStarterClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter");
                 Method getSecureResourcesMethod = SecureDataNodeStarterClass.getMethod("getSecureResources", configClass);
-                SecureResourcesInterface secureResources = (SecureResourcesInterface) getSecureResourcesMethod.invoke(null, dnConf);
+                SecureResourcesJVMInterface secureResources = (SecureResourcesJVMInterface) getSecureResourcesMethod.invoke(null, dnConf);
 
                 // get the DataNode class and create an instance of it
                 Class<?> DataNodeClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.DataNode");
                 // call the static method instantiateDataNode
                 Method instantiateDataNodeMethod = DataNodeClass.getMethod("instantiateDataNode", String[].class, configClass, SecureResourcesClass);
-                DataNodeInterface dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, null, dnConf, secureResources);
+                DataNodeJVMInterface dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, null, dnConf, secureResources);
                 System.out.println("DataNode class is loaded by class loader: " + DataNodeClass.getClassLoader());
                 System.out.println("DataNode class is located at: " + DataNodeClass.getProtectionDomain().getCodeSource().getLocation());
                 System.out.println("DataNode Port is: " + dn.getIpcPort());
@@ -128,7 +125,7 @@ public class MiniDFSClusterHelper {
         //return null;
     }
 
-    public static DataNodeInterface createDataNodeForInJVMCluster(String[] dnArgs, Configuration hdfsConf, boolean setSecureResources) {
+    public static DataNodeJVMInterface createDataNodeForInJVMCluster(String[] dnArgs, Configuration hdfsConf, boolean setSecureResources) {
 
         VersionSelector versionSelector = new VersionSelector();
 
@@ -145,7 +142,7 @@ public class MiniDFSClusterHelper {
         File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
 
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
@@ -165,7 +162,7 @@ public class MiniDFSClusterHelper {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             Map<String, String> hdfsConfMap = hdfsConf.getSetParameters();
             conf.setAllParameters(hdfsConfMap);
 
@@ -173,7 +170,7 @@ public class MiniDFSClusterHelper {
 
             Class<?> HdfsConfigurationClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.HdfsConfiguration");
             Constructor<?> HdfsConfigurationConstructor = HdfsConfigurationClass.getConstructor(configClass);
-            ConfigurationInterface dnConf = (ConfigurationInterface) HdfsConfigurationConstructor.newInstance(conf);
+            ConfigurationJVMInterface dnConf = (ConfigurationJVMInterface) HdfsConfigurationConstructor.newInstance(conf);
 
             // get SecureDataNodeStarter.SecureResources  and create an instance of it
 
@@ -185,14 +182,14 @@ public class MiniDFSClusterHelper {
             // call the static method DataNode.instantiateDataNode(dnArgs, dnConf, secureResources);
             Method instantiateDataNodeMethod = DataNodeClass.getMethod("instantiateDataNode", String[].class, configClass, SecureResourcesClass);
 
-            DataNodeInterface dn = null;
+            DataNodeJVMInterface dn = null;
             if (setSecureResources) {
                 Class<?> SecureDataNodeStarterClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter");
                 Method getSecureResourcesMethod = SecureDataNodeStarterClass.getMethod("getSecureResources", configClass);
-                SecureResourcesInterface secureResources = (SecureResourcesInterface) getSecureResourcesMethod.invoke(null, dnConf);
-                dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, secureResources);
+                SecureResourcesJVMInterface secureResources = (SecureResourcesJVMInterface) getSecureResourcesMethod.invoke(null, dnConf);
+                dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, secureResources);
             }else {
-                dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, null);
+                dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, null);
             }
 
             System.out.println("DataNode class is loaded by class loader: " + DataNodeClass.getClassLoader());
@@ -208,7 +205,7 @@ public class MiniDFSClusterHelper {
         }
     }
 
-    public static NameNodeInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
+    public static NameNodeJVMInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
 
         VersionSelector versionSelector = new VersionSelector();
 
@@ -225,7 +222,7 @@ public class MiniDFSClusterHelper {
         File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
 
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
@@ -245,7 +242,7 @@ public class MiniDFSClusterHelper {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
             // call conf.set function with key and value
             //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -268,7 +265,7 @@ public class MiniDFSClusterHelper {
 
             // Call the NameNode.createNameNode(args, hdfsConf);
             Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
-            NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, args, conf);
+            NameNodeJVMInterface nameNodeInstance = (NameNodeJVMInterface) createNameNodeMethod.invoke(null, args, conf);
 
 
 
@@ -277,11 +274,11 @@ public class MiniDFSClusterHelper {
             System.out.println("Client namenode address: " + s);
 
             System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
-            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
             System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
             System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
-            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+            System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationJVMInterface.class.getClassLoader());
 
             InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
             System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
@@ -300,7 +297,7 @@ public class MiniDFSClusterHelper {
         //return null;
     }
 
-    public static NameNodeInterface createNameNode(String[] args) {
+    public static NameNodeJVMInterface createNameNode(String[] args) {
 
         VersionSelector versionSelector = new VersionSelector();
 
@@ -317,7 +314,7 @@ public class MiniDFSClusterHelper {
             File hdfsJar = versionSelector.getJarByVersion("hadoop-hdfs", version);
 
             try {
-                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+                System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
                 //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
                 VersionClassLoader versionClassLoader = new VersionClassLoader(classPath, Arrays.asList(hcommonJar, hdfsJar));
@@ -337,7 +334,7 @@ public class MiniDFSClusterHelper {
 
                 // create an instance of Configuration
                 assert configConstructor != null;
-                ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+                ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
                 //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
                 // call conf.set function with key and value
                 //Method setMethod = configClass.getMethod("set", String.class, String.class);
@@ -376,7 +373,7 @@ public class MiniDFSClusterHelper {
 
 
                 Method createNameNodeMethod = nameNodeClass.getMethod("createNameNode", String[].class, configClass);
-                NameNodeInterface nameNodeInstance = (NameNodeInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
+                NameNodeJVMInterface nameNodeInstance = (NameNodeJVMInterface) createNameNodeMethod.invoke(null, new String[]{}, conf);
 
 
                 //Constructor<?> nameNodeConstructor = nameNodeClass.getConstructor(configClass); // Use the same Configuration class
@@ -388,11 +385,11 @@ public class MiniDFSClusterHelper {
                 System.out.println("Client namenode address: " + s);
 
                 System.out.println("nameNodeInstance object is loaded by class loader: " + nameNodeInstance.getClass().getClassLoader());
-                System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+                System.out.println("NameNodeInterface class is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
                 System.out.println("nameNodeClass Object is loaded by class loader: " + nameNodeClass.getClassLoader());
                 System.out.println("Configuration Object is loaded by class loader: " + conf.getClass().getClassLoader());
                 System.out.println("ConfigClass is loaded by class loader: " + configClass.getClassLoader());
-                System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationInterface.class.getClassLoader());
+                System.out.println("ConfigurationInterface is loaded by class loader: " + ConfigurationJVMInterface.class.getClassLoader());
 
                 InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
                 System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());

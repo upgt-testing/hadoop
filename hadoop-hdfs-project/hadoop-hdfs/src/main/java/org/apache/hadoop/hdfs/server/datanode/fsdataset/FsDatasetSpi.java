@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.datanode.fsdataset;
 
 
-import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +70,7 @@ import org.apache.hadoop.util.ReflectionUtils;
  * The default implementation stores replicas on local drives. 
  */
 @InterfaceAudience.Private
-public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsDatasetSpiInterface<V> {
+public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsDatasetSpiJVMInterface<V> {
   /**
    * A factory for creating {@link FsDatasetSpi} objects.
    */
@@ -103,7 +102,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsD
    * This also holds the reference counts for these volumes. It releases all the
    * reference counts in {@link #close()}.
    */
-  class FsVolumeReferences implements FsVolumeReferencesInterface {
+  class FsVolumeReferences implements FsVolumeReferencesJVMInterface {
     private final List<FsVolumeReference> references;
 
     public <S extends FsVolumeSpi> FsVolumeReferences(List<S> curVolumes) {

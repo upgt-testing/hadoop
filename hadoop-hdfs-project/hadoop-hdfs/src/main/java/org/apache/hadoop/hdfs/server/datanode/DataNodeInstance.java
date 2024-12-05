@@ -4,15 +4,14 @@ import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import edu.illinois.instance.Instance;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ConfigurationInterface;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.UUID;
 
 public class DataNodeInstance extends Instance {
     public DataNodeInstance() {
@@ -55,10 +54,10 @@ public class DataNodeInstance extends Instance {
         }
     }
 
-    public DataNodeInterface createDataNodeForInJVMCluster(String[] dnArgs, Configuration hdfsConf, boolean setSecureResources) {
+    public DataNodeJVMInterface createDataNodeForInJVMCluster(String[] dnArgs, Configuration hdfsConf, boolean setSecureResources) {
 
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             this.setClassLoader(versionClassLoader);
@@ -77,7 +76,7 @@ public class DataNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             Map<String, String> hdfsConfMap = hdfsConf.getSetParameters();
             conf.setAllParameters(hdfsConfMap);
 
@@ -85,7 +84,7 @@ public class DataNodeInstance extends Instance {
 
             Class<?> HdfsConfigurationClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.HdfsConfiguration");
             Constructor<?> HdfsConfigurationConstructor = HdfsConfigurationClass.getConstructor(configClass);
-            ConfigurationInterface dnConf = (ConfigurationInterface) HdfsConfigurationConstructor.newInstance(conf);
+            ConfigurationJVMInterface dnConf = (ConfigurationJVMInterface) HdfsConfigurationConstructor.newInstance(conf);
 
             // get SecureDataNodeStarter.SecureResources  and create an instance of it
 
@@ -97,14 +96,14 @@ public class DataNodeInstance extends Instance {
             // call the static method DataNode.instantiateDataNode(dnArgs, dnConf, secureResources);
             Method instantiateDataNodeMethod = DataNodeClass.getMethod("instantiateDataNode", String[].class, configClass, SecureResourcesClass);
 
-            DataNodeInterface dn = null;
+            DataNodeJVMInterface dn = null;
             if (setSecureResources) {
                 Class<?> SecureDataNodeStarterClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter");
                 Method getSecureResourcesMethod = SecureDataNodeStarterClass.getMethod("getSecureResources", configClass);
-                SecureResourcesInterface secureResources = (SecureResourcesInterface) getSecureResourcesMethod.invoke(null, dnConf);
-                dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, secureResources);
+                SecureResourcesJVMInterface secureResources = (SecureResourcesJVMInterface) getSecureResourcesMethod.invoke(null, dnConf);
+                dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, secureResources);
             }else {
-                dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, null);
+                dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, dnArgs, dnConf, null);
             }
 
             System.out.println("DataNode class is loaded by class loader: " + DataNodeClass.getClassLoader());
@@ -123,9 +122,9 @@ public class DataNodeInstance extends Instance {
     // For testing purpose, not used in the actual implementation
 
 
-    public DataNodeInterface createDataNode() {
+    public DataNodeJVMInterface createDataNode() {
         try {
-            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeInterface.class.getClassLoader());
+            System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
             //System.out.println("Configuration Class is loaded by class loader: " + Configuration.class.getClassLoader());
 
             this.setClassLoader(versionClassLoader);
@@ -144,7 +143,7 @@ public class DataNodeInstance extends Instance {
 
             // create an instance of Configuration
             assert configConstructor != null;
-            ConfigurationInterface conf = (ConfigurationInterface) configConstructor.newInstance();
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
             conf.set("fs.defaultFS", "hdfs://127.0.0.1:9000");
             conf.set("dfs.namenode.rpc-address", "127.0.0.1:9000");
             conf.set("dfs.namenode.http-address", "127.0.0.1:50070");
@@ -159,7 +158,7 @@ public class DataNodeInstance extends Instance {
 
             Class<?> HdfsConfigurationClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.HdfsConfiguration");
             Constructor<?> HdfsConfigurationConstructor = HdfsConfigurationClass.getConstructor(configClass);
-            ConfigurationInterface dnConf = (ConfigurationInterface) HdfsConfigurationConstructor.newInstance(conf);
+            ConfigurationJVMInterface dnConf = (ConfigurationJVMInterface) HdfsConfigurationConstructor.newInstance(conf);
 
             // get SecureDataNodeStarter.SecureResources  and create an instance of it
 
@@ -168,13 +167,13 @@ public class DataNodeInstance extends Instance {
 
             Class<?> SecureDataNodeStarterClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter");
             Method getSecureResourcesMethod = SecureDataNodeStarterClass.getMethod("getSecureResources", configClass);
-            SecureResourcesInterface secureResources = (SecureResourcesInterface) getSecureResourcesMethod.invoke(null, dnConf);
+            SecureResourcesJVMInterface secureResources = (SecureResourcesJVMInterface) getSecureResourcesMethod.invoke(null, dnConf);
 
             // get the DataNode class and create an instance of it
             Class<?> DataNodeClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.DataNode");
             // call the static method instantiateDataNode
             Method instantiateDataNodeMethod = DataNodeClass.getMethod("instantiateDataNode", String[].class, configClass, SecureResourcesClass);
-            DataNodeInterface dn = (DataNodeInterface) instantiateDataNodeMethod.invoke(null, null, dnConf, secureResources);
+            DataNodeJVMInterface dn = (DataNodeJVMInterface) instantiateDataNodeMethod.invoke(null, null, dnConf, secureResources);
             System.out.println("DataNode class is loaded by class loader: " + DataNodeClass.getClassLoader());
             System.out.println("DataNode class is located at: " + DataNodeClass.getProtectionDomain().getCodeSource().getLocation());
             System.out.println("DataNode Port is: " + dn.getIpcPort());

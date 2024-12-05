@@ -378,7 +378,7 @@ import org.apache.hadoop.thirdparty.com.google.common.util.concurrent.ThreadFact
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class FSNamesystem implements Namesystem, FSNamesystemMBean,
-    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean, FSNamesystemInterface {
+    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean, FSNamesystemJVMInterface {
 
   public static final Logger LOG = LoggerFactory.getLogger(FSNamesystem.class);
 

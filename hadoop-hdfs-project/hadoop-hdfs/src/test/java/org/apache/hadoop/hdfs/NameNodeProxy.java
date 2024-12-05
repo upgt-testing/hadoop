@@ -1,6 +1,6 @@
 package org.apache.hadoop.hdfs;
 
-import org.apache.hadoop.hdfs.server.namenode.NameNodeInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -20,10 +20,10 @@ public class NameNodeProxy implements InvocationHandler {
     }
 
     // Factory method to create the proxy
-    public static NameNodeInterface createProxy(Object target, ClassLoader appClassLoader) {
-        return (NameNodeInterface) Proxy.newProxyInstance(
+    public static NameNodeJVMInterface createProxy(Object target, ClassLoader appClassLoader) {
+        return (NameNodeJVMInterface) Proxy.newProxyInstance(
                 appClassLoader, // Use the app class loader to create the proxy
-                new Class<?>[]{NameNodeInterface.class}, // Interface to implement
+                new Class<?>[]{NameNodeJVMInterface.class}, // Interface to implement
                 new NameNodeProxy(target) // Invocation handler
         );
     }

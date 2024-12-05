@@ -218,7 +218,7 @@ public class NameNodeAdapter {
   }
 
   public static DatanodeDescriptor getDatanode(final FSNamesystem ns,
-                                               DatanodeIDInterface id) throws IOException {
+                                               DatanodeIDJVMInterface id) throws IOException {
     ns.readLock();
     try {
       return ns.getBlockManager().getDatanodeManager().getDatanode(id);
@@ -234,7 +234,7 @@ public class NameNodeAdapter {
     return fsn.getStats();
   }
 
-  public static long[] getStats(final FSNamesystemInterface fsn) {
+  public static long[] getStats(final FSNamesystemJVMInterface fsn) {
     return fsn.getStats();
   }
 

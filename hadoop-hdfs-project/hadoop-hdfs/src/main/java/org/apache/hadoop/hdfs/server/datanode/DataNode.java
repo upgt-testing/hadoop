@@ -302,7 +302,7 @@ import org.slf4j.LoggerFactory;
 public class DataNode extends ReconfigurableBase
     implements InterDatanodeProtocol, ClientDatanodeProtocol,
         DataNodeMXBean, ReconfigurationProtocol,
-        DataNodeInterface
+        DataNodeJVMInterface
 {
   public static final Logger LOG = LoggerFactory.getLogger(DataNode.class);
   

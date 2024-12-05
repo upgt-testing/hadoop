@@ -82,10 +82,9 @@ import java.util.function.Supplier;
 
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
-import org.apache.hadoop.http.HttpServer2;
-import org.apache.hadoop.http.HttpServer2Interface;
+import org.apache.hadoop.http.HttpServer2JVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.collect.ArrayListMultimap;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Multimap;
 import org.apache.hadoop.hdfs.server.common.blockaliasmap.BlockAliasMap;
@@ -115,7 +114,6 @@ import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.Util;
 import org.apache.hadoop.hdfs.server.datanode.FsDatasetTestUtils.MaterializedReplica;
 import org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter.SecureResources;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
@@ -607,13 +605,13 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     public static class DataNodeProperties {
-        final DataNodeInterface datanode;
+        final DataNodeJVMInterface datanode;
         final Configuration conf;
         String[] dnArgs;
         final SecureResources secureResources;
         final int ipcPort;
 
-        DataNodeProperties(DataNodeInterface node, Configuration conf, String[] args,
+        DataNodeProperties(DataNodeJVMInterface node, Configuration conf, String[] args,
                            SecureResources secureResources, int ipcPort) {
             this.datanode = node;
             this.conf = conf;
@@ -626,7 +624,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             dnArgs = args;
         }
 
-        public DataNodeInterface getDatanode() {
+        public DataNodeJVMInterface getDatanode() {
             return datanode;
         }
 
@@ -659,12 +657,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * Stores the information related to a namenode in the cluster
      */
     public static class NameNodeInfo {
-        public NameNodeInterface nameNode;
+        public NameNodeJVMInterface nameNode;
         Configuration conf;
         String nameserviceId;
         String nnId;
         StartupOption startOpt;
-        NameNodeInfo(NameNodeInterface nn, String nameserviceId, String nnId,
+        NameNodeInfo(NameNodeJVMInterface nn, String nameserviceId, String nnId,
                      StartupOption startOpt, Configuration conf) {
             this.nameNode = nn;
             this.nameserviceId = nameserviceId;
@@ -1040,7 +1038,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 }
                 copyKeys(conf, nnConf, nnInfo.nameserviceId, nnInfo.nnId);
             }
-            HttpServer2Interface httpServer = nn.nameNode.getHttpServer();
+            HttpServer2JVMInterface httpServer = nn.nameNode.getHttpServer();
             httpServer.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         }
     }
@@ -1390,7 +1388,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         //NameNode nn =  NameNode.createNameNode(args, hdfsConf);
 
         //NameNodeInterface nn = MiniDFSClusterHelper.createNameNodeForInJVMCluster(args, hdfsConf);
-        NameNodeInterface nn = nnInstance.createNameNodeForInJVMCluster(args, hdfsConf);
+        NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, hdfsConf);
 
         if (operation == StartupOption.RECOVER) {
             return;
@@ -1736,7 +1734,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 operation != StartupOption.ROLLBACK) ?
                 null : new String[] {operation.getName()};
 
-        DataNodeInterface[] dns = new DataNodeInterface[numDataNodes];
+        DataNodeJVMInterface[] dns = new DataNodeJVMInterface[numDataNodes];
         for (int i = curDatanodesNum; i < curDatanodesNum+numDataNodes; i++) {
             Configuration dnConf = new HdfsConfiguration(conf);
             if (dnConfOverlays != null) {
@@ -1802,7 +1800,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
             DataNodeInstance dnInstancre = new DataNodeInstance();
             //DataNodeInterface dn = MiniDFSClusterHelper.createDataNodeForInJVMCluster(dnArgs, dnConf, setSecureResources);
-            DataNodeInterface dn = dnInstancre.createDataNodeForInJVMCluster(dnArgs, dnConf, setSecureResources);
+            DataNodeJVMInterface dn = dnInstancre.createDataNodeForInJVMCluster(dnArgs, dnConf, setSecureResources);
 
 
             /*
@@ -1871,7 +1869,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     private synchronized void setDataNodeStorageCapacities(
             final int curDatanodesNum,
             final int numDNs,
-            final DataNodeInterface[] dns,
+            final DataNodeJVMInterface[] dns,
             long[][] storageCapacities) throws IOException {
         if (storageCapacities != null) {
             for (int i = curDatanodesNum; i < curDatanodesNum + numDNs; ++i) {
@@ -1883,7 +1881,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     private synchronized void setDataNodeStorageCapacities(
             final int curDnIdx,
-            final DataNodeInterface curDn,
+            final DataNodeJVMInterface curDn,
             long[][] storageCapacities) throws IOException {
 
         if (storageCapacities == null || storageCapacities.length == 0) {
@@ -1900,7 +1898,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         //throw new UnsupportedOperationException("Not implemented");
 
         //try (FsDatasetSpi.FsVolumeReferences volumes = curDn.getFSDataset().getFsVolumeReferences()) {
-        try (FsVolumeReferencesInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
+        try (FsVolumeReferencesJVMInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
             assert storageCapacities[curDnIdx].length == storagesPerDatanode;
             assert volumes.size() == storagesPerDatanode;
 
@@ -2047,7 +2045,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return getNameNode(nnIndex).getRpcServer();
     }
 
-    public NameNodeInterface fakeGetNameNode() {
+    public NameNodeJVMInterface fakeGetNameNode() {
         return getNN(0).nameNode;
     }
 
@@ -2080,18 +2078,18 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Gets a list of the started DataNodes.  May be empty.
      */
-    public ArrayList<DataNodeInterface> getDataNodes() {
-        ArrayList<DataNodeInterface> list = new ArrayList<DataNodeInterface>();
+    public ArrayList<DataNodeJVMInterface> getDataNodes() {
+        ArrayList<DataNodeJVMInterface> list = new ArrayList<DataNodeJVMInterface>();
         for (int i = 0; i < dataNodes.size(); i++) {
-            DataNodeInterface node = dataNodes.get(i).datanode;
+            DataNodeJVMInterface node = dataNodes.get(i).datanode;
             list.add(node);
         }
         return list;
     }
 
     /** @return the datanode having the ipc server listen port */
-    public DataNodeInterface getDataNode(int ipcPort) {
-        for(DataNodeInterface dn : getDataNodes()) {
+    public DataNodeJVMInterface getDataNode(int ipcPort) {
+        for(DataNodeJVMInterface dn : getDataNodes()) {
             // TODO: FIX ME
             throw new UnsupportedOperationException("Not implemented");
             /*
@@ -2121,7 +2119,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * @param dn a DataNode
      * @return a FsDatasetTestUtils for the given DataNode.
      */
-    public FsDatasetTestUtils getFsDatasetTestUtils(DataNodeInterface dn) {
+    public FsDatasetTestUtils getFsDatasetTestUtils(DataNodeJVMInterface dn) {
         Preconditions.checkArgument(dn != null);
         // TODO: FIX ME
         throw new UnsupportedOperationException("Not implemented");
@@ -2137,7 +2135,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
             @Override
             public Boolean get() {
-                for (DataNodeInterface dn : getDataNodes()) {
+                for (DataNodeJVMInterface dn : getDataNodes()) {
                     if (getFsDatasetTestUtils(dn).getPendingAsyncDeletions() > 0) {
                         return false;
                     }
@@ -2265,7 +2263,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public void shutdownDataNode(int dnIndex) {
         LOG.info("Shutting down DataNode " + dnIndex);
-        DataNodeInterface dn = dataNodes.remove(dnIndex).datanode;
+        DataNodeJVMInterface dn = dataNodes.remove(dnIndex).datanode;
         dn.shutdown();
         numDataNodes--;
     }
@@ -2295,7 +2293,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Fully stop the NameNode by stop and join.
      */
-    private void stopAndJoinNameNode(NameNodeInterface nn) {
+    private void stopAndJoinNameNode(NameNodeJVMInterface nn) {
         if (nn == null) {
             return;
         }
@@ -2385,7 +2383,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     private int corruptBlockOnDataNodesHelper(ExtendedBlock block,
                                               boolean deleteBlockFile) throws IOException {
         int blocksCorrupted = 0;
-        for (DataNodeInterface dn : getDataNodes()) {
+        for (DataNodeJVMInterface dn : getDataNodes()) {
             try {
                 MaterializedReplica replica =
                         getFsDatasetTestUtils(dn).getMaterializedReplica(block);
@@ -2516,7 +2514,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return null;
         }
         DataNodeProperties dnprop = dataNodes.remove(i);
-        DataNodeInterface dn = dnprop.datanode;
+        DataNodeJVMInterface dn = dnprop.datanode;
         LOG.info("MiniDFSClusterInJVM Stopping DataNode " +
                 dn.getDisplayName() +
                 " from a total of " + (dataNodes.size() + 1) +
@@ -2533,7 +2531,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     public synchronized DataNodeProperties stopDataNode(String dnName) {
         int node = -1;
         for (int i = 0; i < dataNodes.size(); i++) {
-            DataNodeInterface dn = dataNodes.get(i).datanode;
+            DataNodeJVMInterface dn = dataNodes.get(i).datanode;
             // TODO: FIX ME
             throw new UnsupportedOperationException("Not implemented");
             /*
@@ -2554,7 +2552,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     public synchronized boolean restartDataNode(String dnName)
             throws IOException {
         for (int i = 0; i < dataNodes.size(); i++) {
-            DataNodeInterface dn = dataNodes.get(i).datanode;
+            DataNodeJVMInterface dn = dataNodes.get(i).datanode;
             // TODO: FIX ME
             throw new UnsupportedOperationException("Not implemented");
             /*
@@ -2580,7 +2578,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return null;
         }
         DataNodeProperties dnprop = dataNodes.remove(i);
-        DataNodeInterface dn = dnprop.datanode;
+        DataNodeJVMInterface dn = dnprop.datanode;
         LOG.info("MiniDFSClusterInJVM Stopping DataNode " +
                 dn.getDisplayName() +
                 " from a total of " + (dataNodes.size() + 1) +
@@ -2618,13 +2616,13 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                         + timeout + " ms of waiting");
     }
 
-    public void waitDatanodeFullyStarted(DataNodeInterface dn, int timeout)
+    public void waitDatanodeFullyStarted(DataNodeJVMInterface dn, int timeout)
             throws TimeoutException, InterruptedException {
         GenericTestUtils.waitFor(dn::isDatanodeFullyStarted, 100, timeout,
                 "Datanode is not started even after " + timeout + " ms of waiting");
     }
 
-    private void waitDataNodeFullyStarted(final DataNodeInterface dn)
+    private void waitDataNodeFullyStarted(final DataNodeJVMInterface dn)
             throws TimeoutException, InterruptedException {
         waitDatanodeFullyStarted(dn, 60000);
     }
@@ -2714,7 +2712,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * @param dnId
      * @throws IOException
      */
-    public void setDataNodeDead(DatanodeIDInterface dnId) throws IOException {
+    public void setDataNodeDead(DatanodeIDJVMInterface dnId) throws IOException {
         DatanodeDescriptor dnd =
                 NameNodeAdapter.getDatanode(getNamesystem(), dnId);
         DFSTestUtil.setDatanodeDead(dnd);
@@ -2754,7 +2752,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * or if waiting for safe mode is disabled.
      */
     public boolean isNameNodeUp(int nnIndex) {
-        NameNodeInterface nameNode = getNN(nnIndex).nameNode;
+        NameNodeJVMInterface nameNode = getNN(nnIndex).nameNode;
         if (nameNode == null) {
             return false;
         }
@@ -2896,7 +2894,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void triggerBlockReports()
             throws IOException {
-        for (DataNodeInterface dn : getDataNodes()) {
+        for (DataNodeJVMInterface dn : getDataNodes()) {
             // TODO: FIX ME
             //DataNodeTestUtils.triggerBlockReport(dn);
         }
@@ -2905,7 +2903,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void triggerDeletionReports()
             throws IOException {
-        for (DataNodeInterface dn : getDataNodes()) {
+        for (DataNodeJVMInterface dn : getDataNodes()) {
             // TODO: FIX ME
             //DataNodeTestUtils.triggerDeletionReport(dn);
         }
@@ -2913,7 +2911,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void triggerHeartbeats()
             throws IOException {
-        for (DataNodeInterface dn : getDataNodes()) {
+        for (DataNodeJVMInterface dn : getDataNodes()) {
             // TODO: FIX ME
             //DataNodeTestUtils.triggerHeartbeat(dn);
         }
@@ -3063,7 +3061,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         if (dataNodeIndex < 0 || dataNodeIndex > dataNodes.size()) {
             throw new IndexOutOfBoundsException();
         }
-        final DataNodeInterface dn = dataNodes.get(dataNodeIndex).datanode;
+        final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
         // TODO: FIX ME
         throw new RuntimeException("Not implemented");
         //return DataNodeTestUtils.getFSDataset(dn).getBlockReports(bpid);
@@ -3101,7 +3099,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         if (dataNodeIndex < 0 || dataNodeIndex > dataNodes.size()) {
             throw new IndexOutOfBoundsException();
         }
-        final DataNodeInterface dn = dataNodes.get(dataNodeIndex).datanode;
+        final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
         // TODO: FIX ME
         throw new UnsupportedActionException("Not implemented");
         /*
@@ -3128,7 +3126,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         if (dataNodeIndex < 0 || dataNodeIndex > dataNodes.size()) {
             throw new IndexOutOfBoundsException();
         }
-        final DataNodeInterface dn = dataNodes.get(dataNodeIndex).datanode;
+        final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
         //TODO: FIX ME
         throw new UnsupportedActionException("Not implemented");
         /*
@@ -3163,8 +3161,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Returns the current set of datanodes
      */
-    DataNodeInterface[] listDataNodes() {
-        DataNodeInterface[] list = new DataNodeInterface[dataNodes.size()];
+    DataNodeJVMInterface[] listDataNodes() {
+        DataNodeJVMInterface[] list = new DataNodeJVMInterface[dataNodes.size()];
         for (int i = 0; i < dataNodes.size(); i++) {
             list[i] = dataNodes.get(i).datanode;
         }
@@ -3517,7 +3515,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         // Refresh datanodes with the newly started namenode
         for (DataNodeProperties dn : dataNodes) {
-            DataNodeInterface datanode = dn.datanode;
+            DataNodeJVMInterface datanode = dn.datanode;
             // TODO: FIX ME
             throw new UnsupportedOperationException("Not implemented");
             //datanode.refreshNamenodes(conf);

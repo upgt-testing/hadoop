@@ -133,7 +133,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.JMX_NAN_FILTER_
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public final class HttpServer2 implements FilterContainer, HttpServer2Interface {
+public final class HttpServer2 implements FilterContainer, HttpServer2JVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(HttpServer2.class);
 
   public static final String HTTP_SCHEME = "http";
