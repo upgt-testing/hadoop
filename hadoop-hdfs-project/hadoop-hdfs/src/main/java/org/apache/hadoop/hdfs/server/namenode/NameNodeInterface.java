@@ -2,6 +2,7 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 
 import org.apache.hadoop.http.HttpServer2;
+import org.apache.hadoop.http.HttpServer2Interface;
 
 import java.net.InetSocketAddress;
 
@@ -9,7 +10,7 @@ public interface NameNodeInterface {
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     InetSocketAddress getHttpAddress();
     FSNamesystemInterface getNamesystem();
-    HttpServer2 getHttpServer();
+    HttpServer2Interface getHttpServer();
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();
     //void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
@@ -28,7 +29,7 @@ public interface NameNodeInterface {
     //void setStartupOption(Configuration arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1);
     //void stopHttpServer();
     //ReconfigurationTaskStatusInterface getReconfigurationTaskStatus();
-    FSImage getFSImage();
+    FSImageInterface getFSImage();
     boolean isActiveState();
     void joinHttpServer();
     //java.lang.String reconfigureSlowNodesParameters(DatanodeManagerInterface arg0, java.lang.String arg1, java.lang.String arg2) throws org.apache.hadoop.conf.ReconfigurationException;

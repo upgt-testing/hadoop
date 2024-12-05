@@ -19,7 +19,7 @@ public interface DataNodeInterface {
     void scheduleAllBlockReport(long delay);
     String getDatanodeHostname();
 
-    FsDatasetSpi<?> getFSDataset();  // TODO: Here if I put signature FsDatasetSpi<?> getFSDataset(); then 1 DN cluster can be created w/o issue -- but 2 DNs will show class loading conflict
+    FsDatasetSpiInterface<?> getFSDataset();  // TODO: Here if I put signature FsDatasetSpi<?> getFSDataset(); then 1 DN cluster can be created w/o issue -- but 2 DNs will show class loading conflict
     //List<BPOfferService> getAllBpOs();
     //RPC.Server getIpcServer();
     //DatanodeIDInterface getDatanodeIdInterface();

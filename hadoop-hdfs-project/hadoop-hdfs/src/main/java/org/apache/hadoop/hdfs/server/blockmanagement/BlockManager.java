@@ -164,7 +164,7 @@ import org.slf4j.LoggerFactory;
  * replicas + maintenance replicas.
  */
 @InterfaceAudience.Private
-public class BlockManager implements BlockStatsMXBean {
+public class BlockManager implements BlockStatsMXBean, BlockManagerInterface  {
 
   public static final Logger LOG = LoggerFactory.getLogger(BlockManager.class);
   public static final Logger blockLog = NameNode.blockStateChangeLog;

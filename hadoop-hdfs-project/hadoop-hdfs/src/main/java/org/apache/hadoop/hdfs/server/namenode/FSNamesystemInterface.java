@@ -1,11 +1,12 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerInterface;
 
 public interface FSNamesystemInterface {
     void readLock();
-    BlockManager getBlockManager();
+    BlockManagerInterface getBlockManager();
     void readUnlock();
-    LeaseManager getLeaseManager();
+    LeaseManagerInterface getLeaseManager();
     long[] getStats();
 }

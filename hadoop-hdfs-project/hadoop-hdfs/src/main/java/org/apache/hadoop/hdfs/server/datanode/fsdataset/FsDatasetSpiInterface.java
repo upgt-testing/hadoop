@@ -5,7 +5,7 @@ import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 
 import java.util.Map;
 
-public interface FsDatasetSpiInterface {
+public interface FsDatasetSpiInterface<V extends FsVolumeSpi> {
     FsVolumeReferencesInterface getFsVolumeReferences();
     //Map<DatanodeStorage, BlockListAsLongs> getBlockReports(String bpid);
 }

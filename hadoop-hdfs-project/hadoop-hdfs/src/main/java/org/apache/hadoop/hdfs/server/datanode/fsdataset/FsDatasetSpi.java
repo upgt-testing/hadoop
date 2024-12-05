@@ -71,7 +71,7 @@ import org.apache.hadoop.util.ReflectionUtils;
  * The default implementation stores replicas on local drives. 
  */
 @InterfaceAudience.Private
-public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsDatasetSpiInterface {
+public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsDatasetSpiInterface<V> {
   /**
    * A factory for creating {@link FsDatasetSpi} objects.
    */

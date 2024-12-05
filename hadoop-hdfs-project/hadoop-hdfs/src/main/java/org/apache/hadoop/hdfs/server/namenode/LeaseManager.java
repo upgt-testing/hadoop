@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * 2.10) Namenode commit changes to edit log
  */
 @InterfaceAudience.Private
-public class LeaseManager {
+public class LeaseManager implements LeaseManagerInterface {
   public static final Logger LOG = LoggerFactory.getLogger(LeaseManager.class
       .getName());
   private final FSNamesystem fsnamesystem;

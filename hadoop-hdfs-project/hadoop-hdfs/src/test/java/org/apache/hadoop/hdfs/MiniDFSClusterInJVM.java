@@ -1899,8 +1899,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         // TODO: FIX ME
         //throw new UnsupportedOperationException("Not implemented");
 
-        try (FsDatasetSpi.FsVolumeReferences volumes = curDn.getFSDataset().getFsVolumeReferences()) {
-        //try (FsVolumeReferencesInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
+        //try (FsDatasetSpi.FsVolumeReferences volumes = curDn.getFSDataset().getFsVolumeReferences()) {
+        try (FsVolumeReferencesInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
             assert storageCapacities[curDnIdx].length == storagesPerDatanode;
             assert volumes.size() == storagesPerDatanode;
 
