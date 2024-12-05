@@ -1042,10 +1042,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             }
             // TODO: Here http2 might need to be interface
             // TODO: FIX ME
-            //HttpServer2Interface httpServer = nn.nameNode.getHttpServer();
-            //httpServer.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
-            //nn.nameNode.getHttpServer()
-            //.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
+            HttpServer2Interface httpServer = nn.nameNode.getHttpServer();
+            httpServer.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         }
     }
 

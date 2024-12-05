@@ -1,13 +1,15 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 
+import org.apache.hadoop.http.HttpServer2;
+
 import java.net.InetSocketAddress;
 
 public interface NameNodeInterface {
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     InetSocketAddress getHttpAddress();
     //FSNamesystem getNamesystem();
-    //HttpServer2 getHttpServer();
+    HttpServer2 getHttpServer();
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();
     //void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
