@@ -234,6 +234,10 @@ public class NameNodeAdapter {
     return fsn.getStats();
   }
 
+  public static long[] getStats(final FSNamesystemInterface fsn) {
+    return fsn.getStats();
+  }
+
   public static long getGenerationStamp(final FSNamesystem fsn)
       throws IOException {
     return fsn.getBlockManager().getBlockIdManager().getGenerationStamp();

@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 public interface NameNodeInterface {
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     InetSocketAddress getHttpAddress();
-    //FSNamesystem getNamesystem();
+    FSNamesystemInterface getNamesystem();
     HttpServer2 getHttpServer();
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();

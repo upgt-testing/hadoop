@@ -4778,7 +4778,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /** @see ClientProtocol#getStats() */
-  long[] getStats() {
+  public long[] getStats() {
     final long[] stats = datanodeStatistics.getStats();
     stats[ClientProtocol.GET_STATS_LOW_REDUNDANCY_IDX] =
         getLowRedundancyBlocks();

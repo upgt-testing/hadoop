@@ -1040,8 +1040,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 }
                 copyKeys(conf, nnConf, nnInfo.nameserviceId, nnInfo.nnId);
             }
-            // TODO: Here http2 might need to be interface
-            // TODO: FIX ME
             HttpServer2Interface httpServer = nn.nameNode.getHttpServer();
             httpServer.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         }
@@ -2240,7 +2238,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         for (NameNodeInfo nnInfo : namenodes.values()) {
             if (nnInfo == null) continue;
             // TODO: FIX ME
-            //throw new UnsupportedOperationException("Not implemented");
             stopAndJoinNameNode(nnInfo.nameNode);
         }
         ShutdownHookManager.get().clearShutdownHooks();
@@ -2763,13 +2760,14 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         long[] sizes;
         // TODO: FIX ME
+        /*
         try {
             Thread.sleep(5000);
             return true;
         }catch (InterruptedException e) {
             return false;
-        }
-        /*
+        }*/
+
         sizes = NameNodeAdapter.getStats(nameNode.getNamesystem());
         boolean isUp = false;
         synchronized (this) {
@@ -2777,8 +2775,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                     sizes[ClientProtocol.GET_STATS_CAPACITY_IDX] != 0);
         }
         return isUp;
-
-         */
     }
 
     /**

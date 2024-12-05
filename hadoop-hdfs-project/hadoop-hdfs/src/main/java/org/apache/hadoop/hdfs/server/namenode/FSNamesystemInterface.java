@@ -7,4 +7,5 @@ public interface FSNamesystemInterface {
     BlockManager getBlockManager();
     void readUnlock();
     LeaseManager getLeaseManager();
+    long[] getStats();
 }
