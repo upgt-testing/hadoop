@@ -33,7 +33,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,13 +46,13 @@ import org.junit.Test;
 public class TestHdfsTextCommand {
   private static final String TEST_ROOT_DIR = "/test/data/testText";
   private static final Path AVRO_FILENAME = new Path(TEST_ROOT_DIR, "weather.avro");
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static FileSystem fs;
   
   @Before
     public void setUp() throws IOException{
     Configuration conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
   }

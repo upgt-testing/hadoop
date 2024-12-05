@@ -27,12 +27,12 @@ import org.junit.BeforeClass;
  */
 public class TestListFilesInDFS extends TestListFiles {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
 
   @BeforeClass
   public static void testSetUp() throws Exception {
     setTestPaths(new Path("/tmp/TestListFilesInDFS"));
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     fs = cluster.getFileSystem();
     fs.delete(TEST_DIR, true);
   }
