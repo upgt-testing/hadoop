@@ -130,9 +130,9 @@ public class DataNodeTestUtils {
 
 
   public static FsDatasetSpiInterface getFSDataset(DataNodeInterface dn) {
-    //return dn.getFSDataset();
+    return dn.getFSDataset();
     // TODO: FIX ME
-    throw new UnsupportedOperationException("Not implemented");
+    //throw new UnsupportedOperationException("Not implemented");
     //return null;
   }
 

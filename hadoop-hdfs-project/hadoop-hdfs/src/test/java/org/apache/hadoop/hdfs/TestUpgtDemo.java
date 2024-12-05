@@ -35,10 +35,10 @@ public class TestUpgtDemo {
 
     @Test
     public void testMiniClusterInJVM() throws IOException {
-        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(2).build();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
         System.out.println("NameNode address: " + cluster.fakeGetNameNode().getHostAndPort());
         System.out.println("DataNode1 address: " + cluster.getDataNodes().get(0).getDatanodeHostname() + ":" + cluster.getDataNodes().get(0).getIpcPort());
-        System.out.println("DataNode2 address: " + cluster.getDataNodes().get(1).getDatanodeHostname() + ":" + cluster.getDataNodes().get(1).getIpcPort());
+        //System.out.println("DataNode2 address: " + cluster.getDataNodes().get(1).getDatanodeHostname() + ":" + cluster.getDataNodes().get(1).getIpcPort());
         System.out.println(InstanceTable.printString());
     }
 

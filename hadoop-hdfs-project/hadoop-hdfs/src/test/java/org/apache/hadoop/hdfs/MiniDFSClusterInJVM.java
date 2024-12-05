@@ -1901,8 +1901,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
 
         // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        /*
+        //throw new UnsupportedOperationException("Not implemented");
+
         try (FsDatasetSpi.FsVolumeReferences volumes = curDn.getFSDataset().getFsVolumeReferences()) {
         //try (FsVolumeReferencesInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
             assert storageCapacities[curDnIdx].length == storagesPerDatanode;
@@ -1920,7 +1920,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         // TODO: FIX ME
         //DataNodeTestUtils.triggerHeartbeat(curDn);
 
-         */
+
     }
 
     /**
@@ -3042,12 +3042,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         // If datanode dataset is not initialized then wait
         for (DataNodeProperties dn : dataNodes) {
             //TODO: FIX ME
-            Thread.sleep(2000);
-            /*
+            //Thread.sleep(2000);
+
             if (DataNodeTestUtils.getFSDataset(dn.datanode) == null) {
                 LOG.info("DataNodeTestUtils.getFSDataset(dn.datanode) == null");
                 return true;
-            }*/
+            }
         }
         return false;
     }
