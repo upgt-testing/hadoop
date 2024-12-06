@@ -24,20 +24,27 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.BindException;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import edu.illinois.VersionClassLoader;
+import edu.illinois.instance.InstanceTable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServerJVMInterface;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.ipc.FairCallQueue;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
 import org.apache.hadoop.metrics2.MetricsException;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.junit.After;
@@ -159,8 +166,41 @@ public class TestRefreshCallQueue {
       // load the configuration object from the same class loader as the rpcServer
       Class<?> configClass = rpcServerClassLoader.loadClass(Configuration.class.getName());
 
+      // TRY2:
+      NameNodeInstance nnInstance = (NameNodeInstance) InstanceTable.getNameNodeInstance(rpcServerClassLoader);
+      VersionClassLoader vcl = nnInstance.getVersionClassLoader();
+      vcl.setCurrentThreadClassLoader();
 
-      //rpcServer.getClientRpcServer().refreshCallQueue(config); // TODO: This might need to be changed to ConfigurationJVMInterface
+      Constructor<?>[] configConstructors = configClass.getConstructors();
+      // get the first constructor
+      Constructor<?> configConstructor = null;
+      for (Constructor<?> constructor : configConstructors) {
+        if (constructor.getParameterCount() == 0) {
+          configConstructor = constructor;
+          break;
+        }
+      }
+
+      // create an instance of Configuration
+      assert configConstructor != null;
+      ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
+      //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+      // call conf.set function with key and value
+      //Method setMethod = configClass.getMethod("set", String.class, String.class);
+      //setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
+      //NameNode nameNode = new NameNode(conf);
+      Map<String, String> hdfsConfMap = config.getSetParameters();
+      conf.setAllParameters(hdfsConfMap);
+
+      System.out.println("conf class is loaded by " + conf.getClass().getClassLoader());
+      System.out.println(InstanceTable.printString());
+
+
+
+      // I Do not have a way to use Interface for this case
+      // We have to set the class loader to the rpcServer class loader for thread context because in this method, there is some class loading methods and try to initialize the some scheduler
+      rpcServer.getClientRpcServer().refreshCallQueue((ConfigurationJVMInterface) conf);
+      vcl.resetCurrentThreadClassLoader();
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if ((cause instanceof MetricsException)

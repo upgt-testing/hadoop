@@ -7,4 +7,8 @@ public interface ConfigurationJVMInterface {
     String get(String name);
     void setAllParameters(Map<String, String> parameters);
     int getInt(String name, int defaultValue);
+    Class<?> getClass(String name, Class<?> defaultValue);
+    void setClass(String name, Class<?> theClass, Class<?> xface);
+    int[] getInts(String name);
+    boolean getBoolean(String name, boolean defaultValue);
 }

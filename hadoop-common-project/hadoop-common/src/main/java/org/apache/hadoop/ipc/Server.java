@@ -827,6 +827,19 @@ public abstract class Server implements ServerJVMInterface {
     return CallQueueManager.convertQueueClass(queueClass, Call.class);
   }
 
+  static Class<? extends BlockingQueue<Call>> getQueueClass(
+          String namespace, int port, ConfigurationJVMInterface conf) {
+    String nameWithPort = namespace + "." + port + "."
+            + CommonConfigurationKeys.IPC_CALLQUEUE_IMPL_KEY;
+    String nameWithoutPort = namespace + "."
+            + CommonConfigurationKeys.IPC_CALLQUEUE_IMPL_KEY;
+    Class<?> queueClass = conf.getClass(nameWithPort, null);
+    if(queueClass == null) {
+      queueClass = conf.getClass(nameWithoutPort, LinkedBlockingQueue.class);
+    }
+    return CallQueueManager.convertQueueClass(queueClass, Call.class);
+  }
+
   @Deprecated
   static Class<? extends RpcScheduler> getSchedulerClass(
       String prefix, Configuration conf) {
@@ -898,6 +911,37 @@ public abstract class Server implements ServerJVMInterface {
     return CallQueueManager.convertSchedulerClass(schedulerClass);
   }
 
+  static Class<? extends RpcScheduler> getSchedulerClass(
+          String namespace, int port, ConfigurationJVMInterface conf) {
+    String schedulerKeyNameWithPort = namespace + "." + port + "."
+            + CommonConfigurationKeys.IPC_SCHEDULER_IMPL_KEY;
+    String schedulerKeyNameWithoutPort = namespace + "."
+            + CommonConfigurationKeys.IPC_SCHEDULER_IMPL_KEY;
+
+    Class<?> schedulerClass = conf.getClass(schedulerKeyNameWithPort, null);
+    // Patch the configuration for legacy fcq configuration that does not have
+    // a separate scheduler setting
+    if (schedulerClass == null) {
+      String queueKeyNameWithPort = namespace + "." + port + "."
+              + CommonConfigurationKeys.IPC_CALLQUEUE_IMPL_KEY;
+      Class<?> queueClass = conf.getClass(queueKeyNameWithPort, null);
+      if (queueClass != null) {
+        if (queueClass.getCanonicalName().equals(
+                FairCallQueue.class.getCanonicalName())) {
+          conf.setClass(schedulerKeyNameWithPort, DecayRpcScheduler.class,
+                  RpcScheduler.class);
+        }
+      }
+    }
+
+    schedulerClass = conf.getClass(schedulerKeyNameWithPort, null);
+    if (schedulerClass == null) {
+      schedulerClass = conf.getClass(schedulerKeyNameWithoutPort,
+              DefaultRpcScheduler.class);
+    }
+    return CallQueueManager.convertSchedulerClass(schedulerClass);
+  }
+
   /*
    * Refresh the call queue
    */
@@ -913,6 +957,20 @@ public abstract class Server implements ServerJVMInterface {
         maxQueueSize, prefix, conf);
     callQueue.setClientBackoffEnabled(getClientBackoffEnable(
         CommonConfigurationKeys.IPC_NAMESPACE, port, conf));
+  }
+
+  public synchronized void refreshCallQueue(ConfigurationJVMInterface conf) {
+    // Create the next queue
+    String prefix = getQueueClassPrefix();
+    this.maxQueueSize = handlerCount * conf.getInt(
+            CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_KEY,
+            CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_DEFAULT);
+    callQueue.swapQueue(
+            getSchedulerClass(CommonConfigurationKeys.IPC_NAMESPACE, port, conf),
+            getQueueClass(CommonConfigurationKeys.IPC_NAMESPACE, port, conf),
+            maxQueueSize, prefix, conf);
+    callQueue.setClientBackoffEnabled(getClientBackoffEnable(
+            CommonConfigurationKeys.IPC_NAMESPACE, port, conf));
   }
 
   /**
@@ -951,6 +1009,20 @@ public abstract class Server implements ServerJVMInterface {
     return conf.getBoolean(namespace + "."
             + CommonConfigurationKeys.IPC_BACKOFF_ENABLE,
         CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT);
+  }
+
+  static boolean getClientBackoffEnable(
+          String namespace, int port, ConfigurationJVMInterface conf) {
+    String name = namespace + "." + port + "." +
+            CommonConfigurationKeys.IPC_BACKOFF_ENABLE;
+    boolean valueWithPort = conf.getBoolean(name,
+            CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT);
+    if (valueWithPort != CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT) {
+      return valueWithPort;
+    }
+    return conf.getBoolean(namespace + "."
+                    + CommonConfigurationKeys.IPC_BACKOFF_ENABLE,
+            CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT);
   }
 
   /** A generic call queued for handling. */

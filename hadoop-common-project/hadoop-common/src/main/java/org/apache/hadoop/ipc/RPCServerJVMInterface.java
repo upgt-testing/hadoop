@@ -1,5 +1,7 @@
 package org.apache.hadoop.ipc;
 
-public interface RPCServerJVMInterface extends ServerJVMInterface {
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 
+public interface RPCServerJVMInterface extends ServerJVMInterface {
+    void refreshCallQueue(ConfigurationJVMInterface conf);
 }

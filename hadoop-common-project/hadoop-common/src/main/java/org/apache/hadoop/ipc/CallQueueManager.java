@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.ipc.protobuf.RpcHeaderProtos.RpcResponseHeaderProto.RpcStatusProto;
 
@@ -140,6 +141,30 @@ public class CallQueueManager<E extends Schedulable>
     return CommonConfigurationKeys.IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE_DEFAULT;
   }
 
+  private boolean getServerFailOverEnable(String namespace, ConfigurationJVMInterface conf) {
+    String propertyKey = namespace + "." +
+            CommonConfigurationKeys.IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE;
+
+    if (conf.get(propertyKey) != null) {
+      return conf.getBoolean(propertyKey,
+          CommonConfigurationKeys.IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE_DEFAULT);
+    }
+
+    String[] nsPort = namespace.split("\\.");
+    if (nsPort.length == 2) {
+      // Only if ns is split with ".", we can separate namespace and port.
+      // In the absence of "ipc.<port>.callqueue.overflow.trigger.failover" property,
+      // we look up "ipc.callqueue.overflow.trigger.failover" property.
+      return conf.getBoolean(nsPort[0] + "."
+          + IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE, IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE_DEFAULT);
+    }
+
+    // Otherwise return default value.
+    LOG.info("{} not specified set default value is {}",
+        IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE, IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE_DEFAULT);
+    return CommonConfigurationKeys.IPC_CALLQUEUE_SERVER_FAILOVER_ENABLE_DEFAULT;
+  }
+
   private static <T extends RpcScheduler> T createScheduler(
       Class<T> theClass, int priorityLevels, String ns, Configuration conf) {
     // Used for custom, configurable scheduler
@@ -181,6 +206,49 @@ public class CallQueueManager<E extends Schedulable>
     // Nothing worked
     throw new RuntimeException(theClass.getName() +
         " could not be constructed.");
+  }
+
+  private static <T extends RpcScheduler> T createScheduler(
+          Class<T> theClass, int priorityLevels, String ns, ConfigurationJVMInterface conf) {
+    // Used for custom, configurable scheduler
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor(int.class,
+              String.class, Configuration.class);
+      return ctor.newInstance(priorityLevels, ns, conf);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor(int.class);
+      return ctor.newInstance(priorityLevels);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    // Last attempt
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor();
+      return ctor.newInstance();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    // Nothing worked
+    throw new RuntimeException(theClass.getName() +
+            " could not be constructed.");
   }
 
   private <T extends BlockingQueue<E>> T createCallQueueInstance(
@@ -228,6 +296,53 @@ public class CallQueueManager<E extends Schedulable>
     // Nothing worked
     throw new RuntimeException(theClass.getName() +
       " could not be constructed.");
+  }
+
+  private <T extends BlockingQueue<E>> T createCallQueueInstance(
+          Class<T> theClass, int priorityLevels, int maxLen, String ns,
+          int[] capacityWeights, ConfigurationJVMInterface conf) {
+
+    // Used for custom, configurable callqueues
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor(int.class,
+              int.class, String.class, int[].class, boolean.class, Configuration.class);
+      return ctor.newInstance(priorityLevels, maxLen, ns, capacityWeights,
+              this.serverFailOverEnabled, conf);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    // Used for LinkedBlockingQueue, ArrayBlockingQueue, etc
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor(int.class);
+      return ctor.newInstance(maxLen);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    // Last attempt
+    try {
+      Constructor<T> ctor = theClass.getDeclaredConstructor();
+      return ctor.newInstance();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (InvocationTargetException e) {
+      throw new RuntimeException(theClass.getName()
+              + " could not be constructed.", e.getCause());
+    } catch (Exception e) {
+    }
+
+    // Nothing worked
+    throw new RuntimeException(theClass.getName() +
+            " could not be constructed.");
   }
 
   boolean isClientBackoffEnabled() {
@@ -410,6 +525,27 @@ public class CallQueueManager<E extends Schedulable>
     return retval;
   }
 
+  private static int parseNumLevels(String ns, ConfigurationJVMInterface conf) {
+    // Fair call queue levels (IPC_CALLQUEUE_PRIORITY_LEVELS_KEY)
+    // takes priority over the scheduler level key
+    // (IPC_SCHEDULER_PRIORITY_LEVELS_KEY)
+    int retval = conf.getInt(ns + "." +
+            FairCallQueue.IPC_CALLQUEUE_PRIORITY_LEVELS_KEY, 0);
+    if (retval == 0) { // No FCQ priority level configured
+      retval = conf.getInt(ns + "." +
+                      CommonConfigurationKeys.IPC_SCHEDULER_PRIORITY_LEVELS_KEY,
+              CommonConfigurationKeys.IPC_SCHEDULER_PRIORITY_LEVELS_DEFAULT_KEY);
+    } else {
+      LOG.warn(ns + "." + FairCallQueue.IPC_CALLQUEUE_PRIORITY_LEVELS_KEY +
+              " is deprecated. Please use " + ns + "." +
+              CommonConfigurationKeys.IPC_SCHEDULER_PRIORITY_LEVELS_KEY + ".");
+    }
+    if(retval < 1) {
+      throw new IllegalArgumentException("numLevels must be at least 1");
+    }
+    return retval;
+  }
+
   /**
    * Read the weights of capacity in callqueue and pass the value to
    * callqueue constructions.
@@ -433,6 +569,31 @@ public class CallQueueManager<E extends Schedulable>
               CommonConfigurationKeys.IPC_CALLQUEUE_CAPACITY_WEIGHTS_KEY +
                   " only takes positive weights. " + w + " capacity weight " +
                   "found");
+        }
+      }
+    }
+    return weights;
+  }
+
+  private static int[] parseCapacityWeights(
+          int priorityLevels, String ns, ConfigurationJVMInterface conf) {
+    int[] weights = conf.getInts(ns + "." +
+            CommonConfigurationKeys.IPC_CALLQUEUE_CAPACITY_WEIGHTS_KEY);
+    if (weights.length == 0) {
+      weights = getDefaultQueueCapacityWeights(priorityLevels);
+    } else if (weights.length != priorityLevels) {
+      throw new IllegalArgumentException(
+              CommonConfigurationKeys.IPC_CALLQUEUE_CAPACITY_WEIGHTS_KEY + " must "
+                      + "specify " + priorityLevels + " capacity weights: one for each "
+                      + "priority level");
+    } else {
+      // only allow positive numbers
+      for (int w : weights) {
+        if (w <= 0) {
+          throw new IllegalArgumentException(
+                  CommonConfigurationKeys.IPC_CALLQUEUE_CAPACITY_WEIGHTS_KEY +
+                          " only takes positive weights. " + w + " capacity weight " +
+                          "found");
         }
       }
     }
@@ -492,6 +653,39 @@ public class CallQueueManager<E extends Schedulable>
 
     LOG.info("Old Queue: " + stringRepr(oldQ) + ", " +
       "Replacement: " + stringRepr(newQ));
+  }
+
+  public synchronized void swapQueue(
+          Class<? extends RpcScheduler> schedulerClass,
+          Class<? extends BlockingQueue<E>> queueClassToUse, int maxSize,
+          String ns, ConfigurationJVMInterface conf) {
+    int priorityLevels = parseNumLevels(ns, conf);
+    this.scheduler.stop();
+    RpcScheduler newScheduler = createScheduler(schedulerClass, priorityLevels,
+            ns, conf);
+    int[] capacityWeights = parseCapacityWeights(priorityLevels, ns, conf);
+
+    // Update serverFailOverEnabled.
+    this.serverFailOverEnabled = getServerFailOverEnable(ns, conf);
+    BlockingQueue<E> newQ = createCallQueueInstance(queueClassToUse,
+            priorityLevels, maxSize, ns, capacityWeights, conf);
+
+    // Our current queue becomes the old queue
+    BlockingQueue<E> oldQ = putRef.get();
+
+    // Swap putRef first: allow blocked puts() to be unblocked
+    putRef.set(newQ);
+
+    // Wait for handlers to drain the oldQ
+    while (!queueIsReallyEmpty(oldQ)) {}
+
+    // Swap takeRef to handle new calls
+    takeRef.set(newQ);
+
+    this.scheduler = newScheduler;
+
+    LOG.info("Old Queue: " + stringRepr(oldQ) + ", " +
+            "Replacement: " + stringRepr(newQ));
   }
 
   /**
