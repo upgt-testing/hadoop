@@ -2062,17 +2062,17 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * Return the {@link FSNamesystem} object.
      * @return {@link FSNamesystem} object.
      */
-    public FSNamesystem getNamesystem() {
+    public FSNamesystemJVMInterface getNamesystem() {
         checkSingleNameNode();
         // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //return NameNodeAdapter.getNamesystem(getNN(0).nameNode);
+        //throw new UnsupportedOperationException("Not implemented");
+        return NameNodeAdapter.getNamesystem(getNN(0).nameNode);
     }
 
-    public FSNamesystem getNamesystem(int nnIndex) {
+    public FSNamesystemJVMInterface getNamesystem(int nnIndex) {
         // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //return NameNodeAdapter.getNamesystem(getNN(nnIndex).nameNode);
+        //throw new UnsupportedOperationException("Not implemented");
+        return NameNodeAdapter.getNamesystem(getNN(nnIndex).nameNode);
     }
 
     /**
@@ -2713,10 +2713,14 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * @throws IOException
      */
     public void setDataNodeDead(DatanodeIDJVMInterface dnId) throws IOException {
+        // TODO: FIX ME
+        throw new UnsupportedOperationException("Not implemented");
+        /*
         DatanodeDescriptor dnd =
                 NameNodeAdapter.getDatanode(getNamesystem(), dnId);
         DFSTestUtil.setDatanodeDead(dnd);
         BlockManagerTestUtil.checkHeartbeat(getNamesystem().getBlockManager());
+         */
     }
 
     public void setDataNodesDead() throws IOException {
@@ -2962,7 +2966,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return;
         }
 
-        final FSNamesystem ns = getNamesystem(nnIndex);
+        final FSNamesystemJVMInterface ns = getNamesystem(nnIndex);
+        // TODO: FIX ME
+        /*
         final DatanodeManager dm = ns.getBlockManager().getDatanodeManager();
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
             @Override
@@ -2977,6 +2983,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 return true;
             }
         }, 100, timeout);
+         */
     }
 
     /**
@@ -3530,8 +3537,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public void setBlockRecoveryTimeout(long timeout) {
         for (int nnIndex = 0; nnIndex < getNumNameNodes(); nnIndex++) {
-            getNamesystem(nnIndex).getBlockManager().setBlockRecoveryTimeout(
-                    timeout);
+            // TODO: FIX ME
+            throw new UnsupportedOperationException("Not implemented");
+            //getNamesystem(nnIndex).getBlockManager().setBlockRecoveryTimeout(timeout);
         }
     }
 

@@ -72,6 +72,10 @@ public class NameNodeAdapter {
     return namenode.getNamesystem();
   }
 
+  public static FSNamesystemJVMInterface getNamesystem(NameNodeJVMInterface namenode) {
+    return namenode.getNamesystem();
+  }
+
   /**
    * Get block locations within the specified range.
    */
@@ -166,10 +170,19 @@ public class NameNodeAdapter {
     return ns.leaseManager;
   }
 
+  public static LeaseManagerJVMInterface getLeaseManager(final FSNamesystemJVMInterface ns) {
+    return ns.getLeaseManager();
+  }
+
   /** Set the softLimit and hardLimit of client lease periods. */
   public static void setLeasePeriod(final FSNamesystem namesystem, long soft, long hard) {
     getLeaseManager(namesystem).setLeasePeriod(soft, hard);
     namesystem.leaseManager.triggerMonitorCheckNow();
+  }
+
+  public static void setLeasePeriod(final FSNamesystemJVMInterface namesystem, long soft, long hard) {
+    getLeaseManager(namesystem).setLeasePeriod(soft, hard);
+    getLeaseManager(namesystem).triggerMonitorCheckNow();
   }
 
   public static Lease getLeaseForPath(NameNode nn, String path) {

@@ -8,4 +8,5 @@ public interface FSNamesystemJVMInterface {
     void readUnlock();
     LeaseManagerJVMInterface getLeaseManager();
     long[] getStats();
+    boolean isHaEnabled();
 }

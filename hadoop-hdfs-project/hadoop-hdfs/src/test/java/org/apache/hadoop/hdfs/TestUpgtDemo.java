@@ -8,6 +8,7 @@ import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
@@ -56,6 +57,7 @@ public class TestUpgtDemo {
         System.out.println("Configuration is loaded by " + conf.getClass().getClassLoader());
         System.out.println("NameNode address: " + addr.getHostName() + ":" + addr.getPort());
     }
+    */
 
     @Test
     public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
@@ -65,7 +67,7 @@ public class TestUpgtDemo {
         System.out.println("FSNamesystem is " + fsNamesystem);
         System.out.println("FSNamesysten HaEnabled is: " + fsNamesystem.isHaEnabled());
     }
-     */
+
     @Test
     public void testMiniClusterInJVM2() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(2).build();
