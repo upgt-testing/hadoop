@@ -33,6 +33,39 @@ public class TestUpgtDemo {
         //DefaultMetricsSystem.setMiniClusterMode(true);
     }
 
+    //TODO: (1) The argument should be interface or not??? (2) Write a test to test the FSNamesystemInterface got from MiniDFSClusterInJVM
+
+    /*
+    @Test
+    public void testDiffLoaderCommunication() {
+        Configuration conf = new Configuration();
+        conf.set("fs.defaultFS", "hdfs://127.0.0.1:9000");
+        conf.set("dfs.namenode.rpc-address", "127.0.0.1:9000");
+        conf.set("dfs.namenode.http-address", "127.0.0.1:50070");
+        conf.set("dfs.datanode.address", "127.0.0.1:50010");
+        conf.set("dfs.datanode.http.address", "127.0.0.1:50075");
+        conf.set("dfs.datanode.ipc.address", "127.0.0.1:50040");
+        conf.set("dfs.datanode.hostname", "localhost");
+        //conf.set("dfs.datanode.data.dir", "/Users/allenwang/data");
+        conf.set("dfs.replication", "1");
+        NameNodeInstance nameNodeInstance = new NameNodeInstance();
+        NameNodeJVMInterface nameNode = nameNodeInstance.createNameNode(new String[]{});
+        ConfigurationJVMInterface configurationJVMInterface = (ConfigurationJVMInterface) conf;
+        InetSocketAddress addr = nameNode.getRpcServerAddress(configurationJVMInterface);
+        System.out.println("nameNode is loaded by " + nameNode.getClass().getClassLoader());
+        System.out.println("Configuration is loaded by " + conf.getClass().getClassLoader());
+        System.out.println("NameNode address: " + addr.getHostName() + ":" + addr.getPort());
+    }
+
+    @Test
+    public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
+        FSNamesystemJVMInterface fsNamesystem = cluster.getNamesystem();
+        System.out.println("FSNamesystem is loaded by " + fsNamesystem.getClass().getClassLoader());
+        System.out.println("FSNamesystem is " + fsNamesystem);
+        System.out.println("FSNamesysten HaEnabled is: " + fsNamesystem.isHaEnabled());
+    }
+     */
     @Test
     public void testMiniClusterInJVM2() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(2).build();
