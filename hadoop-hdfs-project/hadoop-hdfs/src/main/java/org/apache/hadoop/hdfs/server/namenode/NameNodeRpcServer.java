@@ -239,7 +239,7 @@ import javax.annotation.Nonnull;
  */
 @InterfaceAudience.Private
 @VisibleForTesting
-public class NameNodeRpcServer implements NamenodeProtocols {
+public class NameNodeRpcServer implements NamenodeProtocols, NameNodeRpcServerJVMInterface {
   
   private static final Logger LOG = NameNode.LOG;
   private static final Logger stateChangeLog = NameNode.stateChangeLog;

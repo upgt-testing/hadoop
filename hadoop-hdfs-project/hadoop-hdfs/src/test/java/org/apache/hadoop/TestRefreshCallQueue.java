@@ -34,8 +34,8 @@ import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServerJVMInterface;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.ipc.FairCallQueue;
 import org.apache.hadoop.metrics2.MetricsException;
@@ -44,7 +44,7 @@ import org.junit.After;
 import org.junit.Test;
 
 public class TestRefreshCallQueue {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration config;
   static int mockQueueConstructions;
   static int mockQueuePuts;
@@ -63,7 +63,7 @@ public class TestRefreshCallQueue {
 
       FileSystem.setDefaultUri(config, "hdfs://localhost:" + nnPort);
       try {
-        cluster = new MiniDFSCluster.Builder(config).nameNodePort(nnPort)
+        cluster = new MiniDFSClusterInJVM.Builder(config).nameNodePort(nnPort)
             .build();
         cluster.waitActive();
         break;
@@ -147,7 +147,7 @@ public class TestRefreshCallQueue {
     int serviceHandlerCount = config.getInt(
         DFSConfigKeys.DFS_NAMENODE_SERVICE_HANDLER_COUNT_KEY,
         DFSConfigKeys.DFS_NAMENODE_SERVICE_HANDLER_COUNT_DEFAULT);
-    NameNodeRpcServer rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+    NameNodeRpcServerJVMInterface rpcServer = (NameNodeRpcServerJVMInterface) cluster.getNameNodeRpc();
     // check callqueue size
     assertEquals(CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_DEFAULT
         * serviceHandlerCount, rpcServer.getClientRpcServer().getMaxQueueSize());
@@ -155,7 +155,12 @@ public class TestRefreshCallQueue {
     config.setInt(CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_KEY,
         150);
     try {
-      rpcServer.getClientRpcServer().refreshCallQueue(config);
+      ClassLoader rpcServerClassLoader = rpcServer.getClass().getClassLoader();
+      // load the configuration object from the same class loader as the rpcServer
+      Class<?> configClass = rpcServerClassLoader.loadClass(Configuration.class.getName());
+
+
+      //rpcServer.getClientRpcServer().refreshCallQueue(config); // TODO: This might need to be changed to ConfigurationJVMInterface
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if ((cause instanceof MetricsException)

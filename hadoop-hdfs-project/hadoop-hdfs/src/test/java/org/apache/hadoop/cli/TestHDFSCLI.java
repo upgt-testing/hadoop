@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.security.authorize.PolicyProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class TestHDFSCLI extends CLITestHelperDFS {
 
-  protected MiniDFSCluster dfsCluster = null;
+  protected MiniDFSClusterInJVM dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
   
@@ -53,7 +53,7 @@ public class TestHDFSCLI extends CLITestHelperDFS {
                         "/rack2", "/rack3", "/rack4", "/rack4" };
     String [] hosts = {"host1", "host2", "host3", "host4",
                        "host5", "host6", "host7", "host8" };
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(8)
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(8)
                                                  .racks(racks)
                                                  .hosts(hosts)
                                                  .build();

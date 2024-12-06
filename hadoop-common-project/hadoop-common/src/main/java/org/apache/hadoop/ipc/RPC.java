@@ -992,7 +992,7 @@ public class RPC {
   }
   
   /** An RPC Server. */
-  public abstract static class Server extends org.apache.hadoop.ipc.Server {
+  public abstract static class Server extends org.apache.hadoop.ipc.Server implements RPCServerJVMInterface {
 
     boolean verbose;
 

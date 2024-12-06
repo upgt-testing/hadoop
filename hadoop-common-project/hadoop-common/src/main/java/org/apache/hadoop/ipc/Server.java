@@ -83,6 +83,7 @@ import org.apache.hadoop.classification.InterfaceAudience.Public;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configuration.IntegerRanges;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.ha.HealthCheckFailedException;
@@ -147,7 +148,7 @@ import org.slf4j.LoggerFactory;
  */
 @Public
 @InterfaceStability.Evolving
-public abstract class Server {
+public abstract class Server implements ServerJVMInterface {
   private final boolean authorize;
   private List<AuthMethod> enabledAuthMethods;
   private RpcSaslProto negotiateResponse;

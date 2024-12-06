@@ -84,6 +84,7 @@ import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.collect.ArrayListMultimap;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Multimap;
@@ -2025,7 +2026,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Gets the started NameNode.  May be null.
      */
-    public NameNode getNameNode() {
+    public NameNodeJVMInterface getNameNode() {
         checkSingleNameNode();
         return getNameNode(0);
     }
@@ -2033,7 +2034,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Get an instance of the NameNode's RPC handler.
      */
-    public NamenodeProtocols getNameNodeRpc() {
+    public NamenodeProtocolsJVMInterface getNameNodeRpc() {
         checkSingleNameNode();
         return getNameNodeRpc(0);
     }
@@ -2041,7 +2042,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Get an instance of the NameNode's RPC handler.
      */
-    public NamenodeProtocols getNameNodeRpc(int nnIndex) {
+    public NamenodeProtocolsJVMInterface getNameNodeRpc(int nnIndex) {
+        //TODO: FIX ME
+        //throw new UnsupportedOperationException("Not implemented");
         return getNameNode(nnIndex).getRpcServer();
     }
 
@@ -2052,10 +2055,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Gets the NameNode for the index.  May be null.
      */
-    public NameNode getNameNode(int nnIndex) {
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //return getNN(nnIndex).nameNode;
+    public NameNodeJVMInterface getNameNode(int nnIndex) {
+        return getNN(nnIndex).nameNode;
     }
 
     /**
@@ -2872,28 +2873,38 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void transitionToActive(int nnIndex) throws IOException,
             ServiceFailedException {
-        getNameNode(nnIndex).getRpcServer().transitionToActive(
-                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        // TODO: FIX ME
+        throw new UnsupportedOperationException("Not implemented");
+
+        //getNameNode(nnIndex).getRpcServer().transitionToActive(
+          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void transitionToStandby(int nnIndex) throws IOException,
             ServiceFailedException {
-        getNameNode(nnIndex).getRpcServer().transitionToStandby(
-                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        // TODO: FIX ME
+        throw new UnsupportedOperationException("Not implemented");
+        //getNameNode(nnIndex).getRpcServer().transitionToStandby(
+          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void transitionToObserver(int nnIndex) throws IOException,
             ServiceFailedException {
-        getNameNode(nnIndex).getRpcServer().transitionToObserver(
-                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        // TODO: FIX ME
+        throw new UnsupportedOperationException("Not implemented");
+        //getNameNode(nnIndex).getRpcServer().transitionToObserver(
+          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void rollEditLogAndTail(int nnIndex) throws Exception {
+        // TODO: FIX ME
+        throw new UnsupportedOperationException("Not implemented");
+        /*
         getNameNode(nnIndex).getRpcServer().rollEditLog();
         for (int i = 2; i < getNumNameNodes(); i++) {
             long el = getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
             LOG.info("editsLoaded {}", el);
-        }
+        } */
     }
 
     public void triggerBlockReports()

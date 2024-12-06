@@ -1,6 +1,7 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
 
 import java.net.InetSocketAddress;
@@ -47,7 +48,7 @@ public interface NameNodeJVMInterface {
     //java.net.InetSocketAddress getHttpServerAddress(Configuration arg0);
     //boolean initializeSharedEdits(Configuration arg0, boolean arg1, boolean arg2) throws java.io.IOException;
     //java.net.InetSocketAddress getServiceAddress(Configuration arg0, boolean arg1);
-    //org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols getRpcServer();
+    NamenodeProtocolsJVMInterface getRpcServer();
     long getProtocolVersion(java.lang.String arg0, long arg1) throws java.io.IOException;
     //HAServiceStatusInterface getServiceStatus() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
     boolean isObserverState();
