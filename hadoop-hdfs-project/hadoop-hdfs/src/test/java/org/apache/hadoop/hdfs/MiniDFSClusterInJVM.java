@@ -2283,12 +2283,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public synchronized void shutdownNameNode(int nnIndex) {
         NameNodeInfo info = getNN(nnIndex);
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //stopAndJoinNameNode(info.nameNode);
-        //info.nnId = null;
-        //info.nameNode = null;
-        //info.nameserviceId = null;
+        stopAndJoinNameNode(info.nameNode);
+        info.nnId = null;
+        info.nameNode = null;
+        info.nameserviceId = null;
     }
 
     /**
@@ -2533,15 +2531,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         int node = -1;
         for (int i = 0; i < dataNodes.size(); i++) {
             DataNodeJVMInterface dn = dataNodes.get(i).datanode;
-            // TODO: FIX ME
-            throw new UnsupportedOperationException("Not implemented");
-            /*
             if (dnName.equals(dn.getDatanodeId().getXferAddr())) {
                 node = i;
                 break;
             }
-
-             */
         }
         return stopDataNode(node);
     }
@@ -3134,7 +3127,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
         // TODO: FIX ME
-        throw new UnsupportedActionException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
         /*
         final FsDatasetSpi<?> dataSet = DataNodeTestUtils.getFSDataset(dn);
         if (!(dataSet instanceof SimulatedFSDataset)) {
@@ -3161,7 +3154,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
         //TODO: FIX ME
-        throw new UnsupportedActionException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
         /*
         final FsDatasetSpi<?> dataSet = DataNodeTestUtils.getFSDataset(dn);
         if (!(dataSet instanceof SimulatedFSDataset)) {
