@@ -110,6 +110,12 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void triggerBlockReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerBlockReportForTests();
+    }
+  }
+
   public static void pauseIBR(DataNode dn) {
     dn.setIBRDisabledForTest(true);
   }

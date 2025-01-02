@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface DataNodeJVMInterface {
+    String getDatanodeUuid();
     int getIpcPort();
     void runDatanodeDaemon() throws IOException;
     InetSocketAddress getXferAddress();

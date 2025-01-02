@@ -635,7 +635,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
    * Run an immediate block report on this thread. Used by tests.
    */
   @VisibleForTesting
-  void triggerBlockReportForTests() throws IOException {
+  public void triggerBlockReportForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.triggerBlockReportForTests();
     }
