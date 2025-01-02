@@ -1,6 +1,8 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.hdfs.protocol.DatanodeIDJVMInterface;
+import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManager;
+import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
@@ -10,6 +12,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface DataNodeJVMInterface {
+    BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();
     int getXceiverCount();
     boolean isBPServiceAlive(String bpid);
     String getDatanodeUuid();

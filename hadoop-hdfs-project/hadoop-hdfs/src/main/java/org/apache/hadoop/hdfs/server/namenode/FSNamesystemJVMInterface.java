@@ -5,6 +5,7 @@ import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManagerJVMInterface;
 
 public interface FSNamesystemJVMInterface {
+    FSImageJVMInterface getFSImage();
     void readLock();
     BlockManagerJVMInterface getBlockManager();
     void readUnlock();

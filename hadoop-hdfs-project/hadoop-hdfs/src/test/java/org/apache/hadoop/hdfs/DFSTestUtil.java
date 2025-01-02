@@ -2473,6 +2473,30 @@ public class DFSTestUtil {
     return cluster;
   }
 
+  public static MiniDFSClusterInJVM setupJVMCluster(final Configuration conf,
+                                            final int numDatanodes,
+                                            final int numRacks,
+                                            final int numSingleDnRacks)
+          throws Exception {
+    assert numDatanodes > numRacks;
+    assert numRacks > numSingleDnRacks;
+    assert numSingleDnRacks >= 0;
+    final String[] racks = new String[numDatanodes];
+    for (int i = 0; i < numSingleDnRacks; i++) {
+      racks[i] = "/rack" + i;
+    }
+    for (int i = numSingleDnRacks; i < numDatanodes; i++) {
+      racks[i] =
+              "/rack" + (numSingleDnRacks + (i % (numRacks - numSingleDnRacks)));
+    }
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
+            .numDataNodes(numDatanodes)
+            .racks(racks)
+            .build();
+    cluster.waitActive();
+    return cluster;
+  }
+
   /**
    * Check the correctness of the snapshotDiff report.
    * Make sure all items in the passed entries are in the snapshotDiff

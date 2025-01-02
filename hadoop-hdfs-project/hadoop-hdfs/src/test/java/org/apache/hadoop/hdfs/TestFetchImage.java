@@ -35,6 +35,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.hdfs.util.MD5FileUtils;
@@ -53,9 +54,9 @@ public class TestFetchImage {
   // Shamelessly stolen from NNStorage.
   private static final Pattern IMAGE_REGEX = Pattern.compile("fsimage_(\\d+)");
 
-  private MiniDFSCluster cluster;
-  private NameNode nn0 = null;
-  private NameNode nn1 = null;
+  private MiniDFSClusterInJVM cluster;
+  private NameNodeJVMInterface nn0 = null;
+  private NameNodeJVMInterface nn1 = null;
   private Configuration conf = null;
 
   @BeforeClass
@@ -75,7 +76,7 @@ public class TestFetchImage {
     conf.setInt(DFS_HA_TAILEDITS_PERIOD_KEY, 1);
     conf.setLong(DFS_BLOCK_SIZE_KEY, 1024);
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(1)
         .build();
@@ -143,7 +144,7 @@ public class TestFetchImage {
    * Run `hdfs dfsadmin -fetchImage ...' and verify that the downloaded image is
    * correct.
    */
-  private static void runFetchImage(DFSAdmin dfsAdmin, MiniDFSCluster cluster)
+  private static void runFetchImage(DFSAdmin dfsAdmin, MiniDFSClusterInJVM cluster)
       throws Exception {
     int retVal = dfsAdmin.run(new String[]{"-fetchImage",
         FETCHED_IMAGE_FILE.getPath() });
@@ -161,7 +162,7 @@ public class TestFetchImage {
   /**
    * @return the fsimage with highest transaction ID in the cluster.
    */
-  private static File getHighestFsImageOnCluster(MiniDFSCluster cluster) {
+  private static File getHighestFsImageOnCluster(MiniDFSClusterInJVM cluster) {
     long highestImageTxId = -1;
     File highestImageOnNn = null;
     for (URI nameDir : cluster.getNameDirs(0)) {

@@ -7,7 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
-import org.apache.hadoop.hdfs.server.namenode.FSImageInterface;
+import org.apache.hadoop.hdfs.server.namenode.FSImageJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
@@ -102,9 +102,9 @@ public class TestUpgtDemo {
     public void testNameNodeCreation() throws Exception {
         NameNodeJVMInterface nn = MiniDFSClusterHelper.createNameNode(null);
 
-        FSImageInterface fsImage = nn.getFSImage();
+        FSImageJVMInterface fsImage = nn.getFSImage();
         System.out.println("FSImage is loaded by " + fsImage.getClass().getClassLoader());
-        System.out.println("FSImageInterface is loaded by " + FSImageInterface.class.getClassLoader());
+        System.out.println("FSImageInterface is loaded by " + FSImageJVMInterface.class.getClassLoader());
         //System.out.println(fsImage.getBlockPoolID());
         DataNodeJVMInterface dn = MiniDFSClusterHelper.createDataNode();
 

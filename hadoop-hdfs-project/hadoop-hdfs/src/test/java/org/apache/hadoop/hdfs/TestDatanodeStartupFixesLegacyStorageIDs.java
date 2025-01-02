@@ -116,7 +116,7 @@ public class TestDatanodeStartupFixesLegacyStorageIDs {
                                        final Configuration conf,
                                        final ClusterVerifier verifier)
       throws IOException{
-    upgrade.upgradeAndVerify(new MiniDFSCluster.Builder(conf)
+    upgrade.upgradeAndVerify(new MiniDFSClusterInJVM.Builder(conf)
                                  .numDataNodes(1)
                                  .manageDataDfsDirs(false)
                                  .manageNameDfsDirs(false), verifier);

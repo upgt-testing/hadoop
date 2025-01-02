@@ -31,17 +31,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.function.Supplier;
 
+import org.apache.hadoop.hdfs.*;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hdfs.ClientGSIContext;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.Failover;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -102,6 +99,27 @@ public abstract class HATestUtil {
             + standby.getNamesystem().getFSImage().getLastAppliedTxId() + ")");
   }
 
+  public static void waitForStandbyToCatchUp(NameNodeJVMInterface active, NameNodeJVMInterface standby)
+          throws InterruptedException, IOException, CouldNotCatchUpException {
+    long activeTxId =
+            active.getNamesystem().getFSImage().getEditLog().getLastWrittenTxId();
+
+    active.getRpcServer().rollEditLog();
+
+    long start = Time.now();
+    while (Time.now() - start < TestEditLogTailer.NN_LAG_TIMEOUT) {
+      long nn2HighestTxId =
+              standby.getNamesystem().getFSImage().getLastAppliedTxId();
+      if (nn2HighestTxId >= activeTxId) {
+        return;
+      }
+      Thread.sleep(TestEditLogTailer.SLEEP_TIME);
+    }
+    throw new CouldNotCatchUpException(
+            "Standby did not catch up to txid " + activeTxId + " (currently at "
+                    + standby.getNamesystem().getFSImage().getLastAppliedTxId() + ")");
+  }
+
   /**
    * Wait for the datanodes in the cluster to process any block
    * deletions that have already been asynchronously queued.
@@ -154,6 +172,12 @@ public abstract class HATestUtil {
     return configureFailoverFs(cluster, conf, 0);
   }
 
+  public static DistributedFileSystem configureFailoverFs(
+          MiniDFSClusterInJVM cluster, Configuration conf)
+          throws IOException, URISyntaxException {
+    return configureFailoverFs(cluster, conf, 0);
+  }
+
   /**
    * Gets the filesystem instance by setting the failover configurations.
    * @param cluster the single process DFS cluster
@@ -164,6 +188,16 @@ public abstract class HATestUtil {
   public static DistributedFileSystem configureFailoverFs(
       MiniDFSCluster cluster, Configuration conf,
       int nsIndex) throws IOException, URISyntaxException {
+    conf = new Configuration(conf);
+    String logicalName = getLogicalHostname(cluster);
+    setFailoverConfigurations(cluster, conf, logicalName, null, nsIndex);
+    FileSystem fs = FileSystem.get(new URI("hdfs://" + logicalName), conf);
+    return (DistributedFileSystem)fs;
+  }
+
+  public static DistributedFileSystem configureFailoverFs(
+          MiniDFSClusterInJVM cluster, Configuration conf,
+          int nsIndex) throws IOException, URISyntaxException {
     conf = new Configuration(conf);
     String logicalName = getLogicalHostname(cluster);
     setFailoverConfigurations(cluster, conf, logicalName, null, nsIndex);
@@ -285,6 +319,17 @@ public abstract class HATestUtil {
     setFailoverConfigurations(conf, logicalName, proxyProvider, nnAddresses);
   }
 
+  public static void setFailoverConfigurations(MiniDFSClusterInJVM cluster,
+                                               Configuration conf, String logicalName, String proxyProvider,
+                                               int nsIndex) {
+    MiniDFSClusterInJVM.NameNodeInfo[] nns = cluster.getNameNodeInfos(nsIndex);
+    List<InetSocketAddress> nnAddresses = new ArrayList<InetSocketAddress>(3);
+    for (MiniDFSClusterInJVM.NameNodeInfo nn : nns) {
+      nnAddresses.add(nn.nameNode.getNameNodeAddress());
+    }
+    setFailoverConfigurations(conf, logicalName, proxyProvider, nnAddresses);
+  }
+
   /** Sets the required configurations for performing failover.  */
   public static <P extends FailoverProxyProvider<?>> void
       setFailoverConfigurations(MiniDFSCluster cluster, Configuration conf,
@@ -374,6 +419,10 @@ public abstract class HATestUtil {
   }
 
   public static String getLogicalHostname(MiniDFSCluster cluster) {
+    return String.format(LOGICAL_HOSTNAME, cluster.getInstanceId());
+  }
+
+  public static String getLogicalHostname(MiniDFSClusterInJVM cluster) {
     return String.format(LOGICAL_HOSTNAME, cluster.getInstanceId());
   }
 

@@ -86,7 +86,7 @@ import org.apache.hadoop.util.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class FSImage implements Closeable, FSImageInterface {
+public class FSImage implements Closeable, FSImageJVMInterface {
   static {
     System.out.println("FSImage class is loaded by: " + FSImage.class.getClassLoader());
   }
