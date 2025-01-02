@@ -2032,6 +2032,19 @@ public class DFSTestUtil {
     return false;
   }
 
+  public static boolean changeReplicaLength(MiniDFSClusterInJVM cluster,
+                                            ExtendedBlock blk, int dnIndex, int lenDelta) throws IOException {
+    File blockFile = cluster.getBlockFile(dnIndex, blk);
+    if (blockFile != null && blockFile.exists()) {
+      try (RandomAccessFile raFile = new RandomAccessFile(blockFile, "rw")) {
+        raFile.setLength(raFile.length() + lenDelta);
+      }
+      return true;
+    }
+    LOG.info("failed to change length of block " + blk);
+    return false;
+  }
+
   public static void setNameNodeLogLevel(Level level) {
     GenericTestUtils.setLogLevel(FSNamesystem.LOG, level);
     GenericTestUtils.setLogLevel(BlockManager.LOG, level);

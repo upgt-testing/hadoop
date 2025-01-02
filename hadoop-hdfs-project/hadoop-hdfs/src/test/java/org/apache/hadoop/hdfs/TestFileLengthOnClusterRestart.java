@@ -39,7 +39,7 @@ public class TestFileLengthOnClusterRestart {
     // create cluster
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 512);
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(2).build();
     HdfsDataInputStream in = null;
     try {

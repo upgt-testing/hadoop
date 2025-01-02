@@ -99,12 +99,12 @@ public class TestPersistBlocks {
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
     conf.setBoolean(HdfsClientConfigKeys.Retry.POLICY_ENABLED_KEY, true);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     long len = 0;
     FSDataOutputStream stream;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
       // Creating a file with 4096 blockSize to write multiple blocks
@@ -159,12 +159,12 @@ public class TestPersistBlocks {
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     long len = 0;
     FSDataOutputStream stream;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       FileSystem fs = cluster.getFileSystem();
       // Creating a file with 4096 blockSize to write multiple blocks
       stream = fs.create(FILE_PATH, true, BLOCK_SIZE, (short) 1, BLOCK_SIZE);
@@ -221,11 +221,11 @@ public class TestPersistBlocks {
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     FSDataOutputStream stream;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       FileSystem fs = cluster.getFileSystem();
       DFSUtilClient.getNNAddress(conf).getPort();
       // Creating a file with 4096 blockSize to write multiple blocks
@@ -270,11 +270,11 @@ public class TestPersistBlocks {
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     FSDataOutputStream stream;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       FileSystem fs = cluster.getFileSystem();
       DFSUtilClient.getNNAddress(conf).getPort();
       // Creating a file with 4096 blockSize to write multiple blocks
@@ -338,7 +338,7 @@ public class TestPersistBlocks {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
     conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, dataDir.getAbsolutePath());
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
       .format(false)
       .manageDataDfsDirs(false)
       .manageNameDfsDirs(false)

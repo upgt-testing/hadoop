@@ -1,6 +1,9 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.hdfs.protocol.DatanodeIDJVMInterface;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClientJVMInterface;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServerJVMInterface;
 import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManager;
 import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
@@ -12,6 +15,10 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface DataNodeJVMInterface {
+    int getXferPort();
+    SaslDataTransferServerJVMInterface getSaslServer();
+    SaslDataTransferClientJVMInterface getSaslClient();
+    int getInfoPort();
     BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();
     int getXceiverCount();
     boolean isBPServiceAlive(String bpid);

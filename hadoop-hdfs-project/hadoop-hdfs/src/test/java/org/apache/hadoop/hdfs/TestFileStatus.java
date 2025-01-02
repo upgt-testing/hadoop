@@ -57,7 +57,7 @@ public class TestFileStatus {
   static final int fileSize = 16384;
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static FileSystem fs;
   private static FileContext fc;
   private static DFSClient dfsClient;
@@ -67,7 +67,7 @@ public class TestFileStatus {
   public static void testSetUp() throws Exception {
     conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_LIST_LIMIT, 2);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     fs = cluster.getFileSystem();
     fc = FileContext.getFileContext(cluster.getURI(0), conf);
     dfsClient = new DFSClient(DFSUtilClient.getNNAddress(conf), conf);

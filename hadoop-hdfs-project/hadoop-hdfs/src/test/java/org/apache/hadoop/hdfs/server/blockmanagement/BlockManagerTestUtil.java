@@ -81,6 +81,10 @@ public class BlockManagerTestUtil {
     blockManager.updateState();
   }
 
+  public static void updateState(final BlockManagerJVMInterface blockManager) {
+    blockManager.updateState();
+  }
+
   /**
    * @return a tuple of the replica state (number racks, number live
    * replicas, number needed replicas and number of UpgradeDomains) for the

@@ -14,4 +14,5 @@ public interface FsDatasetSpiJVMInterface<V extends FsVolumeSpi> {
     long getDfsUsed() throws IOException;
     StorageReportJVMInterface[] getStorageReports(String bpid)
             throws IOException;
+    long getRemaining() throws IOException;
 }

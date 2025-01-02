@@ -51,6 +51,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirType;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.namenode.FSImageStorageInspector.FSImageFile;
@@ -537,6 +538,14 @@ public abstract class FSImageTestUtil {
   }
 
   public static List<File> getNameNodeCurrentDirs(MiniDFSCluster cluster, int nnIdx) {
+    List<File> nameDirs = Lists.newArrayList();
+    for (URI u : cluster.getNameDirs(nnIdx)) {
+      nameDirs.add(new File(u.getPath(), "current"));
+    }
+    return nameDirs;
+  }
+
+  public static List<File> getNameNodeCurrentDirs(MiniDFSClusterInJVM cluster, int nnIdx) {
     List<File> nameDirs = Lists.newArrayList();
     for (URI u : cluster.getNameDirs(nnIdx)) {
       nameDirs.add(new File(u.getPath(), "current"));

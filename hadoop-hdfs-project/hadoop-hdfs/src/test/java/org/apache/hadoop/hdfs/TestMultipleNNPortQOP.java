@@ -27,9 +27,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServer;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServerJVMInterface;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.security.token.Token;
 import org.junit.Before;
@@ -89,11 +91,11 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
    */
   @Test
   public void testAuxiliaryPortSendingQOP() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     final String pathPrefix  = "/filetestAuxiliaryPortSendingQOP";
     try {
-      cluster = new MiniDFSCluster.Builder(clusterConf)
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf)
           .numDataNodes(3).build();
 
       cluster.waitActive();
@@ -167,16 +169,16 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
    */
   @Test
   public void testMultipleNNPort() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(clusterConf)
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf)
           .numDataNodes(3).build();
 
       cluster.waitActive();
       HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
       clientConf.unset(
           CommonConfigurationKeys.HADOOP_SECURITY_SASL_PROPS_RESOLVER_CLASS);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
 
       URI currentURI = cluster.getURI();
       URI uriAuthPort = new URI(currentURI.getScheme() +
@@ -189,24 +191,24 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
       clientConf.set(HADOOP_RPC_PROTECTION, "privacy");
       FileSystem fsPrivacy = FileSystem.get(uriPrivacyPort, clientConf);
       doTest(fsPrivacy, PATH1);
-      for (DataNode dn : dataNodes) {
-        SaslDataTransferServer saslServer = dn.getSaslServer();
+      for (DataNodeJVMInterface dn : dataNodes) {
+        SaslDataTransferServerJVMInterface saslServer = dn.getSaslServer();
         assertEquals("auth-conf", saslServer.getNegotiatedQOP());
       }
 
       clientConf.set(HADOOP_RPC_PROTECTION, "integrity");
       FileSystem fsIntegrity = FileSystem.get(uriIntegrityPort, clientConf);
       doTest(fsIntegrity, PATH2);
-      for (DataNode dn : dataNodes) {
-        SaslDataTransferServer saslServer = dn.getSaslServer();
+      for (DataNodeJVMInterface dn : dataNodes) {
+        SaslDataTransferServerJVMInterface saslServer = dn.getSaslServer();
         assertEquals("auth-int", saslServer.getNegotiatedQOP());
       }
 
       clientConf.set(HADOOP_RPC_PROTECTION, "authentication");
       FileSystem fsAuth = FileSystem.get(uriAuthPort, clientConf);
       doTest(fsAuth, PATH3);
-      for (DataNode dn : dataNodes) {
-        SaslDataTransferServer saslServer = dn.getSaslServer();
+      for (DataNodeJVMInterface dn : dataNodes) {
+        SaslDataTransferServerJVMInterface saslServer = dn.getSaslServer();
         assertEquals("auth", saslServer.getNegotiatedQOP());
       }
     } finally {
@@ -227,15 +229,15 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
     clusterConf.set(DFS_ENCRYPT_DATA_OVERWRITE_DOWNSTREAM_NEW_QOP_KEY, "auth");
     clusterConf.setBoolean(
         DFS_ENCRYPT_DATA_OVERWRITE_DOWNSTREAM_DERIVED_QOP_KEY, true);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       cluster =
-          new MiniDFSCluster.Builder(clusterConf).numDataNodes(3).build();
+          new MiniDFSClusterInJVM.Builder(clusterConf).numDataNodes(3).build();
       cluster.waitActive();
       HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
       clientConf.unset(
           CommonConfigurationKeys.HADOOP_SECURITY_SASL_PROPS_RESOLVER_CLASS);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
 
       URI currentURI = cluster.getURI();
       URI uriAuthPort =

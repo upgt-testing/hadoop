@@ -5,6 +5,9 @@ import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManagerJVMInterface;
 
 public interface FSNamesystemJVMInterface {
+    long getPendingReplicationBlocks();
+    long getCorruptReplicaBlocks();
+    long getMissingBlocksCount();
     FSImageJVMInterface getFSImage();
     void readLock();
     BlockManagerJVMInterface getBlockManager();
@@ -14,4 +17,5 @@ public interface FSNamesystemJVMInterface {
     boolean isHaEnabled();
     String getBlockPoolId();
     FSDirectoryJVMInterface getFSDirectory();
+    String getSafemode();
 }

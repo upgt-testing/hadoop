@@ -37,10 +37,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.util.Time;
 import org.junit.After;
 import org.junit.Before;
@@ -61,7 +62,7 @@ public class TestLocatedBlocksRefresher {
   private final int fileLength = numOfBlocks * BLOCK_SIZE;
   private final int dfsClientPrefetchSize = fileLength / 2;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf;
 
   @Before
@@ -92,7 +93,7 @@ public class TestLocatedBlocksRefresher {
     // this is necessary to ensure no caching between runs
     conf.set("dfs.client.context", UUID.randomUUID().toString());
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES).racks(RACKS).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES).racks(RACKS).build();
     cluster.waitActive();
   }
 
@@ -191,7 +192,7 @@ public class TestLocatedBlocksRefresher {
 
         DataNodeProperties dataNodeProperties = cluster.stopDataNode(deadNodeAddr);
         if (dataNodeProperties != null) {
-          List<DataNode> datanodesPostStoppage = cluster.getDataNodes();
+          List<DataNodeJVMInterface> datanodesPostStoppage = cluster.getDataNodes();
           assertEquals(expectedNodes, datanodesPostStoppage.size());
           return;
         }

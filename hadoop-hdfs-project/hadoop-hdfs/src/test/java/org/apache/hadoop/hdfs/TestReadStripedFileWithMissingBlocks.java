@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -40,7 +41,7 @@ import java.io.IOException;
 public class TestReadStripedFileWithMissingBlocks {
   public static final Logger LOG = LoggerFactory
       .getLogger(TestReadStripedFileWithMissingBlocks.class);
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private DFSClient dfsClient;
   private Configuration conf = new HdfsConfiguration();
@@ -63,7 +64,7 @@ public class TestReadStripedFileWithMissingBlocks {
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 0);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.getFileSystem().getClient().setErasureCodingPolicy(
         "/", ecPolicy.getName());
     fs = cluster.getFileSystem();
@@ -152,7 +153,7 @@ public class TestReadStripedFileWithMissingBlocks {
     if (locs != null && locs.length > 0) {
       for (int failedDNIdx : datanodes) {
         String name = (locs[0].getNames())[failedDNIdx];
-        for (DataNode dn : cluster.getDataNodes()) {
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
           int port = dn.getXferPort();
           if (name.contains(Integer.toString(port))) {
             dn.shutdown();

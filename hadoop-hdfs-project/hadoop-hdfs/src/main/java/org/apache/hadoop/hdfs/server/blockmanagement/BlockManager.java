@@ -2054,7 +2054,7 @@ public class BlockManager implements BlockStatsMXBean, BlockManagerJVMInterface 
   }
   
   
-  void updateState() {
+  public void updateState() {
     pendingReconstructionBlocksCount = pendingReconstruction.size();
     lowRedundancyBlocksCount = neededReconstruction.size();
     corruptReplicaBlocksCount = corruptReplicas.size();
