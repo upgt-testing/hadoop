@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.util.Preconditions;
@@ -767,6 +768,20 @@ public class DFSTestUtil {
    */
   public static void waitForDatanodeDeath(DataNode dn) 
       throws InterruptedException, TimeoutException {
+    final int ATTEMPTS = 10;
+    int count = 0;
+    do {
+      Thread.sleep(1000);
+      count++;
+    } while (dn.isDatanodeUp() && count < ATTEMPTS);
+
+    if (count == ATTEMPTS) {
+      throw new TimeoutException("Timed out waiting for DN to die");
+    }
+  }
+
+  public static void waitForDatanodeDeath(DataNodeJVMInterface dn)
+          throws InterruptedException, TimeoutException {
     final int ATTEMPTS = 10;
     int count = 0;
     do {

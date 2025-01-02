@@ -13,4 +13,5 @@ public interface FSNamesystemJVMInterface {
     long[] getStats();
     boolean isHaEnabled();
     String getBlockPoolId();
+    FSDirectoryJVMInterface getFSDirectory();
 }

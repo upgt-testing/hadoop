@@ -57,7 +57,7 @@ import java.util.Objects;
  * directory inodes.
  */
 @InterfaceAudience.Private
-public abstract class INode implements INodeAttributes, Diff.Element<byte[]> {
+public abstract class INode implements INodeAttributes, Diff.Element<byte[]>, INodeJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(INode.class);
 
   /** parent is either an {@link INodeDirectory} or an {@link INodeReference}.*/
