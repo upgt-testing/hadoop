@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.Options.Rename;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.NSQuotaExceededException;
 import org.apache.hadoop.ipc.RemoteException;
@@ -45,7 +45,7 @@ import org.junit.Test;
 
 public class TestHDFSFileContextMainOperations extends
     FileContextMainOperationsBaseTest {
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Path defaultWorkingDirectory;
   private static final HdfsConfiguration CONF = new HdfsConfiguration();
   
@@ -57,7 +57,7 @@ public class TestHDFSFileContextMainOperations extends
   @BeforeClass
   public static void clusterSetupAtBegining() throws IOException,
       LoginException, URISyntaxException {
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     URI uri0 = cluster.getURI(0);
     fc = FileContext.getFileContext(uri0, CONF);
@@ -71,7 +71,7 @@ public class TestHDFSFileContextMainOperations extends
       cluster.shutdown();
       cluster = null;
     }
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(1)
+    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(1)
                                               .format(false).build();
     cluster.waitClusterUp();
     fc = FileContext.getFileContext(cluster.getURI(0), CONF);

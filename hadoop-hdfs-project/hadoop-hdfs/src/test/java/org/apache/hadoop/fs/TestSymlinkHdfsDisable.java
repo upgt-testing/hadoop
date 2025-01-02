@@ -25,7 +25,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class TestSymlinkHdfsDisable {
     conf.setBoolean(
         CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
     // spin up minicluster, get dfs and filecontext
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     DistributedFileSystem dfs = cluster.getFileSystem();
     FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
     // Create test files/links

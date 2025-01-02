@@ -32,7 +32,7 @@ import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
@@ -50,14 +50,14 @@ import org.junit.Test;
  */
 public class TestResolveHdfsSymlink {
   private static final FileContextTestHelper helper = new FileContextTestHelper();
-  private static MiniDFSCluster cluster = null;
+  private static MiniDFSClusterInJVM cluster = null;
 
   @BeforeClass
   public static void setUp() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
 
   }
