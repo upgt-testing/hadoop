@@ -6290,7 +6290,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Returns the DelegationTokenSecretManager instance in the namesystem.
    * @return delegation token secret manager object
    */
-  DelegationTokenSecretManager getDelegationTokenSecretManager() {
+  public DelegationTokenSecretManager getDelegationTokenSecretManager() {
     return dtSecretManager;
   }
 
@@ -7104,7 +7104,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
   
   @VisibleForTesting
-  void setFsLockForTests(ReentrantReadWriteLock lock) {
+  public void setFsLockForTests(ReentrantReadWriteLock lock) {
     this.fsLock.coarseLock = lock;
   }
   

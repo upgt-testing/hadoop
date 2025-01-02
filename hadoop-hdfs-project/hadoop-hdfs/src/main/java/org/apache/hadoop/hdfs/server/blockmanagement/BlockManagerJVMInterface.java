@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public interface BlockManagerJVMInterface {
+    void setInitializedReplQueues(boolean v);
+    long getCorruptBlocks();
     BlockTokenSecretManagerJVMInterface getBlockTokenSecretManager();
     DatanodeManagerJVMInterface getDatanodeManager();
     int getUnderReplicatedNotMissingBlocks();

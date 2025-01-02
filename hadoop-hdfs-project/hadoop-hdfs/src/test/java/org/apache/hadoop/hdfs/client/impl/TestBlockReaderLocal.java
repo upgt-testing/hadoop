@@ -40,7 +40,7 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.ExtendedBlockId;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.ReadStatistics;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -139,7 +139,7 @@ public class TestBlockReaderLocal {
       boolean checksum, long readahead, int shortCircuitCachesNum)
           throws IOException {
     Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY,
         !checksum);
@@ -162,7 +162,7 @@ public class TestBlockReaderLocal {
     ShortCircuitShm shm = null;
     RandomAccessFile raf = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH, 1024,
@@ -757,14 +757,14 @@ public class TestBlockReaderLocal {
     } else {
       conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
     }
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final long RANDOM_SEED = 4567L;
     FSDataInputStream fsIn = null;
     byte original[] = new byte[BlockReaderLocalTest.TEST_LENGTH];
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).
+      cluster = new MiniDFSClusterInJVM.Builder(conf).
           hosts(new String[] {NetUtils.getLocalHostname()}).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -818,7 +818,7 @@ public class TestBlockReaderLocal {
     final int length = ecPolicy.getCellSize() * (numDataNodes + 1) + 123;
     final long randomSeed = 4567L;
     final short repl = 1;
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDataNodes).build()) {
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
