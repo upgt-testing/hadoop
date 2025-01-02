@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface DataNodeJVMInterface {
+    boolean isBPServiceAlive(String bpid);
     String getDatanodeUuid();
     int getIpcPort();
     void runDatanodeDaemon() throws IOException;

@@ -78,7 +78,7 @@ import java.util.function.Consumer;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DatanodeManager {
+public class DatanodeManager implements DatanodeManagerJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(DatanodeManager.class);
 
   private final Namesystem namesystem;

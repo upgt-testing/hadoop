@@ -48,7 +48,7 @@ public class TestDFSStorageStateRecovery {
                                                    "org.apache.hadoop.hdfs.TestDFSStorageStateRecovery");
   private Configuration conf = null;
   private int testCounter = 0;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
   
   // Constants for indexes into test case table below.
   private static final int CURRENT_EXISTS = 0;
@@ -307,8 +307,8 @@ public class TestDFSStorageStateRecovery {
     }
   }
   
-  private MiniDFSCluster createCluster(Configuration c) throws IOException {
-    return new MiniDFSCluster.Builder(c)
+  private MiniDFSClusterInJVM createCluster(Configuration c) throws IOException {
+    return new MiniDFSClusterInJVM.Builder(c)
                              .numDataNodes(0)
                              .startupOption(StartupOption.REGULAR)
                              .format(false)
@@ -451,7 +451,7 @@ public class TestDFSStorageStateRecovery {
 
   @After
   public void tearDown() throws Exception {
-    LOG.info("Shutting down MiniDFSCluster");
+    LOG.info("Shutting down MiniDFSClusterInJVM");
     if (cluster != null) {
       cluster.shutdown();
       cluster = null;

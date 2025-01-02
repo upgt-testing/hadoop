@@ -9,4 +9,5 @@ public interface DatanodeIDJVMInterface {
     int getInfoPort();
     int getInfoSecurePort();
     int getIpcPort();
+    String getIpcAddr(boolean useHostname);
 }

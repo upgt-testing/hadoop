@@ -106,7 +106,7 @@ public class TestDFSShell {
   private static final byte[] USER_A1_VALUE = new byte[]{0x31, 0x32, 0x33};
   private static final int BLOCK_SIZE = 1024;
 
-  private static MiniDFSCluster miniCluster;
+  private static MiniDFSClusterInJVM miniCluster;
   private static DistributedFileSystem dfs;
 
   @BeforeClass
@@ -116,13 +116,13 @@ public class TestDFSShell {
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     // set up the shared miniCluster directory so individual tests can launch
     // new clusters without conflict
-    conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR,
+    conf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR,
         GenericTestUtils.getTestDir("TestDFSShell").getAbsolutePath());
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_XATTRS_ENABLED_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 120000);
 
-    miniCluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    miniCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     miniCluster.waitActive();
     dfs = miniCluster.getFileSystem();
   }
@@ -784,9 +784,9 @@ public class TestDFSShell {
   @Test
   public void testMoveWithTargetPortEmpty() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .format(true)
           .numDataNodes(2)
           .nameNodePort(ServerSocketUtil.waitForPort(
@@ -817,14 +817,14 @@ public class TestDFSShell {
   public void testURIPaths() throws Exception {
     Configuration srcConf = new HdfsConfiguration();
     Configuration dstConf = new HdfsConfiguration();
-    MiniDFSCluster srcCluster =  null;
-    MiniDFSCluster dstCluster = null;
+    MiniDFSClusterInJVM srcCluster =  null;
+    MiniDFSClusterInJVM dstCluster = null;
     File bak = new File(PathUtils.getTestDir(getClass()), "testURIPaths");
     bak.mkdirs();
     try{
-      srcCluster = new MiniDFSCluster.Builder(srcConf).numDataNodes(2).build();
-      dstConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, bak.getAbsolutePath());
-      dstCluster = new MiniDFSCluster.Builder(dstConf).numDataNodes(2).build();
+      srcCluster = new MiniDFSClusterInJVM.Builder(srcConf).numDataNodes(2).build();
+      dstConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, bak.getAbsolutePath());
+      dstCluster = new MiniDFSClusterInJVM.Builder(dstConf).numDataNodes(2).build();
       FileSystem srcFs = srcCluster.getFileSystem();
       FileSystem dstFs = dstCluster.getFileSystem();
       FsShell shell = new FsShell();
@@ -1895,7 +1895,7 @@ public class TestDFSShell {
   }
 
   private static List<MaterializedReplica> getMaterializedReplicas(
-      MiniDFSCluster cluster) throws IOException {
+      MiniDFSClusterInJVM cluster) throws IOException {
     List<MaterializedReplica> replicas = new ArrayList<>();
     String poolId = cluster.getNamesystem().getBlockPoolId();
     List<Map<DatanodeStorage, BlockListAsLongs>> blocks =
@@ -1999,11 +1999,11 @@ public class TestDFSShell {
     };
 
     File localf = createLocalFile(new File(TEST_ROOT_DIR, fname));
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     DistributedFileSystem dfs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).format(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).format(true)
         .build();
       dfs = cluster.getFileSystem();
 
@@ -2032,7 +2032,7 @@ public class TestDFSShell {
       corrupt(replicas, localfcontent);
 
       // Start the miniCluster again, but do not reformat, so prior files remain.
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).format(false)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).format(false)
         .build();
       dfs = cluster.getFileSystem();
 
@@ -2830,8 +2830,8 @@ public class TestDFSShell {
 
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
 
-    MiniDFSCluster.Builder builder = new MiniDFSCluster.Builder(conf);
-    MiniDFSCluster cluster = builder.numDataNodes(2).format(true).build();
+    MiniDFSClusterInJVM.Builder builder = new MiniDFSClusterInJVM.Builder(conf);
+    MiniDFSClusterInJVM cluster = builder.numDataNodes(2).format(true).build();
     FsShell shell = new FsShell(conf);
 
     cluster.waitActive();
@@ -2927,7 +2927,7 @@ public class TestDFSShell {
       serverConf.setLong(FS_TRASH_INTERVAL_KEY, 1);
     }
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(serverConf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf)
       .numDataNodes(1).format(true).build();
     Configuration clientConf = new Configuration(serverConf);
 
@@ -2991,7 +2991,7 @@ public class TestDFSShell {
     createLocalFileWithRandomData(inputFileLength, file2);
 
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
 
     try {
@@ -3055,7 +3055,7 @@ public class TestDFSShell {
     createLocalFileWithRandomData(inputFileLength, file1);
 
     Configuration conf = new HdfsConfiguration();
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(6).build()) {
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(6).build()) {
       cluster.waitActive();
       FileSystem hdfs = cluster.getFileSystem();
       assertTrue("Not a HDFS: " + hdfs.getUri(),
@@ -3580,8 +3580,8 @@ public class TestDFSShell {
   @Test (timeout = 30000)
   public void testListReserved() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     FileSystem fs = cluster.getFileSystem();
     FsShell shell = new FsShell();
     shell.setConf(conf);

@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.util.ThreadUtil;
 import org.junit.After;
@@ -41,7 +41,7 @@ import org.junit.Test;
  */
 public class TestDFSClientExcludedNodes {
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf;
 
   @Before
@@ -60,7 +60,7 @@ public class TestDFSClientExcludedNodes {
 
   @Test(timeout=60000)
   public void testExcludedNodes() throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     FileSystem fs = cluster.getFileSystem();
     Path filePath = new Path("/testExcludedNodes");
 
@@ -92,7 +92,7 @@ public class TestDFSClientExcludedNodes {
     // We'll be using a 512 bytes block size just for tests
     // so making sure the checksum bytes too match it.
     conf.setInt("io.bytes.per.checksum", 512);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     FileSystem fs = cluster.getFileSystem();
     Path filePath = new Path("/testForgivingExcludedNodes");
 

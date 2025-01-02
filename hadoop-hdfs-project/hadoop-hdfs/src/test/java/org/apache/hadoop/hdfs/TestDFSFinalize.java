@@ -46,7 +46,7 @@ public class TestDFSFinalize {
                                                    "org.apache.hadoop.hdfs.TestDFSFinalize");
   private Configuration conf;
   private int testCounter = 0;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
     
   /**
    * Writes an INFO log message containing the parameters.
@@ -129,7 +129,7 @@ public class TestDFSFinalize {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "previous");
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .format(false)
                                   .manageDataDfsDirs(false)
                                   .manageNameDfsDirs(false)
@@ -159,7 +159,7 @@ public class TestDFSFinalize {
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "current", bpid);
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "previous", bpid);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .format(false)
                                   .manageDataDfsDirs(false)
                                   .manageNameDfsDirs(false)
@@ -186,7 +186,7 @@ public class TestDFSFinalize {
  
   @After
   public void tearDown() throws Exception {
-    LOG.info("Shutting down MiniDFSCluster");
+    LOG.info("Shutting down MiniDFSClusterInJVM");
     if (cluster != null) {
       cluster.shutdown();
       cluster = null;
