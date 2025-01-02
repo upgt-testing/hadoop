@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Read the list of file names from test_list.txt
-input_file="test_list.txt"
+input_file=$1
 
 # Check if the input file exists
 if [[ ! -f "$input_file" ]]; then
