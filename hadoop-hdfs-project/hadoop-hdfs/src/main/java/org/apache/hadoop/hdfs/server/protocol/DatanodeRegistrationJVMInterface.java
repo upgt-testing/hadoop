@@ -1,5 +1,7 @@
 package org.apache.hadoop.hdfs.server.protocol;
 
-public interface DatanodeRegistrationJVMInterface {
+import org.apache.hadoop.hdfs.protocol.DatanodeIDJVMInterface;
+
+public interface DatanodeRegistrationJVMInterface extends DatanodeIDJVMInterface {
 
 }

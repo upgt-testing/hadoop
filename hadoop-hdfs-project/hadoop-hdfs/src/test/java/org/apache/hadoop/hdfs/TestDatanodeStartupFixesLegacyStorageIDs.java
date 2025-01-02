@@ -21,6 +21,7 @@ package org.apache.hadoop.hdfs;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
+import org.apache.hadoop.hdfs.server.protocol.StorageReportJVMInterface;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
 
@@ -74,6 +75,21 @@ public class TestDatanodeStartupFixesLegacyStorageIDs {
         final String bpid = cluster.getNamesystem().getBlockPoolId();
         StorageReport[] reports =
             cluster.getDataNodes().get(0).getFSDataset().getStorageReports(bpid);
+        assertThat(reports.length, is(1));
+        final String storageID = reports[0].getStorage().getStorageID();
+        assertTrue(DatanodeStorage.isValidStorageId(storageID));
+
+        if (expectedStorageId != null) {
+          assertThat(storageID, is(expectedStorageId));
+        }
+      }
+
+      @Override
+      public void verifyClusterPostUpgrade(MiniDFSClusterInJVM cluster) throws IOException {
+        // Verify that a GUID-based storage ID was generated.
+        final String bpid = cluster.getNamesystem().getBlockPoolId();
+        StorageReportJVMInterface[] reports =
+                cluster.getDataNodes().get(0).getFSDataset().getStorageReports(bpid);
         assertThat(reports.length, is(1));
         final String storageID = reports[0].getStorage().getStorageID();
         assertTrue(DatanodeStorage.isValidStorageId(storageID));

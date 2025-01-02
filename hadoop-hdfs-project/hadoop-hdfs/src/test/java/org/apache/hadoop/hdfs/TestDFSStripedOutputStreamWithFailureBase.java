@@ -17,6 +17,9 @@
  */
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.util.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -81,7 +84,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
   private int[][] dnIndexSuite;
   protected List<Integer> lengths;
   protected static final Random RANDOM = new Random();
-  MiniDFSCluster cluster;
+  MiniDFSClusterInJVM cluster;
   DistributedFileSystem dfs;
   final Path dir = new Path("/"
       + TestDFSStripedOutputStreamWithFailureBase.class.getSimpleName());
@@ -205,7 +208,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
           CodecUtil.IO_ERASURECODE_CODEC_RS_RAWCODERS_KEY,
           NativeRSRawErasureCoderFactory.CODER_NAME);
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
     AddErasureCodingPolicyResponse[] res =
@@ -299,9 +302,9 @@ public class TestDFSStripedOutputStreamWithFailureBase {
     LOG.info("fullPath=" + fullPath);
 
     if (tokenExpire) {
-      final NameNode nn = cluster.getNameNode();
-      final BlockManager bm = nn.getNamesystem().getBlockManager();
-      final BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
+      final NameNodeJVMInterface nn = cluster.getNameNode();
+      final BlockManagerJVMInterface bm = nn.getNamesystem().getBlockManager();
+      final BlockTokenSecretManagerJVMInterface sm = bm.getBlockTokenSecretManager();
 
       // set a short token lifetime (6 second)
       SecurityTestUtil.setBlockTokenLifetime(sm, 6000L);
@@ -403,7 +406,7 @@ public class TestDFSStripedOutputStreamWithFailureBase {
     }
   }
 
-  static DatanodeInfo killDatanode(MiniDFSCluster cluster,
+  static DatanodeInfo killDatanode(MiniDFSClusterInJVM cluster,
       DFSStripedOutputStream out, final int dnIndex, final AtomicInteger pos) {
     final StripedDataStreamer s = out.getStripedDataStreamer(dnIndex);
     final DatanodeInfo datanode = getDatanodes(s);
