@@ -62,6 +62,7 @@ public class TestUpgtDemo {
     @Test
     public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
+        cluster.restartDataNodeForTesting(0);
         FSNamesystemJVMInterface fsNamesystem = cluster.getNamesystem();
         System.out.println("FSNamesystem is loaded by " + fsNamesystem.getClass().getClassLoader());
         System.out.println("FSNamesystem is " + fsNamesystem);

@@ -2554,14 +2554,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             throws IOException {
         for (int i = 0; i < dataNodes.size(); i++) {
             DataNodeJVMInterface dn = dataNodes.get(i).datanode;
-            // TODO: FIX ME
-            throw new UnsupportedOperationException("Not implemented");
-            /*
             if (dnName.equals(dn.getDatanodeId().getXferAddr())) {
                 return restartDataNode(i);
             }
-
-             */
         }
         return false;
     }
@@ -2648,9 +2643,13 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             conf.set(DFS_DATANODE_IPC_ADDRESS_KEY,
                     addr.getAddress().getHostAddress() + ":" + dnprop.ipcPort);
         }
-        final DataNode newDn = DataNode.createDataNode(args, conf, secureResources);
+        //final DataNode newDn = DataNode.createDataNode(args, conf, secureResources);
         DataNodeInstance dnInstance = new DataNodeInstance();
-        //final DataNodeInterface newDn = dnInstance.createDataNodeForInJVMCluster(args, conf, secureResources);
+        boolean setSecureResources = false;
+        if (secureResources != null) {
+            setSecureResources = true;
+        }
+        final DataNodeJVMInterface newDn = dnInstance.createDataNodeForInJVMCluster(args, conf, setSecureResources);
 
         final DataNodeProperties dnp = new DataNodeProperties(
                 newDn,
@@ -2665,9 +2664,25 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 dataNodes.lastIndexOf(dnp),
                 newDn,
                 storageCap.toArray(new long[][]{}));
-        // TODO: FIX ME
-        throw new UnsupportedActionException("Not implemented");
-        //return true;
+        return true;
+    }
+
+    public boolean restartDataNodeForTesting(int i) {
+        if (i > dataNodes.size()) {
+            i = 0;
+        }
+        boolean underRestartMode = Boolean.getBoolean("upgt.datanode.restart");
+        LOG.info("Under restart mode: " + underRestartMode);
+        if (!underRestartMode) {
+            LOG.info("Skip restarting DataNode " + i);
+            return false;
+        }
+        try {
+            LOG.info("Restarting DataNode " + i);
+            return restartDataNode(i);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot restart datanode " + i, e);
+        }
     }
 
     /*
