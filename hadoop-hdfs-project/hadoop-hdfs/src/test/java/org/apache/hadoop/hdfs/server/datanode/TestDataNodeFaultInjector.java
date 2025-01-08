@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.test.PathUtils;
@@ -132,7 +132,7 @@ public class TestDataNodeFaultInjector {
         / 2;
     conf.setLong(DFSConfigKeys.DFS_DATANODE_SLOW_IO_WARNING_THRESHOLD_KEY,
         datanodeSlowLogThresholdMs);
-    conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.toString());
+    conf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, baseDir.toString());
 
     /**
      * configure to avoid resulting in pipeline failure due to read socket
@@ -147,9 +147,9 @@ public class TestDataNodeFaultInjector {
         HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure.POLICY_KEY,
         "ALWAYS");
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
 
       final FileSystem fs = cluster.getFileSystem();

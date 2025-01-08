@@ -489,7 +489,7 @@ public class DatanodeManager implements DatanodeManagerJVMInterface {
   }
 
   /** @return the heartbeat manager. */
-  HeartbeatManager getHeartbeatManager() {
+  public HeartbeatManager getHeartbeatManager() {
     return heartbeatManager;
   }
 

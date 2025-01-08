@@ -100,6 +100,7 @@ import static org.apache.hadoop.util.ExitUtil.terminate;
 import static org.apache.hadoop.util.Preconditions.checkNotNull;
 import static org.apache.hadoop.util.Time.now;
 
+import org.apache.hadoop.conf.*;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.DF;
 import org.apache.hadoop.fs.DU;
@@ -155,10 +156,6 @@ import javax.net.SocketFactory;
 
 import org.apache.hadoop.HadoopIllegalArgumentException;
 import org.apache.hadoop.classification.InterfaceAudience;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ReconfigurableBase;
-import org.apache.hadoop.conf.ReconfigurationException;
-import org.apache.hadoop.conf.ReconfigurationTaskStatus;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
@@ -3474,7 +3471,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DirectoryScanner getDirectoryScanner() {
+  public DirectoryScanner getDirectoryScanner() {
     return directoryScanner;
   }
 
@@ -3805,7 +3802,7 @@ public class DataNode extends ReconfigurableBase
     setConf(new Configuration());
     refreshNamenodes(getConf());
   }
-  
+
   @Override // ClientDatanodeProtocol
   public void deleteBlockPool(String blockPoolId, boolean force)
       throws IOException {
@@ -4014,7 +4011,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DataStorage getStorage() {
+  public DataStorage getStorage() {
     return storage;
   }
 

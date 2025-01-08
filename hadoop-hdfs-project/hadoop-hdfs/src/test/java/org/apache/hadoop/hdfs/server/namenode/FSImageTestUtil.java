@@ -502,6 +502,11 @@ public abstract class FSImageTestUtil {
       List<Integer> txids) {
     assertNNHasCheckpoints(cluster, 0, txids);
   }
+
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            List<Integer> txids) {
+    assertNNHasCheckpoints(cluster, 0, txids);
+  }
   
   public static void assertNNHasCheckpoints(MiniDFSCluster cluster,
       int nnIdx, List<Integer> txids) {
@@ -515,6 +520,23 @@ public abstract class FSImageTestUtil {
       for (long checkpointTxId : txids) {
         File image = new File(nameDir,
                               NNStorage.getImageFileName(checkpointTxId));
+        assertTrue("Expected non-empty " + image, image.length() > 0);
+      }
+    }
+  }
+
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            int nnIdx, List<Integer> txids) {
+
+    for (File nameDir : getNameNodeCurrentDirs(cluster, nnIdx)) {
+      LOG.info("examining name dir with files: " +
+              Joiner.on(",").join(nameDir.listFiles()));
+      // Should have fsimage_N for the three checkpoints
+      LOG.info("Examining storage dir " + nameDir + " with contents: "
+              + StringUtils.join(nameDir.listFiles(), ", "));
+      for (long checkpointTxId : txids) {
+        File image = new File(nameDir,
+                NNStorage.getImageFileName(checkpointTxId));
         assertTrue("Expected non-empty " + image, image.length() > 0);
       }
     }

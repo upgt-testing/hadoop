@@ -1585,7 +1585,7 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
     return inodeMap.size();
   }
 
-  long totalInodes() {
+  public long totalInodes() {
     return getInodeMapSize();
   }
 

@@ -1,13 +1,19 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 
+import org.apache.hadoop.conf.ReconfigurationException;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public interface NameNodeJVMInterface {
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
+    int getNameNodeState();
+    String reconfigurePropertyImpl(String property, String newVal) throws ReconfigurationException;
+    String getNNRole();
+    void transitionToStandby() throws IOException;
     InetSocketAddress getHttpAddress();
     FSNamesystemJVMInterface getNamesystem();
     HttpServer2JVMInterface getHttpServer();

@@ -53,7 +53,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @InterfaceAudience.Private
 @Metrics(about="DataNode metrics", context="dfs")
-public class DataNodeMetrics {
+public class DataNodeMetrics implements DataNodeMetricsJVMInterface {
 
   @Metric MutableCounterLong bytesWritten;
   @Metric("Milliseconds spent writing")

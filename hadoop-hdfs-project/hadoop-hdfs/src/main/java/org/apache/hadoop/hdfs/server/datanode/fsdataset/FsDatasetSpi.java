@@ -236,7 +236,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsD
    *
    * @return info about volume failures, possibly null
    */
-  VolumeFailureSummary getVolumeFailureSummary();
+  public VolumeFailureSummary getVolumeFailureSummary();
 
   /**
    * Gets a list of references to the finalized blocks for the given block pool.

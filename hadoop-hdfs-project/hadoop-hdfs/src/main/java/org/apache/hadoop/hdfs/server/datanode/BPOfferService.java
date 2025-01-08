@@ -176,7 +176,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
   /**
    * @return true if the service has registered with at least one NameNode.
    */
-  boolean isInitialized() {
+  public boolean isInitialized() {
     return bpRegistration != null;
   }
   
@@ -184,7 +184,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
    * @return true if there is at least one actor thread running which is
    * talking to a NameNode.
    */
-  boolean isAlive() {
+  public boolean isAlive() {
     for (BPServiceActor actor : bpServices) {
       if (actor.isAlive()) {
         return true;
@@ -224,7 +224,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
     }
   }
 
-  String getBlockPoolId() {
+  public String getBlockPoolId() {
     return getBlockPoolId(false);
   }
 
@@ -536,7 +536,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
   }
 
   @VisibleForTesting
-  List<BPServiceActor> getBPServiceActors() {
+  public List<BPServiceActor> getBPServiceActors() {
     return Lists.newArrayList(bpServices);
   }
   
@@ -645,7 +645,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
    * Run an immediate deletion report on this thread. Used by tests.
    */
   @VisibleForTesting
-  void triggerDeletionReportForTests() throws IOException {
+  public void triggerDeletionReportForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.getIbrManager().triggerDeletionReportForTests();
     }

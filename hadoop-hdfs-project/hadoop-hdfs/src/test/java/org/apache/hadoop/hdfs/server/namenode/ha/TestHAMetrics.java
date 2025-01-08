@@ -19,6 +19,8 @@ package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import java.io.IOException;
 import org.apache.hadoop.ha.HAServiceProtocol;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +30,7 @@ import org.apache.hadoop.fs.SafeModeAction;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -56,15 +58,15 @@ public class TestHAMetrics {
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, Integer.MAX_VALUE);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
         .build();
     FileSystem fs = null;
     try {
       cluster.waitActive();
       
-      FSNamesystem nn0 = cluster.getNamesystem(0);
-      FSNamesystem nn1 = cluster.getNamesystem(1);
+      FSNamesystemJVMInterface nn0 = cluster.getNamesystem(0);
+      FSNamesystemJVMInterface nn1 = cluster.getNamesystem(1);
       
       assertEquals(nn0.getHAState(), "standby");
       assertTrue(0 < nn0.getMillisSinceLastLoadedEdits());
@@ -132,15 +134,15 @@ public class TestHAMetrics {
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, Integer.MAX_VALUE);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
         .build();
     FileSystem fs = null;
     try {
       cluster.waitActive();
 
-      FSNamesystem nn0 = cluster.getNamesystem(0);
-      FSNamesystem nn1 = cluster.getNamesystem(1);
+      FSNamesystemJVMInterface nn0 = cluster.getNamesystem(0);
+      FSNamesystemJVMInterface nn1 = cluster.getNamesystem(1);
 
       cluster.transitionToActive(0);
       fs = HATestUtil.configureFailoverFs(cluster, conf);
@@ -191,14 +193,14 @@ public class TestHAMetrics {
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, Integer.MAX_VALUE);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).nnTopology(
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(
         MiniDFSNNTopology.simpleHATopology(3)).numDataNodes(1).build();
 
     cluster.waitActive();
 
-    NameNode nn0 = cluster.getNameNode(0);
-    NameNode nn1 = cluster.getNameNode(1);
-    NameNode nn2 = cluster.getNameNode(2);
+    NameNodeJVMInterface nn0 = cluster.getNameNode(0);
+    NameNodeJVMInterface nn1 = cluster.getNameNode(1);
+    NameNodeJVMInterface nn2 = cluster.getNameNode(2);
 
     // All namenodes are in standby by default
     assertEquals(HAServiceProtocol.HAServiceState.STANDBY.ordinal(),

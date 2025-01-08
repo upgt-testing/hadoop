@@ -41,7 +41,7 @@ import static org.apache.hadoop.hdfs.server.common.HdfsServerConstants.MAX_BLOCK
  * guarantee IDs have no conflicts.
  */
 @InterfaceAudience.Private
-public class SequentialBlockGroupIdGenerator extends SequentialNumber {
+public class SequentialBlockGroupIdGenerator extends SequentialNumber implements SequentialBlockGroupIdGeneratorJVMInterface {
 
   private final BlockManager blockManager;
 

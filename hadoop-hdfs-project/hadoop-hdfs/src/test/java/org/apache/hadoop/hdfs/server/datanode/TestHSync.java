@@ -33,7 +33,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.io.RandomDatum;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
@@ -43,11 +43,11 @@ import org.junit.Test;
 
 public class TestHSync {
   
-  private void checkSyncMetric(MiniDFSCluster cluster, int dn, long value) {
-    DataNode datanode = cluster.getDataNodes().get(dn);
+  private void checkSyncMetric(MiniDFSClusterInJVM cluster, int dn, long value) {
+    DataNodeJVMInterface datanode = cluster.getDataNodes().get(dn);
     assertCounter("FsyncCount", value, getMetrics(datanode.getMetrics().name()));    
   }
-  private void checkSyncMetric(MiniDFSCluster cluster, long value) {
+  private void checkSyncMetric(MiniDFSClusterInJVM cluster, long value) {
     checkSyncMetric(cluster, 0, value);
   }
   /** Test basic hsync cases */
@@ -63,7 +63,7 @@ public class TestHSync {
 
   private void testHSyncOperation(boolean testWithAppend) throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     final DistributedFileSystem fs = cluster.getFileSystem();
 
     final Path p = new Path("/testHSync/foo");
@@ -120,7 +120,7 @@ public class TestHSync {
   @Test
   public void testHSyncBlockBoundary() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     final FileSystem fs = cluster.getFileSystem();
     
     final Path p = new Path("/testHSyncBlockBoundary/foo");
@@ -150,7 +150,7 @@ public class TestHSync {
   @Test
   public void testSequenceFileSync() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     final FileSystem fs = cluster.getFileSystem();
     final Path p = new Path("/testSequenceFileSync/foo");
@@ -184,7 +184,7 @@ public class TestHSync {
   @Test
   public void testHSyncWithReplication() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     final FileSystem fs = cluster.getFileSystem();
 
     final Path p = new Path("/testHSyncWithReplication/foo");

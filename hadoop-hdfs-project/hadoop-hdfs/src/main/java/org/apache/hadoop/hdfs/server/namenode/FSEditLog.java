@@ -1564,7 +1564,7 @@ public class FSEditLog implements LogsPurgeable, FSEditLogJVMInterface {
 
 
   // sets the initial capacity of the flush buffer.
-  synchronized void setOutputBufferCapacity(int size) {
+  public synchronized void setOutputBufferCapacity(int size) {
     journalSet.setOutputBufferCapacity(size);
   }
 

@@ -5,4 +5,6 @@ public interface BlockTokenSecretManagerJVMInterface {
     void setKeyUpdateIntervalForTesting(long millis);
     void clearAllKeysForTesting();
     boolean hasKey(int keyId);
+    void setSerialNo(int serialNo);
+    int getSerialNoForTesting();
 }

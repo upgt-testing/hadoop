@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.test.MultithreadedTestUtil.RepeatingTestThread;
 import org.apache.hadoop.test.MultithreadedTestUtil.TestContext;
@@ -62,7 +62,7 @@ public class TestSeveralNameNodes {
     harness.conf.setInt(HdfsClientConfigKeys.Failover.SLEEPTIME_MAX_KEY, 1000);
     harness.conf.setInt(HdfsClientConfigKeys.Failover.MAX_ATTEMPTS_KEY, 128);
 
-    final MiniDFSCluster cluster = harness.startCluster();
+    final MiniDFSClusterInJVM cluster = harness.startCluster();
     try {
       cluster.waitActive();
       cluster.transitionToActive(0);

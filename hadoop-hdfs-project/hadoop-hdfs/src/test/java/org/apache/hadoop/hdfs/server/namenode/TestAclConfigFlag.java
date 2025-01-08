@@ -26,7 +26,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.AclException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Lists;
@@ -43,7 +43,7 @@ import org.junit.rules.ExpectedException;
 public class TestAclConfigFlag {
   private static final Path PATH = new Path("/path");
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
 
   @Rule
@@ -157,7 +157,7 @@ public class TestAclConfigFlag {
       throws Exception {
     Configuration conf = new Configuration();
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, aclsEnabled);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).format(format)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(format)
       .build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
@@ -172,7 +172,7 @@ public class TestAclConfigFlag {
    */
   private void restart(boolean checkpoint, boolean aclsEnabled)
       throws Exception {
-    NameNode nameNode = cluster.getNameNode();
+    NameNodeJVMInterface nameNode = cluster.getNameNode();
     if (checkpoint) {
       NameNodeAdapter.enterSafeMode(nameNode, false);
       NameNodeAdapter.saveNamespace(nameNode);

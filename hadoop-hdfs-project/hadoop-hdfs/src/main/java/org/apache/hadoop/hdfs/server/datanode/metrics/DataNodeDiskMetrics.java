@@ -52,7 +52,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_SLOWDISK_LOW_THR
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public class DataNodeDiskMetrics {
+public class DataNodeDiskMetrics implements DataNodeDiskMetricsJVMInterface {
 
   public static final Logger LOG = LoggerFactory.getLogger(
       DataNodeDiskMetrics.class);

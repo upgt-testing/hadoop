@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.LongAccumulator;
 import java.util.function.Supplier;
 
 import org.apache.hadoop.hdfs.*;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.slf4j.Logger;
@@ -130,6 +131,22 @@ public abstract class HATestUtil {
       @Override
       public Boolean get() {
         for (DataNode dn : cluster.getDataNodes()) {
+          if (cluster.getFsDatasetTestUtils(dn).getPendingAsyncDeletions() > 0) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }, 1000, 10000);
+
+  }
+
+  public static void waitForDNDeletions(final MiniDFSClusterInJVM cluster)
+          throws TimeoutException, InterruptedException {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      @Override
+      public Boolean get() {
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
           if (cluster.getFsDatasetTestUtils(dn).getPendingAsyncDeletions() > 0) {
             return false;
           }
@@ -301,9 +318,19 @@ public abstract class HATestUtil {
     setFailoverConfigurations(cluster, conf, getLogicalHostname(cluster));
   }
 
+  public static void setFailoverConfigurations(MiniDFSClusterInJVM cluster,
+                                               Configuration conf) {
+    setFailoverConfigurations(cluster, conf, getLogicalHostname(cluster));
+  }
+
   /** Sets the required configurations for performing failover of default namespace. */
   public static void setFailoverConfigurations(MiniDFSCluster cluster,
       Configuration conf, String logicalName) {
+    setFailoverConfigurations(cluster, conf, logicalName, null, 0);
+  }
+
+  public static void setFailoverConfigurations(MiniDFSClusterInJVM cluster,
+                                               Configuration conf, String logicalName) {
     setFailoverConfigurations(cluster, conf, logicalName, null, 0);
   }
 

@@ -1997,7 +1997,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, null);
   }
 
-  private void metaSave(PrintWriter out) {
+  public void metaSave(PrintWriter out) {
     assert hasReadLock();
     long totalInodes = this.dir.totalInodes();
     long totalBlocks = this.getBlocksTotal();
@@ -5034,7 +5034,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * This will save current namespace into fsimage file and empty edits file.
    * Requires superuser privilege and safe mode.
    */
-  boolean saveNamespace(final long timeWindow, final long txGap)
+  public boolean saveNamespace(final long timeWindow, final long txGap)
       throws IOException {
     String operationName = "saveNamespace";
     checkOperation(OperationCategory.UNCHECKED);
@@ -5213,7 +5213,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Enter safe mode. If resourcesLow is false, then we assume it is manual
    * @throws IOException
    */
-  void enterSafeMode(boolean resourcesLow) throws IOException {
+  public void enterSafeMode(boolean resourcesLow) throws IOException {
     writeLock();
     try {
       // Stop the secret manager, since rolling the master key would
@@ -5241,7 +5241,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Leave safe mode.
    * @param force true if to leave safe mode forcefully with -forceExit option
    */
-  void leaveSafeMode(boolean force) {
+  public void leaveSafeMode(boolean force) {
     writeLock();
     try {
       if (!isInSafeMode()) {
@@ -8079,7 +8079,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, src, null, auditStat);
   }
 
-  AclStatus getAclStatus(String src) throws IOException {
+  public AclStatus getAclStatus(String src) throws IOException {
     final String operationName = "getAclStatus";
     checkOperation(OperationCategory.READ);
     final AclStatus ret;

@@ -32,7 +32,7 @@ import org.apache.hadoop.util.Lists;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class AclStatus {
+public class AclStatus implements AclStatusJVMInterface {
   private final String owner;
   private final String group;
   private final boolean stickyBit;

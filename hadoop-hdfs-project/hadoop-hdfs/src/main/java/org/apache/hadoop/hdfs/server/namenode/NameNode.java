@@ -2021,7 +2021,7 @@ public class NameNode extends ReconfigurableBase implements
     state.setState(haContext, ACTIVE_STATE);
   }
 
-  synchronized void transitionToStandby() throws IOException {
+  public synchronized void transitionToStandby() throws IOException {
     String operationName = "transitionToStandby";
     namesystem.checkSuperuserPrivilege(operationName);
     if (!haEnabled) {
@@ -2337,7 +2337,7 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();

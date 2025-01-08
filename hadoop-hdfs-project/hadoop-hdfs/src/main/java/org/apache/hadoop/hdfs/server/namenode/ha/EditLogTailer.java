@@ -69,7 +69,7 @@ import org.apache.hadoop.util.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class EditLogTailer {
+public class EditLogTailer implements EditLogTailerJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(EditLogTailer.class);
 
   /**

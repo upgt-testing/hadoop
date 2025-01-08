@@ -1,20 +1,55 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.conf.ReconfigurationException;
 import org.apache.hadoop.hdfs.protocol.DatanodeIDJVMInterface;
+import org.apache.hadoop.hdfs.protocol.datatransfer.PipelineAck;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClientJVMInterface;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServerJVMInterface;
 import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManager;
 import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeDiskMetricsJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeMetrics;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeMetricsJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
+import org.apache.hadoop.hdfs.server.protocol.VolumeFailureSummaryJVMInterface;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 
 public interface DataNodeJVMInterface {
+    DirectoryScannerJVMInterface getDirectoryScanner();
+    void clearAllBlockSecretKeys();
+    String getDiskBalancerSetting(String key) throws IOException;
+    void deleteBlockPool(String blockPoolId, boolean force) throws IOException;
+    String reconfigurePropertyImpl(String property, String newVal)
+            throws ReconfigurationException;
+    DataXceiverServerJVMInterface getXferServer();
+    DataStorageJVMInterface getStorage();
+    List<Map<String, String>> getBPServiceActorInfoMap();
+    ConfigurationJVMInterface getConf();
+    boolean isSecurityEnabled();
+    String getClusterId();
+    String getVersion();
+    long getDNStartedTimeInMillis();
+    String getSoftwareVersion();
+    String getRevision();
+    String getRpcPort();
+    String getHttpPort();
+    String getNamenodeAddresses();
+    String getVolumeInfo();
+    int getXmitsInProgress();
+    String getBPServiceActorInfo();
+    String getSlowDisks();
+    PipelineAck.ECN getECN();
+    DataNodeMetricsJVMInterface getMetrics();
+    DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();
     SaslDataTransferServerJVMInterface getSaslServer();
     SaslDataTransferClientJVMInterface getSaslClient();
@@ -27,6 +62,7 @@ public interface DataNodeJVMInterface {
     void runDatanodeDaemon() throws IOException;
     InetSocketAddress getXferAddress();
     boolean isDatanodeFullyStarted();
+    boolean isDatanodeFullyStarted(boolean checkForRegistration);
     String getDisplayName();
     void shutdownDatanode(boolean forUpgrade) throws IOException;
     void shutdown();

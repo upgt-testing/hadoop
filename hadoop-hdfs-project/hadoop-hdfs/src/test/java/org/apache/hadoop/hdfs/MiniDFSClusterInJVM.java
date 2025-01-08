@@ -2605,6 +2605,13 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                         + timeout + " ms of waiting");
     }
 
+    public void waitDatanodeConnectedToActive(DataNodeJVMInterface dn, int timeout)
+            throws InterruptedException, TimeoutException {
+        GenericTestUtils.waitFor(() -> dn.isDatanodeFullyStarted(true),
+                100, timeout, "Datanode is not connected to active namenode even after "
+                        + timeout + " ms of waiting");
+    }
+
     public void waitDatanodeFullyStarted(DataNodeJVMInterface dn, int timeout)
             throws TimeoutException, InterruptedException {
         GenericTestUtils.waitFor(dn::isDatanodeFullyStarted, 100, timeout,
@@ -3382,6 +3389,11 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 blk.getBlockPoolId()), blk.getBlockId()), blk.getBlockName());
     }
 
+    public static File getBlockFile(File storageDir, ExtendedBlockJVMInterface blk) {
+        return new File(DatanodeUtil.idToBlockDir(getFinalizedDir(storageDir,
+                blk.getBlockPoolId()), blk.getBlockId()), blk.getBlockName());
+    }
+
     /**
      * Return all block files in given directory (recursive search).
      */
@@ -3472,6 +3484,18 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * @param block block for which corresponding files are needed
      */
     public File getBlockFile(int dnIndex, ExtendedBlock block) {
+        // Check for block file in the two storage directories of the datanode
+        for (int i = 0; i <=1 ; i++) {
+            File storageDir = getStorageDir(dnIndex, i);
+            File blockFile = getBlockFile(storageDir, block);
+            if (blockFile.exists()) {
+                return blockFile;
+            }
+        }
+        return null;
+    }
+
+    public File getBlockFile(int dnIndex, ExtendedBlockJVMInterface block) {
         // Check for block file in the two storage directories of the datanode
         for (int i = 0; i <=1 ; i++) {
             File storageDir = getStorageDir(dnIndex, i);

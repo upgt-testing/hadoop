@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -40,7 +42,7 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.DirectoryListing;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
@@ -190,7 +192,7 @@ public class TestStorageMover {
     private final NamespaceScheme nsScheme;
     private final Configuration conf;
 
-    private MiniDFSCluster cluster;
+    private MiniDFSClusterInJVM cluster;
     private DistributedFileSystem dfs;
     private final BlockStoragePolicySuite policies;
 
@@ -206,7 +208,7 @@ public class TestStorageMover {
      * corresponding scheme.
      */
     void setupCluster() throws Exception {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(clusterScheme
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(clusterScheme
           .numDataNodes).storageTypes(clusterScheme.storageTypes)
           .storageCapacities(clusterScheme.storageCapacities).build();
       cluster.waitActive();
@@ -260,7 +262,7 @@ public class TestStorageMover {
      * Verify block locations after running the migration tool.
      */
     void verify(boolean verifyAll) throws Exception {
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         DataNodeTestUtils.triggerBlockReport(dn);
       }
       if (verifyAll) {
@@ -646,6 +648,22 @@ public class TestStorageMover {
     }
   }
 
+  private void setVolumeFull(DataNodeJVMInterface dn, StorageType type) {
+    try (FsVolumeReferencesJVMInterface refs = dn.getFSDataset()
+            .getFsVolumeReferences()) {
+      for (FsVolumeSpi fvs : refs) {
+        FsVolumeImpl volume = (FsVolumeImpl) fvs;
+        if (volume.getStorageType() == type) {
+          LOG.info("setCapacity to 0 for [" + volume.getStorageType() + "]"
+                  + volume.getStorageID());
+          volume.setCapacityForTesting(0);
+        }
+      }
+    } catch (IOException e) {
+      LOG.error("Unexpected exception by closing FsVolumeReference", e);
+    }
+  }
+
   /**
    * Test DISK is running out of spaces.
    */
@@ -672,7 +690,7 @@ public class TestStorageMover {
       }
 
       // set all the DISK volume to full
-      for (DataNode dn : test.cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : test.cluster.getDataNodes()) {
         setVolumeFull(dn, StorageType.DISK);
         DataNodeTestUtils.triggerHeartbeat(dn);
       }
@@ -731,7 +749,7 @@ public class TestStorageMover {
       }
 
       // set all the ARCHIVE volume to full
-      for (DataNode dn : test.cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : test.cluster.getDataNodes()) {
         setVolumeFull(dn, StorageType.ARCHIVE);
         DataNodeTestUtils.triggerHeartbeat(dn);
       }

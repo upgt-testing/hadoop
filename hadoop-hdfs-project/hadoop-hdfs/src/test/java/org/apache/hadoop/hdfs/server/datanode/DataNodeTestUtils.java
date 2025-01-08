@@ -92,6 +92,12 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void triggerDeletionReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerDeletionReportForTests();
+    }
+  }
+
   public static void triggerHeartbeat(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
       bpos.triggerHeartbeatForTests();
@@ -231,6 +237,13 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void runDirectoryScanner(DataNodeJVMInterface dn) throws IOException {
+    DirectoryScannerJVMInterface directoryScanner = dn.getDirectoryScanner();
+    if (directoryScanner != null) {
+      dn.getDirectoryScanner().reconcile();
+    }
+  }
+
   /**
    * Reconfigure a DataNode by setting a new list of volumes.
    *
@@ -253,6 +266,29 @@ public class DataNodeTestUtils {
               DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
               dnNewDataDirs.toString()),
           is(dn.getConf().get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY)));
+    } catch (ReconfigurationException e) {
+      // This can be thrown if reconfiguration tries to use a failed volume.
+      // We need to swallow the exception, because some of our tests want to
+      // cover this case.
+      LOG.warn("Could not reconfigure DataNode.", e);
+    }
+  }
+
+  public static void reconfigureDataNode(DataNodeJVMInterface dn, File... newVols)
+          throws Exception {
+    StringBuilder dnNewDataDirs = new StringBuilder();
+    for (File newVol: newVols) {
+      if (dnNewDataDirs.length() > 0) {
+        dnNewDataDirs.append(',');
+      }
+      dnNewDataDirs.append(newVol.getAbsolutePath());
+    }
+    try {
+      assertThat(
+              dn.reconfigurePropertyImpl(
+                      DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
+                      dnNewDataDirs.toString()),
+              is(dn.getConf().get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY)));
     } catch (ReconfigurationException e) {
       // This can be thrown if reconfiguration tries to use a failed volume.
       // We need to swallow the exception, because some of our tests want to

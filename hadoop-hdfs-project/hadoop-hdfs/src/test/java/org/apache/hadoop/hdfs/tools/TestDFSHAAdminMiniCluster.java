@@ -29,13 +29,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ha.HAAdmin;
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
@@ -50,7 +51,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.io.Files;
 
 /**
- * Tests for HAAdmin command with {@link MiniDFSCluster} set up in HA mode.
+ * Tests for HAAdmin command with {@link MiniDFSClusterInJVM} set up in HA mode.
  */
 public class TestDFSHAAdminMiniCluster {
   static {
@@ -60,7 +61,7 @@ public class TestDFSHAAdminMiniCluster {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestDFSHAAdminMiniCluster.class);
   
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf; 
   private DFSHAAdmin tool;
   private final ByteArrayOutputStream errOutBytes = new ByteArrayOutputStream();
@@ -73,7 +74,7 @@ public class TestDFSHAAdminMiniCluster {
   public void setup() throws IOException {
     conf = new Configuration();
     conf.setBoolean(DFS_HA_NN_NOT_BECOME_ACTIVE_IN_SAFEMODE, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0)
         .build();
     tool = new DFSHAAdmin();  
@@ -106,14 +107,14 @@ public class TestDFSHAAdminMiniCluster {
     
   @Test 
   public void testStateTransition() throws Exception {
-    NameNode nnode1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
     assertEquals(0, runTool("-transitionToActive", "nn1"));
     assertFalse(nnode1.isStandbyState());       
     assertEquals(0, runTool("-transitionToStandby", "nn1"));
     assertTrue(nnode1.isStandbyState());
     
-    NameNode nnode2 = cluster.getNameNode(1);
+    NameNodeJVMInterface nnode2 = cluster.getNameNode(1);
     assertTrue(nnode2.isStandbyState());
     assertEquals(0, runTool("-transitionToActive", "nn2"));
     assertFalse(nnode2.isStandbyState());
@@ -126,7 +127,7 @@ public class TestDFSHAAdminMiniCluster {
 
   @Test
   public void testObserverTransition() throws Exception {
-    NameNode nnode1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
 
     // Should be able to transition from STANDBY to OBSERVER
@@ -146,7 +147,7 @@ public class TestDFSHAAdminMiniCluster {
 
   @Test
   public void testObserverIllegalTransition() throws Exception {
-    NameNode nnode1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
     assertEquals(0, runTool("-transitionToActive", "nn1"));
     assertFalse(nnode1.isStandbyState());
@@ -284,8 +285,8 @@ public class TestDFSHAAdminMiniCluster {
   @Test
   public void testTransitionToActiveWhenOtherNamenodeisActive() 
       throws Exception {
-    NameNode nn1 = cluster.getNameNode(0);
-    NameNode nn2 = cluster.getNameNode(1);
+    NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nn2 = cluster.getNameNode(1);
     if(nn1.getState() != null && !nn1.getState().
         equals(HAServiceState.STANDBY.name()) ) {
       cluster.transitionToStandby(0);

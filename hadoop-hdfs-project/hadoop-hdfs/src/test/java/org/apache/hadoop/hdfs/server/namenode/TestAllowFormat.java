@@ -37,7 +37,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.TestGenericJournalConf.DummyJournalManager;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
 import org.apache.hadoop.test.PathUtils;
@@ -57,7 +57,7 @@ public class TestAllowFormat {
       LoggerFactory.getLogger(TestAllowFormat.class.getName());
   private static final File DFS_BASE_DIR = new File(PathUtils.getTestDir(TestAllowFormat.class), "dfs");
   private static Configuration config;
-  private static MiniDFSCluster cluster = null;
+  private static MiniDFSClusterInJVM cluster = null;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -113,10 +113,10 @@ public class TestAllowFormat {
     LOG.info("--starting mini cluster");
     // manage dirs parameter set to false 
 
-    NameNode nn;
+    NameNodeJVMInterface nn;
     // 1. Create a new cluster and format DFS
     config.setBoolean(DFS_NAMENODE_SUPPORT_ALLOW_FORMAT_KEY, true);
-    cluster = new MiniDFSCluster.Builder(config).manageDataDfsDirs(false)
+    cluster = new MiniDFSClusterInJVM.Builder(config).manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
                                                 .build();
     cluster.waitActive();

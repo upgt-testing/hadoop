@@ -111,15 +111,31 @@ public class NameNodeAdapter {
       throws AccessControlException, IOException {
     namenode.getNamesystem().saveNamespace(0, 0);
   }
-  
+
+  public static void saveNamespace(NameNodeJVMInterface namenode)
+          throws AccessControlException, IOException {
+    namenode.getNamesystem().saveNamespace(0, 0);
+  }
+
+
   public static void enterSafeMode(NameNode namenode, boolean resourcesLow)
       throws IOException {
+    namenode.getNamesystem().enterSafeMode(resourcesLow);
+  }
+
+  public static void enterSafeMode(NameNodeJVMInterface namenode, boolean resourcesLow)
+          throws IOException {
     namenode.getNamesystem().enterSafeMode(resourcesLow);
   }
   
   public static void leaveSafeMode(NameNode namenode) {
     namenode.getNamesystem().leaveSafeMode(false);
   }
+
+  public static void leaveSafeMode(NameNodeJVMInterface namenode) {
+    namenode.getNamesystem().leaveSafeMode(false);
+  }
+
   
   public static void abortEditLogs(NameNode nn) {
     FSEditLog el = nn.getFSImage().getEditLog();
