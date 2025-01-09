@@ -81,6 +81,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 import org.apache.hadoop.hdfs.protocol.*;
+import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
@@ -107,9 +108,6 @@ import org.apache.hadoop.ha.HAServiceProtocol.StateChangeRequestInfo;
 import org.apache.hadoop.ha.ServiceFailedException;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.Util;
@@ -1895,8 +1893,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             throw new IOException(e);
         }
 
-        // TODO: FIX ME
-        //throw new UnsupportedOperationException("Not implemented");
 
         //try (FsDatasetSpi.FsVolumeReferences volumes = curDn.getFSDataset().getFsVolumeReferences()) {
         try (FsVolumeReferencesJVMInterface volumes = curDn.getFSDataset().getFsVolumeReferences()) {
@@ -1912,9 +1908,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 j++;
             }
         }
-        // TODO: FIX ME
-        //DataNodeTestUtils.triggerHeartbeat(curDn);
-
+        DataNodeTestUtils.triggerHeartbeat(curDn);
 
     }
 
@@ -2043,8 +2037,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * Get an instance of the NameNode's RPC handler.
      */
     public NamenodeProtocolsJVMInterface getNameNodeRpc(int nnIndex) {
-        //TODO: FIX ME
-        //throw new UnsupportedOperationException("Not implemented");
         return getNameNode(nnIndex).getRpcServer();
     }
 
@@ -2065,14 +2057,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public FSNamesystemJVMInterface getNamesystem() {
         checkSingleNameNode();
-        // TODO: FIX ME
-        //throw new UnsupportedOperationException("Not implemented");
         return NameNodeAdapter.getNamesystem(getNN(0).nameNode);
     }
 
     public FSNamesystemJVMInterface getNamesystem(int nnIndex) {
-        // TODO: FIX ME
-        //throw new UnsupportedOperationException("Not implemented");
         return NameNodeAdapter.getNamesystem(getNN(nnIndex).nameNode);
     }
 
@@ -2091,14 +2079,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /** @return the datanode having the ipc server listen port */
     public DataNodeJVMInterface getDataNode(int ipcPort) {
         for(DataNodeJVMInterface dn : getDataNodes()) {
-            // TODO: FIX ME
-            throw new UnsupportedOperationException("Not implemented");
-            /*
-            if (dn.ipcServer.getListenerAddress().getPort() == ipcPort) {
+            if (dn.getRpcServer().getListenerAddress().getPort() == ipcPort) {
                 return dn;
             }
-
-             */
         }
         return null;
     }
@@ -2236,7 +2219,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         shutdownDataNodes();
         for (NameNodeInfo nnInfo : namenodes.values()) {
             if (nnInfo == null) continue;
-            // TODO: FIX ME
             stopAndJoinNameNode(nnInfo.nameNode);
         }
         ShutdownHookManager.get().clearShutdownHooks();
@@ -2777,15 +2759,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return false;
         }
         long[] sizes;
-        // TODO: FIX ME
-        /*
-        try {
-            Thread.sleep(5000);
-            return true;
-        }catch (InterruptedException e) {
-            return false;
-        }*/
-
         sizes = NameNodeAdapter.getStats(nameNode.getNamesystem());
         boolean isUp = false;
         synchronized (this) {
@@ -2888,45 +2861,34 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void transitionToActive(int nnIndex) throws IOException,
             ServiceFailedException {
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-
-        //getNameNode(nnIndex).getRpcServer().transitionToActive(
-          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        getNameNode(nnIndex).getRpcServer().transitionToActive(
+              new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void transitionToStandby(int nnIndex) throws IOException,
             ServiceFailedException {
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //getNameNode(nnIndex).getRpcServer().transitionToStandby(
-          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        getNameNode(nnIndex).getRpcServer().transitionToStandby(
+                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void transitionToObserver(int nnIndex) throws IOException,
             ServiceFailedException {
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        //getNameNode(nnIndex).getRpcServer().transitionToObserver(
-          //      new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+        getNameNode(nnIndex).getRpcServer().transitionToObserver(
+                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void rollEditLogAndTail(int nnIndex) throws Exception {
-        // TODO: FIX ME
-        throw new UnsupportedOperationException("Not implemented");
-        /*
         getNameNode(nnIndex).getRpcServer().rollEditLog();
         for (int i = 2; i < getNumNameNodes(); i++) {
             long el = getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
             LOG.info("editsLoaded {}", el);
-        } */
+        }
     }
 
     public void triggerBlockReports()
             throws IOException {
         for (DataNodeJVMInterface dn : getDataNodes()) {
-            // TODO: FIX ME
-            //DataNodeTestUtils.triggerBlockReport(dn);
+            DataNodeTestUtils.triggerBlockReport(dn);
         }
     }
 
@@ -2934,16 +2896,14 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     public void triggerDeletionReports()
             throws IOException {
         for (DataNodeJVMInterface dn : getDataNodes()) {
-            // TODO: FIX ME
-            //DataNodeTestUtils.triggerDeletionReport(dn);
+            DataNodeTestUtils.triggerDeletionReport(dn);
         }
     }
 
     public void triggerHeartbeats()
             throws IOException {
         for (DataNodeJVMInterface dn : getDataNodes()) {
-            // TODO: FIX ME
-            //DataNodeTestUtils.triggerHeartbeat(dn);
+            DataNodeTestUtils.triggerHeartbeat(dn);
         }
     }
 
@@ -2993,15 +2953,13 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
 
         final FSNamesystemJVMInterface ns = getNamesystem(nnIndex);
-        // TODO: FIX ME
-        /*
-        final DatanodeManager dm = ns.getBlockManager().getDatanodeManager();
+        final DatanodeManagerJVMInterface dm = ns.getBlockManager().getDatanodeManager();
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
             @Override
             public Boolean get() {
-                List<DatanodeDescriptor> nodes = dm.getDatanodeListForReport
+                List<DatanodeDescriptorJVMInterface> nodes = (List<DatanodeDescriptorJVMInterface>) dm.getDatanodeListForReport
                         (DatanodeReportType.LIVE);
-                for (DatanodeDescriptor node : nodes) {
+                for (DatanodeDescriptorJVMInterface node : nodes) {
                     if (!node.checkBlockReportReceived()) {
                         return false;
                     }
@@ -3009,7 +2967,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 return true;
             }
         }, 100, timeout);
-         */
     }
 
     /**
@@ -3066,9 +3023,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         // If datanode dataset is not initialized then wait
         for (DataNodeProperties dn : dataNodes) {
-            //TODO: FIX ME
-            //Thread.sleep(2000);
-
             if (DataNodeTestUtils.getFSDataset(dn.datanode) == null) {
                 LOG.info("DataNodeTestUtils.getFSDataset(dn.datanode) == null");
                 return true;
@@ -3095,7 +3049,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             throw new IndexOutOfBoundsException();
         }
         final DataNodeJVMInterface dn = dataNodes.get(dataNodeIndex).datanode;
-        // TODO: FIX ME
         throw new RuntimeException("Not implemented");
         //return DataNodeTestUtils.getFSDataset(dn).getBlockReports(bpid);
     }

@@ -17,6 +17,7 @@ import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeMetricsJVMInterfac
 import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
 import org.apache.hadoop.hdfs.server.protocol.VolumeFailureSummaryJVMInterface;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataNodeJVMInterface {
+    RPCServerJVMInterface getRpcServer();
     DirectoryScannerJVMInterface getDirectoryScanner();
     void clearAllBlockSecretKeys();
     String getDiskBalancerSetting(String key) throws IOException;

@@ -170,6 +170,7 @@ import org.apache.hadoop.hdfs.server.datanode.checker.StorageLocationChecker;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.BlockPoolSlice;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.util.DataTransferThrottler;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
 import org.apache.hadoop.ipc.Server;
 import org.apache.hadoop.util.*;
 import org.apache.hadoop.hdfs.client.BlockReportOptions;
@@ -428,6 +429,8 @@ public class DataNode extends ReconfigurableBase
   
   // For InterDataNodeProtocol
   public RPC.Server ipcServer;
+
+  public RPCServerJVMInterface getRpcServer() { return ipcServer; }
 
   private JvmPauseMonitor pauseMonitor;
 
