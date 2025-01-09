@@ -116,7 +116,9 @@ public class DataNodeInstance extends Instance {
             System.out.println("DataNode Port is: " + dn.getIpcPort());
 
             versionClassLoader.resetCurrentThreadClassLoader();
-            Thread.sleep(5000);
+            Map<String, String> confMap = conf.getSetParameters();
+            hdfsConf.setAllParameters(confMap);
+            
             return dn;
 
         } catch (Exception e) {

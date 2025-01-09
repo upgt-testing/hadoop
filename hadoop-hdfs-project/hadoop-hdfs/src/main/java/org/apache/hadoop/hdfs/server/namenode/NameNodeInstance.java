@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY;
+
 public class NameNodeInstance extends Instance {
     private final static String NameNodeClassName = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     private final static String ConfigurationClassName = "org.apache.hadoop.conf.Configuration";
@@ -235,7 +237,12 @@ public class NameNodeInstance extends Instance {
             //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());
 
             versionClassLoader.resetCurrentThreadClassLoader();
-            Thread.sleep(5000);
+
+            // set to conf back to hdfsConf
+            //hdfsConf.set(FS_DEFAULT_NAME_KEY, conf.get(FS_DEFAULT_NAME_KEY));
+            Map<String, String> confMap = conf.getSetParameters();
+            hdfsConf.setAllParameters(confMap);
+
             return nameNodeInstance;
         } catch (Exception e) {
             throw new IOException(e);

@@ -5,6 +5,8 @@ import edu.illinois.VersionSelector;
 import edu.illinois.instance.InstanceTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageJVMInterface;
@@ -58,6 +60,27 @@ public class TestUpgtDemo {
         System.out.println("NameNode address: " + addr.getHostName() + ":" + addr.getPort());
     }
     */
+
+    @Test
+    public void testFileSystem() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = FileSystem.get(conf);
+        Path TEST_ROOT = new Path("/TestUpgtDemo-ROOT1");
+        fs.mkdirs(TEST_ROOT);
+        System.out.println(conf.get("fs.defaultFS"));
+    }
+
+    @Test
+    public void testFileSystemInJVM() throws IOException {
+        Configuration conf2 = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf2).numDataNodes(2).build();
+        FileSystem fs2 = FileSystem.get(conf2);
+        Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
+        fs2.mkdirs(TEST_ROOT2);
+        System.out.println(conf2.get("fs.defaultFS"));
+    }
+
 
     @Test
     public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
