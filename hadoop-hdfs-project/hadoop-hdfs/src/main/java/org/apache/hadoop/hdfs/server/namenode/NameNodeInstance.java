@@ -61,6 +61,34 @@ public class NameNodeInstance extends Instance {
         }
     }
 
+    public void setClusterID(String clusterID) {
+        // load StartupOption.FORMAT and call .setClusterId("testClusterID") with versionClassLoader
+        try {
+            versionClassLoader.setCurrentThreadClassLoader();
+
+            Class<?> startupOptionClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.common.HdfsServerConstants$StartupOption");
+            // get the FORMAT field and call .setClusterId("testClusterID")
+
+            // Access the FORMAT enum constant
+            Object formatEnum = Enum.valueOf((Class<Enum>) startupOptionClass, "FORMAT");
+
+            // Get the setClusterId(String) method
+            Method setClusterIdMethod = startupOptionClass.getMethod("setClusterId", String.class);
+
+            // Invoke the method on FORMAT
+            setClusterIdMethod.invoke(formatEnum, "testClusterID");
+
+            // Verify the change using getClusterId()
+            Method getClusterIdMethod = startupOptionClass.getMethod("getClusterId");
+            String clusterId = (String) getClusterIdMethod.invoke(formatEnum);
+            System.out.println("Cluster ID set to: " + clusterId);
+
+            versionClassLoader.resetCurrentThreadClassLoader();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void format(Configuration targetConf) {
         // use the version class loader to load the NameNode class and call the format method
         try {
@@ -196,6 +224,7 @@ public class NameNodeInstance extends Instance {
 
             InetSocketAddress net = nameNodeInstance.getNameNodeAddress();
             System.out.println("NameNode address: " + net.getHostName() + ":" + net.getPort());
+            System.out.println("NameNode dfs.name.dir: " + conf.get("dfs.name.dir"));
 
             //FSImageInterface fsImage = nameNodeInstance.getFSImage();
             //System.out.println("FSImage block ID is " + fsImage.getBlockPoolID());

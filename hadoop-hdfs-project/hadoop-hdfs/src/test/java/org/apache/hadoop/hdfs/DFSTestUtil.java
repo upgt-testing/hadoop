@@ -229,10 +229,13 @@ public class DFSTestUtil {
 
   public static void formatNameNode(Configuration conf, NameNodeInstance nnInstance) throws IOException {
     String clusterId = StartupOption.FORMAT.getClusterId();
-    if(clusterId == null || clusterId.isEmpty())
+    if(clusterId == null || clusterId.isEmpty()) {
       StartupOption.FORMAT.setClusterId("testClusterID");
+      nnInstance.setClusterID("testClusterID");
+    }
     // Use a copy of conf as it can be altered by namenode during format.
     nnInstance.format(new Configuration(conf));
+
     //NameNode.format(new Configuration(conf));
   }
 
