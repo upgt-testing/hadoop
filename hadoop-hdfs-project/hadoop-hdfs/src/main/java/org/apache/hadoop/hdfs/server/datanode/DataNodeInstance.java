@@ -49,6 +49,11 @@ public class DataNodeInstance extends Instance {
             // call DefaultMetricsSystem.setMiniClusterMode(true) with reflection
             Method setMiniClusterModeMethod = DefaultMetricsSystemClass.getMethod("setMiniClusterMode", boolean.class);
             setMiniClusterModeMethod.invoke(null, true);
+
+            // load and call FileSystem.enableSymlinks()
+            Class<?> FileSystemClass = versionClassLoader.loadClass("org.apache.hadoop.fs.FileSystem");
+            Method enableSymlinksMethod = FileSystemClass.getMethod("enableSymlinks");
+            enableSymlinksMethod.invoke(null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
