@@ -8,4 +8,6 @@ import java.io.IOException;
 
 public interface NameNodeRpcServerJVMInterface extends NamenodeProtocolsJVMInterface {
     RPCServerJVMInterface getClientRpcServer();
+    RPCServerJVMInterface getServiceRpcServer();
+    RPCServerJVMInterface getLifelineRpcServer();
 }

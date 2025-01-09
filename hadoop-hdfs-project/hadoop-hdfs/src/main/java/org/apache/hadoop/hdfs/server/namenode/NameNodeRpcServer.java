@@ -564,7 +564,7 @@ public class NameNodeRpcServer implements NamenodeProtocols, NameNodeRpcServerJV
 
   /** Allow access to the lifeline RPC server for testing */
   @VisibleForTesting
-  RPC.Server getLifelineRpcServer() {
+  public RPC.Server getLifelineRpcServer() {
     return lifelineRpcServer;
   }
 
@@ -576,7 +576,7 @@ public class NameNodeRpcServer implements NamenodeProtocols, NameNodeRpcServerJV
   
   /** Allow access to the service RPC server for testing */
   @VisibleForTesting
-  RPC.Server getServiceRpcServer() {
+  public RPC.Server getServiceRpcServer() {
     return serviceRpcServer;
   }
   

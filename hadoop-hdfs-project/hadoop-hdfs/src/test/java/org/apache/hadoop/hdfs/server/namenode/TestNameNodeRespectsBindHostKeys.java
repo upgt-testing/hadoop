@@ -60,17 +60,17 @@ public class TestNameNodeRespectsBindHostKeys {
   private static String sslConfDir;
 
   private static String getRpcServerAddress(MiniDFSClusterInJVM cluster) {
-    NameNodeRpcServer rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+    NameNodeRpcServerJVMInterface rpcServer = (NameNodeRpcServerJVMInterface) cluster.getNameNodeRpc();
     return rpcServer.getClientRpcServer().getListenerAddress().getAddress().toString();
   }
 
   private static String getServiceRpcServerAddress(MiniDFSClusterInJVM cluster) {
-    NameNodeRpcServer rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+    NameNodeRpcServerJVMInterface rpcServer = (NameNodeRpcServerJVMInterface) cluster.getNameNodeRpc();
     return rpcServer.getServiceRpcServer().getListenerAddress().getAddress().toString();
   }
 
   private static String getLifelineRpcServerAddress(MiniDFSClusterInJVM cluster) {
-    NameNodeRpcServer rpcServer = (NameNodeRpcServer) cluster.getNameNodeRpc();
+    NameNodeRpcServerJVMInterface rpcServer = (NameNodeRpcServerJVMInterface) cluster.getNameNodeRpc();
     return rpcServer.getLifelineRpcServer().getListenerAddress().getAddress()
         .toString();
   }

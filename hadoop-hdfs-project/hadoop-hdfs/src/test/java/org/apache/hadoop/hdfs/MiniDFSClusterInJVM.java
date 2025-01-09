@@ -84,6 +84,8 @@ import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpiJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImplJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
@@ -1900,10 +1902,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             assert volumes.size() == storagesPerDatanode;
 
             int j = 0;
-            for (FsVolumeSpi fvs : volumes) {
-                FsVolumeImpl volume = (FsVolumeImpl) fvs;
-                LOG.info("setCapacityForTesting " + storageCapacities[curDnIdx][j]
-                        + " for [" + volume.getStorageType() + "]" + volume.getStorageID());
+            for (FsVolumeSpiJVMInterface fvs : volumes) {
+                FsVolumeImplJVMInterface volume = (FsVolumeImplJVMInterface) fvs;
+                //LOG.info("setCapacityForTesting " + storageCapacities[curDnIdx][j]
+                  //      + " for [" + volume.getStorageType() + "]" + volume.getStorageID());
                 volume.setCapacityForTesting(storageCapacities[curDnIdx][j]);
                 j++;
             }

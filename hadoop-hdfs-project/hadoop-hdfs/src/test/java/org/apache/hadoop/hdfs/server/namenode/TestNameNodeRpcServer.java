@@ -73,7 +73,7 @@ public class TestNameNodeRpcServer {
     try {
       cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
-      assertEquals("0.0.0.0", ((NameNodeRpcServer)cluster.getNameNodeRpc())
+      assertEquals("0.0.0.0", ((NameNodeRpcServerJVMInterface)cluster.getNameNodeRpc())
           .getClientRpcServer().getListenerAddress().getHostName());
     } finally {
       if (cluster != null) {

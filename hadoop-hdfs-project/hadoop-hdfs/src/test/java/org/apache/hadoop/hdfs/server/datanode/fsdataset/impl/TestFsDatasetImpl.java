@@ -1730,11 +1730,11 @@ public class TestFsDatasetImpl {
       String bpid = cluster.getNameNode().getNamesystem().getBlockPoolId();
       DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       FsDatasetSpiJVMInterface fsdataset = dn.getFSDataset();
-      List<ReplicaInfo> replicaInfos =
+      List<ReplicaInfoJVMInterface> replicaInfos =
           fsdataset.getFinalizedBlocks(bpid);
       assertEquals(1, replicaInfos.size());
 
-      ReplicaInfo replicaInfo = replicaInfos.get(0);
+      ReplicaInfoJVMInterface replicaInfo = replicaInfos.get(0);
       String blockPath = replicaInfo.getBlockURI().getPath();
       String metaPath = replicaInfo.getMetadataURI().getPath();
       String blockTempPath = blockPath + ".tmp";
@@ -1750,10 +1750,11 @@ public class TestFsDatasetImpl {
       assertFalse(blockFile.exists());
       assertFalse(metaFile.exists());
 
+      /*
       FsVolumeSpi.ScanInfo info = new FsVolumeSpi.ScanInfo(
           replicaInfo.getBlockId(), blockFile.getParentFile().getAbsoluteFile(),
           blockFile.getName(), metaFile.getName(), replicaInfo.getVolume());
-      /*
+
       fsdataset.checkAndUpdate(bpid, info);
 
       BlockManagerJVMInterface blockManager = cluster.getNameNode().
