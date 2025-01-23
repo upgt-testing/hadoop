@@ -2347,7 +2347,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             args = createArgs(startOpt);
         }
 
-        NameNode nn = NameNode.createNameNode(args, info.conf);
+        //NameNode nn = NameNode.createNameNode(args, info.conf);
+        NameNodeInstance nnInstance = new NameNodeInstance();
+        NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, info.conf);
         nn.getHttpServer()
                 .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         info.nameNode = nn;
@@ -2651,15 +2653,27 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return true;
     }
 
-    public boolean restartDataNodeForTesting(int i) {
-        if (i > dataNodes.size()) {
-            i = 0;
-        }
+    public boolean restartNodeForTesting(int i) {
         boolean underRestartMode = Boolean.getBoolean("upgt.datanode.restart");
         LOG.info("Under restart mode: " + underRestartMode);
         if (!underRestartMode) {
             LOG.info("Skip restarting DataNode " + i);
             return false;
+        }
+        try {
+            System.out.println("Restarting NameNode" + i);
+            restartNameNode(i);
+            System.out.println("Restarting DataNode" + i);
+            restartDataNodeForTesting(i);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot restart node " + i, e);
+        }
+        return true;
+    }
+
+    public boolean restartDataNodeForTesting(int i) {
+        if (i > dataNodes.size()) {
+            i = 0;
         }
         try {
             LOG.info("Restarting DataNode " + i);

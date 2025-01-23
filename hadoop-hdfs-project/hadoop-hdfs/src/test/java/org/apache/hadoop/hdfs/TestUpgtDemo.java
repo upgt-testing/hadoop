@@ -75,6 +75,9 @@ public class TestUpgtDemo {
     public void testFileSystemInJVM() throws IOException {
         Configuration conf2 = new HdfsConfiguration();
         MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf2).numDataNodes(2).build();
+        System.out.println("Start restarting!!");
+        cluster2.restartNodeForTesting(0);
+        System.out.println("Finish restarting!!");
         FileSystem fs2 = FileSystem.get(conf2);
         Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
         fs2.mkdirs(TEST_ROOT2);
