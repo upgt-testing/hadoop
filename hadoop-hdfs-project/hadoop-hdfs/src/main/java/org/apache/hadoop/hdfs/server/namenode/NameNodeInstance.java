@@ -194,11 +194,6 @@ public class NameNodeInstance extends Instance {
             // create an instance of Configuration
             assert configConstructor != null;
             ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
-            //conf.set("hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
-            // call conf.set function with key and value
-            //Method setMethod = configClass.getMethod("set", String.class, String.class);
-            //setMethod.invoke(conf, "hadoop.security.group.mapping", "org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback");
-            //NameNode nameNode = new NameNode(conf);
             Map<String, String> hdfsConfMap = hdfsConf.getSetParameters();
             conf.setAllParameters(hdfsConfMap);
 
@@ -239,7 +234,6 @@ public class NameNodeInstance extends Instance {
             versionClassLoader.resetCurrentThreadClassLoader();
 
             // set to conf back to hdfsConf
-            //hdfsConf.set(FS_DEFAULT_NAME_KEY, conf.get(FS_DEFAULT_NAME_KEY));
             Map<String, String> confMap = conf.getSetParameters();
             hdfsConf.setAllParameters(confMap);
 
