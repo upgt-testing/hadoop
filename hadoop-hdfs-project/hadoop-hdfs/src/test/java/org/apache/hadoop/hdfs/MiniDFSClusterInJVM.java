@@ -68,13 +68,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -2500,6 +2494,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         DataNodeProperties dnprop = dataNodes.remove(i);
         DataNodeJVMInterface dn = dnprop.datanode;
+        oldConf.putAll(dn.getConf().getSetParameters());
         LOG.info("MiniDFSClusterInJVM Stopping DataNode " +
                 dn.getDisplayName() +
                 " from a total of " + (dataNodes.size() + 1) +
@@ -2609,6 +2604,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         waitDatanodeFullyStarted(dn, 60000);
     }
 
+
+    private Map<String, String> oldConf = new HashMap<String, String>();
+    private Map<String, String> newConf = new HashMap<String, String>();
     /**
      * Restart a datanode, on the same port if requested
      * @param dnprop the datanode to restart
@@ -2635,7 +2633,31 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         if (secureResources != null) {
             setSecureResources = true;
         }
-        final DataNodeJVMInterface newDn = dnInstance.createDataNodeForInJVMCluster(args, conf, setSecureResources);
+        final DataNodeJVMInterface newDn = dnInstance.createDataNodeForRestartInJVMCluster(args, conf, secureResources);
+        newConf.putAll(newDn.getConf().getSetParameters());
+
+        // compare newConf with oldConf
+        LOG.info("Start comparing oldConf with newConf");
+        for (Map.Entry<String, String> entry : newConf.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (oldConf.containsKey(key)) {
+                if (!oldConf.get(key).equals(value)) {
+                    LOG.info("Configuration changed: " + key + " from " + oldConf.get(key) + " to " + value);
+                }
+            } else {
+                LOG.info("Configuration added: " + key + " = " + value);
+            }
+        }
+
+        for (Map.Entry<String, String> entry : oldConf.entrySet()) {
+            String key = entry.getKey();
+            if (!newConf.containsKey(key)) {
+                LOG.info("Configuration removed: " + key);
+            }
+        }
+
+        LOG.info("Finished comparing oldConf with newConf");
 
         final DataNodeProperties dnp = new DataNodeProperties(
                 newDn,
@@ -2654,30 +2676,36 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     public boolean restartNodeForTesting(int i) {
-        boolean underRestartMode = Boolean.getBoolean("upgt.datanode.restart");
-        LOG.info("Under restart mode: " + underRestartMode);
-        if (!underRestartMode) {
-            LOG.info("Skip restarting DataNode " + i);
+        boolean restartDN = Boolean.getBoolean("upgt.datanode.restart");
+        boolean restartNN = Boolean.getBoolean("upgt.namenode.restart");
+        LOG.info("Under restart mode: " + restartDN);
+        if (!restartDN && !restartNN) {
+            LOG.info("Skip restarting Node " + i);
             return false;
         }
         try {
-            System.out.println("Restarting NameNode" + i);
-            restartNameNode(i);
-            System.out.println("Restarting DataNode" + i);
-            restartDataNodeForTesting(i);
+            if (restartNN) {
+                LOG.info("Restarting NameNode" + i);
+                restartNameNode(i);
+            }
+            if (restartDN) {
+                System.out.println("Restarting DataNode" + i);
+                restartDataNodeForTesting(i, true);
+            }
+            waitActive();
         } catch (IOException e) {
             throw new RuntimeException("Cannot restart node " + i, e);
         }
         return true;
     }
 
-    public boolean restartDataNodeForTesting(int i) {
+    public boolean restartDataNodeForTesting(int i, boolean keepPort) {
         if (i > dataNodes.size()) {
             i = 0;
         }
         try {
             LOG.info("Restarting DataNode " + i);
-            return restartDataNode(i);
+            return restartDataNode(i, keepPort);
         } catch (IOException e) {
             throw new RuntimeException("Cannot restart datanode " + i, e);
         }

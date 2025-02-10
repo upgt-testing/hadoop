@@ -10,6 +10,8 @@ import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
+import java.nio.channels.ServerSocketChannel;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -54,6 +56,80 @@ public class DataNodeInstance extends Instance {
             Class<?> FileSystemClass = versionClassLoader.loadClass("org.apache.hadoop.fs.FileSystem");
             Method enableSymlinksMethod = FileSystemClass.getMethod("enableSymlinks");
             enableSymlinksMethod.invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public DataNodeJVMInterface createDataNodeForRestartInJVMCluster(String[] dnArgs, Configuration hdfsConf, SecureDataNodeStarter.SecureResources secureResources) {
+
+        try {
+            System.out.println("DataNodeInterface is loaded by class loader: " + DataNodeJVMInterface.class.getClassLoader());
+
+            this.setClassLoader(versionClassLoader);
+            versionClassLoader.setCurrentThreadClassLoader();
+            Class<?> configClass = versionClassLoader.loadClass("org.apache.hadoop.conf.Configuration");
+
+            Constructor<?>[] configConstructors = configClass.getConstructors();
+            // get the first constructor
+            Constructor<?> configConstructor = null;
+            for (Constructor<?> constructor : configConstructors) {
+                if (constructor.getParameterCount() == 0) {
+                    configConstructor = constructor;
+                    break;
+                }
+            }
+
+            // create an instance of Configuration
+            assert configConstructor != null;
+            ConfigurationJVMInterface conf = (ConfigurationJVMInterface) configConstructor.newInstance();
+            Map<String, String> hdfsConfMap = hdfsConf.getSetParameters();
+            conf.setAllParameters(hdfsConfMap);
+
+            // get the HdfsConfiguration class and create an instance of it
+
+            Class<?> HdfsConfigurationClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.HdfsConfiguration");
+            Constructor<?> HdfsConfigurationConstructor = HdfsConfigurationClass.getConstructor(configClass);
+            ConfigurationJVMInterface dnConf = (ConfigurationJVMInterface) HdfsConfigurationConstructor.newInstance(conf);
+
+            // get SecureDataNodeStarter.SecureResources  and create an instance of it
+
+            // get SecureDataNodeStarter.SecureResources class
+            Class<?> SecureResourcesClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter$SecureResources");
+
+            Constructor<?> secureResourcesConstructor = SecureResourcesClass.getConstructor(ServerSocket.class, ServerSocketChannel.class, boolean.class, boolean.class, boolean.class);
+
+
+            SecureResourcesJVMInterface secureResourcesJVM = null;
+            if (secureResources != null) {
+                ServerSocket streamingSocket = secureResources.getStreamingSocket();
+                ServerSocketChannel httpServerSocket = secureResources.getHttpServerChannel();
+                boolean isSaslEnabled = secureResources.isSaslEnabled();
+                boolean isRpcPortPrivileged = secureResources.isRpcPortPrivileged();
+                boolean isHttpPortPrivileged = secureResources.isHttpPortPrivileged();
+                secureResourcesJVM = (SecureResourcesJVMInterface) secureResourcesConstructor.newInstance(streamingSocket, httpServerSocket, isSaslEnabled, isRpcPortPrivileged, isHttpPortPrivileged);
+            }
+
+            // get the DataNode class and create an instance of it
+            Class<?> DataNodeClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.DataNode");
+            // call the static method DataNode.createDataNode(args, conf, secureResources);
+            Method createDataNodeMethod = DataNodeClass.getMethod("createDataNode", String[].class, configClass, SecureResourcesClass);
+
+            DataNodeJVMInterface dn = null;
+            dn = (DataNodeJVMInterface) createDataNodeMethod.invoke(null, dnArgs, dnConf, secureResourcesJVM);
+
+
+            System.out.println("DataNode class is loaded by class loader: " + DataNodeClass.getClassLoader());
+            System.out.println("DataNode class is located at: " + DataNodeClass.getProtectionDomain().getCodeSource().getLocation());
+            System.out.println("DataNode Port is: " + dn.getIpcPort());
+
+            versionClassLoader.resetCurrentThreadClassLoader();
+            Map<String, String> confMap = conf.getSetParameters();
+            hdfsConf.setAllParameters(confMap);
+
+            return dn;
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
