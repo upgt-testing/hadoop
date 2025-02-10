@@ -13,7 +13,7 @@ mkdir -p logs
 
 # Loop through each file name in the list
 while IFS= read -r base_name; do
-    echo mvn -B surefire:test -Dtest=${base_name}
-    mvn -B surefire:test -Dtest=${base_name} > logs/${base_name}.log
+    echo mvn -B surefire:test -Dtest=${base_name} -Dupgt.datanode.restart -Dupgt.namenode.restart
+    mvn -B surefire:test -Dtest=${base_name} -Dupgt.datanode.restart -Dupgt.namenode.restart > logs/${base_name}.log
 done < "$input_file"
 
