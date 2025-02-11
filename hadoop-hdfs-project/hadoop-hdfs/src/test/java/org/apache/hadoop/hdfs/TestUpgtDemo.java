@@ -5,8 +5,11 @@ import edu.illinois.VersionSelector;
 import edu.illinois.instance.InstanceTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageJVMInterface;
@@ -14,6 +17,7 @@ import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
+import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,6 +88,37 @@ public class TestUpgtDemo {
         System.out.println(conf2.get("fs.defaultFS"));
     }
 
+
+    // Write a test file after verification
+    public void writeTestFile(MiniDFSClusterInJVM cluster) throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        Path filePath = new Path("/testFile.dat");
+
+        try (FSDataOutputStream out = fs.create(filePath)) {
+            out.write("Hello, HDFS!".getBytes());
+            out.hflush();
+            System.out.println("✅ Successfully wrote file: " + filePath);
+        }
+        // Verify the file
+        try (FSDataInputStream in = fs.open(filePath)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead = in.read(buffer);
+            String content = new String(buffer, 0, bytesRead);
+            assertEquals("Hello, HDFS!", content);
+            System.out.println("✅ Successfully verified file: " + filePath);
+        }
+    }
+
+
+    @Test
+    public void testDNRestart() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        File builderBaseDir = new File(GenericTestUtils.getRandomizedTempPath());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf, builderBaseDir).build();
+        cluster.restartNodeForTesting(0);
+
+        writeTestFile(cluster);
+    }
 
     @Test
     public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
