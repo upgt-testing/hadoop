@@ -597,9 +597,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 builder.useConfiguredTopologyMappingClass,
                 builder.dnHttpPorts,
                 builder.dnIpcPorts);
-
-        // restart immediately for DN-0 and NN-0
-        restartNodeForTesting(0);
     }
 
     public static class DataNodeProperties {
@@ -2195,6 +2192,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * Shutdown all the nodes in the cluster.
      */
     public void shutdown(boolean deleteDfsDir, boolean closeFileSystem) {
+        // restart immediately for DN-0 and NN-0
+        restartNodeForTesting(0);
         LOG.info("Shutting down the Mini HDFS Cluster");
         if (checkExitOnShutdown)  {
             if (ExitUtil.terminateCalled()) {
