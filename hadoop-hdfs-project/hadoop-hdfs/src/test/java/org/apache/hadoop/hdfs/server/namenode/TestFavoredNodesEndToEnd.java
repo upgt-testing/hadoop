@@ -1,5 +1,4 @@
 /**
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -20,7 +19,6 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -28,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Random;
-
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -50,80 +47,84 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 public class TestFavoredNodesEndToEnd {
-  {
-    GenericTestUtils.setLogLevel(
-        LoggerFactory.getLogger(BlockPlacementPolicy.class), Level.TRACE);
-  }
 
-  private static MiniDFSClusterInJVM cluster;
-  private static Configuration conf;
-  private final static int NUM_DATA_NODES = 10;
-  private final static int NUM_FILES = 10;
-  private final static byte[] SOME_BYTES = "foo".getBytes();
-  private static DistributedFileSystem dfs;
-  private static ArrayList<DataNodeJVMInterface> datanodes;
-  
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-    conf = new Configuration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES)
-        .build();
-    cluster.waitClusterUp();
-    dfs = cluster.getFileSystem();
-    datanodes = cluster.getDataNodes();
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    if (cluster != null) { 
-      cluster.shutdown();
+    {
+        GenericTestUtils.setLogLevel(LoggerFactory.getLogger(BlockPlacementPolicy.class), Level.TRACE);
     }
-  }
 
-  @Test(timeout=180000)
-  public void testFavoredNodesEndToEnd() throws Exception {
-    //create 10 files with random preferred nodes
-    for (int i = 0; i < NUM_FILES; i++) {
-      Random rand = new Random(System.currentTimeMillis() + i);
-      //pass a new created rand so as to get a uniform distribution each time
-      //without too much collisions (look at the do-while loop in getDatanodes)
-      InetSocketAddress datanode[] = getDatanodes(rand);
-      Path p = new Path("/filename"+i);
-      FSDataOutputStream out = dfs.create(p, FsPermission.getDefault(), true,
-          4096, (short)3, 4096L, null, datanode);
-      out.write(SOME_BYTES);
-      out.close();
-      BlockLocation[] locations = getBlockLocations(p);
-      //verify the files got created in the right nodes
-      for (BlockLocation loc : locations) {
-        String[] hosts = loc.getNames();
-        String[] hosts1 = getStringForInetSocketAddrs(datanode);
-        assertTrue(compareNodes(hosts, hosts1));
-      }
+    private static MiniDFSClusterInJVM cluster;
+
+    private static Configuration conf;
+
+    private final static int NUM_DATA_NODES = 10;
+
+    private final static int NUM_FILES = 10;
+
+    private final static byte[] SOME_BYTES = "foo".getBytes();
+
+    private static DistributedFileSystem dfs;
+
+    private static ArrayList<DataNodeJVMInterface> datanodes;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        conf = new Configuration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES).build();
+        cluster.waitClusterUp();
+        dfs = cluster.getFileSystem();
+        datanodes = cluster.getDataNodes();
     }
-  }
 
-  @Test(timeout=180000)
-  public void testWhenFavoredNodesNotPresent() throws Exception {
-    //when we ask for favored nodes but the nodes are not there, we should
-    //get some other nodes. In other words, the write to hdfs should not fail
-    //and if we do getBlockLocations on the file, we should see one blklocation
-    //and three hosts for that
-    InetSocketAddress arbitraryAddrs[] = new InetSocketAddress[3];
-    for (int i = 0; i < 3; i++) {
-      arbitraryAddrs[i] = getArbitraryLocalHostAddr();
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
     }
-    Path p = new Path("/filename-foo-bar");
-    FSDataOutputStream out = dfs.create(p, FsPermission.getDefault(), true,
-        4096, (short)3, 4096L, null, arbitraryAddrs);
-    out.write(SOME_BYTES);
-    out.close();
-    getBlockLocations(p);
-  }
 
-  /*
+    @Test
+    public void testFavoredNodesEndToEnd() throws Exception {
+        cluster.restartNodeForTesting(0);
+        //create 10 files with random preferred nodes
+        for (int i = 0; i < NUM_FILES; i++) {
+            Random rand = new Random(System.currentTimeMillis() + i);
+            //pass a new created rand so as to get a uniform distribution each time
+            //without too much collisions (look at the do-while loop in getDatanodes)
+            InetSocketAddress[] datanode = getDatanodes(rand);
+            Path p = new Path("/filename" + i);
+            FSDataOutputStream out = dfs.create(p, FsPermission.getDefault(), true, 4096, (short) 3, 4096L, null, datanode);
+            out.write(SOME_BYTES);
+            out.close();
+            BlockLocation[] locations = getBlockLocations(p);
+            //verify the files got created in the right nodes
+            for (BlockLocation loc : locations) {
+                String[] hosts = loc.getNames();
+                String[] hosts1 = getStringForInetSocketAddrs(datanode);
+                assertTrue(compareNodes(hosts, hosts1));
+            }
+        }
+    }
+
+    @Test
+    public void testWhenFavoredNodesNotPresent() throws Exception {
+        //when we ask for favored nodes but the nodes are not there, we should
+        //get some other nodes. In other words, the write to hdfs should not fail
+        //and if we do getBlockLocations on the file, we should see one blklocation
+        //and three hosts for that
+        InetSocketAddress[] arbitraryAddrs = new InetSocketAddress[3];
+        for (int i = 0; i < 3; i++) {
+            arbitraryAddrs[i] = getArbitraryLocalHostAddr();
+        }
+        Path p = new Path("/filename-foo-bar");
+        FSDataOutputStream out = dfs.create(p, FsPermission.getDefault(), true, 4096, (short) 3, 4096L, null, arbitraryAddrs);
+        out.write(SOME_BYTES);
+        out.close();
+        cluster.restartNodeForTesting(0);
+        getBlockLocations(p);
+    }
+
+    /*
   @Test(timeout=180000)
   public void testWhenSomeNodesAreNotGood() throws Exception {
     // 4 favored nodes
@@ -164,127 +165,119 @@ public class TestFavoredNodesEndToEnd {
     }
   }
    */
-
-  @Test(timeout = 180000)
-  public void testFavoredNodesEndToEndForAppend() throws Exception {
-    // create 10 files with random preferred nodes
-    for (int i = 0; i < NUM_FILES; i++) {
-      Random rand = new Random(System.currentTimeMillis() + i);
-      // pass a new created rand so as to get a uniform distribution each time
-      // without too much collisions (look at the do-while loop in getDatanodes)
-      InetSocketAddress datanode[] = getDatanodes(rand);
-      Path p = new Path("/filename" + i);
-      // create and close the file.
-      dfs.create(p, FsPermission.getDefault(), true, 4096, (short) 3, 4096L,
-          null, null).close();
-      // re-open for append
-      FSDataOutputStream out = dfs.append(p, EnumSet.of(CreateFlag.APPEND),
-          4096, null, datanode);
-      out.write(SOME_BYTES);
-      out.close();
-      BlockLocation[] locations = getBlockLocations(p);
-      // verify the files got created in the right nodes
-      for (BlockLocation loc : locations) {
-        String[] hosts = loc.getNames();
-        String[] hosts1 = getStringForInetSocketAddrs(datanode);
-        assertTrue(compareNodes(hosts, hosts1));
-      }
-    }
-  }
-
-  @Test(timeout = 180000)
-  public void testCreateStreamBuilderFavoredNodesEndToEnd() throws Exception {
-    //create 10 files with random preferred nodes
-    for (int i = 0; i < NUM_FILES; i++) {
-      Random rand = new Random(System.currentTimeMillis() + i);
-      //pass a new created rand so as to get a uniform distribution each time
-      //without too much collisions (look at the do-while loop in getDatanodes)
-      InetSocketAddress[] dns = getDatanodes(rand);
-      Path p = new Path("/filename"+i);
-      FSDataOutputStream out =
-          dfs.createFile(p).favoredNodes(dns).build();
-      out.write(SOME_BYTES);
-      out.close();
-      BlockLocation[] locations = getBlockLocations(p);
-      //verify the files got created in the right nodes
-      for (BlockLocation loc : locations) {
-        String[] hosts = loc.getNames();
-        String[] hosts1 = getStringForInetSocketAddrs(dns);
-        assertTrue(compareNodes(hosts, hosts1));
-      }
-    }
-  }
-
-  private BlockLocation[] getBlockLocations(Path p) throws Exception {
-    DFSTestUtil.waitReplication(dfs, p, (short)3);
-    BlockLocation[] locations = dfs.getClient().getBlockLocations(
-        p.toUri().getPath(), 0, Long.MAX_VALUE);
-    assertTrue(locations.length == 1 && locations[0].getHosts().length == 3);
-    return locations;
-  }
-
-  private String[] getStringForInetSocketAddrs(InetSocketAddress[] datanode) {
-    String strs[] = new String[datanode.length];
-    for (int i = 0; i < datanode.length; i++) {
-      strs[i] = datanode[i].getAddress().getHostAddress() + ":" + 
-       datanode[i].getPort();
-    }
-    return strs;
-  }
-
-  private boolean compareNodes(String[] dnList1, String[] dnList2) {
-    for (int i = 0; i < dnList1.length; i++) {
-      boolean matched = false;
-      for (int j = 0; j < dnList2.length; j++) {
-        if (dnList1[i].equals(dnList2[j])) {
-          matched = true;
-          break;
+    @Test
+    public void testFavoredNodesEndToEndForAppend() throws Exception {
+        cluster.restartNodeForTesting(0);
+        // create 10 files with random preferred nodes
+        for (int i = 0; i < NUM_FILES; i++) {
+            Random rand = new Random(System.currentTimeMillis() + i);
+            // pass a new created rand so as to get a uniform distribution each time
+            // without too much collisions (look at the do-while loop in getDatanodes)
+            InetSocketAddress[] datanode = getDatanodes(rand);
+            Path p = new Path("/filename" + i);
+            // create and close the file.
+            dfs.create(p, FsPermission.getDefault(), true, 4096, (short) 3, 4096L, null, null).close();
+            // re-open for append
+            FSDataOutputStream out = dfs.append(p, EnumSet.of(CreateFlag.APPEND), 4096, null, datanode);
+            out.write(SOME_BYTES);
+            out.close();
+            BlockLocation[] locations = getBlockLocations(p);
+            // verify the files got created in the right nodes
+            for (BlockLocation loc : locations) {
+                String[] hosts = loc.getNames();
+                String[] hosts1 = getStringForInetSocketAddrs(datanode);
+                assertTrue(compareNodes(hosts, hosts1));
+            }
         }
-      }
-      if (matched == false) {
-        fail(dnList1[i] + " not a favored node");
-      }
     }
-    return true;
-  }
 
-  private InetSocketAddress[] getDatanodes(Random rand) {
-    //Get some unique random indexes
-    int idx1 = rand.nextInt(NUM_DATA_NODES);
-    int idx2;
-    
-    do {
-      idx2 = rand.nextInt(NUM_DATA_NODES);
-    } while (idx1 == idx2);
-    
-    int idx3;
-    do {
-      idx3 = rand.nextInt(NUM_DATA_NODES);
-    } while (idx2 == idx3 || idx1 == idx3);
-    
-    InetSocketAddress[] addrs = new InetSocketAddress[3];
-    addrs[0] = datanodes.get(idx1).getXferAddress();
-    addrs[1] = datanodes.get(idx2).getXferAddress();
-    addrs[2] = datanodes.get(idx3).getXferAddress();
-    return addrs;
-  }
-
-  private InetSocketAddress getArbitraryLocalHostAddr() 
-      throws UnknownHostException{
-    Random rand = new Random(System.currentTimeMillis());
-    int port = rand.nextInt(65535);
-    while (true) {
-      boolean conflict = false;
-      for (DataNodeJVMInterface d : datanodes) {
-        if (d.getXferAddress().getPort() == port) {
-          port = rand.nextInt(65535);
-          conflict = true;
+    @Test
+    public void testCreateStreamBuilderFavoredNodesEndToEnd() throws Exception {
+        cluster.restartNodeForTesting(0);
+        //create 10 files with random preferred nodes
+        for (int i = 0; i < NUM_FILES; i++) {
+            Random rand = new Random(System.currentTimeMillis() + i);
+            //pass a new created rand so as to get a uniform distribution each time
+            //without too much collisions (look at the do-while loop in getDatanodes)
+            InetSocketAddress[] dns = getDatanodes(rand);
+            Path p = new Path("/filename" + i);
+            FSDataOutputStream out = dfs.createFile(p).favoredNodes(dns).build();
+            out.write(SOME_BYTES);
+            out.close();
+            BlockLocation[] locations = getBlockLocations(p);
+            //verify the files got created in the right nodes
+            for (BlockLocation loc : locations) {
+                String[] hosts = loc.getNames();
+                String[] hosts1 = getStringForInetSocketAddrs(dns);
+                assertTrue(compareNodes(hosts, hosts1));
+            }
         }
-      }
-      if (conflict == false) {
-        break;
-      }
     }
-    return new InetSocketAddress(InetAddress.getLocalHost(), port);
-  }
+
+    private BlockLocation[] getBlockLocations(Path p) throws Exception {
+        DFSTestUtil.waitReplication(dfs, p, (short) 3);
+        BlockLocation[] locations = dfs.getClient().getBlockLocations(p.toUri().getPath(), 0, Long.MAX_VALUE);
+        assertTrue(locations.length == 1 && locations[0].getHosts().length == 3);
+        return locations;
+    }
+
+    private String[] getStringForInetSocketAddrs(InetSocketAddress[] datanode) {
+        String[] strs = new String[datanode.length];
+        for (int i = 0; i < datanode.length; i++) {
+            strs[i] = datanode[i].getAddress().getHostAddress() + ":" + datanode[i].getPort();
+        }
+        return strs;
+    }
+
+    private boolean compareNodes(String[] dnList1, String[] dnList2) {
+        for (int i = 0; i < dnList1.length; i++) {
+            boolean matched = false;
+            for (int j = 0; j < dnList2.length; j++) {
+                if (dnList1[i].equals(dnList2[j])) {
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched == false) {
+                fail(dnList1[i] + " not a favored node");
+            }
+        }
+        return true;
+    }
+
+    private InetSocketAddress[] getDatanodes(Random rand) {
+        //Get some unique random indexes
+        int idx1 = rand.nextInt(NUM_DATA_NODES);
+        int idx2;
+        do {
+            idx2 = rand.nextInt(NUM_DATA_NODES);
+        } while (idx1 == idx2);
+        int idx3;
+        do {
+            idx3 = rand.nextInt(NUM_DATA_NODES);
+        } while (idx2 == idx3 || idx1 == idx3);
+        InetSocketAddress[] addrs = new InetSocketAddress[3];
+        addrs[0] = datanodes.get(idx1).getXferAddress();
+        addrs[1] = datanodes.get(idx2).getXferAddress();
+        addrs[2] = datanodes.get(idx3).getXferAddress();
+        return addrs;
+    }
+
+    private InetSocketAddress getArbitraryLocalHostAddr() throws UnknownHostException {
+        Random rand = new Random(System.currentTimeMillis());
+        int port = rand.nextInt(65535);
+        while (true) {
+            boolean conflict = false;
+            for (DataNodeJVMInterface d : datanodes) {
+                if (d.getXferAddress().getPort() == port) {
+                    port = rand.nextInt(65535);
+                    conflict = true;
+                }
+            }
+            if (conflict == false) {
+                break;
+            }
+        }
+        return new InetSocketAddress(InetAddress.getLocalHost(), port);
+    }
 }

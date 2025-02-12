@@ -19,26 +19,26 @@
 [WARNING] Parameter 'skipTests' is unknown for plugin 'maven-antrun-plugin:1.7:run (create-log-dir)'
 [INFO] 
 [INFO] --- clean:3.1.0:clean (default-clean) @ hadoop-hdfs ---
-[INFO] Deleting /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target
-[INFO] Deleting /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/site/resources (includes = [configuration.xsl, hdfs-default.xml], excludes = [])
+[INFO] Deleting /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target
+[INFO] Deleting /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/site/resources (includes = [configuration.xsl, hdfs-default.xml], excludes = [])
 [INFO] 
 [INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-hdfs ---
 [INFO] Executing tasks
 
 main:
-    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test-dir
-    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test/data
+    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test-dir
+    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test/data
 [INFO] Executed tasks
 [INFO] 
 [INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-hdfs ---
-[INFO] Compiling 12 proto file(s) to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java
+[INFO] Compiling 12 proto file(s) to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/generated-sources/java
 [WARNING] PROTOC: HdfsServer.proto:35:1: warning: Import HAServiceProtocol.proto is unused.
-JournalProtocol.proto:35:1: warning: Import HdfsServer.proto is unused.
 JournalProtocol.proto:34:1: warning: Import hdfs.proto is unused.
+JournalProtocol.proto:35:1: warning: Import HdfsServer.proto is unused.
 QJournalProtocol.proto:31:1: warning: Import hdfs.proto is unused.
 InterQJournalProtocol.proto:31:1: warning: Import HdfsServer.proto is unused.
-fsimage.proto:26:1: warning: Import xattr.proto is unused.
 fsimage.proto:25:1: warning: Import acl.proto is unused.
+fsimage.proto:26:1: warning: Import xattr.proto is unused.
 
 [INFO] 
 [INFO] --- enforcer:3.0.0:enforce (banned-illegal-imports) @ hadoop-hdfs ---
@@ -48,69 +48,69 @@ fsimage.proto:25:1: warning: Import acl.proto is unused.
 [INFO] Replacement run on 12 files.
 [INFO] 
 [INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-hdfs ---
-[INFO] Replacement run on 707 files.
+[INFO] Replacement run on 759 files.
 [INFO] 
 [INFO] --- hadoops:3.5.0-SNAPSHOT:resource-gz (resource-gz) @ hadoop-hdfs ---
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dfs-dust.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dfs-dust.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dust-full-2.0.0.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dust-full-2.0.0.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/d3-v4.1.1.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/d3-v4.1.1.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/hadoop.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/hadoop.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/jquery-3.6.0.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/jquery-3.6.0.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dust-helpers-1.1.1.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dust-helpers-1.1.1.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/histogram-hostip.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/histogram-hostip.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap.min.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap.min.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-editable.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-editable.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.min.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.min.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/npm.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/npm.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap-editable.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap-editable.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/jquery.dataTables.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/jquery.dataTables.min.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dataTables.bootstrap.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dataTables.bootstrap.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/json-bignum.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/json-bignum.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/rest-csrf.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/rest-csrf.js.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dataTables.bootstrap.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dataTables.bootstrap.css.gz
-[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/moment.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/moment.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dfs-dust.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dfs-dust.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dust-full-2.0.0.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dust-full-2.0.0.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/d3-v4.1.1.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/d3-v4.1.1.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/hadoop.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/hadoop.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/jquery-3.6.0.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/jquery-3.6.0.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dust-helpers-1.1.1.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dust-helpers-1.1.1.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/histogram-hostip.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/histogram-hostip.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap.min.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap.min.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-editable.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-editable.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.min.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/css/bootstrap-theme.min.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/npm.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/npm.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/bootstrap-3.4.1/js/bootstrap-editable.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/bootstrap-3.4.1/js/bootstrap-editable.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/jquery.dataTables.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/jquery.dataTables.min.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dataTables.bootstrap.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dataTables.bootstrap.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/json-bignum.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/json-bignum.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/rest-csrf.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/rest-csrf.js.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/dataTables.bootstrap.css to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/dataTables.bootstrap.css.gz
+[INFO] Compressing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/webapps/static/moment.min.js to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/static/moment.min.js.gz
 [INFO] 
 [INFO] --- resources:2.6:resources (default-resources) @ hadoop-hdfs ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
 [INFO] Copying 2 resources
 [INFO] 
 [INFO] --- compiler:3.10.1:compile (default-compile) @ hadoop-hdfs ---
-[INFO] Compiling 720 source files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/classes
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1053,15] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1055,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1060,57] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1062,36] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1063,37] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1063,58] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSUtil.java: Some input files use or override a deprecated API.
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSUtil.java: Recompile with -Xlint:deprecation for details.
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ReencryptionHandler.java: Some input files use unchecked or unsafe operations.
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ReencryptionHandler.java: Recompile with -Xlint:unchecked for details.
+[INFO] Compiling 772 source files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/classes
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1045,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1053,15] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1055,26] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1060,57] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1062,36] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1063,37] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[WARNING] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/datanode/checker/AbstractFuture.java:[1063,58] sun.misc.Unsafe is internal proprietary API and may be removed in a future release
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSUtil.java: Some input files use or override a deprecated API.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/DFSUtil.java: Recompile with -Xlint:deprecation for details.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ReencryptionHandler.java: Some input files use unchecked or unsafe operations.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/ReencryptionHandler.java: Recompile with -Xlint:unchecked for details.
 [INFO] 
 [INFO] --- antrun:1.7:run (create-web-xmls) @ hadoop-hdfs ---
 [INFO] Executing tasks
 
 main:
-     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/hdfs/WEB-INF
-     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/secondary/WEB-INF
-     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/datanode/WEB-INF
-     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/journal/WEB-INF
-     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps/nfs3/WEB-INF
-     [copy] Copying 49 files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/webapps
+     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/hdfs/WEB-INF
+     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/secondary/WEB-INF
+     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/datanode/WEB-INF
+     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/journal/WEB-INF
+     [copy] Copying 1 file to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps/nfs3/WEB-INF
+     [copy] Copying 49 files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/webapps
 [INFO] Executed tasks
 [INFO] 
 [INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-hdfs ---
 [INFO] Skipping mojo execution
 [INFO] 
 [INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-hdfs ---
-[INFO] Replacement run on 815 files.
+[INFO] Replacement run on 863 files.
 [INFO] 
 [INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-hdfs ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
@@ -120,49 +120,46 @@ main:
 [INFO] Executing tasks
 
 main:
-   [delete] Deleting directory /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test/data
-    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test/data
-    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/log
-     [copy] Copying 76 files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test-classes/webapps
+   [delete] Deleting directory /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test/data
+    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test/data
+    [mkdir] Created dir: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/log
+     [copy] Copying 76 files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test-classes/webapps
 [INFO] Executed tasks
 [INFO] 
 [INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-hdfs ---
 [INFO] Skipping
 [INFO] 
 [INFO] --- compiler:3.10.1:testCompile (default-testCompile) @ hadoop-hdfs ---
-[INFO] Compiling 814 source files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/target/test-classes
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/FSAclBaseTest.java: Some input files use or override a deprecated API.
-[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/namenode/FSAclBaseTest.java: Recompile with -Xlint:deprecation for details.
-[INFO] -------------------------------------------------------------
-[ERROR] COMPILATION ERROR : 
-[INFO] -------------------------------------------------------------
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/ParameterizedTestDFSStripedOutputStreamWithFailureWithRandomECPolicy.java:[30,5] cannot find symbol
-  symbol: class ParameterizedTestDFSStripedOutputStreamWithFailure
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/diskbalancer/command/TestDiskBalancerCommand.java:[56,50] cannot find symbol
-  symbol:   class DiskBalancerTestUtil
-  location: package org.apache.hadoop.hdfs.server.diskbalancer
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestDFSStripedOutputStreamWithFailureWithRandomECPolicy.java:[29,5] cannot find symbol
-  symbol: class TestDFSStripedOutputStreamWithFailure
-[INFO] 3 errors 
-[INFO] -------------------------------------------------------------
+[INFO] Compiling 862 source files to /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/test-classes
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/test/MiniDFSClusterManager.java: Some input files use or override a deprecated API.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/test/MiniDFSClusterManager.java: Recompile with -Xlint:deprecation for details.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/MiniDFSClusterInJVM.java: Some input files use unchecked or unsafe operations.
+[INFO] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/MiniDFSClusterInJVM.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-hdfs ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.5:jar (prepare-jar) @ hadoop-hdfs ---
+[INFO] Building jar: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/hadoop-hdfs-3.5.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- jar:2.5:test-jar (prepare-test-jar) @ hadoop-hdfs ---
+[INFO] Building jar: /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/hadoop-hdfs-3.5.0-SNAPSHOT-tests.jar
+[INFO] 
+[INFO] --- jar:2.5:jar (default-jar) @ hadoop-hdfs ---
+[INFO] 
+[INFO] --- site:3.9.1:attach-descriptor (attach-descriptor) @ hadoop-hdfs ---
+[INFO] Skipping because packaging 'jar' is not pom.
+[INFO] 
+[INFO] --- enforcer:3.0.0:enforce (depcheck) @ hadoop-hdfs ---
+[INFO] Skipping Rule Enforcement.
+[INFO] 
+[INFO] --- install:2.5.1:install (default-install) @ hadoop-hdfs ---
+[INFO] Installing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/hadoop-hdfs-3.5.0-SNAPSHOT.jar to /Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.5.0-SNAPSHOT/hadoop-hdfs-3.5.0-SNAPSHOT.jar
+[INFO] Installing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/pom.xml to /Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.5.0-SNAPSHOT/hadoop-hdfs-3.5.0-SNAPSHOT.pom
+[INFO] Installing /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-restart/hadoop-hdfs-project/hadoop-hdfs/target/hadoop-hdfs-3.5.0-SNAPSHOT-tests.jar to /Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-hdfs/3.5.0-SNAPSHOT/hadoop-hdfs-3.5.0-SNAPSHOT-tests.jar
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
+[INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  15.301 s
-[INFO] Finished at: 2024-11-21T16:11:30-06:00
+[INFO] Total time:  16.523 s
+[INFO] Finished at: 2025-02-12T00:25:42-06:00
 [INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile (default-testCompile) on project hadoop-hdfs: Compilation failure: Compilation failure: 
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/ParameterizedTestDFSStripedOutputStreamWithFailureWithRandomECPolicy.java:[30,5] cannot find symbol
-[ERROR]   symbol: class ParameterizedTestDFSStripedOutputStreamWithFailure
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/diskbalancer/command/TestDiskBalancerCommand.java:[56,50] cannot find symbol
-[ERROR]   symbol:   class DiskBalancerTestUtil
-[ERROR]   location: package org.apache.hadoop.hdfs.server.diskbalancer
-[ERROR] /Users/allenwang/Documents/xlab/cross-system/multi-hadoop/hadoop-recover/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestDFSStripedOutputStreamWithFailureWithRandomECPolicy.java:[29,5] cannot find symbol
-[ERROR]   symbol: class TestDFSStripedOutputStreamWithFailure
-[ERROR] -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

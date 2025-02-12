@@ -25,7 +25,6 @@ import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
-
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED;
 
 /**
@@ -41,51 +40,40 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_CORRUPT_BLOCK_DE
  */
 public class TestErasureCodingCorruption {
 
-  @Test
-  public void testCorruptionDuringFailover() throws Exception {
-    Configuration conf = new Configuration();
-    // Set removal of corrupt replicas immediately as false, to trigger this
-    // case.
-    conf.setBoolean(DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED,
-        false);
-    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
-        .Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(8)
-        .build()) {
-      cluster.transitionToActive(0);
-      cluster.waitActive();
-
-      DistributedFileSystem dfs = cluster.getFileSystem(0);
-      dfs.mkdirs(new Path("/dir"));
-      dfs.setErasureCodingPolicy(new Path("/dir"), "RS-6-3-1024k");
-
-      FSDataOutputStream out = dfs.create(new Path("/dir/file"));
-      // Write more than one stripe, so that data can get flushed to all
-      // datanodes.
-      for (int i = 0; i < 15 * 1024 * 1024; i++) {
-        out.write(i);
-      }
-
-      // Stop one datanode, so as to trigger update pipeline.
-      MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
-      // Write some more data and close the file.
-      for (int i = 0; i < 7 * 1024 * 1024; i++) {
-        out.write(i);
-      }
-      out.close();
-
-      BlockManagerJVMInterface bm = cluster.getNamesystem(0).getBlockManager();
-
-      // Transition to standby and then to active.
-      cluster.transitionToStandby(0);
-      cluster.transitionToActive(0);
-
-      // Restart the stopped Datanode, this datanode would report a replica
-      // that failed during write.
-      cluster.restartDataNode(dn);
-      GenericTestUtils
-          .waitFor(() -> bm.getCorruptECBlockGroups() == 0, 100, 10000);
+    @Test
+    public void testCorruptionDuringFailover() throws Exception {
+        Configuration conf = new Configuration();
+        // Set removal of corrupt replicas immediately as false, to trigger this
+        // case.
+        conf.setBoolean(DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED, false);
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(8).build()) {
+            cluster.transitionToActive(0);
+            cluster.waitActive();
+            DistributedFileSystem dfs = cluster.getFileSystem(0);
+            dfs.mkdirs(new Path("/dir"));
+            dfs.setErasureCodingPolicy(new Path("/dir"), "RS-6-3-1024k");
+            FSDataOutputStream out = dfs.create(new Path("/dir/file"));
+            // Write more than one stripe, so that data can get flushed to all
+            // datanodes.
+            for (int i = 0; i < 15 * 1024 * 1024; i++) {
+                out.write(i);
+            }
+            // Stop one datanode, so as to trigger update pipeline.
+            MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
+            // Write some more data and close the file.
+            for (int i = 0; i < 7 * 1024 * 1024; i++) {
+                out.write(i);
+            }
+            out.close();
+            BlockManagerJVMInterface bm = cluster.getNamesystem(0).getBlockManager();
+            // Transition to standby and then to active.
+            cluster.transitionToStandby(0);
+            cluster.transitionToActive(0);
+            // Restart the stopped Datanode, this datanode would report a replica
+            // that failed during write.
+            cluster.restartDataNode(dn);
+            cluster.restartNodeForTesting(0);
+            GenericTestUtils.waitFor(() -> bm.getCorruptECBlockGroups() == 0, 100, 10000);
+        }
     }
-  }
 }

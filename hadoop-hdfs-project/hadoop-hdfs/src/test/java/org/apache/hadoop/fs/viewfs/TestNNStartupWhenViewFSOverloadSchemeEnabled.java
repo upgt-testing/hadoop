@@ -32,57 +32,55 @@ import org.junit.Test;
  * Tests that the NN startup is successful with ViewFSOverloadScheme.
  */
 public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
-  private MiniDFSClusterInJVM cluster;
-  private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
-  private static final String HDFS_SCHEME = "hdfs";
-  private static final Configuration CONF = new Configuration();
 
-  @BeforeClass
-  public static void setUp() {
-    CONF.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
-    CONF.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    CONF.setInt(
-        CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
-    CONF.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
-        ViewFileSystemOverloadScheme.class.getName());
-    CONF.set(String
-        .format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
-            HDFS_SCHEME), DistributedFileSystem.class.getName());
-    // By default trash interval is 0. To trigger TrashEmptier, let's set it to
-    // >0 value.
-    CONF.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 100);
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  /**
-   * Tests that the HA mode NameNode startup is successful when
-   * ViewFSOverloadScheme configured.
-   */
-  @Test(timeout = 30000)
-  public void testHANameNodeAndDataNodeStartup() throws Exception {
-    cluster = new MiniDFSClusterInJVM.Builder(CONF)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0)
-        .waitSafeMode(false).build();
-    cluster.waitActive();
-    cluster.transitionToActive(0);
-  }
+    private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
 
-  /**
-   * Tests that the NameNode startup is successful when ViewFSOverloadScheme
-   * configured.
-   */
-  @Test(timeout = 30000)
-  public void testNameNodeAndDataNodeStartup() throws Exception {
-    cluster =
-        new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(0).waitSafeMode(false)
-            .build();
-    cluster.waitActive();
-  }
+    private static final String HDFS_SCHEME = "hdfs";
 
-  @After
-  public void shutdownCluster() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private static final Configuration CONF = new Configuration();
+
+    @BeforeClass
+    public static void setUp() {
+        CONF.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        CONF.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        CONF.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
+        CONF.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME), ViewFileSystemOverloadScheme.class.getName());
+        CONF.set(String.format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN, HDFS_SCHEME), DistributedFileSystem.class.getName());
+        // By default trash interval is 0. To trigger TrashEmptier, let's set it to
+        // >0 value.
+        CONF.setLong(CommonConfigurationKeysPublic.FS_TRASH_INTERVAL_KEY, 100);
     }
-  }
+
+    /**
+     * Tests that the HA mode NameNode startup is successful when
+     * ViewFSOverloadScheme configured.
+     */
+    @Test
+    public void testHANameNodeAndDataNodeStartup() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(CONF).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).waitSafeMode(false).build();
+        cluster.waitActive();
+        cluster.restartNodeForTesting(0);
+        cluster.transitionToActive(0);
+    }
+
+    /**
+     * Tests that the NameNode startup is successful when ViewFSOverloadScheme
+     * configured.
+     */
+    @Test
+    public void testNameNodeAndDataNodeStartup() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(0).waitSafeMode(false).build();
+        cluster.restartNodeForTesting(0);
+        cluster.waitActive();
+    }
+
+    @After
+    public void shutdownCluster() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 }
