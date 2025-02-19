@@ -22,20 +22,37 @@ import static org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY;
 public class NameNodeInstance extends Instance {
     private final static String NameNodeClassName = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     private final static String ConfigurationClassName = "org.apache.hadoop.conf.Configuration";
+    public final static String StartVersion = System.getProperty("upgt.start.version", "3.5.0-SNAPSHOT");
+    public final static String UpgradeVersion = System.getProperty("upgt.upgrade.version", "3.5.1-SNAPSHOT");
+    private String curVersion;
     Class<?> nameNodeClass = null;
 
-    public NameNodeInstance() {
+    public NameNodeInstance(String version) {
         super();
-        createVersionClassLoader();
-        setMiniClusterTestingMode();
+        if (version == null) {
+            throw new IllegalArgumentException("Cluster Version cannot be null");
+        }
+        curVersion = version;
+        init(version);
+    }
+
+    public NameNodeInstance() {
+        this(StartVersion);
     }
 
     public VersionClassLoader createVersionClassLoader() {
+        return createVersionClassLoader(curVersion);
+    }
+
+    public void init(String version) {
+        createVersionClassLoader(version);
+        setMiniClusterTestingMode();
+    }
+
+    public VersionClassLoader createVersionClassLoader(String version) {
         VersionSelector versionSelector = new VersionSelector();
 
         String classPath = System.getProperty("java.class.path");
-        //String[] versions = {"3.5.0-SNAPSHOT"};
-        String version = "3.5.0-SNAPSHOT";
 
         //print the classpath from the thread context class loader
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -172,7 +189,31 @@ public class NameNodeInstance extends Instance {
         }
     }
 
+    /**
+     * This method is used to upgrade the NameNode in the in-JVM cluster from the current version to the new version.
+     * @param args the arguments to create the NameNode
+     * @param hdfsConf the HDFS configuration
+     * @param newVersion the new version to upgrade to
+     * @return the NameNodeJVMInterface object
+     * @throws IOException if the new NN creation with target newVersion fails
+     */
+    public NameNodeJVMInterface upgradeNameNodeForInJVMCluster(String[] args, Configuration hdfsConf, String newVersion) throws IOException {
+        // check if the new version is different from the current version, if so, upgrade the NameNode
+        if (newVersion != null && !newVersion.equals(curVersion)) {
+            curVersion = newVersion;
+            init(curVersion);
+        }
+        return createNameNodeForInJVMCluster(args, hdfsConf);
+    }
 
+
+    /**
+     * This method is used to create a NameNode in the in-JVM cluster under this.curVersion with this.versionClassLoader.
+     * @param args the arguments to create the NameNode
+     * @param hdfsConf the HDFS configuration
+     * @return the NameNodeJVMInterface object
+     * @throws IOException if the NN creation fails
+     */
     public NameNodeJVMInterface createNameNodeForInJVMCluster(String[] args, Configuration hdfsConf) throws IOException {
         try {
             System.out.println("NameNodeInterface is loaded by class loader: " + NameNodeJVMInterface.class.getClassLoader());
@@ -350,5 +391,9 @@ public class NameNodeInstance extends Instance {
                 ", customClassLoader=" + getVersionClassLoader().getUrlClassLoader() +
                 ", parentClassLoader=" + getVersionClassLoader().getUrlClassLoader().getParentClassLoader() +
                 '}';
+    }
+
+    public String getCurVersion() {
+        return curVersion;
     }
 }

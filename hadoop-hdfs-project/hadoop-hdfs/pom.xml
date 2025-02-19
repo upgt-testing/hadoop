@@ -247,6 +247,11 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
           <systemPropertyVariables>
             <runningWithNative>${runningWithNative}</runningWithNative>
           </systemPropertyVariables>
+
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <useFile>false</useFile>
+          <printSummary>true</printSummary>
+
           <properties>
             <property>
               <name>listener</name>
