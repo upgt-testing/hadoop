@@ -52,6 +52,7 @@ import org.apache.hadoop.hdfs.protocol.RollingUpgradeStatus;
 import org.apache.hadoop.hdfs.protocol.UnregisteredNodeException;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeLifelineProtocolClientSideTranslatorPB;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB;
+import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPBJVMInterface;
 import org.apache.hadoop.hdfs.server.common.IncorrectVersionException;
 import org.apache.hadoop.hdfs.server.common.DataNodeLockManager.LockLevel;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -90,7 +91,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
  * </ul>
  */
 @InterfaceAudience.Private
-class BPServiceActor implements Runnable {
+class BPServiceActor implements Runnable, BPServiceActorJVMInterface {
   
   static final Logger LOG = DataNode.LOG;
   final InetSocketAddress nnAddr;
@@ -166,7 +167,7 @@ class BPServiceActor implements Runnable {
     return ibrManager;
   }
 
-  boolean isAlive() {
+  public boolean isAlive() {
     if (!shouldServiceRun || !bpThread.isAlive()) {
       return false;
     }
@@ -183,7 +184,7 @@ class BPServiceActor implements Runnable {
     return bpos.toString() + " service to " + nnAddr;
   }
   
-  InetSocketAddress getNNSocketAddress() {
+  public InetSocketAddress getNNSocketAddress() {
     return nnAddr;
   }
 
@@ -216,7 +217,7 @@ class BPServiceActor implements Runnable {
    * Used to inject a spy NN in the unit tests.
    */
   @VisibleForTesting
-  void setNameNode(DatanodeProtocolClientSideTranslatorPB dnProtocol) {
+  public void setNameNode(DatanodeProtocolClientSideTranslatorPB dnProtocol) {
     bpNamenode = dnProtocol;
   }
 
@@ -226,7 +227,7 @@ class BPServiceActor implements Runnable {
   }
 
   @VisibleForTesting
-  DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
+  public DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
     return bpNamenode;
   }
 
@@ -1488,7 +1489,7 @@ class BPServiceActor implements Runnable {
   }
 
   @VisibleForTesting
-  void stopCommandProcessingThread() {
+  public void stopCommandProcessingThread() {
     if (commandProcessingThread != null) {
       commandProcessingThread.interrupt();
     }

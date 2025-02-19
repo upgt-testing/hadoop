@@ -24,7 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
 
@@ -78,13 +78,13 @@ public class TestDataNodeUUID {
     FileUtils.deleteDirectory(disk1);
     FileUtils.deleteDirectory(disk2);
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setStrings(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
             disk1.toURI().toString(),
             disk2.toURI().toString());
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
               .numDataNodes(1)
               .manageDataDfsDirs(false)
               .build();
@@ -94,7 +94,7 @@ public class TestDataNodeUUID {
       String originalUUID = cluster.getDataNodes().get(0).getDatanodeUuid();
       // Stop and simulate a DN wipe or unmount-but-root-path condition
       // on the second disk
-      MiniDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
+      MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
       FileUtils.deleteDirectory(disk2);
       assertTrue("Failed to recreate the data directory: " + disk2,
               disk2.mkdirs());

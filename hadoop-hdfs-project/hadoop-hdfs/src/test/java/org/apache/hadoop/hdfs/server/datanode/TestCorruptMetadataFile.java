@@ -43,8 +43,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestCorruptMetadataFile {
 
-  private MiniDFSCluster cluster;
-  private MiniDFSCluster.Builder clusterBuilder;
+  private MiniDFSClusterInJVM cluster;
+  private MiniDFSClusterInJVM.Builder clusterBuilder;
   private Configuration conf;
 
   @Before
@@ -54,7 +54,7 @@ public class TestCorruptMetadataFile {
     // test to run faster
     conf.setInt(
         HdfsClientConfigKeys.DFS_CLIENT_MAX_BLOCK_ACQUIRE_FAILURES_KEY, 1);
-    clusterBuilder = new MiniDFSCluster.Builder(conf).numDataNodes(1);
+    clusterBuilder = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1);
   }
 
   @After
@@ -70,7 +70,7 @@ public class TestCorruptMetadataFile {
     cluster = clusterBuilder.build();
     cluster.waitActive();
     FileSystem fs = cluster.getFileSystem();
-    DataNode dn0 = cluster.getDataNodes().get(0);
+    DataNodeJVMInterface dn0 = cluster.getDataNodes().get(0);
     Path filePath = new Path("test.dat");
     FSDataOutputStream out = fs.create(filePath, (short) 1);
     out.write(1);

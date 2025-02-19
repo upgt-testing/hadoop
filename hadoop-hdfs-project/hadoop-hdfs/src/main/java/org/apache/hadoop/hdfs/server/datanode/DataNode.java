@@ -100,11 +100,13 @@ import static org.apache.hadoop.util.ExitUtil.terminate;
 import static org.apache.hadoop.util.Preconditions.checkNotNull;
 import static org.apache.hadoop.util.Time.now;
 
+import org.apache.hadoop.conf.*;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.DF;
 import org.apache.hadoop.fs.DU;
 import org.apache.hadoop.fs.GetSpaceUsed;
 import org.apache.hadoop.fs.WindowsGetSpaceUsed;
+import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.protocol.proto.ReconfigurationProtocolProtos.ReconfigurationProtocolService;
 
 import java.io.BufferedOutputStream;
@@ -154,10 +156,6 @@ import javax.net.SocketFactory;
 
 import org.apache.hadoop.HadoopIllegalArgumentException;
 import org.apache.hadoop.classification.InterfaceAudience;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.ReconfigurableBase;
-import org.apache.hadoop.conf.ReconfigurationException;
-import org.apache.hadoop.conf.ReconfigurationTaskStatus;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
@@ -172,23 +170,14 @@ import org.apache.hadoop.hdfs.server.datanode.checker.StorageLocationChecker;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.BlockPoolSlice;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.util.DataTransferThrottler;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
 import org.apache.hadoop.ipc.Server;
 import org.apache.hadoop.util.*;
 import org.apache.hadoop.hdfs.client.BlockReportOptions;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.net.DomainPeerServer;
 import org.apache.hadoop.hdfs.net.TcpPeerServer;
-import org.apache.hadoop.hdfs.protocol.Block;
-import org.apache.hadoop.hdfs.protocol.BlockLocalPathInfo;
-import org.apache.hadoop.hdfs.protocol.ClientDatanodeProtocol;
-import org.apache.hadoop.hdfs.protocol.DatanodeID;
-import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo.DatanodeInfoBuilder;
-import org.apache.hadoop.hdfs.protocol.DatanodeLocalInfo;
-import org.apache.hadoop.hdfs.protocol.DatanodeVolumeInfo;
-import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
-import org.apache.hadoop.hdfs.protocol.HdfsConstants;
-import org.apache.hadoop.hdfs.protocol.ReconfigurationProtocol;
 import org.apache.hadoop.hdfs.protocol.datatransfer.BlockConstructionStage;
 import org.apache.hadoop.hdfs.protocol.datatransfer.DataTransferProtocol;
 import org.apache.hadoop.hdfs.protocol.datatransfer.IOStreamPair;
@@ -310,7 +299,9 @@ import org.slf4j.LoggerFactory;
 @InterfaceAudience.Private
 public class DataNode extends ReconfigurableBase
     implements InterDatanodeProtocol, ClientDatanodeProtocol,
-        DataNodeMXBean, ReconfigurationProtocol {
+        DataNodeMXBean, ReconfigurationProtocol,
+        DataNodeJVMInterface
+{
   public static final Logger LOG = LoggerFactory.getLogger(DataNode.class);
   
   static{
@@ -438,6 +429,8 @@ public class DataNode extends ReconfigurableBase
   
   // For InterDataNodeProtocol
   public RPC.Server ipcServer;
+
+  public RPCServerJVMInterface getRpcServer() { return ipcServer; }
 
   private JvmPauseMonitor pauseMonitor;
 
@@ -2227,8 +2220,7 @@ public class DataNode extends ReconfigurableBase
       LOG.debug("HandleAddBlockPoolError called with empty exception list");
     }
   }
-
-  List<BPOfferService> getAllBpOs() {
+  public List<BPOfferService> getAllBpOs() {
     return blockPoolManager.getAllNamenodeThreads();
   }
 
@@ -2326,7 +2318,11 @@ public class DataNode extends ReconfigurableBase
   public int getIpcPort() {
     return ipcServer.getListenerAddress().getPort();
   }
-  
+
+  public RPC.Server getIpcServer() {
+    return ipcServer;
+  }
+
   /**
    * get BP registration by blockPool id
    * @return BP registration object
@@ -3478,7 +3474,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DirectoryScanner getDirectoryScanner() {
+  public DirectoryScanner getDirectoryScanner() {
     return directoryScanner;
   }
 
@@ -3809,7 +3805,7 @@ public class DataNode extends ReconfigurableBase
     setConf(new Configuration());
     refreshNamenodes(getConf());
   }
-  
+
   @Override // ClientDatanodeProtocol
   public void deleteBlockPool(String blockPoolId, boolean force)
       throws IOException {
@@ -4018,7 +4014,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DataStorage getStorage() {
+  public DataStorage getStorage() {
     return storage;
   }
 

@@ -28,7 +28,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.Time;
 import org.apache.hadoop.util.Tool;
@@ -149,7 +149,7 @@ public class TestLoadGenerator extends Configured implements Tool {
     writer.write(FILE_STRUCTURE_SECOND_LINE+"\n");
     writer.close();
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(3).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(3).build();
     cluster.waitActive();
     
     try {

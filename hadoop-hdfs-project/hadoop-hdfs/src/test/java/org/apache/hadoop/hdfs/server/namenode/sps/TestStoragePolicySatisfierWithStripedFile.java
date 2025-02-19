@@ -31,8 +31,8 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.NameNodeProxies;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
@@ -118,7 +118,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
       }
     }
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(new StorageType[][]{
@@ -229,7 +229,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
       }
     }
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(new StorageType[][]{
@@ -343,7 +343,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
     conf.set(DFSConfigKeys
         .DFS_STORAGE_POLICY_SATISFIER_SELF_RETRY_TIMEOUT_MILLIS_KEY,
         "5000");
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(new StorageType[][]{
@@ -434,7 +434,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
       }
     }
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(new StorageType[][]{
@@ -525,7 +525,7 @@ public class TestStoragePolicySatisfierWithStripedFile {
 
   // Check whether the Block movement has been successfully completed to satisfy
   // the storage policy for the given file.
-  private void waitExpectedStorageType(MiniDFSCluster cluster,
+  private void waitExpectedStorageType(MiniDFSClusterInJVM cluster,
       final String fileName, long fileLen,
       final StorageType expectedStorageType, int expectedStorageCount,
       int expectedBlkLocationCount, int timeout) throws Exception {

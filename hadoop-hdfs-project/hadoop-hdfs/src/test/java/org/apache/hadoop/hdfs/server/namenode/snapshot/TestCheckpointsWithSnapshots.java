@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.namenode.SecondaryNameNode;
@@ -45,7 +45,7 @@ public class TestCheckpointsWithSnapshots {
   
   @Before
   public void setUp() {
-    FileUtil.fullyDeleteContents(new File(MiniDFSCluster.getBaseDirectory()));
+    FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
   }
 
   /**
@@ -54,14 +54,14 @@ public class TestCheckpointsWithSnapshots {
    */
   @Test
   public void testCheckpoint() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
       secondary = new SecondaryNameNode(conf);
-      SnapshotManager nnSnapshotManager = cluster.getNamesystem().getSnapshotManager();
-      SnapshotManager secondarySnapshotManager = secondary.getFSNamesystem().getSnapshotManager();
+      SnapshotManagerJVMInterface nnSnapshotManager = cluster.getNamesystem().getSnapshotManager();
+      SnapshotManagerJVMInterface secondarySnapshotManager = secondary.getFSNamesystem().getSnapshotManager();
       
       FileSystem fs = cluster.getFileSystem();
       HdfsAdmin admin =  new HdfsAdmin(FileSystem.getDefaultUri(conf), conf);

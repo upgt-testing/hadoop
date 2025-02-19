@@ -94,7 +94,7 @@ public class TestReplaceDatanodeFailureReplication {
   @Test
   public void testLessNumberOfLiveDatanodesThanWriteReplaceDatanodeOnFailureRF()
       throws Exception {
-    final MiniDFSCluster cluster = setupCluster(2);
+    final MiniDFSClusterInJVM cluster = setupCluster(2);
 
     try {
       final DistributedFileSystem fs = cluster.getFileSystem();
@@ -150,7 +150,7 @@ public class TestReplaceDatanodeFailureReplication {
     }
   }
 
-  private MiniDFSCluster setupCluster(int failRF) throws IOException {
+  private MiniDFSClusterInJVM setupCluster(int failRF) throws IOException {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure.
         MIN_REPLICATION, failRF);
@@ -159,14 +159,14 @@ public class TestReplaceDatanodeFailureReplication {
 
     final String[] racks = new String[REPLICATION];
     Arrays.fill(racks, RACK0);
-    return new MiniDFSCluster.Builder(conf).racks(racks)
+    return new MiniDFSClusterInJVM.Builder(conf).racks(racks)
         .numDataNodes(REPLICATION).build();
   }
 
   private void testWriteFileAndVerifyAfterDNStop(int failRF, int dnindex,
       int slowWrites, boolean failPipeLine)
       throws IOException, InterruptedException, TimeoutException {
-    final MiniDFSCluster cluster = setupCluster(failRF);
+    final MiniDFSClusterInJVM cluster = setupCluster(failRF);
     try {
       final DistributedFileSystem fs = cluster.getFileSystem();
       final Path dir = new Path(DIR);

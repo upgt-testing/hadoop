@@ -81,11 +81,11 @@ public class TestFileAppendRestart {
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECTION_MAXIDLETIME_KEY,
         0);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     FSDataOutputStream stream = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       FileSystem fs = cluster.getFileSystem();
       File editLog =
         new File(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 0).get(0),
@@ -161,7 +161,7 @@ public class TestFileAppendRestart {
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
       .format(false)
       .manageDataDfsDirs(false)
       .manageNameDfsDirs(false)
@@ -185,10 +185,10 @@ public class TestFileAppendRestart {
   @Test
   public void testAppendWithPipelineRecovery() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FSDataOutputStream out = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).manageDataDfsDirs(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).manageDataDfsDirs(true)
           .manageNameDfsDirs(true).numDataNodes(4)
           .racks(new String[] { "/rack1", "/rack1", "/rack2", "/rack2" })
           .build();

@@ -19,13 +19,14 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.ContentSummaryJVMInterface;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
@@ -47,7 +48,7 @@ public class TestGetContentSummaryWithPermission {
   protected static final long BLOCKSIZE = 1024;
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
 
   @Before
@@ -55,7 +56,7 @@ public class TestGetContentSummaryWithPermission {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
     cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
     cluster.waitActive();
 
     dfs = cluster.getFileSystem();
@@ -83,7 +84,7 @@ public class TestGetContentSummaryWithPermission {
     dfs.mkdirs(bar);
     DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
 
-    ContentSummary summary;
+    ContentSummaryJVMInterface summary;
 
     summary = cluster.getNameNodeRpc().getContentSummary(
         foo.toString());
@@ -139,8 +140,8 @@ public class TestGetContentSummaryWithPermission {
     assertEquals((short)644, fileStatus.getPermission().toOctal());
 
     // by default, can get content summary
-    ContentSummary summary =
-        userUgi.doAs((PrivilegedExceptionAction<ContentSummary>)
+    ContentSummaryJVMInterface summary =
+        userUgi.doAs((PrivilegedExceptionAction<ContentSummaryJVMInterface>)
             () -> cluster.getNameNodeRpc().getContentSummary(
             foo.toString()));
     verifySummary(summary, 2, 1, 10);
@@ -148,7 +149,7 @@ public class TestGetContentSummaryWithPermission {
     // set empty access on root dir, should disallow content summary
     dfs.setPermission(foo, new FsPermission((short)0));
     try {
-      userUgi.doAs((PrivilegedExceptionAction<ContentSummary>)
+      userUgi.doAs((PrivilegedExceptionAction<ContentSummaryJVMInterface>)
           () -> cluster.getNameNodeRpc().getContentSummary(
               foo.toString()));
       fail("Should've fail due to access control exception.");
@@ -164,7 +165,7 @@ public class TestGetContentSummaryWithPermission {
     dfs.setPermission(bar, new FsPermission((short)0));
 
     try {
-      userUgi.doAs((PrivilegedExceptionAction<ContentSummary>)
+      userUgi.doAs((PrivilegedExceptionAction<ContentSummaryJVMInterface>)
           () -> cluster.getNameNodeRpc().getContentSummary(
               foo.toString()));
       fail("Should've fail due to access control exception.");
@@ -177,7 +178,7 @@ public class TestGetContentSummaryWithPermission {
     dfs.setPermission(bar,
         new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
 
-    summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummary>)
+    summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummaryJVMInterface>)
         () -> cluster.getNameNodeRpc().getContentSummary(
                 foo.toString()));
     verifySummary(summary, 2, 1, 10);
@@ -185,14 +186,21 @@ public class TestGetContentSummaryWithPermission {
     // permission of files under the directory does not affect
     // getContentSummary
     dfs.setPermission(baz, new FsPermission((short)0));
-    summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummary>)
+    summary = userUgi.doAs((PrivilegedExceptionAction<ContentSummaryJVMInterface>)
         () -> cluster.getNameNodeRpc().getContentSummary(
-            foo.toString()));
+                foo.toString()));
     verifySummary(summary, 2, 1, 10);
   }
 
   private void verifySummary(ContentSummary summary, int dirCount,
       int fileCount, int length) {
+    assertEquals(dirCount, summary.getDirectoryCount());
+    assertEquals(fileCount, summary.getFileCount());
+    assertEquals(length, summary.getLength());
+  }
+
+  private void verifySummary(ContentSummaryJVMInterface summary, int dirCount,
+                             int fileCount, int length) {
     assertEquals(dirCount, summary.getDirectoryCount());
     assertEquals(fileCount, summary.getFileCount());
     assertEquals(length, summary.getLength());

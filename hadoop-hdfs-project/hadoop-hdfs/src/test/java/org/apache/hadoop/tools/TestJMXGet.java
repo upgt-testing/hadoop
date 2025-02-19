@@ -40,7 +40,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.JMXGet;
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class TestJMXGet {
   public static final String WRONG_METRIC_VALUE_ERROR_MSG = "Unable to get the correct value for %s.";
 
   private Configuration config;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
 
   static final long seed = 0xAAAAEEFL;
   static final int blockSize = 4096;
@@ -91,7 +91,7 @@ public class TestJMXGet {
   @Test
   public void testNameNode() throws Exception {
     int numDatanodes = 2;
-    cluster = new MiniDFSCluster.Builder(config).numDataNodes(numDatanodes).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).numDataNodes(numDatanodes).build();
     cluster.waitActive();
 
     DFSTestUtil.createFile(cluster.getFileSystem(), new Path("/test1"),
@@ -149,7 +149,7 @@ public class TestJMXGet {
   @Test
   public void testDataNode() throws Exception {
     int numDatanodes = 2;
-    cluster = new MiniDFSCluster.Builder(config).numDataNodes(numDatanodes).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).numDataNodes(numDatanodes).build();
     cluster.waitActive();
 
     DFSTestUtil.createFile(cluster.getFileSystem(), new Path("/test"),

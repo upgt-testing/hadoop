@@ -106,7 +106,7 @@ import static org.apache.hadoop.hdfs.server.namenode.snapshot.Snapshot.CURRENT_S
  * @see org.apache.hadoop.hdfs.server.namenode.FSNamesystem
  **/
 @InterfaceAudience.Private
-public class FSDirectory implements Closeable {
+public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(FSDirectory.class);
 
   private static INodeDirectory createRoot(FSNamesystem namesystem) {
@@ -1583,7 +1583,7 @@ public class FSDirectory implements Closeable {
     return inodeMap.size();
   }
 
-  long totalInodes() {
+  public long totalInodes() {
     return getInodeMapSize();
   }
 

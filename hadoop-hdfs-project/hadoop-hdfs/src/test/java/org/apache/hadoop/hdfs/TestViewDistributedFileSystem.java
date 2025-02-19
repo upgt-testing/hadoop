@@ -70,9 +70,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testOpenWithPathHandle() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       FileSystem fileSys = cluster.getFileSystem();
       Path openTestPath = new Path("/testOpen");
       fileSys.create(openTestPath).close();
@@ -89,9 +89,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Override
   public void testEmptyDelegationToken() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       ConfigUtil.addLinkFallback(conf, defaultUri.getHost(), defaultUri);
@@ -108,9 +108,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testRenameWithOptions() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback",
@@ -135,9 +135,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testRenameWithOptionsWithMountEntries() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback",
@@ -172,9 +172,9 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
   @Test
   public void testQuota() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       URI defaultUri =
           URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
       conf.set("fs.viewfs.mounttable." + defaultUri.getHost() + ".linkFallback",
@@ -203,7 +203,7 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
 
   @Test
   public void testPathCapabilities() throws IOException {
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(getViewFsConfiguration())
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(getViewFsConfiguration())
         .numDataNodes(0).build();
         ViewDistributedFileSystem fileSystem = (ViewDistributedFileSystem) FileSystem.get(
             cluster.getConfiguration(0))) {
@@ -232,7 +232,7 @@ public class TestViewDistributedFileSystem extends TestDistributedFileSystem{
 
   private void testSafeMode(ConsumerRaisingIOE<ViewDistributedFileSystem> executeAssertionsFunction)
       throws IOException {
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(getViewFsConfiguration())
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(getViewFsConfiguration())
         .numDataNodes(0).build();
         ViewDistributedFileSystem fileSystem = (ViewDistributedFileSystem) FileSystem.get(
             cluster.getConfiguration(0))) {

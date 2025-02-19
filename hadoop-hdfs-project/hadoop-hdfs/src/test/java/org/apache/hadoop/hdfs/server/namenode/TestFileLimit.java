@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsDataOutputStream;
 import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -60,6 +60,23 @@ public class TestFileLimit {
     }
   }
 
+  private void waitForLimit(FSNamesystemJVMInterface namesys, long num)
+  {
+    // wait for number of blocks to decrease
+    while (true) {
+      long total = namesys.getBlocksTotal() + namesys.getFSDirectory().totalInodes();
+      System.out.println("Comparing current nodes " + total +
+              " to become " + num);
+      if (total == num) {
+        break;
+      }
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+      }
+    }
+  }
+
   /**
    * Test that file data becomes available before file is closed.
    */
@@ -75,9 +92,9 @@ public class TestFileLimit {
     if (simulatedStorage) {
       SimulatedFSDataset.setFactory(conf);
     }
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
-    FSNamesystem namesys = cluster.getNamesystem();
+    FSNamesystemJVMInterface namesys = cluster.getNamesystem();
     try {
 
       //
@@ -170,7 +187,7 @@ public class TestFileLimit {
     final long numBlocks = 2;
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MAX_BLOCKS_PER_FILE_KEY, numBlocks);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     HdfsDataOutputStream fout =
         (HdfsDataOutputStream)fs.create(new Path("/testmaxfilelimit"));
@@ -197,7 +214,7 @@ public class TestFileLimit {
     final long blockSize = 4096;
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, blockSize);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
 
     try {

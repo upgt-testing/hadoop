@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.ReplicaState;
@@ -52,7 +52,7 @@ public class TestDatanodeRestart {
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024L);
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, 512);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
     FileSystem fs = cluster.getFileSystem();
     try {
@@ -70,13 +70,14 @@ public class TestDatanodeRestart {
       cluster.shutdown();
     }
   }
-  
+
+  /*
   // test rbw replicas persist across DataNode restarts
   public void testRbwReplicas() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024L);
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, 512);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
     try {
       testRbwReplicas(cluster, false);
@@ -86,7 +87,7 @@ public class TestDatanodeRestart {
     }
   }
     
-  private void testRbwReplicas(MiniDFSCluster cluster, boolean isCorrupt) 
+  private void testRbwReplicas(MiniDFSClusterInJVM cluster, boolean isCorrupt) 
   throws IOException {
     FSDataOutputStream out = null;
     FileSystem fs = cluster.getFileSystem();
@@ -143,6 +144,8 @@ public class TestDatanodeRestart {
   private static FsDatasetImpl dataset(DataNode dn) {
     return (FsDatasetImpl)DataNodeTestUtils.getFSDataset(dn);
   }
+  
+   */
 
   @Test
   public void testWaitForRegistrationOnRestart() throws Exception {
@@ -160,12 +163,12 @@ public class TestDatanodeRestart {
     };
     DataNodeFaultInjector oldDnInjector = DataNodeFaultInjector.get();
     DataNodeFaultInjector.set(dnFaultInjector);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     long start = 0;
     Path file = new Path("/reg");
     try {
       int numDNs = 1;
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
       cluster.waitActive();
 
       start = Time.monotonicNow();

@@ -61,7 +61,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.ListMultimap;
  * Reconciles the differences with block information maintained in the dataset.
  */
 @InterfaceAudience.Private
-public class DirectoryScanner implements Runnable {
+public class DirectoryScanner implements Runnable, DirectoryScannerJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(DirectoryScanner.class);
 

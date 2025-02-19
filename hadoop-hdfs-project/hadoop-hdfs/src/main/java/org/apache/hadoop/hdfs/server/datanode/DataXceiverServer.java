@@ -45,7 +45,7 @@ import org.slf4j.Logger;
  * for requests from clients or other DataNodes. This small server does not use
  * the Hadoop IPC mechanism.
  */
-class DataXceiverServer implements Runnable {
+class DataXceiverServer implements Runnable, DataXceiverServerJVMInterface {
   public static final Logger LOG = DataNode.LOG;
 
   /**
@@ -479,7 +479,7 @@ class DataXceiverServer implements Runnable {
   }
 
   @VisibleForTesting
-  PeerServer getPeerServer() {
+  public PeerServer getPeerServer() {
     return peerServer;
   }
 

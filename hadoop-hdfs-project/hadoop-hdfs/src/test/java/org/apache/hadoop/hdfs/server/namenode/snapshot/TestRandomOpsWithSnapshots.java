@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.SafeModeAction;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.SnapshotException;
 import org.apache.hadoop.hdfs.protocol.SnapshottableDirectoryStatus;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -80,7 +80,7 @@ public class TestRandomOpsWithSnapshots {
       new HashMap<Path, ArrayList<String>>();
 
   private static final Configuration CONFIG = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem hdfs;
   private static Random generator = null;
 
@@ -181,7 +181,7 @@ public class TestRandomOpsWithSnapshots {
   @Before
   public void setUp() throws Exception {
     CONFIG.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(CONFIG).numDataNodes(REPL).
+    cluster = new MiniDFSClusterInJVM.Builder(CONFIG).numDataNodes(REPL).
         format(true).build();
     cluster.waitActive();
 

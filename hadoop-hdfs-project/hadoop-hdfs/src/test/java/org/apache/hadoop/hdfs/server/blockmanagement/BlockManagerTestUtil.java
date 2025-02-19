@@ -28,9 +28,13 @@ import java.util.concurrent.ExecutionException;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
+import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerSafeMode.BMSafeModeStatus;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
 import org.apache.hadoop.test.Whitebox;
@@ -50,6 +54,16 @@ public class BlockManagerTestUtil {
   /** @return the datanode descriptor for the given the given storageID. */
   public static DatanodeDescriptor getDatanode(final FSNamesystem ns,
       final String storageID) {
+    ns.readLock();
+    try {
+      return ns.getBlockManager().getDatanodeManager().getDatanode(storageID);
+    } finally {
+      ns.readUnlock();
+    }
+  }
+
+  public static DatanodeDescriptorJVMInterface getDatanode(final FSNamesystemJVMInterface ns,
+                                               final String storageID) {
     ns.readLock();
     try {
       return ns.getBlockManager().getDatanodeManager().getDatanode(storageID);
@@ -78,6 +92,10 @@ public class BlockManagerTestUtil {
    * Refresh block queue counts on the name-node.
    */
   public static void updateState(final BlockManager blockManager) {
+    blockManager.updateState();
+  }
+
+  public static void updateState(final BlockManagerJVMInterface blockManager) {
     blockManager.updateState();
   }
 
@@ -206,8 +224,17 @@ public class BlockManagerTestUtil {
   {
     return blockManager.computeDatanodeWork();
   }
+
+  public static int getComputedDatanodeWork(final BlockManagerJVMInterface blockManager) throws IOException
+  {
+    return blockManager.computeDatanodeWork();
+  }
   
   public static int computeInvalidationWork(BlockManager bm) {
+    return bm.computeInvalidateWork(Integer.MAX_VALUE);
+  }
+
+  public static int computeInvalidationWork(BlockManagerJVMInterface bm) {
     return bm.computeInvalidateWork(Integer.MAX_VALUE);
   }
 
@@ -234,6 +261,12 @@ public class BlockManagerTestUtil {
    * a high value to ensure that all work is calculated.
    */
   public static int computeAllPendingWork(BlockManager bm) {
+    int work = computeInvalidationWork(bm);
+    work += bm.computeBlockReconstructionWork(Integer.MAX_VALUE);
+    return work;
+  }
+
+  public static int computeAllPendingWork(BlockManagerJVMInterface bm) {
     int work = computeInvalidationWork(bm);
     work += bm.computeBlockReconstructionWork(Integer.MAX_VALUE);
     return work;
@@ -268,7 +301,31 @@ public class BlockManagerTestUtil {
       namesystem.writeUnlock();
     }
   }
-  
+
+  public static void noticeDeadDatanode(NameNodeJVMInterface nn, String dnName) {
+    FSNamesystemJVMInterface namesystem = nn.getNamesystem();
+    namesystem.writeLock();
+    try {
+      DatanodeManagerJVMInterface dnm = namesystem.getBlockManager().getDatanodeManager();
+      HeartbeatManagerJVMInterface hbm = dnm.getHeartbeatManager();
+      DatanodeDescriptorJVMInterface[] dnds = hbm.getDatanodes();
+      DatanodeDescriptorJVMInterface theDND = null;
+      for (DatanodeDescriptorJVMInterface dnd : dnds) {
+        if (dnd.getXferAddr().equals(dnName)) {
+          theDND = dnd;
+        }
+      }
+      Assert.assertNotNull("Could not find DN with name: " + dnName, theDND);
+
+      synchronized (hbm) {
+        DFSTestUtil.setDatanodeDead((DatanodeInfoJVMInterface) theDND);
+        hbm.heartbeatCheck();
+      }
+    } finally {
+      namesystem.writeUnlock();
+    }
+  }
+
   /**
    * Change whether the block placement policy will prefer the writer's
    * local Datanode or not.
@@ -288,6 +345,12 @@ public class BlockManagerTestUtil {
    */
   public static void checkHeartbeat(BlockManager bm) {
     HeartbeatManager hbm = bm.getDatanodeManager().getHeartbeatManager();
+    hbm.restartHeartbeatStopWatch();
+    hbm.heartbeatCheck();
+  }
+
+  public static void checkHeartbeat(BlockManagerJVMInterface bm) {
+    HeartbeatManagerJVMInterface hbm = bm.getDatanodeManager().getHeartbeatManager();
     hbm.restartHeartbeatStopWatch();
     hbm.heartbeatCheck();
   }

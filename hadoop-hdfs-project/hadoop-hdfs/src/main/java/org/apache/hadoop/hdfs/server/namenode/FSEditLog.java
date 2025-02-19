@@ -124,7 +124,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class FSEditLog implements LogsPurgeable {
+public class FSEditLog implements LogsPurgeable, FSEditLogJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(FSEditLog.class);
   /**
    * State machine for edit log.
@@ -1564,7 +1564,7 @@ public class FSEditLog implements LogsPurgeable {
 
 
   // sets the initial capacity of the flush buffer.
-  synchronized void setOutputBufferCapacity(int size) {
+  public synchronized void setOutputBufferCapacity(int size) {
     journalSet.setOutputBufferCapacity(size);
   }
 

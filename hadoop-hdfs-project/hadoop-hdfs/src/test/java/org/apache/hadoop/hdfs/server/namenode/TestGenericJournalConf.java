@@ -26,7 +26,7 @@ import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.StorageInfo;
 import org.apache.hadoop.hdfs.server.protocol.NamespaceInfo;
@@ -41,13 +41,13 @@ public class TestGenericJournalConf {
    */
   @Test(expected=IllegalArgumentException.class)
   public void testNotConfigured() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new Configuration();
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
              "dummy://test");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
     } finally {
       if (cluster != null) {
@@ -62,7 +62,7 @@ public class TestGenericJournalConf {
    */
   @Test(expected=IllegalArgumentException.class)
   public void testClassDoesntExist() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new Configuration();
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_PLUGIN_PREFIX + ".dummy",
@@ -71,7 +71,7 @@ public class TestGenericJournalConf {
              "dummy://test");
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
     } finally {
       if (cluster != null) {
@@ -86,7 +86,7 @@ public class TestGenericJournalConf {
    */
   @Test
   public void testBadConstructor() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new Configuration();
     
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_PLUGIN_PREFIX + ".dummy",
@@ -94,7 +94,7 @@ public class TestGenericJournalConf {
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
              "dummy://test");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       fail("Should have failed before this point");
     } catch (IllegalArgumentException iae) {
@@ -114,7 +114,7 @@ public class TestGenericJournalConf {
    */
   @Test
   public void testDummyJournalManager() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new Configuration();
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_PLUGIN_PREFIX + ".dummy",
@@ -122,7 +122,7 @@ public class TestGenericJournalConf {
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, DUMMY_URI);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_CHECKED_VOLUMES_MINIMUM_KEY, 0);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       
       assertTrue(DummyJournalManager.shouldPromptCalled);
@@ -131,7 +131,7 @@ public class TestGenericJournalConf {
       assertEquals(new URI(DUMMY_URI), DummyJournalManager.uri);
       assertNotNull(DummyJournalManager.nsInfo);
       assertEquals(DummyJournalManager.nsInfo.getClusterID(),
-          cluster.getNameNode().getNamesystem().getClusterId());
+              cluster.getNameNode().getNamesystem().getClusterId());
     } finally {
       if (cluster != null) {
         cluster.shutdown();

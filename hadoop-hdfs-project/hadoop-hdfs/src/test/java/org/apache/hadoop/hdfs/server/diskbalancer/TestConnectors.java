@@ -19,7 +19,7 @@ package org.apache.hadoop.hdfs.server.diskbalancer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.diskbalancer.connectors.ClusterConnector;
 import org.apache.hadoop.hdfs.server.diskbalancer.connectors.ConnectorFactory;
 import org.apache.hadoop.hdfs.server.diskbalancer.datamodel.DiskBalancerCluster;
@@ -34,15 +34,15 @@ import java.io.IOException;
  * Test Class that tests connectors.
  */
 public class TestConnectors {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private final int numDatanodes = 3;
-  private final int volumeCount = 2; // default volumes in MiniDFSCluster.
+  private final int volumeCount = 2; // default volumes in MiniDFSClusterInJVM.
   private Configuration conf;
 
   @Before
   public void setup() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDatanodes).build();
   }
 

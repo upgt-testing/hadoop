@@ -36,11 +36,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.ExitUtil.ExitException;
 import org.junit.Test;
@@ -131,10 +132,10 @@ public class TestFailureOfSharedDir {
     conf.setLong(DFS_NAMENODE_RESOURCE_CHECK_INTERVAL_KEY, 2000);
     
     // The shared edits dir will automatically be marked required.
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     File sharedEditsDir = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(0)
         .checkExitOnShutdown(false)
@@ -156,13 +157,13 @@ public class TestFailureOfSharedDir {
       Thread.sleep(conf.getLong(DFS_NAMENODE_RESOURCE_CHECK_INTERVAL_KEY,
           DFS_NAMENODE_RESOURCE_CHECK_INTERVAL_DEFAULT) * 2);
 
-      NameNode nn1 = cluster.getNameNode(1);
+      NameNodeJVMInterface nn1 = cluster.getNameNode(1);
       assertTrue(nn1.isStandbyState());
       assertFalse(
           "StandBy NameNode should not go to SafeMode on resource unavailability",
           nn1.isInSafeMode());
 
-      NameNode nn0 = cluster.getNameNode(0);
+      NameNodeJVMInterface nn0 = cluster.getNameNode(0);
       try {
         // Make sure that subsequent operations on the NN fail.
         nn0.getRpcServer().rollEditLog();

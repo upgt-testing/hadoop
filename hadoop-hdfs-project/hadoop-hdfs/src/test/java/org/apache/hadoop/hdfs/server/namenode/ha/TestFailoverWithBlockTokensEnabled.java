@@ -33,15 +33,18 @@ import org.apache.hadoop.hdfs.DFSClientAdapter;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager;
+import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.Time;
@@ -59,7 +62,7 @@ public class TestFailoverWithBlockTokensEnabled {
   private static final int numNNs = 3;
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
 
   @Before
   public void startCluster() throws IOException {
@@ -67,7 +70,7 @@ public class TestFailoverWithBlockTokensEnabled {
     conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, true);
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology(numNNs))
         .numDataNodes(1)
         .build();
@@ -83,11 +86,11 @@ public class TestFailoverWithBlockTokensEnabled {
 
   @Test
   public void ensureSerialNumbersNeverOverlap() {
-    BlockTokenSecretManager btsm1 = cluster.getNamesystem(0).getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm1 = cluster.getNamesystem(0).getBlockManager()
         .getBlockTokenSecretManager();
-    BlockTokenSecretManager btsm2 = cluster.getNamesystem(1).getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm2 = cluster.getNamesystem(1).getBlockManager()
         .getBlockTokenSecretManager();
-    BlockTokenSecretManager btsm3 = cluster.getNamesystem(2).getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm3 = cluster.getNamesystem(2).getBlockManager()
         .getBlockTokenSecretManager();
 
     setAndCheckSerialNumber(0, btsm1, btsm2, btsm3);
@@ -98,8 +101,8 @@ public class TestFailoverWithBlockTokensEnabled {
         btsm1, btsm2, btsm3);
   }
 
-  private void setAndCheckSerialNumber(int serialNumber, BlockTokenSecretManager... btsms) {
-    for (BlockTokenSecretManager btsm : btsms) {
+  private void setAndCheckSerialNumber(int serialNumber, BlockTokenSecretManagerJVMInterface... btsms) {
+    for (BlockTokenSecretManagerJVMInterface btsm : btsms) {
       btsm.setSerialNo(serialNumber);
     }
 
@@ -186,10 +189,10 @@ public class TestFailoverWithBlockTokensEnabled {
     DFSTestUtil.writeFile(fs, TEST_PATH, TEST_DATA);
   }
   
-  private static void lowerKeyUpdateIntervalAndClearKeys(MiniDFSCluster cluster) {
+  private static void lowerKeyUpdateIntervalAndClearKeys(MiniDFSClusterInJVM cluster) {
     lowerKeyUpdateIntervalAndClearKeys(cluster.getNamesystem(0));
     lowerKeyUpdateIntervalAndClearKeys(cluster.getNamesystem(1));
-    for (DataNode dn : cluster.getDataNodes()) {
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       dn.clearAllBlockSecretKeys();
     }
   }
@@ -197,6 +200,14 @@ public class TestFailoverWithBlockTokensEnabled {
   private static void lowerKeyUpdateIntervalAndClearKeys(FSNamesystem namesystem) {
     BlockTokenSecretManager btsm = namesystem.getBlockManager()
         .getBlockTokenSecretManager();
+    btsm.setKeyUpdateIntervalForTesting(2 * 1000);
+    btsm.setTokenLifetime(2 * 1000);
+    btsm.clearAllKeysForTesting();
+  }
+
+  private static void lowerKeyUpdateIntervalAndClearKeys(FSNamesystemJVMInterface namesystem) {
+    BlockTokenSecretManagerJVMInterface btsm = namesystem.getBlockManager()
+            .getBlockTokenSecretManager();
     btsm.setKeyUpdateIntervalForTesting(2 * 1000);
     btsm.setTokenLifetime(2 * 1000);
     btsm.clearAllKeysForTesting();

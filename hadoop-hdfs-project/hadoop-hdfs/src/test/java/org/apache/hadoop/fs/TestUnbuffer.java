@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.PeerCache;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.io.IOUtils;
@@ -60,10 +60,10 @@ public class TestUnbuffer {
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY,
         100000000L);
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FSDataInputStream stream = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       DistributedFileSystem dfs = (DistributedFileSystem)
           FileSystem.newInstance(conf);
       final Path TEST_PATH = new Path("/test1");
@@ -106,10 +106,10 @@ public class TestUnbuffer {
     final int NUM_OPENS = 500;
     Configuration conf = new Configuration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       DistributedFileSystem dfs = cluster.getFileSystem();
       final Path TEST_PATH = new Path("/testFile");
       DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short)1, 1);

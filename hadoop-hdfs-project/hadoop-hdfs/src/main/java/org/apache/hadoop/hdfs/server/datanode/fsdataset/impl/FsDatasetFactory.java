@@ -31,6 +31,8 @@ public class FsDatasetFactory extends FsDatasetSpi.Factory<FsDatasetImpl> {
   @Override
   public FsDatasetImpl newInstance(DataNode datanode,
       DataStorage storage, Configuration conf) throws IOException {
+    System.out.println("FsDatasetImpl is loaded by " + FsDatasetImpl.class.getClassLoader());
+    System.out.println("FsDatasetSpi is loaded by " + FsDatasetSpi.class.getClassLoader());
     return new FsDatasetImpl(datanode, storage, conf);
   }
 }

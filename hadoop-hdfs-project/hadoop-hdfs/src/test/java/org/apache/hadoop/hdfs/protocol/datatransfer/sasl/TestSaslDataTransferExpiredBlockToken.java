@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSInputStream;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.HedgedRead;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.Retry;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
@@ -49,7 +49,7 @@ public class TestSaslDataTransferExpiredBlockToken extends SaslDataTransferTestC
   private static final Path PATH = new Path("/file1");
 
   private final byte[] rawData = new byte[FILE_SIZE];
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
 
   @Rule
   public Timeout timeout = new Timeout(60, TimeUnit.SECONDS);
@@ -60,7 +60,7 @@ public class TestSaslDataTransferExpiredBlockToken extends SaslDataTransferTestC
     r.nextBytes(rawData);
 
     HdfsConfiguration conf = createSecureConfig("authentication,integrity,privacy");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     try (FileSystem fs = cluster.getFileSystem()) {

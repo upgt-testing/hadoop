@@ -20,7 +20,7 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 
 import static org.junit.Assert.assertNotEquals;
 
@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestMalformedURLs {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   Configuration config;
 
   @Before
@@ -46,7 +46,7 @@ public class TestMalformedURLs {
 
     assertNotEquals(config.get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY),
       config.getTrimmed(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY));
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).build();
     cluster.waitActive();
   }
 

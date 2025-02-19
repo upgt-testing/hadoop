@@ -63,7 +63,7 @@ public class TestStripedFileAppend {
   private static final int BLOCK_GROUP_SIZE = BLOCK_SIZE * NUM_DATA_BLOCKS;
   private static final Random RANDOM = new Random();
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
   private Path dir = new Path("/TestFileAppendStriped");
   private HdfsConfiguration conf = new HdfsConfiguration();
@@ -71,7 +71,7 @@ public class TestStripedFileAppend {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DN).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
     dfs.mkdirs(dir);

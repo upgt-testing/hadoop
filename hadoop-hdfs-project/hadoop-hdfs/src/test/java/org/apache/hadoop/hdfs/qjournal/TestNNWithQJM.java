@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -66,11 +66,11 @@ public class TestNNWithQJM {
   @Test (timeout = 30000)
   public void testLogAndRestart() throws IOException {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-        MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/TestNNWithQJM/image");
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
         mjc.getQuorumJournalURI("myjournal").toString());
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .numDataNodes(0)
       .manageNameDfsDirs(false)
       .build();
@@ -96,9 +96,9 @@ public class TestNNWithQJM {
   @Test (timeout = 30000)
   public void testNewNamenodeTakesOverWriter() throws Exception {
     File nn1Dir = new File(
-        MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image-nn1");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/TestNNWithQJM/image-nn1");
     File nn2Dir = new File(
-        MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image-nn2");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/TestNNWithQJM/image-nn2");
     
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         nn1Dir.getAbsolutePath());
@@ -106,7 +106,7 @@ public class TestNNWithQJM {
         mjc.getQuorumJournalURI("myjournal").toString());
 
     // Start the cluster once to generate the dfs dirs
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .numDataNodes(0)
       .manageNameDfsDirs(false)
       .checkExitOnShutdown(false)
@@ -126,7 +126,7 @@ public class TestNNWithQJM {
           new Path(nn2Dir.getAbsolutePath()), false, conf);
 
       // Start the cluster again
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(0)
         .format(false)
         .manageNameDfsDirs(false)
@@ -140,7 +140,7 @@ public class TestNNWithQJM {
           nn2Dir.getAbsolutePath());
       conf2.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
           mjc.getQuorumJournalURI("myjournal").toString());
-      MiniDFSCluster cluster2 = new MiniDFSCluster.Builder(conf2)
+      MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf2)
         .numDataNodes(0)
         .format(false)
         .manageNameDfsDirs(false)
@@ -170,14 +170,14 @@ public class TestNNWithQJM {
   @Test (timeout = 30000)
   public void testMismatchedNNIsRejected() throws Exception {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-        MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/TestNNWithQJM/image");
     String defaultEditsDir = conf.get(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY);
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
         mjc.getQuorumJournalURI("myjournal").toString());
     
     // Start a NN, so the storage is formatted -- both on-disk
     // and QJM.
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .numDataNodes(0)
       .manageNameDfsDirs(false)
       .build();
@@ -192,7 +192,7 @@ public class TestNNWithQJM {
     // with the old namespace ID.
     try {
       ExitUtil.disableSystemExit();
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .manageNameDfsDirs(false).format(false).checkExitOnShutdown(false)
           .build();
       fail("New NN with different namespace should have been rejected");

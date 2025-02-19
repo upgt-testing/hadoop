@@ -33,7 +33,7 @@ import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.AfterClass;
@@ -55,7 +55,7 @@ public class TestViewFileSystemLinkRegex extends ViewFileSystemBaseTest {
       LoggerFactory.getLogger(TestViewFileSystemLinkRegex.class);
 
   private static FileSystem fsDefault;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration clusterConfig;
   private static final int NAME_SPACES_COUNT = 3;
   private static final int DATA_NODES_COUNT = 3;
@@ -80,7 +80,7 @@ public class TestViewFileSystemLinkRegex extends ViewFileSystemBaseTest {
     clusterConfig.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(clusterConfig).nnTopology(
+    cluster = new MiniDFSClusterInJVM.Builder(clusterConfig).nnTopology(
         MiniDFSNNTopology.simpleFederatedTopology(NAME_SPACES_COUNT))
         .numDataNodes(DATA_NODES_COUNT).build();
     cluster.waitClusterUp();

@@ -21,11 +21,10 @@ package org.apache.hadoop.hdfs;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
-import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
+import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.util.Lists;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +48,7 @@ public class TestSafeModeWithStripedFile {
   private int cellSize;
   private int blockSize;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf;
 
   @Rule
@@ -71,7 +70,7 @@ public class TestSafeModeWithStripedFile {
     conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 100);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.getFileSystem().enableErasureCodingPolicy(getEcPolicy().getName());
     cluster.getFileSystem().getClient().setErasureCodingPolicy("/",
         getEcPolicy().getName());
@@ -124,11 +123,11 @@ public class TestSafeModeWithStripedFile {
     // total blocks 3.
 
     // stopping all DNs
-    List<MiniDFSCluster.DataNodeProperties> dnprops = Lists.newArrayList();
-    LocatedBlocks lbs = cluster.getNameNodeRpc()
+    List<MiniDFSClusterInJVM.DataNodeProperties> dnprops = Lists.newArrayList();
+    LocatedBlocksJVMInterface lbs = cluster.getNameNodeRpc()
         .getBlockLocations(smallFilePath.toString(), 0, smallSize);
-    DatanodeInfo[] locations = lbs.get(0).getLocations();
-    for (DatanodeInfo loc : locations) {
+    DatanodeInfoJVMInterface[] locations = lbs.get(0).getLocations();
+    for (DatanodeInfoJVMInterface loc : locations) {
       // keep the DNs that have smallFile in the head of dnprops
       dnprops.add(cluster.stopDataNode(loc.getName()));
     }
@@ -137,7 +136,7 @@ public class TestSafeModeWithStripedFile {
     }
 
     cluster.restartNameNode(0);
-    NameNode nn = cluster.getNameNode();
+    NameNodeJVMInterface nn = cluster.getNameNode();
     assertTrue(cluster.getNameNode().isInSafeMode());
     assertEquals(0, NameNodeAdapter.getSafeModeSafeBlocks(nn));
 

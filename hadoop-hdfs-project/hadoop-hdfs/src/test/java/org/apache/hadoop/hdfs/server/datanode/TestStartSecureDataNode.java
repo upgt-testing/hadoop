@@ -24,7 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import static org.apache.hadoop.security.SecurityUtilTestHelper.isExternalKdcRunning;
 import org.apache.hadoop.net.NetUtils;
 import org.junit.Assume;
@@ -36,7 +36,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
 /**
- * This test starts a 1 NameNode 1 DataNode MiniDFSCluster with
+ * This test starts a 1 NameNode 1 DataNode MiniDFSClusterInJVM with
  * kerberos authentication enabled using user-specified KDC,
  * principals, and keytabs.
  *
@@ -65,7 +65,7 @@ public class TestStartSecureDataNode {
   @Test
   public void testSecureNameNode() throws Exception {
     testExternalKdcRunning();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       String nnPrincipal =
         System.getProperty("dfs.namenode.kerberos.principal");
@@ -96,7 +96,7 @@ public class TestStartSecureDataNode {
       conf.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY, "127.0.0.1:1006");
       conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, "700");
 
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES)
         .checkDataNodeAddrConfig(true)
         .build();

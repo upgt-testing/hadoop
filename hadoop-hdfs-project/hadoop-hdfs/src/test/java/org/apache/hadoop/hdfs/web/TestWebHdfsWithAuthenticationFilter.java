@@ -33,7 +33,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.http.FilterContainer;
 import org.apache.hadoop.http.FilterInitializer;
 import org.apache.hadoop.http.HttpServer2;
@@ -80,7 +80,7 @@ public class TestWebHdfsWithAuthenticationFilter {
   }
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static FileSystem fs;
 
   @BeforeClass
@@ -89,7 +89,7 @@ public class TestWebHdfsWithAuthenticationFilter {
     conf.set(HttpServer2.FILTER_INITIALIZER_PROPERTY,
         CustomizedFilter.Initializer.class.getName());
     conf.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, "localhost:0");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     InetSocketAddress addr = cluster.getNameNode().getHttpAddress();
     fs = FileSystem.get(
         URI.create("webhdfs://" + NetUtils.getHostPortString(addr)), conf);

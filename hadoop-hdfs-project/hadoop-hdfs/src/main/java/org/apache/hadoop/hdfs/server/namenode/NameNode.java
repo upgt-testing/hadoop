@@ -272,7 +272,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DE
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class NameNode extends ReconfigurableBase implements
-    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier> {
+    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier>, NameNodeJVMInterface {
   static{
     HdfsConfiguration.init();
   }
@@ -1392,6 +1392,8 @@ public class NameNode extends ReconfigurableBase implements
 
     LOG.info("Formatting using clusterid: {}", clusterId);
     FSNamesystem fsn = null;
+    System.out.println("Here we probably load the FSImage class");
+    System.out.println("Here the NameNode class is loaded by " + NameNode.class.getClassLoader());
     try (FSImage fsImage = new FSImage(conf, nameDirsToFormat, editDirsToFormat)) {
       fsn = new FSNamesystem(conf, fsImage);
       fsImage.getEditLog().initJournalsForWrite();
@@ -2019,7 +2021,7 @@ public class NameNode extends ReconfigurableBase implements
     state.setState(haContext, ACTIVE_STATE);
   }
 
-  synchronized void transitionToStandby() throws IOException {
+  public synchronized void transitionToStandby() throws IOException {
     String operationName = "transitionToStandby";
     namesystem.checkSuperuserPrivilege(operationName);
     if (!haEnabled) {
@@ -2335,7 +2337,7 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();
