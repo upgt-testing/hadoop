@@ -15,17 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -36,97 +33,85 @@ import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NSConf;
 import org.apache.hadoop.util.Sets;
 import org.junit.Test;
-
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 
 /**
  * Tests datanode refresh namenode list functionality.
  */
 public class TestRefreshNamenodes {
-  private final int nnPort1 = 2221;
-  private final int nnPort2 = 2224;
-  private final int nnPort3 = 2227;
-  private final int nnPort4 = 2230;
 
-  @Test
-  public void testRefreshNamenodes() throws IOException {
-    // Start cluster with a single NN and DN
-    Configuration conf = new Configuration();
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      MiniDFSNNTopology topology = new MiniDFSNNTopology()
-        .addNameservice(new NSConf("ns1").addNN(
-            new NNConf(null).setIpcPort(nnPort1)))
-        .setFederation(true);
-      cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(topology)
-        .build();
+    private final int nnPort1 = 2221;
 
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      assertEquals(1, dn.getAllBpOs().size());
+    private final int nnPort2 = 2224;
 
-      cluster.addNameNode(conf, nnPort2);
-      assertEquals(2, dn.getAllBpOs().size());
+    private final int nnPort3 = 2227;
 
-      cluster.addNameNode(conf, nnPort3);
-      assertEquals(3, dn.getAllBpOs().size());
+    private final int nnPort4 = 2230;
 
-      cluster.addNameNode(conf, nnPort4);
-
-      // Ensure a BPOfferService in the datanodes corresponds to
-      // a namenode in the cluster
-      Set<InetSocketAddress> nnAddrsFromCluster = new HashSet<>();
-      for (int i = 0; i < 4; i++) {
-        assertTrue(nnAddrsFromCluster.add(
-            cluster.getNameNode(i).getNameNodeAddress()));
-      }
-      
-      Set<InetSocketAddress> nnAddrsFromDN = new HashSet<>();
-      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
-        for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
-          assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+    @Test
+    public void testRefreshNamenodes() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = new HashSet<>();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = new HashSet<>();
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-      }
-      
-      assertEquals("",
-          Joiner.on(",").join(
-            Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
 
-  @Test(timeout=10000)
-  public void testRefreshNameNodeDeadLock() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-      cluster.waitActive();
+    @Test
+    public void testRefreshNameNodeDeadLock() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.waitActive();
+            DataNodeFaultInjector.set(new DataNodeFaultInjector() {
 
-      DataNodeFaultInjector.set(new DataNodeFaultInjector() {
-        @Override
-        public void delayWhenOfferServiceHoldLock() {
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
+                @Override
+                public void delayWhenOfferServiceHoldLock() {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            ConfigurationJVMInterface dnConf = dn.getConf();
+            dnConf.set(DFSConfigKeys.DFS_NAMESERVICES, "ns1");
+            //dn.refreshNamenodes(dnConf);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            dnConf.set(DFSConfigKeys.DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY + ".ns1", "mock:8022");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-      });
-
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      ConfigurationJVMInterface dnConf = dn.getConf();
-      dnConf.set(DFSConfigKeys.DFS_NAMESERVICES, "ns1");
-      dnConf.set(DFSConfigKeys.DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY + ".ns1",
-          "mock:8022");
-      //dn.refreshNamenodes(dnConf);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
 }

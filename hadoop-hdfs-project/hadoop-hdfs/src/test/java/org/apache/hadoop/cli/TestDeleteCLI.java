@@ -15,11 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.cli;
 
 import static org.junit.Assert.assertTrue;
-
 import org.apache.hadoop.cli.util.CLICommand;
 import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
@@ -32,63 +30,64 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestDeleteCLI extends CLITestHelperDFS {
-  protected MiniDFSClusterInJVM dfsCluster = null;
-  protected FileSystem fs = null;
-  protected String namenode = null;
 
-  @Before
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-    conf.setLong(CommonConfigurationKeysPublic.
-        HADOOP_SHELL_SAFELY_DELETE_LIMIT_NUM_FILES, 5);
+    protected MiniDFSClusterInJVM dfsCluster = null;
 
-    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    dfsCluster.waitClusterUp();
-    namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
+    protected FileSystem fs = null;
 
-    fs = dfsCluster.getFileSystem();
-    assertTrue("Not an HDFS: " + fs.getUri(),
-        fs instanceof DistributedFileSystem);
-  }
+    protected String namenode = null;
 
-  @After
-  @Override
-  public void tearDown() throws Exception {
-    if (fs != null) {
-      fs.close();
-      fs = null;
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
+        conf.setLong(CommonConfigurationKeysPublic.HADOOP_SHELL_SAFELY_DELETE_LIMIT_NUM_FILES, 5);
+        dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        dfsCluster.waitClusterUp();
+        namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
+        fs = dfsCluster.getFileSystem();
+        assertTrue("Not an HDFS: " + fs.getUri(), fs instanceof DistributedFileSystem);
     }
-    if (dfsCluster != null) {
-      dfsCluster.shutdown();
-      dfsCluster = null;
+
+    @After
+    @Override
+    public void tearDown() throws Exception {
+        if (fs != null) {
+            fs.close();
+            fs = null;
+        }
+        if (dfsCluster != null) {
+            dfsCluster.shutdown();
+            dfsCluster = null;
+        }
+        Thread.sleep(2000);
+        super.tearDown();
     }
-    Thread.sleep(2000);
-    super.tearDown();
-  }
 
-  @Override
-  protected String getTestFile() {
-    return "testDeleteConf.xml";
-  }
+    @Override
+    protected String getTestFile() {
+        return "testDeleteConf.xml";
+    }
 
-  @Override
-  protected String expandCommand(final String cmd) {
-    String expCmd = cmd;
-    expCmd = expCmd.replaceAll("NAMENODE", namenode);
-    expCmd = super.expandCommand(expCmd);
-    return expCmd;
-  }
+    @Override
+    protected String expandCommand(final String cmd) {
+        String expCmd = cmd;
+        expCmd = expCmd.replaceAll("NAMENODE", namenode);
+        expCmd = super.expandCommand(expCmd);
+        return expCmd;
+    }
 
-  @Override
-  protected Result execute(CLICommand cmd) throws Exception {
-    return cmd.getExecutor(namenode, conf).executeCommand(cmd.getCmd());
-  }
+    @Override
+    protected Result execute(CLICommand cmd) throws Exception {
+        return cmd.getExecutor(namenode, conf).executeCommand(cmd.getCmd());
+    }
 
-  @Test
-  @Override
-  public void testAll () {
-    super.testAll();
-  }
+    @Test
+    @Override
+    public void testAll() {
+        dfsCluster.restartNodeForTesting(0);
+        dfsCluster.upgradeNodeForTesting(0);
+        super.testAll();
+    }
 }

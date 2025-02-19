@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 package org.apache.hadoop.hdfs;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,168 +36,160 @@ import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
 
 public class TestDFSRename {
-  static int countLease(MiniDFSClusterInJVM cluster) {
-    return NameNodeAdapter.getLeaseManager(cluster.getNamesystem()).countLease();
-  }
-  
-  final Path dir = new Path("/test/rename/");
 
-  void list(FileSystem fs, String name) throws IOException {
-    FileSystem.LOG.info("\n\n" + name);
-    for(FileStatus s : fs.listStatus(dir)) {
-      FileSystem.LOG.info("" + s.getPath());
+    static int countLease(MiniDFSClusterInJVM cluster) {
+        return NameNodeAdapter.getLeaseManager(cluster.getNamesystem()).countLease();
     }
-  }
 
-  static void createFile(FileSystem fs, Path f) throws IOException {
-    DataOutputStream a_out = fs.create(f);
-    a_out.writeBytes("something");
-    a_out.close();
-  }
-  
-  @Test
-  public void testRename() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      assertTrue(fs.mkdirs(dir));
-      
-      { //test lease
-        Path a = new Path(dir, "a");
-        Path aa = new Path(dir, "aa");
-        Path b = new Path(dir, "b");
-  
-        createFile(fs, a);
-        
-        //should not have any lease
-        assertEquals(0, countLease(cluster)); 
-  
-        DataOutputStream aa_out = fs.create(aa);
-        aa_out.writeBytes("something");
-  
-        //should have 1 lease
-        assertEquals(1, countLease(cluster)); 
-        list(fs, "rename0");
-        fs.rename(a, b);
-        list(fs, "rename1");
-        aa_out.writeBytes(" more");
-        aa_out.close();
-        list(fs, "rename2");
-  
-        //should not have any lease
-        assertEquals(0, countLease(cluster));
-      }
+    final Path dir = new Path("/test/rename/");
 
-      { // test non-existent destination
-        Path dstPath = new Path("/c/d");
-        assertFalse(fs.exists(dstPath));
-        assertFalse(fs.rename(dir, dstPath));
-      }
-      
-      { // dst cannot be a file or directory under src
-        // test rename /a/b/foo to /a/b/c
-        Path src = new Path("/a/b");
-        Path dst = new Path("/a/b/c");
-
-        createFile(fs, new Path(src, "foo"));
-        
-        // dst cannot be a file under src
-        assertFalse(fs.rename(src, dst)); 
-        
-        // dst cannot be a directory under src
-        assertFalse(fs.rename(src.getParent(), dst.getParent())); 
-      }
-      
-      { // dst can start with src, if it is not a directory or file under src
-        // test rename /test /testfile
-        Path src = new Path("/testPrefix");
-        Path dst = new Path("/testPrefixfile");
-
-        createFile(fs, src);
-        assertTrue(fs.rename(src, dst));
-      }
-      
-      { // dst should not be same as src test rename /a/b/c to /a/b/c
-        Path src = new Path("/a/b/c");
-        createFile(fs, src);
-        assertTrue(fs.rename(src, src));
-        assertFalse(fs.rename(new Path("/a/b"), new Path("/a/b/")));
-        assertTrue(fs.rename(src, new Path("/a/b/c/")));
-      }
-      fs.delete(dir, true);
-    } finally {
-      if (cluster != null) {cluster.shutdown();}
+    void list(FileSystem fs, String name) throws IOException {
+        FileSystem.LOG.info("\n\n" + name);
+        for (FileStatus s : fs.listStatus(dir)) {
+            FileSystem.LOG.info("" + s.getPath());
+        }
     }
-  }
-  
-  /**
-   * Check the blocks of dst file are cleaned after rename with overwrite
-   * Restart NN to check the rename successfully
-   */
-  /**
-  @Test(timeout = 120000)
-  public void testRenameWithOverwrite() throws Exception {
-    final short replFactor = 2;
-    final long blockSize = 512;
-    Configuration conf = new Configuration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).
-        numDataNodes(replFactor).build();
-    DistributedFileSystem dfs = cluster.getFileSystem();
-    try {
-      
-      long fileLen = blockSize*3;
-      String src = "/foo/src";
-      String dst = "/foo/dst";
-      Path srcPath = new Path(src);
-      Path dstPath = new Path(dst);
-      
-      DFSTestUtil.createFile(dfs, srcPath, fileLen, replFactor, 1);
-      DFSTestUtil.createFile(dfs, dstPath, fileLen, replFactor, 1);
-      
-      LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(
-          cluster.getNameNode(), dst, 0, fileLen);
-      BlockManager bm = NameNodeAdapter.getNamesystem(cluster.getNameNode()).
-          getBlockManager();
-      assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().
-          getLocalBlock()) != null);
-      dfs.rename(srcPath, dstPath, Rename.OVERWRITE);
-      BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-          cluster.getNamesystem(0).getBlockManager());
-      assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().
-          getLocalBlock()) == null);
-      
-      // Restart NN and check the rename successfully
-      cluster.restartNameNodes();
-      assertFalse(dfs.exists(srcPath));
-      assertTrue(dfs.exists(dstPath));
-    } finally {
-      if (dfs != null) {
-        dfs.close();
-      }
-      if (cluster != null) {
-        cluster.shutdown();
-      }
-    }
-  }
-   **/
 
-  @Test
-  public void testRename2Options() throws Exception {
-    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(
-        new HdfsConfiguration()).build()) {
-      cluster.waitActive();
-      final DistributedFileSystem dfs = cluster.getFileSystem();
-      Path path = new Path("/test");
-      dfs.mkdirs(path);
-      GenericTestUtils.LogCapturer auditLog =
-          GenericTestUtils.LogCapturer.captureLogs(FSNamesystem.AUDIT_LOG);
-      dfs.rename(path, new Path("/dir1"),
-          new Rename[] {Rename.OVERWRITE, Rename.TO_TRASH});
-      String auditOut = auditLog.getOutput();
-      assertTrue("Rename should have both OVERWRITE and TO_TRASH "
-              + "flags at namenode but had only " + auditOut,
-          auditOut.contains("options=[OVERWRITE, TO_TRASH]"));
+    static void createFile(FileSystem fs, Path f) throws IOException {
+        DataOutputStream a_out = fs.create(f);
+        a_out.writeBytes("something");
+        a_out.close();
     }
-  }
+
+    @Test
+    public void testRename() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            assertTrue(fs.mkdirs(dir));
+            {
+                //test lease
+                Path a = new Path(dir, "a");
+                Path aa = new Path(dir, "aa");
+                Path b = new Path(dir, "b");
+                createFile(fs, a);
+                //should not have any lease
+                assertEquals(0, countLease(cluster));
+                DataOutputStream aa_out = fs.create(aa);
+                aa_out.writeBytes("something");
+                //should have 1 lease
+                assertEquals(1, countLease(cluster));
+                list(fs, "rename0");
+                fs.rename(a, b);
+                list(fs, "rename1");
+                aa_out.writeBytes(" more");
+                aa_out.close();
+                list(fs, "rename2");
+                //should not have any lease
+                assertEquals(0, countLease(cluster));
+            }
+            {
+                // test non-existent destination
+                Path dstPath = new Path("/c/d");
+                assertFalse(fs.exists(dstPath));
+                assertFalse(fs.rename(dir, dstPath));
+            }
+            {
+                // dst cannot be a file or directory under src
+                // test rename /a/b/foo to /a/b/c
+                Path src = new Path("/a/b");
+                Path dst = new Path("/a/b/c");
+                createFile(fs, new Path(src, "foo"));
+                // dst cannot be a file under src
+                assertFalse(fs.rename(src, dst));
+                // dst cannot be a directory under src
+                assertFalse(fs.rename(src.getParent(), dst.getParent()));
+            }
+            {
+                // dst can start with src, if it is not a directory or file under src
+                // test rename /test /testfile
+                Path src = new Path("/testPrefix");
+                Path dst = new Path("/testPrefixfile");
+                createFile(fs, src);
+                assertTrue(fs.rename(src, dst));
+            }
+            {
+                // dst should not be same as src test rename /a/b/c to /a/b/c
+                Path src = new Path("/a/b/c");
+                createFile(fs, src);
+                assertTrue(fs.rename(src, src));
+                assertFalse(fs.rename(new Path("/a/b"), new Path("/a/b/")));
+                assertTrue(fs.rename(src, new Path("/a/b/c/")));
+            }
+            fs.delete(dir, true);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    /**
+     * Check the blocks of dst file are cleaned after rename with overwrite
+     * Restart NN to check the rename successfully
+     */
+    /**
+     *  @Test(timeout = 120000)
+     *  public void testRenameWithOverwrite() throws Exception {
+     *    final short replFactor = 2;
+     *    final long blockSize = 512;
+     *    Configuration conf = new Configuration();
+     *    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).
+     *        numDataNodes(replFactor).build();
+     *    DistributedFileSystem dfs = cluster.getFileSystem();
+     *    try {
+     *
+     *      long fileLen = blockSize*3;
+     *      String src = "/foo/src";
+     *      String dst = "/foo/dst";
+     *      Path srcPath = new Path(src);
+     *      Path dstPath = new Path(dst);
+     *
+     *      DFSTestUtil.createFile(dfs, srcPath, fileLen, replFactor, 1);
+     *      DFSTestUtil.createFile(dfs, dstPath, fileLen, replFactor, 1);
+     *
+     *      LocatedBlocks lbs = NameNodeAdapter.getBlockLocations(
+     *          cluster.getNameNode(), dst, 0, fileLen);
+     *      BlockManager bm = NameNodeAdapter.getNamesystem(cluster.getNameNode()).
+     *          getBlockManager();
+     *      assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().
+     *          getLocalBlock()) != null);
+     *      dfs.rename(srcPath, dstPath, Rename.OVERWRITE);
+     *      BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
+     *          cluster.getNamesystem(0).getBlockManager());
+     *      assertTrue(bm.getStoredBlock(lbs.getLocatedBlocks().get(0).getBlock().
+     *          getLocalBlock()) == null);
+     *
+     *      // Restart NN and check the rename successfully
+     *      cluster.restartNameNodes();
+     *      assertFalse(dfs.exists(srcPath));
+     *      assertTrue(dfs.exists(dstPath));
+     *    } finally {
+     *      if (dfs != null) {
+     *        dfs.close();
+     *      }
+     *      if (cluster != null) {
+     *        cluster.shutdown();
+     *      }
+     *    }
+     *  }
+     */
+    @Test
+    public void testRename2Options() throws Exception {
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build()) {
+            cluster.waitActive();
+            final DistributedFileSystem dfs = cluster.getFileSystem();
+            Path path = new Path("/test");
+            dfs.mkdirs(path);
+            GenericTestUtils.LogCapturer auditLog = GenericTestUtils.LogCapturer.captureLogs(FSNamesystem.AUDIT_LOG);
+            dfs.rename(path, new Path("/dir1"), new Rename[] { Rename.OVERWRITE, Rename.TO_TRASH });
+            String auditOut = auditLog.getOutput();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue("Rename should have both OVERWRITE and TO_TRASH " + "flags at namenode but had only " + auditOut, auditOut.contains("options=[OVERWRITE, TO_TRASH]"));
+        }
+    }
 }

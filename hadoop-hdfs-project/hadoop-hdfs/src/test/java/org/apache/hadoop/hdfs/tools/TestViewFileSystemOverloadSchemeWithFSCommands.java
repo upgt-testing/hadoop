@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.tools;
 
 import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Scanner;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
@@ -42,7 +40,6 @@ import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.Lists;
 import org.apache.hadoop.util.ToolRunner;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,121 +50,121 @@ import org.junit.Test;
  * links.
  */
 public class TestViewFileSystemOverloadSchemeWithFSCommands {
-  private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
-  private static final String HDFS_SCHEME = "hdfs";
-  private Configuration conf = null;
-  private MiniDFSClusterInJVM cluster = null;
-  private URI defaultFSURI;
-  private File localTargetDir;
-  private static final String TEST_ROOT_DIR = PathUtils
-      .getTestDirName(TestViewFileSystemOverloadSchemeWithFSCommands.class);
-  private static final String HDFS_USER_FOLDER = "/HDFSUser";
-  private static final String LOCAL_FOLDER = "/local";
-  private final ByteArrayOutputStream out = new ByteArrayOutputStream();
-  private final ByteArrayOutputStream err = new ByteArrayOutputStream();
-  private static final PrintStream OLD_OUT = System.out;
-  private static final PrintStream OLD_ERR = System.err;
 
-  /**
-   * Sets up the configurations and starts the MiniDFSClusterInJVM.
-   */
-  @Before
-  public void startCluster() throws IOException {
-    conf = new Configuration();
-    conf.setInt(
-        CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
-    conf.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
-        ViewFileSystemOverloadScheme.class.getName());
-    conf.set(String.format(
-        FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
-        HDFS_SCHEME), DistributedFileSystem.class.getName());
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    cluster.waitClusterUp();
-    defaultFSURI =
-        URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-    localTargetDir = new File(TEST_ROOT_DIR, "/root/");
-    Assert.assertEquals(HDFS_SCHEME, defaultFSURI.getScheme()); // hdfs scheme.
-  }
+    private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
 
-  @After
-  public void tearDown() throws IOException {
-    try {
-      System.out.flush();
-      System.err.flush();
-    } finally {
-      System.setOut(OLD_OUT);
-      System.setErr(OLD_ERR);
+    private static final String HDFS_SCHEME = "hdfs";
+
+    private Configuration conf = null;
+
+    private MiniDFSClusterInJVM cluster = null;
+
+    private URI defaultFSURI;
+
+    private File localTargetDir;
+
+    private static final String TEST_ROOT_DIR = PathUtils.getTestDirName(TestViewFileSystemOverloadSchemeWithFSCommands.class);
+
+    private static final String HDFS_USER_FOLDER = "/HDFSUser";
+
+    private static final String LOCAL_FOLDER = "/local";
+
+    private final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+    private final ByteArrayOutputStream err = new ByteArrayOutputStream();
+
+    private static final PrintStream OLD_OUT = System.out;
+
+    private static final PrintStream OLD_ERR = System.err;
+
+    /**
+     * Sets up the configurations and starts the MiniDFSClusterInJVM.
+     */
+    @Before
+    public void startCluster() throws IOException {
+        conf = new Configuration();
+        conf.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
+        conf.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME), ViewFileSystemOverloadScheme.class.getName());
+        conf.set(String.format(FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN, HDFS_SCHEME), DistributedFileSystem.class.getName());
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.waitClusterUp();
+        defaultFSURI = URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+        localTargetDir = new File(TEST_ROOT_DIR, "/root/");
+        // hdfs scheme.
+        Assert.assertEquals(HDFS_SCHEME, defaultFSURI.getScheme());
     }
-    if (cluster != null) {
-      FileSystem.closeAll();
-      cluster.shutdown();
+
+    @After
+    public void tearDown() throws IOException {
+        try {
+            System.out.flush();
+            System.err.flush();
+        } finally {
+            System.setOut(OLD_OUT);
+            System.setErr(OLD_ERR);
+        }
+        if (cluster != null) {
+            FileSystem.closeAll();
+            cluster.shutdown();
+        }
+        resetStream();
     }
-    resetStream();
-  }
 
-  private void redirectStream() {
-    System.setOut(new PrintStream(out));
-    System.setErr(new PrintStream(err));
-  }
-
-  private void resetStream() {
-    out.reset();
-    err.reset();
-  }
-
-  private static void scanIntoList(final ByteArrayOutputStream baos,
-      final List<String> list) {
-    final Scanner scanner = new Scanner(baos.toString());
-    while (scanner.hasNextLine()) {
-      list.add(scanner.nextLine());
+    private void redirectStream() {
+        System.setOut(new PrintStream(out));
+        System.setErr(new PrintStream(err));
     }
-    scanner.close();
-  }
 
-  /**
-   * Adds the given mount links to config. sources contains mount link src and
-   * the respective index location in targets contains the target uri.
-   */
-  void addMountLinks(String mountTable, String[] sources, String[] targets,
-      Configuration config) throws IOException, URISyntaxException {
-    ViewFsTestSetup.addMountLinksToConf(mountTable, sources, targets, config);
-  }
-
-  /**
-   * Tests DF with ViewFSOverloadScheme.
-   */
-  @Test
-  public void testDFWithViewFsOverloadScheme() throws Exception {
-    final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
-    List<String> mounts = Lists.newArrayList();
-    mounts.add(HDFS_USER_FOLDER);
-    mounts.add(LOCAL_FOLDER);
-    addMountLinks(defaultFSURI.getHost(),
-        mounts.toArray(new String[mounts.size()]),
-        new String[] {hdfsTargetPath.toUri().toString(),
-            localTargetDir.toURI().toString() },
-        conf);
-    FsShell fsShell = new FsShell(conf);
-    try {
-      redirectStream();
-      int ret =
-          ToolRunner.run(fsShell, new String[] {"-fs", defaultFSURI.toString(),
-              "-df", "-h", defaultFSURI.toString() + "/" });
-      assertEquals(0, ret);
-      final List<String> errList = Lists.newArrayList();
-      scanIntoList(out, errList);
-      assertEquals(3, errList.size());
-      for (int i = 1; i < errList.size(); i++) {
-        String[] lineSplits = errList.get(i).split("\\s+");
-        String mount = lineSplits[lineSplits.length - 1];
-        mounts.remove(mount);
-      }
-      String msg =
-          "DF was not calculated on all mounts. The left out mounts are: "
-              + mounts;
-      assertEquals(msg, 0, mounts.size());
-    } finally {
-      fsShell.close();
+    private void resetStream() {
+        out.reset();
+        err.reset();
     }
-  }
+
+    private static void scanIntoList(final ByteArrayOutputStream baos, final List<String> list) {
+        final Scanner scanner = new Scanner(baos.toString());
+        while (scanner.hasNextLine()) {
+            list.add(scanner.nextLine());
+        }
+        scanner.close();
+    }
+
+    /**
+     * Adds the given mount links to config. sources contains mount link src and
+     * the respective index location in targets contains the target uri.
+     */
+    void addMountLinks(String mountTable, String[] sources, String[] targets, Configuration config) throws IOException, URISyntaxException {
+        ViewFsTestSetup.addMountLinksToConf(mountTable, sources, targets, config);
+    }
+
+    /**
+     * Tests DF with ViewFSOverloadScheme.
+     */
+    @Test
+    public void testDFWithViewFsOverloadScheme() throws Exception {
+        final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
+        List<String> mounts = Lists.newArrayList();
+        mounts.add(HDFS_USER_FOLDER);
+        mounts.add(LOCAL_FOLDER);
+        addMountLinks(defaultFSURI.getHost(), mounts.toArray(new String[mounts.size()]), new String[] { hdfsTargetPath.toUri().toString(), localTargetDir.toURI().toString() }, conf);
+        FsShell fsShell = new FsShell(conf);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            redirectStream();
+            int ret = ToolRunner.run(fsShell, new String[] { "-fs", defaultFSURI.toString(), "-df", "-h", defaultFSURI.toString() + "/" });
+            assertEquals(0, ret);
+            final List<String> errList = Lists.newArrayList();
+            scanIntoList(out, errList);
+            assertEquals(3, errList.size());
+            for (int i = 1; i < errList.size(); i++) {
+                String[] lineSplits = errList.get(i).split("\\s+");
+                String mount = lineSplits[lineSplits.length - 1];
+                mounts.remove(mount);
+            }
+            String msg = "DF was not calculated on all mounts. The left out mounts are: " + mounts;
+            assertEquals(msg, 0, mounts.size());
+        } finally {
+            fsShell.close();
+        }
+    }
 }
