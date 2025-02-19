@@ -30,7 +30,7 @@ import org.apache.hadoop.fs.FileEncryptionInfo;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class LocatedBlocks {
+public class LocatedBlocks implements LocatedBlocksJVMInterface {
   private final long fileLength;
   // array of blocks with prioritized locations
   private final List<LocatedBlock> blocks;

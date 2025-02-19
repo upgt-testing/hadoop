@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * pipelines and block transfers.
  */
 @InterfaceAudience.Private
-public class SaslDataTransferClient {
+public class SaslDataTransferClient implements SaslDataTransferClientJVMInterface{
 
   private static final Logger LOG = LoggerFactory.getLogger(
       SaslDataTransferClient.class);

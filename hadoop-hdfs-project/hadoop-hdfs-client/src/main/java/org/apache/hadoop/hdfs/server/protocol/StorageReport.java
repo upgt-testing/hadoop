@@ -20,7 +20,7 @@ package org.apache.hadoop.hdfs.server.protocol;
 /**
  * Utilization report for a Datanode storage
  */
-public class StorageReport {
+public class StorageReport implements StorageReportJVMInterface {
   private final DatanodeStorage storage;
   private final boolean failed;
   private final long capacity;

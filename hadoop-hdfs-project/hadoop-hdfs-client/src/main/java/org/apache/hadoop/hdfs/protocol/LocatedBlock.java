@@ -38,7 +38,7 @@ import org.apache.hadoop.util.Lists;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class LocatedBlock {
+public class LocatedBlock implements LocatedBlockJVMInterface {
 
   /**
    * Comparator that ensures that a PROVIDED storage type is greater than any
