@@ -539,7 +539,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     protected MiniDFSClusterInJVM(Builder builder) throws IOException {
         if (builder.nnTopology == null) {
-            // If no topology is specified, build a single NN. 
+            // If no topology is specified, build a single NN.
             builder.nnTopology = MiniDFSNNTopology.simpleSingleNN(
                     builder.nameNodePort, builder.nameNodeHttpPort);
         }
@@ -599,19 +599,22 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 builder.dnIpcPorts);
 
         // restart immediately for DN-0 and NN-0
-        restartNodeForTesting(0);
+        //restartNodeForTesting(0);
+        //upgradeNodeForTesting(0);
     }
 
     public static class DataNodeProperties {
         final DataNodeJVMInterface datanode;
+        public DataNodeInstance dnInstance;
         final Configuration conf;
         String[] dnArgs;
         final SecureResources secureResources;
         final int ipcPort;
 
-        DataNodeProperties(DataNodeJVMInterface node, Configuration conf, String[] args,
+        DataNodeProperties(DataNodeJVMInterface node, DataNodeInstance dnInstance, Configuration conf, String[] args,
                            SecureResources secureResources, int ipcPort) {
             this.datanode = node;
+            this.dnInstance = dnInstance;
             this.conf = conf;
             this.dnArgs = args;
             this.secureResources = secureResources;
@@ -646,7 +649,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * A unique instance identifier for the cluster. This
      * is used to disambiguate HA filesystems in the case where
-     * multiple MiniDFSClusters are used in the same test suite. 
+     * multiple MiniDFSClusters are used in the same test suite.
      */
     private int instanceId;
     private static int instanceCount = 0;
@@ -656,13 +659,15 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public static class NameNodeInfo {
         public NameNodeJVMInterface nameNode;
+        public NameNodeInstance nnInstance;
         Configuration conf;
         String nameserviceId;
         String nnId;
         StartupOption startOpt;
-        NameNodeInfo(NameNodeJVMInterface nn, String nameserviceId, String nnId,
+        NameNodeInfo(NameNodeJVMInterface nn, NameNodeInstance nnInstance, String nameserviceId, String nnId,
                      StartupOption startOpt, Configuration conf) {
             this.nameNode = nn;
+            this.nnInstance = nnInstance;
             this.nameserviceId = nameserviceId;
             this.nnId = nnId;
             this.startOpt = startOpt;
@@ -713,8 +718,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(Configuration conf,
-                          int numDataNodes,
-                          StartupOption nameNodeOperation) throws IOException {
+                               int numDataNodes,
+                               StartupOption nameNodeOperation) throws IOException {
         this(0, conf, numDataNodes, false, false, false,  nameNodeOperation,
                 null, null, null);
     }
@@ -734,9 +739,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(Configuration conf,
-                          int numDataNodes,
-                          boolean format,
-                          String[] racks) throws IOException {
+                               int numDataNodes,
+                               boolean format,
+                               String[] racks) throws IOException {
         this(0, conf, numDataNodes, format, true, true, null,
                 racks, null, null);
     }
@@ -757,26 +762,26 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(Configuration conf,
-                          int numDataNodes,
-                          boolean format,
-                          String[] racks, String[] hosts) throws IOException {
+                               int numDataNodes,
+                               boolean format,
+                               String[] racks, String[] hosts) throws IOException {
         this(0, conf, numDataNodes, format, true, true, null,
                 racks, hosts, null);
     }
 
     /**
-     * NOTE: if possible, the other constructors that don't have nameNode port 
-     * parameter should be used as they will ensure that the servers use free 
+     * NOTE: if possible, the other constructors that don't have nameNode port
+     * parameter should be used as they will ensure that the servers use free
      * ports.
      * <p>
-     * Modify the config and start up the servers.  
+     * Modify the config and start up the servers.
      *
      * @param nameNodePort suggestion for which rpc port to use.  caller should
      *          use getNameNodePort() to get the actual port used.
      * @param conf the base configuration to use in starting the servers.  This
      *          will be modified as necessary.
      * @param numDataNodes Number of DataNodes to start; may be zero
-     * @param format if true, format the NameNode and DataNodes before starting 
+     * @param format if true, format the NameNode and DataNodes before starting
      *          up
      * @param manageDfsDirs if true, the data directories for servers will be
      *          created and {@link DFSConfigKeys#DFS_NAMENODE_NAME_DIR_KEY} and
@@ -788,21 +793,21 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(int nameNodePort,
-                          Configuration conf,
-                          int numDataNodes,
-                          boolean format,
-                          boolean manageDfsDirs,
-                          StartupOption operation,
-                          String[] racks) throws IOException {
+                               Configuration conf,
+                               int numDataNodes,
+                               boolean format,
+                               boolean manageDfsDirs,
+                               StartupOption operation,
+                               String[] racks) throws IOException {
         this(nameNodePort, conf, numDataNodes, format, manageDfsDirs,
                 manageDfsDirs, operation, racks, null, null);
     }
 
     /**
-     * NOTE: if possible, the other constructors that don't have nameNode port 
+     * NOTE: if possible, the other constructors that don't have nameNode port
      * parameter should be used as they will ensure that the servers use free ports.
      * <p>
-     * Modify the config and start up the servers.  
+     * Modify the config and start up the servers.
      *
      * @param nameNodePort suggestion for which rpc port to use.  caller should
      *          use getNameNodePort() to get the actual port used.
@@ -821,22 +826,22 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(int nameNodePort,
-                          Configuration conf,
-                          int numDataNodes,
-                          boolean format,
-                          boolean manageDfsDirs,
-                          StartupOption operation,
-                          String[] racks,
-                          long[] simulatedCapacities) throws IOException {
+                               Configuration conf,
+                               int numDataNodes,
+                               boolean format,
+                               boolean manageDfsDirs,
+                               StartupOption operation,
+                               String[] racks,
+                               long[] simulatedCapacities) throws IOException {
         this(nameNodePort, conf, numDataNodes, format, manageDfsDirs,
                 manageDfsDirs, operation, racks, null, simulatedCapacities);
     }
 
     /**
-     * NOTE: if possible, the other constructors that don't have nameNode port 
+     * NOTE: if possible, the other constructors that don't have nameNode port
      * parameter should be used as they will ensure that the servers use free ports.
      * <p>
-     * Modify the config and start up the servers.  
+     * Modify the config and start up the servers.
      *
      * @param nameNodePort suggestion for which rpc port to use.  caller should
      *          use getNameNodePort() to get the actual port used.
@@ -859,14 +864,14 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     @Deprecated // in 22 to be removed in 24. Use MiniDFSClusterInJVM.Builder instead
     public MiniDFSClusterInJVM(int nameNodePort,
-                          Configuration conf,
-                          int numDataNodes,
-                          boolean format,
-                          boolean manageNameDfsDirs,
-                          boolean manageDataDfsDirs,
-                          StartupOption operation,
-                          String[] racks, String hosts[],
-                          long[] simulatedCapacities) throws IOException {
+                               Configuration conf,
+                               int numDataNodes,
+                               boolean format,
+                               boolean manageNameDfsDirs,
+                               boolean manageDataDfsDirs,
+                               StartupOption operation,
+                               String[] racks, String hosts[],
+                               long[] simulatedCapacities) throws IOException {
         this.storagesPerDatanode = DEFAULT_STORAGES_PER_DATANODE;
         initMiniDFSCluster(conf, numDataNodes, null, format,
                 manageNameDfsDirs, true, manageDataDfsDirs, manageDataDfsDirs,
@@ -1411,7 +1416,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         copyKeys(hdfsConf, conf, nameserviceId, nnId);
         DFSUtil.setGenericConf(hdfsConf, nameserviceId, nnId,
                 DFS_NAMENODE_HTTP_ADDRESS_KEY);
-        NameNodeInfo info = new NameNodeInfo(nn, nameserviceId, nnId,
+        NameNodeInfo info = new NameNodeInfo(nn, nnInstance, nameserviceId, nnId,
                 operation, hdfsConf);
         namenodes.put(nameserviceId, info);
     }
@@ -1845,7 +1850,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                         racks[i-curDatanodesNum]);
             }
             dn.runDatanodeDaemon();
-            dataNodes.add(new DataNodeProperties(dn, newconf, dnArgs,
+            dataNodes.add(new DataNodeProperties(dn, dnInstancre, newconf, dnArgs,
                     secureResources, dn.getIpcPort()));
             dns[i - curDatanodesNum] = dn;
         }
@@ -1902,7 +1907,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             for (FsVolumeSpiJVMInterface fvs : volumes) {
                 FsVolumeImplJVMInterface volume = (FsVolumeImplJVMInterface) fvs;
                 //LOG.info("setCapacityForTesting " + storageCapacities[curDnIdx][j]
-                  //      + " for [" + volume.getStorageType() + "]" + volume.getStorageID());
+                //      + " for [" + volume.getStorageType() + "]" + volume.getStorageID());
                 volume.setCapacityForTesting(storageCapacities[curDnIdx][j]);
                 j++;
             }
@@ -1919,7 +1924,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      *          will be modified as necessary.
      * @param numDataNodes Number of DataNodes to start; may be zero
      * @param manageDfsDirs if true, the data directories for DataNodes will be
-     *          created and {@link DFSConfigKeys#DFS_DATANODE_DATA_DIR_KEY} will be 
+     *          created and {@link DFSConfigKeys#DFS_DATANODE_DATA_DIR_KEY} will be
      *          set in the conf
      * @param operation the operation with which to start the DataNodes.  If null
      *          or StartupOption.FORMAT, then StartupOption.REGULAR will be used.
@@ -1950,7 +1955,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      *          will be modified as necessary.
      * @param numDataNodes Number of DataNodes to start; may be zero
      * @param manageDfsDirs if true, the data directories for DataNodes will be
-     *          created and {@link DFSConfigKeys#DFS_DATANODE_DATA_DIR_KEY} will 
+     *          created and {@link DFSConfigKeys#DFS_DATANODE_DATA_DIR_KEY} will
      *          be set in the conf
      * @param operation the operation with which to start the DataNodes.  If null
      *          or StartupOption.FORMAT, then StartupOption.REGULAR will be used.
@@ -1981,7 +1986,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     /**
-     * Finalize cluster for the namenode at the given index 
+     * Finalize cluster for the namenode at the given index
      * @see MiniDFSClusterInJVM#finalizeCluster(Configuration)
      * @param nnIndex index of the namenode
      * @param conf configuration
@@ -2317,6 +2322,41 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         restartNameNode(nnIndex, true);
     }
 
+
+    /**
+     * Upgrade all namenodes.
+     */
+    public synchronized void upgradeNameNodes() throws IOException {
+        for (int i = 0; i < namenodes.size(); i++) {
+            upgradeNameNode(i, false);
+        }
+        waitActive();
+    }
+
+    /**
+     * Upgrade the namenode.
+     */
+    public synchronized void upgradeNameNode(String... args) throws IOException {
+        checkSingleNameNode();
+        upgradeNameNode(0, true, args);
+    }
+
+    /**
+     * Upgrade the namenode. Optionally wait for the cluster to become active.
+     */
+    public synchronized void upgradeNameNode(boolean waitActive)
+            throws IOException {
+        checkSingleNameNode();
+        upgradeNameNode(0, waitActive);
+    }
+
+    /**
+     * Upgrade the namenode at a given index.
+     */
+    public synchronized void upgradeNameNode(int nnIndex) throws IOException {
+        upgradeNameNode(nnIndex, true);
+    }
+
     /**
      * Update an existing NameNode's configuration.
      */
@@ -2345,13 +2385,15 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
 
         //NameNode nn = NameNode.createNameNode(args, info.conf);
-        NameNodeInstance nnInstance = new NameNodeInstance();
+        String curVersion =  info.nnInstance.getCurVersion();
+        NameNodeInstance nnInstance = new NameNodeInstance(curVersion);
         NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, info.conf);
         nn.getHttpServer()
                 .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         info.nameNode = nn;
         info.nameserviceId = info.conf.get(DFS_NAMESERVICE_ID);
         info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
+        info.nnInstance = nnInstance;
         info.setStartOpt(startOpt);
         if (waitActive) {
             if (numDataNodes > 0) {
@@ -2361,6 +2403,38 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             waitActive(nnIndex);
         }
     }
+
+    public synchronized void upgradeNameNode(int nnIndex, boolean waitActive,
+                                             String... args) throws IOException {
+        NameNodeInfo info = getNN(nnIndex);
+        StartupOption startOpt = info.startOpt;
+
+        shutdownNameNode(nnIndex);
+        if (args.length != 0) {
+            startOpt = null;
+        } else {
+            args = createArgs(startOpt);
+        }
+
+        //NameNode nn = NameNode.createNameNode(args, info.conf);
+        NameNodeInstance nnInstance = new NameNodeInstance(NameNodeInstance.UpgradeVersion);
+        NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, info.conf);
+        nn.getHttpServer()
+                .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
+        info.nameNode = nn;
+        info.nameserviceId = info.conf.get(DFS_NAMESERVICE_ID);
+        info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
+        info.nnInstance = nnInstance;
+        info.setStartOpt(startOpt);
+        if (waitActive) {
+            if (numDataNodes > 0) {
+                waitNameNodeUp(nnIndex);
+            }
+            LOG.info("Upgrarded the namenode");
+            waitActive(nnIndex);
+        }
+    }
+
 
     private int corruptBlockOnDataNodesHelper(ExtendedBlock block,
                                               boolean deleteBlockFile) throws IOException {
@@ -2538,6 +2612,17 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return false;
     }
 
+    public synchronized boolean upgradeDataNode(String dnName)
+            throws IOException {
+        for (int i = 0; i < dataNodes.size(); i++) {
+            DataNodeJVMInterface dn = dataNodes.get(i).datanode;
+            if (dnName.equals(dn.getDatanodeId().getXferAddr())) {
+                return upgradeDataNode(i);
+            }
+        }
+        return false;
+    }
+
 
     /*
      * Shutdown a particular datanode
@@ -2569,6 +2654,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public boolean restartDataNode(DataNodeProperties dnprop) throws IOException {
         return restartDataNode(dnprop, false);
+    }
+
+    public boolean upgradeDataNode(DataNodeProperties dnprop) throws IOException {
+        return upgradeDataNode(dnprop, false);
     }
 
     /**
@@ -2613,7 +2702,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     /**
      * Restart a datanode, on the same port if requested
      * @param dnprop the datanode to restart
-     * @param keepPort whether to use the same port 
+     * @param keepPort whether to use the same port
      * @return true if restarting is successful
      * @throws IOException
      */
@@ -2631,7 +2720,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                     addr.getAddress().getHostAddress() + ":" + dnprop.ipcPort);
         }
         //final DataNode newDn = DataNode.createDataNode(args, conf, secureResources);
-        DataNodeInstance dnInstance = new DataNodeInstance();
+        String curVersion =  dnprop.dnInstance.getCurVersion();
+        DataNodeInstance dnInstance = new DataNodeInstance(curVersion);
         boolean setSecureResources = false;
         if (secureResources != null) {
             setSecureResources = true;
@@ -2664,6 +2754,69 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         final DataNodeProperties dnp = new DataNodeProperties(
                 newDn,
+                dnInstance,
+                newconf,
+                args,
+                secureResources,
+                newDn.getIpcPort());
+        dataNodes.add(dnp);
+        numDataNodes++;
+
+        setDataNodeStorageCapacities(
+                dataNodes.lastIndexOf(dnp),
+                newDn,
+                storageCap.toArray(new long[][]{}));
+        return true;
+    }
+
+    public synchronized boolean upgradeDataNode(DataNodeProperties dnprop,
+                                                boolean keepPort) throws IOException {
+        Configuration conf = dnprop.conf;
+        String[] args = dnprop.dnArgs;
+        SecureResources secureResources = dnprop.secureResources;
+        Configuration newconf = new HdfsConfiguration(conf); // save cloned config
+        if (keepPort) {
+            InetSocketAddress addr = dnprop.datanode.getXferAddress();
+            conf.set(DFS_DATANODE_ADDRESS_KEY,
+                    addr.getAddress().getHostAddress() + ":" + addr.getPort());
+            conf.set(DFS_DATANODE_IPC_ADDRESS_KEY,
+                    addr.getAddress().getHostAddress() + ":" + dnprop.ipcPort);
+        }
+        //final DataNode newDn = DataNode.createDataNode(args, conf, secureResources);
+        DataNodeInstance dnInstance = new DataNodeInstance(DataNodeInstance.UpgradeVersion);
+        boolean setSecureResources = false;
+        if (secureResources != null) {
+            setSecureResources = true;
+        }
+        final DataNodeJVMInterface newDn = dnInstance.createDataNodeForRestartInJVMCluster(args, conf, secureResources);
+        newConf.putAll(newDn.getConf().getSetParameters());
+
+        // compare newConf with oldConf
+        LOG.info("Start comparing oldConf with newConf");
+        for (Map.Entry<String, String> entry : newConf.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (oldConf.containsKey(key)) {
+                if (!oldConf.get(key).equals(value)) {
+                    LOG.info("Configuration changed: " + key + " from " + oldConf.get(key) + " to " + value);
+                }
+            } else {
+                LOG.info("Configuration added: " + key + " = " + value);
+            }
+        }
+
+        for (Map.Entry<String, String> entry : oldConf.entrySet()) {
+            String key = entry.getKey();
+            if (!newConf.containsKey(key)) {
+                LOG.info("Configuration removed: " + key);
+            }
+        }
+
+        LOG.info("Finished comparing oldConf with newConf");
+
+        final DataNodeProperties dnp = new DataNodeProperties(
+                newDn,
+                dnInstance,
                 newconf,
                 args,
                 secureResources,
@@ -2702,6 +2855,30 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return true;
     }
 
+    public boolean upgradeNodeForTesting(int i) {
+        boolean upgradeDN = Boolean.getBoolean("upgt.datanode.upgrade");
+        boolean upgradeNN = Boolean.getBoolean("upgt.namenode.upgrade");
+        LOG.info("Under upgrade mode: " + upgradeDN);
+        if (!upgradeDN && !upgradeNN) {
+            LOG.info("Skip upgrading Node " + i);
+            return false;
+        }
+        try {
+            if (upgradeNN) {
+                LOG.info("Upgrading NameNode" + i);
+                upgradeNameNode(i);
+            }
+            if (upgradeDN) {
+                System.out.println("Upgrading DataNode" + i);
+                upgradeDataNode(i, true);
+            }
+            waitActive();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot upgrade node " + i, e);
+        }
+        return true;
+    }
+
     public boolean restartDataNodeForTesting(int i, boolean keepPort) {
         if (i > dataNodes.size()) {
             i = 0;
@@ -2721,6 +2898,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return restartDataNode(i, false);
     }
 
+    public boolean upgradeDataNode(int i) throws IOException {
+        return restartDataNode(i, false);
+    }
+
     /*
      * Restart a particular datanode, on the same port if keepPort is true
      */
@@ -2728,6 +2909,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             throws IOException {
         return restartDataNode(i, keepPort, false);
     }
+
+    public synchronized boolean upgradeDataNode(int i, boolean keepPort)
+            throws IOException {
+        return upgradeDataNode(i, keepPort, false);
+    }
+
 
     /**
      * Restart a particular DataNode.
@@ -2749,6 +2936,21 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return false;
         } else {
             return restartDataNode(dnprop, keepPort);
+        }
+    }
+
+    public synchronized boolean upgradeDataNode(
+            int idn, boolean keepPort, boolean expireOnNN) throws IOException {
+        DataNodeProperties dnprop = stopDataNode(idn);
+        if(expireOnNN) {
+            // TODO: FIX ME
+            throw new UnsupportedOperationException("Not implemented");
+            //setDataNodeDead(dnprop.datanode.getDatanodeIdInterface());
+        }
+        if (dnprop == null) {
+            return false;
+        } else {
+            return upgradeDataNode(dnprop, keepPort);
         }
     }
 
@@ -2789,11 +2991,25 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return true;
     }
 
+    public synchronized boolean upgradeDataNodes(boolean keepPort)
+            throws IOException {
+        for (int i = dataNodes.size() - 1; i >= 0; i--) {
+            if (!upgradeDataNode(i, keepPort))
+                return false;
+            LOG.info("Restarted DataNode " + i);
+        }
+        return true;
+    }
+
     /*
      * Restart all datanodes, use newly assigned ports
      */
     public boolean restartDataNodes() throws IOException {
         return restartDataNodes(false);
+    }
+
+    public boolean upgradeDataNodes() throws IOException {
+        return upgradeDataNodes(false);
     }
 
     /**
@@ -2909,7 +3125,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     public void transitionToActive(int nnIndex) throws IOException,
             ServiceFailedException {
         getNameNode(nnIndex).getRpcServer().transitionToActive(
-              new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
     public void transitionToStandby(int nnIndex) throws IOException,

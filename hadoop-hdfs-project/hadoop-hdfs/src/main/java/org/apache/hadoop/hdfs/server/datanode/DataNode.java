@@ -3236,6 +3236,7 @@ public class DataNode extends ReconfigurableBase
    */
   public static DataNode instantiateDataNode(String args [], Configuration conf,
       SecureResources resources) throws IOException {
+    LOG.info("[UPGT] DataNode version 3.5.0-SNAPSHOT!!!");
     if (conf == null)
       conf = new HdfsConfiguration();
     
