@@ -30,7 +30,7 @@ import org.apache.hadoop.security.AccessControlException;
 /**
  * Quota feature for {@link INodeDirectory}. 
  */
-public final class DirectoryWithQuotaFeature implements INode.Feature {
+public final class DirectoryWithQuotaFeature implements INode.Feature, DirectoryWithQuotaFeatureJVMInterface  {
   public static final long DEFAULT_NAMESPACE_QUOTA = Long.MAX_VALUE;
   public static final long DEFAULT_STORAGE_SPACE_QUOTA = HdfsConstants.QUOTA_RESET;
 

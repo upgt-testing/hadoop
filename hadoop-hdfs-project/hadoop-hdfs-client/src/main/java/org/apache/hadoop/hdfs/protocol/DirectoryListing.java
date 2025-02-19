@@ -27,7 +27,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DirectoryListing {
+public class DirectoryListing implements DirectoryListingJVMInterface {
   private HdfsFileStatus[] partialListing;
   private int remainingEntries;
 

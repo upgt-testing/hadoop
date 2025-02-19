@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * Class captures information of a storage in Datanode.
  */
-public class DatanodeStorage {
+public class DatanodeStorage implements DatanodeStorageJVMInterface {
   /** The state of the storage. */
   public enum State {
     NORMAL,

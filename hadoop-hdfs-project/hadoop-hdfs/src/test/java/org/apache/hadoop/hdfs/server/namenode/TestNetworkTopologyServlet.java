@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.StaticMapping;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class TestNetworkTopologyServlet {
       }
     }
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
             .numDataNodes(dataNodesNum)
             .racks(rackList.toArray(new String[rackList.size()]))
             .build();
@@ -100,7 +100,7 @@ public class TestNetworkTopologyServlet {
           }
       }
 
-      MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+      MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
               .numDataNodes(dataNodesNum)
               .racks(rackList.toArray(new String[rackList.size()]))
               .build();
@@ -143,7 +143,7 @@ public class TestNetworkTopologyServlet {
   public void testPrintTopologyNoDatanodesTextFormat() throws IOException {
     StaticMapping.resetMap();
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
             .numDataNodes(0)
             .build();
     cluster.waitActive();
@@ -173,7 +173,7 @@ public class TestNetworkTopologyServlet {
     public void testPrintTopologyNoDatanodesJsonFormat() throws IOException {
         StaticMapping.resetMap();
         Configuration conf = new HdfsConfiguration();
-        MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                 .numDataNodes(0)
                 .build();
         cluster.waitActive();

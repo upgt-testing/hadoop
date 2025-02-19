@@ -73,7 +73,7 @@ import org.slf4j.LoggerFactory;
  * 2. Lock the {@link FSDirectory} lock for the {@link SnapshotManager} methods
  * if necessary.
  */
-public class SnapshotManager implements SnapshotStatsMXBean {
+public class SnapshotManager implements SnapshotStatsMXBean, SnapshotManagerJVMInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(SnapshotManager.class);
 
@@ -139,7 +139,7 @@ public class SnapshotManager implements SnapshotStatsMXBean {
   }
 
   @VisibleForTesting
-  void setCaptureOpenFiles(boolean captureOpenFiles) {
+  public void setCaptureOpenFiles(boolean captureOpenFiles) {
     this.captureOpenFiles = captureOpenFiles;
   }
 
@@ -151,7 +151,7 @@ public class SnapshotManager implements SnapshotStatsMXBean {
   }
 
   /** Used in tests only */
-  void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
+  public void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
     this.allowNestedSnapshots = allowNestedSnapshots;
   }
 

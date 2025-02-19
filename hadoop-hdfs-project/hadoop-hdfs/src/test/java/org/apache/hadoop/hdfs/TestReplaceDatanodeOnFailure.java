@@ -126,7 +126,7 @@ public class TestReplaceDatanodeOnFailure {
 
     final String[] racks = new String[REPLICATION];
     Arrays.fill(racks, RACK0);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf
         ).racks(racks).numDataNodes(REPLICATION).build();
 
     try {
@@ -156,7 +156,7 @@ public class TestReplaceDatanodeOnFailure {
       cluster.waitFirstBRCompleted(0, 10000);
 
       //stop an old datanode
-      MiniDFSCluster.DataNodeProperties dnprop = cluster.stopDataNode(
+      MiniDFSClusterInJVM.DataNodeProperties dnprop = cluster.stopDataNode(
           AppendTestUtil.nextInt(REPLICATION));
 
       for(int i = FIRST_BATCH; i < slowwriters.length; i++) {
@@ -279,7 +279,7 @@ public class TestReplaceDatanodeOnFailure {
     final Configuration conf = new HdfsConfiguration();
     final short REPLICATION = (short)3;
     
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf
         ).numDataNodes(1).build();
 
     try {
@@ -331,7 +331,7 @@ public class TestReplaceDatanodeOnFailure {
     //always replace a datanode but do not throw exception
     ReplaceDatanodeOnFailure.write(Policy.ALWAYS, true, conf);
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf
         ).numDataNodes(1).build();
 
     try {

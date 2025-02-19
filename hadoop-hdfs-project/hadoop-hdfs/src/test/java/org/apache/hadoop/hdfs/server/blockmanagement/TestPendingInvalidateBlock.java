@@ -26,8 +26,8 @@ import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -54,7 +54,7 @@ public class TestPendingInvalidateBlock {
   private static final short REPLICATION = 2;
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
 
   @Before
@@ -69,7 +69,7 @@ public class TestPendingInvalidateBlock {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_INTERVAL_SECONDS_KEY, 1);
     // disable the RPC timeout for debug
     conf.setLong(CommonConfigurationKeys.IPC_PING_INTERVAL_KEY, 0);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();

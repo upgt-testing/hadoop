@@ -67,7 +67,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  */
 @InterfaceAudience.Private
 public class NNStorage extends Storage implements Closeable,
-    StorageErrorReporter {
+    StorageErrorReporter, NNStorageJVMInterface {
   static final String DEPRECATED_MESSAGE_DIGEST_PROPERTY = "imageMD5Digest";
   static final String LOCAL_URI_SCHEME = "file";
 

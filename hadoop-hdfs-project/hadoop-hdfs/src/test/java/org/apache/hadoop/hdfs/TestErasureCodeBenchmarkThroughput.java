@@ -36,7 +36,7 @@ import java.io.IOException;
  * To test {@link org.apache.hadoop.hdfs.ErasureCodeBenchmarkThroughput}.
  */
 public class TestErasureCodeBenchmarkThroughput {
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration conf;
   private static FileSystem fs;
 
@@ -48,7 +48,7 @@ public class TestErasureCodeBenchmarkThroughput {
     conf = new HdfsConfiguration();
     int numDN = ErasureCodeBenchmarkThroughput.getEcPolicy().getNumDataUnits() +
         ErasureCodeBenchmarkThroughput.getEcPolicy().getNumParityUnits();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDN).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDN).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     ((DistributedFileSystem)fs).enableErasureCodingPolicy(

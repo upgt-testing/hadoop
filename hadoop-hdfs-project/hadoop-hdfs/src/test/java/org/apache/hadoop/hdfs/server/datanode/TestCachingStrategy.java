@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.hadoop.hdfs.protocol.ExtendedBlockJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -32,7 +33,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.namenode.EditLogFileOutputStream;
@@ -217,11 +218,11 @@ public class TestCachingStrategy {
     LOG.info("testFadviseAfterWriteThenRead");
     tracker.clear();
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     String TEST_PATH = "/test";
     int TEST_PATH_LEN = MAX_TEST_FILE_LEN;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -229,7 +230,7 @@ public class TestCachingStrategy {
       // create new file
       createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, true);
       // verify that we dropped everything from the cache during file creation.
-      ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(
+      ExtendedBlockJVMInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(
           TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
       String fadvisedFileName = cluster.getBlockFile(0, block).getName();
       Stats stats = tracker.getStats(fadvisedFileName);
@@ -262,11 +263,11 @@ public class TestCachingStrategy {
     conf.setBoolean(DFSConfigKeys.DFS_DATANODE_DROP_CACHE_BEHIND_WRITES_KEY, false);
     conf.setBoolean(HdfsClientConfigKeys.DFS_CLIENT_CACHE_DROP_BEHIND_READS, true);
     conf.setBoolean(HdfsClientConfigKeys.DFS_CLIENT_CACHE_DROP_BEHIND_WRITES, true);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     String TEST_PATH = "/test";
     int TEST_PATH_LEN = MAX_TEST_FILE_LEN;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -274,7 +275,7 @@ public class TestCachingStrategy {
       // create new file
       createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, null);
       // verify that we dropped everything from the cache during file creation.
-      ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(
+      ExtendedBlockJVMInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(
           TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
       String fadvisedFileName = cluster.getBlockFile(0, block).getName();
       Stats stats = tracker.getStats(fadvisedFileName);
@@ -301,12 +302,12 @@ public class TestCachingStrategy {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_DATANODE_DROP_CACHE_BEHIND_READS_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_DATANODE_DROP_CACHE_BEHIND_WRITES_KEY, true);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     String TEST_PATH = "/test";
     int TEST_PATH_LEN = MAX_TEST_FILE_LEN;
     FSDataInputStream fis = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -315,7 +316,7 @@ public class TestCachingStrategy {
       createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, null);
       // Since the DataNode was configured with drop-behind, and we didn't
       // specify any policy, we should have done drop-behind.
-      ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(
+      ExtendedBlockJVMInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(
           TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
       String fadvisedFileName = cluster.getBlockFile(0, block).getName();
       Stats stats = tracker.getStats(fadvisedFileName);
@@ -345,11 +346,11 @@ public class TestCachingStrategy {
     LOG.info("testNoFadviseAfterWriteThenRead");
     tracker.clear();
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     String TEST_PATH = "/test";
     int TEST_PATH_LEN = MAX_TEST_FILE_LEN;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -357,7 +358,7 @@ public class TestCachingStrategy {
       // create new file
       createHdfsFile(fs, new Path(TEST_PATH), TEST_PATH_LEN, false);
       // verify that we did not drop everything from the cache during file creation.
-      ExtendedBlock block = cluster.getNameNode().getRpcServer().getBlockLocations(
+      ExtendedBlockJVMInterface block = cluster.getNameNode().getRpcServer().getBlockLocations(
           TEST_PATH, 0, Long.MAX_VALUE).get(0).getBlock();
       String fadvisedFileName = cluster.getBlockFile(0, block).getName();
       Stats stats = tracker.getStats(fadvisedFileName);
@@ -377,11 +378,11 @@ public class TestCachingStrategy {
     // start a cluster
     LOG.info("testSeekAfterSetDropBehind");
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     String TEST_PATH = "/test";
     int TEST_PATH_LEN = MAX_TEST_FILE_LEN;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();

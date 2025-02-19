@@ -23,7 +23,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.protocol.InvalidBlockReportLeaseException;
 import org.apache.hadoop.hdfs.server.protocol.SlowDiskReports;
 
@@ -571,6 +571,16 @@ public class TestBPOfferService {
 
   private void waitForInitialization(final BPOfferService bpos)
       throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      @Override
+      public Boolean get() {
+        return bpos.isAlive() && bpos.isInitialized();
+      }
+    }, 100, 10000);
+  }
+
+  private void waitForInitialization(final BPOfferServiceJVMInterface bpos)
+          throws Exception {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
       @Override
       public Boolean get() {
@@ -1185,11 +1195,11 @@ public class TestBPOfferService {
   @Test(timeout = 15000)
   public void testCommandProcessingThread() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
 
       // Try to write file and trigger NN send back command to DataNode.
       FileSystem fs = cluster.getFileSystem();
@@ -1213,15 +1223,15 @@ public class TestBPOfferService {
   @Test(timeout = 5000)
   public void testCommandProcessingThreadExit() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).
         numDataNodes(1).build();
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
-      DataNode dataNode = datanodes.get(0);
-      List<BPOfferService> allBpOs = dataNode.getAllBpOs();
-      BPOfferService bpos = allBpOs.get(0);
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+      DataNodeJVMInterface dataNode = datanodes.get(0);
+      List<BPOfferServiceJVMInterface> allBpOs = (List<BPOfferServiceJVMInterface>) dataNode.getAllBpOs();
+      BPOfferServiceJVMInterface bpos = allBpOs.get(0);
       waitForInitialization(bpos);
-      BPServiceActor actor = bpos.getBPServiceActors().get(0);
+      BPServiceActorJVMInterface actor = bpos.getBPServiceActors().get(0);
       // Stop and wait util actor exit.
       actor.stopCommandProcessingThread();
       GenericTestUtils.waitFor(() -> !actor.isAlive(), 100, 3000);

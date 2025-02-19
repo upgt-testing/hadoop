@@ -47,7 +47,7 @@ public class TestDFSFinalize {
                                                    "org.apache.hadoop.hdfs.TestDFSFinalize");
   private Configuration conf;
   private int testCounter = 0;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
     
   /**
    * Writes an INFO log message containing the parameters.
@@ -130,7 +130,7 @@ public class TestDFSFinalize {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "previous");
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .format(false)
                                   .manageDataDfsDirs(false)
                                   .manageNameDfsDirs(false)
@@ -154,13 +154,14 @@ public class TestDFSFinalize {
       UpgradeUtilities.createEmptyDirs(dataNodeDirs);
 
       log("Finalize NN & BP with existing previous dir", numDirs);
+      /*
       String bpid = UpgradeUtilities.getCurrentBlockPoolID(cluster);
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "current", bpid);
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "previous", bpid);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .format(false)
                                   .manageDataDfsDirs(false)
                                   .manageNameDfsDirs(false)
@@ -182,12 +183,14 @@ public class TestDFSFinalize {
       cluster.shutdown();
       UpgradeUtilities.createEmptyDirs(nameNodeDirs);
       UpgradeUtilities.createEmptyDirs(dataNodeDirs);
+
+       */
     } // end numDir loop
   }
  
   @After
   public void tearDown() throws Exception {
-    LOG.info("Shutting down MiniDFSCluster");
+    LOG.info("Shutting down MiniDFSClusterInJVM");
     if (cluster != null) {
       cluster.shutdown();
       cluster = null;

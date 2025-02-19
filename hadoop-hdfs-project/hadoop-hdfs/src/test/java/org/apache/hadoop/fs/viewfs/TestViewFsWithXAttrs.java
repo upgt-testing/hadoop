@@ -23,7 +23,7 @@ import org.apache.hadoop.fs.FileContextTestHelper;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestViewFsWithXAttrs {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileContext fc, fc2;
   private FileContext fcView, fcTarget, fcTarget2;
@@ -58,7 +58,7 @@ public class TestViewFsWithXAttrs {
 
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDFSClusterInJVM.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2)
         .build();

@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
+
+import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -90,7 +93,7 @@ public class TestEncryptedTransfer {
   private static final String PLAIN_TEXT = "this is very secret plain text";
   private static final Path TEST_PATH = new Path("/non-encrypted-file");
 
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
   private Configuration conf = null;
   private FileSystem fs = null;
   
@@ -134,7 +137,7 @@ public class TestEncryptedTransfer {
 
   private FileChecksum writeUnencryptedAndThenRestartEncryptedCluster()
       throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     fs = getFileSystem(conf);
     writeTestDataToFile(fs);
@@ -145,7 +148,7 @@ public class TestEncryptedTransfer {
 
     setEncryptionConfigKeys();
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .manageDataDfsDirs(false)
         .manageNameDfsDirs(false)
         .format(false)
@@ -278,7 +281,7 @@ public class TestEncryptedTransfer {
   @Test
   public void testLongLivedWriteClientAfterRestart() throws IOException {
     setEncryptionConfigKeys();
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     fs = getFileSystem(conf);
 
@@ -299,7 +302,7 @@ public class TestEncryptedTransfer {
   public void testLongLivedClient() throws IOException, InterruptedException {
     FileChecksum checksum = writeUnencryptedAndThenRestartEncryptedCluster();
 
-    BlockTokenSecretManager btsm = cluster.getNamesystem().getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm = cluster.getNamesystem().getBlockManager()
         .getBlockTokenSecretManager();
     btsm.setKeyUpdateIntervalForTesting(2 * 1000);
     btsm.setTokenLifetime(2 * 1000);
@@ -328,7 +331,7 @@ public class TestEncryptedTransfer {
       return;
     }
     setEncryptionConfigKeys();
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     fs = getFileSystem(conf);
     DFSClient client = DFSClientAdapter.getDFSClient((DistributedFileSystem)fs);
@@ -337,7 +340,7 @@ public class TestEncryptedTransfer {
     writeTestDataToFile(fs);
     FileChecksum checksum = fs.getFileChecksum(TEST_PATH);
 
-    BlockTokenSecretManager btsm = cluster.getNamesystem().getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm = cluster.getNamesystem().getBlockManager()
         .getBlockTokenSecretManager();
     // Reduce key update interval and token life for testing.
     btsm.setKeyUpdateIntervalForTesting(2 * 1000);
@@ -348,8 +351,8 @@ public class TestEncryptedTransfer {
     LOG.info("Wait until encryption keys become invalid...");
 
     DataEncryptionKey encryptionKey = spyClient.getEncryptionKey();
-    List<DataNode> dataNodes = cluster.getDataNodes();
-    for (DataNode dn: dataNodes) {
+    List<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
+    for (DataNodeJVMInterface dn: dataNodes) {
       GenericTestUtils.waitFor(
           new Supplier<Boolean>() {
             @Override
@@ -384,7 +387,7 @@ public class TestEncryptedTransfer {
 
     setEncryptionConfigKeys();
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDataNodes)
         .build();
 
@@ -394,7 +397,7 @@ public class TestEncryptedTransfer {
     DFSClientAdapter.setDFSClient((DistributedFileSystem) fs, spyClient);
     writeTestDataToFile(fs);
 
-    BlockTokenSecretManager btsm = cluster.getNamesystem().getBlockManager()
+    BlockTokenSecretManagerJVMInterface btsm = cluster.getNamesystem().getBlockManager()
         .getBlockTokenSecretManager();
     // Reduce key update interval and token life for testing.
     btsm.setKeyUpdateIntervalForTesting(2 * 1000);
@@ -405,8 +408,8 @@ public class TestEncryptedTransfer {
     LOG.info("Wait until encryption keys become invalid...");
 
     DataEncryptionKey encryptionKey = spyClient.getEncryptionKey();
-    List<DataNode> dataNodes = cluster.getDataNodes();
-    for (DataNode dn: dataNodes) {
+    List<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
+    for (DataNodeJVMInterface dn: dataNodes) {
       GenericTestUtils.waitFor(
           new Supplier<Boolean>() {
             @Override
@@ -452,7 +455,7 @@ public class TestEncryptedTransfer {
   private void testEncryptedWrite(int numDns) throws IOException {
     setEncryptionConfigKeys();
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDns).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDns).build();
 
     fs = getFileSystem(conf);
 
@@ -482,7 +485,7 @@ public class TestEncryptedTransfer {
   public void testEncryptedAppend() throws IOException {
     setEncryptionConfigKeys();
 
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
 
     fs = getFileSystem(conf);
 
@@ -498,7 +501,7 @@ public class TestEncryptedTransfer {
     setEncryptionConfigKeys();
 
     // start up 4 DNs
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(4).build();
 
     fs = getFileSystem(conf);
 
@@ -512,7 +515,7 @@ public class TestEncryptedTransfer {
     in.close();
     assertEquals(1, locatedBlocks.size());
     assertEquals(3, locatedBlocks.get(0).getLocations().length);
-    DataNode dn = cluster.getDataNode(
+    DataNodeJVMInterface dn = cluster.getDataNode(
         locatedBlocks.get(0).getLocations()[0].getIpcPort());
     dn.shutdown();
 

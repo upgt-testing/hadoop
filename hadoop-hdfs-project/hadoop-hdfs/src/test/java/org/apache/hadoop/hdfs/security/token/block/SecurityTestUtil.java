@@ -42,4 +42,9 @@ public class SecurityTestUtil {
     handler.setTokenLifetime(tokenLifetime);
   }
 
+  public static void setBlockTokenLifetime(BlockTokenSecretManagerJVMInterface handler,
+                                           long tokenLifetime) {
+    handler.setTokenLifetime(tokenLifetime);
+  }
+
 }

@@ -40,7 +40,7 @@ import static org.apache.hadoop.hdfs.DFSUtilClient.percent2String;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DatanodeInfo extends DatanodeID implements Node {
+public class DatanodeInfo extends DatanodeID implements Node, DatanodeInfoJVMInterface {
   private long capacity;
   private long dfsUsed;
   private long nonDfsUsed;
@@ -723,6 +723,17 @@ public class DatanodeInfo extends DatanodeID implements Node {
     }
 
     public DatanodeInfoBuilder setNodeID(DatanodeID nodeID) {
+      this.ipAddr = nodeID.getIpAddr();
+      this.hostName = nodeID.getHostName();
+      this.datanodeUuid = nodeID.getDatanodeUuid();
+      this.xferPort = nodeID.getXferPort();
+      this.infoPort = nodeID.getInfoPort();
+      this.infoSecurePort = nodeID.getInfoSecurePort();
+      this.ipcPort = nodeID.getIpcPort();
+      return this;
+    }
+
+    public DatanodeInfoBuilder setNodeID(DatanodeIDJVMInterface nodeID) {
       this.ipAddr = nodeID.getIpAddr();
       this.hostName = nodeID.getHostName();
       this.datanodeUuid = nodeID.getDatanodeUuid();

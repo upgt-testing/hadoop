@@ -53,6 +53,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirType;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.namenode.FSImageStorageInspector.FSImageFile;
@@ -499,6 +500,11 @@ public abstract class FSImageTestUtil {
       List<Integer> txids) {
     assertNNHasCheckpoints(cluster, 0, txids);
   }
+
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            List<Integer> txids) {
+    assertNNHasCheckpoints(cluster, 0, txids);
+  }
   
   public static void assertNNHasCheckpoints(MiniDFSCluster cluster,
       int nnIdx, List<Integer> txids) {
@@ -517,7 +523,32 @@ public abstract class FSImageTestUtil {
     }
   }
 
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            int nnIdx, List<Integer> txids) {
+
+    for (File nameDir : getNameNodeCurrentDirs(cluster, nnIdx)) {
+      LOG.info("examining name dir with files: " +
+              Joiner.on(",").join(nameDir.listFiles()));
+      // Should have fsimage_N for the three checkpoints
+      LOG.info("Examining storage dir " + nameDir + " with contents: "
+              + StringUtils.join(nameDir.listFiles(), ", "));
+      for (long checkpointTxId : txids) {
+        File image = new File(nameDir,
+                NNStorage.getImageFileName(checkpointTxId));
+        assertTrue("Expected non-empty " + image, image.length() > 0);
+      }
+    }
+  }
+
   public static List<File> getNameNodeCurrentDirs(MiniDFSCluster cluster, int nnIdx) {
+    List<File> nameDirs = Lists.newArrayList();
+    for (URI u : cluster.getNameDirs(nnIdx)) {
+      nameDirs.add(new File(u.getPath(), "current"));
+    }
+    return nameDirs;
+  }
+
+  public static List<File> getNameNodeCurrentDirs(MiniDFSClusterInJVM cluster, int nnIdx) {
     List<File> nameDirs = Lists.newArrayList();
     for (URI u : cluster.getNameDirs(nnIdx)) {
       nameDirs.add(new File(u.getPath(), "current"));

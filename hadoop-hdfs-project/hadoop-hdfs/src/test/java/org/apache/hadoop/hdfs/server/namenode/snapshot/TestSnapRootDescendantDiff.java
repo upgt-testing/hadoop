@@ -24,6 +24,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +46,7 @@ public class TestSnapRootDescendantDiff extends TestSnapshotDiffReport {
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_DIFF_ALLOW_SNAP_ROOT_DESCENDANT,
         false);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3)
         .format(true).build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();

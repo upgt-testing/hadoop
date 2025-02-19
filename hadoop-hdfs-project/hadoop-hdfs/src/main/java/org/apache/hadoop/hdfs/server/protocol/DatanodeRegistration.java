@@ -35,7 +35,7 @@ import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTest
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class DatanodeRegistration extends DatanodeID
-    implements NodeRegistration {
+    implements NodeRegistration, DatanodeRegistrationJVMInterface {
 
   private final StorageInfo storageInfo;
   private ExportedBlockKeys exportedKeys;

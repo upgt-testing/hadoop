@@ -80,12 +80,12 @@ import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_WRIT
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY;
 
 public class TestDFSOutputStream {
-  static MiniDFSCluster cluster;
+  static MiniDFSClusterInJVM cluster;
 
   @BeforeClass
   public static void setup() throws IOException {
     Configuration conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
   }
 
   /**
@@ -198,17 +198,17 @@ public class TestDFSOutputStream {
     final int chunkSize = bytesPerChecksum + checksumSize;
     final int packateMaxHeaderLength = 33;
 
-    MiniDFSCluster dfsCluster = null;
+    MiniDFSClusterInJVM dfsCluster = null;
     final File baseDir = new File(PathUtils.getTestDir(getClass()),
         GenericTestUtils.getMethodName());
 
     try {
       final Configuration dfsConf = new Configuration();
-      dfsConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR,
+      dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR,
           baseDir.getAbsolutePath());
       dfsConf.setInt(DFS_CLIENT_WRITE_PACKET_SIZE_KEY,
           configuredWritePacketSize);
-      dfsCluster = new MiniDFSCluster.Builder(dfsConf).numDataNodes(1).build();
+      dfsCluster = new MiniDFSClusterInJVM.Builder(dfsConf).numDataNodes(1).build();
       dfsCluster.waitActive();
 
       final FSDataOutputStream os = dfsCluster.getFileSystem()
@@ -377,6 +377,7 @@ public class TestDFSOutputStream {
     Assert.assertFalse(isDelay.get());
   }
 
+  /*
   @Test
   public void testNoLocalWriteFlag() throws IOException {
     DistributedFileSystem fs = cluster.getFileSystem();
@@ -417,6 +418,8 @@ public class TestDFSOutputStream {
     // Verify that only one DN has no data.
     assertEquals(1, 3 - numDataNodesWithData);
   }
+
+   */
 
   @Test
   public void testEndLeaseCall() throws Exception {

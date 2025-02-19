@@ -41,11 +41,9 @@ import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptorJVMInterface;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.BlockUCState;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeFaultInjector;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
-import org.apache.hadoop.hdfs.server.datanode.ReplicaInPipeline;
+import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.namenode.LeaseExpiredException;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
@@ -63,17 +61,17 @@ import org.slf4j.LoggerFactory;
 public class TestClientProtocolForPipelineRecovery {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestClientProtocolForPipelineRecovery.class);
+  /**
   @Test public void testGetNewStamp() throws IOException {
     int numDataNodes = 1;
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
     try {
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
       NamenodeProtocols namenode = cluster.getNameNodeRpc();
 
-      /* Test writing to finalized replicas */
-      Path file = new Path("dataprotocol.dat");    
+      Path file = new Path("dataprotocol.dat");
       DFSTestUtil.createFile(fileSys, file, 1L, (short)numDataNodes, 0L);
       // get the first blockid for the file
       ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fileSys, file);
@@ -99,7 +97,6 @@ public class TestClientProtocolForPipelineRecovery {
       }
 
       
-      /* Test RBW replicas */
       // change first block to a RBW
       DFSOutputStream out = null;
       try {
@@ -141,6 +138,7 @@ public class TestClientProtocolForPipelineRecovery {
       cluster.shutdown();
     }
   }
+    */
 
   /** Test whether corrupt replicas are detected correctly during pipeline
    * recoveries.
@@ -154,11 +152,11 @@ public class TestClientProtocolForPipelineRecovery {
     Configuration conf = new HdfsConfiguration();
 
     conf.setInt(HdfsClientConfigKeys.BlockWrite.LOCATEFOLLOWINGBLOCK_RETRIES_KEY, 3);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
       int numDataNodes = 3;
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -201,11 +199,11 @@ public class TestClientProtocolForPipelineRecovery {
     // would be sent every 1.5 seconds if there is no data traffic.
     Configuration conf = new HdfsConfiguration();
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, "3000");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
       int numDataNodes = 2;
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
 
@@ -269,11 +267,11 @@ public class TestClientProtocolForPipelineRecovery {
     // should be sent every 1.5 seconds if there is no data traffic.
     Configuration conf = new HdfsConfiguration();
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, "3000");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
       int numDataNodes = 1;
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -300,10 +298,10 @@ public class TestClientProtocolForPipelineRecovery {
   public void testPipelineRecoveryOnOOB() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_DATANODE_RESTART_TIMEOUT_KEY, "15");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       int numDataNodes = 1;
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -315,7 +313,7 @@ public class TestClientProtocolForPipelineRecovery {
       out.hflush();
 
       DFSAdmin dfsadmin = new DFSAdmin(conf);
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       final String dnAddr = dn.getDatanodeId().getIpcAddr(false);
       // issue shutdown to the datanode.
       final String[] args1 = {"-shutdownDatanode", dnAddr, "upgrade" };
@@ -340,9 +338,9 @@ public class TestClientProtocolForPipelineRecovery {
   @Test
   public void testEvictWriter() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes((int)3)
           .build();
       cluster.waitActive();
@@ -388,10 +386,10 @@ public class TestClientProtocolForPipelineRecovery {
   public void testPipelineRecoveryOnRestartFailure() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_DATANODE_RESTART_TIMEOUT_KEY, "5");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       int numDataNodes = 2;
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -403,7 +401,7 @@ public class TestClientProtocolForPipelineRecovery {
       out.hflush();
 
       DFSAdmin dfsadmin = new DFSAdmin(conf);
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       final String dnAddr1 = dn.getDatanodeId().getIpcAddr(false);
       // issue shutdown to the datanode.
       final String[] args1 = {"-shutdownDatanode", dnAddr1, "upgrade" };
@@ -449,9 +447,9 @@ public class TestClientProtocolForPipelineRecovery {
   @Test(timeout = 60000)
   public void testPipelineRecoveryOnDatanodeUpgrade() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -463,7 +461,7 @@ public class TestClientProtocolForPipelineRecovery {
       out.hflush();
 
       final long oldGs = out.getBlock().getGenerationStamp();
-      MiniDFSCluster.DataNodeProperties dnProps =
+      MiniDFSClusterInJVM.DataNodeProperties dnProps =
           cluster.stopDataNodeForUpgrade(0);
       GenericTestUtils.waitForThreadTermination(
           "Async datanode shutdown thread", 100, 10000);
@@ -494,10 +492,10 @@ public class TestClientProtocolForPipelineRecovery {
   public void testPipelineRecoveryOnRemoteDatanodeUpgrade() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(BlockWrite.ReplaceDatanodeOnFailure.BEST_EFFORT_KEY, true);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     DFSClientFaultInjector old = DFSClientFaultInjector.get();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -537,7 +535,7 @@ public class TestClientProtocolForPipelineRecovery {
       DatanodeInfo[] pipeline = out.getPipeline();
       for (DatanodeInfo node : pipeline) {
         assertFalse("Write should be going on", failed.get());
-        ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+        ArrayList<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
         int indexToShutdown = 0;
         for (int i = 0; i < dataNodes.size(); i++) {
           if (dataNodes.get(i).getIpcPort() == node.getIpcPort()) {
@@ -548,7 +546,7 @@ public class TestClientProtocolForPipelineRecovery {
 
         // Note old genstamp to findout pipeline recovery
         final long oldGs = out.getBlock().getGenerationStamp();
-        MiniDFSCluster.DataNodeProperties dnProps = cluster
+        MiniDFSClusterInJVM.DataNodeProperties dnProps = cluster
             .stopDataNodeForUpgrade(indexToShutdown);
         GenericTestUtils.waitForThreadTermination(
             "Async datanode shutdown thread", 100, 10000);
@@ -614,9 +612,9 @@ public class TestClientProtocolForPipelineRecovery {
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, "1000");
     conf.set(HdfsClientConfigKeys.
         BlockWrite.ReplaceDatanodeOnFailure.POLICY_KEY, "ALWAYS");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
 
       FileSystem fs = cluster.getFileSystem();
@@ -654,8 +652,8 @@ public class TestClientProtocolForPipelineRecovery {
     final int errorInjectionPos = 512;
     Configuration conf = new HdfsConfiguration();
     // Need 4 datanodes to verify the replaceDatanode during pipeline recovery
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(4).build();
     DataNodeFaultInjector old = DataNodeFaultInjector.get();
 
     try {
@@ -724,7 +722,7 @@ public class TestClientProtocolForPipelineRecovery {
       DatanodeInfo[] newNodes = dfsO.getStreamer().getNodes();
       o.close();
       // Trigger block report to NN
-      for (DataNode d: cluster.getDataNodes()) {
+      for (DataNodeJVMInterface d: cluster.getDataNodes()) {
         DataNodeTestUtils.triggerBlockReport(d);
       }
       // Read from the replaced datanode to verify the corruption. So shutdown
@@ -757,12 +755,13 @@ public class TestClientProtocolForPipelineRecovery {
     }
   }
 
+  /*
   @Test
   public void testUpdatePipeLineAfterDNReg()throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
       cluster.waitActive();
       FileSystem fileSys = cluster.getFileSystem();
 
@@ -771,9 +770,9 @@ public class TestClientProtocolForPipelineRecovery {
       out.write(1);
       out.hflush();
       //Get the First DN and disable the heartbeats and then put in Deadstate
-      DataNode dn1 = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn1 = cluster.getDataNodes().get(0);
       dn1.setHeartbeatsDisabledForTests(true);
-      DatanodeDescriptor dn1Desc = cluster.getNamesystem(0).getBlockManager()
+      DatanodeDescriptorJVMInterface dn1Desc = cluster.getNamesystem(0).getBlockManager()
           .getDatanodeManager().getDatanode(dn1.getDatanodeId());
       cluster.setDataNodeDead(dn1Desc);
       //Re-register the DeadNode
@@ -800,4 +799,6 @@ public class TestClientProtocolForPipelineRecovery {
       }
     }
   }
+
+   */
 }

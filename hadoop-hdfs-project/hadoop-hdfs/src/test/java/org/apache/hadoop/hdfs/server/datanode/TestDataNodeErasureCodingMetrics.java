@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hdfs.server.datanode;
 
+import org.apache.hadoop.hdfs.protocol.*;
+import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -24,15 +26,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
-import org.apache.hadoop.hdfs.protocol.DatanodeID;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
-import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
-import org.apache.hadoop.hdfs.protocol.LocatedStripedBlock;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.metrics2.MetricsRecordBuilder;
 import static org.apache.hadoop.test.MetricsAsserts.getLongCounter;
@@ -63,7 +58,7 @@ public class TestDataNodeErasureCodingMetrics {
   private final int blockGroupSize = blockSize * dataBlocks;
   private final int numDNs = groupSize + 1;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf;
   private DistributedFileSystem fs;
 
@@ -72,7 +67,7 @@ public class TestDataNodeErasureCodingMetrics {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_INTERVAL_SECONDS_KEY, 1);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.waitActive();
     cluster.getFileSystem().getClient().setErasureCodingPolicy("/",
         StripedFileTestUtil.getDefaultECPolicy().getName());
@@ -160,7 +155,7 @@ public class TestDataNodeErasureCodingMetrics {
   private long getLongMetric(String metricName) {
     long metricValue = 0;
     // Add all reconstruction metric value from all data nodes
-    for (DataNode dn : cluster.getDataNodes()) {
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
       metricValue += getLongCounter(metricName, rb);
     }
@@ -170,7 +165,7 @@ public class TestDataNodeErasureCodingMetrics {
   private long getLongMetricWithoutCheck(String metricName) {
     long metricValue = 0;
     // Add all reconstruction metric value from all data nodes
-    for (DataNode dn : cluster.getDataNodes()) {
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
       metricValue += getLongCounterWithoutCheck(metricName, rb);
     }
@@ -192,7 +187,7 @@ public class TestDataNodeErasureCodingMetrics {
         (LocatedStripedBlock)locatedBlocks.getLastLocatedBlock();
     assertTrue(lastBlock.getLocations().length > deadNodeIndex);
 
-    final DataNode toCorruptDn = cluster.getDataNode(
+    final DataNodeJVMInterface toCorruptDn = cluster.getDataNode(
         lastBlock.getLocations()[deadNodeIndex].getIpcPort());
     LOG.info("Datanode to be corrupted: " + toCorruptDn);
     assertNotNull("Failed to find a datanode to be corrupted", toCorruptDn);
@@ -214,7 +209,7 @@ public class TestDataNodeErasureCodingMetrics {
 
   private int getComputedDatanodeWork()
       throws IOException, InterruptedException {
-    final BlockManager bm = cluster.getNamesystem().getBlockManager();
+    final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
     // Giving a grace period to compute datanode work.
     int workCount = 0;
     int retries = 20;
@@ -231,10 +226,18 @@ public class TestDataNodeErasureCodingMetrics {
   }
 
   private void setDataNodeDead(DatanodeID dnID) throws IOException {
-    DatanodeDescriptor dnd =
+    DatanodeDescriptorJVMInterface dnd =
         NameNodeAdapter.getDatanode(cluster.getNamesystem(), dnID);
-    DFSTestUtil.setDatanodeDead(dnd);
+    DFSTestUtil.setDatanodeDead((DatanodeInfoJVMInterface) dnd);
     BlockManagerTestUtil.checkHeartbeat(
         cluster.getNamesystem().getBlockManager());
+  }
+
+  private void setDataNodeDead(DatanodeIDJVMInterface dnID) throws IOException {
+    DatanodeDescriptorJVMInterface dnd =
+            NameNodeAdapter.getDatanode(cluster.getNamesystem(), dnID);
+    DFSTestUtil.setDatanodeDead((DatanodeInfoJVMInterface) dnd);
+    BlockManagerTestUtil.checkHeartbeat(
+            cluster.getNamesystem().getBlockManager());
   }
 }

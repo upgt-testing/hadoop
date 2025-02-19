@@ -92,7 +92,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
  * </ul>
  */
 @InterfaceAudience.Private
-class BPServiceActor implements Runnable {
+class BPServiceActor implements Runnable, BPServiceActorJVMInterface {
   
   static final Logger LOG = DataNode.LOG;
   final InetSocketAddress nnAddr;
@@ -173,7 +173,7 @@ class BPServiceActor implements Runnable {
     return ibrManager;
   }
 
-  boolean isAlive() {
+  public boolean isAlive() {
     if (!shouldServiceRun || !bpThread.isAlive()) {
       return false;
     }
@@ -190,7 +190,7 @@ class BPServiceActor implements Runnable {
     return bpos.toString() + " service to " + nnAddr;
   }
   
-  InetSocketAddress getNNSocketAddress() {
+  public InetSocketAddress getNNSocketAddress() {
     return nnAddr;
   }
 
@@ -227,7 +227,7 @@ class BPServiceActor implements Runnable {
   }
 
   @VisibleForTesting
-  DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
+  public DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
     return bpNamenode;
   }
 
@@ -1522,7 +1522,7 @@ class BPServiceActor implements Runnable {
   }
 
   @VisibleForTesting
-  void stopCommandProcessingThread() {
+  public void stopCommandProcessingThread() {
     if (commandProcessingThread != null) {
       commandProcessingThread.interrupt();
     }

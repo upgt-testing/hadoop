@@ -36,7 +36,7 @@ import static org.apache.hadoop.hdfs.protocol.BlockType.STRIPED;
  * {@link FSNamesystem} is responsible for persisting the allocations in the
  * {@link FSEditLog}.
  */
-public class BlockIdManager {
+public class BlockIdManager implements BlockIdManagerJVMInterface{
   /**
    * The global generation stamp for legacy blocks with randomly
    * generated block IDs.
@@ -122,7 +122,7 @@ public class BlockIdManager {
   }
 
   @VisibleForTesting
-  SequentialBlockIdGenerator getBlockIdGenerator() {
+  public SequentialBlockIdGenerator getBlockIdGenerator() {
     return blockIdGenerator;
   }
 
@@ -321,7 +321,7 @@ public class BlockIdManager {
         HdfsServerConstants.BLOCK_GROUP_INDEX_MASK);
   }
 
-  SequentialBlockGroupIdGenerator getBlockGroupIdGenerator() {
+  public SequentialBlockGroupIdGenerator getBlockGroupIdGenerator() {
     return blockGroupIdGenerator;
   }
 }

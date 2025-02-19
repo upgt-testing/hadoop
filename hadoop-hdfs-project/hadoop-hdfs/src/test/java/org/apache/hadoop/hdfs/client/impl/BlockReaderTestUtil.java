@@ -38,7 +38,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.RemotePeerFactory;
 import org.apache.hadoop.hdfs.net.Peer;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
@@ -50,6 +50,7 @@ import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.server.blockmanagement.CacheReplicationMonitor;
 import org.apache.hadoop.hdfs.server.datanode.CachingStrategy;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.ShortCircuitRegistry;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsDatasetCache;
 import org.apache.hadoop.hdfs.server.namenode.CacheManager;
@@ -77,7 +78,7 @@ public class BlockReaderTestUtil {
   }
 
   private HdfsConfiguration conf = null;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
 
   /**
    * Setup the cluster
@@ -86,7 +87,7 @@ public class BlockReaderTestUtil {
     this(replicationFactor, new HdfsConfiguration());
   }
 
-  public BlockReaderTestUtil(MiniDFSCluster cluster, HdfsConfiguration conf) {
+  public BlockReaderTestUtil(MiniDFSClusterInJVM cluster, HdfsConfiguration conf) {
     this.conf = conf;
     this.cluster = cluster;
   }
@@ -94,7 +95,7 @@ public class BlockReaderTestUtil {
   public BlockReaderTestUtil(int replicationFactor, HdfsConfiguration config) throws Exception {
     this.conf = config;
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, replicationFactor);
-    cluster = new MiniDFSCluster.Builder(conf).format(true).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).format(true).build();
     cluster.waitActive();
   }
 
@@ -107,7 +108,7 @@ public class BlockReaderTestUtil {
     }
   }
 
-  public MiniDFSCluster getCluster() {
+  public MiniDFSClusterInJVM getCluster() {
     return cluster;
   }
 
@@ -231,7 +232,7 @@ public class BlockReaderTestUtil {
   /**
    * Get a DataNode that serves our testBlock.
    */
-  public DataNode getDataNode(LocatedBlock testBlock) {
+  public DataNodeJVMInterface getDataNode(LocatedBlock testBlock) {
     DatanodeInfo[] nodes = testBlock.getLocations();
     int ipcport = nodes[0].getIpcPort();
     return cluster.getDataNode(ipcport);

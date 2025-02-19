@@ -32,7 +32,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.NetUtils;
 
@@ -61,7 +61,7 @@ public class TestWebHdfsWithRestCsrfPreventionFilter {
   private final boolean dnRestCsrf;
   private final boolean clientRestCsrf;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private FileSystem fs, webhdfs;
 
   @Rule
@@ -94,7 +94,7 @@ public class TestWebHdfsWithRestCsrfPreventionFilter {
     // Set configuration to treat anything as a browser, so that CSRF prevention
     // checks actually get enforced.
     nnConf.set(DFS_WEBHDFS_REST_CSRF_BROWSER_USERAGENTS_REGEX_KEY, ".*");
-    cluster = new MiniDFSCluster.Builder(nnConf).numDataNodes(0).build();
+    cluster = new MiniDFSClusterInJVM.Builder(nnConf).numDataNodes(0).build();
 
     Configuration dnConf = new Configuration(nnConf);
     dnConf.setBoolean(DFS_WEBHDFS_REST_CSRF_ENABLED_KEY, dnRestCsrf);

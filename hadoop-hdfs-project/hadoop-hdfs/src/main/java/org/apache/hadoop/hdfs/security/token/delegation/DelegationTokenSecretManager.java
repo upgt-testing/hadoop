@@ -60,7 +60,7 @@ import org.apache.hadoop.thirdparty.protobuf.ByteString;
  */
 @InterfaceAudience.Private
 public class DelegationTokenSecretManager
-    extends AbstractDelegationTokenSecretManager<DelegationTokenIdentifier> {
+    extends AbstractDelegationTokenSecretManager<DelegationTokenIdentifier> implements DelegationTokenSecretManagerJVMInterface {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(DelegationTokenSecretManager.class);

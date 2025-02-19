@@ -43,7 +43,7 @@ import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTest
  * The datanode list and statistics are synchronized
  * by the heartbeat manager lock.
  */
-class HeartbeatManager implements DatanodeStatistics {
+class HeartbeatManager implements DatanodeStatistics, HeartbeatManagerJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(HeartbeatManager.class);
   private static final String REPORT_DELTA_STALE_DN_HEADER =
       "StaleNodes Report: [New Stale Nodes]: %d";
@@ -228,7 +228,7 @@ class HeartbeatManager implements DatanodeStatistics {
     }
   }
 
-  synchronized DatanodeDescriptor[] getDatanodes() {
+  public synchronized DatanodeDescriptor[] getDatanodes() {
     return datanodes.toArray(new DatanodeDescriptor[datanodes.size()]);
   }
 
@@ -332,7 +332,7 @@ class HeartbeatManager implements DatanodeStatistics {
   }
 
   @VisibleForTesting
-  void restartHeartbeatStopWatch() {
+  public void restartHeartbeatStopWatch() {
     heartbeatStopWatch.reset().start();
   }
 
@@ -422,7 +422,7 @@ class HeartbeatManager implements DatanodeStatistics {
    *    when we remove all blocks from BlocksMap for that storage.
    */
   @VisibleForTesting
-  void heartbeatCheck() {
+  public void heartbeatCheck() {
     final DatanodeManager dm = blockManager.getDatanodeManager();
     // It's OK to check safe mode w/o taking the lock here, we re-check
     // for safe mode after taking the lock before removing a datanode.

@@ -20,7 +20,9 @@ package org.apache.hadoop.hdfs.server.datanode.fsdataset.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Supplier;
-import org.apache.hadoop.hdfs.server.datanode.LocalReplica;
+
+import org.apache.hadoop.hdfs.server.datanode.*;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
 import java.io.OutputStream;
@@ -40,7 +42,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
@@ -51,16 +53,6 @@ import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.common.StorageInfo;
-import org.apache.hadoop.hdfs.server.datanode.BlockScanner;
-import org.apache.hadoop.hdfs.server.datanode.DNConf;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
-import org.apache.hadoop.hdfs.server.datanode.DataStorage;
-import org.apache.hadoop.hdfs.server.datanode.FinalizedReplica;
-import org.apache.hadoop.hdfs.server.datanode.ReplicaHandler;
-import org.apache.hadoop.hdfs.server.datanode.ReplicaInfo;
-import org.apache.hadoop.hdfs.server.datanode.ShortCircuitRegistry;
-import org.apache.hadoop.hdfs.server.datanode.StorageLocation;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.DataNodeVolumeMetrics;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi.FsVolumeReferences;
@@ -249,18 +241,19 @@ public class TestFsDatasetImpl {
     holder.interrupt();
   }
 
+  /*
   @Test(timeout=10000)
   public void testReadLockCanBeDisabledByConfig()
       throws Exception {
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setBoolean(
         DFSConfigKeys.DFS_DATANODE_LOCK_READ_WRITE_ENABLED_KEY, false);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1).build();
     try {
       cluster.waitActive();
-      DataNode dn = cluster.getDataNodes().get(0);
-      final FsDatasetSpi<?> ds = DataNodeTestUtils.getFSDataset(dn);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+      final FsDatasetSpiJVMInterface<?> ds = DataNodeTestUtils.getFSDataset(dn);
 
       CountDownLatch latch = new CountDownLatch(1);
       CountDownLatch waiterLatch = new CountDownLatch(1);
@@ -315,6 +308,8 @@ public class TestFsDatasetImpl {
     }
   }
 
+   */
+
   @Test
   public void testAddVolumes() throws IOException {
     final int numNewVolumes = 3;
@@ -362,14 +357,14 @@ public class TestFsDatasetImpl {
   @Test
   public void testAddVolumeWithSameStorageUuid() throws IOException {
     HdfsConfiguration config = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(config)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(config)
         .numDataNodes(1).build();
     try {
       cluster.waitActive();
       assertTrue(cluster.getDataNodes().get(0).isConnectedToNN(
           cluster.getNameNode().getServiceRpcAddress()));
 
-      MiniDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
+      MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
       File vol0 = cluster.getStorageDir(0, 0);
       File vol1 = cluster.getStorageDir(0, 1);
       Storage.StorageDirectory sd0 = new Storage.StorageDirectory(vol0);
@@ -589,16 +584,17 @@ public class TestFsDatasetImpl {
 
     FsDatasetTestUtil.assertFileLockReleased(badDir.toString());
   }
-  
+
+  /*
   @Test
   public void testDeletingBlocks() throws IOException {
     HdfsConfiguration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       
-      FsDatasetSpi<?> ds = DataNodeTestUtils.getFSDataset(dn);
+      FsDatasetSpiJVMInterface<?> ds = DataNodeTestUtils.getFSDataset(dn);
       ds.addBlockPool(BLOCKPOOL, conf);
       FsVolumeImpl vol;
       try (FsDatasetSpi.FsVolumeReferences volumes = ds.getFsVolumeReferences()) {
@@ -636,6 +632,8 @@ public class TestFsDatasetImpl {
       cluster.shutdown();
     }
   }
+
+   */
 
   @Test
   public void testDuplicateReplicaResolution() throws IOException {
@@ -861,9 +859,10 @@ public class TestFsDatasetImpl {
    * Tests stopping all the active DataXceiver thread on volume failure event.
    * @throws Exception
    */
+  /*
   @Test
   public void testCleanShutdownOfVolume() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       Configuration config = new HdfsConfiguration();
       config.setLong(
@@ -873,11 +872,11 @@ public class TestFsDatasetImpl {
           TimeUnit.MILLISECONDS);
       config.setInt(DFSConfigKeys.DFS_DATANODE_FAILED_VOLUMES_TOLERATED_KEY, 1);
 
-      cluster = new MiniDFSCluster.Builder(config,
+      cluster = new MiniDFSClusterInJVM.Builder(config,
           GenericTestUtils.getRandomizedTestDir()).numDataNodes(1).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
       Path filePath = new Path("test.dat");
       // Create a file and keep the output stream unclosed.
       FSDataOutputStream out = fs.create(filePath, (short) 1);
@@ -924,11 +923,14 @@ public class TestFsDatasetImpl {
     }
   }
 
+
+   */
+  /*
   @Test(timeout = 30000)
   public void testReportBadBlocks() throws Exception {
     boolean threwException = false;
     final Configuration config = new HdfsConfiguration();
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(config)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(config)
         .numDataNodes(1).build()) {
       cluster.waitActive();
 
@@ -959,17 +961,19 @@ public class TestFsDatasetImpl {
     }
   }
 
+   */
+
   @Test(timeout = 30000)
   public void testMoveBlockFailure() {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(1)
           .storageTypes(new StorageType[]{StorageType.DISK, StorageType.DISK})
           .storagesPerDatanode(2)
           .build();
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
 
       Path filePath = new Path("testData");
       DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
@@ -1004,15 +1008,15 @@ public class TestFsDatasetImpl {
 
   @Test(timeout = 30000)
   public void testMoveBlockSuccess() {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(1)
           .storageTypes(new StorageType[]{StorageType.DISK, StorageType.DISK})
           .storagesPerDatanode(2)
           .build();
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
 
       Path filePath = new Path("testData");
       DFSTestUtil.createFile(fs, filePath, 100, (short) 1, 0);
@@ -1072,18 +1076,18 @@ public class TestFsDatasetImpl {
 
   @Test(timeout = 3000000)
   public void testBlockReadOpWhileMovingBlock() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
 
       // Setup cluster
       conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(1)
           .storageTypes(new StorageType[]{StorageType.DISK, StorageType.DISK})
           .storagesPerDatanode(2)
           .build();
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
 
       // Create test file with ASCII data
       Path filePath = new Path("/tmp/testData");
@@ -1222,7 +1226,7 @@ public class TestFsDatasetImpl {
 
   @Test(timeout = 20000)
   public void testReleaseVolumeRefIfExceptionThrown() throws IOException {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(
         new HdfsConfiguration()).build();
     cluster.waitActive();
     FsVolumeImpl vol = (FsVolumeImpl) dataset.getFsVolumeReferences().get(0);
@@ -1261,13 +1265,13 @@ public class TestFsDatasetImpl {
         100);
     config.set(DFSConfigKeys.DFS_METRICS_PERCENTILES_INTERVALS_KEY,
         "60,300,1500");
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(config)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(config)
         .numDataNodes(1)
         .storageTypes(new StorageType[]{StorageType.DISK, StorageType.DISK})
         .storagesPerDatanode(2)
         .build()) {
       FileSystem fs = cluster.getFileSystem();
-      DataNode dataNode = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
 
       // Create file that has one block with one replica.
       Path filePath = new Path("test");

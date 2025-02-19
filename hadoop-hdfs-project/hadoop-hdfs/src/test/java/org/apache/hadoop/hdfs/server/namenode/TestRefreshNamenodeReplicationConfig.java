@@ -20,9 +20,10 @@ package org.apache.hadoop.hdfs.server.namenode;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ReconfigurationException;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
 import org.apache.hadoop.test.LambdaTestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -36,8 +37,8 @@ import static org.junit.Assert.assertTrue;
  * be refreshed dynamically, without a namenode restart.
  */
 public class TestRefreshNamenodeReplicationConfig {
-  private MiniDFSCluster cluster = null;
-  private BlockManager bm;
+  private MiniDFSClusterInJVM cluster = null;
+  private BlockManagerJVMInterface bm;
 
   @Before
   public void setup() throws IOException {
@@ -50,7 +51,7 @@ public class TestRefreshNamenodeReplicationConfig {
         DFSConfigKeys.DFS_NAMENODE_REPLICATION_WORK_MULTIPLIER_PER_ITERATION,
         12);
 
-    cluster = new MiniDFSCluster.Builder(config)
+    cluster = new MiniDFSClusterInJVM.Builder(config)
         .nnTopology(MiniDFSNNTopology.simpleSingleNN(0, 0))
         .numDataNodes(0).build();
     cluster.waitActive();

@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
  *
  */
 public class TestViewFileSystemWithTruncate {
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileSystem fHdfs;
   private FileSystem fsView;
@@ -55,7 +55,7 @@ public class TestViewFileSystemWithTruncate {
 
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDFSClusterInJVM.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2).build();
     cluster.waitClusterUp();

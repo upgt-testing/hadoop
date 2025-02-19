@@ -50,7 +50,7 @@ public class FileAppendTest4 {
   private static final short REPLICATION = 3;
   private static final int DATANODE_NUM = 5;
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem fs;
 
   private static void init(Configuration conf) {
@@ -63,7 +63,7 @@ public class FileAppendTest4 {
   public static void startUp () throws IOException {
     conf = new HdfsConfiguration();
     init(conf);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(DATANODE_NUM).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(DATANODE_NUM).build();
     fs = cluster.getFileSystem();
   }
 

@@ -23,7 +23,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AddBlockFlag;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.BlockStoragePolicy;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault;
@@ -47,7 +47,7 @@ import static org.junit.Assert.assertEquals;
  * Test refresh block placement policy.
  */
 public class TestRefreshBlockPlacementPolicy {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration config;
   private static int counter = 0;
   static class MockBlockPlacementPolicy extends BlockPlacementPolicyDefault {
@@ -74,7 +74,7 @@ public class TestRefreshBlockPlacementPolicy {
         MockBlockPlacementPolicy.class, BlockPlacementPolicy.class);
     config.setClass(DFS_BLOCK_PLACEMENT_EC_CLASSNAME_KEY,
         MockBlockPlacementPolicy.class, BlockPlacementPolicy.class);
-    cluster = new MiniDFSCluster.Builder(config).numDataNodes(9).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).numDataNodes(9).build();
     cluster.waitActive();
   }
 

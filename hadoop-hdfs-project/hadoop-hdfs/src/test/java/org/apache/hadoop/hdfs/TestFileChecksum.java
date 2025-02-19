@@ -28,6 +28,7 @@ import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeFaultInjector;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -61,7 +62,7 @@ public class TestFileChecksum {
   private int dataBlocks = ecPolicy.getNumDataUnits();
   private int parityBlocks = ecPolicy.getNumParityUnits();
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private Configuration conf;
   private DFSClient client;
@@ -91,7 +92,7 @@ public class TestFileChecksum {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 0);
     conf.setBoolean(DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, true);
     customizeConf(conf);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     Path ecPath = new Path(ecDir);
     cluster.getFileSystem().mkdir(ecPath, FsPermission.getDirDefault());
     cluster.getFileSystem().getClient().setErasureCodingPolicy(ecDir,
@@ -605,7 +606,7 @@ public class TestFileChecksum {
     int dnIdxToDie = -1;
     if (killDn) {
       dnIdxToDie = getDataNodeToKill(filePath);
-      DataNode dnToDie = cluster.getDataNodes().get(dnIdxToDie);
+      DataNodeJVMInterface dnToDie = cluster.getDataNodes().get(dnIdxToDie);
       shutdownDataNode(dnToDie);
     }
 
@@ -645,6 +646,17 @@ public class TestFileChecksum {
     cluster.setDataNodeDead(dataNode.getDatanodeId());
   }
 
+  void shutdownDataNode(DataNodeJVMInterface dataNode) throws IOException {
+    /*
+     * Kill the datanode which contains one replica
+     * We need to make sure it dead in namenode: clear its update time and
+     * trigger NN to check heartbeat.
+     */
+    dataNode.shutdown();
+    cluster.setDataNodeDead(dataNode.getDatanodeId());
+  }
+
+
   /**
    * Determine the datanode that hosts the first block of the file. For simple
    * this just returns the first datanode as it's firstly tried.
@@ -657,7 +669,7 @@ public class TestFileChecksum {
     DatanodeInfo chosenDn = datanodes[new Random().nextInt(datanodes.length)];
 
     int idx = 0;
-    for (DataNode dn : cluster.getDataNodes()) {
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       if (dn.getInfoPort() == chosenDn.getInfoPort()) {
         return idx;
       }

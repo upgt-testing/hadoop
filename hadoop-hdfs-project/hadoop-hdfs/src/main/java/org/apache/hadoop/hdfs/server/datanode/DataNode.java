@@ -155,6 +155,7 @@ import org.apache.hadoop.hdfs.server.datanode.checker.StorageLocationChecker;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.BlockPoolSlice;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.util.DataTransferThrottler;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
 import org.apache.hadoop.util.AutoCloseableLock;
 import org.apache.hadoop.hdfs.client.BlockReportOptions;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -302,7 +303,7 @@ import org.slf4j.LoggerFactory;
 @InterfaceAudience.Private
 public class DataNode extends ReconfigurableBase
     implements InterDatanodeProtocol, ClientDatanodeProtocol,
-        DataNodeMXBean, ReconfigurationProtocol {
+        DataNodeMXBean, ReconfigurationProtocol, DataNodeJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(DataNode.class);
   
   static{
@@ -422,6 +423,8 @@ public class DataNode extends ReconfigurableBase
   
   // For InterDataNodeProtocol
   public RPC.Server ipcServer;
+
+  public RPCServerJVMInterface getRpcServer() { return ipcServer; }
 
   private JvmPauseMonitor pauseMonitor;
 
@@ -2028,7 +2031,7 @@ public class DataNode extends ReconfigurableBase
     }
   }
 
-  List<BPOfferService> getAllBpOs() {
+  public List<BPOfferService> getAllBpOs() {
     return blockPoolManager.getAllNamenodeThreads();
   }
 
@@ -2126,6 +2129,10 @@ public class DataNode extends ReconfigurableBase
    */
   public int getIpcPort() {
     return ipcServer.getListenerAddress().getPort();
+  }
+
+  public RPC.Server getIpcServer() {
+    return ipcServer;
   }
   
   /**
@@ -3226,7 +3233,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DirectoryScanner getDirectoryScanner() {
+  public DirectoryScanner getDirectoryScanner() {
     return directoryScanner;
   }
 
@@ -3749,7 +3756,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  DataStorage getStorage() {
+  public DataStorage getStorage() {
     return storage;
   }
 

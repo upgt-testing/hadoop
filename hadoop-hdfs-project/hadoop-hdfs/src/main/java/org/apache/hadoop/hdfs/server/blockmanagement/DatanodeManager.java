@@ -77,7 +77,7 @@ import java.util.function.Consumer;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DatanodeManager {
+public class DatanodeManager implements DatanodeManagerJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(DatanodeManager.class);
 
   private final Namesystem namesystem;
@@ -469,7 +469,7 @@ public class DatanodeManager {
   }
 
   /** @return the heartbeat manager. */
-  HeartbeatManager getHeartbeatManager() {
+  public HeartbeatManager getHeartbeatManager() {
     return heartbeatManager;
   }
 
@@ -769,6 +769,21 @@ public class DatanodeManager {
           nodeID, node);
       NameNode.stateChangeLog.error("BLOCK* NameSystem.getDatanode: "
                                     + e.getLocalizedMessage());
+      throw e;
+    }
+    return node;
+  }
+
+  public DatanodeDescriptor getDatanode(DatanodeIDJVMInterface nodeID)
+          throws UnregisteredNodeException {
+    final DatanodeDescriptor node = getDatanode(nodeID.getDatanodeUuid());
+    if (node == null)
+      return null;
+    if (!node.getXferAddr().equals(nodeID.getXferAddr())) {
+      final UnregisteredNodeException e = new UnregisteredNodeException(
+              nodeID, node);
+      NameNode.stateChangeLog.error("BLOCK* NameSystem.getDatanode: "
+              + e.getLocalizedMessage());
       throw e;
     }
     return node;

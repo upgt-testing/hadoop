@@ -21,7 +21,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class TestErasureCodingCorruption {
     // case.
     conf.setBoolean(DFS_NAMENODE_CORRUPT_BLOCK_DELETE_IMMEDIATELY_ENABLED,
         false);
-    try (MiniDFSCluster cluster = new MiniDFSCluster
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(8)
@@ -68,14 +68,14 @@ public class TestErasureCodingCorruption {
       }
 
       // Stop one datanode, so as to trigger update pipeline.
-      MiniDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
+      MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
       // Write some more data and close the file.
       for (int i = 0; i < 7 * 1024 * 1024; i++) {
         out.write(i);
       }
       out.close();
 
-      BlockManager bm = cluster.getNamesystem(0).getBlockManager();
+      BlockManagerJVMInterface bm = cluster.getNamesystem(0).getBlockManager();
 
       // Transition to standby and then to active.
       cluster.transitionToStandby(0);

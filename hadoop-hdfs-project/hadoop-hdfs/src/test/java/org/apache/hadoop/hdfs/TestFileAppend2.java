@@ -81,7 +81,7 @@ public class TestFileAppend2 {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
       { // test appending to a file.
@@ -230,7 +230,7 @@ public class TestFileAppend2 {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     try {
       { // test appending to a file.
@@ -374,10 +374,10 @@ public class TestFileAppend2 {
   //
   class Workload extends Thread {
     private final int id;
-    private final MiniDFSCluster cluster;
+    private final MiniDFSClusterInJVM cluster;
     private final boolean appendToNewBlock;
 
-    Workload(MiniDFSCluster cluster, int threadIndex, boolean append2) {
+    Workload(MiniDFSClusterInJVM cluster, int threadIndex, boolean append2) {
       id = threadIndex;
       this.cluster = cluster;
       this.appendToNewBlock = append2;
@@ -486,7 +486,7 @@ public class TestFileAppend2 {
     conf.setInt(HdfsClientConfigKeys.DFS_DATANODE_SOCKET_WRITE_TIMEOUT_KEY, 30000);
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -550,7 +550,7 @@ public class TestFileAppend2 {
   @Test
   public void testAppendLessThanChecksumChunk() throws Exception {
     final byte[] buf = new byte[1024];
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(new HdfsConfiguration()).numDataNodes(1).build();
     cluster.waitActive();
 

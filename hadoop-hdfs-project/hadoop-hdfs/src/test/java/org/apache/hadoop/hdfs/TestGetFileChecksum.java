@@ -35,14 +35,14 @@ public class TestGetFileChecksum {
   private static final short REPLICATION = 3;
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
 
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION)
         .build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();

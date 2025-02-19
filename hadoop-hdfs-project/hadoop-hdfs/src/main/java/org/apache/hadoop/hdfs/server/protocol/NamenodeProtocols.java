@@ -41,5 +41,6 @@ public interface NamenodeProtocols
           RefreshCallQueueProtocol,
           GenericRefreshProtocol,
           GetUserMappingsProtocol,
-          HAServiceProtocol {
+          HAServiceProtocol,
+          NamenodeProtocolsJVMInterface{
 }

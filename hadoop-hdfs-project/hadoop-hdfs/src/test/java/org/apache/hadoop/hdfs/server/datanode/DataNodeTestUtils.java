@@ -22,6 +22,7 @@ package org.apache.hadoop.hdfs.server.datanode;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -70,6 +71,11 @@ public class DataNodeTestUtils {
     dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
   }
 
+  public static void setHeartbeatsDisabledForTests(DataNodeJVMInterface dn,
+                                                   boolean heartbeatsDisabledForTests) {
+    dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
+  }
+
   /**
    * Set if cache reports are disabled for all DNs in a mini cluster.
    */
@@ -86,14 +92,32 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void triggerDeletionReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerDeletionReportForTests();
+    }
+  }
+
   public static void triggerHeartbeat(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
+      bpos.triggerHeartbeatForTests();
+    }
+  }
+
+  public static void triggerHeartbeat(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
       bpos.triggerHeartbeatForTests();
     }
   }
   
   public static void triggerBlockReport(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
+      bpos.triggerBlockReportForTests();
+    }
+  }
+
+  public static void triggerBlockReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
       bpos.triggerBlockReportForTests();
     }
   }
@@ -126,6 +150,16 @@ public class DataNodeTestUtils {
   public static FsDatasetSpi<?> getFSDataset(DataNode dn) {
     return dn.getFSDataset();
   }
+
+
+  public static FsDatasetSpiJVMInterface<?> getFSDataset(DataNodeJVMInterface dn) {
+    return dn.getFSDataset();
+    // TODO: FIX ME
+    //throw new UnsupportedOperationException("Not implemented");
+    //return null;
+  }
+
+
 
   /**
    * Fetch a copy of ReplicaInfo from a datanode by block id
@@ -203,6 +237,13 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void runDirectoryScanner(DataNodeJVMInterface dn) throws IOException {
+    DirectoryScannerJVMInterface directoryScanner = dn.getDirectoryScanner();
+    if (directoryScanner != null) {
+      dn.getDirectoryScanner().reconcile();
+    }
+  }
+
   /**
    * Reconfigure a DataNode by setting a new list of volumes.
    *
@@ -225,6 +266,29 @@ public class DataNodeTestUtils {
               DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
               dnNewDataDirs.toString()),
           is(dn.getConf().get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY)));
+    } catch (ReconfigurationException e) {
+      // This can be thrown if reconfiguration tries to use a failed volume.
+      // We need to swallow the exception, because some of our tests want to
+      // cover this case.
+      LOG.warn("Could not reconfigure DataNode.", e);
+    }
+  }
+
+  public static void reconfigureDataNode(DataNodeJVMInterface dn, File... newVols)
+          throws Exception {
+    StringBuilder dnNewDataDirs = new StringBuilder();
+    for (File newVol: newVols) {
+      if (dnNewDataDirs.length() > 0) {
+        dnNewDataDirs.append(',');
+      }
+      dnNewDataDirs.append(newVol.getAbsolutePath());
+    }
+    try {
+      assertThat(
+              dn.reconfigurePropertyImpl(
+                      DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
+                      dnNewDataDirs.toString()),
+              is(dn.getConf().get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY)));
     } catch (ReconfigurationException e) {
       // This can be thrown if reconfiguration tries to use a failed volume.
       // We need to swallow the exception, because some of our tests want to

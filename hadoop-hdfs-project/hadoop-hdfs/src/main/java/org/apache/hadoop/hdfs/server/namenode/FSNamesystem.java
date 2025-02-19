@@ -380,7 +380,7 @@ import org.slf4j.LoggerFactory;
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class FSNamesystem implements Namesystem, FSNamesystemMBean,
-    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean {
+    NameNodeMXBean, ReplicatedBlocksMBean, ECBlockGroupsMBean, FSNamesystemJVMInterface {
 
   public static final org.slf4j.Logger LOG = LoggerFactory
       .getLogger(FSNamesystem.class.getName());
@@ -710,7 +710,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   @VisibleForTesting
-  LeaseManager getLeaseManager() {
+  public LeaseManager getLeaseManager() {
     return leaseManager;
   }
 
@@ -1921,7 +1921,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, null);
   }
 
-  private void metaSave(PrintWriter out) {
+  public void metaSave(PrintWriter out) {
     assert hasReadLock();
     long totalInodes = this.dir.totalInodes();
     long totalBlocks = this.getBlocksTotal();
@@ -4648,7 +4648,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /** @see ClientProtocol#getStats() */
-  long[] getStats() {
+  public long[] getStats() {
     final long[] stats = datanodeStatistics.getStats();
     stats[ClientProtocol.GET_STATS_LOW_REDUNDANCY_IDX] =
         getLowRedundancyBlocks();
@@ -4889,7 +4889,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * This will save current namespace into fsimage file and empty edits file.
    * Requires superuser privilege and safe mode.
    */
-  boolean saveNamespace(final long timeWindow, final long txGap)
+  public boolean saveNamespace(final long timeWindow, final long txGap)
       throws IOException {
     String operationName = "saveNamespace";
     checkOperation(OperationCategory.UNCHECKED);
@@ -5068,7 +5068,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Enter safe mode. If resourcesLow is false, then we assume it is manual
    * @throws IOException
    */
-  void enterSafeMode(boolean resourcesLow) throws IOException {
+  public void enterSafeMode(boolean resourcesLow) throws IOException {
     writeLock();
     try {
       // Stop the secret manager, since rolling the master key would
@@ -5096,7 +5096,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Leave safe mode.
    * @param force true if to leave safe mode forcefully with -forceExit option
    */
-  void leaveSafeMode(boolean force) {
+  public void leaveSafeMode(boolean force) {
     writeLock();
     try {
       if (!isInSafeMode()) {
@@ -6094,7 +6094,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Returns the DelegationTokenSecretManager instance in the namesystem.
    * @return delegation token secret manager object
    */
-  DelegationTokenSecretManager getDelegationTokenSecretManager() {
+  public DelegationTokenSecretManager getDelegationTokenSecretManager() {
     return dtSecretManager;
   }
 
@@ -6899,7 +6899,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
   
   @VisibleForTesting
-  void setFsLockForTests(ReentrantReadWriteLock lock) {
+  public void setFsLockForTests(ReentrantReadWriteLock lock) {
     this.fsLock.coarseLock = lock;
   }
   
@@ -7802,7 +7802,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, src, null, auditStat);
   }
 
-  AclStatus getAclStatus(String src) throws IOException {
+  public AclStatus getAclStatus(String src) throws IOException {
     final String operationName = "getAclStatus";
     checkOperation(OperationCategory.READ);
     final AclStatus ret;

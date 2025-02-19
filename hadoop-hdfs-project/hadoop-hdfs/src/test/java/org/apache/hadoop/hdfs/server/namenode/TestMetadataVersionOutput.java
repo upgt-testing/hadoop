@@ -21,7 +21,7 @@ import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.util.ExitUtil;
@@ -40,7 +40,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HA_NAMENODES_KEY_PREFIX;
 
 public class TestMetadataVersionOutput {
 
-  private MiniDFSCluster dfsCluster = null;
+  private MiniDFSClusterInJVM dfsCluster = null;
   private final Configuration conf = new Configuration();
 
   @After
@@ -56,7 +56,7 @@ public class TestMetadataVersionOutput {
     conf.set(DFS_NAMESERVICE_ID, "ns1");
     conf.set(DFS_HA_NAMENODES_KEY_PREFIX + ".ns1", "nn1");
     conf.set(DFS_HA_NAMENODE_ID_KEY, "nn1");
-    conf.set(DFS_NAMENODE_NAME_DIR_KEY + ".ns1.nn1", MiniDFSCluster.getBaseDirectory() + "1");
+    conf.set(DFS_NAMENODE_NAME_DIR_KEY + ".ns1.nn1", MiniDFSClusterInJVM.getBaseDirectory() + "1");
     conf.unset(DFS_NAMENODE_NAME_DIR_KEY);
   }
 
@@ -64,7 +64,7 @@ public class TestMetadataVersionOutput {
   public void testMetadataVersionOutput() throws IOException {
 
     initConfig();
-    dfsCluster = new MiniDFSCluster.Builder(conf).
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).
         manageNameDfsDirs(false).
         numDataNodes(1).
         checkExitOnShutdown(false).

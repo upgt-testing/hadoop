@@ -27,6 +27,7 @@ import org.apache.hadoop.hdfs.protocol.LocatedStripedBlock;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.util.StripedBlockUtil;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -86,8 +87,31 @@ abstract public class ReadStripedFileWithDecodingHelper {
     return myCluster;
   }
 
+  public static MiniDFSClusterInJVM initializeJVMCluster() throws IOException {
+    Configuration conf = new HdfsConfiguration();
+    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
+    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 2);
+    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_STREAMS_HARD_LIMIT_KEY,
+            2);
+    MiniDFSClusterInJVM myCluster = new MiniDFSClusterInJVM.Builder(conf)
+            .numDataNodes(NUM_DATANODES + 3)
+            .build();
+    myCluster.getFileSystem().enableErasureCodingPolicy(
+            StripedFileTestUtil.getDefaultECPolicy().getName());
+    myCluster.getFileSystem().getClient().setErasureCodingPolicy("/",
+            StripedFileTestUtil.getDefaultECPolicy().getName());
+    return myCluster;
+  }
+
   public static void tearDownCluster(MiniDFSCluster cluster)
       throws IOException {
+    if (cluster != null) {
+      cluster.shutdown();
+    }
+  }
+
+  public static void tearDownCluster(MiniDFSClusterInJVM cluster)
+          throws IOException {
     if (cluster != null) {
       cluster.shutdown();
     }
@@ -108,6 +132,21 @@ abstract public class ReadStripedFileWithDecodingHelper {
     return -1;
   }
 
+  public static int findFirstDataNode(MiniDFSClusterInJVM cluster,
+                                      DistributedFileSystem dfs, Path file, long length) throws IOException {
+    BlockLocation[] locs = dfs.getFileBlockLocations(file, 0, length);
+    String name = (locs[0].getNames())[0];
+    int dnIndex = 0;
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
+      int port = dn.getXferPort();
+      if (name.contains(Integer.toString(port))) {
+        return dnIndex;
+      }
+      dnIndex++;
+    }
+    return -1;
+  }
+
   // The index begins from 1.
   public static int findDataNodeAtIndex(MiniDFSCluster cluster,
       DistributedFileSystem dfs, Path file, long length, int index) throws IOException {
@@ -115,6 +154,21 @@ abstract public class ReadStripedFileWithDecodingHelper {
     String name = (locs[0].getNames())[index - 1];
     int dnIndex = 0;
     for (DataNode dn : cluster.getDataNodes()) {
+      int port = dn.getXferPort();
+      if (name.contains(Integer.toString(port))) {
+        return dnIndex;
+      }
+      dnIndex++;
+    }
+    return -1;
+  }
+
+  public static int findDataNodeAtIndex(MiniDFSClusterInJVM cluster,
+                                        DistributedFileSystem dfs, Path file, long length, int index) throws IOException {
+    BlockLocation[] locs = dfs.getFileBlockLocations(file, 0, length);
+    String name = (locs[0].getNames())[index - 1];
+    int dnIndex = 0;
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       int port = dn.getXferPort();
       if (name.contains(Integer.toString(port))) {
         return dnIndex;
@@ -194,6 +248,38 @@ abstract public class ReadStripedFileWithDecodingHelper {
     verifyRead(dfs, testPath, fileLength, bytes);
   }
 
+  public static void testReadWithDNFailure(MiniDFSClusterInJVM cluster,
+                                           DistributedFileSystem dfs, int fileLength, int dnFailureNum)
+          throws Exception {
+    String fileType = fileLength < (BLOCK_SIZE * NUM_DATA_UNITS) ?
+            "smallFile" : "largeFile";
+    String src = "/dnFailure_" + dnFailureNum + "_" + fileType;
+    LOG.info("testReadWithDNFailure: file = " + src
+            + ", fileSize = " + fileLength
+            + ", dnFailureNum = " + dnFailureNum);
+
+    Path testPath = new Path(src);
+    final byte[] bytes = StripedFileTestUtil.generateBytes(fileLength);
+    DFSTestUtil.writeFile(dfs, testPath, bytes);
+    StripedFileTestUtil.waitBlockGroupsReported(dfs, src);
+
+    // shut down the DN that holds an internal data block
+    BlockLocation[] locs = dfs.getFileBlockLocations(testPath, CELL_SIZE * 5,
+            CELL_SIZE);
+    for (int failedDnIdx = 0; failedDnIdx < dnFailureNum; failedDnIdx++) {
+      String name = (locs[0].getNames())[failedDnIdx];
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
+        int port = dn.getXferPort();
+        if (name.contains(Integer.toString(port))) {
+          dn.shutdown();
+        }
+      }
+    }
+
+    // check file length, pread, stateful read and seek
+    verifyRead(dfs, testPath, fileLength, bytes);
+  }
+
 
   /**
    * Test reading a file with some blocks(data blocks or parity blocks or both)
@@ -235,6 +321,34 @@ abstract public class ReadStripedFileWithDecodingHelper {
     verifyRead(dfs, srcPath, fileNumBytes, bytes);
   }
 
+  public static void testReadWithBlockCorrupted(MiniDFSClusterInJVM cluster,
+                                                DistributedFileSystem dfs, String src, int fileNumBytes,
+                                                int dataBlkDelNum, int parityBlkDelNum,
+                                                boolean deleteBlockFile) throws IOException {
+    LOG.info("testReadWithBlockCorrupted: file = " + src
+            + ", dataBlkDelNum = " + dataBlkDelNum
+            + ", parityBlkDelNum = " + parityBlkDelNum
+            + ", deleteBlockFile? " + deleteBlockFile);
+    int recoverBlkNum = dataBlkDelNum + parityBlkDelNum;
+    Assert.assertTrue("dataBlkDelNum and parityBlkDelNum should be positive",
+            dataBlkDelNum >= 0 && parityBlkDelNum >= 0);
+    Assert.assertTrue("The sum of dataBlkDelNum and parityBlkDelNum " +
+            "should be between 1 ~ " + NUM_PARITY_UNITS, recoverBlkNum <=
+            NUM_PARITY_UNITS);
+
+    // write a file with the length of writeLen
+    Path srcPath = new Path(src);
+    final byte[] bytes = StripedFileTestUtil.generateBytes(fileNumBytes);
+    DFSTestUtil.writeFile(dfs, srcPath, bytes);
+
+    // delete or corrupt some blocks
+    corruptBlocks(cluster, dfs, srcPath, dataBlkDelNum, parityBlkDelNum,
+            deleteBlockFile);
+
+    // check the file can be read after some blocks were deleted
+    verifyRead(dfs, srcPath, fileNumBytes, bytes);
+  }
+
   public static void corruptBlocks(MiniDFSCluster cluster,
       DistributedFileSystem dfs, Path srcPath,
       int dataBlkDelNum, int parityBlkDelNum, boolean deleteBlockFile)
@@ -264,6 +378,47 @@ abstract public class ReadStripedFileWithDecodingHelper {
       delBlocks[i] = StripedBlockUtil
           .constructInternalBlock(lastBlock.getBlock(),
               CELL_SIZE, NUM_DATA_UNITS, delBlkIndices[i]);
+      if (deleteBlockFile) {
+        // delete the block file
+        LOG.info("Deleting block file {}", delBlocks[i]);
+        cluster.corruptBlockOnDataNodesByDeletingBlockFile(delBlocks[i]);
+      } else {
+        // corrupt the block file
+        LOG.info("Corrupting block file {}", delBlocks[i]);
+        cluster.corruptBlockOnDataNodes(delBlocks[i]);
+      }
+    }
+  }
+
+  public static void corruptBlocks(MiniDFSClusterInJVM cluster,
+                                   DistributedFileSystem dfs, Path srcPath,
+                                   int dataBlkDelNum, int parityBlkDelNum, boolean deleteBlockFile)
+          throws IOException {
+    LOG.info("corruptBlocks on path {}", srcPath);
+    int recoverBlkNum = dataBlkDelNum + parityBlkDelNum;
+
+    LocatedBlocks locatedBlocks = getLocatedBlocks(dfs, srcPath);
+    LocatedStripedBlock lastBlock =
+            (LocatedStripedBlock)locatedBlocks.getLastLocatedBlock();
+
+    int[] delDataBlkIndices = StripedFileTestUtil.randomArray(0, NUM_DATA_UNITS,
+            dataBlkDelNum);
+    Assert.assertNotNull(delDataBlkIndices);
+    int[] delParityBlkIndices = StripedFileTestUtil.randomArray(NUM_DATA_UNITS,
+            NUM_DATA_UNITS + NUM_PARITY_UNITS, parityBlkDelNum);
+    Assert.assertNotNull(delParityBlkIndices);
+
+    int[] delBlkIndices = new int[recoverBlkNum];
+    System.arraycopy(delDataBlkIndices, 0,
+            delBlkIndices, 0, delDataBlkIndices.length);
+    System.arraycopy(delParityBlkIndices, 0,
+            delBlkIndices, delDataBlkIndices.length, delParityBlkIndices.length);
+
+    ExtendedBlock[] delBlocks = new ExtendedBlock[recoverBlkNum];
+    for (int i = 0; i < recoverBlkNum; i++) {
+      delBlocks[i] = StripedBlockUtil
+              .constructInternalBlock(lastBlock.getBlock(),
+                      CELL_SIZE, NUM_DATA_UNITS, delBlkIndices[i]);
       if (deleteBlockFile) {
         // delete the block file
         LOG.info("Deleting block file {}", delBlocks[i]);

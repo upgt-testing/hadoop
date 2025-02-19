@@ -79,7 +79,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  * pipelines and block transfers.
  */
 @InterfaceAudience.Private
-public class SaslDataTransferClient {
+public class SaslDataTransferClient implements SaslDataTransferClientJVMInterface{
 
   private static final Logger LOG = LoggerFactory.getLogger(
       SaslDataTransferClient.class);
