@@ -49,7 +49,7 @@ public interface DataNodeJVMInterface {
     int getXmitsInProgress();
     String getBPServiceActorInfo();
     String getSlowDisks();
-    PipelineAck.ECN getECN();
+    //PipelineAck.ECN getECN();
     DataNodeMetricsJVMInterface getMetrics();
     DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();

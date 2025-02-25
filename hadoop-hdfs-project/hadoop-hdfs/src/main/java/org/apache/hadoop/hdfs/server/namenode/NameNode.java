@@ -460,6 +460,7 @@ public class NameNode extends ReconfigurableBase implements
   /** Format a new filesystem.  Destroys any filesystem that may already
    * exist at this location.  **/
   public static void format(Configuration conf) throws IOException {
+    System.out.println("[UPGT] In format, the configuration class is loaded by + " + Configuration.class.getClassLoader());
     format(conf, true, true);
   }
 
@@ -1720,6 +1721,7 @@ public class NameNode extends ReconfigurableBase implements
 
   public static NameNode createNameNode(String argv[], Configuration conf)
       throws IOException {
+    LOG.info("Start namenode in version 3.3.6");
     LOG.info("createNameNode " + Arrays.asList(argv));
     if (conf == null)
       conf = new HdfsConfiguration();

@@ -16,13 +16,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class DataNodeInstance extends Instance {
-    public final static String StartVersion = System.getProperty("upgt.start.version", "3.5.0-SNAPSHOT");
-    public final static String UpgradeVersion = System.getProperty("upgt.upgrade.version", "3.5.1-SNAPSHOT");
-    private String curVersion;
 
     public DataNodeInstance(String version) {
-        super();
-        curVersion = version;
+        super(version);
         init(version);
     }
 
@@ -31,10 +27,11 @@ public class DataNodeInstance extends Instance {
     }
 
     public void init(String version) {
-        createVersionClassLoader(version);
+        //createVersionClassLoader(version);
         setMiniClusterTestingMode();
     }
 
+    /*
     public VersionClassLoader createVersionClassLoader() {
         return createVersionClassLoader(curVersion);
     }
@@ -58,6 +55,8 @@ public class DataNodeInstance extends Instance {
 
     }
 
+     */
+
 
     public void setMiniClusterTestingMode() {
         //DefaultMetricsSystem.setMiniClusterMode(true);
@@ -76,6 +75,7 @@ public class DataNodeInstance extends Instance {
         }
     }
 
+    /*
     public DataNodeJVMInterface createDataNodeForUpgradeInJVMCluster(String[] dnArgs, Configuration hdfsConf, SecureDataNodeStarter.SecureResources secureResources, String newVersion) {
         // check if the new version is different from the current version, if so, upgrade the NameNode
         if (newVersion != null && !newVersion.equals(curVersion)) {
@@ -84,6 +84,8 @@ public class DataNodeInstance extends Instance {
         }
         return createDataNodeForRestartInJVMCluster(dnArgs, hdfsConf, secureResources);
     }
+
+     */
 
 
 

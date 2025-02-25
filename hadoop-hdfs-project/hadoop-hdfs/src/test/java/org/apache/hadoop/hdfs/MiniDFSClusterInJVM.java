@@ -2403,7 +2403,15 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public synchronized void upgradeNameNode(int nnIndex, boolean waitActive,
                                              String... args) throws IOException {
+        // Enter safe mode
         NameNodeInfo info = getNN(nnIndex);
+        try {
+            ToolRunner.run(new DFSAdmin(getNN(nnIndex).conf), new String[]{"-safemode", "enter"});
+            ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-rollingUpgrade", "prepare"});
+        } catch (Exception e) {
+            throw new IOException("Failed to start rolling upgrade", e);
+        }
+        // info.setStartOpt(StartupOption.ROLLINGUPGRADE);
         StartupOption startOpt = info.startOpt;
 
         shutdownNameNode(nnIndex);
@@ -2415,7 +2423,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         //NameNode nn = NameNode.createNameNode(args, info.conf);
         NameNodeInstance nnInstance = new NameNodeInstance(NameNodeInstance.UpgradeVersion);
-        NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, info.conf);
+        // add the -rollingUpgrade option and the -prepare option
+        List<String> argList = new ArrayList<>(Arrays.asList(args));
+        argList.add("-rollingUpgrade");
+        argList.add("started");
+        String[] newArgs = argList.toArray(new String[0]);
+        NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(newArgs, info.conf);
         nn.getHttpServer()
                 .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         info.nameNode = nn;
@@ -2423,12 +2436,24 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
         info.nnInstance = nnInstance;
         info.setStartOpt(startOpt);
+        try {
+            // leave safe mode
+            //ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-safemode", "leave"});
+        } catch (Exception e) {
+            throw new IOException("Failed to leave safe mode", e);
+        }
         if (waitActive) {
             if (numDataNodes > 0) {
                 waitNameNodeUp(nnIndex);
             }
             LOG.info("Upgrarded the namenode");
             waitActive(nnIndex);
+        }
+        try {
+            // finalize the upgrade
+            ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-rollingUpgrade", "finalize"});
+        } catch (Exception e) {
+            throw new IOException("Failed to finalize upgrade", e);
         }
     }
 
