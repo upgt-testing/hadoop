@@ -16,18 +16,30 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class DataNodeInstance extends Instance {
+
+    public DataNodeInstance(String version) {
+        super(version);
+        init(version);
+    }
+
     public DataNodeInstance() {
-        super();
-        createVersionClassLoader();
+        this(StartVersion);
+    }
+
+    public void init(String version) {
+        //createVersionClassLoader(version);
         setMiniClusterTestingMode();
     }
 
+    /*
     public VersionClassLoader createVersionClassLoader() {
+        return createVersionClassLoader(curVersion);
+    }
+
+    public VersionClassLoader createVersionClassLoader(String version) {
         VersionSelector versionSelector = new VersionSelector();
 
         String classPath = System.getProperty("java.class.path");
-        //String[] versions = {"3.5.0-SNAPSHOT"};
-        String version = "3.5.0-SNAPSHOT";
 
         //print the classpath from the thread context class loader
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -42,6 +54,8 @@ public class DataNodeInstance extends Instance {
         return versionClassLoader;
 
     }
+
+     */
 
 
     public void setMiniClusterTestingMode() {
@@ -60,6 +74,19 @@ public class DataNodeInstance extends Instance {
             throw new RuntimeException(e);
         }
     }
+
+    /*
+    public DataNodeJVMInterface createDataNodeForUpgradeInJVMCluster(String[] dnArgs, Configuration hdfsConf, SecureDataNodeStarter.SecureResources secureResources, String newVersion) {
+        // check if the new version is different from the current version, if so, upgrade the NameNode
+        if (newVersion != null && !newVersion.equals(curVersion)) {
+            curVersion = newVersion;
+            init(curVersion);
+        }
+        return createDataNodeForRestartInJVMCluster(dnArgs, hdfsConf, secureResources);
+    }
+
+     */
+
 
 
     public DataNodeJVMInterface createDataNodeForRestartInJVMCluster(String[] dnArgs, Configuration hdfsConf, SecureDataNodeStarter.SecureResources secureResources) {
@@ -194,7 +221,7 @@ public class DataNodeInstance extends Instance {
             versionClassLoader.resetCurrentThreadClassLoader();
             Map<String, String> confMap = conf.getSetParameters();
             hdfsConf.setAllParameters(confMap);
-            
+
             return dn;
 
         } catch (Exception e) {
@@ -281,5 +308,9 @@ public class DataNodeInstance extends Instance {
                 ", customClassLoader=" + getVersionClassLoader().getUrlClassLoader() +
                 ", parentClassLoader=" + getVersionClassLoader().getUrlClassLoader().getParentClassLoader() +
                 '}';
+    }
+
+    public String getCurVersion() {
+        return curVersion;
     }
 }

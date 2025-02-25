@@ -1845,6 +1845,7 @@ public class NameNode extends ReconfigurableBase implements
 
   public static NameNode createNameNode(String argv[], Configuration conf)
       throws IOException {
+    LOG.info("createNameNode 3.5.0");
     LOG.info("createNameNode " + Arrays.asList(argv));
     if (conf == null)
       conf = new HdfsConfiguration();
