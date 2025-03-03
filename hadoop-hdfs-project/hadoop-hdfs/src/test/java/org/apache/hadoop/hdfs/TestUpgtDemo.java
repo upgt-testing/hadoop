@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeInstance;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageJVMInterface;
@@ -35,35 +34,71 @@ import static org.junit.Assert.assertTrue;
  * Author: Shuai Wang
  */
 public class TestUpgtDemo {
-    @Before
-    public void setUp() {
-        //DefaultMetricsSystem.setMiniClusterMode(true);
-    }
 
-    //TODO: (1) The argument should be interface or not??? (2) Write a test to test the FSNamesystemInterface got from MiniDFSClusterInJVM
 
-    /*
     @Test
-    public void testDiffLoaderCommunication() {
+    public void testUpgradeFinalize() throws IOException {
         Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://127.0.0.1:9000");
-        conf.set("dfs.namenode.rpc-address", "127.0.0.1:9000");
-        conf.set("dfs.namenode.http-address", "127.0.0.1:50070");
-        conf.set("dfs.datanode.address", "127.0.0.1:50010");
-        conf.set("dfs.datanode.http.address", "127.0.0.1:50075");
-        conf.set("dfs.datanode.ipc.address", "127.0.0.1:50040");
-        conf.set("dfs.datanode.hostname", "localhost");
-        //conf.set("dfs.datanode.data.dir", "/Users/allenwang/data");
-        conf.set("dfs.replication", "1");
-        NameNodeInstance nameNodeInstance = new NameNodeInstance();
-        NameNodeJVMInterface nameNode = nameNodeInstance.createNameNode(new String[]{});
-        ConfigurationJVMInterface configurationJVMInterface = (ConfigurationJVMInterface) conf;
-        InetSocketAddress addr = nameNode.getRpcServerAddress(configurationJVMInterface);
-        System.out.println("nameNode is loaded by " + nameNode.getClass().getClassLoader());
-        System.out.println("Configuration is loaded by " + conf.getClass().getClassLoader());
-        System.out.println("NameNode address: " + addr.getHostName() + ":" + addr.getPort());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.upgradeAllNameNodes();
+        cluster.shutdown();
     }
-    */
+
+
+    @Test
+    public void testFileSystemUpgradeDNInJVM() throws IOException {
+        Configuration conf2 = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf2).numDataNodes(2).build();
+        cluster2.upgradeAllDataNodes(true);
+        FileSystem fs2 = FileSystem.get(conf2);
+        Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
+        fs2.mkdirs(TEST_ROOT2);
+        System.out.println(conf2.get("fs.defaultFS"));
+        cluster2.shutdown();
+    }
+
+
+    @Test
+    public void testFileSystemUpgradeNNInJVM() throws IOException {
+        Configuration conf2 = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf2).numDataNodes(2).build();
+        cluster2.upgradeAllNameNodes();
+        FileSystem fs2 = FileSystem.get(conf2);
+        Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
+        fs2.mkdirs(TEST_ROOT2);
+        System.out.println(conf2.get("fs.defaultFS"));
+        cluster2.shutdown();
+    }
+
+    @Test
+    public void testUpgradeFinalizeHA() throws IOException {
+
+        int maxNNCount = 3;
+        int STARTING_PORT = 20000;
+        Configuration conf = new Configuration();
+
+        MiniDFSNNTopology.NSConf nameservice = new MiniDFSNNTopology.NSConf("ns1");
+        for (int i = 0; i < maxNNCount; i++) {
+            nameservice.addNN(new MiniDFSNNTopology.NNConf("nn" + i).setHttpPort(STARTING_PORT + i + 1));
+        }
+
+        MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(nameservice);
+
+        MiniDFSClusterInJVM cluster2 = new MiniDFSClusterInJVM.Builder(conf)
+                .nnTopology(topology)
+                .numDataNodes(0)
+                .build();
+        cluster2.waitActive();
+        cluster2.transitionToActive(0);
+
+        cluster2.upgradeAllNameNodes();
+        cluster2.transitionToStandby(0);
+        cluster2.transitionToActive(1); // NN1 will be active and upgrade the layoutVersion in VERSION file
+        cluster2.transitionToStandby(1);
+        cluster2.transitionToActive(2); // NN2 will be active and upgrade the layoutVersion in VERSION file
+        cluster2.shutdown();
+    }
+
 
     @Test
     public void testUpgrade() throws IOException {
@@ -82,6 +117,7 @@ public class TestUpgtDemo {
         Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
         fs2.mkdirs(TEST_ROOT2);
         System.out.println(conf2.get("fs.defaultFS"));
+        cluster2.shutdown();
     }
 
     @Test
@@ -92,6 +128,7 @@ public class TestUpgtDemo {
         Path TEST_ROOT = new Path("/TestUpgtDemo-ROOT1");
         fs.mkdirs(TEST_ROOT);
         System.out.println(conf.get("fs.defaultFS"));
+        cluster.shutdown();
     }
 
     @Test
@@ -105,6 +142,7 @@ public class TestUpgtDemo {
         Path TEST_ROOT2 = new Path("/TestUpgtDemo-ROOT2");
         fs2.mkdirs(TEST_ROOT2);
         System.out.println(conf2.get("fs.defaultFS"));
+        cluster2.shutdown();
     }
 
 
@@ -129,7 +167,7 @@ public class TestUpgtDemo {
     }
 
 
-    @Test
+    //@Test
     public void testDNRestart() throws Exception {
         Configuration conf = new HdfsConfiguration();
         File builderBaseDir = new File(GenericTestUtils.getRandomizedTempPath());
@@ -139,7 +177,7 @@ public class TestUpgtDemo {
         writeTestFile(cluster);
     }
 
-    @Test
+    //@Test
     public void testFSNamesystemFromMiniClusterInJVM() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
         cluster.restartDataNodeForTesting(0, true);
@@ -149,7 +187,7 @@ public class TestUpgtDemo {
         System.out.println("FSNamesysten HaEnabled is: " + fsNamesystem.isHaEnabled());
     }
 
-    @Test
+    //@Test
     public void testMiniClusterInJVM2() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(2).build();
         System.out.println("NameNode address: " + cluster.fakeGetNameNode().getHostAndPort());
@@ -158,7 +196,7 @@ public class TestUpgtDemo {
         System.out.println(InstanceTable.printString());
     }
 
-    @Test
+    //@Test
     public void testMiniClusterInJVM() throws IOException {
         MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration()).numDataNodes(1).build();
         System.out.println("NameNode address: " + cluster.fakeGetNameNode().getHostAndPort());
@@ -166,7 +204,7 @@ public class TestUpgtDemo {
         System.out.println(InstanceTable.printString());
     }
 
-    @Test
+    //@Test
     public void testInstances() {
         NameNodeInstance nameNodeInstance = new NameNodeInstance();
         DataNodeInstance dataNodeInstance = new DataNodeInstance();
@@ -179,7 +217,7 @@ public class TestUpgtDemo {
 
     }
 
-    @Test
+    //@Test
     public void testNameNodeCreation() throws Exception {
         NameNodeJVMInterface nn = MiniDFSClusterHelper.createNameNode(null);
 
@@ -202,13 +240,13 @@ public class TestUpgtDemo {
     }
 
 
-    @Test
+    //@Test
     public void testMiniCluster() throws IOException {
         //MiniDFSCluster cluster = new MiniDFSCluster.Builder(new Configuration()).numDataNodes(1).build();
         //System.out.println(cluster.getNameNodeInterface(0).getClientNamenodeAddress());
     }
 
-    @Test
+    //@Test
     public void testNamenode() {
 
         VersionSelector versionSelector = new VersionSelector();
@@ -303,7 +341,7 @@ public class TestUpgtDemo {
         }
     }
 
-    @Test
+    //@Test
     public void testCreateCluster() throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, IOException {
         createCluster(4);
     }

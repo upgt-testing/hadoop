@@ -45,6 +45,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hdfs.server.common.StorageDirectoryJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -629,6 +630,11 @@ public abstract class FSImageTestUtil {
     return node.getFSImage();
   }
 
+  /** get the fsImage*/
+  public static FSImageJVMInterface getFSImage(NameNodeJVMInterface node) {
+    return node.getFSImage();
+  }
+
   /**
    * get NameSpace quota.
    */
@@ -648,10 +654,29 @@ public abstract class FSImageTestUtil {
         ignoredFiles);
   }
 
+  public static void assertNNFilesMatch(MiniDFSClusterInJVM cluster) throws Exception {
+    List<File> curDirs = Lists.newArrayList();
+    curDirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 0));
+    curDirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 1));
+
+    // Ignore seen_txid file, since the newly bootstrapped standby
+    // will have a higher seen_txid than the one it bootstrapped from.
+    Set<String> ignoredFiles = ImmutableSet.of("seen_txid");
+    FSImageTestUtil.assertParallelFilesAreIdentical(curDirs,
+            ignoredFiles);
+  }
+
   public static long getStorageTxId(NameNode node, URI storageUri)
       throws IOException {
     StorageDirectory sDir = getFSImage(node).getStorage().
         getStorageDirectory(storageUri);
+    return NNStorage.readTransactionIdFile(sDir);
+  }
+
+  public static long getStorageTxId(NameNodeJVMInterface node, URI storageUri)
+          throws IOException {
+    StorageDirectoryJVMInterface sDir = getFSImage(node).getStorage().
+            getStorageDirectory(storageUri);
     return NNStorage.readTransactionIdFile(sDir);
   }
 

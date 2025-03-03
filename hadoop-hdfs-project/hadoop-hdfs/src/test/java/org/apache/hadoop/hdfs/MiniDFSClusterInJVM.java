@@ -60,6 +60,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMESERVICES;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMESERVICE_ID;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_REPLICATION_KEY;
 import static org.apache.hadoop.hdfs.server.common.Util.fileAsURI;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -74,6 +75,7 @@ import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
 
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
@@ -95,10 +97,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.ha.HAServiceProtocol.RequestSource;
 import org.apache.hadoop.ha.HAServiceProtocol.StateChangeRequestInfo;
 import org.apache.hadoop.ha.ServiceFailedException;
@@ -109,10 +107,8 @@ import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.Util;
 import org.apache.hadoop.hdfs.server.datanode.FsDatasetTestUtils.MaterializedReplica;
 import org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter.SecureResources;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
-import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.apache.hadoop.net.DNSToSwitchMapping;
@@ -2319,54 +2315,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         restartNameNode(nnIndex, true);
     }
 
-
     /**
-     * Upgrade all namenodes.
-     */
-    public synchronized void upgradeNameNodes() throws IOException {
-        for (int i = 0; i < namenodes.size(); i++) {
-            upgradeNameNode(i, false);
-        }
-        waitActive();
-    }
-
-    /**
-     * Upgrade the namenode.
-     */
-    public synchronized void upgradeNameNode(String... args) throws IOException {
-        checkSingleNameNode();
-        upgradeNameNode(0, true, args);
-    }
-
-    /**
-     * Upgrade the namenode. Optionally wait for the cluster to become active.
-     */
-    public synchronized void upgradeNameNode(boolean waitActive)
-            throws IOException {
-        checkSingleNameNode();
-        upgradeNameNode(0, waitActive);
-    }
-
-    /**
-     * Upgrade the namenode at a given index.
-     */
-    public synchronized void upgradeNameNode(int nnIndex) throws IOException {
-        upgradeNameNode(nnIndex, true);
-    }
-
-    /**
-     * Update an existing NameNode's configuration.
-     */
-    public void setNameNodeConf(int nnIndex, Configuration nnConf) {
-        NameNodeInfo info = getNN(nnIndex);
-        if (info == null) {
-            throw new RuntimeException("Invalid nnIndex!");
-        }
-        info.setConf(nnConf);
-    }
-
-    /**
-     * Restart the namenode at a given index. Optionally wait for the cluster
+     * Restart the NameNode at a given index. Optionally wait for the cluster
      * to become active.
      */
     public synchronized void restartNameNode(int nnIndex, boolean waitActive,
@@ -2401,17 +2351,132 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
     }
 
-    public synchronized void upgradeNameNode(int nnIndex, boolean waitActive,
-                                             String... args) throws IOException {
-        // Enter safe mode
-        NameNodeInfo info = getNN(nnIndex);
-        try {
-            ToolRunner.run(new DFSAdmin(getNN(nnIndex).conf), new String[]{"-safemode", "enter"});
-            ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-rollingUpgrade", "prepare"});
-        } catch (Exception e) {
-            throw new IOException("Failed to start rolling upgrade", e);
+
+    /**
+     * Call Prepare on the cluster for rolling upgrade, the calling NN is the active NN.
+     */
+    private synchronized int prepareNNUpgrade() throws IOException {
+        int activeNN = 0;
+
+        for (int i = 0; i < namenodes.size(); i++) {
+            NameNodeInfo nn = getNN(i);
+            if (nn.nameNode.getNamesystem().getHAState().equals(("active"))) {
+                activeNN = i;
+                break;
+            }
         }
-        // info.setStartOpt(StartupOption.ROLLINGUPGRADE);
+        DistributedFileSystem dfs = getFileSystem(activeNN);
+        if (isSingleNN()) {
+            dfs.setSafeMode(SafeModeAction.ENTER);
+        }
+
+        //start rolling upgrade
+        final RollingUpgradeInfo info1;
+        //dfs.setSafeMode(SafeModeAction.ENTER);
+        LOG.info("[UPGT] Calling PREPARE on the cluster for rolling upgrade");
+        info1 = dfs.rollingUpgrade(HdfsConstants.RollingUpgradeAction.PREPARE);
+        LOG.info("[UPGT] PREPARE rolling upgrade returned: " + info1);
+
+        //query rolling upgrade
+        LOG.info("[UPGT] Calling QUERY on the cluster for rolling upgrade");
+        assertEquals(info1, dfs.rollingUpgrade(HdfsConstants.RollingUpgradeAction.QUERY));
+        LOG.info("[UPGT] QUERY rolling upgrade returned: " + info1);
+        return activeNN;
+    }
+
+    /**
+     * Call finalize on the cluster for rolling upgrade, the calling NN is the active NN.
+     */
+    private synchronized void finalizeNNUpgrade(int activeNN) throws IOException {
+        // we need to figure out which is the active namenode and then finalize the upgrade on that namenode
+        if (!isSingleNN()) {
+            transitionToActive(activeNN);
+        }
+        DistributedFileSystem dfs = getFileSystem(activeNN);
+        LOG.info("[UPGT] Calling FINALIZE on the cluster for rolling upgrade");
+        RollingUpgradeInfo rollingUpgradeInfo = dfs.rollingUpgrade(HdfsConstants.RollingUpgradeAction.FINALIZE);
+        if (isSingleNN()) {
+            dfs.setSafeMode(SafeModeAction.LEAVE);
+        }
+        LOG.info("Finalized rolling upgrade: " + rollingUpgradeInfo + " finalized = " +  rollingUpgradeInfo.isFinalized());
+    }
+
+    /**
+     * Check if the cluster only has a single NameNode.
+     */
+    private boolean isSingleNN() {
+        return namenodes.size() == 1;
+    }
+
+    /**
+     * Upgrade the namenode.
+     */
+    public synchronized void upgradeNameNode(String... args) throws IOException {
+        checkSingleNameNode();
+        upgradeNameNode(0, true, true, args);
+    }
+
+    /**
+     * Upgrade the namenode. Optionally wait for the cluster to become active.
+     */
+    public synchronized void upgradeNameNode(boolean waitActive)
+            throws IOException {
+        checkSingleNameNode();
+        upgradeNameNode(0, true, waitActive);
+    }
+
+    /**
+     * Upgrade the namenode at a given index.
+     */
+    public synchronized void upgradeNameNode(int nnIndex, boolean isSingleNN) throws IOException {
+        upgradeNameNode(nnIndex, isSingleNN,true);
+    }
+
+    /**
+     * Update an existing NameNode's configuration.
+     */
+    public void setNameNodeConf(int nnIndex, Configuration nnConf) {
+        NameNodeInfo info = getNN(nnIndex);
+        if (info == null) {
+            throw new RuntimeException("Invalid nnIndex!");
+        }
+        info.setConf(nnConf);
+    }
+
+    /**
+     * Upgrade all namenodes.
+     */
+    public synchronized void upgradeAllNameNodes() throws IOException {
+        int activeNN = prepareNNUpgrade();
+        for (int i = 0; i < namenodes.size(); i++) {
+            upgradeNameNode(i, false, true); // Here set isSingleNN to false to enforce no repeat prepare and finalize
+        }
+        waitActive();
+        finalizeNNUpgrade(activeNN);
+    }
+
+
+    /**
+     * Upgrade a given NN at index nnIndex. This will do PREPARE and FINALIZE in single NN mode.
+     */
+    public synchronized void upgradeNameNode(int nnIndex, boolean isSingleNN, boolean waitActive,
+                                             String... args) throws IOException {
+        if (!Boolean.getBoolean("upgt.datanode.upgrade")) {
+            return;
+        }
+        LOG.info("Upgrading the namenode at index " + nnIndex);
+        NameNodeInfo info = getNN(nnIndex);
+        if (info == null || info.nameNode == null) {
+            LOG.warn("Try to upgrade a non-started namenode at index " + nnIndex + ", skip it.");
+            return;
+        }
+
+        int activeNN = 0;
+        if (isSingleNN) {
+            // Only do Prepare in single NN mode, because HA mode will do this in upgradeAllNameNodes()
+            activeNN = prepareNNUpgrade();
+        }
+
         StartupOption startOpt = info.startOpt;
 
         shutdownNameNode(nnIndex);
@@ -2436,12 +2501,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
         info.nnInstance = nnInstance;
         info.setStartOpt(startOpt);
-        try {
-            // leave safe mode
-            //ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-safemode", "leave"});
-        } catch (Exception e) {
-            throw new IOException("Failed to leave safe mode", e);
-        }
         if (waitActive) {
             if (numDataNodes > 0) {
                 waitNameNodeUp(nnIndex);
@@ -2449,11 +2508,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             LOG.info("Upgrarded the namenode");
             waitActive(nnIndex);
         }
-        try {
-            // finalize the upgrade
-            ToolRunner.run(new DFSAdmin(info.conf), new String[]{"-rollingUpgrade", "finalize"});
-        } catch (Exception e) {
-            throw new IOException("Failed to finalize upgrade", e);
+
+        if (isSingleNN) {
+            // Only do Finalize in single NN mode, because HA mode will do this in upgradeAllNameNodes()
+            finalizeNNUpgrade(activeNN);
         }
     }
 
@@ -2887,12 +2945,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         try {
             if (upgradeNN) {
-                LOG.info("Upgrading NameNode" + i);
-                upgradeNameNode(i);
+                //upgradeNameNode(i, true);
+                upgradeAllNameNodes();
             }
             if (upgradeDN) {
-                System.out.println("Upgrading DataNode" + i);
-                upgradeDataNode(i, true);
+                //upgradeDataNode(i, true);
+                upgradeAllDataNodes(true);
             }
             waitActive();
         } catch (IOException e) {
@@ -2937,6 +2995,15 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return upgradeDataNode(i, keepPort, false);
     }
 
+    public synchronized boolean upgradeAllDataNodes(boolean keepPort)
+            throws IOException {
+        for (int i = dataNodes.size() - 1; i >= 0; i--) {
+            if (!upgradeDataNode(i, keepPort))
+                return false;
+            LOG.info("Upgraded DataNode " + i);
+        }
+        return true;
+    }
 
     /**
      * Restart a particular DataNode.
@@ -2963,6 +3030,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public synchronized boolean upgradeDataNode(
             int idn, boolean keepPort, boolean expireOnNN) throws IOException {
+        LOG.info("Upgrading DataNode " + idn);
         DataNodeProperties dnprop = stopDataNode(idn);
         if(expireOnNN) {
             // TODO: FIX ME
