@@ -1485,6 +1485,22 @@ public class DatanodeManager implements DatanodeManagerJVMInterface {
     this.numStaleStorages = numStaleStorages;
   }
 
+  public void fetchDatanodesJVM(final List<DatanodeDescriptorJVMInterface> live,
+                      final List<DatanodeDescriptorJVMInterface> dead, final boolean removeDecommissionNode) {
+    List<DatanodeDescriptor> liveDatanodes = new ArrayList<>();
+    List<DatanodeDescriptor> deadDatanodes = new ArrayList<>();
+    // Convert live list items to DatanodeDescriptor and add them to liveDatanodes
+    for (DatanodeDescriptorJVMInterface node : live) {
+      liveDatanodes.add((DatanodeDescriptor) node);
+    }
+
+    // Convert dead list items to DatanodeDescriptor and add them to deadDatanodes
+    for (DatanodeDescriptorJVMInterface node : dead) {
+      deadDatanodes.add((DatanodeDescriptor) node);
+    }
+    fetchDatanodes(liveDatanodes, deadDatanodes, removeDecommissionNode);
+  }
+
   /** Fetch live and dead datanodes. */
   public void fetchDatanodes(final List<DatanodeDescriptor> live, 
       final List<DatanodeDescriptor> dead, final boolean removeDecommissionNode) {

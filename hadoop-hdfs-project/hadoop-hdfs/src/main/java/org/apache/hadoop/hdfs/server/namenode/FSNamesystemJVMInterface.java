@@ -1,16 +1,56 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
+import org.apache.hadoop.crypto.key.KeyProviderJVMInterface;
 import org.apache.hadoop.fs.permission.AclStatusJVMInterface;
+import org.apache.hadoop.hdfs.protocol.LocatedBlocksJVMInterface;
+import org.apache.hadoop.hdfs.protocol.RollingUpgradeInfoJVMInterface;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.ha.EditLogTailerJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManagerJVMInterface;
+import org.apache.hadoop.ipc.RetryCacheJVMInterface;
 
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public interface FSNamesystemJVMInterface {
+    boolean isExternalInvocation();
+    boolean isUpgradeFinalized();
+    boolean recoverLease(String src, String holder, String clientMachine) throws IOException;
+    int getNumDeadDataNodes();
+    Collection<?> listCorruptFileBlocks(String path, String[] cookieTab) throws IOException;
+    String getNameDirSize();
+    String getNameDirStatuses();
+    int getCorruptFilesCount();
+    String getCorruptFiles();
+    String getCompileInfo();
+    String getJournalTransactionInfo();
+    String getNameJournalStatus();
+    String getNodeUsage();
+    String getDeadNodes();
+    String getLiveNodes();
+    float getPercentRemaining();
+    long getTotalBlocks();
+    long getNonDfsUsedSpace();
+    long getTotal();
+    long getUsed();
+    String getVersion();
+    boolean getCallerContextEnabled();
+    void close();
+    boolean setReplication(String src, short replication) throws IOException;
+    long getPostponedMisreplicatedBlocks();
+    int getNumLiveDataNodes();
+    long getTransactionsSinceLastLogRoll();
+    boolean isInStartupSafeMode();
+    RetryCacheJVMInterface getRetryCache();
+    boolean isInStandbyState();
+    LocatedBlocksJVMInterface getBlockLocations(String clientMachine, String srcArg, long offset, long length) throws IOException;
+    long getNumFilesUnderConstruction();
+    int getNumDecomLiveDataNodes();
+    int getNumDecomDeadDataNodes();
+    KeyProviderJVMInterface getProvider();
     void leaveSafeMode(boolean force);
     SnapshotManagerJVMInterface getSnapshotManager();
     CacheManagerJVMInterface getCacheManager();

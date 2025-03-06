@@ -22,7 +22,7 @@ import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.viewfs.ConfigUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.ViewDistributedFileSystem;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class TestCacheDirectivesWithViewDFS extends TestCacheDirectives {
   }
 
   @Override
-  public DistributedFileSystem getDFS(MiniDFSCluster cluster, int nnIdx)
+  public DistributedFileSystem getDFS(MiniDFSClusterInJVM cluster, int nnIdx)
       throws IOException {
     Configuration conf = cluster.getConfiguration(nnIdx);
     conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
+
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -58,20 +60,20 @@ public class TestBalancerBandwidth {
         DEFAULT_BANDWIDTH);
 
     /* Create and start cluster */
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES).build()) {
       cluster.waitActive();
 
       DistributedFileSystem fs = cluster.getFileSystem();
 
-      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      ArrayList<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       // Ensure value from the configuration is reflected in the datanodes.
       assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(0).getBalancerBandwidth());
       assertEquals(DEFAULT_BANDWIDTH, (long) datanodes.get(1).getBalancerBandwidth());
       DFSAdmin admin = new DFSAdmin(conf);
-      String dn1Address = datanodes.get(0).ipcServer.getListenerAddress()
+      String dn1Address = datanodes.get(0).getRpcServer().getListenerAddress()
           .getHostName() + ":" + datanodes.get(0).getIpcPort();
-      String dn2Address = datanodes.get(1).ipcServer.getListenerAddress()
+      String dn2Address = datanodes.get(1).getRpcServer().getListenerAddress()
           .getHostName() + ":" + datanodes.get(1).getIpcPort();
 
       // verifies the dfsadmin command execution
@@ -113,8 +115,8 @@ public class TestBalancerBandwidth {
     }
   }
 
-  private void verifyBalancerBandwidth(final ArrayList<DataNode> datanodes,
-      final long newBandwidth) throws TimeoutException, InterruptedException {
+  private void verifyBalancerBandwidth(final ArrayList<DataNodeJVMInterface> datanodes,
+                                       final long newBandwidth) throws TimeoutException, InterruptedException {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
       @Override
       public Boolean get() {

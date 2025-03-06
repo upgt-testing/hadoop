@@ -72,6 +72,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.hadoop.crypto.key.KeyProviderJVMInterface;
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
@@ -1148,6 +1149,23 @@ public class DFSTestUtil {
         .join(nameservices));
   }
 
+  public static void setFederatedConfiguration(MiniDFSClusterInJVM cluster,
+                                               Configuration conf) {
+    Set<String> nameservices = new HashSet<String>();
+    for (MiniDFSClusterInJVM.NameNodeInfo info : cluster.getNameNodeInfos()) {
+      assert info.nameserviceId != null;
+      nameservices.add(info.nameserviceId);
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_RPC_ADDRESS_KEY,
+              info.nameserviceId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+              info.nameNode.getNameNodeAddress()).toString());
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
+              info.nameserviceId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+              info.nameNode.getNameNodeAddress()).toString());
+    }
+    conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
+            .join(nameservices));
+  }
+
   public static void setFederatedHAConfiguration(MiniDFSCluster cluster,
       Configuration conf) {
     Map<String, List<String>> nameservices = Maps.newHashMap();
@@ -1177,6 +1195,37 @@ public class DFSTestUtil {
     }
     conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
         .join(nameservices.keySet()));
+  }
+
+  public static void setFederatedHAConfiguration(MiniDFSClusterInJVM cluster,
+                                                 Configuration conf) {
+    Map<String, List<String>> nameservices = Maps.newHashMap();
+    for (MiniDFSClusterInJVM.NameNodeInfo info : cluster.getNameNodeInfos()) {
+      Preconditions.checkState(info.nameserviceId != null);
+      List<String> nns = nameservices.get(info.nameserviceId);
+      if (nns == null) {
+        nns = Lists.newArrayList();
+        nameservices.put(info.nameserviceId, nns);
+      }
+      nns.add(info.nnId);
+
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_RPC_ADDRESS_KEY,
+                      info.nameserviceId, info.nnId),
+              DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+                      info.nameNode.getNameNodeAddress()).toString());
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
+                      info.nameserviceId, info.nnId),
+              DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+                      info.nameNode.getNameNodeAddress()).toString());
+    }
+    for (Map.Entry<String, List<String>> entry : nameservices.entrySet()) {
+      conf.set(DFSUtil.addKeySuffixes(DFS_HA_NAMENODES_KEY_PREFIX,
+              entry.getKey()), Joiner.on(",").join(entry.getValue()));
+      conf.set(HdfsClientConfigKeys.Failover.PROXY_PROVIDER_KEY_PREFIX + "."
+              + entry.getKey(), ConfiguredFailoverProxyProvider.class.getName());
+    }
+    conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
+            .join(nameservices.keySet()));
   }
   
   private static DatanodeID getDatanodeID(String ipAddr) {
@@ -1893,6 +1942,12 @@ public class DFSTestUtil {
     createKey(keyName, cluster, 0, conf);
   }
 
+  public static void createKey(String keyName, MiniDFSClusterInJVM cluster,
+                               Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    createKey(keyName, cluster, 0, conf);
+  }
+
   /**
    * Helper function to create a key in the Key Provider.
    *
@@ -1906,6 +1961,18 @@ public class DFSTestUtil {
       throws NoSuchAlgorithmException, IOException {
     NameNode nn = cluster.getNameNode(idx);
     KeyProvider provider = nn.getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    provider.createKey(keyName, options);
+    provider.flush();
+  }
+
+  public static void createKey(String keyName, MiniDFSClusterInJVM cluster,
+                               int idx, Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeJVMInterface nn = cluster.getNameNode(idx);
+    KeyProviderJVMInterface provider = nn.getNamesystem().getProvider();
     final KeyProvider.Options options = KeyProvider.options(conf);
     options.setDescription(keyName);
     options.setBitLength(128);
@@ -2167,6 +2234,11 @@ public class DFSTestUtil {
    * Update lastUpdate and lastUpdateMonotonic with some offset.
    */
   public static void resetLastUpdatesWithOffset(DatanodeInfo dn, long offset) {
+    dn.setLastUpdate(Time.now() + offset);
+    dn.setLastUpdateMonotonic(Time.monotonicNow() + offset);
+  }
+
+  public static void resetLastUpdatesWithOffset(DatanodeInfoJVMInterface dn, long offset) {
     dn.setLastUpdate(Time.now() + offset);
     dn.setLastUpdateMonotonic(Time.monotonicNow() + offset);
   }

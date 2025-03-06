@@ -348,7 +348,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
   }
   
   //This must be called only by blockPoolManager.
-  void stop() {
+  public void stop() {
     for (BPServiceActor actor : bpServices) {
       actor.stop();
     }

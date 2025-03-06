@@ -722,7 +722,7 @@ public class BlockManager implements BlockStatsMXBean, BlockManagerJVMInterface 
 
   /** Allow silent termination of redundancy monitor for testing. */
   @VisibleForTesting
-  void enableRMTerminationForTesting() {
+  public void enableRMTerminationForTesting() {
     checkNSRunning = false;
   }
 
@@ -2875,7 +2875,7 @@ public class BlockManager implements BlockStatsMXBean, BlockManagerJVMInterface 
   /**
    * Rescan the list of blocks which were previously postponed.
    */
-  void rescanPostponedMisreplicatedBlocks() {
+  public void rescanPostponedMisreplicatedBlocks() {
     if (getPostponedMisreplicatedBlocksCount() == 0) {
       return;
     }
@@ -5375,7 +5375,7 @@ public class BlockManager implements BlockStatsMXBean, BlockManagerJVMInterface 
    * @return redundancy thread.
    */
   @VisibleForTesting
-  Daemon getRedundancyThread() {
+  public Daemon getRedundancyThread() {
     return redundancyThread;
   }
 

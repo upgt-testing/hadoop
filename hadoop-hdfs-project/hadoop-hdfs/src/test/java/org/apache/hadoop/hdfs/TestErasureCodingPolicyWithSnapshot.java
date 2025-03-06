@@ -38,7 +38,7 @@ import org.junit.Rule;
 import org.junit.rules.Timeout;
 
 public class TestErasureCodingPolicyWithSnapshot {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private Configuration conf;
 
@@ -59,7 +59,7 @@ public class TestErasureCodingPolicyWithSnapshot {
     groupSize = (short) (ecPolicy.getNumDataUnits()
         + ecPolicy.getNumParityUnits());
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(groupSize).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(groupSize).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());

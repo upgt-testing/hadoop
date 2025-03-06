@@ -1,6 +1,7 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 public interface FSEditLogJVMInterface {
+    void abortCurrentLogSegment();
     long getLastWrittenTxId();
     long getCurSegmentTxId();
     void endCurrentLogSegment(boolean writeEndTxn);

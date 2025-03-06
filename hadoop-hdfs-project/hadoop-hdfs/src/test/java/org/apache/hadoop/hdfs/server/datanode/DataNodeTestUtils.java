@@ -126,6 +126,10 @@ public class DataNodeTestUtils {
     dn.setIBRDisabledForTest(true);
   }
 
+  public static void pauseIBR(DataNodeJVMInterface dn) {
+    dn.setIBRDisabledForTest(true);
+  }
+
   public static void resumeIBR(DataNode dn) {
     dn.setIBRDisabledForTest(false);
   }

@@ -40,7 +40,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class NamespaceInfo extends StorageInfo {
+public class NamespaceInfo extends StorageInfo implements NamespaceInfoJVMInterface {
   final String  buildVersion;
   String blockPoolID = "";    // id of the block pool
   String softwareVersion;

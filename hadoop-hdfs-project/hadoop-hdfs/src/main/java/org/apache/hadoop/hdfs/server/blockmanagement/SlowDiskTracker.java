@@ -194,7 +194,7 @@ public class SlowDiskTracker implements SlowDiskTrackerJVMInterface {
       this.timestamp = timestamp;
     }
 
-    String getSlowDiskID() {
+    public String getSlowDiskID() {
       return this.slowDiskID;
     }
 

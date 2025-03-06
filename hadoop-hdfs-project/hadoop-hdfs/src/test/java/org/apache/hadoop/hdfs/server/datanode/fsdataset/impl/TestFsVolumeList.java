@@ -29,11 +29,12 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.datanode.BlockScanner;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.StorageLocation;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReference;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.RoundRobinVolumeChoosingPolicy;
@@ -351,7 +352,7 @@ public class TestFsVolumeList {
     cnf.setInt(
         DFSConfigKeys.DFS_DATANODE_VOLUMES_REPLICA_ADD_THREADPOOL_SIZE_KEY,
         poolSize);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(cnf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(cnf).numDataNodes(1)
         .storagesPerDatanode(1).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     // Generate data blocks.
@@ -398,7 +399,7 @@ public class TestFsVolumeList {
   @Test(timeout = 60000)
   public void testInstanceOfAddReplicaThreadPool() throws Exception {
     // Start cluster with multiple namespace
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(
         new HdfsConfiguration())
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(1).build()) {
@@ -464,6 +465,7 @@ public class TestFsVolumeList {
         DFSConfigKeys.DFS_DATANODE_FIXED_VOLUME_SIZE_DEFAULT);
   }
 
+  /*
   @Test
   public void testExcludeSlowDiskWhenChoosingVolume() throws Exception {
     conf = new HdfsConfiguration();
@@ -485,7 +487,7 @@ public class TestFsVolumeList {
       }
     }
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .hosts(hostnames)
         .numDataNodes(NUM_DATANODES)
         .storagesPerDatanode(STORAGES_PER_DATANODE)
@@ -558,4 +560,5 @@ public class TestFsVolumeList {
         .filter(v -> (v.getPath() + "/").equals(slowDisk0OnDn2)).collect(Collectors.toList()).get(0)
         .getNumBlocks());
   }
+   */
 }

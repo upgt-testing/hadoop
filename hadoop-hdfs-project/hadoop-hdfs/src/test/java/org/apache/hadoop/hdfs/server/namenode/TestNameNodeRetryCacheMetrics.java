@@ -27,8 +27,9 @@ import org.apache.hadoop.ipc.metrics.RetryCacheMetrics;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
+import org.apache.hadoop.ipc.metrics.RetryCacheMetricsJVMInterface;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
@@ -46,12 +47,12 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_ENABLE_RETRY_CAC
  *
  */
 public class TestNameNodeRetryCacheMetrics {
-  private MiniDFSCluster cluster;
-  private FSNamesystem namesystem;
+  private MiniDFSClusterInJVM cluster;
+  private FSNamesystemJVMInterface namesystem;
   private DistributedFileSystem filesystem;
   private final int namenodeId = 0;
   private Configuration conf;
-  private RetryCacheMetrics metrics;
+  private RetryCacheMetricsJVMInterface metrics;
 
   private DFSClient client;
 
@@ -61,7 +62,7 @@ public class TestNameNodeRetryCacheMetrics {
     conf = new HdfsConfiguration();
     conf.setBoolean(DFS_NAMENODE_ENABLE_RETRY_CACHE_KEY, true);
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY, 2);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3)
         .build();
     cluster.waitActive();

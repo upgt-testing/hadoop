@@ -81,6 +81,12 @@ public class NameNodeAdapter {
     return namenode.getNamesystem().getBlockLocations("foo",
         src, offset, length);
   }
+
+  public static LocatedBlocksJVMInterface getBlockLocations(NameNodeJVMInterface namenode,
+                                                String src, long offset, long length) throws IOException {
+    return namenode.getNamesystem().getBlockLocations("foo",
+            src, offset, length);
+  }
   
   public static HdfsFileStatus getFileInfo(NameNode namenode, String src,
       boolean resolveLink, boolean needLocation, boolean needBlockToken)
@@ -139,6 +145,11 @@ public class NameNodeAdapter {
   
   public static void abortEditLogs(NameNode nn) {
     FSEditLog el = nn.getFSImage().getEditLog();
+    el.abortCurrentLogSegment();
+  }
+
+  public static void abortEditLogs(NameNodeJVMInterface nn) {
+    FSEditLogJVMInterface el = nn.getFSImage().getEditLog();
     el.abortCurrentLogSegment();
   }
   

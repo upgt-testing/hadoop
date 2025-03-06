@@ -220,6 +220,15 @@ public class StripedFileTestUtil {
     cluster.stopDataNode(datanode.getXferAddr());
   }
 
+  static void killDatanode(MiniDFSClusterInJVM cluster, DFSStripedOutputStream out,
+                           final int dnIndex, final AtomicInteger pos) {
+    final StripedDataStreamer s = out.getStripedDataStreamer(dnIndex);
+    final DatanodeInfo datanode = getDatanodes(s);
+    assert datanode != null;
+    LOG.info("killDatanode " + dnIndex + ": " + datanode + ", pos=" + pos);
+    cluster.stopDataNode(datanode.getXferAddr());
+  }
+
   static DatanodeInfo getDatanodes(StripedDataStreamer streamer) {
     for(;;) {
       final DatanodeInfo[] datanodes = streamer.getNodes();

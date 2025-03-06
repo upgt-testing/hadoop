@@ -25,6 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataNodeJVMInterface {
+    int getBpOsCount();
+    ChangedVolumesJVMInterface parseChangedVolumes(String arg) throws IOException;
+    String getDiskBalancerStatus();
+    void cancelDiskBalancePlan(String bpid) throws IOException;
+    void checkDiskError() throws IOException;
+    long getLastDiskErrorCheck();
+    void setIBRDisabledForTest(boolean disabled);
+    long getBalancerBandwidth();
     RPCServerJVMInterface getRpcServer();
     DirectoryScannerJVMInterface getDirectoryScanner();
     void clearAllBlockSecretKeys();

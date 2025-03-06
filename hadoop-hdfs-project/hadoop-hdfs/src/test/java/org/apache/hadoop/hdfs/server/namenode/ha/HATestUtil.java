@@ -172,6 +172,17 @@ public abstract class HATestUtil {
     }, 250, 10000);
   }
 
+  public static void waitForNNToIssueDeletions(final NameNodeJVMInterface nn)
+          throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      @Override
+      public Boolean get() {
+        LOG.info("Waiting for NN to issue block deletions to DNs");
+        return nn.getNamesystem().getBlockManager().getPendingDeletionBlocksCount() == 0;
+      }
+    }, 250, 10000);
+  }
+
   public static class CouldNotCatchUpException extends IOException {
     private static final long serialVersionUID = 1L;
 
@@ -251,6 +262,22 @@ public abstract class HATestUtil {
     for (int nnIdx : nnIndices) {
       if (pi.proxyInfo.equals(
           cluster.getNameNode(nnIdx).getNameNodeAddress().toString())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean isSentToAnyOfNameNodes(
+          DistributedFileSystem dfs,
+          MiniDFSClusterInJVM cluster, int... nnIndices) throws IOException {
+    ObserverReadProxyProvider<?> provider = (ObserverReadProxyProvider<?>)
+            ((RetryInvocationHandler<?>) Proxy.getInvocationHandler(
+                    dfs.getClient().getNamenode())).getProxyProvider();
+    FailoverProxyProvider.ProxyInfo<?> pi = provider.getLastProxy();
+    for (int nnIdx : nnIndices) {
+      if (pi.proxyInfo.equals(
+              cluster.getNameNode(nnIdx).getNameNodeAddress().toString())) {
         return true;
       }
     }
@@ -424,8 +451,31 @@ public abstract class HATestUtil {
         getLogicalHostname(cluster));
   }
 
+  public static URI getLogicalUri(MiniDFSClusterInJVM cluster)
+          throws URISyntaxException {
+    return new URI(HdfsConstants.HDFS_URI_SCHEME + "://" +
+            getLogicalHostname(cluster));
+  }
+
   public static void waitForCheckpoint(MiniDFSCluster cluster, int nnIdx,
       List<Integer> txids) throws InterruptedException {
+    long start = Time.now();
+    while (true) {
+      try {
+        FSImageTestUtil.assertNNHasCheckpoints(cluster, nnIdx, txids);
+        return;
+      } catch (AssertionError err) {
+        if (Time.now() - start > 10000) {
+          throw err;
+        } else {
+          Thread.sleep(300);
+        }
+      }
+    }
+  }
+
+  public static void waitForCheckpoint(MiniDFSClusterInJVM cluster, int nnIdx,
+                                       List<Integer> txids) throws InterruptedException {
     long start = Time.now();
     while (true) {
       try {

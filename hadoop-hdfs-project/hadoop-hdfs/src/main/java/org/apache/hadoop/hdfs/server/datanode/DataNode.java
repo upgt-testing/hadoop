@@ -974,7 +974,7 @@ public class DataNode extends ReconfigurableBase
    * Contains the StorageLocations for changed data volumes.
    */
   @VisibleForTesting
-  static class ChangedVolumes {
+  static class ChangedVolumes implements ChangedVolumesJVMInterface {
     /** The storage locations of the newly added volumes. */
     List<StorageLocation> newLocations = Lists.newArrayList();
     /** The storage locations of the volumes that are removed. */
@@ -992,7 +992,7 @@ public class DataNode extends ReconfigurableBase
    * configuration, or the storage type of a directory is changed.
    */
   @VisibleForTesting
-  ChangedVolumes parseChangedVolumes(String newVolumes) throws IOException {
+  public ChangedVolumes parseChangedVolumes(String newVolumes) throws IOException {
     Configuration conf = new Configuration();
     conf.set(DFS_DATANODE_DATA_DIR_KEY, newVolumes);
     List<StorageLocation> newStorageLocations = getStorageLocations(conf);
@@ -1653,7 +1653,7 @@ public class DataNode extends ReconfigurableBase
   }
 
   @VisibleForTesting
-  void setIBRDisabledForTest(boolean disabled) {
+  public void setIBRDisabledForTest(boolean disabled) {
     this.ibrDisabledForTests = disabled;
   }
 

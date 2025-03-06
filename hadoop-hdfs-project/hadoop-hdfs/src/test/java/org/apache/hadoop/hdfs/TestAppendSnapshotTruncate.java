@@ -75,7 +75,7 @@ public class TestAppendSnapshotTruncate {
   static final String[] EMPTY_STRINGS = {};
 
   static Configuration conf;
-  static MiniDFSCluster cluster;
+  static MiniDFSClusterInJVM cluster;
   static DistributedFileSystem dfs;
 
   @BeforeClass
@@ -87,7 +87,7 @@ public class TestAppendSnapshotTruncate {
     conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, 1);
     conf.setBoolean(ReplaceDatanodeOnFailure.BEST_EFFORT_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .format(true)
         .numDataNodes(DATANODE_NUM)
         .waitSafeMode(true)

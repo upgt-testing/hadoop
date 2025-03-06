@@ -44,7 +44,7 @@ public class TestStoragePolicyPermissionSettings {
   private static final int SIZE = 128;
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem fs;
   private static BlockStoragePolicySuite suite;
   private static BlockStoragePolicy cold;
@@ -54,7 +54,7 @@ public class TestStoragePolicyPermissionSettings {
   @BeforeClass
   public static void clusterSetUp() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     suite = BlockStoragePolicySuite.createDefaultSuite();

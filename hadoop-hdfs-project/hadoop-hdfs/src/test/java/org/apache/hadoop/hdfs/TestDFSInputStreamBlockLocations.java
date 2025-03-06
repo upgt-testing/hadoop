@@ -41,6 +41,7 @@ import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.util.Time;
 import org.junit.After;
 import org.junit.Assert;
@@ -67,7 +68,7 @@ public class TestDFSInputStreamBlockLocations {
   private final long dfsInputLocationsTimeout = 60 * 60 * 1000L;
 
   private HdfsConfiguration conf;
-  private MiniDFSCluster dfsCluster;
+  private MiniDFSClusterInJVM dfsCluster;
   private DFSClient dfsClient;
   private DistributedFileSystem fs;
   private Path filePath;
@@ -110,7 +111,7 @@ public class TestDFSInputStreamBlockLocations {
           dfsInputLocationsTimeout);
     }
     // start the cluster and create a DFSClient
-    dfsCluster = new MiniDFSCluster.Builder(conf)
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_DATA_NODES).racks(RACKS).build();
     dfsCluster.waitActive();
     assertEquals(NUM_DATA_NODES, dfsCluster.getDataNodes().size());
@@ -170,7 +171,7 @@ public class TestDFSInputStreamBlockLocations {
       // are unresolved hosts.
       Map<String, InetSocketAddress> mockAddressCache = new HashMap<>();
       InetSocketAddress unresolved = InetSocketAddress.createUnresolved("www.google.com", 80);
-      for (DataNode dataNode : dfsCluster.getDataNodes()) {
+      for (DataNodeJVMInterface dataNode : dfsCluster.getDataNodes()) {
         mockAddressCache.put(dataNode.getDatanodeUuid(), unresolved);
       }
 

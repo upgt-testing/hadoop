@@ -1486,7 +1486,7 @@ public class FSEditLog implements LogsPurgeable, FSEditLogJVMInterface {
   /**
    * Abort all current logs. Called from the backup node.
    */
-  synchronized void abortCurrentLogSegment() {
+  public synchronized void abortCurrentLogSegment() {
     try {
       //Check for null, as abort can be called any time.
       if (editLogStream != null) {

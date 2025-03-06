@@ -807,7 +807,7 @@ public class TestReplication {
     return bm.getPendingReconstructionBlocksCount();
   }
 
-  private void assertNoReplicationWasPerformed(MiniDFSCluster cluster) {
+  private void assertNoReplicationWasPerformed(MiniDFSClusterInJVM cluster) {
     for (DataNode dn : cluster.getDataNodes()) {
       MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
       assertCounter("BlocksReplicated", 0L, rb);

@@ -45,7 +45,7 @@ import org.apache.hadoop.fs.contract.ContractTestUtils;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.client.CreateEncryptionZoneFlag;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
@@ -72,7 +72,7 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
       LoggerFactory.getLogger(TestViewFileSystemHdfs.class);
 
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Path defaultWorkingDirectory;
   private static Path defaultWorkingDirectory2;
   private static final Configuration CONF = new Configuration();
@@ -107,7 +107,7 @@ public class TestViewFileSystemHdfs extends ViewFileSystemBaseTest {
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
     
     cluster =
-        new MiniDFSCluster.Builder(CONF).nnTopology(
+        new MiniDFSClusterInJVM.Builder(CONF).nnTopology(
                 MiniDFSNNTopology.simpleFederatedTopology(2))
             .numDataNodes(2)
             .build();

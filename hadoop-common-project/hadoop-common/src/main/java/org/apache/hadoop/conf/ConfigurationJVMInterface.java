@@ -1,8 +1,10 @@
 package org.apache.hadoop.conf;
 
+import java.util.Collection;
 import java.util.Map;
 
 public interface ConfigurationJVMInterface {
+    Collection<String> getTrimmedStringCollection(String name);
     Map<String, String> getSetParameters();
     void set(String name, String value);
     String get(String name);
@@ -12,4 +14,5 @@ public interface ConfigurationJVMInterface {
     void setClass(String name, Class<?> theClass, Class<?> xface);
     int[] getInts(String name);
     boolean getBoolean(String name, boolean defaultValue);
+    long getLong(String name, long defaultValue);
 }

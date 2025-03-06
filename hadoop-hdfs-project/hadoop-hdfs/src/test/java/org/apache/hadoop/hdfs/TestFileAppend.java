@@ -121,7 +121,7 @@ public class TestFileAppend{
   public void testBreakHardlinksIfNeeded() throws IOException {
     Configuration conf = new HdfsConfiguration();
     File builderBaseDir = new File(GenericTestUtils.getRandomizedTempPath());
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf, builderBaseDir)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf, builderBaseDir)
         .build();
     FileSystem fs = cluster.getFileSystem();
     InetSocketAddress addr = new InetSocketAddress("localhost",
@@ -696,7 +696,7 @@ public class TestFileAppend{
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
 
     File builderBaseDir = new File(GenericTestUtils.getRandomizedTempPath());
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf, builderBaseDir)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf, builderBaseDir)
         .build();
     try {
       cluster.waitActive();
