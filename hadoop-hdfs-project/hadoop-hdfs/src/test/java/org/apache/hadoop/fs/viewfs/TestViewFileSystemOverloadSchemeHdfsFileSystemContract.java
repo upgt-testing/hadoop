@@ -34,7 +34,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.TestHDFSFileSystemContract;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -51,7 +51,7 @@ import org.junit.Test;
 public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract
     extends TestHDFSFileSystemContract {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static String defaultWorkingDirectory;
   private static Configuration conf = new HdfsConfiguration();
 
@@ -60,7 +60,7 @@ public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract
     final File basedir = GenericTestUtils.getRandomizedTestDir();
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
         FileSystemContractBaseTest.TEST_UMASK);
-    cluster = new MiniDFSCluster.Builder(conf, basedir)
+    cluster = new MiniDFSClusterInJVM.Builder(conf, basedir)
         .numDataNodes(2)
         .build();
     defaultWorkingDirectory =

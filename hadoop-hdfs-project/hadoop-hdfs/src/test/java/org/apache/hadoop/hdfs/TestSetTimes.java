@@ -97,7 +97,7 @@ public class TestSetTimes {
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -199,7 +199,7 @@ public class TestSetTimes {
       // shutdown cluster and restart
       cluster.shutdown();
       try {Thread.sleep(2*MAX_IDLE_TIME);} catch (InterruptedException e) {}
-      cluster = new MiniDFSCluster.Builder(conf).nameNodePort(nnport)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(nnport)
                                                 .format(false)
                                                 .build();
       cluster.waitActive();
@@ -238,7 +238,7 @@ public class TestSetTimes {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 1000);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitActive();
@@ -294,7 +294,7 @@ public class TestSetTimes {
   public void testGetBlockLocationsOnlyUsesReadLock() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 100*1000);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .numDataNodes(0)
       .build();
     ReentrantReadWriteLock spyLock = NameNodeAdapter.spyOnFsLock(cluster.getNamesystem());
@@ -324,11 +324,11 @@ public class TestSetTimes {
   public void testAtimeUpdate() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 0);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(0)
           .build();
       fs = cluster.getFileSystem();

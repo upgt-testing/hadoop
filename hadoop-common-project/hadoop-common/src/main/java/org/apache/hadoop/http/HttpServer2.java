@@ -126,7 +126,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public final class HttpServer2 implements FilterContainer {
+public final class HttpServer2 implements FilterContainer, HttpServer2JVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(HttpServer2.class);
 
   public static final String HTTP_SCHEME = "http";

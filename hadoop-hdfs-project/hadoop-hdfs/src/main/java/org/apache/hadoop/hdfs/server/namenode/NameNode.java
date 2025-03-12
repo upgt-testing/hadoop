@@ -243,7 +243,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DE
  **********************************************************/
 @InterfaceAudience.Private
 public class NameNode extends ReconfigurableBase implements
-    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier> {
+    NameNodeStatusMXBean, TokenVerifier<DelegationTokenIdentifier>, NameNodeJVMInterface {
   static{
     HdfsConfiguration.init();
   }
@@ -454,6 +454,7 @@ public class NameNode extends ReconfigurableBase implements
   /** Format a new filesystem.  Destroys any filesystem that may already
    * exist at this location.  **/
   public static void format(Configuration conf) throws IOException {
+    System.out.println("[UPGT] In format, the configuration class is loaded by + " + Configuration.class.getClassLoader());
     format(conf, true, true);
   }
 
@@ -1256,7 +1257,8 @@ public class NameNode extends ReconfigurableBase implements
     }
 
     LOG.info("Formatting using clusterid: {}", clusterId);
-    
+    System.out.println("Here we probably load the FSImage class");
+    System.out.println("Here the NameNode class is loaded by " + NameNode.class.getClassLoader());
     FSImage fsImage = new FSImage(conf, nameDirsToFormat, editDirsToFormat);
     FSNamesystem fsn = null;
     try {
@@ -1713,6 +1715,7 @@ public class NameNode extends ReconfigurableBase implements
 
   public static NameNode createNameNode(String argv[], Configuration conf)
       throws IOException {
+    LOG.info("Start namenode in version 3.3.6");
     LOG.info("createNameNode " + Arrays.asList(argv));
     if (conf == null)
       conf = new HdfsConfiguration();
@@ -1889,7 +1892,7 @@ public class NameNode extends ReconfigurableBase implements
     state.setState(haContext, ACTIVE_STATE);
   }
 
-  synchronized void transitionToStandby()
+  public synchronized void transitionToStandby()
       throws ServiceFailedException, AccessControlException {
     namesystem.checkSuperuserPrivilege();
     if (!haEnabled) {
@@ -2181,7 +2184,7 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();

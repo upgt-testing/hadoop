@@ -70,7 +70,7 @@ public class TestModTime {
   public void testModTime() throws IOException {
     Configuration conf = new HdfsConfiguration();
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes).build();
     cluster.waitActive();
     InetSocketAddress addr = new InetSocketAddress("localhost", 
@@ -184,11 +184,11 @@ public class TestModTime {
   @Test
   public void testModTimePersistsAfterRestart() throws IOException {
     final long sleepTime = 10; // 10 milliseconds
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
     Configuration conf = new HdfsConfiguration();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       fs = cluster.getFileSystem();
       Path testPath = new Path("/test");
       

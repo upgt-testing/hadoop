@@ -29,7 +29,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.datanode.BlockScanner;
@@ -351,7 +351,7 @@ public class TestFsVolumeList {
     cnf.setInt(
         DFSConfigKeys.DFS_DATANODE_VOLUMES_REPLICA_ADD_THREADPOOL_SIZE_KEY,
         poolSize);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(cnf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(cnf).numDataNodes(1)
         .storagesPerDatanode(1).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     // Generate data blocks.
@@ -398,7 +398,7 @@ public class TestFsVolumeList {
   @Test(timeout = 60000)
   public void testInstanceOfAddReplicaThreadPool() throws Exception {
     // Start cluster with multiple namespace
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(
         new HdfsConfiguration())
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(1).build()) {

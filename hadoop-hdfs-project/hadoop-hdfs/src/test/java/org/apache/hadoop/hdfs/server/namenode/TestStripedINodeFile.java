@@ -28,7 +28,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.NameNodeProxies;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
@@ -306,7 +306,7 @@ public class TestStripedINodeFile {
    */
   @Test(timeout = 60000)
   public void testDeleteOp() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       final int len = 1024;
       final Path parentDir = new Path("/parentDir");
@@ -319,11 +319,11 @@ public class TestStripedINodeFile {
           testECPolicy.getNumParityUnits());
       conf.setInt(DFSConfigKeys.DFS_NAMENODE_MAX_XATTRS_PER_INODE_KEY, 2);
 
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(GROUP_SIZE)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(GROUP_SIZE)
           .build();
       cluster.waitActive();
 
-      FSNamesystem fsn = cluster.getNamesystem();
+      FSNamesystemJVMInterface fsn = cluster.getNamesystem();
       dfs = cluster.getFileSystem();
       dfs.enableErasureCodingPolicy(
           StripedFileTestUtil.getDefaultECPolicy().getName());
@@ -334,11 +334,11 @@ public class TestStripedINodeFile {
           StripedFileTestUtil.getDefaultECPolicy().getName());
       DFSTestUtil.createFile(dfs, ecFile, len, (short) 1, 0xFEED);
       DFSTestUtil.createFile(dfs, contiguousFile, len, (short) 1, 0xFEED);
-      final FSDirectory fsd = fsn.getFSDirectory();
+      final FSDirectoryJVMInterface fsd = fsn.getFSDirectory();
 
       // Case-1: Verify the behavior of striped blocks
       // Get blocks of striped file
-      INode inodeStriped = fsd.getINode("/parentDir/ecDir/ecFile");
+      INodeJVMInterface inodeStriped = fsd.getINode("/parentDir/ecDir/ecFile");
       assertTrue("Failed to get INodeFile for /parentDir/ecDir/ecFile",
           inodeStriped instanceof INodeFile);
       INodeFile inodeStripedFile = (INodeFile) inodeStriped;
@@ -356,7 +356,7 @@ public class TestStripedINodeFile {
 
       // Case-2: Verify the behavior of contiguous blocks
       // Get blocks of contiguous file
-      INode inode = fsd.getINode("/parentDir/someFile");
+      INodeJVMInterface inode = fsd.getINode("/parentDir/someFile");
       assertTrue("Failed to get INodeFile for /parentDir/someFile",
           inode instanceof INodeFile);
       INodeFile inodeFile = (INodeFile) inode;
@@ -405,7 +405,7 @@ public class TestStripedINodeFile {
       }
     }
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes).storagesPerDatanode(storagesPerDatanode)
         .storageTypes(
             new StorageType[][] { { StorageType.SSD, StorageType.DISK },

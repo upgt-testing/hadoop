@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
 
@@ -90,7 +91,7 @@ public class TestBlockStoragePolicy {
   public void testConfigKeyEnabled() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_STORAGE_POLICY_ENABLED_KEY, true);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1).build();
     try {
       cluster.waitActive();
@@ -110,7 +111,7 @@ public class TestBlockStoragePolicy {
   public void testConfigKeyDisabled() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_STORAGE_POLICY_ENABLED_KEY, false);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1).build();
     try {
       cluster.waitActive();
@@ -895,7 +896,7 @@ public class TestBlockStoragePolicy {
 
   @Test
   public void testSetStoragePolicy() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(REPLICATION).build();
     cluster.waitActive();
     final DistributedFileSystem fs = cluster.getFileSystem();
@@ -989,7 +990,7 @@ public class TestBlockStoragePolicy {
 
   @Test
   public void testGetStoragePolicy() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(REPLICATION).build();
     cluster.waitActive();
     final DistributedFileSystem fs = cluster.getFileSystem();
@@ -1012,7 +1013,7 @@ public class TestBlockStoragePolicy {
 
   @Test
   public void testSetStoragePolicyWithSnapshot() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(REPLICATION).build();
     cluster.waitActive();
     final DistributedFileSystem fs = cluster.getFileSystem();
@@ -1118,7 +1119,7 @@ public class TestBlockStoragePolicy {
                                    StorageType[] after) throws Exception {
     final int numDataNodes = 5;
     final StorageType[][] types = genStorageTypes(numDataNodes);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDataNodes).storageTypes(types).build();
     cluster.waitActive();
     final DistributedFileSystem fs = cluster.getFileSystem();
@@ -1139,7 +1140,7 @@ public class TestBlockStoragePolicy {
       // change the replication factor to 5
       fs.setReplication(foo, (short) numDataNodes);
       Thread.sleep(1000);
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         DataNodeTestUtils.triggerHeartbeat(dn);
       }
       Thread.sleep(1000);
@@ -1152,11 +1153,11 @@ public class TestBlockStoragePolicy {
       // change the replication factor back to 3
       fs.setReplication(foo, REPLICATION);
       Thread.sleep(1000);
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         DataNodeTestUtils.triggerHeartbeat(dn);
       }
       Thread.sleep(1000);
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         DataNodeTestUtils.triggerBlockReport(dn);
       }
       Thread.sleep(1000);
@@ -1374,7 +1375,7 @@ public class TestBlockStoragePolicy {
   @Test
   public void testGetFileStoragePolicyAfterRestartNN() throws Exception {
     //HDFS8219
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(REPLICATION)
         .storageTypes(
             new StorageType[] {StorageType.DISK, StorageType.ARCHIVE})
@@ -1419,7 +1420,7 @@ public class TestBlockStoragePolicy {
    */
   @Test
   public void testGetAllStoragePoliciesFromFs() throws IOException {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(REPLICATION)
         .storageTypes(
             new StorageType[] {StorageType.DISK, StorageType.ARCHIVE})

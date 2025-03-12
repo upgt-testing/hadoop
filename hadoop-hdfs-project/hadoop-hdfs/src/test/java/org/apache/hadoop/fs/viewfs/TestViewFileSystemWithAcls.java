@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.AclStatus;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,7 +50,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestViewFileSystemWithAcls {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration clusterConf = new Configuration();
   private static FileSystem fHdfs;
   private static FileSystem fHdfs2;
@@ -64,7 +64,7 @@ public class TestViewFileSystemWithAcls {
   @BeforeClass
   public static void clusterSetupAtBeginning() throws IOException {
     clusterConf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(clusterConf)
+    cluster = new MiniDFSClusterInJVM.Builder(clusterConf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
         .numDataNodes(2)
         .build();

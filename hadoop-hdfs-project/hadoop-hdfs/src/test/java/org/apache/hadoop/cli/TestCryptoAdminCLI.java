@@ -35,13 +35,14 @@ import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.crypto.key.JavaKeyStoreProvider;
 import org.apache.hadoop.crypto.key.KeyProvider;
+import org.apache.hadoop.crypto.key.KeyProviderJVMInterface;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.CryptoAdmin;
 import org.apache.hadoop.security.authorize.PolicyProvider;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -51,7 +52,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class TestCryptoAdminCLI extends CLITestHelperDFS {
-  protected MiniDFSCluster dfsCluster = null;
+  protected MiniDFSClusterInJVM dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
   private static File tmpDir;
@@ -70,7 +71,7 @@ public class TestCryptoAdminCLI extends CLITestHelperDFS {
     conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
         JavaKeyStoreProvider.SCHEME_NAME + "://file" + jksPath.toUri());
 
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     dfsCluster.waitClusterUp();
     createAKey("mykey", conf);
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
@@ -100,7 +101,7 @@ public class TestCryptoAdminCLI extends CLITestHelperDFS {
   /* Helper function to create a key in the Key Provider. */
   private void createAKey(String keyName, Configuration conf)
     throws NoSuchAlgorithmException, IOException {
-    final KeyProvider provider =
+    final KeyProviderJVMInterface provider =
         dfsCluster.getNameNode().getNamesystem().getProvider();
     final KeyProvider.Options options = KeyProvider.options(conf);
     provider.createKey(keyName, options);

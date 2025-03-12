@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestQuotaAllowOwner {
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem dfs;
 
   @BeforeClass
@@ -59,7 +59,7 @@ public class TestQuotaAllowOwner {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
   }

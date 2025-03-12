@@ -22,6 +22,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.classification.InterfaceStability.Unstable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.retry.RetryPolicy;
 import org.apache.hadoop.ipc.Client.ConnectionId;
@@ -400,6 +401,11 @@ public class ProtobufRpcEngine2 implements RpcEngine {
         new ThreadLocal<>();
 
     static final ThreadLocal<CallInfo> CURRENT_CALL_INFO = new ThreadLocal<>();
+
+    @Override
+    public void refreshCallQueue(ConfigurationJVMInterface conf) {
+        super.refreshCallQueue(conf);
+    }
 
     static class CallInfo {
       private final RPC.Server server;

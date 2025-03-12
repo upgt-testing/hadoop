@@ -225,7 +225,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class Configuration implements Iterable<Map.Entry<String,String>>,
-                                      Writable {
+                                      Writable, ConfigurationJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(Configuration.class);
 
@@ -242,6 +242,20 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   private static boolean restrictSystemPropsDefault = false;
   private boolean restrictSystemProps = restrictSystemPropsDefault;
   private boolean allowNullValueProperties = false;
+
+  // This is upgt related methods to re-construct the configuration for each instance
+  private Map<String, String> setParameters = new HashMap<>();
+
+  public Map<String, String> getSetParameters() {
+    return setParameters;
+  }
+
+  public void setAllParameters(Map<String, String> parameters) {
+    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+      set(entry.getKey(), entry.getValue());
+    }
+  }
+
 
   private static class Resource {
     private final Object resource;
@@ -841,6 +855,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   @SuppressWarnings("unchecked")
   public Configuration(Configuration other) {
     synchronized(other) {
+      this.setParameters.putAll(other.getSetParameters());
       // Make sure we clone a finalized state
       // Resources like input streams can be processed only once
       other.getProps();
@@ -1398,6 +1413,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * @throws IllegalArgumentException when the value or name is null.
    */
   public void set(String name, String value, String source) {
+    setParameters.put(name, value);
     Preconditions.checkArgument(
         name != null,
         "Property name must not be null");

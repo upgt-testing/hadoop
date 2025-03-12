@@ -24,14 +24,16 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedStripedBlock;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.hdfs.util.StripedBlockUtil;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.After;
@@ -54,7 +56,7 @@ public class TestDebugAdmin {
       new File(System.getProperty("test.build.data", "/tmp"),
           TestDebugAdmin.class.getSimpleName()).getAbsolutePath();
   private Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DebugAdmin admin;
 
   @Before
@@ -94,7 +96,7 @@ public class TestDebugAdmin {
 
   @Test(timeout = 60000)
   public void testRecoverLease() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     assertEquals("ret: 1, You must supply a -path argument to recoverLease.",
         runCmd(new String[]{"recoverLease", "-retries", "1"}));
@@ -108,12 +110,12 @@ public class TestDebugAdmin {
 
   @Test(timeout = 60000)
   public void testVerifyMetaCommand() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     DistributedFileSystem fs = cluster.getFileSystem();
-    DataNode datanode = cluster.getDataNodes().get(0);
+    DataNodeJVMInterface datanode = cluster.getDataNodes().get(0);
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
@@ -137,12 +139,12 @@ public class TestDebugAdmin {
 
   @Test(timeout = 60000)
   public void testComputeMetaCommand() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     DistributedFileSystem fs = cluster.getFileSystem();
-    DataNode datanode = cluster.getDataNodes().get(0);
+    DataNodeJVMInterface datanode = cluster.getDataNodes().get(0);
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
@@ -179,7 +181,7 @@ public class TestDebugAdmin {
 
   @Test(timeout = 60000)
   public void testRecoverLeaseforFileNotFound() throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     assertTrue(runCmd(new String[] {
         "recoverLease", "-path", "/foo", "-retries", "2" }).contains(
@@ -190,7 +192,7 @@ public class TestDebugAdmin {
   public void testVerifyECCommand() throws Exception {
     final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(
         SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
-    cluster = DFSTestUtil.setupCluster(conf, 6, 5, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 6, 5, 0);
     cluster.waitActive();
     DistributedFileSystem fs = cluster.getFileSystem();
 
@@ -256,7 +258,7 @@ public class TestDebugAdmin {
     // Try corrupt block 0 in block group.
     LocatedBlock toCorruptLocatedBlock = indexedBlocks[0];
     ExtendedBlock toCorruptBlock = toCorruptLocatedBlock.getBlock();
-    DataNode datanode = cluster.getDataNode(toCorruptLocatedBlock.getLocations()[0].getIpcPort());
+    DataNodeJVMInterface datanode = cluster.getDataNode(toCorruptLocatedBlock.getLocations()[0].getIpcPort());
     File blockFile = getBlockFile(datanode.getFSDataset(),
         toCorruptBlock.getBlockPoolId(), toCorruptBlock.getLocalBlock());
     File metaFile = getMetaFile(datanode.getFSDataset(),

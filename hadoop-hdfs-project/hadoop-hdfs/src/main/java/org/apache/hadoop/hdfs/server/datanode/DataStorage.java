@@ -73,7 +73,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Maps;
  * @see Storage
  */
 @InterfaceAudience.Private
-public class DataStorage extends Storage {
+public class DataStorage extends Storage implements DataStorageJVMInterface {
 
   public final static String BLOCK_SUBDIR_PREFIX = "subdir";
   final static String STORAGE_DIR_DETACHED = "detach";

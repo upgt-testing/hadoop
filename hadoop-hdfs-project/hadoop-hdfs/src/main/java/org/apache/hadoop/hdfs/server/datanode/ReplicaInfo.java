@@ -37,7 +37,7 @@ import org.apache.hadoop.util.LightWeightResizableGSet;
  */
 @InterfaceAudience.Private
 abstract public class ReplicaInfo extends Block
-    implements Replica, LightWeightResizableGSet.LinkedElement {
+    implements Replica, LightWeightResizableGSet.LinkedElement, ReplicaInfoJVMInterface {
 
   /** For implementing {@link LightWeightResizableGSet.LinkedElement}. */
   private LightWeightResizableGSet.LinkedElement next;
