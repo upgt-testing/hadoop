@@ -98,7 +98,7 @@ import org.apache.hadoop.thirdparty.com.google.common.util.concurrent.ThreadFact
  */
 @InterfaceAudience.Private
 @VisibleForTesting
-public class FsVolumeImpl implements FsVolumeSpi {
+public class FsVolumeImpl implements FsVolumeSpi, FsVolumeImplJVMInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(FsVolumeImpl.class);
   private static final ObjectWriter WRITER =

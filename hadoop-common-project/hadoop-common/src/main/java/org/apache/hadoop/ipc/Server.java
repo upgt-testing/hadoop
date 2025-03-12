@@ -80,6 +80,7 @@ import org.apache.hadoop.classification.InterfaceAudience.Public;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configuration.IntegerRanges;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.ha.HealthCheckFailedException;
@@ -141,7 +142,7 @@ import org.slf4j.LoggerFactory;
  */
 @Public
 @InterfaceStability.Evolving
-public abstract class Server {
+public abstract class Server implements ServerJVMInterface {
   private final boolean authorize;
   private List<AuthMethod> enabledAuthMethods;
   private RpcSaslProto negotiateResponse;
@@ -727,6 +728,13 @@ public abstract class Server {
     return CallQueueManager.convertQueueClass(queueClass, Call.class);
   }
 
+  static Class<? extends BlockingQueue<Call>> getQueueClass(
+          String prefix, ConfigurationJVMInterface conf) {
+    String name = prefix + "." + CommonConfigurationKeys.IPC_CALLQUEUE_IMPL_KEY;
+    Class<?> queueClass = conf.getClass(name, LinkedBlockingQueue.class);
+    return CallQueueManager.convertQueueClass(queueClass, Call.class);
+  }
+
   static Class<? extends RpcScheduler> getSchedulerClass(
       String prefix, Configuration conf) {
     String schedulerKeyname = prefix + "." + CommonConfigurationKeys
@@ -752,6 +760,31 @@ public abstract class Server {
     return CallQueueManager.convertSchedulerClass(schedulerClass);
   }
 
+  static Class<? extends RpcScheduler> getSchedulerClass(
+          String prefix, ConfigurationJVMInterface conf) {
+    String schedulerKeyname = prefix + "." + CommonConfigurationKeys
+            .IPC_SCHEDULER_IMPL_KEY;
+    Class<?> schedulerClass = conf.getClass(schedulerKeyname, null);
+    // Patch the configuration for legacy fcq configuration that does not have
+    // a separate scheduler setting
+    if (schedulerClass == null) {
+      String queueKeyName = prefix + "." + CommonConfigurationKeys
+              .IPC_CALLQUEUE_IMPL_KEY;
+      Class<?> queueClass = conf.getClass(queueKeyName, null);
+      if (queueClass != null) {
+        if (queueClass.getCanonicalName().equals(
+                FairCallQueue.class.getCanonicalName())) {
+          conf.setClass(schedulerKeyname, DecayRpcScheduler.class,
+                  RpcScheduler.class);
+        }
+      }
+    }
+    schedulerClass = conf.getClass(schedulerKeyname,
+            DefaultRpcScheduler.class);
+
+    return CallQueueManager.convertSchedulerClass(schedulerClass);
+  }
+
   /*
    * Refresh the call queue
    */
@@ -766,6 +799,17 @@ public abstract class Server {
     callQueue.setClientBackoffEnabled(getClientBackoffEnable(prefix, conf));
   }
 
+  public synchronized void refreshCallQueue(ConfigurationJVMInterface conf) {
+    // Create the next queue
+    String prefix = getQueueClassPrefix();
+    this.maxQueueSize = handlerCount * conf.getInt(
+            CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_KEY,
+            CommonConfigurationKeys.IPC_SERVER_HANDLER_QUEUE_SIZE_DEFAULT);
+    callQueue.swapQueue(getSchedulerClass(prefix, conf),
+            getQueueClass(prefix, conf), maxQueueSize, prefix, conf);
+    callQueue.setClientBackoffEnabled(getClientBackoffEnable(prefix, conf));
+  }
+
   /**
    * Get from config if client backoff is enabled on that port.
    */
@@ -775,6 +819,14 @@ public abstract class Server {
         CommonConfigurationKeys.IPC_BACKOFF_ENABLE;
     return conf.getBoolean(name,
         CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT);
+  }
+
+  static boolean getClientBackoffEnable(
+          String prefix, ConfigurationJVMInterface conf) {
+    String name = prefix + "." +
+            CommonConfigurationKeys.IPC_BACKOFF_ENABLE;
+    return conf.getBoolean(name,
+            CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DEFAULT);
   }
 
   /** A generic call queued for handling. */

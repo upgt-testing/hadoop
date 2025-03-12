@@ -25,7 +25,7 @@ import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.StoragePolicySatisfierMode;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -36,7 +36,7 @@ import org.junit.Test;
  * Tests that StoragePolicySatisfier is able to work with HA enabled.
  */
 public class TestStoragePolicySatisfierWithHA {
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
 
   private final Configuration config = new HdfsConfiguration();
   private static final int DEFAULT_BLOCK_SIZE = 1024;
@@ -72,7 +72,7 @@ public class TestStoragePolicySatisfierWithHA {
         capacities[i][j] = nodeCapacity;
       }
     }
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(numberOfDatanodes).storagesPerDatanode(storagesPerDn)
         .storageTypes(storageTypes).storageCapacities(capacities).build();

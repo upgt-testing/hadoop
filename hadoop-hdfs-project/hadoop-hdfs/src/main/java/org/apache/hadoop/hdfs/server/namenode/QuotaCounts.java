@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 /**
  * Counters for namespace, storage space and storage type space quota and usage.
  */
-public class QuotaCounts {
+public class QuotaCounts implements QuotaCountsJVMInterface {
 
   /**
    * We pre-define 4 most common used EnumCounters objects. When the nsSsCounts

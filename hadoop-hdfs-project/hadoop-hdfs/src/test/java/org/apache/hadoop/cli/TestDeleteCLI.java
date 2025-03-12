@@ -26,13 +26,13 @@ import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestDeleteCLI extends CLITestHelperDFS {
-  protected MiniDFSCluster dfsCluster = null;
+  protected MiniDFSClusterInJVM dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
 
@@ -44,7 +44,7 @@ public class TestDeleteCLI extends CLITestHelperDFS {
     conf.setLong(CommonConfigurationKeysPublic.
         HADOOP_SHELL_SAFELY_DELETE_LIMIT_NUM_FILES, 5);
 
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     dfsCluster.waitClusterUp();
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
 

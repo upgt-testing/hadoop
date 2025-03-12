@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 @InterfaceAudience.Private
-public interface PeerServer extends Closeable {
+public interface PeerServer extends Closeable, PeerServerJVMInterface {
   /**
    * Set the receive buffer size of the PeerServer.
    * 

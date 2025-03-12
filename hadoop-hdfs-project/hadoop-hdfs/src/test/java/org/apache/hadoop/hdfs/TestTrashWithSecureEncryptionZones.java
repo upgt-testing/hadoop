@@ -95,7 +95,7 @@ public class TestTrashWithSecureEncryptionZones {
   private static final Path CURRENT = new Path("Current");
 
   // MiniDFS
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static HdfsConfiguration conf;
   private static FileSystem fs;
   private static HdfsAdmin dfsAdmin;
@@ -210,7 +210,7 @@ public class TestTrashWithSecureEncryptionZones {
         .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
     conf = new HdfsConfiguration(baseConf);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .build();
     cluster.waitActive();
 

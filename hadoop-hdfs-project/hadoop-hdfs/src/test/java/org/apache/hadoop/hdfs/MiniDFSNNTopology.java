@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 
+import org.apache.hadoop.hdfs.server.namenode.NameNodeInstance;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
@@ -235,6 +236,7 @@ public class MiniDFSNNTopology {
   }
   
   public static class NNConf {
+    private NameNodeInstance nnInstance;
     private final String nnId;
     private int httpPort;
     private int ipcPort;
@@ -242,6 +244,7 @@ public class MiniDFSNNTopology {
     
     public NNConf(String nnId) {
       this.nnId = nnId;
+      nnInstance = new NameNodeInstance();
     }
 
     public String getNnId() {
@@ -273,6 +276,10 @@ public class MiniDFSNNTopology {
     public NNConf setClusterId(String clusterId) {
       this.clusterId = clusterId;
       return this;
+    }
+
+    public NameNodeInstance getNnInstance() {
+      return nnInstance;
     }
   }
 

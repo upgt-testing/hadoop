@@ -42,7 +42,7 @@ import org.apache.hadoop.fs.FsShell;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.util.ToolRunner;
 
 public class TestSnapshotFileLength {
@@ -52,7 +52,7 @@ public class TestSnapshotFileLength {
   private static final int BLOCKSIZE = 1024;
 
   private static final Configuration conf = new Configuration();
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem hdfs;
 
   private final Path dir = new Path("/TestSnapshotFileLength");
@@ -64,7 +64,7 @@ public class TestSnapshotFileLength {
   public void setUp() throws Exception {
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, BLOCKSIZE);
     conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION)
                                               .build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();

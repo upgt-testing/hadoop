@@ -35,7 +35,7 @@ import org.apache.hadoop.fs.StorageType;
  * given a block pool Id to corresponding {@link BlockTokenSecretManager}
  */
 public class BlockPoolTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockPoolTokenSecretManagerJVMInterface {
   
   private final Map<String, BlockTokenSecretManager> map =
       new ConcurrentHashMap<>();

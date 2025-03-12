@@ -33,7 +33,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.Util;
 
 /**
@@ -42,11 +42,11 @@ import org.apache.hadoop.hdfs.server.common.Util;
 public class TestCreateEditsLog {
 
   private static final File HDFS_DIR = new File(
-    MiniDFSCluster.getBaseDirectory()).getAbsoluteFile();
+    MiniDFSClusterInJVM.getBaseDirectory()).getAbsoluteFile();
   private static final File TEST_DIR =
       GenericTestUtils.getTestDir("TestCreateEditsLog");
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
 
   @Before
   public void setUp() throws Exception {
@@ -89,7 +89,7 @@ public class TestCreateEditsLog {
     }
 
     // Start a namenode to try to load the edits.
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
       .format(false)
       .manageNameDfsDirs(false)
       .waitSafeMode(false)

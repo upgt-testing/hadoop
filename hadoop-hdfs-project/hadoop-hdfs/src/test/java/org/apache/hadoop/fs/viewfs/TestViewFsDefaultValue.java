@@ -48,7 +48,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.QuotaUsage;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,7 +64,7 @@ public class TestViewFsDefaultValue {
   static final String testFileDir = "/tmp/test/";
   static final String testFileName = testFileDir + "testFileStatusSerialziation";
   static final String NOT_IN_MOUNTPOINT_FILENAME = "/NotInMountpointFile";
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static final FileSystemTestHelper fileSystemTestHelper = new FileSystemTestHelper(); 
   private static final Configuration CONF = new Configuration();
   private static FileSystem fHdfs;
@@ -85,7 +85,7 @@ public class TestViewFsDefaultValue {
     CONF.setInt(DFS_REPLICATION_KEY, DFS_REPLICATION_DEFAULT + 1);
     CONF.setInt(IO_FILE_BUFFER_SIZE_KEY, IO_FILE_BUFFER_SIZE_DEFAULT);
  
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(DFS_REPLICATION_DEFAULT + 1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(DFS_REPLICATION_DEFAULT + 1).build();
     cluster.waitClusterUp();
     fHdfs = cluster.getFileSystem();
     fileSystemTestHelper.createFile(fHdfs, testFileName);

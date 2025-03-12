@@ -41,7 +41,7 @@ import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.metrics2.util.MBeans;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.log4j.Appender;
@@ -63,7 +63,7 @@ public class TestDataNodeMetricsLogger {
   static final Logger LOG =
       LoggerFactory.getLogger(TestDataNodeMetricsLogger.class);
 
-  private static final String DATA_DIR = MiniDFSCluster.getBaseDirectory()
+  private static final String DATA_DIR = MiniDFSClusterInJVM.getBaseDirectory()
       + "data";
 
   private final static InetSocketAddress NN_ADDR = new InetSocketAddress(

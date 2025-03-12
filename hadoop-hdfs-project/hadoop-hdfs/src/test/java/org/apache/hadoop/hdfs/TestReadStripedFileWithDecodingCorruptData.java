@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.initializeCluster;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.tearDownCluster;
+import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.*;
 
 /**
  * Test online recovery with corrupt files. This test is parameterized.
@@ -41,7 +40,7 @@ public class TestReadStripedFileWithDecodingCorruptData {
   static final Logger LOG =
       LoggerFactory.getLogger(TestReadStripedFileWithDecodingCorruptData.class);
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem dfs;
 
   @Rule
@@ -49,7 +48,7 @@ public class TestReadStripedFileWithDecodingCorruptData {
 
   @BeforeClass
   public static void setup() throws IOException {
-    cluster = initializeCluster();
+    cluster = initializeJVMCluster();
     dfs = cluster.getFileSystem();
   }
 

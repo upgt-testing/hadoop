@@ -70,7 +70,7 @@ import org.apache.hadoop.util.Time;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class EditLogTailer {
+public class EditLogTailer implements EditLogTailerJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(EditLogTailer.class);
 
   /**

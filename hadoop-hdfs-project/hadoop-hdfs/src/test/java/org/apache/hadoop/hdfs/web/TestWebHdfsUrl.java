@@ -40,7 +40,7 @@ import org.apache.hadoop.fs.WebHdfs;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManager;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -405,7 +405,7 @@ public class TestWebHdfsUrl {
     final Path dir = new Path("/testWebHdfsSpecialCharacterFile");
 
     final short numDatanodes = 1;
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
             .numDataNodes(numDatanodes)
             .build();
     try {
@@ -455,7 +455,7 @@ public class TestWebHdfsUrl {
     final Path dir = new Path("/testWebHdfsSpecialCharacterFile");
 
     final short numDatanodes = 1;
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
             .numDataNodes(numDatanodes)
             .build();
     try {
@@ -508,8 +508,8 @@ public class TestWebHdfsUrl {
 
   @Test
   public void testWebHdfsPathWithSemicolon() throws Exception {
-    try (MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(WebHdfsTestUtil.createConf())
+    try (MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(WebHdfsTestUtil.createConf())
             .numDataNodes(1)
             .build()) {
       cluster.waitActive();

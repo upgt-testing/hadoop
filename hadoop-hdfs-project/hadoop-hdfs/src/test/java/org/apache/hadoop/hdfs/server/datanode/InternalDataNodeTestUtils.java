@@ -33,14 +33,12 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB;
+import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPBJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
-import org.apache.hadoop.hdfs.server.protocol.DatanodeCommand;
-import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistration;
-import org.apache.hadoop.hdfs.server.protocol.HeartbeatResponse;
-import org.apache.hadoop.hdfs.server.protocol.NNHAStatusHeartbeat;
-import org.apache.hadoop.hdfs.server.protocol.NamespaceInfo;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.*;
 import org.junit.Assert;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -63,6 +61,11 @@ public class InternalDataNodeTestUtils {
 
   public static DatanodeRegistration
   getDNRegistrationForBP(DataNode dn, String bpid) throws IOException {
+    return dn.getDNRegistrationForBP(bpid);
+  }
+
+  public static DatanodeRegistrationJVMInterface
+  getDNRegistrationForBP(DataNodeJVMInterface dn, String bpid) throws IOException {
     return dn.getDNRegistrationForBP(bpid);
   }
 

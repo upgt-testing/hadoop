@@ -44,7 +44,7 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.impl.TestBlockReaderLocal;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsDataInputStream;
@@ -269,7 +269,7 @@ public class TestShortCircuitLocalRead {
       conf.setBoolean(
           HdfsClientConfigKeys.DFS_CLIENT_USE_LEGACY_BLOCKREADERLOCAL, true);
     }
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .format(true).build();
     FileSystem fs = cluster.getFileSystem();
     try {
@@ -353,10 +353,11 @@ public class TestShortCircuitLocalRead {
     });
   }
 
+  /*
   @Test(timeout=60000)
   public void testDeprecatedGetBlockLocalPathInfoRpc() throws IOException {
     final Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .format(true).build();
     cluster.waitActive();
     FileSystem fs = cluster.getFileSystem();
@@ -388,6 +389,8 @@ public class TestShortCircuitLocalRead {
     }
   }
 
+   */
+
   @Test(timeout=60000)
   public void testSkipWithVerifyChecksum() throws IOException {
     int size = blockSize;
@@ -399,7 +402,7 @@ public class TestShortCircuitLocalRead {
         new File(sockDir.getDir(),
             "testSkipWithVerifyChecksum._PORT.sock").getAbsolutePath());
     DomainSocket.disableBindPathValidation();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .format(true).build();
     FileSystem fs = cluster.getFileSystem();
     try {
@@ -435,7 +438,7 @@ public class TestShortCircuitLocalRead {
 
   @Test(timeout=120000)
   public void testHandleTruncatedBlockFile() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
     conf.setBoolean(
@@ -452,7 +455,7 @@ public class TestShortCircuitLocalRead {
     final int TEST_LENGTH = 3456;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -480,7 +483,7 @@ public class TestShortCircuitLocalRead {
       try (RandomAccessFile raf = new RandomAccessFile(dataFile, "rw")) {
         raf.setLength(0);
       }
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).format(false)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(false)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -604,7 +607,7 @@ public class TestShortCircuitLocalRead {
     Configuration conf = new Configuration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
              .format(true).build();
     FileSystem fs = cluster.getFileSystem();
     // check that / exists

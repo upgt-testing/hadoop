@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.BlockStoragePolicy;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.StoragePolicySatisfierMode;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockStoragePolicySuite;
@@ -43,7 +43,7 @@ public class TestStoragePolicyCommands {
   private static final int SIZE = 128;
 
   protected static Configuration conf;
-  protected static MiniDFSCluster cluster;
+  protected static MiniDFSClusterInJVM cluster;
   protected static FileSystem fs;
 
   @Before
@@ -53,7 +53,7 @@ public class TestStoragePolicyCommands {
         StoragePolicySatisfierMode.EXTERNAL.toString());
     StorageType[][] newtypes = new StorageType[][] {
         {StorageType.ARCHIVE, StorageType.DISK}};
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL)
         .storageTypes(newtypes).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
