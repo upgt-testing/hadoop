@@ -34,7 +34,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.CacheAdmin;
 import org.apache.hadoop.security.authorize.PolicyProvider;
 import org.junit.After;
@@ -47,7 +47,7 @@ public class TestCacheAdminCLI extends CLITestHelper {
   public static final Logger LOG =
       LoggerFactory.getLogger(TestCacheAdminCLI.class);
 
-  protected MiniDFSCluster dfsCluster = null;
+  protected MiniDFSClusterInJVM dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
 
@@ -61,7 +61,7 @@ public class TestCacheAdminCLI extends CLITestHelper {
     // Many of the tests expect a replication value of 1 in the output
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
 
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
 
     dfsCluster.waitClusterUp();
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");

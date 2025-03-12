@@ -35,7 +35,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.XAttrNotFoundException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
@@ -69,7 +69,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Maps;
  */
 public class FSXAttrBaseTest {
 
-  protected static MiniDFSCluster dfsCluster;
+  protected static MiniDFSClusterInJVM dfsCluster;
   protected static Configuration conf;
   private static int pathCount = 0;
   protected static Path path;
@@ -1373,7 +1373,7 @@ public class FSXAttrBaseTest {
    * @throws Exception if any step fails
    */
   protected static void initCluster(boolean format) throws Exception {
-    dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).format(format)
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(format)
       .build();
     dfsCluster.waitActive();
   }
@@ -1385,7 +1385,7 @@ public class FSXAttrBaseTest {
    * @throws Exception if restart fails
    */
   protected static void restart(boolean checkpoint) throws Exception {
-    NameNode nameNode = dfsCluster.getNameNode();
+    NameNodeJVMInterface nameNode = dfsCluster.getNameNode();
     if (checkpoint) {
       NameNodeAdapter.enterSafeMode(nameNode, false);
       NameNodeAdapter.saveNamespace(nameNode);

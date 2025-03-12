@@ -74,7 +74,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  * This class is used in the DataNode for handling inbound connections.
  */
 @InterfaceAudience.Private
-public class SaslDataTransferServer {
+public class SaslDataTransferServer implements SaslDataTransferServerJVMInterface {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     SaslDataTransferServer.class);

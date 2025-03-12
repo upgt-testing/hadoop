@@ -23,7 +23,7 @@ import org.apache.hadoop.fs.StorageType;
 
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class DatanodeInfoWithStorage extends DatanodeInfo {
+public class DatanodeInfoWithStorage extends DatanodeInfo implements DatanodeInfoJVMInterface {
   private final String storageID;
   private final StorageType storageType;
 

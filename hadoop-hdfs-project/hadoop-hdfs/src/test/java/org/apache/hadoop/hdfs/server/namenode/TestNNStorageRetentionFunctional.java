@@ -32,7 +32,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 public class TestNNStorageRetentionFunctional {
 
   private static final File TEST_ROOT_DIR =
-    new File(MiniDFSCluster.getBaseDirectory());
+    new File(MiniDFSClusterInJVM.getBaseDirectory());
   private static final Logger LOG = LoggerFactory.getLogger(
       TestNNStorageRetentionFunctional.class);
 
@@ -61,7 +61,7 @@ public class TestNNStorageRetentionFunctional {
   @Test
   public void testPurgingWithNameEditsDirAfterFailure()
       throws Exception {
-    MiniDFSCluster cluster = null;    
+    MiniDFSClusterInJVM cluster = null;    
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_NUM_EXTRA_EDITS_RETAINED_KEY, 0);
 
@@ -73,12 +73,12 @@ public class TestNNStorageRetentionFunctional {
         Joiner.on(",").join(sd0, sd1));
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(0)
         .manageNameDfsDirs(false)
         .format(true).build();
   
-      NameNode nn = cluster.getNameNode();
+      NameNodeJVMInterface nn = cluster.getNameNode();
 
       doSaveNamespace(nn);
       LOG.info("After first save, images 0 and 2 should exist in both dirs");
@@ -155,4 +155,12 @@ public class TestNNStorageRetentionFunctional {
     nn.getRpcServer().saveNamespace(0, 0);
     nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
   }
+
+  private static void doSaveNamespace(NameNodeJVMInterface nn) throws IOException {
+    LOG.info("Saving namespace...");
+    nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_ENTER, false);
+    nn.getRpcServer().saveNamespace(0, 0);
+    nn.getRpcServer().setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
+  }
+
 }

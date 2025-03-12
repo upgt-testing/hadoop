@@ -104,7 +104,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Multimap;
  * caching directives, we will schedule caching and uncaching work.
  */
 @InterfaceAudience.LimitedPrivate({"HDFS"})
-public class CacheManager {
+public class CacheManager implements CacheManagerJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(CacheManager.class);
 
   private static final float MIN_CACHED_BLOCKS_PERCENT = 0.001f;

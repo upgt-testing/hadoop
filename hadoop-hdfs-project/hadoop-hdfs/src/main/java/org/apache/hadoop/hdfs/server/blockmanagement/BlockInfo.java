@@ -40,7 +40,7 @@ import static org.apache.hadoop.hdfs.server.namenode.INodeId.INVALID_INODE_ID;
  */
 @InterfaceAudience.Private
 public abstract class BlockInfo extends Block
-    implements LightWeightGSet.LinkedElement {
+    implements LightWeightGSet.LinkedElement, BlockInfoJVMInterface {
 
   public static final BlockInfo[] EMPTY_ARRAY = {};
 

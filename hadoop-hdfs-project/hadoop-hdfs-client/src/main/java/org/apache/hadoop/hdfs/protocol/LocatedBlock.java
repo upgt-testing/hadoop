@@ -39,7 +39,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class LocatedBlock {
+public class LocatedBlock implements LocatedBlockJVMInterface {
 
   /**
    * Comparator that ensures that a PROVIDED storage type is greater than any

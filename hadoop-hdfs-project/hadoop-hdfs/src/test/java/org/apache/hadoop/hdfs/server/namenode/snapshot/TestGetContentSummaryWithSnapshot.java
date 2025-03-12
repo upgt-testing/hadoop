@@ -19,13 +19,16 @@ package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
+import org.apache.hadoop.fs.ContentSummaryJVMInterface;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.FSDirectory;
+import org.apache.hadoop.hdfs.server.namenode.FSDirectoryJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,9 +49,9 @@ public class TestGetContentSummaryWithSnapshot {
   protected static final long BLOCKSIZE = 1024;
 
   protected Configuration conf;
-  protected MiniDFSCluster cluster;
-  protected FSNamesystem fsn;
-  protected FSDirectory fsdir;
+  protected MiniDFSClusterInJVM cluster;
+  protected FSNamesystemJVMInterface fsn;
+  protected FSDirectoryJVMInterface fsdir;
   protected DistributedFileSystem dfs;
 
   @Rule
@@ -58,7 +61,7 @@ public class TestGetContentSummaryWithSnapshot {
   public void setUp() throws Exception {
     conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
     cluster.waitActive();
 
     fsn = cluster.getNamesystem();
@@ -101,7 +104,7 @@ public class TestGetContentSummaryWithSnapshot {
     DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
     DFSTestUtil.createFile(dfs, qux, 10, REPLICATION, 0L);
 
-    ContentSummary summary = cluster.getNameNodeRpc().getContentSummary(
+    ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(
         bar.toString());
     Assert.assertEquals(1, summary.getDirectoryCount());
     Assert.assertEquals(2, summary.getFileCount());

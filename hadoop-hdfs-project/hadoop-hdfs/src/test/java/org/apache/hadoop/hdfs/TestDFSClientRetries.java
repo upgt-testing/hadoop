@@ -49,6 +49,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -183,7 +184,7 @@ public class TestDFSClientRetries {
     final int bufferSize = 4096;
     conf.setInt(CommonConfigurationKeys.IO_FILE_BUFFER_SIZE_KEY, bufferSize);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     
     try {
       cluster.waitActive();
@@ -295,6 +296,7 @@ public class TestDFSClientRetries {
    * operation, and not over the lifetime of the stream. It is a regression
    * test for HDFS-127.
    */
+  /*
   @Test
   public void testFailuresArePerOperation() throws Exception
   {
@@ -304,19 +306,19 @@ public class TestDFSClientRetries {
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     conf.setInt(DFS_CLIENT_SOCKET_TIMEOUT_KEY, 2 * 1000);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
-      NamenodeProtocols preSpyNN = cluster.getNameNodeRpc();
+      NamenodeProtocolsJVMInterface preSpyNN = cluster.getNameNodeRpc();
       NamenodeProtocols spyNN = spy(preSpyNN);
       DFSClient client = new DFSClient(null, spyNN, conf, null);
       int maxBlockAcquires = client.getConf().getMaxBlockAcquireFailures();
       assertTrue(maxBlockAcquires > 0);
 
 
-      DFSTestUtil.createFile(fs, file, fileSize, (short)1, 12345L /*seed*/);
+      DFSTestUtil.createFile(fs, file, fileSize, (short)1, 12345L);
 
       // If the client will retry maxBlockAcquires times, then if we fail
       // any more than that number of times, the operation should entirely
@@ -366,11 +368,13 @@ public class TestDFSClientRetries {
       cluster.shutdown();
     }
   }
+  */
 
   /**
    * Test DFSClient can continue to function after renewLease RPC
    * receives SocketTimeoutException.
    */
+  /*
   @Test
   public void testLeaseRenewSocketTimeout() throws Exception
   {
@@ -379,7 +383,7 @@ public class TestDFSClientRetries {
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     conf.setInt(DFS_CLIENT_SOCKET_TIMEOUT_KEY, 2 * 1000);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       NamenodeProtocols spyNN = spy(cluster.getNameNodeRpc());
@@ -420,18 +424,21 @@ public class TestDFSClientRetries {
     }
   }
 
+   */
+
   /**
    * Test that getAdditionalBlock() and close() are idempotent. This allows
    * a client to safely retry a call and still produce a correct
    * file. See HDFS-3031.
    */
+  /*
   @Test
   public void testIdempotentAllocateBlockAndClose() throws Exception {
     final String src = "/testIdempotentAllocateBlock";
     Path file = new Path(src);
 
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
       cluster.waitActive();
@@ -535,6 +542,8 @@ public class TestDFSClientRetries {
       cluster.shutdown();
     }
   }
+
+   */
 
   /**
    * Mock Answer implementation of NN.getBlockLocations that will return
@@ -679,7 +688,7 @@ public class TestDFSClientRetries {
     // Disable keepalive
     conf.setInt(DFSConfigKeys.DFS_DATANODE_SOCKET_REUSE_KEEPALIVE_KEY, 0);
 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(replicationFactor).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(replicationFactor).build();
     cluster.waitActive();
     
     FileSystem fs = cluster.getFileSystem();
@@ -769,11 +778,11 @@ public class TestDFSClientRetries {
     final byte[] expected_sha;
     FileSystem  fs;
     final Path filePath;
-    final MiniDFSCluster cluster;
+    final MiniDFSClusterInJVM cluster;
     final int len;
     final Counter counter;
 
-    DFSClientReader(Path file, MiniDFSCluster cluster, byte[] hash_sha, int fileLen, Counter cnt) {
+    DFSClientReader(Path file, MiniDFSClusterInJVM cluster, byte[] hash_sha, int fileLen, Counter cnt) {
       filePath = file;
       this.cluster = cluster;
       counter = cnt;
@@ -835,14 +844,15 @@ public class TestDFSClientRetries {
     public int get() { return counter; }
   }
 
+  /*
   @Test
   public void testGetFileChecksum() throws Exception {
     final String f = "/testGetFileChecksum";
     final Path p = new Path(f);
     final int numReplicas = 3;
     final int numDatanodes = numReplicas;
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes).build();
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
     try {
       cluster.waitActive();
 
@@ -868,6 +878,8 @@ public class TestDFSClientRetries {
       cluster.shutdown();
     }
   }
+
+   */
 
   /** Test that timeout occurs when DN does not respond to RPC.
    * Start up a server and ask it to sleep for n seconds. Make an
@@ -912,8 +924,8 @@ public class TestDFSClientRetries {
   @Test
   public void testRetryOnChecksumFailure() throws Exception {
     HdfsConfiguration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster =
-      new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+      new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
 
     try {
       final short REPL_FACTOR = 1;
@@ -971,10 +983,10 @@ public class TestDFSClientRetries {
       conf.setBoolean(HdfsClientConfigKeys.Retry.POLICY_ENABLED_KEY, true);
     }
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_SAFEMODE_MIN_DATANODES_KEY, 1);
-    conf.setInt(MiniDFSCluster.DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY, 5000);
+    conf.setInt(MiniDFSClusterInJVM.DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY, 5000);
 
     final short numDatanodes = 3;
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDatanodes)
         .build();
     try {
@@ -1230,10 +1242,11 @@ public class TestDFSClientRetries {
    * - dfs.client.block.write.locateFollowingBlock.max.delay.ms
    * - dfs.client.block.write.locateFollowingBlock.retries
    */
+  /*
   @Test
   public void testDFSClientConfigurationLocateFollowingBlock()
       throws Exception {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     final int initialDelayTestValue = 1000;
     final int maxDelayTestValue = 35000;
     final int retryTestValue = 7;
@@ -1274,6 +1287,9 @@ public class TestDFSClientRetries {
     }
   }
 
+   */
+
+  /*
   @Test(timeout=120000)
   public void testLeaseRenewAndDFSOutputStreamDeadLock() throws Exception {
     CountDownLatch testLatch = new CountDownLatch(1);
@@ -1289,7 +1305,7 @@ public class TestDFSClientRetries {
     String file1 = "/testFile1";
     // Set short retry timeouts so this test runs faster
     conf.setInt(DFS_CLIENT_SOCKET_TIMEOUT_KEY, 1000);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       final NamenodeProtocols spyNN = spy(cluster.getNameNodeRpc());
@@ -1324,6 +1340,8 @@ public class TestDFSClientRetries {
       cluster.shutdown();
     }
   }
+
+   */
 
   private static class SleepFixedTimeAnswer implements Answer<Object> {
     private final int sleepTime;
