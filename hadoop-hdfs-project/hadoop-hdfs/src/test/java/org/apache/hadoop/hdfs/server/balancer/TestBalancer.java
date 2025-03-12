@@ -38,6 +38,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIP
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY;
 
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.junit.AfterClass;
@@ -84,14 +85,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
-import org.apache.hadoop.hdfs.NameNodeProxies;
-import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
@@ -294,6 +287,17 @@ public class TestBalancer {
         replicationFactor, r.nextLong());
     DFSTestUtil.waitReplication(fs, filePath, replicationFactor);
   }
+
+  public static void createFile(MiniDFSCluster cluster, Path filePath, long
+          fileLen,
+                                short replicationFactor, int nnIndex)
+          throws IOException, InterruptedException, TimeoutException {
+    FileSystem fs = cluster.getFileSystem(nnIndex);
+    DFSTestUtil.createFile(fs, filePath, fileLen,
+            replicationFactor, r.nextLong());
+    DFSTestUtil.waitReplication(fs, filePath, replicationFactor);
+  }
+
 
   /* fill up a cluster with <code>numNodes</code> datanodes
    * whose used space to be <code>size</code>
