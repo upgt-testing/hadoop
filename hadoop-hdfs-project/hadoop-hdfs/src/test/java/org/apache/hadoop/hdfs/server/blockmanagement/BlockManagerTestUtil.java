@@ -199,16 +199,6 @@ public class BlockManagerTestUtil {
     
   }
 
-  public static void waitForMarkedDeleteQueueIsEmpty(
-          BlockManagerJVMInterface blockManager) throws InterruptedException {
-    while (true) {
-      if (blockManager.getMarkedDeleteQueue().isEmpty()) {
-        return;
-      }
-      Thread.sleep(SLEEP_TIME);
-    }
-  }
-
   /**
    * @return computed block replication and block invalidation work that can be
    *         scheduled on data-nodes.

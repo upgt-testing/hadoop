@@ -59,7 +59,7 @@ public class TestDebugAdmin {
     testRoot.delete();
     testRoot.mkdirs();
     Configuration conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     admin = new DebugAdmin(conf);
@@ -107,7 +107,7 @@ public class TestDebugAdmin {
   @Test(timeout = 60000)
   public void testVerifyMetaCommand() throws Exception {
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
@@ -132,7 +132,7 @@ public class TestDebugAdmin {
   @Test(timeout = 60000)
   public void testComputeMetaCommand() throws Exception {
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());

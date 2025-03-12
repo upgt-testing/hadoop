@@ -36,7 +36,6 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
-import org.apache.hadoop.hdfs.protocol.XAttrNotFoundException;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -409,7 +408,7 @@ public class FSXAttrBaseTest {
       Assert.fail("expected IOException");
     } catch (IOException e) {
       GenericTestUtils.assertExceptionContains(
-          XAttrNotFoundException.DEFAULT_EXCEPTION_MSG, e);
+              "At least one of the attributes provided was not found.", e);
     }
     
     /* Throw an exception if an xattr that was requested does not exist. */
@@ -423,7 +422,7 @@ public class FSXAttrBaseTest {
         Assert.fail("expected IOException");
       } catch (IOException e) {
         GenericTestUtils.assertExceptionContains(
-            XAttrNotFoundException.DEFAULT_EXCEPTION_MSG, e);
+                "At least one of the attributes provided was not found.", e);
       }
     }
     

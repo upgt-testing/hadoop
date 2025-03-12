@@ -383,8 +383,6 @@ public class TestFileTruncate {
     // Truncate to block boundary
     int newLength = length[0] + BLOCK_SIZE / 2;
     boolean isReady = fs.truncate(src, newLength);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertTrue("Recovery is not expected.", isReady);
     assertFileLength(snapshotFiles[2], length[2]);
     assertFileLength(snapshotFiles[1], length[1]);
@@ -430,8 +428,6 @@ public class TestFileTruncate {
     assertEquals("Number of INodes should not change",
         numINodes, fsDir.getInodeMapSize());
     fs.deleteSnapshot(parent, ss[3]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertBlockExists(firstBlk);
     assertBlockExists(lastBlk);
     assertBlockNotPresent(replacedBlk);
@@ -450,8 +446,6 @@ public class TestFileTruncate {
     contentSummary = fs.getContentSummary(parent);
     assertThat(contentSummary.getSpaceConsumed(), is(48L));
     fs.deleteSnapshot(parent, ss[deleteOrder[1]]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertFileLength(snapshotFiles[deleteOrder[2]], length[deleteOrder[2]]);
     assertBlockExists(firstBlk);
     contentSummary = fs.getContentSummary(parent);
@@ -466,8 +460,6 @@ public class TestFileTruncate {
     assertEquals("Number of INodes should not change",
         numINodes, fsDir .getInodeMapSize());
     fs.deleteSnapshot(parent, ss[deleteOrder[2]]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertBlockNotPresent(firstBlk);
     assertBlockNotPresent(lastBlk);
     // Diskspace consumed should be 0 bytes * 3. []
@@ -541,8 +533,6 @@ public class TestFileTruncate {
     assertThat(contentSummary.getSpaceConsumed(), is(42L));
 
     fs.deleteSnapshot(parent, ss[deleteOrder[0]]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertFileLength(snapshotFiles[deleteOrder[1]], length[deleteOrder[1]]);
     assertFileLength(snapshotFiles[deleteOrder[2]], length[deleteOrder[2]]);
     assertFileLength(src, length[2]);
@@ -560,8 +550,6 @@ public class TestFileTruncate {
     }
 
     fs.deleteSnapshot(parent, ss[deleteOrder[1]]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertFileLength(snapshotFiles[deleteOrder[2]], length[deleteOrder[2]]);
     assertFileLength(src, length[2]);
     assertBlockExists(firstBlk);
@@ -582,8 +570,6 @@ public class TestFileTruncate {
     }
 
     fs.deleteSnapshot(parent, ss[deleteOrder[2]]);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem(0).getBlockManager());
     assertFileLength(src, length[2]);
     assertBlockExists(firstBlk);
 
@@ -593,8 +579,6 @@ public class TestFileTruncate {
     assertThat(contentSummary.getLength(), is(6L));
 
     fs.delete(src, false);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem().getBlockManager());
     assertBlockNotPresent(firstBlk);
 
     // Diskspace consumed should be 0 bytes * 3. []
@@ -1265,8 +1249,6 @@ public class TestFileTruncate {
         cluster.getNamesystem().getFSDirectory().getBlockManager()
             .getTotalBlocks());
     fs.delete(p, true);
-    BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
-        cluster.getNamesystem().getBlockManager());
     assertEquals("block num should 0", 0,
         cluster.getNamesystem().getFSDirectory().getBlockManager()
             .getTotalBlocks());

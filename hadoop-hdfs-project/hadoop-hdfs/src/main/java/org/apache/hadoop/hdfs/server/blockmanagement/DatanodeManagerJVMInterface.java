@@ -10,8 +10,6 @@ import java.util.List;
 public interface DatanodeManagerJVMInterface {
     DatanodeAdminManagerJVMInterface getDatanodeAdminManager();
     SlowPeerTrackerJVMInterface getSlowPeerTracker();
-    int getMaxSlowpeerCollectNodes();
-    boolean getEnableAvoidSlowDataNodesForRead();
     long getHeartbeatRecheckInterval();
     long getHeartbeatInterval();
     int getBlockInvalidateLimit();

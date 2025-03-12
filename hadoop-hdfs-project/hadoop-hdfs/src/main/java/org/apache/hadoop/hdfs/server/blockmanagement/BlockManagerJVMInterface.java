@@ -4,7 +4,6 @@ import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManagerJVMInt
 import org.apache.hadoop.util.DeamonJVMInterface;
 
 import java.io.PrintWriter;
-import java.util.Queue;
 
 public interface BlockManagerJVMInterface {
     DeamonJVMInterface getRedundancyThread();
@@ -12,7 +11,6 @@ public interface BlockManagerJVMInterface {
     int getTotalBlocks();
     boolean isPopulatingReplQueues();
     void rescanPostponedMisreplicatedBlocks();
-    Queue<?> getMarkedDeleteQueue();
     BlockPlacementPolicyJVMInterface getBlockPlacementPolicy();
     long getMissingBlocksCount();
     int numOfUnderReplicatedBlocks();

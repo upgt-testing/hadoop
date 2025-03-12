@@ -15,7 +15,7 @@ public interface FsDatasetSpiJVMInterface<V extends FsVolumeSpi> {
     BlockJVMInterface getStoredBlock(String bpid, long blkid) throws IOException;
     FsVolumeReferencesJVMInterface getFsVolumeReferences();
     //Map<DatanodeStorage, BlockListAsLongs> getBlockReports(String bpid);
-    List<? extends ReplicaInfoJVMInterface> getFinalizedBlocks(String bpid);
+    List<? extends ReplicaInfoJVMInterface> getSortedFinalizedBlocks(String bpid);
     long getDfsUsed() throws IOException;
     StorageReportJVMInterface[] getStorageReports(String bpid)
             throws IOException;

@@ -667,7 +667,7 @@ public class TestBalancer {
     int numOfDatanodes = capacities.length;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .numDataNodes(0)
                                   .build();
       cluster.getConfiguration(0).setInt(DFSConfigKeys.DFS_REPLICATION_KEY,
@@ -676,7 +676,8 @@ public class TestBalancer {
           DFSConfigKeys.DFS_REPLICATION_DEFAULT);
       if(useNamesystemSpy) {
         LOG.info("Using Spy Namesystem");
-        spyFSNamesystem(cluster.getNameNode());
+        throw new UnsupportedOperationException("Do not support Spy Namesystem in upgrade testing yet!");
+        //spyFSNamesystem(cluster.getNameNode());
       }
       cluster.startDataNodes(conf, numOfDatanodes, true,
           StartupOption.REGULAR, racks, null, capacities, false);
@@ -701,7 +702,7 @@ public class TestBalancer {
       } else {
         //if running a test with "include list", include original nodes as well
         if (nodes.getNumberofIncludeNodes()>0) {
-          for (DataNode dn: cluster.getDataNodes())
+          for (DataNodeJVMInterface dn: cluster.getDataNodes())
             nodes.getNodesToBeIncluded().add(dn.getDatanodeId().getHostName());
         }
         String[] newRacks = new String[nodes.getNumberofNewNodes()];
@@ -989,7 +990,7 @@ public class TestBalancer {
 
     // restart the cluster: do NOT format the cluster
     conf.set(DFSConfigKeys.DFS_NAMENODE_SAFEMODE_THRESHOLD_PCT_KEY, "0.0f");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
         .format(false)
         .racks(racks)
         .simulatedCapacities(capacities)
@@ -1098,7 +1099,7 @@ public class TestBalancer {
       throws Exception {
     int numOfDatanodes = capacities.length;
     assertEquals(numOfDatanodes, racks.length);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
                                 .numDataNodes(capacities.length)
                                 .racks(racks)
                                 .simulatedCapacities(capacities)
@@ -1439,7 +1440,7 @@ public class TestBalancer {
     conf.setLong(DFSConfigKeys.DFS_BALANCER_GETBLOCKS_MIN_BLOCK_SIZE_KEY, 1L);
 
     final int BLOCK_SIZE = 1024*1024;
-    cluster = new MiniDFSCluster
+    cluster = new MiniDFSClusterInJVM
         .Builder(conf)
         .numDataNodes(1)
         .storageCapacities(new long[] { BLOCK_SIZE * 10 })
@@ -1513,7 +1514,7 @@ public class TestBalancer {
     LOG.info("useTool    = " + false);
     assertEquals(capacities.length, racks.length);
     int numOfDatanodes = capacities.length;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(capacities.length)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(capacities.length)
         .racks(racks).simulatedCapacities(capacities).build();
     cluster.waitActive();
     client = NameNodeProxies.createProxy(conf,
@@ -1584,7 +1585,7 @@ public class TestBalancer {
     for (int i = 0; i < numOfDatanodes; i++) {
       racks[i] = "/rack" + (i % numOfRacks);
     }
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .racks(racks)
         .simulatedCapacities(capacities)
