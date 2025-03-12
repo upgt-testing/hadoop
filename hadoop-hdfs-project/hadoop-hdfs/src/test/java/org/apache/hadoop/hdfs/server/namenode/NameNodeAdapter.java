@@ -18,8 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.protocol.*;
+import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.protocol.SlowDiskReports;
 import static org.mockito.Mockito.spy;
 
@@ -32,15 +33,7 @@ import org.apache.hadoop.fs.UnresolvedLinkException;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.protocol.Block;
-import org.apache.hadoop.hdfs.protocol.BlockType;
-import org.apache.hadoop.hdfs.protocol.DatanodeID;
-import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
-import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManager;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.namenode.FSDirectory.DirOp;
 import org.apache.hadoop.hdfs.server.namenode.FSEditLogOp.MkdirOp;
@@ -69,6 +62,10 @@ public class NameNodeAdapter {
     return namenode.getNamesystem();
   }
 
+  public static FSNamesystemJVMInterface getNamesystem(NameNodeJVMInterface namenode) {
+    return namenode.getNamesystem();
+  }
+
   /**
    * Get block locations within the specified range.
    */
@@ -76,6 +73,12 @@ public class NameNodeAdapter {
       String src, long offset, long length) throws IOException {
     return namenode.getNamesystem().getBlockLocations("foo",
         src, offset, length);
+  }
+
+  public static LocatedBlocksJVMInterface getBlockLocations(NameNodeJVMInterface namenode,
+                                                String src, long offset, long length) throws IOException {
+    return namenode.getNamesystem().getBlockLocations("foo",
+            src, offset, length);
   }
   
   public static HdfsFileStatus getFileInfo(NameNode namenode, String src,
@@ -107,18 +110,39 @@ public class NameNodeAdapter {
       throws AccessControlException, IOException {
     namenode.getNamesystem().saveNamespace(0, 0);
   }
-  
+
+  public static void saveNamespace(NameNodeJVMInterface namenode)
+          throws AccessControlException, IOException {
+    namenode.getNamesystem().saveNamespace(0, 0);
+  }
+
+
   public static void enterSafeMode(NameNode namenode, boolean resourcesLow)
       throws IOException {
+    namenode.getNamesystem().enterSafeMode(resourcesLow);
+  }
+
+  public static void enterSafeMode(NameNodeJVMInterface namenode, boolean resourcesLow)
+          throws IOException {
     namenode.getNamesystem().enterSafeMode(resourcesLow);
   }
   
   public static void leaveSafeMode(NameNode namenode) {
     namenode.getNamesystem().leaveSafeMode(false);
   }
+
+  public static void leaveSafeMode(NameNodeJVMInterface namenode) {
+    namenode.getNamesystem().leaveSafeMode(false);
+  }
+
   
   public static void abortEditLogs(NameNode nn) {
     FSEditLog el = nn.getFSImage().getEditLog();
+    el.abortCurrentLogSegment();
+  }
+
+  public static void abortEditLogs(NameNodeJVMInterface nn) {
+    FSEditLogJVMInterface el = nn.getFSImage().getEditLog();
     el.abortCurrentLogSegment();
   }
   
@@ -146,6 +170,11 @@ public class NameNodeAdapter {
     return ns.getDelegationTokenSecretManager();
   }
 
+  public static DelegationTokenSecretManagerJVMInterface getDtSecretManager(
+          final FSNamesystemJVMInterface ns) {
+    return ns.getDelegationTokenSecretManager();
+  }
+
   public static HeartbeatResponse sendHeartBeat(DatanodeRegistration nodeReg,
       DatanodeDescriptor dd, FSNamesystem namesystem) throws IOException {
     return namesystem.handleHeartbeat(nodeReg,
@@ -163,10 +192,19 @@ public class NameNodeAdapter {
     return ns.leaseManager;
   }
 
+  public static LeaseManagerJVMInterface getLeaseManager(final FSNamesystemJVMInterface ns) {
+    return ns.getLeaseManager();
+  }
+
   /** Set the softLimit and hardLimit of client lease periods. */
   public static void setLeasePeriod(final FSNamesystem namesystem, long soft, long hard) {
     getLeaseManager(namesystem).setLeasePeriod(soft, hard);
     namesystem.leaseManager.triggerMonitorCheckNow();
+  }
+
+  public static void setLeasePeriod(final FSNamesystemJVMInterface namesystem, long soft, long hard) {
+    getLeaseManager(namesystem).setLeasePeriod(soft, hard);
+    getLeaseManager(namesystem).triggerMonitorCheckNow();
   }
 
   public static Lease getLeaseForPath(NameNode nn, String path) {
@@ -213,11 +251,25 @@ public class NameNodeAdapter {
       ns.readUnlock();
     }
   }
+
+  public static DatanodeDescriptorJVMInterface getDatanode(final FSNamesystemJVMInterface ns,
+                                                           DatanodeIDJVMInterface id) throws IOException {
+    ns.readLock();
+    try {
+      return ns.getBlockManager().getDatanodeManager().getDatanode(id);
+    } finally {
+      ns.readUnlock();
+    }
+  }
   
   /**
    * Return the FSNamesystem stats
    */
   public static long[] getStats(final FSNamesystem fsn) {
+    return fsn.getStats();
+  }
+
+  public static long[] getStats(final FSNamesystemJVMInterface fsn) {
     return fsn.getStats();
   }
 
@@ -302,6 +354,12 @@ public class NameNodeAdapter {
     return spy;
   }
 
+  public static ReentrantReadWriteLock spyOnFsLock(FSNamesystemJVMInterface fsn) {
+    ReentrantReadWriteLock spy = Mockito.spy(fsn.getFsLockForTests());
+    fsn.setFsLockForTests(spy);
+    return spy;
+  }
+
   public static FSImage spyOnFsImage(NameNode nn1) {
     FSNamesystem fsn = nn1.getNamesystem();
     FSImage spy = Mockito.spy(fsn.getFSImage());
@@ -353,6 +411,15 @@ public class NameNodeAdapter {
     }
     Object bmSafeMode = Whitebox.getInternalState(
         nn.getNamesystem().getBlockManager(), "bmSafeMode");
+    return (long)Whitebox.getInternalState(bmSafeMode, "blockSafe");
+  }
+
+  public static long getSafeModeSafeBlocks(NameNodeJVMInterface nn) {
+    if (!nn.getNamesystem().isInSafeMode()) {
+      return -1;
+    }
+    Object bmSafeMode = Whitebox.getInternalState(
+            nn.getNamesystem().getBlockManager(), "bmSafeMode");
     return (long)Whitebox.getInternalState(bmSafeMode, "blockSafe");
   }
   

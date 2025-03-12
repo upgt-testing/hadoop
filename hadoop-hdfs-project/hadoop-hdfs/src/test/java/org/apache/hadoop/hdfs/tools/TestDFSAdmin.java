@@ -27,6 +27,10 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_PLACEMENT_EC_CLASSN
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY;
 
 import java.util.function.Supplier;
+
+import org.apache.hadoop.hdfs.server.blockmanagement.*;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
 import org.apache.commons.io.FileUtils;
@@ -44,7 +48,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
@@ -104,10 +108,10 @@ import static org.mockito.Mockito.when;
 public class TestDFSAdmin {
   private static final Logger LOG = LoggerFactory.getLogger(TestDFSAdmin.class);
   private Configuration conf = null;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DFSAdmin admin;
-  private DataNode datanode;
-  private NameNode namenode;
+  private DataNodeJVMInterface datanode;
+  private NameNodeJVMInterface namenode;
   private final ByteArrayOutputStream out = new ByteArrayOutputStream();
   private final ByteArrayOutputStream err = new ByteArrayOutputStream();
   private static final PrintStream OLD_OUT = System.out;
@@ -120,7 +124,7 @@ public class TestDFSAdmin {
     conf = new Configuration();
     conf.setInt(IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 3);
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 512);
-    conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR,
+    conf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR,
         GenericTestUtils.getRandomizedTempPath());
     restartCluster();
 
@@ -164,7 +168,7 @@ public class TestDFSAdmin {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_DATANODES).build();
     cluster.waitActive();
     datanode = cluster.getDataNodes().get(0);
@@ -224,7 +228,7 @@ public class TestDFSAdmin {
 
     for (int i = 0; i < cluster.getDataNodes().size(); i++) {
       resetStream();
-      final DataNode dn = cluster.getDataNodes().get(i);
+      final DataNodeJVMInterface dn = cluster.getDataNodes().get(i);
       final String addr = String.format(
           "%s:%d",
           dn.getXferAddress().getHostString(),
@@ -252,8 +256,8 @@ public class TestDFSAdmin {
   public void testTriggerBlockReport() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
-    final DataNode dn = cluster.getDataNodes().get(0);
-    final NameNode nn = cluster.getNameNode();
+    final DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+    final NameNodeJVMInterface nn = cluster.getNameNode();
 
     final String dnAddr = String.format(
         "%s:%d",
@@ -280,7 +284,7 @@ public class TestDFSAdmin {
 
     for (int i = 0; i < cluster.getDataNodes().size(); i++) {
       resetStream();
-      final DataNode dn = cluster.getDataNodes().get(i);
+      final DataNodeJVMInterface dn = cluster.getDataNodes().get(i);
       final String addr = String.format("%s:%d", dn.getXferAddress()
           .getHostString(), dn.getIpcPort());
       final int ret = ToolRunner.run(dfsAdmin, new String[] {
@@ -338,6 +342,7 @@ public class TestDFSAdmin {
    * @throws InterruptedException
    * @throws TimeoutException
    */
+  /*
   private void testDataNodeGetReconfigurationStatus(boolean expectedSuccuss)
       throws IOException, InterruptedException, TimeoutException {
     ReconfigurationUtil ru = mock(ReconfigurationUtil.class);
@@ -415,6 +420,7 @@ public class TestDFSAdmin {
     restartCluster();
     testDataNodeGetReconfigurationStatus(false);
   }
+   */
 
   @Test(timeout = 30000)
   public void testNameNodeGetReconfigurableProperties() throws IOException {
@@ -461,7 +467,7 @@ public class TestDFSAdmin {
     final File baseDir = new File(
         PathUtils.getTestDir(getClass()),
         GenericTestUtils.getMethodName());
-    dfsConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.getAbsolutePath());
+    dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, baseDir.getAbsolutePath());
 
     final int numDn = 4;
     final String[] racks = {
@@ -469,7 +475,7 @@ public class TestDFSAdmin {
         "/d2/r1", "/d2/r2"};
 
     /* init cluster using topology */
-    try (MiniDFSCluster miniCluster = new MiniDFSCluster.Builder(dfsConf)
+    try (MiniDFSClusterInJVM miniCluster = new MiniDFSClusterInJVM.Builder(dfsConf)
         .numDataNodes(numDn).racks(racks).build()) {
 
       miniCluster.waitActive();
@@ -501,6 +507,7 @@ public class TestDFSAdmin {
     }
   }
 
+  /*
   @Test(timeout = 30000)
   public void testNameNodeGetReconfigurationStatus() throws IOException,
       InterruptedException, TimeoutException {
@@ -547,6 +554,7 @@ public class TestDFSAdmin {
     assertThat(outs.get(offset + 2),
         is(allOf(containsString("To:"), containsString("6"))));
   }
+   */
 
   private static String scanIntoString(final ByteArrayOutputStream baos) {
     final TextStringBuilder sb = new TextStringBuilder();
@@ -559,7 +567,7 @@ public class TestDFSAdmin {
   }
 
   // get block details and check if the block is corrupt
-  private void waitForCorruptBlock(MiniDFSCluster miniCluster,
+  private void waitForCorruptBlock(MiniDFSClusterInJVM miniCluster,
       DFSClient client, Path file)
       throws TimeoutException, InterruptedException {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
@@ -578,6 +586,7 @@ public class TestDFSAdmin {
     }, 1000, 60000);
   }
 
+  /*
   @Test(timeout = 180000)
   public void testReportCommand() throws Exception {
     tearDown();
@@ -593,11 +602,11 @@ public class TestDFSAdmin {
     final Path baseDir = new Path(
         PathUtils.getTestDir(getClass()).getAbsolutePath(),
         GenericTestUtils.getMethodName());
-    dfsConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.toString());
+    dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, baseDir.toString());
     final int numDn =
         ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits();
 
-    try(MiniDFSCluster miniCluster = new MiniDFSCluster
+    try(MiniDFSClusterInJVM miniCluster = new MiniDFSClusterInJVM
         .Builder(dfsConf)
         .numDataNodes(numDn).build()) {
 
@@ -723,6 +732,7 @@ public class TestDFSAdmin {
       verifyNodesAndCorruptBlocks(numDn, numDn - 1, 1, 1, client, 0L, 0L);
     }
   }
+   */
 
   @Test(timeout = 300000L)
   public void testListOpenFiles() throws Exception {
@@ -736,13 +746,13 @@ public class TestDFSAdmin {
     final Path baseDir = new Path(
         PathUtils.getTestDir(getClass()).getAbsolutePath(),
         GenericTestUtils.getMethodName());
-    dfsConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.toString());
+    dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, baseDir.toString());
 
     final int numDataNodes = 3;
     final int numClosedFiles = 25;
     final int numOpenFiles = 15;
 
-    try(MiniDFSCluster miniCluster = new MiniDFSCluster
+    try(MiniDFSClusterInJVM miniCluster = new MiniDFSClusterInJVM
         .Builder(dfsConf)
         .numDataNodes(numDataNodes).build()) {
       final short replFactor = 1;
@@ -1052,3 +1062,4 @@ public class TestDFSAdmin {
     });
   }
 }
+

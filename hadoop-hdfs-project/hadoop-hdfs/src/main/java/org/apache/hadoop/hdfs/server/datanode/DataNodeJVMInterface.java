@@ -46,7 +46,6 @@ public interface DataNodeJVMInterface {
     boolean isSecurityEnabled();
     String getClusterId();
     String getVersion();
-    long getDNStartedTimeInMillis();
     String getSoftwareVersion();
     String getRevision();
     String getRpcPort();
