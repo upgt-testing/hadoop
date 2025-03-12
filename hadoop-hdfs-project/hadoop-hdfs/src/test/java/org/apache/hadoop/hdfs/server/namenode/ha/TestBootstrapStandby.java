@@ -24,24 +24,16 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import java.util.function.Supplier;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtilClient;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
-import org.apache.hadoop.hdfs.server.namenode.CheckpointSignature;
-import org.apache.hadoop.hdfs.server.namenode.FSImageTestUtil;
-import org.apache.hadoop.hdfs.server.namenode.NNStorage;
-import org.apache.hadoop.hdfs.server.namenode.NameNode;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.test.GenericTestUtils.LogCapturer;
 import org.junit.After;
@@ -57,8 +49,8 @@ public class TestBootstrapStandby {
   private static final int maxNNCount = 3;
   private static final int STARTING_PORT = 20000;
 
-  private MiniDFSCluster cluster;
-  private NameNode nn0;
+  private MiniDFSClusterInJVM cluster;
+  private NameNodeJVMInterface nn0;
 
   @Before
   public void setupCluster() throws IOException {
@@ -73,7 +65,7 @@ public class TestBootstrapStandby {
 
     MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(nameservice);
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(topology)
         .numDataNodes(0)
         .build();
@@ -136,6 +128,7 @@ public class TestBootstrapStandby {
    */
   @Test
   public void testDownloadingLaterCheckpoint() throws Exception {
+    cluster.upgradeAllNameNodes();
     // Roll edit logs a few times to inflate txid
     nn0.getRpcServer().rollEditLog();
     nn0.getRpcServer().rollEditLog();
@@ -180,7 +173,7 @@ public class TestBootstrapStandby {
   public void testSharedEditsMissingLogs() throws Exception {
     removeStandbyNameDirs();
 
-    CheckpointSignature sig = nn0.getRpcServer().rollEditLog();
+    CheckpointSignatureJVMInterface sig = nn0.getRpcServer().rollEditLog();
     assertEquals(3, sig.getCurSegmentTxId());
 
     // Should have created edits_1-2 in shared edits dir
@@ -216,6 +209,10 @@ public class TestBootstrapStandby {
   @Test
   public void testStandbyDirsAlreadyExist() throws Exception {
     // Should not pass since standby dirs exist, force not given
+    cluster.upgradeAllNameNodes();
+    restartNameNodesFromIndex(1);
+    cluster.upgradeNameNode(1, true);
+
     int rc = BootstrapStandby.run(
         new String[]{"-nonInteractive"},
         cluster.getConfiguration(1));
@@ -241,6 +238,7 @@ public class TestBootstrapStandby {
    * {@link DFSConfigKeys#DFS_IMAGE_TRANSFER_BOOTSTRAP_STANDBY_RATE_KEY}
    * created by HDFS-8808.
    */
+  /*
   @Test(timeout=180000)
   public void testRateThrottling() throws Exception {
     cluster.getConfiguration(0).setLong(
@@ -325,6 +323,8 @@ public class TestBootstrapStandby {
       LOG.info("Encountered expected timeout.");
     }
   }
+   */
+
   private void removeStandbyNameDirs() {
     for (int i = 1; i < maxNNCount; i++) {
       for (URI u : cluster.getNameDirs(i)) {

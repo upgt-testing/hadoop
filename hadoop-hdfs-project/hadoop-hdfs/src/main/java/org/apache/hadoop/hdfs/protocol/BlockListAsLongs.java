@@ -42,7 +42,7 @@ import org.apache.hadoop.thirdparty.protobuf.WireFormat;
 
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public abstract class BlockListAsLongs implements Iterable<BlockReportReplica> {
+public abstract class BlockListAsLongs implements Iterable<BlockReportReplica>, BlockListAsLongsJVMInterface {
   private final static int CHUNK_SIZE = 64*1024; // 64K
   private static long[] EMPTY_LONGS = new long[]{0, 0};
 

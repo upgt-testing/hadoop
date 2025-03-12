@@ -60,7 +60,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Multiset;
  */
 @InterfaceAudience.Private
 public class BlockTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockTokenSecretManagerJVMInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(BlockTokenSecretManager.class);
 

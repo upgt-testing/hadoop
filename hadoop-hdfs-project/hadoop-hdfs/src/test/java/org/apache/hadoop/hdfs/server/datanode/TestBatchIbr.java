@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure;
 import org.apache.hadoop.metrics2.MetricsRecordBuilder;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -108,7 +108,7 @@ public class TestBatchIbr {
     final Random ran = new Random();
 
     final Configuration conf = newConf(ibrInterval);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_DATANODES).build();
     final DistributedFileSystem dfs = cluster.getFileSystem();
 
@@ -191,9 +191,9 @@ public class TestBatchIbr {
     return (ms/1000.0) + "s";
   }
 
-  static void logIbrCounts(List<DataNode> datanodes) {
+  static void logIbrCounts(List<DataNodeJVMInterface> datanodes) {
     final String name = "IncrementalBlockReportsNumOps";
-    for(DataNode dn : datanodes) {
+    for(DataNodeJVMInterface dn : datanodes) {
       final MetricsRecordBuilder m = MetricsAsserts.getMetrics(
           dn.getMetrics().name());
       final long ibr = MetricsAsserts.getLongCounter(name, m);

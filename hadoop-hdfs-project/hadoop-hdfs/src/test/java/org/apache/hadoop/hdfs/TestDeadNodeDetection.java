@@ -56,7 +56,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDeadNodeDetection {
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf;
 
   @Before
@@ -87,7 +87,7 @@ public class TestDeadNodeDetection {
   @Test
   public void testDeadNodeDetectionInBackground() throws Exception {
     conf.set(DFS_CLIENT_CONTEXT, "testDeadNodeDetectionInBackground");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     FileSystem fs = cluster.getFileSystem();
@@ -142,7 +142,7 @@ public class TestDeadNodeDetection {
   @Test
   public void testDeadNodeDetectionInMultipleDFSInputStream()
       throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
 
     FileSystem fs = cluster.getFileSystem();
@@ -203,7 +203,7 @@ public class TestDeadNodeDetection {
     // prevent interrupt deadNodeDetectorThr in cluster.waitActive()
     DFSClient.setDisabledStopDeadNodeDetectorThreadForTest(true);
     conf.set(DFS_CLIENT_CONTEXT, "testDeadNodeDetectionDeadNodeRecovery");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
 
     DFSClient.setDisabledStopDeadNodeDetectorThreadForTest(false);
@@ -212,7 +212,7 @@ public class TestDeadNodeDetection {
     createFile(fs, filePath);
 
     // Remove three DNs,
-    MiniDFSCluster.DataNodeProperties one = cluster.stopDataNode(0);
+    MiniDFSClusterInJVM.DataNodeProperties one = cluster.stopDataNode(0);
     cluster.stopDataNode(0);
     cluster.stopDataNode(0);
 
@@ -254,7 +254,7 @@ public class TestDeadNodeDetection {
     FSDataInputStream in = null;
     Path filePath = new Path("/" + GenericTestUtils.getMethodName());
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
 
       fs = cluster.getFileSystem();
@@ -307,14 +307,14 @@ public class TestDeadNodeDetection {
   @Test
   public void testDeadNodeDetectionSuspectNode() throws Exception {
     DeadNodeDetector.setDisabledProbeThreadForTest(true);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
 
     FileSystem fs = cluster.getFileSystem();
     Path filePath = new Path("/testDeadNodeDetectionSuspectNode");
     createFile(fs, filePath);
 
-    MiniDFSCluster.DataNodeProperties one = cluster.stopDataNode(0);
+    MiniDFSClusterInJVM.DataNodeProperties one = cluster.stopDataNode(0);
 
     FSDataInputStream in = fs.open(filePath);
     DFSInputStream din = (DFSInputStream) in.getWrappedStream();

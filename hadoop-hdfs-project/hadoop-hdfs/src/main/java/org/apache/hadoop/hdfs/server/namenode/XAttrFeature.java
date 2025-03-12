@@ -31,7 +31,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.ImmutableList;
  * Feature for extended attributes.
  */
 @InterfaceAudience.Private
-public class XAttrFeature implements INode.Feature {
+public class XAttrFeature implements INode.Feature, XAttrFeatureJVMInterface {
   static final int PACK_THRESHOLD = 1024;
 
   /** The packed bytes for small size XAttrs. */

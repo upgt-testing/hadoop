@@ -39,7 +39,7 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.security.authorize.DefaultImpersonationProvider;
@@ -56,7 +56,7 @@ import org.junit.Test;
 public class TestRefreshUserMappings {
   private static final Logger LOG = LoggerFactory.getLogger(
       TestRefreshUserMappings.class);
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   Configuration config;
   private static final long groupRefreshTimeoutSec = 1;
   private String tempResource = null;
@@ -96,7 +96,7 @@ public class TestRefreshUserMappings {
     Groups.getUserToGroupsMappingService(config);
     
     FileSystem.setDefaultUri(config, "hdfs://localhost:" + "0");
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).build();
     cluster.waitActive();
 
     GenericTestUtils.setLogLevel(Groups.LOG, Level.DEBUG);

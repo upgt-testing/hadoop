@@ -19,7 +19,7 @@ package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class TestRemoteNameNodeInfo {
             .addNN(new MiniDFSNNTopology.NNConf("nn3").setIpcPort(10003)));
 
     // add the configurations of the NNs to the passed conf, so we can parse it back out
-    MiniDFSCluster.configureNameNodes(topology, false, conf);
+    MiniDFSClusterInJVM.configureNameNodes(topology, false, conf);
 
     // set the 'local' one as nn1
     conf.set(DFSConfigKeys.DFS_HA_NAMENODE_ID_KEY, "nn1");

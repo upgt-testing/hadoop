@@ -32,14 +32,16 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.InternalDataNodeTestUtils;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistration;
+import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
 import org.apache.hadoop.util.Time;
 import org.junit.After;
 import org.junit.Assert;
@@ -66,7 +68,7 @@ public class TestDFSInputStreamBlockLocations {
   private final long dfsInputLocationsTimeout = 60 * 60 * 1000L;
 
   private HdfsConfiguration conf;
-  private MiniDFSCluster dfsCluster;
+  private MiniDFSClusterInJVM dfsCluster;
   private DFSClient dfsClient;
   private DistributedFileSystem fs;
   private Path filePath;
@@ -109,7 +111,7 @@ public class TestDFSInputStreamBlockLocations {
           dfsInputLocationsTimeout);
     }
     // start the cluster and create a DFSClient
-    dfsCluster = new MiniDFSCluster.Builder(conf)
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_DATA_NODES).racks(RACKS).build();
     dfsCluster.waitActive();
     assertEquals(NUM_DATA_NODES, dfsCluster.getDataNodes().size());
@@ -194,15 +196,15 @@ public class TestDFSInputStreamBlockLocations {
       DatanodeInfo[] secondBlkDNInfos = secondLocatedBlk.getLocations();
       DatanodeInfo deadNodeInfo = secondBlkDNInfos[0];
       // stop the datanode in the list of the
-      DataNode deadNode = getdataNodeFromHostName(dfsCluster,
+      DataNodeJVMInterface deadNode = getdataNodeFromHostName(dfsCluster,
           deadNodeInfo.getHostName());
       // Shutdown and wait for datanode to be marked dead
-      DatanodeRegistration reg = InternalDataNodeTestUtils.
+      DatanodeRegistrationJVMInterface reg = InternalDataNodeTestUtils.
           getDNRegistrationForBP(dfsCluster.getDataNodes().get(0), poolId);
       DataNodeProperties stoppedDNProps =
           dfsCluster.stopDataNode(deadNodeInfo.getName());
 
-      List<DataNode> datanodesPostStoppage = dfsCluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodesPostStoppage = dfsCluster.getDataNodes();
       assertEquals(NUM_DATA_NODES - 1, datanodesPostStoppage.size());
       // get the located blocks
       LocatedBlocks afterStoppageLocatedBlocks =
@@ -236,7 +238,7 @@ public class TestDFSInputStreamBlockLocations {
       // restart the dead node with the same port
       assertTrue(dfsCluster.restartDataNode(stoppedDNProps, true));
       dfsCluster.waitActive();
-      List<DataNode> datanodesPostRestart = dfsCluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodesPostRestart = dfsCluster.getDataNodes();
       assertEquals(NUM_DATA_NODES, datanodesPostRestart.size());
       // continue reading from block 2 again. We should read from deadNode
       int thirdBlockMark =  2 * BLOCK_SIZE;
@@ -278,9 +280,9 @@ public class TestDFSInputStreamBlockLocations {
     }
   }
 
-  private DataNode getdataNodeFromHostName(MiniDFSCluster cluster,
+  private DataNodeJVMInterface getdataNodeFromHostName(MiniDFSClusterInJVM cluster,
       String hostName) {
-    for (DataNode dn : cluster.getDataNodes()) {
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       if (dn.getDatanodeId().getHostName().equals(hostName)) {
         return dn;
       }

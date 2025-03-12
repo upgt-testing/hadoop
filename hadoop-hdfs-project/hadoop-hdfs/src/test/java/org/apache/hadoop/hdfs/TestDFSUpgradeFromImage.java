@@ -67,7 +67,7 @@ public class TestDFSUpgradeFromImage {
   private static final org.slf4j.Logger LOG = LoggerFactory
       .getLogger(TestDFSUpgradeFromImage.class);
   private static final File TEST_ROOT_DIR =
-                      new File(MiniDFSCluster.getBaseDirectory());
+                      new File(MiniDFSClusterInJVM.getBaseDirectory());
   private static final String HADOOP_DFS_DIR_TXT = "hadoop-dfs-dir.txt";
   private static final String HADOOP22_IMAGE = "hadoop-22-dfs-dir.tgz";
   private static final String HADOOP1_BBW_IMAGE = "hadoop1-bbw.tgz";
@@ -95,6 +95,7 @@ public class TestDFSUpgradeFromImage {
   }
   
   public interface ClusterVerifier {
+    public void verifyClusterPostUpgrade(final MiniDFSClusterInJVM cluster) throws IOException;
     public void verifyClusterPostUpgrade(final MiniDFSCluster cluster) throws IOException;
   }
 
@@ -268,9 +269,9 @@ public class TestDFSUpgradeFromImage {
 
     // Now try to start an NN from it
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
         .format(false)
         .manageDataDfsDirs(false)
         .manageNameDfsDirs(false)
@@ -295,7 +296,7 @@ public class TestDFSUpgradeFromImage {
   @Test
   public void testUpgradeFromRel22Image() throws IOException {
     unpackStorage(HADOOP22_IMAGE, HADOOP_DFS_DIR_TXT);
-    upgradeAndVerify(new MiniDFSCluster.Builder(upgradeConf).
+    upgradeAndVerify(new MiniDFSClusterInJVM.Builder(upgradeConf).
         numDataNodes(4), null);
   }
   
@@ -308,7 +309,7 @@ public class TestDFSUpgradeFromImage {
     unpackStorage(HADOOP22_IMAGE, HADOOP_DFS_DIR_TXT);
     
     // Overwrite the md5 stored in the VERSION files
-    File[] nnDirs = MiniDFSCluster.getNameNodeDirectory(MiniDFSCluster.getBaseDirectory(), 0, 0);
+    File[] nnDirs = MiniDFSClusterInJVM.getNameNodeDirectory(MiniDFSClusterInJVM.getBaseDirectory(), 0, 0);
     FSImageTestUtil.corruptVersionFile(
         new File(nnDirs[0], "current/VERSION"),
         "imageMD5Digest", "22222222222222222222222222222222");
@@ -323,7 +324,7 @@ public class TestDFSUpgradeFromImage {
 
     // Upgrade should now fail
     try {
-      upgradeAndVerify(new MiniDFSCluster.Builder(upgradeConf).
+      upgradeAndVerify(new MiniDFSClusterInJVM.Builder(upgradeConf).
           numDataNodes(4), null);
       fail("Upgrade did not fail with bad MD5");
     } catch (IOException ioe) {
@@ -343,7 +344,7 @@ public class TestDFSUpgradeFromImage {
   @Test
   public void testUpgradeFromRel1ReservedImage() throws Exception {
     unpackStorage(HADOOP1_RESERVED_IMAGE, HADOOP_DFS_DIR_TXT);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     // Try it once without setting the upgrade flag to ensure it fails
     final Configuration conf = new Configuration();
     // Try it again with a custom rename string
@@ -352,7 +353,7 @@ public class TestDFSUpgradeFromImage {
           ".snapshot=.user-snapshot," +
               ".reserved=.my-reserved");
       cluster =
-          new MiniDFSCluster.Builder(conf)
+          new MiniDFSClusterInJVM.Builder(conf)
               .format(false)
               .startupOption(StartupOption.UPGRADE)
               .numDataNodes(0).build();
@@ -413,7 +414,7 @@ public class TestDFSUpgradeFromImage {
   @Test
   public void testUpgradeFromRel023ReservedImage() throws Exception {
     unpackStorage(HADOOP023_RESERVED_IMAGE, HADOOP_DFS_DIR_TXT);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     // Try it once without setting the upgrade flag to ensure it fails
     final Configuration conf = new Configuration();
     // Try it again with a custom rename string
@@ -422,7 +423,7 @@ public class TestDFSUpgradeFromImage {
           ".snapshot=.user-snapshot," +
               ".reserved=.my-reserved");
       cluster =
-          new MiniDFSCluster.Builder(conf)
+          new MiniDFSClusterInJVM.Builder(conf)
               .format(false)
               .startupOption(StartupOption.UPGRADE)
               .numDataNodes(0).build();
@@ -478,12 +479,12 @@ public class TestDFSUpgradeFromImage {
   @Test
   public void testUpgradeFromRel2ReservedImage() throws Exception {
     unpackStorage(HADOOP2_RESERVED_IMAGE, HADOOP_DFS_DIR_TXT);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     // Try it once without setting the upgrade flag to ensure it fails
     final Configuration conf = new Configuration();
     try {
       cluster =
-          new MiniDFSCluster.Builder(conf)
+          new MiniDFSClusterInJVM.Builder(conf)
               .format(false)
               .startupOption(StartupOption.UPGRADE)
               .numDataNodes(0).build();
@@ -507,7 +508,7 @@ public class TestDFSUpgradeFromImage {
           ".snapshot=.user-snapshot," +
           ".reserved=.my-reserved");
       cluster =
-          new MiniDFSCluster.Builder(conf)
+          new MiniDFSClusterInJVM.Builder(conf)
               .format(false)
               .startupOption(StartupOption.UPGRADE)
               .numDataNodes(0).build();
@@ -594,10 +595,38 @@ public class TestDFSUpgradeFromImage {
       prev = dirList.getLastName();
     } while (dirList.hasMore());
   }
-  
+
   void upgradeAndVerify(MiniDFSCluster.Builder bld, ClusterVerifier verifier)
-      throws IOException {
+          throws IOException {
     MiniDFSCluster cluster = null;
+    try {
+      bld.format(false).startupOption(StartupOption.UPGRADE)
+              .clusterId("testClusterId");
+      cluster = bld.build();
+      cluster.waitActive();
+      DistributedFileSystem dfs = cluster.getFileSystem();
+      DFSClient dfsClient = dfs.dfs;
+      //Safemode will be off only after upgrade is complete. Wait for it.
+      while ( dfsClient.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_GET) ) {
+        LOG.info("Waiting for SafeMode to be OFF.");
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException ignored) {}
+      }
+      recoverAllLeases(dfsClient, new Path("/"));
+      verifyFileSystem(dfs);
+
+      if (verifier != null) {
+        verifier.verifyClusterPostUpgrade(cluster);
+      }
+    } finally {
+      if (cluster != null) { cluster.shutdown(); }
+    }
+  }
+  
+  void upgradeAndVerify(MiniDFSClusterInJVM.Builder bld, ClusterVerifier verifier)
+      throws IOException {
+    MiniDFSClusterInJVM cluster = null;
     try {
       bld.format(false).startupOption(StartupOption.UPGRADE)
         .clusterId("testClusterId");
@@ -635,7 +664,7 @@ public class TestDFSUpgradeFromImage {
         "dfs" + File.separator + 
         "data" + File.separator + 
         "data1"));
-    upgradeAndVerify(new MiniDFSCluster.Builder(conf).
+    upgradeAndVerify(new MiniDFSClusterInJVM.Builder(conf).
           numDataNodes(1).enableManagedDfsDirsRedundancy(false).
           manageDataDfsDirs(false), null);
   }
@@ -653,7 +682,7 @@ public class TestDFSUpgradeFromImage {
      */
     Configuration conf = new HdfsConfiguration();
     conf = UpgradeUtilities.initializeStorageStateConf(1, conf);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
         .format(false)
         .manageDataDfsDirs(false)
         .manageNameDfsDirs(false)

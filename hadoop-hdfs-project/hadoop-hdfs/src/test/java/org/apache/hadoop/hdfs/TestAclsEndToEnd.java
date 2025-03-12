@@ -86,7 +86,7 @@ public class TestAclsEndToEnd {
 
   private MiniKMS miniKMS;
   private File kmsDir;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
 
   @BeforeClass
@@ -196,7 +196,7 @@ public class TestAclsEndToEnd {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
 
-    MiniDFSCluster.Builder clusterBuilder = new MiniDFSCluster.Builder(conf);
+    MiniDFSClusterInJVM.Builder clusterBuilder = new MiniDFSClusterInJVM.Builder(conf);
 
     cluster = clusterBuilder.numDataNodes(1).format(resetDfs).build();
     fs = cluster.getFileSystem();

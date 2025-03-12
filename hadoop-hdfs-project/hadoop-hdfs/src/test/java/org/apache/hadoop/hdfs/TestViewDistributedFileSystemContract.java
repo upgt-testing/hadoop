@@ -37,7 +37,7 @@ import java.net.URI;
 
 public class TestViewDistributedFileSystemContract
     extends TestHDFSFileSystemContract {
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static String defaultWorkingDirectory;
   private static Configuration conf = new HdfsConfiguration();
 
@@ -46,7 +46,7 @@ public class TestViewDistributedFileSystemContract
     final File basedir = GenericTestUtils.getRandomizedTestDir();
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
         FileSystemContractBaseTest.TEST_UMASK);
-    cluster = new MiniDFSCluster.Builder(conf, basedir)
+    cluster = new MiniDFSClusterInJVM.Builder(conf, basedir)
         .numDataNodes(2)
         .build();
     defaultWorkingDirectory =
