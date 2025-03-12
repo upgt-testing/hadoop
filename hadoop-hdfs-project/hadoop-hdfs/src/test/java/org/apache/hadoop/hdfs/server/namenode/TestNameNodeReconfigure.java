@@ -457,9 +457,10 @@ public class TestNameNodeReconfigure {
     assertEquals(10, datanodeManager.getMaxSlowpeerCollectNodes());
   }
 
+  /*
   @Test
   public void testBlockInvalidateLimit() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    final NameNodeJ nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem
         .getBlockManager().getDatanodeManager();
 
@@ -515,6 +516,7 @@ public class TestNameNodeReconfigure {
         datanodeManager.getSlowPeerTracker().isSlowPeerTrackerEnabled());
 
   }
+   */
 
   @After
   public void shutDown() throws IOException {

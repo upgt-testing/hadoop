@@ -48,7 +48,9 @@ import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.qjournal.MiniQJMHACluster;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfoJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
@@ -76,17 +78,17 @@ public class TestBalancerWithHANameNodes {
     TestBalancer.initTestSetup();
   }
 
-  public static void waitStoragesNoStale(MiniDFSCluster cluster,
+  public static void waitStoragesNoStale(MiniDFSClusterInJVM cluster,
       ClientProtocol client, int nnIndex) throws Exception {
     // trigger a full block report and wait all storages out of stale
     cluster.triggerBlockReports();
     DatanodeInfo[] dataNodes = client.getDatanodeReport(HdfsConstants.DatanodeReportType.ALL);
     GenericTestUtils.waitFor(() -> {
-      BlockManager bm = cluster.getNamesystem(nnIndex).getBlockManager();
+      BlockManagerJVMInterface bm = cluster.getNamesystem(nnIndex).getBlockManager();
       for (DatanodeInfo dn : dataNodes) {
-        DatanodeStorageInfo[] storageInfos = bm.getDatanodeManager()
+        DatanodeStorageInfoJVMInterface[] storageInfos = bm.getDatanodeManager()
             .getDatanode(dn.getDatanodeUuid()).getStorageInfos();
-        for (DatanodeStorageInfo s : storageInfos) {
+        for (DatanodeStorageInfoJVMInterface s : storageInfos) {
           if (s.areBlockContentsStale()) {
             return false;
           }
