@@ -333,6 +333,76 @@ class FSDirXAttrOp {
   }
 
   static List<XAttr> setINodeXAttrs(
+          FSDirectoryJVMInterface fsd, final List<XAttr> existingXAttrs,
+          final List<XAttr> toSet, final EnumSet<XAttrSetFlag> flag)
+          throws IOException {
+    // Check for duplicate XAttrs in toSet
+    // We need to use a custom comparator, so using a HashSet is not suitable
+    for (int i = 0; i < toSet.size(); i++) {
+      for (int j = i + 1; j < toSet.size(); j++) {
+        if (toSet.get(i).equalsIgnoreValue(toSet.get(j))) {
+          throw new IOException("Cannot specify the same XAttr to be set " +
+                  "more than once");
+        }
+      }
+    }
+
+    // Count the current number of user-visible XAttrs for limit checking
+    int userVisibleXAttrsNum = 0; // Number of user visible xAttrs
+
+    // The XAttr list is copied to an exactly-sized array when it's stored,
+    // so there's no need to size it precisely here.
+    int newSize = (existingXAttrs != null) ? existingXAttrs.size() : 0;
+    newSize += toSet.size();
+    List<XAttr> xAttrs = Lists.newArrayListWithCapacity(newSize);
+
+    // Check if the XAttr already exists to validate with the provided flag
+    for (XAttr xAttr: toSet) {
+      boolean exist = false;
+      if (existingXAttrs != null) {
+        for (XAttr a : existingXAttrs) {
+          if (a.equalsIgnoreValue(xAttr)) {
+            exist = true;
+            break;
+          }
+        }
+      }
+      XAttrSetFlag.validate(xAttr.getName(), exist, flag);
+      // add the new XAttr since it passed validation
+      xAttrs.add(xAttr);
+      if (isUserVisible(xAttr)) {
+        userVisibleXAttrsNum++;
+      }
+    }
+
+    // Add the existing xattrs back in, if they weren't already set
+    if (existingXAttrs != null) {
+      for (XAttr existing : existingXAttrs) {
+        boolean alreadySet = false;
+        for (XAttr set : toSet) {
+          if (set.equalsIgnoreValue(existing)) {
+            alreadySet = true;
+            break;
+          }
+        }
+        if (!alreadySet) {
+          xAttrs.add(existing);
+          if (isUserVisible(existing)) {
+            userVisibleXAttrsNum++;
+          }
+        }
+      }
+    }
+
+    if (userVisibleXAttrsNum > fsd.getInodeXAttrsLimit()) {
+      throw new IOException("Cannot add additional XAttr to inode, "
+              + "would exceed limit of " + fsd.getInodeXAttrsLimit());
+    }
+
+    return xAttrs;
+  }
+
+  static List<XAttr> setINodeXAttrs(
       FSDirectory fsd, final List<XAttr> existingXAttrs,
       final List<XAttr> toSet, final EnumSet<XAttrSetFlag> flag)
       throws IOException {

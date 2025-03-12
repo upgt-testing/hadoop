@@ -33,7 +33,7 @@ public class TestDFSStripedOutputStreamUpdatePipeline {
 
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFS_BLOCK_SIZE_KEY, 1 * 1024 * 1024);
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(5).build()) {
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -70,7 +70,7 @@ public class TestDFSStripedOutputStreamUpdatePipeline {
   public void testECWriteHangWhenAddBlockWithException() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1 * 1024 * 1024);
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3).build()) {
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();

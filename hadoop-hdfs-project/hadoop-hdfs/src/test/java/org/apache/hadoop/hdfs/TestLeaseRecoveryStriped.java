@@ -80,7 +80,7 @@ public class TestLeaseRecoveryStriped {
   static private final String fakeUsername = "fakeUser1";
   static private final String fakeGroup = "supergroup";
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
   private Configuration conf;
   private final Path dir = new Path("/" + this.getClass().getSimpleName());
@@ -97,7 +97,7 @@ public class TestLeaseRecoveryStriped {
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 0);
     final int numDNs = dataBlocks + parityBlocks;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();
     dfs.enableErasureCodingPolicy(ecPolicy.getName());

@@ -33,7 +33,7 @@ import org.apache.hadoop.fs.Options.Rename;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.FSLimitException.MaxDirectoryItemsExceededException;
 import org.apache.hadoop.hdfs.protocol.FSLimitException.PathComponentTooLongException;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -46,7 +46,7 @@ public class TestFsLimits {
   static Configuration conf;
   static FSNamesystem fs;
   static boolean fsIsReady;
-  
+
   static final PermissionStatus perms
     = new PermissionStatus("admin", "admin", FsPermission.getDefault());
 
@@ -63,7 +63,7 @@ public class TestFsLimits {
   public void setUp() throws IOException {
     conf = new Configuration();
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-             fileAsURI(new File(MiniDFSCluster.getBaseDirectory(),
+             fileAsURI(new File(MiniDFSClusterInJVM.getBaseDirectory(),
                                 "namenode")).toString());
     NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
     fs = null;

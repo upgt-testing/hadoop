@@ -36,15 +36,10 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.SnapshotAccessControlException;
-import org.apache.hadoop.hdfs.server.namenode.AclFeature;
-import org.apache.hadoop.hdfs.server.namenode.AclStorage;
-import org.apache.hadoop.hdfs.server.namenode.AclTestHelpers;
-import org.apache.hadoop.hdfs.server.namenode.FSAclBaseTest;
-import org.apache.hadoop.hdfs.server.namenode.NameNode;
-import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -66,7 +61,7 @@ public class TestAclWithSnapshot {
   private static final UserGroupInformation DIANA =
     UserGroupInformation.createUserForTesting("diana", new String[] { });
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static Configuration conf;
   private static FileSystem fsAsBruce, fsAsDiana;
   private static DistributedFileSystem hdfs;
@@ -672,7 +667,7 @@ public class TestAclWithSnapshot {
     hdfs.mkdirs(subdir);
     Path file = new Path(path, "file");
     hdfs.create(file).close();
-    AclFeature aclFeature;
+    AclFeatureJVMInterface aclFeature;
     {
       // create the snapshot with root directory having ACLs should refer to
       // same ACLFeature without incrementing the reference count
@@ -681,7 +676,7 @@ public class TestAclWithSnapshot {
           aclFeature.getRefCount());
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
-      AclFeature snapshotAclFeature = FSAclBaseTest.getAclFeature(snapshotPath,
+      AclFeatureJVMInterface snapshotAclFeature = FSAclBaseTest.getAclFeature(snapshotPath,
           cluster);
       assertSame(aclFeature, snapshotAclFeature);
       assertEquals("Reference count should be increased", 2,
@@ -699,7 +694,7 @@ public class TestAclWithSnapshot {
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
       Path subdirInSnapshot = new Path(snapshotPath, "sub-dir");
-      AclFeature snapshotAcl = FSAclBaseTest.getAclFeature(subdirInSnapshot,
+      AclFeatureJVMInterface snapshotAcl = FSAclBaseTest.getAclFeature(subdirInSnapshot,
           cluster);
       assertSame(aclFeature, snapshotAcl);
       assertEquals("Reference count should remain same", 1,
@@ -716,7 +711,7 @@ public class TestAclWithSnapshot {
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
       Path fileInSnapshot = new Path(snapshotPath, file.getName());
-      AclFeature snapshotAcl = FSAclBaseTest.getAclFeature(fileInSnapshot,
+      AclFeatureJVMInterface snapshotAcl = FSAclBaseTest.getAclFeature(fileInSnapshot,
           cluster);
       assertSame(aclFeature, snapshotAcl);
       assertEquals("Reference count should remain same", 1,
@@ -732,7 +727,7 @@ public class TestAclWithSnapshot {
       hdfs.modifyAclEntries(path, aclSpec);
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
-      AclFeature snapshotAcl = FSAclBaseTest.getAclFeature(snapshotPath,
+      AclFeatureJVMInterface snapshotAcl = FSAclBaseTest.getAclFeature(snapshotPath,
           cluster);
       aclFeature = FSAclBaseTest.getAclFeature(path, cluster);
       assertEquals("Before modification same ACL should be referenced twice", 2,
@@ -741,7 +736,7 @@ public class TestAclWithSnapshot {
           "testNewUser", ALL));
       hdfs.modifyAclEntries(path, newAcl);
       aclFeature = FSAclBaseTest.getAclFeature(path, cluster);
-      AclFeature snapshotAclPostModification = FSAclBaseTest.getAclFeature(
+      AclFeatureJVMInterface snapshotAclPostModification = FSAclBaseTest.getAclFeature(
           snapshotPath, cluster);
       assertSame(snapshotAcl, snapshotAclPostModification);
       assertNotSame(aclFeature, snapshotAclPostModification);
@@ -758,7 +753,7 @@ public class TestAclWithSnapshot {
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
       Path subdirInSnapshot = new Path(snapshotPath, "sub-dir");
-      AclFeature snapshotAclFeature = FSAclBaseTest.getAclFeature(
+      AclFeatureJVMInterface snapshotAclFeature = FSAclBaseTest.getAclFeature(
           subdirInSnapshot, cluster);
       List<AclEntry> newAcl = Lists.newArrayList(aclEntry(ACCESS, USER,
           "testNewUser", ALL));
@@ -778,7 +773,7 @@ public class TestAclWithSnapshot {
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
       Path fileInSnapshot = new Path(snapshotPath, file.getName());
-      AclFeature snapshotAclFeature = FSAclBaseTest.getAclFeature(
+      AclFeatureJVMInterface snapshotAclFeature = FSAclBaseTest.getAclFeature(
           fileInSnapshot, cluster);
       List<AclEntry> newAcl = Lists.newArrayList(aclEntry(ACCESS, USER,
           "testNewUser", ALL));
@@ -800,15 +795,15 @@ public class TestAclWithSnapshot {
       hdfs.create(file).close();
       aclSpec.add(aclEntry(ACCESS, USER, "testNewUser", ALL));
       hdfs.modifyAclEntries(file, aclSpec);
-      AclFeature fileAcl = FSAclBaseTest.getAclFeature(file, cluster);
-      AclFeature dirAcl = FSAclBaseTest.getAclFeature(dir, cluster);
+      AclFeatureJVMInterface fileAcl = FSAclBaseTest.getAclFeature(file, cluster);
+      AclFeatureJVMInterface dirAcl = FSAclBaseTest.getAclFeature(dir, cluster);
       Path snapshotPath = SnapshotTestHelper.createSnapshot(hdfs, path,
           snapshotName);
       Path dirInSnapshot = new Path(snapshotPath, "sub-dir/dir");
-      AclFeature snapshotDirAclFeature = FSAclBaseTest.getAclFeature(
+      AclFeatureJVMInterface snapshotDirAclFeature = FSAclBaseTest.getAclFeature(
           dirInSnapshot, cluster);
       Path fileInSnapshot = new Path(snapshotPath, "sub-dir/file");
-      AclFeature snapshotFileAclFeature = FSAclBaseTest.getAclFeature(
+      AclFeatureJVMInterface snapshotFileAclFeature = FSAclBaseTest.getAclFeature(
           fileInSnapshot, cluster);
       assertSame(fileAcl, snapshotFileAclFeature);
       assertSame(dirAcl, snapshotDirAclFeature);
@@ -825,10 +820,10 @@ public class TestAclWithSnapshot {
     }
   }
 
-  private void deleteSnapshotWithAclAndVerify(AclFeature aclFeature,
+  private void deleteSnapshotWithAclAndVerify(AclFeatureJVMInterface aclFeature,
       Path pathToCheckAcl, int totalAclFeatures) throws IOException {
     hdfs.deleteSnapshot(path, snapshotName);
-    AclFeature afterDeleteAclFeature = FSAclBaseTest.getAclFeature(
+    AclFeatureJVMInterface afterDeleteAclFeature = FSAclBaseTest.getAclFeature(
         pathToCheckAcl, cluster);
     assertSame(aclFeature, afterDeleteAclFeature);
     assertEquals("Reference count should remain same"
@@ -908,7 +903,7 @@ public class TestAclWithSnapshot {
    * @throws Exception if any step fails
    */
   private static void initCluster(boolean format) throws Exception {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).format(format)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(format)
       .build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
@@ -923,7 +918,7 @@ public class TestAclWithSnapshot {
    * @throws Exception if restart fails
    */
   private static void restart(boolean checkpoint) throws Exception {
-    NameNode nameNode = cluster.getNameNode();
+    NameNodeJVMInterface nameNode = cluster.getNameNode();
     if (checkpoint) {
       NameNodeAdapter.enterSafeMode(nameNode, false);
       NameNodeAdapter.saveNamespace(nameNode);

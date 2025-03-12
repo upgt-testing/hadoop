@@ -124,7 +124,7 @@ public class TestMultiThreadedHflush {
   
   private void doTestMultipleHflushers(int repl) throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(repl)
         .build();
 
@@ -151,7 +151,7 @@ public class TestMultiThreadedHflush {
   @Test
   public void testHflushWhileClosing() throws Throwable {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     Path p = new Path("/hflush-and-close.dat");
 

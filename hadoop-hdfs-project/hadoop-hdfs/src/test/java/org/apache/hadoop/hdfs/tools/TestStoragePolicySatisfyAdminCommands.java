@@ -27,7 +27,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.StoragePolicySatisfierMode;
 import org.apache.hadoop.hdfs.server.balancer.NameNodeConnector;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
@@ -46,7 +46,7 @@ public class TestStoragePolicySatisfyAdminCommands {
   private static final int SIZE = 128;
 
   private Configuration conf = null;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
   private DistributedFileSystem dfs = null;
   private StoragePolicySatisfier externalSps = null;
 
@@ -60,7 +60,7 @@ public class TestStoragePolicySatisfyAdminCommands {
         1000);
     StorageType[][] newtypes = new StorageType[][] {
         {StorageType.ARCHIVE, StorageType.DISK}};
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL)
         .storageTypes(newtypes).build();
     cluster.waitActive();
     dfs = cluster.getFileSystem();

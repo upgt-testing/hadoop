@@ -22,8 +22,9 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.UnresolvedLinkException;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
@@ -32,15 +33,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestNameNodeRpcServerMethods {
-  private static NamenodeProtocols nnRpc;
+  private static NamenodeProtocolsJVMInterface nnRpc;
   private static Configuration conf;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
 
   /** Start a cluster */
   @Before
   public void setup() throws Exception {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
     nnRpc = cluster.getNameNode().getRpcServer();
   }

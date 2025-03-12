@@ -42,7 +42,7 @@ import java.util.Map;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public class DataNodeDiskMetrics {
+public class DataNodeDiskMetrics implements DataNodeDiskMetricsJVMInterface {
 
   public static final Logger LOG = LoggerFactory.getLogger(
       DataNodeDiskMetrics.class);

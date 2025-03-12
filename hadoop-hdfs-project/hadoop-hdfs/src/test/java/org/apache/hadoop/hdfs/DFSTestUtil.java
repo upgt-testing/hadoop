@@ -72,6 +72,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.hadoop.crypto.key.KeyProviderJVMInterface;
+import org.apache.hadoop.hdfs.protocol.*;
+import org.apache.hadoop.hdfs.server.blockmanagement.*;
+import org.apache.hadoop.hdfs.server.datanode.*;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.thirdparty.com.google.common.base.Charsets;
 import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
 import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
@@ -111,29 +117,10 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.MiniDFSCluster.NameNodeInfo;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsDataInputStream;
-import org.apache.hadoop.hdfs.protocol.AddErasureCodingPolicyResponse;
-import org.apache.hadoop.hdfs.protocol.Block;
-import org.apache.hadoop.hdfs.protocol.CacheDirectiveInfo;
-import org.apache.hadoop.hdfs.protocol.CachePoolInfo;
-import org.apache.hadoop.hdfs.protocol.ClientProtocol;
-import org.apache.hadoop.hdfs.protocol.DatanodeID;
-import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo.AdminStates;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo.DatanodeInfoBuilder;
-import org.apache.hadoop.hdfs.protocol.ECBlockGroupStats;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicyInfo;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicyState;
-import org.apache.hadoop.hdfs.protocol.ReplicatedBlockStats;
-import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport;
 import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport.DiffReportEntry;
 import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport.DiffType;
-import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
-import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
-import org.apache.hadoop.hdfs.protocol.HdfsConstants;
-import org.apache.hadoop.hdfs.protocol.LayoutVersion;
-import org.apache.hadoop.hdfs.protocol.LocatedBlock;
-import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.protocol.datatransfer.Sender;
 import org.apache.hadoop.hdfs.protocol.proto.DataTransferProtos.BlockOpResponseProto;
 import org.apache.hadoop.hdfs.protocol.proto.DataTransferProtos.Status;
@@ -141,31 +128,11 @@ import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager;
 import org.apache.hadoop.hdfs.security.token.block.ExportedBlockKeys;
 import org.apache.hadoop.hdfs.server.balancer.NameNodeConnector;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
-import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.common.StorageInfo;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.DataNodeLayoutVersion;
-import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
-import org.apache.hadoop.hdfs.server.datanode.TestTransferRbw;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
-import org.apache.hadoop.hdfs.server.namenode.ErasureCodingPolicyManager;
-import org.apache.hadoop.hdfs.server.namenode.FSDirectory;
-import org.apache.hadoop.hdfs.server.namenode.FSEditLog;
-import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
-import org.apache.hadoop.hdfs.server.namenode.INode;
-import org.apache.hadoop.hdfs.server.namenode.INodeFile;
-import org.apache.hadoop.hdfs.server.namenode.LeaseManager;
-import org.apache.hadoop.hdfs.server.namenode.NameNode;
-import org.apache.hadoop.hdfs.server.namenode.Namesystem;
-import org.apache.hadoop.hdfs.server.namenode.XAttrStorage;
 import org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider;
 import org.apache.hadoop.hdfs.server.namenode.sps.StoragePolicySatisfier;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistration;
@@ -261,6 +228,18 @@ public class DFSTestUtil {
     NameNode.format(new Configuration(conf));
   }
 
+  public static void formatNameNode(Configuration conf, NameNodeInstance nnInstance) throws IOException {
+    String clusterId = StartupOption.FORMAT.getClusterId();
+    if(clusterId == null || clusterId.isEmpty()) {
+      StartupOption.FORMAT.setClusterId("testClusterID");
+      nnInstance.setClusterID("testClusterID");
+    }
+    // Use a copy of conf as it can be altered by namenode during format.
+    nnInstance.format(new Configuration(conf));
+
+    //NameNode.format(new Configuration(conf));
+  }
+
   /**
    * Create a new HA-enabled configuration.
    */
@@ -306,6 +285,15 @@ public class DFSTestUtil {
     Whitebox.setInternalState(fsn.getFSImage(), "editLog", newLog);
     Whitebox.setInternalState(fsn.getFSDirectory(), "editLog", newLog);
   }
+
+  public static void setEditLogForTesting(FSNamesystemJVMInterface fsn, FSEditLogJVMInterface newLog) {
+    // spies are shallow copies, must allow async log to restart its thread
+    // so it has the new copy
+    newLog.restart();
+    Whitebox.setInternalState(fsn.getFSImage(), "editLog", newLog);
+    Whitebox.setInternalState(fsn.getFSDirectory(), "editLog", newLog);
+  }
+
 
   public static void enableAllECPolicies(DistributedFileSystem fs)
       throws IOException {
@@ -783,6 +771,20 @@ public class DFSTestUtil {
       throw new TimeoutException("Timed out waiting for DN to die");
     }
   }
+
+  public static void waitForDatanodeDeath(DataNodeJVMInterface dn)
+          throws InterruptedException, TimeoutException {
+    final int ATTEMPTS = 10;
+    int count = 0;
+    do {
+      Thread.sleep(1000);
+      count++;
+    } while (dn.isDatanodeUp() && count < ATTEMPTS);
+
+    if (count == ATTEMPTS) {
+      throw new TimeoutException("Timed out waiting for DN to die");
+    }
+  }
   
   /** return list of filenames created as part of createFiles */
   public String[] getFileNames(String topDir) {
@@ -1140,6 +1142,23 @@ public class DFSTestUtil {
         .join(nameservices));
   }
 
+  public static void setFederatedConfiguration(MiniDFSClusterInJVM cluster,
+                                               Configuration conf) {
+    Set<String> nameservices = new HashSet<String>();
+    for (MiniDFSClusterInJVM.NameNodeInfo info : cluster.getNameNodeInfos()) {
+      assert info.nameserviceId != null;
+      nameservices.add(info.nameserviceId);
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_RPC_ADDRESS_KEY,
+              info.nameserviceId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+              info.nameNode.getNameNodeAddress()).toString());
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
+              info.nameserviceId), DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+              info.nameNode.getNameNodeAddress()).toString());
+    }
+    conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
+            .join(nameservices));
+  }
+
   public static void setFederatedHAConfiguration(MiniDFSCluster cluster,
       Configuration conf) {
     Map<String, List<String>> nameservices = Maps.newHashMap();
@@ -1169,6 +1188,37 @@ public class DFSTestUtil {
     }
     conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
         .join(nameservices.keySet()));
+  }
+
+  public static void setFederatedHAConfiguration(MiniDFSClusterInJVM cluster,
+                                                 Configuration conf) {
+    Map<String, List<String>> nameservices = Maps.newHashMap();
+    for (MiniDFSClusterInJVM.NameNodeInfo info : cluster.getNameNodeInfos()) {
+      Preconditions.checkState(info.nameserviceId != null);
+      List<String> nns = nameservices.get(info.nameserviceId);
+      if (nns == null) {
+        nns = Lists.newArrayList();
+        nameservices.put(info.nameserviceId, nns);
+      }
+      nns.add(info.nnId);
+
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_RPC_ADDRESS_KEY,
+                      info.nameserviceId, info.nnId),
+              DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+                      info.nameNode.getNameNodeAddress()).toString());
+      conf.set(DFSUtil.addKeySuffixes(DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
+                      info.nameserviceId, info.nnId),
+              DFSUtil.createUri(HdfsConstants.HDFS_URI_SCHEME,
+                      info.nameNode.getNameNodeAddress()).toString());
+    }
+    for (Map.Entry<String, List<String>> entry : nameservices.entrySet()) {
+      conf.set(DFSUtil.addKeySuffixes(DFS_HA_NAMENODES_KEY_PREFIX,
+              entry.getKey()), Joiner.on(",").join(entry.getValue()));
+      conf.set(HdfsClientConfigKeys.Failover.PROXY_PROVIDER_KEY_PREFIX + "."
+              + entry.getKey(), ConfiguredFailoverProxyProvider.class.getName());
+    }
+    conf.set(DFSConfigKeys.DFS_NAMESERVICES, Joiner.on(",")
+            .join(nameservices.keySet()));
   }
   
   private static DatanodeID getDatanodeID(String ipAddr) {
@@ -1656,6 +1706,38 @@ public class DFSTestUtil {
     return expectedCacheUsed;
   }
 
+  public static long verifyExpectedCacheUsage(final long expectedCacheUsed,
+                                              final long expectedBlocks, final FsDatasetSpiJVMInterface<?> fsd) throws Exception {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      private int tries = 0;
+
+      @Override
+      public Boolean get() {
+        long curCacheUsed = fsd.getCacheUsed();
+        long curBlocks = fsd.getNumBlocksCached();
+        if ((curCacheUsed != expectedCacheUsed) ||
+                (curBlocks != expectedBlocks)) {
+          if (tries++ > 10) {
+            LOG.info("verifyExpectedCacheUsage: have " +
+                    curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                    curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                    "memlock limit = " +
+                    NativeIO.POSIX.getCacheManipulator().getMemlockLimit() +
+                    ".  Waiting...");
+          }
+          return false;
+        }
+        LOG.info("verifyExpectedCacheUsage: got " +
+                curCacheUsed + "/" + expectedCacheUsed + " bytes cached; " +
+                curBlocks + "/" + expectedBlocks + " blocks cached. " +
+                "memlock limit = " +
+                NativeIO.POSIX.getCacheManipulator().getMemlockLimit());
+        return true;
+      }
+    }, 100, 120000);
+    return expectedCacheUsed;
+  }
+
   /**
    * Round a long value up to a multiple of a factor.
    *
@@ -1853,6 +1935,12 @@ public class DFSTestUtil {
     createKey(keyName, cluster, 0, conf);
   }
 
+  public static void createKey(String keyName, MiniDFSClusterInJVM cluster,
+                               Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    createKey(keyName, cluster, 0, conf);
+  }
+
   /**
    * Helper function to create a key in the Key Provider.
    *
@@ -1866,6 +1954,18 @@ public class DFSTestUtil {
       throws NoSuchAlgorithmException, IOException {
     NameNode nn = cluster.getNameNode(idx);
     KeyProvider provider = nn.getNamesystem().getProvider();
+    final KeyProvider.Options options = KeyProvider.options(conf);
+    options.setDescription(keyName);
+    options.setBitLength(128);
+    provider.createKey(keyName, options);
+    provider.flush();
+  }
+
+  public static void createKey(String keyName, MiniDFSClusterInJVM cluster,
+                               int idx, Configuration conf)
+          throws NoSuchAlgorithmException, IOException {
+    NameNodeJVMInterface nn = cluster.getNameNode(idx);
+    KeyProviderJVMInterface provider = nn.getNamesystem().getProvider();
     final KeyProvider.Options options = KeyProvider.options(conf);
     options.setDescription(keyName);
     options.setBitLength(128);
@@ -2005,11 +2105,39 @@ public class DFSTestUtil {
     }, 100, waitTime);
   }
 
+  public static void waitForDatanodeState(
+          final MiniDFSClusterInJVM cluster, final String nodeID,
+          final boolean alive, int waitTime)
+          throws TimeoutException, InterruptedException {
+    GenericTestUtils.waitFor(new Supplier<Boolean>() {
+      @Override
+      public Boolean get() {
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        final DatanodeDescriptorJVMInterface dd = BlockManagerTestUtil.getDatanode(
+                namesystem, nodeID);
+        return (dd.isAlive() == alive);
+      }
+    }, 100, waitTime);
+  }
+
   /**
    * Change the length of a block at datanode dnIndex.
    */
   public static boolean changeReplicaLength(MiniDFSCluster cluster,
       ExtendedBlock blk, int dnIndex, int lenDelta) throws IOException {
+    File blockFile = cluster.getBlockFile(dnIndex, blk);
+    if (blockFile != null && blockFile.exists()) {
+      try (RandomAccessFile raFile = new RandomAccessFile(blockFile, "rw")) {
+        raFile.setLength(raFile.length() + lenDelta);
+      }
+      return true;
+    }
+    LOG.info("failed to change length of block " + blk);
+    return false;
+  }
+
+  public static boolean changeReplicaLength(MiniDFSClusterInJVM cluster,
+                                            ExtendedBlock blk, int dnIndex, int lenDelta) throws IOException {
     File blockFile = cluster.getBlockFile(dnIndex, blk);
     if (blockFile != null && blockFile.exists()) {
       try (RandomAccessFile raFile = new RandomAccessFile(blockFile, "rw")) {
@@ -2085,10 +2213,25 @@ public class DFSTestUtil {
     dn.setLastUpdateMonotonic(Long.MIN_VALUE/2);
   }
 
+  public static void setDatanodeDead(DatanodeInfoJVMInterface dn) {
+    dn.setLastUpdate(0);
+    // Set this to a large negative value.
+    // On short-lived VMs, the monotonic time can be less than the heartbeat
+    // expiry time. Setting this to 0 will fail to immediately mark the DN as
+    // dead.
+    dn.setLastUpdateMonotonic(Long.MIN_VALUE/2);
+  }
+
+
   /**
    * Update lastUpdate and lastUpdateMonotonic with some offset.
    */
   public static void resetLastUpdatesWithOffset(DatanodeInfo dn, long offset) {
+    dn.setLastUpdate(Time.now() + offset);
+    dn.setLastUpdateMonotonic(Time.monotonicNow() + offset);
+  }
+
+  public static void resetLastUpdatesWithOffset(DatanodeInfoJVMInterface dn, long offset) {
     dn.setLastUpdate(Time.now() + offset);
     dn.setLastUpdateMonotonic(Time.monotonicNow() + offset);
   }
@@ -2482,6 +2625,30 @@ public class DFSTestUtil {
         .numDataNodes(numDatanodes)
         .racks(racks)
         .build();
+    cluster.waitActive();
+    return cluster;
+  }
+
+  public static MiniDFSClusterInJVM setupJVMCluster(final Configuration conf,
+                                            final int numDatanodes,
+                                            final int numRacks,
+                                            final int numSingleDnRacks)
+          throws Exception {
+    assert numDatanodes > numRacks;
+    assert numRacks > numSingleDnRacks;
+    assert numSingleDnRacks >= 0;
+    final String[] racks = new String[numDatanodes];
+    for (int i = 0; i < numSingleDnRacks; i++) {
+      racks[i] = "/rack" + i;
+    }
+    for (int i = numSingleDnRacks; i < numDatanodes; i++) {
+      racks[i] =
+              "/rack" + (numSingleDnRacks + (i % (numRacks - numSingleDnRacks)));
+    }
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
+            .numDataNodes(numDatanodes)
+            .racks(racks)
+            .build();
     cluster.waitActive();
     return cluster;
   }

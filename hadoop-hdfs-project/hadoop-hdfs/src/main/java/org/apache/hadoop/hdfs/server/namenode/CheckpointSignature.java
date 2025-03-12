@@ -30,7 +30,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.ComparisonChain;
  */
 @InterfaceAudience.Private
 public class CheckpointSignature extends StorageInfo
-    implements Comparable<CheckpointSignature> { 
+    implements Comparable<CheckpointSignature>, CheckpointSignatureJVMInterface{
 
   private static final String FIELD_SEPARATOR = ":";
   private static final int NUM_FIELDS = 7;

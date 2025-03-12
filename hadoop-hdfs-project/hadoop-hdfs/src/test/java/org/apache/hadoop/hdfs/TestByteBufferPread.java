@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestByteBufferPread {
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static FileSystem fs;
   private static byte[] fileContents;
   private static Path testFile;
@@ -61,7 +61,7 @@ public class TestByteBufferPread {
     // that span multiple blocks
     Configuration conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     fs = cluster.getFileSystem();
 
     // Create a test file that spans 12 blocks, and contains a bunch of random
