@@ -2177,6 +2177,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * Shutdown all the nodes in the cluster.
      */
     public void shutdown(boolean deleteDfsDir, boolean closeFileSystem) {
+        upgradeNodeForTesting(0);	
         LOG.info("Shutting down the Mini HDFS Cluster");
         if (checkExitOnShutdown)  {
             if (ExitUtil.terminateCalled()) {
