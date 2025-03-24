@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.File;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
@@ -33,112 +32,109 @@ import org.junit.Test;
 
 public class TestNNThroughputBenchmark {
 
-  @BeforeClass
-  public static void setUp() {
-    ExitUtil.disableSystemExit();
-  }
-
-  @After
-  public void cleanUp() {
-    FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
-  }
-
-  /**
-   * This test runs all benchmarks defined in {@link NNThroughputBenchmark}.
-   */
-  @Test
-  public void testNNThroughput() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
-    conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-        nameDir.getAbsolutePath());
-    DFSTestUtil.formatNameNode(conf);
-    NNThroughputBenchmark.runBenchmark(conf, new String[] {"-op", "all"});
-  }
-
-  /**
-   * This test runs all benchmarks defined in {@link NNThroughputBenchmark},
-   * with explicit local -fs option.
-   */
-  @Test(timeout = 120000)
-  public void testNNThroughputWithFsOption() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
-    conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-        nameDir.getAbsolutePath());
-    DFSTestUtil.formatNameNode(conf);
-    NNThroughputBenchmark.runBenchmark(conf,
-        new String[] {"-fs", "file:///", "-op", "all"});
-  }
-
-  /**
-   * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster.
-   */
-  @Test(timeout = 120000)
-  public void testNNThroughputAgainstRemoteNN() throws Exception {
-    final Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
-      cluster.waitActive();
-
-      final Configuration benchConf = new HdfsConfiguration();
-      benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-      FileSystem.setDefaultUri(benchConf, cluster.getURI());
-      NNThroughputBenchmark.runBenchmark(benchConf, new String[]{"-op", "all"});
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @BeforeClass
+    public static void setUp() {
+        ExitUtil.disableSystemExit();
     }
-  }
 
-  /**
-   * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
-   * with explicit -fs option.
-   */
-  @Test(timeout = 120000)
-  public void testNNThroughputRemoteAgainstNNWithFsOption() throws Exception {
-    final Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
-      cluster.waitActive();
-
-      final Configuration benchConf = new HdfsConfiguration();
-      benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-      NNThroughputBenchmark.runBenchmark(benchConf,
-          new String[]{"-fs", cluster.getURI().toString(), "-op", "all"});
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @After
+    public void cleanUp() {
+        FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
     }
-  }
 
-  /**
-   * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
-   * for block report operation.
-   */
-  @Test(timeout = 120000)
-  public void testNNThroughputForBlockReportOp() throws Exception {
-    final Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).
-        numDataNodes(3).build()) {
-      cluster.waitActive();
-      final Configuration benchConf = new HdfsConfiguration();
-      benchConf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-      benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
-      NNThroughputBenchmark.runBenchmark(benchConf,
-          new String[]{"-fs", cluster.getURI().toString(), "-op",
-              "blockReport", "-datanodes", "3", "-reports", "2"});
+    /**
+     * This test runs all benchmarks defined in {@link NNThroughputBenchmark}.
+     */
+    @Test
+    public void testNNThroughput() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+        File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
+        conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
+        DFSTestUtil.formatNameNode(conf);
+        NNThroughputBenchmark.runBenchmark(conf, new String[] { "-op", "all" });
     }
-  }
+
+    /**
+     * This test runs all benchmarks defined in {@link NNThroughputBenchmark},
+     * with explicit local -fs option.
+     */
+    @Test(timeout = 120000)
+    public void testNNThroughputWithFsOption() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+        File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
+        conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
+        DFSTestUtil.formatNameNode(conf);
+        NNThroughputBenchmark.runBenchmark(conf, new String[] { "-fs", "file:///", "-op", "all" });
+    }
+
+    /**
+     * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster.
+     */
+    @Test
+    public void testNNThroughputAgainstRemoteNN() throws Exception {
+        final Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            cluster.waitActive();
+            final Configuration benchConf = new HdfsConfiguration();
+            benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+            FileSystem.setDefaultUri(benchConf, cluster.getURI());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            NNThroughputBenchmark.runBenchmark(benchConf, new String[] { "-op", "all" });
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    /**
+     * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
+     * with explicit -fs option.
+     */
+    @Test
+    public void testNNThroughputRemoteAgainstNNWithFsOption() throws Exception {
+        final Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            cluster.waitActive();
+            final Configuration benchConf = new HdfsConfiguration();
+            benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            NNThroughputBenchmark.runBenchmark(benchConf, new String[] { "-fs", cluster.getURI().toString(), "-op", "all" });
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    /**
+     * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
+     * for block report operation.
+     */
+    @Test
+    public void testNNThroughputForBlockReportOp() throws Exception {
+        final Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            cluster.waitActive();
+            final Configuration benchConf = new HdfsConfiguration();
+            benchConf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
+            benchConf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            NNThroughputBenchmark.runBenchmark(benchConf, new String[] { "-fs", cluster.getURI().toString(), "-op", "blockReport", "-datanodes", "3", "-reports", "2" });
+        }
+    }
 }

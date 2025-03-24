@@ -30,59 +30,54 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-public class TestViewDistributedFileSystemContract
-    extends TestHDFSFileSystemContract {
-  private static MiniDFSClusterInJVM cluster;
-  private static String defaultWorkingDirectory;
-  private static Configuration conf = new HdfsConfiguration();
+public class TestViewDistributedFileSystemContract extends TestHDFSFileSystemContract {
 
-  @BeforeClass
-  public static void init() throws IOException {
-    final File basedir = GenericTestUtils.getRandomizedTestDir();
-    conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
-        FileSystemContractBaseTest.TEST_UMASK);
-    cluster = new MiniDFSClusterInJVM.Builder(conf, basedir)
-        .numDataNodes(2)
-        .build();
-    defaultWorkingDirectory =
-        "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
-  }
+    private static MiniDFSClusterInJVM cluster;
 
-  @Before
-  public void setUp() throws Exception {
-    conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());
-    URI defaultFSURI =
-        URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-    ConfigUtil.addLink(conf, defaultFSURI.getHost(), "/user",
-        defaultFSURI);
-    ConfigUtil.addLinkFallback(conf, defaultFSURI.getHost(),
-        defaultFSURI);
-    fs = FileSystem.get(conf);
-  }
+    private static String defaultWorkingDirectory;
 
-  @AfterClass
-  public static void tearDownAfter() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private static Configuration conf = new HdfsConfiguration();
+
+    @BeforeClass
+    public static void init() throws IOException {
+        final File basedir = GenericTestUtils.getRandomizedTestDir();
+        conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY, FileSystemContractBaseTest.TEST_UMASK);
+        cluster = new MiniDFSClusterInJVM.Builder(conf, basedir).numDataNodes(2).build();
+        defaultWorkingDirectory = "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
     }
-  }
 
-  @Override
-  protected String getDefaultWorkingDirectory() {
-    return defaultWorkingDirectory;
-  }
+    @Before
+    public void setUp() throws Exception {
+        conf.set("fs.hdfs.impl", ViewDistributedFileSystem.class.getName());
+        URI defaultFSURI = URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+        ConfigUtil.addLink(conf, defaultFSURI.getHost(), "/user", defaultFSURI);
+        ConfigUtil.addLinkFallback(conf, defaultFSURI.getHost(), defaultFSURI);
+        fs = FileSystem.get(conf);
+    }
 
-  @Test
-  public void testRenameRootDirForbidden() throws Exception {
-    LambdaTestUtils.intercept(AccessControlException.class,
-        "InternalDir of ViewFileSystem is readonly", () -> {
-          super.testRenameRootDirForbidden();
+    @AfterClass
+    public static void tearDownAfter() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    @Override
+    protected String getDefaultWorkingDirectory() {
+        return defaultWorkingDirectory;
+    }
+
+    @Test
+    public void testRenameRootDirForbidden() throws Exception {
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        LambdaTestUtils.intercept(AccessControlException.class, "InternalDir of ViewFileSystem is readonly", () -> {
+            super.testRenameRootDirForbidden();
         });
-  }
+    }
 }
