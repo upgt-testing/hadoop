@@ -51,7 +51,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.event.Level;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -60,109 +59,95 @@ import java.net.URI;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.HashSet;
-
 import static org.apache.hadoop.hdfs.server.namenode.ha.ObserverReadProxyProvider.OBSERVER_PROBE_RETRY_PERIOD_KEY;
 import static org.junit.Assert.*;
 
 /**
  * Test case for client support of delegation tokens in an HA cluster.
  * See HDFS-2904 for more info.
- **/
+ */
 public class TestDelegationTokensWithHA {
-  private static final Configuration conf = new Configuration();
-  private static final Logger LOG =
-      LoggerFactory.getLogger(TestDelegationTokensWithHA.class);
-  private static MiniDFSClusterInJVM cluster;
-  private static NameNodeJVMInterface nn0;
-  private static NameNodeJVMInterface nn1;
-  private static FileSystem fs;
-  private static DelegationTokenSecretManagerJVMInterface dtSecretManager;
-  private static DistributedFileSystem dfs;
 
-  private volatile boolean catchup = false;
-  
-  @Before
-  public void setupCluster() throws Exception {
-    SecurityUtilTestHelper.setTokenServiceUseIp(true);
-    
-    conf.setBoolean(
-        DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_AUTH_TO_LOCAL,
-        "RULE:[2:$1@$0](JobTracker@.*FOO.COM)s/@.*//" + "DEFAULT");
+    private static final Configuration conf = new Configuration();
 
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleHATopology())
-      .numDataNodes(0)
-      .build();
-    cluster.waitActive();
-    
-    String logicalName = HATestUtil.getLogicalHostname(cluster);
-    HATestUtil.setFailoverConfigurations(cluster, conf, logicalName, 0);
+    private static final Logger LOG = LoggerFactory.getLogger(TestDelegationTokensWithHA.class);
 
-    nn0 = cluster.getNameNode(0);
-    nn1 = cluster.getNameNode(1);
-    fs = HATestUtil.configureFailoverFs(cluster, conf);
-    dfs = (DistributedFileSystem)fs;
+    private static MiniDFSClusterInJVM cluster;
 
-    cluster.transitionToActive(0);
-    dtSecretManager = NameNodeAdapter.getDtSecretManager(
-        nn0.getNamesystem());
-  }
+    private static NameNodeJVMInterface nn0;
 
-  @After
-  public void shutdownCluster() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private static NameNodeJVMInterface nn1;
+
+    private static FileSystem fs;
+
+    private static DelegationTokenSecretManagerJVMInterface dtSecretManager;
+
+    private static DistributedFileSystem dfs;
+
+    private volatile boolean catchup = false;
+
+    @Before
+    public void setupCluster() throws Exception {
+        SecurityUtilTestHelper.setTokenServiceUseIp(true);
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
+        conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_AUTH_TO_LOCAL, "RULE:[2:$1@$0](JobTracker@.*FOO.COM)s/@.*//" + "DEFAULT");
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        String logicalName = HATestUtil.getLogicalHostname(cluster);
+        HATestUtil.setFailoverConfigurations(cluster, conf, logicalName, 0);
+        nn0 = cluster.getNameNode(0);
+        nn1 = cluster.getNameNode(1);
+        fs = HATestUtil.configureFailoverFs(cluster, conf);
+        dfs = (DistributedFileSystem) fs;
+        cluster.transitionToActive(0);
+        dtSecretManager = NameNodeAdapter.getDtSecretManager(nn0.getNamesystem());
     }
-  }
 
-  /**
-   * Test that, when using ObserverReadProxyProvider with DT authentication,
-   * the ORPP gracefully handles when the Standby NN throws a StandbyException.
-   */
-  @Test(timeout = 300000)
-  public void testObserverReadProxyProviderWithDT() throws Exception {
-    // Make the first node standby, so that the ORPP will try it first
-    // instead of just using and succeeding on the active
-    conf.setInt(OBSERVER_PROBE_RETRY_PERIOD_KEY, 0);
-    cluster.transitionToStandby(0);
-    cluster.transitionToActive(1);
-
-    HATestUtil.setFailoverConfigurations(cluster, conf,
-        HATestUtil.getLogicalHostname(cluster), 0,
-        ObserverReadProxyProvider.class);
-    conf.setBoolean("fs.hdfs.impl.disable.cache", true);
-
-    dfs = (DistributedFileSystem) FileSystem.get(conf);
-    final UserGroupInformation ugi = UserGroupInformation
-        .createRemoteUser("JobTracker");
-    final Token<DelegationTokenIdentifier> token =
-        getDelegationToken(dfs, ugi.getShortUserName());
-    ugi.addToken(token);
-    // Recreate the DFS, this time authenticating using a DT
-    dfs = ugi.doAs((PrivilegedExceptionAction<DistributedFileSystem>)
-        () -> (DistributedFileSystem) FileSystem.get(conf));
-
-    GenericTestUtils.setLogLevel(ObserverReadProxyProvider.LOG, Level.DEBUG);
-    GenericTestUtils.LogCapturer logCapture = GenericTestUtils.LogCapturer
-        .captureLogs(ObserverReadProxyProvider.LOG);
-    try {
-      dfs.access(new Path("/"), FsAction.READ);
-      assertTrue(logCapture.getOutput()
-          .contains("threw StandbyException when fetching HAState"));
-      HATestUtil.isSentToAnyOfNameNodes(dfs, cluster, 1);
-
-      cluster.shutdownNameNode(0);
-      logCapture.clearOutput();
-      dfs.access(new Path("/"), FsAction.READ);
-      assertTrue(logCapture.getOutput().contains("Failed to connect to"));
-    } finally {
-      logCapture.stopCapturing();
+    @After
+    public void shutdownCluster() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-  }
 
-  /*
+    /**
+     * Test that, when using ObserverReadProxyProvider with DT authentication,
+     * the ORPP gracefully handles when the Standby NN throws a StandbyException.
+     */
+    @Test
+    public void testObserverReadProxyProviderWithDT() throws Exception {
+        // Make the first node standby, so that the ORPP will try it first
+        // instead of just using and succeeding on the active
+        conf.setInt(OBSERVER_PROBE_RETRY_PERIOD_KEY, 0);
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        HATestUtil.setFailoverConfigurations(cluster, conf, HATestUtil.getLogicalHostname(cluster), 0, ObserverReadProxyProvider.class);
+        conf.setBoolean("fs.hdfs.impl.disable.cache", true);
+        dfs = (DistributedFileSystem) FileSystem.get(conf);
+        final UserGroupInformation ugi = UserGroupInformation.createRemoteUser("JobTracker");
+        final Token<DelegationTokenIdentifier> token = getDelegationToken(dfs, ugi.getShortUserName());
+        ugi.addToken(token);
+        // Recreate the DFS, this time authenticating using a DT
+        dfs = ugi.doAs((PrivilegedExceptionAction<DistributedFileSystem>) () -> (DistributedFileSystem) FileSystem.get(conf));
+        GenericTestUtils.setLogLevel(ObserverReadProxyProvider.LOG, Level.DEBUG);
+        GenericTestUtils.LogCapturer logCapture = GenericTestUtils.LogCapturer.captureLogs(ObserverReadProxyProvider.LOG);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            dfs.access(new Path("/"), FsAction.READ);
+            assertTrue(logCapture.getOutput().contains("threw StandbyException when fetching HAState"));
+            HATestUtil.isSentToAnyOfNameNodes(dfs, cluster, 1);
+            cluster.shutdownNameNode(0);
+            logCapture.clearOutput();
+            dfs.access(new Path("/"), FsAction.READ);
+            assertTrue(logCapture.getOutput().contains("Failed to connect to"));
+        } finally {
+            logCapture.stopCapturing();
+        }
+    }
+
+    /*
   @Test(timeout = 300000)
   public void testDelegationTokenDFSApi() throws Exception {
     final Token<DelegationTokenIdentifier> token =
@@ -204,30 +189,31 @@ public class TestDelegationTokensWithHA {
     doRenewOrCancel(token, clientConf, TokenTestAction.CANCEL);
   }
    */
-  
-  private class EditLogTailerForTest extends EditLogTailer {
-    public EditLogTailerForTest(FSNamesystem namesystem, Configuration conf) {
-      super(namesystem, conf);
-    }
-    
-    public void catchupDuringFailover() throws IOException {
-      synchronized (TestDelegationTokensWithHA.this) {
-        while (!catchup) {
-          try {
-            LOG.info("The editlog tailer is waiting to catchup...");
-            TestDelegationTokensWithHA.this.wait();
-          } catch (InterruptedException e) {}
+    private class EditLogTailerForTest extends EditLogTailer {
+
+        public EditLogTailerForTest(FSNamesystem namesystem, Configuration conf) {
+            super(namesystem, conf);
         }
-      }
-      super.catchupDuringFailover();
+
+        public void catchupDuringFailover() throws IOException {
+            synchronized (TestDelegationTokensWithHA.this) {
+                while (!catchup) {
+                    try {
+                        LOG.info("The editlog tailer is waiting to catchup...");
+                        TestDelegationTokensWithHA.this.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+            super.catchupDuringFailover();
+        }
     }
-  }
-  
-  /**
-   * Test if correct exception (StandbyException or RetriableException) can be
-   * thrown during the NN failover. 
-   */
-  /*
+
+    /**
+     * Test if correct exception (StandbyException or RetriableException) can be
+     * thrown during the NN failover.
+     */
+    /*
   @Test(timeout = 300000)
   public void testDelegationTokenDuringNNFailover() throws Exception {
     EditLogTailer editLogTailer = nn1.getNamesystem().getEditLogTailer();
@@ -296,194 +282,175 @@ public class TestDelegationTokensWithHA {
     doRenewOrCancel(token, clientConf, TokenTestAction.CANCEL);
   }
    */
+    @Test
+    public void testDelegationTokenWithDoAs() throws Exception {
+        final Token<DelegationTokenIdentifier> token = getDelegationToken(fs, "JobTracker");
+        final UserGroupInformation longUgi = UserGroupInformation.createRemoteUser("JobTracker/foo.com@FOO.COM");
+        final UserGroupInformation shortUgi = UserGroupInformation.createRemoteUser("JobTracker");
+        longUgi.doAs(new PrivilegedExceptionAction<Void>() {
 
-  @Test(timeout = 300000)
-  public void testDelegationTokenWithDoAs() throws Exception {
-    final Token<DelegationTokenIdentifier> token =
-        getDelegationToken(fs, "JobTracker");
-    final UserGroupInformation longUgi = UserGroupInformation
-        .createRemoteUser("JobTracker/foo.com@FOO.COM");
-    final UserGroupInformation shortUgi = UserGroupInformation
-        .createRemoteUser("JobTracker");
-    longUgi.doAs(new PrivilegedExceptionAction<Void>() {
-      @Override
-      public Void run() throws Exception {
-        // try renew with long name
-        token.renew(conf);
-        return null;
-      }
-    });
-    shortUgi.doAs(new PrivilegedExceptionAction<Void>() {
-      @Override
-      public Void run() throws Exception {
-        token.renew(conf);
-        return null;
-      }
-    });
-    longUgi.doAs(new PrivilegedExceptionAction<Void>() {
-      @Override
-      public Void run() throws Exception {
-        token.cancel(conf);;
-        return null;
-      }
-    });
-  }
-
-  @Test(timeout = 300000)
-  public void testHAUtilClonesDelegationTokens() throws Exception {
-    final Token<DelegationTokenIdentifier> token =
-        getDelegationToken(fs, "JobTracker");
-
-    UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test");
-    
-    URI haUri = new URI("hdfs://my-ha-uri/");
-    token.setService(HAUtilClient.buildTokenServiceForLogicalUri(haUri,
-                                                                 HdfsConstants.HDFS_URI_SCHEME));
-    ugi.addToken(token);
-
-    Collection<InetSocketAddress> nnAddrs = new HashSet<InetSocketAddress>();
-    nnAddrs.add(new InetSocketAddress("localhost",
-      nn0.getNameNodeAddress().getPort()));
-    nnAddrs.add(new InetSocketAddress("localhost",
-      nn1.getNameNodeAddress().getPort()));
-    HAUtilClient.cloneDelegationTokenForLogicalUri(ugi, haUri, nnAddrs);
-    
-    Collection<Token<? extends TokenIdentifier>> tokens = ugi.getTokens();
-    assertEquals(3, tokens.size());
-    
-    LOG.info("Tokens:\n" + Joiner.on("\n").join(tokens));
-    DelegationTokenSelector dts = new DelegationTokenSelector();
-    
-    // check that the token selected for one of the physical IPC addresses
-    // matches the one we received
-    for (InetSocketAddress addr : nnAddrs) {
-      Text ipcDtService = SecurityUtil.buildTokenService(addr);
-      Token<DelegationTokenIdentifier> token2 =
-          dts.selectToken(ipcDtService, ugi.getTokens());
-      assertNotNull(token2);
-      assertArrayEquals(token.getIdentifier(), token2.getIdentifier());
-      assertArrayEquals(token.getPassword(), token2.getPassword());
-    }
-    
-    // switch to host-based tokens, shouldn't match existing tokens 
-    SecurityUtilTestHelper.setTokenServiceUseIp(false);
-    for (InetSocketAddress addr : nnAddrs) {
-      Text ipcDtService = SecurityUtil.buildTokenService(addr);
-      Token<DelegationTokenIdentifier> token2 =
-          dts.selectToken(ipcDtService, ugi.getTokens());
-      assertNull(token2);
-    }
-    
-    // reclone the tokens, and see if they match now
-    HAUtilClient.cloneDelegationTokenForLogicalUri(ugi, haUri, nnAddrs);
-    for (InetSocketAddress addr : nnAddrs) {
-      Text ipcDtService = SecurityUtil.buildTokenService(addr);
-      Token<DelegationTokenIdentifier> token2 =
-          dts.selectToken(ipcDtService, ugi.getTokens());
-      assertNotNull(token2);
-      assertArrayEquals(token.getIdentifier(), token2.getIdentifier());
-      assertArrayEquals(token.getPassword(), token2.getPassword());
-    }    
-  }
-
-  /**
-   * HDFS-3062: DistributedFileSystem.getCanonicalServiceName() throws an
-   * exception if the URI is a logical URI. This bug fails the combination of
-   * ha + mapred + security.
-   */
-  @Test(timeout = 300000)
-  public void testDFSGetCanonicalServiceName() throws Exception {
-    URI hAUri = HATestUtil.getLogicalUri(cluster);
-    String haService = HAUtilClient.buildTokenServiceForLogicalUri(hAUri,
-                                                                   HdfsConstants.HDFS_URI_SCHEME).toString();
-    assertEquals(haService, dfs.getCanonicalServiceName());
-    final String renewer = UserGroupInformation.getCurrentUser().getShortUserName();
-    final Token<DelegationTokenIdentifier> token =
-        getDelegationToken(dfs, renewer);
-    assertEquals(haService, token.getService().toString());
-    // make sure the logical uri is handled correctly
-    token.renew(dfs.getConf());
-    token.cancel(dfs.getConf());
-  }
-
-  @Test(timeout = 300000)
-  public void testHdfsGetCanonicalServiceName() throws Exception {
-    Configuration conf = dfs.getConf();
-    URI haUri = HATestUtil.getLogicalUri(cluster);
-    AbstractFileSystem afs =  AbstractFileSystem.createFileSystem(haUri, conf);    
-    String haService = HAUtilClient.buildTokenServiceForLogicalUri(haUri,
-                                                                   HdfsConstants.HDFS_URI_SCHEME).toString();
-    assertEquals(haService, afs.getCanonicalServiceName());
-    Token<?> token = afs.getDelegationTokens(
-        UserGroupInformation.getCurrentUser().getShortUserName()).get(0);
-    assertEquals(haService, token.getService().toString());
-    // make sure the logical uri is handled correctly
-    token.renew(conf);
-    token.cancel(conf);
-  }
-
-  @Test(timeout = 300000)
-  public void testCancelAndUpdateDelegationTokens() throws Exception {
-    // Create UGI with token1
-    String user = UserGroupInformation.getCurrentUser().getShortUserName();
-    UserGroupInformation ugi1 = UserGroupInformation.createRemoteUser(user);
-
-    ugi1.doAs(new PrivilegedExceptionAction<Void>() {
-      public Void run() throws Exception {
-        final Token<DelegationTokenIdentifier> token1 =
-            getDelegationToken(fs, "JobTracker");
-        UserGroupInformation.getCurrentUser()
-            .addToken(token1.getService(), token1);
-
-        FileSystem fs1 = HATestUtil.configureFailoverFs(cluster, conf);
-
-        // Cancel token1
-        doRenewOrCancel(token1, conf, TokenTestAction.CANCEL);
-
-        // Update UGI with token2
-        final Token<DelegationTokenIdentifier> token2 =
-            getDelegationToken(fs, "JobTracker");
-        UserGroupInformation.getCurrentUser()
-            .addToken(token2.getService(), token2);
-
-        // Check whether token2 works
-        fs1.listFiles(new Path("/"), false);
-        return null;
-      }
-    });
-  }
-
-  @SuppressWarnings("unchecked")
-  private Token<DelegationTokenIdentifier> getDelegationToken(FileSystem fs,
-      String renewer) throws IOException {
-    final Token<?> tokens[] = fs.addDelegationTokens(renewer, null);
-    assertEquals(1, tokens.length);
-    return (Token<DelegationTokenIdentifier>) tokens[0];
-  }
-  enum TokenTestAction {
-    RENEW, CANCEL;
-  }
-  
-  private static void doRenewOrCancel(
-      final Token<DelegationTokenIdentifier> token, final Configuration conf,
-      final TokenTestAction action)
-      throws IOException, InterruptedException {
-    UserGroupInformation.createRemoteUser("JobTracker").doAs(
-        new PrivilegedExceptionAction<Void>() {
-          @Override
-          public Void run() throws Exception {
-            switch (action) {
-            case RENEW:
-              token.renew(conf);
-              break;
-            case CANCEL:
-              token.cancel(conf);
-              break;
-            default:
-              fail("bad action:" + action);
+            @Override
+            public Void run() throws Exception {
+                // try renew with long name
+                token.renew(conf);
+                return null;
             }
-            return null;
-          }
         });
-  }
+        shortUgi.doAs(new PrivilegedExceptionAction<Void>() {
+
+            @Override
+            public Void run() throws Exception {
+                token.renew(conf);
+                return null;
+            }
+        });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        longUgi.doAs(new PrivilegedExceptionAction<Void>() {
+
+            @Override
+            public Void run() throws Exception {
+                token.cancel(conf);
+                ;
+                return null;
+            }
+        });
+    }
+
+    @Test
+    public void testHAUtilClonesDelegationTokens() throws Exception {
+        final Token<DelegationTokenIdentifier> token = getDelegationToken(fs, "JobTracker");
+        UserGroupInformation ugi = UserGroupInformation.createRemoteUser("test");
+        URI haUri = new URI("hdfs://my-ha-uri/");
+        token.setService(HAUtilClient.buildTokenServiceForLogicalUri(haUri, HdfsConstants.HDFS_URI_SCHEME));
+        ugi.addToken(token);
+        Collection<InetSocketAddress> nnAddrs = new HashSet<InetSocketAddress>();
+        nnAddrs.add(new InetSocketAddress("localhost", nn0.getNameNodeAddress().getPort()));
+        nnAddrs.add(new InetSocketAddress("localhost", nn1.getNameNodeAddress().getPort()));
+        HAUtilClient.cloneDelegationTokenForLogicalUri(ugi, haUri, nnAddrs);
+        Collection<Token<? extends TokenIdentifier>> tokens = ugi.getTokens();
+        assertEquals(3, tokens.size());
+        LOG.info("Tokens:\n" + Joiner.on("\n").join(tokens));
+        DelegationTokenSelector dts = new DelegationTokenSelector();
+        // check that the token selected for one of the physical IPC addresses
+        // matches the one we received
+        for (InetSocketAddress addr : nnAddrs) {
+            Text ipcDtService = SecurityUtil.buildTokenService(addr);
+            Token<DelegationTokenIdentifier> token2 = dts.selectToken(ipcDtService, ugi.getTokens());
+            assertNotNull(token2);
+            assertArrayEquals(token.getIdentifier(), token2.getIdentifier());
+            assertArrayEquals(token.getPassword(), token2.getPassword());
+        }
+        // switch to host-based tokens, shouldn't match existing tokens
+        SecurityUtilTestHelper.setTokenServiceUseIp(false);
+        for (InetSocketAddress addr : nnAddrs) {
+            Text ipcDtService = SecurityUtil.buildTokenService(addr);
+            Token<DelegationTokenIdentifier> token2 = dts.selectToken(ipcDtService, ugi.getTokens());
+            assertNull(token2);
+        }
+        // reclone the tokens, and see if they match now
+        HAUtilClient.cloneDelegationTokenForLogicalUri(ugi, haUri, nnAddrs);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (InetSocketAddress addr : nnAddrs) {
+            Text ipcDtService = SecurityUtil.buildTokenService(addr);
+            Token<DelegationTokenIdentifier> token2 = dts.selectToken(ipcDtService, ugi.getTokens());
+            assertNotNull(token2);
+            assertArrayEquals(token.getIdentifier(), token2.getIdentifier());
+            assertArrayEquals(token.getPassword(), token2.getPassword());
+        }
+    }
+
+    /**
+     * HDFS-3062: DistributedFileSystem.getCanonicalServiceName() throws an
+     * exception if the URI is a logical URI. This bug fails the combination of
+     * ha + mapred + security.
+     */
+    @Test
+    public void testDFSGetCanonicalServiceName() throws Exception {
+        URI hAUri = HATestUtil.getLogicalUri(cluster);
+        String haService = HAUtilClient.buildTokenServiceForLogicalUri(hAUri, HdfsConstants.HDFS_URI_SCHEME).toString();
+        assertEquals(haService, dfs.getCanonicalServiceName());
+        final String renewer = UserGroupInformation.getCurrentUser().getShortUserName();
+        final Token<DelegationTokenIdentifier> token = getDelegationToken(dfs, renewer);
+        assertEquals(haService, token.getService().toString());
+        // make sure the logical uri is handled correctly
+        token.renew(dfs.getConf());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        token.cancel(dfs.getConf());
+    }
+
+    @Test
+    public void testHdfsGetCanonicalServiceName() throws Exception {
+        Configuration conf = dfs.getConf();
+        URI haUri = HATestUtil.getLogicalUri(cluster);
+        AbstractFileSystem afs = AbstractFileSystem.createFileSystem(haUri, conf);
+        String haService = HAUtilClient.buildTokenServiceForLogicalUri(haUri, HdfsConstants.HDFS_URI_SCHEME).toString();
+        assertEquals(haService, afs.getCanonicalServiceName());
+        Token<?> token = afs.getDelegationTokens(UserGroupInformation.getCurrentUser().getShortUserName()).get(0);
+        assertEquals(haService, token.getService().toString());
+        // make sure the logical uri is handled correctly
+        token.renew(conf);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        token.cancel(conf);
+    }
+
+    @Test
+    public void testCancelAndUpdateDelegationTokens() throws Exception {
+        // Create UGI with token1
+        String user = UserGroupInformation.getCurrentUser().getShortUserName();
+        UserGroupInformation ugi1 = UserGroupInformation.createRemoteUser(user);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        ugi1.doAs(new PrivilegedExceptionAction<Void>() {
+
+            public Void run() throws Exception {
+                final Token<DelegationTokenIdentifier> token1 = getDelegationToken(fs, "JobTracker");
+                UserGroupInformation.getCurrentUser().addToken(token1.getService(), token1);
+                FileSystem fs1 = HATestUtil.configureFailoverFs(cluster, conf);
+                // Cancel token1
+                doRenewOrCancel(token1, conf, TokenTestAction.CANCEL);
+                // Update UGI with token2
+                final Token<DelegationTokenIdentifier> token2 = getDelegationToken(fs, "JobTracker");
+                UserGroupInformation.getCurrentUser().addToken(token2.getService(), token2);
+                // Check whether token2 works
+                fs1.listFiles(new Path("/"), false);
+                return null;
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Token<DelegationTokenIdentifier> getDelegationToken(FileSystem fs, String renewer) throws IOException {
+        final Token<?>[] tokens = fs.addDelegationTokens(renewer, null);
+        assertEquals(1, tokens.length);
+        return (Token<DelegationTokenIdentifier>) tokens[0];
+    }
+
+    enum TokenTestAction {
+
+        RENEW, CANCEL
+    }
+
+    private static void doRenewOrCancel(final Token<DelegationTokenIdentifier> token, final Configuration conf, final TokenTestAction action) throws IOException, InterruptedException {
+        UserGroupInformation.createRemoteUser("JobTracker").doAs(new PrivilegedExceptionAction<Void>() {
+
+            @Override
+            public Void run() throws Exception {
+                switch(action) {
+                    case RENEW:
+                        token.renew(conf);
+                        break;
+                    case CANCEL:
+                        token.cancel(conf);
+                        break;
+                    default:
+                        fail("bad action:" + action);
+                }
+                return null;
+            }
+        });
+    }
 }

@@ -23,9 +23,7 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HA_NN_NOT_BECOME_ACTIVE_I
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.HealthCheckFailedException;
@@ -44,72 +42,60 @@ import org.junit.Test;
 
 public class TestNNHealthCheck {
 
-  private MiniDFSClusterInJVM cluster;
-  private Configuration conf;
+    private MiniDFSClusterInJVM cluster;
 
-  @Before
-  public void setup() {
-    conf = new Configuration();
-  }
+    private Configuration conf;
 
-  @After
-  public void shutdown() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    @Before
+    public void setup() {
+        conf = new Configuration();
     }
-  }
 
-  @Test
-  public void testNNHealthCheck() throws IOException {
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(0)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .build();
-    doNNHealthCheckTest();
-  }
+    @After
+    public void shutdown() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-  @Test
-  public void testNNHealthCheckWithLifelineAddress() throws IOException {
-    conf.set(DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY, "0.0.0.0:0");
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-          .numDataNodes(0)
-          .nnTopology(MiniDFSNNTopology.simpleHATopology())
-          .build();
-    doNNHealthCheckTest();
-  }
+    @Test
+    public void testNNHealthCheck() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        doNNHealthCheckTest();
+    }
 
-  @Test
-  public void testNNHealthCheckWithSafemodeAsUnhealthy() throws Exception {
-    conf.setBoolean(DFS_HA_NN_NOT_BECOME_ACTIVE_IN_SAFEMODE, true);
+    @Test
+    public void testNNHealthCheckWithLifelineAddress() throws IOException {
+        conf.set(DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        doNNHealthCheckTest();
+    }
 
-    // now bring up just the NameNode.
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
-    cluster.waitActive();
+    @Test
+    public void testNNHealthCheckWithSafemodeAsUnhealthy() throws Exception {
+        conf.setBoolean(DFS_HA_NN_NOT_BECOME_ACTIVE_IN_SAFEMODE, true);
+        // now bring up just the NameNode.
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        cluster.waitActive();
+        // manually set safemode.
+        cluster.getFileSystem(0).setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
+        NNHAServiceTarget haTarget = new NNHAServiceTarget(conf, DFSUtil.getNamenodeNameServiceId(conf), "nn1");
+        final String expectedTargetString = haTarget.getAddress().toString();
+        assertTrue("Expected haTarget " + haTarget + " containing " + expectedTargetString, haTarget.toString().contains(expectedTargetString));
+        HAServiceProtocol rpc = haTarget.getHealthMonitorProxy(conf, 5000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        LambdaTestUtils.intercept(RemoteException.class, "The NameNode is configured to report UNHEALTHY to ZKFC in Safemode.", () -> rpc.monitorHealth());
+    }
 
-    // manually set safemode.
-    cluster.getFileSystem(0)
-        .setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
-
-    NNHAServiceTarget haTarget = new NNHAServiceTarget(conf,
-        DFSUtil.getNamenodeNameServiceId(conf), "nn1");
-    final String expectedTargetString = haTarget.getAddress().toString();
-
-    assertTrue("Expected haTarget " + haTarget + " containing " +
-            expectedTargetString,
-        haTarget.toString().contains(expectedTargetString));
-    HAServiceProtocol rpc = haTarget.getHealthMonitorProxy(conf, 5000);
-
-    LambdaTestUtils.intercept(RemoteException.class,
-        "The NameNode is configured to report UNHEALTHY to ZKFC in Safemode.",
-        () -> rpc.monitorHealth());
-  }
-
-  private void doNNHealthCheckTest() throws IOException {
-    MockNameNodeResourceChecker mockResourceChecker =
-        new MockNameNodeResourceChecker(conf);
-    /*
+    private void doNNHealthCheckTest() throws IOException {
+        MockNameNodeResourceChecker mockResourceChecker = new MockNameNodeResourceChecker(conf);
+        /*
     cluster.getNameNode(0).getNamesystem()
         .setNNResourceChecker(mockResourceChecker);
 
@@ -146,5 +132,5 @@ public class TestNNHealthCheck {
           re.unwrapRemoteException(HealthCheckFailedException.class));
     }
      */
-  }
+    }
 }
