@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import org.apache.hadoop.conf.Configuration;
@@ -54,7 +53,6 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -67,7 +65,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SIZE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY;
@@ -85,139 +82,111 @@ import static org.mockito.Mockito.when;
  */
 public class TestBlockRecovery2 {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(TestBlockRecovery2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestBlockRecovery2.class);
 
-  private static final String DATA_DIR =
-      MiniDFSClusterInJVM.getBaseDirectory() + "data";
+    private static final String DATA_DIR = MiniDFSClusterInJVM.getBaseDirectory() + "data";
 
-  private DataNode dn;
-  private Configuration conf;
-  private boolean tearDownDone;
+    private DataNode dn;
 
-  private final static String CLUSTER_ID = "testClusterID";
-  private final static String POOL_ID = "BP-TEST";
-  private final static InetSocketAddress NN_ADDR = new InetSocketAddress(
-      "localhost", 5020);
+    private Configuration conf;
 
-  @Rule
-  public TestName currentTestName = new TestName();
+    private boolean tearDownDone;
 
-  static {
-    GenericTestUtils.setLogLevel(FSNamesystem.LOG, Level.TRACE);
-    GenericTestUtils.setLogLevel(LOG, Level.TRACE);
-  }
+    private final static String CLUSTER_ID = "testClusterID";
 
-  /**
-   * Starts an instance of DataNode.
-   * @throws IOException
-   */
-  @Before
-  public void startUp() throws IOException {
-    tearDownDone = false;
-    conf = new HdfsConfiguration();
-    conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, DATA_DIR);
-    conf.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
-    conf.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
-    conf.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
-    conf.setInt(CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 0);
-    FileSystem.setDefaultUri(conf,
-        "hdfs://" + NN_ADDR.getHostName() + ":" + NN_ADDR.getPort());
-    List<StorageLocation> locations = new ArrayList<>();
-    File dataDir = new File(DATA_DIR);
-    FileUtil.fullyDelete(dataDir);
-    dataDir.mkdirs();
-    StorageLocation location = StorageLocation.parse(dataDir.getPath());
-    locations.add(location);
-    final DatanodeProtocolClientSideTranslatorPB namenode =
-        mock(DatanodeProtocolClientSideTranslatorPB.class);
+    private final static String POOL_ID = "BP-TEST";
 
-    Mockito.doAnswer(
-        (Answer<DatanodeRegistration>) invocation ->
-            (DatanodeRegistration) invocation.getArguments()[0])
-        .when(namenode)
-        .registerDatanode(Mockito.any(DatanodeRegistration.class));
+    private final static InetSocketAddress NN_ADDR = new InetSocketAddress("localhost", 5020);
 
-    when(namenode.versionRequest())
-        .thenReturn(new NamespaceInfo(1, CLUSTER_ID, POOL_ID, 1L));
+    @Rule
+    public TestName currentTestName = new TestName();
 
-    when(namenode.sendHeartbeat(
-        Mockito.any(),
-        Mockito.any(),
-        Mockito.anyLong(),
-        Mockito.anyLong(),
-        Mockito.anyInt(),
-        Mockito.anyInt(),
-        Mockito.anyInt(),
-        Mockito.any(),
-        Mockito.anyBoolean(),
-        Mockito.any(),
-        Mockito.any()))
-        .thenReturn(new HeartbeatResponse(
-            new DatanodeCommand[0],
-            new NNHAStatusHeartbeat(HAServiceProtocol.HAServiceState.ACTIVE, 1),
-            null, ThreadLocalRandom.current().nextLong() | 1L));
-
-    dn = new DataNode(conf, locations, null, null) {
-      @Override
-      DatanodeProtocolClientSideTranslatorPB connectToNN(
-          InetSocketAddress nnAddr) throws IOException {
-        Assert.assertEquals(NN_ADDR, nnAddr);
-        return namenode;
-      }
-    };
-    // Trigger a heartbeat so that it acknowledges the NN as active.
-    dn.getAllBpOs().get(0).triggerHeartbeatForTests();
-    waitForActiveNN();
-  }
-
-  /**
-   * Wait for active NN up to 15 seconds.
-   */
-  private void waitForActiveNN() {
-    try {
-      GenericTestUtils.waitFor(() ->
-          dn.getAllBpOs().get(0).getActiveNN() != null, 1000, 15 * 1000);
-    } catch (TimeoutException e) {
-      // Here its not failing, will again do the assertions for activeNN after
-      // this waiting period and fails there if BPOS has not acknowledged
-      // any NN as active.
-      LOG.warn("Failed to get active NN", e);
-    } catch (InterruptedException e) {
-      LOG.warn("InterruptedException while waiting to see active NN", e);
+    static {
+        GenericTestUtils.setLogLevel(FSNamesystem.LOG, Level.TRACE);
+        GenericTestUtils.setLogLevel(LOG, Level.TRACE);
     }
-    Assert.assertNotNull("Failed to get ActiveNN",
-        dn.getAllBpOs().get(0).getActiveNN());
-  }
 
-  /**
-   * Cleans the resources and closes the instance of datanode.
-   * @throws IOException if an error occurred
-   */
-  @After
-  public void tearDown() throws IOException {
-    if (!tearDownDone && dn != null) {
-      try {
-        dn.shutdown();
-      } catch(Exception e) {
-        LOG.error("Cannot close: ", e);
-      } finally {
-        File dir = new File(DATA_DIR);
-        if (dir.exists()) {
-          Assert.assertTrue(
-              "Cannot delete data-node dirs", FileUtil.fullyDelete(dir));
+    /**
+     * Starts an instance of DataNode.
+     * @throws IOException
+     */
+    @Before
+    public void startUp() throws IOException {
+        tearDownDone = false;
+        conf = new HdfsConfiguration();
+        conf.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, DATA_DIR);
+        conf.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        conf.setInt(CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 0);
+        FileSystem.setDefaultUri(conf, "hdfs://" + NN_ADDR.getHostName() + ":" + NN_ADDR.getPort());
+        List<StorageLocation> locations = new ArrayList<>();
+        File dataDir = new File(DATA_DIR);
+        FileUtil.fullyDelete(dataDir);
+        dataDir.mkdirs();
+        StorageLocation location = StorageLocation.parse(dataDir.getPath());
+        locations.add(location);
+        final DatanodeProtocolClientSideTranslatorPB namenode = mock(DatanodeProtocolClientSideTranslatorPB.class);
+        Mockito.doAnswer((Answer<DatanodeRegistration>) invocation -> (DatanodeRegistration) invocation.getArguments()[0]).when(namenode).registerDatanode(Mockito.any(DatanodeRegistration.class));
+        when(namenode.versionRequest()).thenReturn(new NamespaceInfo(1, CLUSTER_ID, POOL_ID, 1L));
+        when(namenode.sendHeartbeat(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(), Mockito.any())).thenReturn(new HeartbeatResponse(new DatanodeCommand[0], new NNHAStatusHeartbeat(HAServiceProtocol.HAServiceState.ACTIVE, 1), null, ThreadLocalRandom.current().nextLong() | 1L));
+        dn = new DataNode(conf, locations, null, null) {
+
+            @Override
+            DatanodeProtocolClientSideTranslatorPB connectToNN(InetSocketAddress nnAddr) throws IOException {
+                Assert.assertEquals(NN_ADDR, nnAddr);
+                return namenode;
+            }
+        };
+        // Trigger a heartbeat so that it acknowledges the NN as active.
+        dn.getAllBpOs().get(0).triggerHeartbeatForTests();
+        waitForActiveNN();
+    }
+
+    /**
+     * Wait for active NN up to 15 seconds.
+     */
+    private void waitForActiveNN() {
+        try {
+            GenericTestUtils.waitFor(() -> dn.getAllBpOs().get(0).getActiveNN() != null, 1000, 15 * 1000);
+        } catch (TimeoutException e) {
+            // Here its not failing, will again do the assertions for activeNN after
+            // this waiting period and fails there if BPOS has not acknowledged
+            // any NN as active.
+            LOG.warn("Failed to get active NN", e);
+        } catch (InterruptedException e) {
+            LOG.warn("InterruptedException while waiting to see active NN", e);
         }
-      }
-      tearDownDone = true;
+        Assert.assertNotNull("Failed to get ActiveNN", dn.getAllBpOs().get(0).getActiveNN());
     }
-  }
 
-  /**
-   * Test to verify the race between finalizeBlock and Lease recovery.
-   *
-   * @throws Exception
-   */
-  /*
+    /**
+     * Cleans the resources and closes the instance of datanode.
+     * @throws IOException if an error occurred
+     */
+    @After
+    public void tearDown() throws IOException {
+        if (!tearDownDone && dn != null) {
+            try {
+                dn.shutdown();
+            } catch (Exception e) {
+                LOG.error("Cannot close: ", e);
+            } finally {
+                File dir = new File(DATA_DIR);
+                if (dir.exists()) {
+                    Assert.assertTrue("Cannot delete data-node dirs", FileUtil.fullyDelete(dir));
+                }
+            }
+            tearDownDone = true;
+        }
+    }
+
+    /**
+     * Test to verify the race between finalizeBlock and Lease recovery.
+     *
+     * @throws Exception
+     */
+    /*
   @Test(timeout = 20000)
   public void testRaceBetweenReplicaRecoveryAndFinalizeBlock()
       throws Exception {
@@ -279,60 +248,58 @@ public class TestBlockRecovery2 {
     }
   }
    */
+    /**
+     * Test for block recovery timeout. All recovery attempts will be delayed
+     * and the first attempt will be lost to trigger recovery timeout and retry.
+     */
+    @Test(timeout = 300000L)
+    public void testRecoveryTimeout() throws Exception {
+        // Stop the Mocked DN started in startup()
+        tearDown();
+        final Random r = new Random();
+        // Make sure first commitBlockSynchronization call from the DN gets lost
+        // for the recovery timeout to expire and new recovery attempt
+        // to be started.
+        GenericTestUtils.SleepAnswer delayer = new GenericTestUtils.SleepAnswer(3000) {
 
-  /**
-   * Test for block recovery timeout. All recovery attempts will be delayed
-   * and the first attempt will be lost to trigger recovery timeout and retry.
-   */
-  @Test(timeout = 300000L)
-  public void testRecoveryTimeout() throws Exception {
-    tearDown(); // Stop the Mocked DN started in startup()
-    final Random r = new Random();
+            private final AtomicBoolean callRealMethod = new AtomicBoolean();
 
-    // Make sure first commitBlockSynchronization call from the DN gets lost
-    // for the recovery timeout to expire and new recovery attempt
-    // to be started.
-    GenericTestUtils.SleepAnswer delayer =
-        new GenericTestUtils.SleepAnswer(3000) {
-      private final AtomicBoolean callRealMethod = new AtomicBoolean();
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                boolean interrupted = false;
+                try {
+                    Thread.sleep(r.nextInt(3000) + 6000);
+                } catch (InterruptedException ie) {
+                    interrupted = true;
+                }
+                try {
+                    if (callRealMethod.get()) {
+                        return invocation.callRealMethod();
+                    }
+                    callRealMethod.set(true);
+                    return null;
+                } finally {
+                    if (interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        };
+        TestBlockRecovery.testRecoveryWithDatanodeDelayed(delayer);
+    }
 
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        boolean interrupted = false;
-        try {
-          Thread.sleep(r.nextInt(3000) + 6000);
-        } catch (InterruptedException ie) {
-          interrupted = true;
-        }
-        try {
-          if (callRealMethod.get()) {
-            return invocation.callRealMethod();
-          }
-          callRealMethod.set(true);
-          return null;
-        } finally {
-          if (interrupted) {
-            Thread.currentThread().interrupt();
-          }
-        }
-      }
-    };
-    TestBlockRecovery.testRecoveryWithDatanodeDelayed(delayer);
-  }
+    /**
+     * Test for block recovery taking longer than the heartbeat interval.
+     */
+    @Test(timeout = 300000L)
+    public void testRecoverySlowerThanHeartbeat() throws Exception {
+        // Stop the Mocked DN started in startup()
+        tearDown();
+        GenericTestUtils.SleepAnswer delayer = new GenericTestUtils.SleepAnswer(3000, 6000);
+        TestBlockRecovery.testRecoveryWithDatanodeDelayed(delayer);
+    }
 
-  /**
-   * Test for block recovery taking longer than the heartbeat interval.
-   */
-  @Test(timeout = 300000L)
-  public void testRecoverySlowerThanHeartbeat() throws Exception {
-    tearDown(); // Stop the Mocked DN started in startup()
-
-    GenericTestUtils.SleepAnswer delayer =
-        new GenericTestUtils.SleepAnswer(3000, 6000);
-    TestBlockRecovery.testRecoveryWithDatanodeDelayed(delayer);
-  }
-
-  /*
+    /*
   @Test(timeout = 60000)
   public void testEcRecoverBlocks() throws Throwable {
     // Stop the Mocked DN started in startup()
@@ -387,77 +354,63 @@ public class TestBlockRecovery2 {
     }
   }
    */
-
-  /**
-   * Test that block will be recovered even if there are less than the
-   * specified minReplication datanodes involved in its recovery.
-   *
-   * Check that, after recovering, the block will be successfully replicated.
-   */
-  @Test(timeout = 300000L)
-  public void testRecoveryWillIgnoreMinReplication() throws Exception {
-    tearDown(); // Stop the Mocked DN started in startup()
-
-    final int blockSize = 4096;
-    final int numReplicas = 3;
-    final String filename = "/testIgnoreMinReplication";
-    final Path filePath = new Path(filename);
-    Configuration configuration = new HdfsConfiguration();
-    configuration.setInt(DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 2000);
-    configuration.setInt(DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
-    configuration.setLong(DFS_BLOCK_SIZE_KEY, blockSize);
-    MiniDFSClusterInJVM cluster = null;
-
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(configuration).numDataNodes(5)
-          .build();
-      cluster.waitActive();
-      final DistributedFileSystem dfs = cluster.getFileSystem();
-      final FSNamesystemJVMInterface fsn = cluster.getNamesystem();
-
-      // Create a file and never close the output stream to trigger recovery
-      FSDataOutputStream out = dfs.create(filePath, (short) numReplicas);
-      out.write(AppendTestUtil.randomBytes(0, blockSize));
-      out.hsync();
-
-      DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost",
-          cluster.getNameNodePort()), configuration);
-      LocatedBlock blk = dfsClient.getNamenode().
-          getBlockLocations(filename, 0, blockSize).
-          getLastLocatedBlock();
-
-      // Kill 2 out of 3 datanodes so that only 1 alive, thus < minReplication
-      List<DatanodeInfo> dataNodes = Arrays.asList(blk.getLocations());
-      assertEquals(dataNodes.size(), numReplicas);
-      for (DatanodeInfo dataNode : dataNodes.subList(0, numReplicas - 1)) {
-        cluster.stopDataNode(dataNode.getName());
-      }
-
-      GenericTestUtils.waitFor(() -> fsn.getNumDeadDataNodes() == 2,
-          300, 300000);
-
-      // Make sure hard lease expires to trigger replica recovery
-      cluster.setLeasePeriod(100L, 100L);
-
-      // Wait for recovery to succeed
-      GenericTestUtils.waitFor(() -> {
+    /**
+     * Test that block will be recovered even if there are less than the
+     * specified minReplication datanodes involved in its recovery.
+     *
+     * Check that, after recovering, the block will be successfully replicated.
+     */
+    @Test
+    public void testRecoveryWillIgnoreMinReplication() throws Exception {
+        // Stop the Mocked DN started in startup()
+        tearDown();
+        final int blockSize = 4096;
+        final int numReplicas = 3;
+        final String filename = "/testIgnoreMinReplication";
+        final Path filePath = new Path(filename);
+        Configuration configuration = new HdfsConfiguration();
+        configuration.setInt(DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 2000);
+        configuration.setInt(DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
+        configuration.setLong(DFS_BLOCK_SIZE_KEY, blockSize);
+        MiniDFSClusterInJVM cluster = null;
         try {
-          return dfs.isFileClosed(filePath);
-        } catch (IOException e) {
-          LOG.info("Something went wrong.", e);
+            cluster = new MiniDFSClusterInJVM.Builder(configuration).numDataNodes(5).build();
+            cluster.waitActive();
+            final DistributedFileSystem dfs = cluster.getFileSystem();
+            final FSNamesystemJVMInterface fsn = cluster.getNamesystem();
+            // Create a file and never close the output stream to trigger recovery
+            FSDataOutputStream out = dfs.create(filePath, (short) numReplicas);
+            out.write(AppendTestUtil.randomBytes(0, blockSize));
+            out.hsync();
+            DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost", cluster.getNameNodePort()), configuration);
+            LocatedBlock blk = dfsClient.getNamenode().getBlockLocations(filename, 0, blockSize).getLastLocatedBlock();
+            // Kill 2 out of 3 datanodes so that only 1 alive, thus < minReplication
+            List<DatanodeInfo> dataNodes = Arrays.asList(blk.getLocations());
+            assertEquals(dataNodes.size(), numReplicas);
+            for (DatanodeInfo dataNode : dataNodes.subList(0, numReplicas - 1)) {
+                cluster.stopDataNode(dataNode.getName());
+            }
+            GenericTestUtils.waitFor(() -> fsn.getNumDeadDataNodes() == 2, 300, 300000);
+            // Make sure hard lease expires to trigger replica recovery
+            cluster.setLeasePeriod(100L, 100L);
+            // Wait for the block to be replicated
+            //DFSTestUtil.waitForReplication(cluster, DFSTestUtil.getFirstBlock(
+            //  dfs, filePath), 1, numReplicas, 0);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // Wait for recovery to succeed
+            GenericTestUtils.waitFor(() -> {
+                try {
+                    return dfs.isFileClosed(filePath);
+                } catch (IOException e) {
+                    LOG.info("Something went wrong.", e);
+                }
+                return false;
+            }, 300, 300000);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-        return false;
-      }, 300, 300000);
-
-      // Wait for the block to be replicated
-      //DFSTestUtil.waitForReplication(cluster, DFSTestUtil.getFirstBlock(
-        //  dfs, filePath), 1, numReplicas, 0);
-
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
-
 }

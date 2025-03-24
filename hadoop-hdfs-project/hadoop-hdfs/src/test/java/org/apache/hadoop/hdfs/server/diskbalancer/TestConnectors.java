@@ -14,7 +14,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.apache.hadoop.hdfs.server.diskbalancer;
 
 import org.apache.hadoop.conf.Configuration;
@@ -27,59 +26,57 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.io.IOException;
 
 /**
  * Test Class that tests connectors.
  */
 public class TestConnectors {
-  private MiniDFSClusterInJVM cluster;
-  private final int numDatanodes = 3;
-  private final int volumeCount = 2; // default volumes in MiniDFSClusterInJVM.
-  private Configuration conf;
 
-  @Before
-  public void setup() throws IOException {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(numDatanodes).build();
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  @After
-  public void teardown() {
-    if (cluster != null) {
-      cluster.shutdown();
+    private final int numDatanodes = 3;
+
+    // default volumes in MiniDFSClusterInJVM.
+    private final int volumeCount = 2;
+
+    private Configuration conf;
+
+    @Before
+    public void setup() throws IOException {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
     }
-  }
 
-  @Test
-  public void testNameNodeConnector() throws Exception {
-    cluster.waitActive();
-    ClusterConnector nameNodeConnector =
-        ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
-    DiskBalancerCluster diskBalancerCluster =
-        new DiskBalancerCluster(nameNodeConnector);
-    diskBalancerCluster.readClusterInfo();
-    Assert.assertEquals("Expected number of Datanodes not found.",
-        numDatanodes, diskBalancerCluster.getNodes().size());
-    Assert.assertEquals("Expected number of volumes not found.",
-        volumeCount, diskBalancerCluster.getNodes().get(0).getVolumeCount());
-  }
+    @After
+    public void teardown() {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
 
-  @Test
-  public void testJsonConnector() throws Exception {
-    cluster.waitActive();
-    ClusterConnector nameNodeConnector =
-        ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
-    DiskBalancerCluster diskBalancerCluster =
-        new DiskBalancerCluster(nameNodeConnector);
-    diskBalancerCluster.readClusterInfo();
-    String diskBalancerJson = diskBalancerCluster.toJson();
-    DiskBalancerCluster serializedCluster =
-        DiskBalancerCluster.parseJson(diskBalancerJson);
-    Assert.assertEquals("Parsed cluster is not equal to persisted info.",
-        diskBalancerCluster.getNodes().size(),
-        serializedCluster.getNodes().size());
-  }
+    @Test
+    public void testNameNodeConnector() throws Exception {
+        cluster.waitActive();
+        ClusterConnector nameNodeConnector = ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
+        DiskBalancerCluster diskBalancerCluster = new DiskBalancerCluster(nameNodeConnector);
+        diskBalancerCluster.readClusterInfo();
+        Assert.assertEquals("Expected number of Datanodes not found.", numDatanodes, diskBalancerCluster.getNodes().size());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals("Expected number of volumes not found.", volumeCount, diskBalancerCluster.getNodes().get(0).getVolumeCount());
+    }
+
+    @Test
+    public void testJsonConnector() throws Exception {
+        cluster.waitActive();
+        ClusterConnector nameNodeConnector = ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
+        DiskBalancerCluster diskBalancerCluster = new DiskBalancerCluster(nameNodeConnector);
+        diskBalancerCluster.readClusterInfo();
+        String diskBalancerJson = diskBalancerCluster.toJson();
+        DiskBalancerCluster serializedCluster = DiskBalancerCluster.parseJson(diskBalancerJson);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals("Parsed cluster is not equal to persisted info.", diskBalancerCluster.getNodes().size(), serializedCluster.getNodes().size());
+    }
 }

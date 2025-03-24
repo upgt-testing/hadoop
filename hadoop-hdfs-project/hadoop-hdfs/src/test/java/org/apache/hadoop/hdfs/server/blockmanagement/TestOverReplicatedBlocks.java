@@ -20,9 +20,7 @@ package org.apache.hadoop.hdfs.server.blockmanagement;
 import static org.apache.hadoop.util.Time.monotonicNow;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.File;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -47,64 +45,56 @@ import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
 import org.junit.Test;
 
 public class TestOverReplicatedBlocks {
-  /** Test processOverReplicatedBlock can handle corrupt replicas fine.
-   * It make sure that it won't treat corrupt replicas as valid ones 
-   * thus prevents NN deleting valid replicas but keeping
-   * corrupt ones.
-   */
-  @Test
-  public void testProcesOverReplicateBlock() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, 100L);
-    conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
-    conf.set(
-        DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY,
-        Integer.toString(2));
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-    FileSystem fs = cluster.getFileSystem();
 
-    try {
-      final Path fileName = new Path("/foo1");
-      DFSTestUtil.createFile(fs, fileName, 2, (short)3, 0L);
-      DFSTestUtil.waitReplication(fs, fileName, (short)3);
-      
-      // corrupt the block on datanode 0
-      ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
-      cluster.corruptReplica(0, block);
-      DataNodeProperties dnProps = cluster.stopDataNode(0);
-      // remove block scanner log to trigger block scanning
-      File scanCursor = new File(new File(MiniDFSClusterInJVM.getFinalizedDir(
-          cluster.getInstanceStorageDir(0, 0),
-          cluster.getNamesystem().getBlockPoolId()).getParent()).getParent(),
-          "scanner.cursor");
-      //wait for one minute for deletion to succeed;
-      for(int i = 0; !scanCursor.delete(); i++) {
-        assertTrue("Could not delete " + scanCursor.getAbsolutePath() +
-            " in one minute", i < 60);
+    /**
+     * Test processOverReplicatedBlock can handle corrupt replicas fine.
+     * It make sure that it won't treat corrupt replicas as valid ones
+     * thus prevents NN deleting valid replicas but keeping
+     * corrupt ones.
+     */
+    @Test
+    public void testProcesOverReplicateBlock() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, 100L);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
+        conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+        FileSystem fs = cluster.getFileSystem();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         try {
-          Thread.sleep(1000);
-        } catch (InterruptedException ignored) {}
-      }
-      
-      // restart the datanode so the corrupt replica will be detected
-      cluster.restartDataNode(dnProps);
-      DFSTestUtil.waitReplication(fs, fileName, (short)2);
-      
-      String blockPoolId = cluster.getNamesystem().getBlockPoolId();
-      final DatanodeIDJVMInterface corruptDataNode =
-        InternalDataNodeTestUtils.getDNRegistrationForBP(
-            cluster.getDataNodes().get(2), blockPoolId);
-         
-      final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
-      final BlockManagerJVMInterface bm = namesystem.getBlockManager();
-      final HeartbeatManagerJVMInterface hm = bm.getDatanodeManager().getHeartbeatManager();
-      try {
-        namesystem.writeLock();
-        synchronized(hm) {
-          // set live datanode's remaining space to be 0 
-          // so they will be chosen to be deleted when over-replication occurs
-          String corruptMachineName = corruptDataNode.getXferAddr();
-          /*
+            final Path fileName = new Path("/foo1");
+            DFSTestUtil.createFile(fs, fileName, 2, (short) 3, 0L);
+            DFSTestUtil.waitReplication(fs, fileName, (short) 3);
+            // corrupt the block on datanode 0
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
+            cluster.corruptReplica(0, block);
+            DataNodeProperties dnProps = cluster.stopDataNode(0);
+            // remove block scanner log to trigger block scanning
+            File scanCursor = new File(new File(MiniDFSClusterInJVM.getFinalizedDir(cluster.getInstanceStorageDir(0, 0), cluster.getNamesystem().getBlockPoolId()).getParent()).getParent(), "scanner.cursor");
+            //wait for one minute for deletion to succeed;
+            for (int i = 0; !scanCursor.delete(); i++) {
+                assertTrue("Could not delete " + scanCursor.getAbsolutePath() + " in one minute", i < 60);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
+            }
+            // restart the datanode so the corrupt replica will be detected
+            cluster.restartDataNode(dnProps);
+            DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+            String blockPoolId = cluster.getNamesystem().getBlockPoolId();
+            final DatanodeIDJVMInterface corruptDataNode = InternalDataNodeTestUtils.getDNRegistrationForBP(cluster.getDataNodes().get(2), blockPoolId);
+            final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+            final BlockManagerJVMInterface bm = namesystem.getBlockManager();
+            final HeartbeatManagerJVMInterface hm = bm.getDatanodeManager().getHeartbeatManager();
+            try {
+                namesystem.writeLock();
+                synchronized (hm) {
+                    // set live datanode's remaining space to be 0
+                    // so they will be chosen to be deleted when over-replication occurs
+                    String corruptMachineName = corruptDataNode.getXferAddr();
+                    /*
           for (DatanodeDescriptorJVMInterface datanode : hm.getDatanodes()) {
             if (!corruptMachineName.equals(datanode.getXferAddr())) {
               datanode.getStorageInfos()[0].setUtilizationForTesting(100L, 100L, 0, 100L);
@@ -122,61 +112,54 @@ public class TestOverReplicatedBlocks {
           assertEquals(1, bm.countNodes(
               bm.getStoredBlock(block.getLocalBlock())).liveReplicas());
            */
+                }
+            } finally {
+                namesystem.writeUnlock();
+            }
+        } finally {
+            cluster.shutdown();
         }
-      } finally {
-        namesystem.writeUnlock();
-      }
-      
-    } finally {
-      cluster.shutdown();
     }
-  }
 
-  static final long SMALL_BLOCK_SIZE =
-    DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_DEFAULT;
-  static final long SMALL_FILE_LENGTH = SMALL_BLOCK_SIZE * 4;
+    static final long SMALL_BLOCK_SIZE = DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_DEFAULT;
 
-  /**
-   * The test verifies that replica for deletion is chosen on a node,
-   * with the oldest heartbeat, when this heartbeat is larger than the
-   * tolerable heartbeat interval.
-   * It creates a file with several blocks and replication 4.
-   * The last DN is configured to send heartbeats rarely.
-   * 
-   * Test waits until the tolerable heartbeat interval expires, and reduces
-   * replication of the file. All replica deletions should be scheduled for the
-   * last node. No replicas will actually be deleted, since last DN doesn't
-   * send heartbeats. 
-   */
-  @Test
-  public void testChooseReplicaToDelete() throws Exception {
-    MiniDFSClusterInJVM cluster = null;
-    FileSystem fs = null;
-    try {
-      Configuration conf = new HdfsConfiguration();
-      conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, SMALL_BLOCK_SIZE);
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-      fs = cluster.getFileSystem();
-      final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
-      final BlockManagerJVMInterface bm = namesystem.getBlockManager();
+    static final long SMALL_FILE_LENGTH = SMALL_BLOCK_SIZE * 4;
 
-      conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 300);
-      cluster.startDataNodes(conf, 1, true, null, null, null);
-      DataNodeJVMInterface lastDN = cluster.getDataNodes().get(3);
-      DatanodeRegistrationJVMInterface dnReg = InternalDataNodeTestUtils.
-          getDNRegistrationForBP(lastDN, namesystem.getBlockPoolId());
-      String lastDNid = dnReg.getDatanodeUuid();
-
-      final Path fileName = new Path("/foo2");
-      DFSTestUtil.createFile(fs, fileName, SMALL_FILE_LENGTH, (short)4, 0L);
-      DFSTestUtil.waitReplication(fs, fileName, (short)4);
-
-      // Wait for tolerable number of heartbeats plus one
-      DatanodeDescriptor nodeInfo = null;
-      long lastHeartbeat = 0;
-      long waitTime = DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT * 1000 *
-        (DFSConfigKeys.DFS_NAMENODE_TOLERATE_HEARTBEAT_MULTIPLIER_DEFAULT + 1);
-      /*
+    /**
+     * The test verifies that replica for deletion is chosen on a node,
+     * with the oldest heartbeat, when this heartbeat is larger than the
+     * tolerable heartbeat interval.
+     * It creates a file with several blocks and replication 4.
+     * The last DN is configured to send heartbeats rarely.
+     *
+     * Test waits until the tolerable heartbeat interval expires, and reduces
+     * replication of the file. All replica deletions should be scheduled for the
+     * last node. No replicas will actually be deleted, since last DN doesn't
+     * send heartbeats.
+     */
+    @Test
+    public void testChooseReplicaToDelete() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        FileSystem fs = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, SMALL_BLOCK_SIZE);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            fs = cluster.getFileSystem();
+            final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+            final BlockManagerJVMInterface bm = namesystem.getBlockManager();
+            conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 300);
+            cluster.startDataNodes(conf, 1, true, null, null, null);
+            DataNodeJVMInterface lastDN = cluster.getDataNodes().get(3);
+            DatanodeRegistrationJVMInterface dnReg = InternalDataNodeTestUtils.getDNRegistrationForBP(lastDN, namesystem.getBlockPoolId());
+            String lastDNid = dnReg.getDatanodeUuid();
+            final Path fileName = new Path("/foo2");
+            DFSTestUtil.createFile(fs, fileName, SMALL_FILE_LENGTH, (short) 4, 0L);
+            DFSTestUtil.waitReplication(fs, fileName, (short) 4);
+            // Wait for tolerable number of heartbeats plus one
+            DatanodeDescriptor nodeInfo = null;
+            long lastHeartbeat = 0;
+            /*
       do {
         nodeInfo = bm.getDatanodeManager().getDatanode(dnReg);
         lastHeartbeat = nodeInfo.getLastUpdateMonotonic();
@@ -197,39 +180,44 @@ public class TestOverReplicatedBlocks {
         assertEquals("Block should still have 4 replicas",
             4, location.getNames().length);
        */
-    } finally {
-      if(fs != null) fs.close();
-      if(cluster != null) cluster.shutdown();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            long waitTime = DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT * 1000 * (DFSConfigKeys.DFS_NAMENODE_TOLERATE_HEARTBEAT_MULTIPLIER_DEFAULT + 1);
+        } finally {
+            if (fs != null)
+                fs.close();
+            if (cluster != null)
+                cluster.shutdown();
+        }
     }
-  }
 
-  /**
-   * Test over replicated block should get invalidated when decreasing the
-   * replication for a partial block.
-   */
-  @Test
-  public void testInvalidateOverReplicatedBlock() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3)
-        .build();
-    try {
-      final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
-      final BlockManagerJVMInterface bm = namesystem.getBlockManager();
-      FileSystem fs = cluster.getFileSystem();
-      Path p = new Path(MiniDFSClusterInJVM.getBaseDirectory(), "/foo1");
-      FSDataOutputStream out = fs.create(p, (short) 2);
-      out.writeBytes("HDFS-3119: " + p);
-      out.hsync();
-      fs.setReplication(p, (short) 1);
-      out.close();
-      ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, p);
-      /*
+    /**
+     * Test over replicated block should get invalidated when decreasing the
+     * replication for a partial block.
+     */
+    @Test
+    public void testInvalidateOverReplicatedBlock() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+            final BlockManagerJVMInterface bm = namesystem.getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            Path p = new Path(MiniDFSClusterInJVM.getBaseDirectory(), "/foo1");
+            FSDataOutputStream out = fs.create(p, (short) 2);
+            out.writeBytes("HDFS-3119: " + p);
+            out.hsync();
+            fs.setReplication(p, (short) 1);
+            out.close();
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, p);
+            /*
       assertEquals("Expected only one live replica for the block", 1, bm
           .countNodes(bm.getStoredBlock(block.getLocalBlock())).liveReplicas());
        */
-    } finally {
-      cluster.shutdown();
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 }
-
