@@ -25,12 +25,10 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -58,22 +56,26 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class TestLease {
-  static boolean hasLease(MiniDFSClusterInJVM cluster, Path src) {
-    //return NameNodeAdapter.getLeaseForPath(cluster.getNameNode(),
-      //      src.toString()) != null;
-    return true;
-  }
 
-  static int leaseCount(MiniDFSClusterInJVM cluster) {
-    return NameNodeAdapter.getLeaseManager(cluster.getNamesystem()).countLease();
-  }
-  
-  static final String dirString = "/test/lease";
-  final Path dir = new Path(dirString);
-  static final Logger LOG = LoggerFactory.getLogger(TestLease.class);
-  final Configuration conf = new HdfsConfiguration();
+    static boolean hasLease(MiniDFSClusterInJVM cluster, Path src) {
+        //return NameNodeAdapter.getLeaseForPath(cluster.getNameNode(),
+        //      src.toString()) != null;
+        return true;
+    }
 
-  /*
+    static int leaseCount(MiniDFSClusterInJVM cluster) {
+        return NameNodeAdapter.getLeaseManager(cluster.getNamesystem()).countLease();
+    }
+
+    static final String dirString = "/test/lease";
+
+    final Path dir = new Path(dirString);
+
+    static final Logger LOG = LoggerFactory.getLogger(TestLease.class);
+
+    final Configuration conf = new HdfsConfiguration();
+
+    /*
   @Test
   public void testLeaseAbort() throws Exception {
     MiniDFSClusterInJVM cluster =
@@ -164,256 +166,213 @@ public class TestLease {
     }
   }
    */
-
-  @Test
-  public void testLeaseAfterRename() throws Exception {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    try {
-      Path p = new Path("/test-file");
-      Path d = new Path("/test-d");
-      Path d2 = new Path("/test-d-other");
-
-      // open a file to get a lease
-      FileSystem fs = cluster.getFileSystem();
-      FSDataOutputStream out = fs.create(p);
-      out.writeBytes("something");
-      //out.hsync();
-      //Assert.assertTrue(hasLease(cluster, p));
-      Assert.assertEquals(1, leaseCount(cluster));
-      
-      // just to ensure first fs doesn't have any logic to twiddle leases
-      DistributedFileSystem fs2 = (DistributedFileSystem) FileSystem.newInstance(fs.getUri(), fs.getConf());
-
-      // rename the file into an existing dir
-      LOG.info("DMS: rename file into dir");
-      Path pRenamed = new Path(d, p.getName());
-      fs2.mkdirs(d);
-      fs2.rename(p, pRenamed);
-      Assert.assertFalse(p+" exists", fs2.exists(p));
-      Assert.assertTrue(pRenamed+" not found", fs2.exists(pRenamed));
-      //Assert.assertFalse("has lease for "+p, hasLease(cluster, p));
-      //Assert.assertTrue("no lease for "+pRenamed, hasLease(cluster, pRenamed));
-      Assert.assertEquals(1, leaseCount(cluster));
-    
-      // rename the parent dir to a new non-existent dir
-      LOG.info("DMS: rename parent dir");
-      Path pRenamedAgain = new Path(d2, pRenamed.getName());
-      fs2.rename(d, d2);
-      // src gone
-      Assert.assertFalse(d+" exists", fs2.exists(d));
-      //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
-      // dst checks
-      Assert.assertTrue(d2+" not found", fs2.exists(d2));
-      Assert.assertTrue(pRenamedAgain+" not found", fs2.exists(pRenamedAgain));
-      //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
-      Assert.assertEquals(1, leaseCount(cluster));
-
-      // rename the parent dir to existing dir
-      // NOTE: rename w/o options moves paths into existing dir
-      LOG.info("DMS: rename parent again");
-      pRenamed = pRenamedAgain;
-      pRenamedAgain = new Path(new Path(d, d2.getName()), p.getName());      
-      fs2.mkdirs(d);
-      fs2.rename(d2, d);
-      // src gone
-      Assert.assertFalse(d2+" exists", fs2.exists(d2));
-      //Assert.assertFalse("no lease for "+pRenamed, hasLease(cluster, pRenamed));
-      // dst checks
-      Assert.assertTrue(d+" not found", fs2.exists(d));
-      Assert.assertTrue(pRenamedAgain +" not found", fs2.exists(pRenamedAgain));
-      //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
-      Assert.assertEquals(1, leaseCount(cluster));
-      
-      // rename with opts to non-existent dir
-      pRenamed = pRenamedAgain;
-      pRenamedAgain = new Path(d2, p.getName());
-      fs2.rename(pRenamed.getParent(), d2, Options.Rename.OVERWRITE);
-      // src gone
-      Assert.assertFalse(pRenamed.getParent() +" not found", fs2.exists(pRenamed.getParent()));
-      //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
-      // dst checks
-      Assert.assertTrue(d2+" not found", fs2.exists(d2));
-      Assert.assertTrue(pRenamedAgain+" not found", fs2.exists(pRenamedAgain));
-      //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
-      Assert.assertEquals(1, leaseCount(cluster));
-
-      // rename with opts to existing dir
-      // NOTE: rename with options will not move paths into the existing dir
-      pRenamed = pRenamedAgain;
-      pRenamedAgain = new Path(d, p.getName());
-      fs2.rename(pRenamed.getParent(), d, Options.Rename.OVERWRITE);
-      // src gone
-      Assert.assertFalse(pRenamed.getParent() +" not found", fs2.exists(pRenamed.getParent()));
-      //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
-      // dst checks
-      Assert.assertTrue(d+" not found", fs2.exists(d));
-      Assert.assertTrue(pRenamedAgain+" not found", fs2.exists(pRenamedAgain));
-      //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
-      Assert.assertEquals(1, leaseCount(cluster));
-      out.close();
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-  /**
-   * Test that we can open up a file for write, move it to another location,
-   * and then create a new file in the previous location, without causing any
-   * lease conflicts.  This is possible because we now use unique inode IDs
-   * to identify files to the NameNode.
-   */
-  @Test
-  public void testLeaseAfterRenameAndRecreate() throws Exception {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    try {
-      final Path path1 = new Path("/test-file");
-      final String contents1 = "contents1";
-      final Path path2 = new Path("/test-file-new-location");
-      final String contents2 = "contents2";
-
-      // open a file to get a lease
-      FileSystem fs = cluster.getFileSystem();
-      FSDataOutputStream out1 = fs.create(path1);
-      out1.writeBytes(contents1);
-      //Assert.assertTrue(hasLease(cluster, path1));
-      Assert.assertEquals(1, leaseCount(cluster));
-
-      DistributedFileSystem fs2 = (DistributedFileSystem)
-          FileSystem.newInstance(fs.getUri(), fs.getConf());
-      fs2.rename(path1, path2);
-
-      FSDataOutputStream out2 = fs2.create(path1);
-      out2.writeBytes(contents2);
-      out2.close();
-
-      // The first file should still be open and valid
-      //Assert.assertTrue(hasLease(cluster, path2));
-      out1.close();
-
-      // Contents should be as expected
-      DistributedFileSystem fs3 = (DistributedFileSystem)
-          FileSystem.newInstance(fs.getUri(), fs.getConf());
-      Assert.assertEquals(contents1, DFSTestUtil.readFile(fs3, path2));
-      Assert.assertEquals(contents2, DFSTestUtil.readFile(fs3, path1));
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-  @Test
-  public void testLease() throws Exception {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      Assert.assertTrue(fs.mkdirs(dir));
-      
-      Path a = new Path(dir, "a");
-      Path b = new Path(dir, "b");
-
-      DataOutputStream a_out = fs.create(a);
-      a_out.writeBytes("something");
-
-      //Assert.assertTrue(hasLease(cluster, a));
-      //Assert.assertTrue(!hasLease(cluster, b));
-      
-      DataOutputStream b_out = fs.create(b);
-      b_out.writeBytes("something");
-
-      //Assert.assertTrue(hasLease(cluster, a));
-      //Assert.assertTrue(hasLease(cluster, b));
-
-      a_out.close();
-      b_out.close();
-
-      //Assert.assertTrue(!hasLease(cluster, a));
-      //Assert.assertTrue(!hasLease(cluster, b));
-
-      Path fileA = new Path(dir, "fileA");
-      FSDataOutputStream fileA_out = fs.create(fileA);
-      fileA_out.writeBytes("something");
-      //Assert.assertTrue("Failed to get the lease!", hasLease(cluster, fileA));
-
-      fs.delete(dir, true);
-      try {
-        fileA_out.hflush();
-        Assert.fail("Should validate file existence!");
-      } catch (FileNotFoundException e) {
-        // expected
-        GenericTestUtils.assertExceptionContains("File does not exist", e);
-      }
-    } finally {
-      if (cluster != null) {cluster.shutdown();}
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testFactory() throws Exception {
-    final String[] groups = new String[]{"supergroup"};
-    final UserGroupInformation[] ugi = new UserGroupInformation[3];
-    for(int i = 0; i < ugi.length; i++) {
-      ugi[i] = UserGroupInformation.createUserForTesting("user" + i, groups);
+    @Test
+    public void testLeaseAfterRename() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            Path p = new Path("/test-file");
+            Path d = new Path("/test-d");
+            Path d2 = new Path("/test-d-other");
+            // open a file to get a lease
+            FileSystem fs = cluster.getFileSystem();
+            FSDataOutputStream out = fs.create(p);
+            out.writeBytes("something");
+            //out.hsync();
+            //Assert.assertTrue(hasLease(cluster, p));
+            Assert.assertEquals(1, leaseCount(cluster));
+            // just to ensure first fs doesn't have any logic to twiddle leases
+            DistributedFileSystem fs2 = (DistributedFileSystem) FileSystem.newInstance(fs.getUri(), fs.getConf());
+            // rename the file into an existing dir
+            LOG.info("DMS: rename file into dir");
+            Path pRenamed = new Path(d, p.getName());
+            fs2.mkdirs(d);
+            fs2.rename(p, pRenamed);
+            Assert.assertFalse(p + " exists", fs2.exists(p));
+            Assert.assertTrue(pRenamed + " not found", fs2.exists(pRenamed));
+            //Assert.assertFalse("has lease for "+p, hasLease(cluster, p));
+            //Assert.assertTrue("no lease for "+pRenamed, hasLease(cluster, pRenamed));
+            Assert.assertEquals(1, leaseCount(cluster));
+            // rename the parent dir to a new non-existent dir
+            LOG.info("DMS: rename parent dir");
+            Path pRenamedAgain = new Path(d2, pRenamed.getName());
+            fs2.rename(d, d2);
+            // src gone
+            Assert.assertFalse(d + " exists", fs2.exists(d));
+            //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
+            // dst checks
+            Assert.assertTrue(d2 + " not found", fs2.exists(d2));
+            Assert.assertTrue(pRenamedAgain + " not found", fs2.exists(pRenamedAgain));
+            //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
+            Assert.assertEquals(1, leaseCount(cluster));
+            // rename the parent dir to existing dir
+            // NOTE: rename w/o options moves paths into existing dir
+            LOG.info("DMS: rename parent again");
+            pRenamed = pRenamedAgain;
+            pRenamedAgain = new Path(new Path(d, d2.getName()), p.getName());
+            fs2.mkdirs(d);
+            fs2.rename(d2, d);
+            // src gone
+            Assert.assertFalse(d2 + " exists", fs2.exists(d2));
+            //Assert.assertFalse("no lease for "+pRenamed, hasLease(cluster, pRenamed));
+            // dst checks
+            Assert.assertTrue(d + " not found", fs2.exists(d));
+            Assert.assertTrue(pRenamedAgain + " not found", fs2.exists(pRenamedAgain));
+            //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
+            Assert.assertEquals(1, leaseCount(cluster));
+            // rename with opts to non-existent dir
+            pRenamed = pRenamedAgain;
+            pRenamedAgain = new Path(d2, p.getName());
+            fs2.rename(pRenamed.getParent(), d2, Options.Rename.OVERWRITE);
+            // src gone
+            Assert.assertFalse(pRenamed.getParent() + " not found", fs2.exists(pRenamed.getParent()));
+            //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
+            // dst checks
+            Assert.assertTrue(d2 + " not found", fs2.exists(d2));
+            Assert.assertTrue(pRenamedAgain + " not found", fs2.exists(pRenamedAgain));
+            //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
+            Assert.assertEquals(1, leaseCount(cluster));
+            // rename with opts to existing dir
+            // NOTE: rename with options will not move paths into the existing dir
+            pRenamed = pRenamedAgain;
+            pRenamedAgain = new Path(d, p.getName());
+            fs2.rename(pRenamed.getParent(), d, Options.Rename.OVERWRITE);
+            // src gone
+            Assert.assertFalse(pRenamed.getParent() + " not found", fs2.exists(pRenamed.getParent()));
+            //Assert.assertFalse("has lease for "+pRenamed, hasLease(cluster, pRenamed));
+            // dst checks
+            Assert.assertTrue(d + " not found", fs2.exists(d));
+            Assert.assertTrue(pRenamedAgain + " not found", fs2.exists(pRenamedAgain));
+            //Assert.assertTrue("no lease for "+pRenamedAgain, hasLease(cluster, pRenamedAgain));
+            Assert.assertEquals(1, leaseCount(cluster));
+            out.close();
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-    Mockito.doReturn(new HdfsFileStatus.Builder()
-          .replication(1)
-          .blocksize(1024)
-          .perm(new FsPermission((short) 777))
-          .owner("owner")
-          .group("group")
-          .symlink(new byte[0])
-          .path(new byte[0])
-          .fileId(1010)
-          .build())
-        .when(mcp)
-        .getFileInfo(anyString());
-    Mockito.doReturn(new HdfsFileStatus.Builder()
-          .replication(1)
-          .blocksize(1024)
-          .perm(new FsPermission((short) 777))
-          .owner("owner")
-          .group("group")
-          .symlink(new byte[0])
-          .path(new byte[0])
-          .fileId(1010)
-          .build())
-        .when(mcp)
-        .create(anyString(), (FsPermission) anyObject(), anyString(),
-          (EnumSetWritable<CreateFlag>) anyObject(), anyBoolean(),
-          anyShort(), anyLong(), (CryptoProtocolVersion[]) anyObject(),
-          anyObject());
+    /**
+     * Test that we can open up a file for write, move it to another location,
+     * and then create a new file in the previous location, without causing any
+     * lease conflicts.  This is possible because we now use unique inode IDs
+     * to identify files to the NameNode.
+     */
+    @Test
+    public void testLeaseAfterRenameAndRecreate() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            final Path path1 = new Path("/test-file");
+            final String contents1 = "contents1";
+            final Path path2 = new Path("/test-file-new-location");
+            final String contents2 = "contents2";
+            // open a file to get a lease
+            FileSystem fs = cluster.getFileSystem();
+            FSDataOutputStream out1 = fs.create(path1);
+            out1.writeBytes(contents1);
+            //Assert.assertTrue(hasLease(cluster, path1));
+            Assert.assertEquals(1, leaseCount(cluster));
+            DistributedFileSystem fs2 = (DistributedFileSystem) FileSystem.newInstance(fs.getUri(), fs.getConf());
+            fs2.rename(path1, path2);
+            FSDataOutputStream out2 = fs2.create(path1);
+            out2.writeBytes(contents2);
+            out2.close();
+            // The first file should still be open and valid
+            //Assert.assertTrue(hasLease(cluster, path2));
+            out1.close();
+            // Contents should be as expected
+            DistributedFileSystem fs3 = (DistributedFileSystem) FileSystem.newInstance(fs.getUri(), fs.getConf());
+            Assert.assertEquals(contents1, DFSTestUtil.readFile(fs3, path2));
+            Assert.assertEquals(contents2, DFSTestUtil.readFile(fs3, path1));
+        } finally {
+            cluster.shutdown();
+        }
+    }
 
-    final Configuration conf = new Configuration();
-    final DFSClient c1 = createDFSClientAs(ugi[0], conf);
-    FSDataOutputStream out1 = createFsOut(c1, "/out1");
-    final DFSClient c2 = createDFSClientAs(ugi[0], conf);
-    FSDataOutputStream out2 = createFsOut(c2, "/out2");
-    Assert.assertEquals(c1.getLeaseRenewer(), c2.getLeaseRenewer());
-    final DFSClient c3 = createDFSClientAs(ugi[1], conf);
-    FSDataOutputStream out3 = createFsOut(c3, "/out3");
-    Assert.assertTrue(c1.getLeaseRenewer() != c3.getLeaseRenewer());
-    final DFSClient c4 = createDFSClientAs(ugi[1], conf);
-    FSDataOutputStream out4 = createFsOut(c4, "/out4");
-    Assert.assertEquals(c3.getLeaseRenewer(), c4.getLeaseRenewer());
-    final DFSClient c5 = createDFSClientAs(ugi[2], conf);
-    FSDataOutputStream out5 = createFsOut(c5, "/out5");
-    Assert.assertTrue(c1.getLeaseRenewer() != c5.getLeaseRenewer());
-    Assert.assertTrue(c3.getLeaseRenewer() != c5.getLeaseRenewer());
-  }
-  
-  private FSDataOutputStream createFsOut(DFSClient dfs, String path) 
-      throws IOException {
-    return new FSDataOutputStream(dfs.create(path, true), null);
-  }
+    @Test
+    public void testLease() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            Assert.assertTrue(fs.mkdirs(dir));
+            Path a = new Path(dir, "a");
+            Path b = new Path(dir, "b");
+            DataOutputStream a_out = fs.create(a);
+            a_out.writeBytes("something");
+            //Assert.assertTrue(hasLease(cluster, a));
+            //Assert.assertTrue(!hasLease(cluster, b));
+            DataOutputStream b_out = fs.create(b);
+            b_out.writeBytes("something");
+            //Assert.assertTrue(hasLease(cluster, a));
+            //Assert.assertTrue(hasLease(cluster, b));
+            a_out.close();
+            b_out.close();
+            //Assert.assertTrue(!hasLease(cluster, a));
+            //Assert.assertTrue(!hasLease(cluster, b));
+            Path fileA = new Path(dir, "fileA");
+            FSDataOutputStream fileA_out = fs.create(fileA);
+            fileA_out.writeBytes("something");
+            //Assert.assertTrue("Failed to get the lease!", hasLease(cluster, fileA));
+            fs.delete(dir, true);
+            try {
+                fileA_out.hflush();
+                Assert.fail("Should validate file existence!");
+            } catch (FileNotFoundException e) {
+                // expected
+                GenericTestUtils.assertExceptionContains("File does not exist", e);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 
-  static final ClientProtocol mcp = Mockito.mock(ClientProtocol.class);
-  static public DFSClient createDFSClientAs(UserGroupInformation ugi, 
-      final Configuration conf) throws Exception {
-    return ugi.doAs(new PrivilegedExceptionAction<DFSClient>() {
-      @Override
-      public DFSClient run() throws Exception {
-        return new DFSClient(null, mcp, conf, null);
-      }
-    });
-  }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testFactory() throws Exception {
+        final String[] groups = new String[] { "supergroup" };
+        final UserGroupInformation[] ugi = new UserGroupInformation[3];
+        for (int i = 0; i < ugi.length; i++) {
+            ugi[i] = UserGroupInformation.createUserForTesting("user" + i, groups);
+        }
+        Mockito.doReturn(new HdfsFileStatus.Builder().replication(1).blocksize(1024).perm(new FsPermission((short) 777)).owner("owner").group("group").symlink(new byte[0]).path(new byte[0]).fileId(1010).build()).when(mcp).getFileInfo(anyString());
+        Mockito.doReturn(new HdfsFileStatus.Builder().replication(1).blocksize(1024).perm(new FsPermission((short) 777)).owner("owner").group("group").symlink(new byte[0]).path(new byte[0]).fileId(1010).build()).when(mcp).create(anyString(), (FsPermission) anyObject(), anyString(), (EnumSetWritable<CreateFlag>) anyObject(), anyBoolean(), anyShort(), anyLong(), (CryptoProtocolVersion[]) anyObject(), anyObject());
+        final Configuration conf = new Configuration();
+        final DFSClient c1 = createDFSClientAs(ugi[0], conf);
+        FSDataOutputStream out1 = createFsOut(c1, "/out1");
+        final DFSClient c2 = createDFSClientAs(ugi[0], conf);
+        FSDataOutputStream out2 = createFsOut(c2, "/out2");
+        Assert.assertEquals(c1.getLeaseRenewer(), c2.getLeaseRenewer());
+        final DFSClient c3 = createDFSClientAs(ugi[1], conf);
+        FSDataOutputStream out3 = createFsOut(c3, "/out3");
+        Assert.assertTrue(c1.getLeaseRenewer() != c3.getLeaseRenewer());
+        final DFSClient c4 = createDFSClientAs(ugi[1], conf);
+        FSDataOutputStream out4 = createFsOut(c4, "/out4");
+        Assert.assertEquals(c3.getLeaseRenewer(), c4.getLeaseRenewer());
+        final DFSClient c5 = createDFSClientAs(ugi[2], conf);
+        FSDataOutputStream out5 = createFsOut(c5, "/out5");
+        Assert.assertTrue(c1.getLeaseRenewer() != c5.getLeaseRenewer());
+        Assert.assertTrue(c3.getLeaseRenewer() != c5.getLeaseRenewer());
+    }
+
+    private FSDataOutputStream createFsOut(DFSClient dfs, String path) throws IOException {
+        return new FSDataOutputStream(dfs.create(path, true), null);
+    }
+
+    static final ClientProtocol mcp = Mockito.mock(ClientProtocol.class);
+
+    static public DFSClient createDFSClientAs(UserGroupInformation ugi, final Configuration conf) throws Exception {
+        return ugi.doAs(new PrivilegedExceptionAction<DFSClient>() {
+
+            @Override
+            public DFSClient run() throws Exception {
+                return new DFSClient(null, mcp, conf, null);
+            }
+        });
+    }
 }

@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,44 +36,39 @@ import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
 import org.junit.Test;
 
 public class TestUpdatePipelineWithSnapshots {
-  
-  // Regression test for HDFS-6647.
-  @Test
-  public void testUpdatePipelineAfterDelete() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    Path file = new Path("/test-file");    
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
-      DFSOutputStream out = null;
-      try {
-        // Create a file and make sure a block is allocated for it.
-        out = (DFSOutputStream)(fs.create(file).
-            getWrappedStream()); 
-        out.write(1);
-        out.hflush();
-        
-        // Create a snapshot that includes the file.
-        SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs,
-            new Path("/"), "s1");
-        
-        // Grab the block info of this file for later use.
-        FSDataInputStream in = null;
-        ExtendedBlock oldBlock = null;
+
+    // Regression test for HDFS-6647.
+    @Test
+    public void testUpdatePipelineAfterDelete() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         try {
-          in = fs.open(file);
-          oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
-        } finally {
-          IOUtils.closeStream(in);
-        }
-        
-        // Allocate a new block ID/gen stamp so we can simulate pipeline
-        // recovery.
-        String clientName = ((DistributedFileSystem)fs).getClient()
-            .getClientName();
-        /*
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+                /*
         LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
             oldBlock, clientName);
         ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
@@ -101,12 +95,11 @@ public class TestUpdatePipelineWithSnapshots {
         // Make sure the NN can restart with the edit logs as we have them now.
         cluster.restartNameNode(true);
          */
-      } finally {
-        IOUtils.closeStream(out);
-      }
-    } finally {
-      cluster.shutdown();
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
-
 }

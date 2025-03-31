@@ -25,7 +25,6 @@ import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -49,34 +48,39 @@ import org.apache.hadoop.util.Time;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** Test if a datanode can correctly upgrade itself */
+/**
+ * Test if a datanode can correctly upgrade itself
+ */
 public class TestDatanodeRestart {
-  // test finalized replicas persist across DataNode restarts
-  @Test public void testFinalizedReplicas() throws Exception {
-    // bring up a cluster of 3
-    Configuration conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024L);
-    conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, 512);
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-    cluster.waitActive();
-    FileSystem fs = cluster.getFileSystem();
-    try {
-      // test finalized replicas
-      final String TopDir = "/test";
-      DFSTestUtil util = new DFSTestUtil.Builder().
-          setName("TestDatanodeRestart").setNumFiles(2).build();
-      util.createFiles(fs, TopDir, (short)3);
-      util.waitReplication(fs, TopDir, (short)3);
-      util.checkFiles(fs, TopDir);
-      cluster.restartDataNodes();
-      cluster.waitActive();
-      util.checkFiles(fs, TopDir);
-    } finally {
-      cluster.shutdown();
-    }
-  }
 
-  /*
+    // test finalized replicas persist across DataNode restarts
+    @Test
+    public void testFinalizedReplicas() throws Exception {
+        // bring up a cluster of 3
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024L);
+        conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY, 512);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+        cluster.waitActive();
+        FileSystem fs = cluster.getFileSystem();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            // test finalized replicas
+            final String TopDir = "/test";
+            DFSTestUtil util = new DFSTestUtil.Builder().setName("TestDatanodeRestart").setNumFiles(2).build();
+            util.createFiles(fs, TopDir, (short) 3);
+            util.waitReplication(fs, TopDir, (short) 3);
+            util.checkFiles(fs, TopDir);
+            cluster.restartDataNodes();
+            cluster.waitActive();
+            util.checkFiles(fs, TopDir);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    /*
   // test rbw replicas persist across DataNode restarts
   public void testRbwReplicas() throws IOException {
     Configuration conf = new HdfsConfiguration();
@@ -151,75 +155,74 @@ public class TestDatanodeRestart {
   }
   
    */
+    @Test
+    public void testWaitForRegistrationOnRestart() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_DATANODE_BP_READY_TIMEOUT_KEY, 5);
+        conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 5000);
+        // This makes the datanode appear registered to the NN, but it won't be
+        // able to get to the saved dn reg internally.
+        DataNodeFaultInjector dnFaultInjector = new DataNodeFaultInjector() {
 
-  @Test
-  public void testWaitForRegistrationOnRestart() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_DATANODE_BP_READY_TIMEOUT_KEY, 5);
-    conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 5000);
-
-    // This makes the datanode appear registered to the NN, but it won't be
-    // able to get to the saved dn reg internally.
-    DataNodeFaultInjector dnFaultInjector = new DataNodeFaultInjector() {
-      @Override
-      public void noRegistration() throws IOException {
-        throw new IOException("no reg found for testing");
-      }
-    };
-    DataNodeFaultInjector oldDnInjector = DataNodeFaultInjector.get();
-    DataNodeFaultInjector.set(dnFaultInjector);
-    MiniDFSClusterInJVM cluster = null;
-    long start = 0;
-    Path file = new Path("/reg");
-    try {
-      int numDNs = 1;
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
-      cluster.waitActive();
-
-      start = Time.monotonicNow();
-      FileSystem fileSys = cluster.getFileSystem();
-      try {
-        DFSTestUtil.createFile(fileSys, file, 10240L, (short)1, 0L);
-        // It is a bug if this does not fail.
-        throw new IOException("Did not fail!");
-      } catch (org.apache.hadoop.ipc.RemoteException e) {
-        long elapsed = Time.monotonicNow() - start;
-        // timers have at-least semantics, so it should be at least 5 seconds.
-        if (elapsed < 5000 || elapsed > 10000) {
-          throw new IOException(elapsed + " milliseconds passed.", e);
+            @Override
+            public void noRegistration() throws IOException {
+                throw new IOException("no reg found for testing");
+            }
+        };
+        DataNodeFaultInjector oldDnInjector = DataNodeFaultInjector.get();
+        DataNodeFaultInjector.set(dnFaultInjector);
+        MiniDFSClusterInJVM cluster = null;
+        long start = 0;
+        Path file = new Path("/reg");
+        try {
+            int numDNs = 1;
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
+            cluster.waitActive();
+            start = Time.monotonicNow();
+            FileSystem fileSys = cluster.getFileSystem();
+            try {
+                DFSTestUtil.createFile(fileSys, file, 10240L, (short) 1, 0L);
+                // It is a bug if this does not fail.
+                throw new IOException("Did not fail!");
+            } catch (org.apache.hadoop.ipc.RemoteException e) {
+                long elapsed = Time.monotonicNow() - start;
+                // timers have at-least semantics, so it should be at least 5 seconds.
+                if (elapsed < 5000 || elapsed > 10000) {
+                    throw new IOException(elapsed + " milliseconds passed.", e);
+                }
+            }
+            DataNodeFaultInjector.set(oldDnInjector);
+            // this should succeed now.
+            DFSTestUtil.createFile(fileSys, file, 10240L, (short) 1, 0L);
+            // turn it back to under-construction, so that the client calls
+            // getReplicaVisibleLength() rpc method against the datanode.
+            fileSys.append(file);
+            // back to simulating unregistered node.
+            DataNodeFaultInjector.set(dnFaultInjector);
+            byte[] buffer = new byte[8];
+            start = Time.monotonicNow();
+            try {
+                fileSys.open(file).read(0L, buffer, 0, 1);
+                throw new IOException("Did not fail!");
+            } catch (IOException e) {
+                long elapsed = Time.monotonicNow() - start;
+                if (e.getMessage().contains("readBlockLength")) {
+                    throw new IOException("Failed, but with unexpected exception:", e);
+                }
+                // timers have at-least semantics, so it should be at least 5 seconds.
+                if (elapsed < 5000 || elapsed > 10000) {
+                    throw new IOException(elapsed + " milliseconds passed.", e);
+                }
+            }
+            DataNodeFaultInjector.set(oldDnInjector);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fileSys.open(file).read(0L, buffer, 0, 1);
+        } finally {
+            DataNodeFaultInjector.set(oldDnInjector);
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-      }
-      DataNodeFaultInjector.set(oldDnInjector);
-      // this should succeed now.
-      DFSTestUtil.createFile(fileSys, file, 10240L, (short)1, 0L);
-
-      // turn it back to under-construction, so that the client calls
-      // getReplicaVisibleLength() rpc method against the datanode.
-      fileSys.append(file);
-      // back to simulating unregistered node.
-      DataNodeFaultInjector.set(dnFaultInjector);
-      byte[] buffer = new byte[8];
-      start = Time.monotonicNow();
-      try {
-        fileSys.open(file).read(0L, buffer, 0, 1);
-        throw new IOException("Did not fail!");
-      } catch (IOException e) {
-        long elapsed = Time.monotonicNow() - start;
-        if (e.getMessage().contains("readBlockLength")) {
-          throw new IOException("Failed, but with unexpected exception:", e);
-        }
-        // timers have at-least semantics, so it should be at least 5 seconds.
-        if (elapsed < 5000 || elapsed > 10000) {
-          throw new IOException(elapsed + " milliseconds passed.", e);
-        }
-      }
-      DataNodeFaultInjector.set(oldDnInjector);
-      fileSys.open(file).read(0L, buffer, 0, 1);
-    } finally {
-      DataNodeFaultInjector.set(oldDnInjector);
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
 }

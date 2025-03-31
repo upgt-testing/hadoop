@@ -20,12 +20,10 @@ package org.apache.hadoop.hdfs.server.datanode;
 import static org.apache.hadoop.test.MetricsAsserts.assertCounter;
 import static org.apache.hadoop.test.MetricsAsserts.getMetrics;
 import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -50,92 +48,81 @@ import org.junit.rules.Timeout;
  * Test class for DataNodeVolumeMetrics.
  */
 public class TestDataNodeVolumeMetrics {
-  private static final Logger LOG =
-      LoggerFactory.getLogger(TestDataNodeVolumeMetrics.class);
 
-  private static final int BLOCK_SIZE = 1024;
-  private static final short REPL = 1;
-  private static final int NUM_DATANODES = 1;
+    private static final Logger LOG = LoggerFactory.getLogger(TestDataNodeVolumeMetrics.class);
 
-  @Rule
-  public Timeout timeout = new Timeout(300000);
+    private static final int BLOCK_SIZE = 1024;
 
-  @Test
-  public void testVolumeMetrics() throws Exception {
-    MiniDFSClusterInJVM cluster = setupClusterForVolumeMetrics();
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      final Path fileName = new Path("/test.dat");
-      final long fileLen = Integer.MAX_VALUE + 1L;
-      DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen,
-          fs.getDefaultBlockSize(fileName),
-          REPL, 1L, true);
+    private static final short REPL = 1;
 
-      try (FSDataOutputStream out = fs.append(fileName)) {
-        out.writeBytes("hello world");
-        ((DFSOutputStream) out.getWrappedStream()).hsync();
-      }
+    private static final int NUM_DATANODES = 1;
 
-      verifyDataNodeVolumeMetrics(fs, cluster, fileName);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Rule
+    public Timeout timeout = new Timeout(300000);
+
+    @Test
+    public void testVolumeMetrics() throws Exception {
+        MiniDFSClusterInJVM cluster = setupClusterForVolumeMetrics();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            final Path fileName = new Path("/test.dat");
+            final long fileLen = Integer.MAX_VALUE + 1L;
+            DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen, fs.getDefaultBlockSize(fileName), REPL, 1L, true);
+            try (FSDataOutputStream out = fs.append(fileName)) {
+                out.writeBytes("hello world");
+                ((DFSOutputStream) out.getWrappedStream()).hsync();
+            }
+            verifyDataNodeVolumeMetrics(fs, cluster, fileName);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  @Test
-  public void testVolumeMetricsWithVolumeDepartureArrival() throws Exception {
-    MiniDFSClusterInJVM cluster = setupClusterForVolumeMetrics();
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      final Path fileName = new Path("/test.dat");
-      final long fileLen = Integer.MAX_VALUE + 1L;
-      DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen,
-          fs.getDefaultBlockSize(fileName),
-          REPL, 1L, true);
-
-      try (FSDataOutputStream out = fs.append(fileName)) {
-        out.writeBytes("hello world");
-        ((DFSOutputStream) out.getWrappedStream()).hsync();
-      }
-
-      ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
-      assertTrue("DN1 should be up", dns.get(0).isDatanodeUp());
-      final File dn1Vol2 = cluster.getInstanceStorageDir(0, 1);
-
-      DataNodeTestUtils.injectDataDirFailure(dn1Vol2);
-      verifyDataNodeVolumeMetrics(fs, cluster, fileName);
-
-      DataNodeTestUtils.restoreDataDirFromFailure(dn1Vol2);
-      DataNodeTestUtils.reconfigureDataNode(dns.get(0), dn1Vol2);
-      verifyDataNodeVolumeMetrics(fs, cluster, fileName);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Test
+    public void testVolumeMetricsWithVolumeDepartureArrival() throws Exception {
+        MiniDFSClusterInJVM cluster = setupClusterForVolumeMetrics();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            final Path fileName = new Path("/test.dat");
+            final long fileLen = Integer.MAX_VALUE + 1L;
+            DFSTestUtil.createFile(fs, fileName, false, BLOCK_SIZE, fileLen, fs.getDefaultBlockSize(fileName), REPL, 1L, true);
+            try (FSDataOutputStream out = fs.append(fileName)) {
+                out.writeBytes("hello world");
+                ((DFSOutputStream) out.getWrappedStream()).hsync();
+            }
+            ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+            assertTrue("DN1 should be up", dns.get(0).isDatanodeUp());
+            final File dn1Vol2 = cluster.getInstanceStorageDir(0, 1);
+            DataNodeTestUtils.injectDataDirFailure(dn1Vol2);
+            verifyDataNodeVolumeMetrics(fs, cluster, fileName);
+            DataNodeTestUtils.restoreDataDirFromFailure(dn1Vol2);
+            DataNodeTestUtils.reconfigureDataNode(dns.get(0), dn1Vol2);
+            verifyDataNodeVolumeMetrics(fs, cluster, fileName);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  private MiniDFSClusterInJVM setupClusterForVolumeMetrics() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys
-        .DFS_DATANODE_FILEIO_PROFILING_SAMPLING_PERCENTAGE_KEY, 100);
-    SimulatedFSDataset.setFactory(conf);
-    return new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(NUM_DATANODES)
-        .storageTypes(new StorageType[]{StorageType.RAM_DISK, StorageType.DISK})
-        .storagesPerDatanode(2)
-        .build();
-  }
+    private MiniDFSClusterInJVM setupClusterForVolumeMetrics() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_DATANODE_FILEIO_PROFILING_SAMPLING_PERCENTAGE_KEY, 100);
+        SimulatedFSDataset.setFactory(conf);
+        return new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATANODES).storageTypes(new StorageType[] { StorageType.RAM_DISK, StorageType.DISK }).storagesPerDatanode(2).build();
+    }
 
-  private void verifyDataNodeVolumeMetrics(final FileSystem fs,
-      final MiniDFSClusterInJVM cluster, final Path fileName) throws IOException {
-    List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
-    DataNodeJVMInterface datanode = datanodes.get(0);
-
-    final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
-    /*
+    private void verifyDataNodeVolumeMetrics(final FileSystem fs, final MiniDFSClusterInJVM cluster, final Path fileName) throws IOException {
+        List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+        DataNodeJVMInterface datanode = datanodes.get(0);
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, fileName);
+        /*
     final FsVolumeSpi volume = datanode.getFSDataset().getVolume(block);
     DataNodeVolumeMetrics metrics = volume.getMetrics();
 
@@ -187,5 +174,5 @@ public class TestDataNodeVolumeMetrics {
     LOG.info("fileIoErrorMean : " + metrics.getFileIoErrorMean());
     LOG.info("fileIoErrorStdDev : " + metrics.getFileIoErrorStdDev());
      */
-  }
+    }
 }
