@@ -582,8 +582,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 builder.useConfiguredTopologyMappingClass);
 
         // restart immediately for DN-0 and NN-0
-        //restartNodeForTesting(0);
-        //upgradeNodeForTesting(0);
+        restartNodeForTesting(0);
+        upgradeNodeForTesting(0);
     }
 
     public static class DataNodeProperties {
