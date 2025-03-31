@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface DatanodeManagerJVMInterface {
     DatanodeAdminManagerJVMInterface getDatanodeAdminManager();
-    SlowPeerTrackerJVMInterface getSlowPeerTracker();
     long getHeartbeatRecheckInterval();
     long getHeartbeatInterval();
     int getBlockInvalidateLimit();

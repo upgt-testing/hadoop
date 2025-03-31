@@ -21,20 +21,9 @@ import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DEFAULT_NAME
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_DEFAULT;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_KERBEROS_PRINCIPAL_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_KEYTAB_FILE_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HTTP_POLICY_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_JOURNALNODE_HTTPS_ADDRESS_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_KEYTAB_FILE_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCKREPORT_INITIAL_DELAY_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY;
@@ -74,8 +63,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import java.util.function.Supplier;
-
-import org.apache.hadoop.fs.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.server.blockmanagement.*;
 import org.apache.hadoop.hdfs.server.datanode.*;
@@ -85,14 +74,8 @@ import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImplJVMInte
 import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
-import org.apache.hadoop.thirdparty.com.google.common.collect.ArrayListMultimap;
-import org.apache.hadoop.thirdparty.com.google.common.collect.Multimap;
-import org.apache.hadoop.hdfs.server.common.blockaliasmap.BlockAliasMap;
-import org.apache.hadoop.hdfs.server.common.blockaliasmap.impl.InMemoryLevelDBAliasMapClient;
 import org.apache.hadoop.hdfs.server.datanode.VolumeScanner;
 import org.apache.hadoop.hdfs.server.namenode.ImageServlet;
-import org.apache.hadoop.http.HttpConfig;
-import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -145,11 +128,10 @@ import org.apache.hadoop.util.ShutdownHookManager;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.util.ToolRunner;
 
-import org.apache.hadoop.thirdparty.com.google.common.base.Joiner;
-import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
-import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
-import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * This class creates a single-process DFS cluster for junit testing.
@@ -247,10 +229,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                         "MiniDFSClusterInJVM base directory cannot be null");
             }
             String cdir = conf.get(HDFS_MINIDFS_BASEDIR);
-            // There are tests which restart server, and we want to allow them to restart with the same
-            // configuration.  Although it is an error if the base directory is already set, we'll ignore
-            // cases where the base directory is the same.
-            if (cdir != null && !cdir.equals(basedir.getAbsolutePath())) {
+            if (cdir != null) {
                 throw new IllegalArgumentException(
                         "MiniDFSClusterInJVM base directory already defined (" + cdir + ")");
             }
@@ -3303,7 +3282,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     private synchronized boolean shouldWait(DatanodeInfo[] dnInfo,
-                                            InetSocketAddress addr) throws InterruptedException {
+                                            InetSocketAddress addr) {
         // If a datanode failed to start, then do not wait
         for (DataNodeProperties dn : dataNodes) {
             // the datanode thread communicating with the namenode should be alive
@@ -3896,73 +3875,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         } finally {
             writer.close();
         }
-    }
-
-    /**
-     * Setup the namenode-level PROVIDED configurations, using the
-     * {@link InMemoryLevelDBAliasMapClient}.
-     *
-     * @param conf Configuration, which is modified, to enable provided storage.
-     *        This cannot be null.
-     */
-    public static void setupNamenodeProvidedConfiguration(Configuration conf) {
-        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_PROVIDED_ENABLED, true);
-        conf.setBoolean(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_ENABLED, true);
-        conf.setClass(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_CLASS,
-                InMemoryLevelDBAliasMapClient.class, BlockAliasMap.class);
-        File tempDirectory = new File(GenericTestUtils.getRandomizedTestDir(),
-                "in-memory-alias-map");
-        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_LEVELDB_DIR,
-                tempDirectory.getAbsolutePath());
-        conf.setInt(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_LOAD_RETRIES, 10);
-        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_LEVELDB_PATH,
-                tempDirectory.getAbsolutePath());
-    }
-
-    /**
-     * Updates configuration objects with keys required to setup a secure
-     * {@link org.apache.hadoop.minikdc.MiniKdc} based DFS cluster.
-     * @param conf the configuration object to be updated
-     * @param userName username to be used in kerberos principal
-     * @param realm realm to be used in the kerberos principal
-     * @param keytab absolute path of the the keytab file
-     * @param keystoresDir absolute path of the keystore
-     * @param sslConfDir absolute path of the ssl conf dir
-     * @throws Exception
-     */
-    public static void setupKerberosConfiguration(Configuration conf,
-                                                  String userName, String realm, String keytab, String keystoresDir,
-                                                  String sslConfDir) throws Exception {
-        // Windows will not reverse name lookup "127.0.0.1" to "localhost".
-        String krbInstance = Path.WINDOWS ? "127.0.0.1" : "localhost";
-        String hdfsPrincipal = userName + "/" + krbInstance + "@" + realm;
-        String spnegoPrincipal = "HTTP/" + krbInstance + "@" + realm;
-
-        conf.set(DFS_NAMENODE_KERBEROS_PRINCIPAL_KEY, hdfsPrincipal);
-        conf.set(DFS_NAMENODE_KEYTAB_FILE_KEY, keytab);
-        conf.set(DFS_DATANODE_KERBEROS_PRINCIPAL_KEY, hdfsPrincipal);
-        conf.set(DFS_DATANODE_KEYTAB_FILE_KEY, keytab);
-        conf.set(DFS_WEB_AUTHENTICATION_KERBEROS_PRINCIPAL_KEY, spnegoPrincipal);
-        conf.setBoolean(DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, true);
-        conf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
-
-        conf.set(DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
-        conf.set(DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
-        conf.set(DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
-        conf.set(DFS_JOURNALNODE_HTTPS_ADDRESS_KEY, "localhost:0");
-        conf.setInt(IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY, 10);
-
-        KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
-        conf.set(DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
-                KeyStoreTestUtil.getClientSSLConfigFileName());
-        conf.set(DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
-                KeyStoreTestUtil.getServerSSLConfigFileName());
-
-        KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
-        conf.set(DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
-                KeyStoreTestUtil.getClientSSLConfigFileName());
-        conf.set(DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
-                KeyStoreTestUtil.getServerSSLConfigFileName());
     }
 
     @Override

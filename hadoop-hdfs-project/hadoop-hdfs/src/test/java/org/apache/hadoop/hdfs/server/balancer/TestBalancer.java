@@ -491,7 +491,7 @@ public class TestBalancer {
    * @throws TimeoutException
    */
   static void waitForBalancer(long totalUsedSpace, long totalCapacity,
-      ClientProtocol client, MiniDFSCluster cluster, BalancerParameters p,
+      ClientProtocol client, MiniDFSClusterInJVM cluster, BalancerParameters p,
       int expectedExcludedNodes, boolean checkExcludeNodesUtilization)
       throws IOException, TimeoutException {
     long timeout = TIMEOUT;
@@ -1687,7 +1687,7 @@ public class TestBalancer {
     for (int i = 0; i < numOfDatanodes; i++) {
       racks[i] = "/rack" + (i % numOfRacks);
     }
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .racks(racks)
         .simulatedCapacities(capacities)

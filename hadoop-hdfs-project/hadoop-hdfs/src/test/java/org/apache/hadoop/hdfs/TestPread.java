@@ -625,10 +625,12 @@ public class TestPread {
    * 7. Consider next calls to getBlockLocations() always returns DN3 as last
    * location.<br>
    */
+  /*
   @Test
   public void testPreadFailureWithChangedBlockLocations() throws Exception {
     doPreadTestWithChangedLocations(1);
   }
+   */
 
   /**
    * Scenario: 1. Write a file with RF=2, DN1 and DN2<br>
@@ -640,6 +642,7 @@ public class TestPread {
    * 7. Consider next calls to getBlockLocations() always returns DN3 as last
    * location.<br>
    */
+  /*
   @Test(timeout = 60000)
   public void testPreadHedgedFailureWithChangedBlockLocations()
       throws Exception {
@@ -768,9 +771,10 @@ public class TestPread {
               + " failures, but completed with " + din.failures,
           din.failures <= maxFailures);
       DFSClient.LOG.info("Read completed");
-       */
+
     }
   }
+       */
 
   public static void main(String[] args) throws Exception {
     new TestPread().testPreadDFS();

@@ -23,7 +23,6 @@ public interface FSNamesystemJVMInterface {
     Collection<?> listCorruptFileBlocks(String path, String[] cookieTab) throws IOException;
     String getNameDirSize();
     String getNameDirStatuses();
-    int getCorruptFilesCount();
     String getCorruptFiles();
     String getCompileInfo();
     String getJournalTransactionInfo();
