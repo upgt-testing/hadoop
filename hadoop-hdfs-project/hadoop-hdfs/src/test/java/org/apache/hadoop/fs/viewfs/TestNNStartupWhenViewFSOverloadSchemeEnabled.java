@@ -22,7 +22,7 @@ import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -32,7 +32,7 @@ import org.junit.Test;
  * Tests that the NN startup is successful with ViewFSOverloadScheme.
  */
 public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private static final Configuration CONF = new Configuration();
@@ -59,7 +59,7 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
    */
   @Test(timeout = 30000)
   public void testHANameNodeAndDataNodeStartup() throws Exception {
-    cluster = new MiniDFSCluster.Builder(CONF)
+    cluster = new MiniDFSClusterInJVM.Builder(CONF)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
         .waitSafeMode(false).build();
     cluster.waitActive();
@@ -73,7 +73,7 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled {
   @Test(timeout = 30000)
   public void testNameNodeAndDataNodeStartup() throws Exception {
     cluster =
-        new MiniDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false)
+        new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(1).waitSafeMode(false)
             .build();
     cluster.waitActive();
   }

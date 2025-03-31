@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -58,7 +59,7 @@ public class TestWriteReadStripedFile {
   private final int blockSize = stripesPerBlock * cellSize;
   private final int blockGroupSize = blockSize * dataBlocks;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private Configuration conf = new HdfsConfiguration();
 
@@ -75,7 +76,7 @@ public class TestWriteReadStripedFile {
   @Before
   public void setup() throws IOException {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     fs = cluster.getFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());
     fs.mkdirs(new Path("/ec"));
@@ -243,7 +244,7 @@ public class TestWriteReadStripedFile {
     BlockLocation[] locs = fs.getFileBlockLocations(path, 0, cellSize);
     if (locs != null && locs.length > 0) {
       String name = (locs[0].getNames())[failedDNIdx];
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         int port = dn.getXferPort();
         if (name.contains(Integer.toString(port))) {
           dn.shutdown();

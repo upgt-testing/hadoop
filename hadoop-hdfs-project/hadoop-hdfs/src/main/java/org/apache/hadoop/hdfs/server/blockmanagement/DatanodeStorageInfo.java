@@ -34,7 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
  * A Datanode has one or more storages. A storage in the Datanode is represented
  * by this class.
  */
-public class DatanodeStorageInfo {
+public class DatanodeStorageInfo implements DatanodeStorageInfoJVMInterface {
   public static final DatanodeStorageInfo[] EMPTY_ARRAY = {};
 
   public static DatanodeInfo[] toDatanodeInfos(
@@ -206,7 +206,7 @@ public class DatanodeStorageInfo {
     heartbeatedSinceFailover = value;
   }
 
-  boolean areBlocksOnFailedStorage() {
+  public boolean areBlocksOnFailedStorage() {
     return getState() == State.FAILED && numBlocks != 0;
   }
 

@@ -37,7 +37,7 @@ import org.apache.hadoop.fs.Options;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -51,7 +51,7 @@ import org.junit.Test;
 public class TestViewFsLinkFallback {
   private static FileSystem fsDefault;
   private FileSystem fsTarget;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static URI viewFsDefaultClusterUri;
   private Path targetTestRoot;
 
@@ -65,7 +65,7 @@ public class TestViewFsLinkFallback {
     FileSystem[] fsHdfs = new FileSystem[nameSpacesCount];
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(
             nameSpacesCount))
         .numDataNodes(dataNodesCount)

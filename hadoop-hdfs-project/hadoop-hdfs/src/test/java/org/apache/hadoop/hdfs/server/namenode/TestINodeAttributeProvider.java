@@ -33,7 +33,8 @@ import org.apache.hadoop.fs.XAttr;
 import org.apache.hadoop.fs.permission.*;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
@@ -49,7 +50,7 @@ public class TestINodeAttributeProvider {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestINodeAttributeProvider.class);
 
-  private MiniDFSCluster miniDFS;
+  private MiniDFSClusterInJVM miniDFS;
   private static final Set<String> CALLED = new HashSet<String>();
   private static final short HDFS_PERMISSION = 0777;
   private static final short PROVIDER_PERMISSION = 0770;
@@ -210,7 +211,7 @@ public class TestINodeAttributeProvider {
         DFSConfigKeys.DFS_NAMENODE_INODE_ATTRIBUTES_PROVIDER_BYPASS_USERS_KEY,
         " u2,, ,u3, ");
     EditLogFileOutputStream.setShouldSkipFsyncForTesting(true);
-    miniDFS = new MiniDFSCluster.Builder(conf).build();
+    miniDFS = new MiniDFSClusterInJVM.Builder(conf).build();
   }
 
   @After

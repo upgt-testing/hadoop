@@ -27,7 +27,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
@@ -86,7 +86,7 @@ public class TestPendingDataNodeMessages {
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 20 * 60000);
 
     int numDn = ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits();
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDn).nnTopology(MiniDFSNNTopology.simpleHATopology())
         .build();
     try {

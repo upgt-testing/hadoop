@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * It also maintains the state about which of the NNs is considered active.
  */
 @InterfaceAudience.Private
-class BPOfferService {
+class BPOfferService implements BPOfferServiceJVMInterface {
   static final Logger LOG = DataNode.LOG;
   
   /**
@@ -173,7 +173,7 @@ class BPOfferService {
   /**
    * @return true if the service has registered with at least one NameNode.
    */
-  boolean isInitialized() {
+  public boolean isInitialized() {
     return bpRegistration != null;
   }
   
@@ -181,7 +181,7 @@ class BPOfferService {
    * @return true if there is at least one actor thread running which is
    * talking to a NameNode.
    */
-  boolean isAlive() {
+  public boolean isAlive() {
     for (BPServiceActor actor : bpServices) {
       if (actor.isAlive()) {
         return true;
@@ -221,7 +221,7 @@ class BPOfferService {
     }
   }
 
-  String getBlockPoolId() {
+  public String getBlockPoolId() {
     return getBlockPoolId(false);
   }
 
@@ -346,7 +346,7 @@ class BPOfferService {
   }
   
   //This must be called only by blockPoolManager.
-  void stop() {
+  public void stop() {
     for (BPServiceActor actor : bpServices) {
       actor.stop();
     }
@@ -532,7 +532,7 @@ class BPOfferService {
   }
 
   @VisibleForTesting
-  List<BPServiceActor> getBPServiceActors() {
+  public List<BPServiceActor> getBPServiceActors() {
     return Lists.newArrayList(bpServices);
   }
   
@@ -631,7 +631,7 @@ class BPOfferService {
    * Run an immediate block report on this thread. Used by tests.
    */
   @VisibleForTesting
-  void triggerBlockReportForTests() throws IOException {
+  public void triggerBlockReportForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.triggerBlockReportForTests();
     }
@@ -641,7 +641,7 @@ class BPOfferService {
    * Run an immediate deletion report on this thread. Used by tests.
    */
   @VisibleForTesting
-  void triggerDeletionReportForTests() throws IOException {
+  public void triggerDeletionReportForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.getIbrManager().triggerDeletionReportForTests();
     }
@@ -651,7 +651,7 @@ class BPOfferService {
    * Run an immediate heartbeat from all actors. Used by tests.
    */
   @VisibleForTesting
-  void triggerHeartbeatForTests() throws IOException {
+  public void triggerHeartbeatForTests() throws IOException {
     for (BPServiceActor actor : bpServices) {
       actor.triggerHeartbeatForTests();
     }

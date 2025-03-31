@@ -28,6 +28,7 @@ import static org.mockito.Mockito.spy;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -36,7 +37,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
@@ -71,9 +72,9 @@ public class TestSequentialBlockGroupId {
   private final int blockGrpCount = 4;
   private final int fileLen = blockSize * dataBlocks * blockGrpCount;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
-  private SequentialBlockGroupIdGenerator blockGrpIdGenerator;
+  private SequentialBlockGroupIdGeneratorJVMInterface blockGrpIdGenerator;
   private Path ecDir = new Path("/ecDir");
 
   @Before
@@ -81,7 +82,7 @@ public class TestSequentialBlockGroupId {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     cluster.waitActive();
 
     fs = cluster.getFileSystem();
@@ -187,9 +188,9 @@ public class TestSequentialBlockGroupId {
 
     // Creates contiguous block with negative blockId so that it would trigger
     // collision during blockGroup Id generation
-    FSNamesystem fsn = cluster.getNamesystem();
+    FSNamesystemJVMInterface fsn = cluster.getNamesystem();
     // Replace SequentialBlockIdGenerator with a spy
-    SequentialBlockIdGenerator blockIdGenerator = spy(fsn.getBlockManager()
+    SequentialBlockIdGeneratorJVMInterface blockIdGenerator = spy(fsn.getBlockManager()
         .getBlockIdManager().getBlockIdGenerator());
     Whitebox.setInternalState(fsn.getBlockManager().getBlockIdManager(),
         "blockIdGenerator", blockIdGenerator);

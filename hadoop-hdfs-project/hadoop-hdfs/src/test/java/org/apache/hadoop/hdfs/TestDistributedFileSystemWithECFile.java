@@ -57,7 +57,7 @@ public class TestDistributedFileSystemWithECFile {
   private int blockSize;
   private int blockGroupSize;
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private FileContext fileContext;
   private DistributedFileSystem fs;
   private Configuration conf = new HdfsConfiguration();
@@ -83,7 +83,7 @@ public class TestDistributedFileSystemWithECFile {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY,
         false);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDNs).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
     fileContext = FileContext.getFileContext(cluster.getURI(0), conf);
     fs = cluster.getFileSystem();
     fs.enableErasureCodingPolicy(ecPolicy.getName());
@@ -219,7 +219,7 @@ public class TestDistributedFileSystemWithECFile {
     );
     // Test RS(6,3) as default policy
     int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(numDataNodes)
         .build();

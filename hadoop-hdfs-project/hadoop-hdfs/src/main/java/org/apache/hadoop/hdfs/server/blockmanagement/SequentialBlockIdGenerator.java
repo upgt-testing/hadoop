@@ -32,7 +32,7 @@ import org.apache.hadoop.util.SequentialNumber;
  * and can be skipped over when detected.
  */
 @InterfaceAudience.Private
-public class SequentialBlockIdGenerator extends SequentialNumber {
+public class SequentialBlockIdGenerator extends SequentialNumber implements SequentialBlockIdGeneratorJVMInterface {
   /**
    * The last reserved block ID.
    */

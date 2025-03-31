@@ -207,6 +207,11 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <artifactId>assertj-core</artifactId>
         <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgt-core</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -215,6 +220,9 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+          <useFile>false</useFile>
+          <printSummary>true</printSummary>
           <systemPropertyVariables>
             <startKdc>${startKdc}</startKdc>
             <kdc.resource.dir>${kdc.resource.dir}</kdc.resource.dir>

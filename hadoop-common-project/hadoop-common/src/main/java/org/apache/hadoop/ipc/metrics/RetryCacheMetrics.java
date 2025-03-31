@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Private
 @Metrics(about="Aggregate RetryCache metrics", context="rpc")
-public class RetryCacheMetrics {
+public class RetryCacheMetrics implements RetryCacheMetricsJVMInterface {
 
   static final Logger LOG = LoggerFactory.getLogger(RetryCacheMetrics.class);
   final MetricsRegistry registry;

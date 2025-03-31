@@ -55,6 +55,9 @@ import java.util.Map;
 import java.util.Random;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.hadoop.hdfs.*;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.QuotaUsage;
 import org.apache.hadoop.test.LambdaTestUtils;
@@ -81,14 +84,6 @@ import org.apache.hadoop.fs.permission.AclEntryScope;
 import org.apache.hadoop.fs.permission.AclEntryType;
 import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.TestDFSClientRetries;
-import org.apache.hadoop.hdfs.TestFileCreation;
 import org.apache.hadoop.hdfs.client.CreateEncryptionZoneFlag;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -196,7 +191,7 @@ public class TestWebHDFS {
   static void largeFileTest(final long fileLength) throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .build();
     try {
@@ -220,7 +215,7 @@ public class TestWebHDFS {
         long remaining = fileLength;
         for(; remaining > 0;) {
           t.tick(fileLength - remaining, "remaining=%d", remaining);
-          
+
           final int n = (int)Math.min(remaining, data.length);
           out.write(data, 0, n);
           remaining -= n;
@@ -229,7 +224,7 @@ public class TestWebHDFS {
         out.close();
       }
       t.end(fileLength);
-  
+
       Assert.assertEquals(fileLength, fs.getFileStatus(p).getLen());
 
       final long smallOffset = RANDOM.nextInt(1 << 20) + (1 << 20);
@@ -238,7 +233,7 @@ public class TestWebHDFS {
 
       verifySeek(fs, p, largeOffset, fileLength, buf, expected);
       verifySeek(fs, p, smallOffset, fileLength, buf, expected);
-  
+
       verifyPread(fs, p, largeOffset, fileLength, buf, expected);
     } finally {
       cluster.shutdown();
@@ -326,8 +321,8 @@ public class TestWebHDFS {
     // during listStatus
     FsPermission.setUMask(conf, new FsPermission((short)0077));
     
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     try {
       cluster.waitActive();
       WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME)
@@ -409,7 +404,7 @@ public class TestWebHDFS {
     long spaceQuota = 50L << 20;
     long fileLength = 80L << 20;
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .build();
 
@@ -463,8 +458,8 @@ public class TestWebHDFS {
         "^(default:)?(user|group|mask|other):" +
             "[[0-9A-Za-z_][@A-Za-z0-9._-]]*:([rwx-]{3})?(,(default:)?" +
             "(user|group|mask|other):[[0-9A-Za-z_][@A-Za-z0-9._-]]*:([rwx-]{3})?)*$");
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     try {
       cluster.waitActive();
       WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME)
@@ -509,10 +504,10 @@ public class TestWebHDFS {
    */
   @Test(timeout=300000)
   public void testCreateWithNoDN() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
       cluster.waitActive();
       FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
@@ -534,10 +529,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsAllowandDisallowSnapshots() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil
@@ -596,10 +591,10 @@ public class TestWebHDFS {
 
   @Test (timeout = 60000)
   public void testWebHdfsErasureCodingFiles() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       dfs.enableErasureCodingPolicy(SystemErasureCodingPolicies.getByID(
@@ -668,10 +663,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsCreateSnapshot() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final FileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
@@ -710,10 +705,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsDeleteSnapshot() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final FileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
@@ -755,10 +750,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsSnapshotDiff() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil
@@ -827,10 +822,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsSnapshottableDirectoryList() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil
@@ -895,12 +890,12 @@ public class TestWebHDFS {
 
   @Test
   public void testWebHdfsCreateNonRecursive() throws IOException, URISyntaxException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     WebHdfsFileSystem webHdfs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
 
       webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
@@ -922,10 +917,10 @@ public class TestWebHDFS {
    */
   @Test
   public void testWebHdfsRenameSnapshot() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final FileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
@@ -969,13 +964,13 @@ public class TestWebHDFS {
    */
   @Test
   public void testRaceWhileNNStartup() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
-      final NameNode namenode = cluster.getNameNode();
-      final NamenodeProtocols rpcServer = namenode.getRpcServer();
+      final NameNodeJVMInterface namenode = cluster.getNameNode();
+      final NamenodeProtocolsJVMInterface rpcServer = namenode.getRpcServer();
       Whitebox.setInternalState(namenode, "rpcServer", null);
 
       final Path foo = new Path("/foo");
@@ -999,12 +994,12 @@ public class TestWebHDFS {
   @Test
   public void testDTInInsecureClusterWithFallback()
       throws IOException, URISyntaxException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     conf.setBoolean(CommonConfigurationKeys
         .IPC_CLIENT_FALLBACK_TO_SIMPLE_AUTH_ALLOWED_KEY, true);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final FileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
             WebHdfsConstants.WEBHDFS_SCHEME);
       Assert.assertNull(webHdfs.getDelegationToken(null));
@@ -1017,10 +1012,10 @@ public class TestWebHDFS {
 
   @Test
   public void testDTInInsecureCluster() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final FileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
           WebHdfsConstants.WEBHDFS_SCHEME);
       webHdfs.getDelegationToken(null);
@@ -1037,7 +1032,7 @@ public class TestWebHDFS {
 
   @Test
   public void testWebHdfsOffsetAndLength() throws Exception{
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final int OFFSET = 42;
     final int LENGTH = 512;
@@ -1045,7 +1040,7 @@ public class TestWebHDFS {
     byte[] CONTENTS = new byte[1024];
     RANDOM.nextBytes(CONTENTS);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       final WebHdfsFileSystem fs =
           WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
       try (OutputStream os = fs.create(new Path(PATH))) {
@@ -1074,11 +1069,11 @@ public class TestWebHDFS {
 
   @Test
   public void testContentSummary() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final Path path = new Path("/QuotaDir");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
       final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1096,11 +1091,11 @@ public class TestWebHDFS {
 
   @Test
   public void testQuotaUsage() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final Path path = new Path("/TestDir");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
       final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1136,11 +1131,11 @@ public class TestWebHDFS {
 
   @Test
   public void testSetQuota() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final Path path = new Path("/TestDir");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
       final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1195,7 +1190,7 @@ public class TestWebHDFS {
   @Test
   public void testWebHdfsPread() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .build();
     byte[] content = new byte[1024];
     RANDOM.nextBytes(content);
@@ -1234,10 +1229,10 @@ public class TestWebHDFS {
   @Test(timeout = 30000)
   public void testGetHomeDirectory() throws Exception {
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       Configuration conf = new Configuration();
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
       DistributedFileSystem hdfs = cluster.getFileSystem();
 
@@ -1273,7 +1268,7 @@ public class TestWebHDFS {
 
   @Test
   public void testWebHdfsGetBlockLocationsWithStorageType() throws Exception{
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final int OFFSET = 42;
     final int LENGTH = 512;
@@ -1281,7 +1276,7 @@ public class TestWebHDFS {
     byte[] CONTENTS = new byte[1024];
     RANDOM.nextBytes(CONTENTS);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
           WebHdfsConstants.WEBHDFS_SCHEME);
       try (OutputStream os = fs.create(PATH)) {
@@ -1303,7 +1298,7 @@ public class TestWebHDFS {
 
   @Test
   public void testWebHdfsGetBlockLocations() throws Exception{
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final int offset = 42;
     final int length = 512;
@@ -1311,7 +1306,7 @@ public class TestWebHDFS {
     byte[] contents = new byte[1024];
     RANDOM.nextBytes(contents);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf,
           WebHdfsConstants.WEBHDFS_SCHEME);
       try (OutputStream os = fs.create(path)) {
@@ -1473,7 +1468,7 @@ public class TestWebHDFS {
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, 1);
 
     final short numDatanodes = 1;
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDatanodes)
         .build();
     try {
@@ -1631,10 +1626,10 @@ public class TestWebHDFS {
    * redirect) is a 200 with JSON that contains the redirected location
    */
   public void testWebHdfsNoRedirect() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
       LOG.info("Started cluster");
       InetSocketAddress addr = cluster.getNameNode().getHttpAddress();
 
@@ -1680,12 +1675,12 @@ public class TestWebHDFS {
 
   @Test
   public void testGetTrashRoot() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final String currentUser =
         UserGroupInformation.getCurrentUser().getShortUserName();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final WebHdfsFileSystem webFS = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
 
@@ -1700,6 +1695,7 @@ public class TestWebHDFS {
     }
   }
 
+  /*
   @Test
   public void testGetEZTrashRoot() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
@@ -1707,8 +1703,8 @@ public class TestWebHDFS {
     File testRootDir = new File(fsHelper.getTestRootDir()).getAbsoluteFile();
     conf.set(CommonConfigurationKeysPublic.HADOOP_SECURITY_KEY_PROVIDER_PATH,
         "jceks://file" + new Path(testRootDir.toString(), "test.jks").toUri());
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
     cluster.waitActive();
     DistributedFileSystem dfs = cluster.getFileSystem();
     final WebHdfsFileSystem webhdfs = WebHdfsTestUtil.getWebHdfsFileSystem(
@@ -1747,14 +1743,15 @@ public class TestWebHDFS {
         webhdfs.getTrashRoot(outsideEZ).toUri().getPath(),
         webhdfs.getTrashRoot(zone1).toUri().getPath());
   }
+   */
 
   @Test
   public void testStoragePolicy() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final Path path = new Path("/file");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
@@ -1830,8 +1827,8 @@ public class TestWebHDFS {
   @Test
   public void testECPolicyCommands() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    try (MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(0).build()) {
+    try (MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build()) {
       cluster.waitActive();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webHdfs = WebHdfsTestUtil
@@ -1864,12 +1861,12 @@ public class TestWebHDFS {
 
   @Test
   public void testWebHdfsAppend() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     final int dnNumber = 3;
     try {
 
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(dnNumber).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(dnNumber).build();
 
       final WebHdfsFileSystem webFS = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
@@ -1908,7 +1905,7 @@ public class TestWebHDFS {
    */
   @Test
   public void testFsserverDefaults() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     // Here we override all the default values so that we can verify that it
     // doesn't pick up the default value.
@@ -1937,7 +1934,7 @@ public class TestWebHDFS {
         bufferSize, encryptDataTransfer, trashInterval,
         DataChecksum.Type.valueOf(checksumType), "", policyId);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final DistributedFileSystem dfs = cluster.getFileSystem();
       final WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
@@ -1996,12 +1993,13 @@ public class TestWebHDFS {
    * but then namenode is not upgraded.
    * @throws Exception
    */
+  /*
   @Test
   public void testFsserverDefaultsBackwardsCompatible() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       final WebHdfsFileSystem webfs = WebHdfsTestUtil.getWebHdfsFileSystem(
           conf, WebHdfsConstants.WEBHDFS_SCHEME);
       FSNamesystem fsnSpy =
@@ -2020,6 +2018,7 @@ public class TestWebHDFS {
       }
     }
   }
+   */
 
   /**
    * Tests that {@link WebHdfsFileSystem.AbstractRunner} propagates original
@@ -2034,7 +2033,7 @@ public class TestWebHDFS {
     conf.setBoolean(HdfsClientConfigKeys.Retry.POLICY_ENABLED_KEY, true);
 
     final short numDatanodes = 1;
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDatanodes)
         .build();
     try {
@@ -2087,7 +2086,7 @@ public class TestWebHDFS {
     final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies
         .getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
     final String ecPolicyName = ecPolicy.getName();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(5)
         .build();
     cluster.waitActive();

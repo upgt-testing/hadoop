@@ -21,7 +21,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -42,7 +42,7 @@ public class TestCorruptionWithFailover {
     // Enable data to be written, to less replicas in case of pipeline failure.
     conf.setInt(HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure.
         MIN_REPLICATION, 2);
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3)
         .build()) {
       cluster.transitionToActive(0);
@@ -55,14 +55,14 @@ public class TestCorruptionWithFailover {
       }
       out.hsync();
       // Stop one datanode, so as to trigger update pipeline.
-      MiniDFSCluster.DataNodeProperties dn = cluster.stopDataNode(0);
+      MiniDFSClusterInJVM.DataNodeProperties dn = cluster.stopDataNode(0);
       // Write some more data and close the file.
       for (int i = 0; i < 1024 * 1024; i++) {
         out.write(i);
       }
       out.close();
-      BlockManager bm0 = cluster.getNamesystem(0).getBlockManager();
-      BlockManager bm1 = cluster.getNamesystem(1).getBlockManager();
+      BlockManagerJVMInterface bm0 = cluster.getNamesystem(0).getBlockManager();
+      BlockManagerJVMInterface bm1 = cluster.getNamesystem(1).getBlockManager();
       // Mark datanodes as stale, as are marked if a namenode went through a
       // failover, to prevent replica deletion.
       bm0.getDatanodeManager().markAllDatanodesStale();

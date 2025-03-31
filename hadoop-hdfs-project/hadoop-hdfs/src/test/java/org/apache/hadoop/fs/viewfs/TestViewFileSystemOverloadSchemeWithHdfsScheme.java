@@ -37,7 +37,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.test.PathUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -57,7 +57,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme {
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
   private Configuration conf = null;
-  private MiniDFSCluster cluster = null;
+  private static MiniDFSClusterInJVM cluster = null;
   private URI defaultFSURI;
   private File localTargetDir;
   private static final String TEST_ROOT_DIR = PathUtils
@@ -82,7 +82,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme {
         HDFS_SCHEME), DistributedFileSystem.class.getName());
     conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
         CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
     defaultFSURI =
         URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));

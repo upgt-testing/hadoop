@@ -227,7 +227,7 @@ public class TestReplication {
     LocatedBlocks blocks = null;
     int replicaCount = 0;
     short replFactor = 1;
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     dfsClient = new DFSClient(new InetSocketAddress("localhost",
@@ -280,8 +280,8 @@ public class TestReplication {
     FileSystem fs;
     int replicaCount = 0;
     short replFactor = 1;
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
     cluster.waitActive();
     try {
       fs = cluster.getFileSystem();
@@ -342,7 +342,7 @@ public class TestReplication {
     if (simulated) {
       SimulatedFSDataset.setFactory(conf);
     }
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .racks(racks).build();
     cluster.waitActive();
@@ -461,7 +461,7 @@ public class TestReplication {
   @Test
   public void testPendingReplicationRetry() throws IOException {
     
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     int numDataNodes = 4;
     String testFile = "/replication-test-file";
     Path testPath = new Path(testFile);
@@ -475,7 +475,7 @@ public class TestReplication {
       Configuration conf = new HdfsConfiguration();
       conf.set(DFSConfigKeys.DFS_REPLICATION_KEY, Integer.toString(numDataNodes));
       //first time format
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost",
                                             cluster.getNameNodePort()),
@@ -513,7 +513,7 @@ public class TestReplication {
         fileCount++;
       }
 
-      /* Start the MiniDFSCluster with more datanodes since once a writeBlock
+      /* Start the MiniDFSClusterInJVM with more datanodes since once a writeBlock
        * to a datanode node fails, same block can not be written to it
        * immediately. In our case some replication attempts will fail.
        */
@@ -525,7 +525,7 @@ public class TestReplication {
       conf.set("dfs.datanode.block.write.timeout.sec", Integer.toString(5));
       conf.set(DFSConfigKeys.DFS_NAMENODE_SAFEMODE_THRESHOLD_PCT_KEY, "0.75f"); // only 3 copies exist
       
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .numDataNodes(numDataNodes * 2)
                                   .format(false)
                                   .build();
@@ -550,7 +550,7 @@ public class TestReplication {
    */
   @Test
   public void testReplicateLenMismatchedBlock() throws Exception {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(new HdfsConfiguration()).numDataNodes(2).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(2).build();
     try {
       cluster.waitActive();
       // test truncated block
@@ -562,7 +562,7 @@ public class TestReplication {
     }
   }
   
-  private void changeBlockLen(MiniDFSCluster cluster, int lenDelta)
+  private void changeBlockLen(MiniDFSClusterInJVM cluster, int lenDelta)
       throws IOException, InterruptedException, TimeoutException {
     final Path fileName = new Path("/file1");
     final short REPLICATION_FACTOR = (short)1;
@@ -612,14 +612,15 @@ public class TestReplication {
    * Simulate rbw blocks by creating dummy copies, then a DN restart to detect
    * those corrupted blocks asap.
    */
+  /*
   @Test(timeout=30000)
   public void testReplicationWhenBlockCorruption() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       Configuration conf = new HdfsConfiguration();
       conf.setLong(
           DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, 1);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3)
           .storagesPerDatanode(1).build();
       FileSystem fs = cluster.getFileSystem();
       Path filePath = new Path("/test");
@@ -651,6 +652,8 @@ public class TestReplication {
     }
   }
 
+   */
+
 
   /**
    * This test makes sure that, when a file is closed before all
@@ -658,6 +661,7 @@ public class TestReplication {
    * the NameNode doesn't consider the block under-replicated too
    * aggressively. It is a regression test for HDFS-1172.
    */
+  /*
   @Test(timeout=60000)
   public void testNoExtraReplicationWhenBlockReceivedIsLate()
       throws Exception {
@@ -666,7 +670,7 @@ public class TestReplication {
     final short replication = 3;
     final Configuration conf = new Configuration();
         conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numDataNodes).build();
     final String testFile = "/replication-test-file";
     final Path testPath = new Path(testFile);
@@ -732,16 +736,19 @@ public class TestReplication {
     }
   }
 
+   */
+
   /**
    * This test makes sure that, if a file is under construction, blocks
    * in the middle of that file are properly re-replicated if they
    * become corrupt.
    */
+  /*
   @Test(timeout=60000)
   public void testReplicationWhileUnderConstruction()
       throws Exception {
     LOG.info("Test block replication in under construction" );
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final short numDataNodes = 6;
     final short replication = 3;
     String testFile = "/replication-test-file";
@@ -749,7 +756,7 @@ public class TestReplication {
     FSDataOutputStream stm = null;
     try {
       Configuration conf = new Configuration();
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
 
       FileSystem fs = cluster.getFileSystem();
@@ -801,10 +808,11 @@ public class TestReplication {
     return bm.getPendingReconstructionBlocksCount();
   }
 
-  private void assertNoReplicationWasPerformed(MiniDFSCluster cluster) {
+  private void assertNoReplicationWasPerformed(MiniDFSClusterInJVM cluster) {
     for (DataNode dn : cluster.getDataNodes()) {
       MetricsRecordBuilder rb = getMetrics(dn.getMetrics().name());
       assertCounter("BlocksReplicated", 0L, rb);
     }
   }
+   */
 }

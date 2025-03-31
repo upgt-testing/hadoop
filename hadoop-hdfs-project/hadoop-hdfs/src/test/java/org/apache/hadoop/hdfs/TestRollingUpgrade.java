@@ -33,6 +33,8 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeDataSupport;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -40,7 +42,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.RollingUpgradeAction;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
 import org.apache.hadoop.hdfs.protocol.RollingUpgradeInfo;
@@ -48,11 +50,6 @@ import org.apache.hadoop.hdfs.qjournal.MiniJournalCluster;
 import org.apache.hadoop.hdfs.qjournal.MiniQJMHACluster;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.namenode.CheckpointFaultInjector;
-import org.apache.hadoop.hdfs.server.namenode.FSImage;
-import org.apache.hadoop.hdfs.server.namenode.NNStorage;
-import org.apache.hadoop.hdfs.server.namenode.SecondaryNameNode;
-import org.apache.hadoop.hdfs.server.namenode.TestFileTruncate;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -87,9 +84,9 @@ public class TestRollingUpgrade {
   public void testDFSAdminRollingUpgradeCommands() throws Exception {
     // start a cluster
     final Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
 
       final Path foo = new Path("/foo");
@@ -165,7 +162,7 @@ public class TestRollingUpgrade {
 
   @Test (timeout = 30000)
   public void testRollingUpgradeWithQJM() throws Exception {
-    String nnDirPrefix = MiniDFSCluster.getBaseDirectory() + "/nn/";
+    String nnDirPrefix = MiniDFSClusterInJVM.getBaseDirectory() + "/nn/";
     final File nn1Dir = new File(nnDirPrefix + "image1");
     final File nn2Dir = new File(nnDirPrefix + "image2");
 
@@ -179,7 +176,7 @@ public class TestRollingUpgrade {
 
     {
       // Start the cluster once to generate the dfs dirs
-      final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+      final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(0)
         .manageNameDfsDirs(false)
         .checkExitOnShutdown(false)
@@ -189,7 +186,7 @@ public class TestRollingUpgrade {
       cluster.shutdown();
     }
 
-    MiniDFSCluster cluster2 = null;
+    MiniDFSClusterInJVM cluster2 = null;
     try {
       // Start a second NN pointed to the same quorum.
       // We need to copy the image dir from the first NN -- or else
@@ -199,7 +196,7 @@ public class TestRollingUpgrade {
           new Path(nn2Dir.getAbsolutePath()), false, conf);
 
       // Start the cluster again
-      final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+      final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(0)
         .format(false)
         .manageNameDfsDirs(false)
@@ -230,7 +227,7 @@ public class TestRollingUpgrade {
 
       // cluster2 takes over QJM
       final Configuration conf2 = setConf(new Configuration(), nn2Dir, mjc);
-      cluster2 = new MiniDFSCluster.Builder(conf2)
+      cluster2 = new MiniDFSClusterInJVM.Builder(conf2)
         .numDataNodes(0)
         .format(false)
         .manageNameDfsDirs(false)
@@ -310,9 +307,9 @@ public class TestRollingUpgrade {
   public void testRollback() throws Exception {
     // start a cluster
     final Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
 
       final Path foo = new Path("/foo");
@@ -371,7 +368,7 @@ public class TestRollingUpgrade {
 
   private static void startRollingUpgrade(Path foo, Path bar,
       Path file, byte[] data,
-      MiniDFSCluster cluster) throws IOException {
+      MiniDFSClusterInJVM cluster) throws IOException {
     final DistributedFileSystem dfs = cluster.getFileSystem();
 
     //start rolling upgrade
@@ -393,7 +390,7 @@ public class TestRollingUpgrade {
 
   private static void rollbackRollingUpgrade(Path foo, Path bar,
       Path file, byte[] data,
-      MiniDFSCluster cluster) throws IOException {
+      MiniDFSClusterInJVM cluster) throws IOException {
     final DataNodeProperties dnprop = cluster.stopDataNode(0);
     cluster.restartNameNode("-rollingUpgrade", "rollback");
     cluster.restartDataNode(dnprop, true);
@@ -408,12 +405,12 @@ public class TestRollingUpgrade {
   public void testDFSAdminDatanodeUpgradeControlCommands() throws Exception {
     // start a cluster
     final Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       final DFSAdmin dfsadmin = new DFSAdmin(conf);
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
 
       // check the datanode
       final String dnAddr = dn.getDatanodeId().getIpcAddr(false);
@@ -571,9 +568,9 @@ public class TestRollingUpgrade {
   @Test (timeout = 300000)
   public void testQueryAfterRestart() throws IOException, InterruptedException {
     final Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       DistributedFileSystem dfs = cluster.getFileSystem();
 
@@ -638,7 +635,7 @@ public class TestRollingUpgrade {
       RollingUpgradeInfo info = dfs
           .rollingUpgrade(RollingUpgradeAction.PREPARE);
       Assert.assertTrue(info.isStarted());
-      FSImage fsimage = dfsCluster.getNamesystem(0).getFSImage();
+      FSImageJVMInterface fsimage = dfsCluster.getNamesystem(0).getFSImage();
       queryForPreparation(dfs);
       // The NN should have a copy of the fsimage in case of rollbacks.
       Assert.assertTrue(fsimage.hasRollbackFSImage());
@@ -691,6 +688,19 @@ public class TestRollingUpgrade {
   /**
    * Verify that the namenode at the given index has an FSImage with a TxId up to txid-1
    */
+  private void verifyNNCheckpoint(MiniDFSClusterInJVM dfsCluster, long txid, int nnIndex) throws InterruptedException {
+    int retries = 0;
+    while (++retries < 5) {
+      NNStorageJVMInterface storage = dfsCluster.getNamesystem(nnIndex).getFSImage()
+              .getStorage();
+      if (storage.getFsImageName(txid - 1) != null) {
+        return;
+      }
+      Thread.sleep(1000);
+    }
+    Assert.fail("new checkpoint does not exist");
+  }
+
   private void verifyNNCheckpoint(MiniDFSCluster dfsCluster, long txid, int nnIndex) throws InterruptedException {
     int retries = 0;
     while (++retries < 5) {
@@ -727,13 +737,13 @@ public class TestRollingUpgrade {
    */
   @Test
   public void testCheckpointWithSNN() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     DistributedFileSystem dfs = null;
     SecondaryNameNode snn = null;
 
     try {
       Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
 
       conf.set(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY,

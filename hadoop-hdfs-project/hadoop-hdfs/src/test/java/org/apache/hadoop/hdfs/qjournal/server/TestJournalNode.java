@@ -25,7 +25,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.qjournal.QJMTestUtil;
 import org.apache.hadoop.hdfs.qjournal.client.IPCLoggerChannel;
 import org.apache.hadoop.hdfs.qjournal.protocol.QJournalProtocolProtos.NewEpochResponseProto;
@@ -80,7 +80,7 @@ public class TestJournalNode {
   
   @Before
   public void setup() throws Exception {
-    File editsDir = new File(MiniDFSCluster.getBaseDirectory() +
+    File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory() +
         File.separator + "TestJournalNode");
     FileUtil.fullyDelete(editsDir);
     journalId = "test-journalid-" + GenericTestUtils.uniqueSequenceId();
@@ -201,7 +201,7 @@ public class TestJournalNode {
       String jid = "test-journalid-" + nsId;
       Journal nsJournal = jn.getJournal(jid);
       JNStorage journalStorage = nsJournal.getStorage();
-      File editsDir = new File(MiniDFSCluster.getBaseDirectory() +
+      File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory() +
           File.separator + "TestJournalNode" + File.separator
           + nsId + File.separator + jid);
       assertEquals(editsDir.toString(), journalStorage.getRoot().toString());
@@ -216,7 +216,7 @@ public class TestJournalNode {
       String jid = "test-journalid-" + nsId;
       Journal nsJournal = jn.getJournal(jid);
       JNStorage journalStorage = nsJournal.getStorage();
-      File editsDir = new File(MiniDFSCluster.getBaseDirectory() +
+      File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory() +
           File.separator + "TestJournalNode" + File.separator + jid);
       assertEquals(editsDir.toString(), journalStorage.getRoot().toString());
     }
@@ -229,7 +229,7 @@ public class TestJournalNode {
     String jid = "test-journalid-ns1";
     Journal nsJournal = jn.getJournal(jid);
     JNStorage journalStorage = nsJournal.getStorage();
-    File editsDir = new File(MiniDFSCluster.getBaseDirectory() +
+    File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory() +
         File.separator + "TestJournalNode" + File.separator + "ns1" + File
         .separator + jid);
     assertEquals(editsDir.toString(), journalStorage.getRoot().toString());

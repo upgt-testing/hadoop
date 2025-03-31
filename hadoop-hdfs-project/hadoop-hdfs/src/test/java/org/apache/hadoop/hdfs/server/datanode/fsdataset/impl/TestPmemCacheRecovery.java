@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.HdfsBlockLocation;
@@ -45,7 +46,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.CacheDirectiveInfo;
 import org.apache.hadoop.hdfs.protocol.CachePoolInfo;
 import org.apache.hadoop.io.nativeio.NativeIO;
@@ -78,9 +79,9 @@ public class TestPmemCacheRecovery {
   protected static final long BLOCK_SIZE = 4 * 1024;
 
   private static Configuration conf;
-  private static MiniDFSCluster cluster = null;
+  private static MiniDFSClusterInJVM cluster = null;
   private static DistributedFileSystem fs;
-  private static DataNode dn;
+  private static DataNodeJVMInterface dn;
   private static FsDatasetCache cacheManager;
   private static String blockPoolId = "";
   /**
@@ -92,9 +93,9 @@ public class TestPmemCacheRecovery {
   private static DataNodeFaultInjector oldInjector;
 
   private static final String PMEM_DIR_0 =
-      MiniDFSCluster.getBaseDirectory() + "pmem0";
+      MiniDFSClusterInJVM.getBaseDirectory() + "pmem0";
   private static final String PMEM_DIR_1 =
-      MiniDFSCluster.getBaseDirectory() + "pmem1";
+      MiniDFSClusterInJVM.getBaseDirectory() + "pmem1";
 
   static {
     GenericTestUtils.setLogLevel(
@@ -133,7 +134,7 @@ public class TestPmemCacheRecovery {
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(
         DFS_DATANODE_FSDATASETCACHE_MAX_THREADS_PER_VOLUME_KEY, 10);
-
+    
     // Configuration for pmem cache
     new File(PMEM_DIR_0).getAbsoluteFile().mkdir();
     new File(PMEM_DIR_1).getAbsoluteFile().mkdir();
@@ -143,7 +144,7 @@ public class TestPmemCacheRecovery {
     prevCacheManipulator = NativeIO.POSIX.getCacheManipulator();
     NativeIO.POSIX.setCacheManipulator(new NoMlockCacheManipulator());
 
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1).build();
     cluster.waitActive();
 
@@ -182,7 +183,7 @@ public class TestPmemCacheRecovery {
     NativeIO.POSIX.setCacheManipulator(new NoMlockCacheManipulator());
 
     FsDatasetImpl.setBlockPoolId(blockPoolId);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1).build();
     cluster.waitActive();
 

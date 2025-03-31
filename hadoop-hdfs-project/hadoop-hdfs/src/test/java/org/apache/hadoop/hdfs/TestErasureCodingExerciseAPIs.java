@@ -67,7 +67,7 @@ import static org.junit.Assert.*;
  */
 public class TestErasureCodingExerciseAPIs {
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private HdfsAdmin dfsAdmin;
   private FileSystemTestWrapper fsWrapper;
@@ -100,7 +100,7 @@ public class TestErasureCodingExerciseAPIs {
         keyProviderURI);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY,
         true);
-    cluster = new MiniDFSCluster.Builder(conf).
+    cluster = new MiniDFSClusterInJVM.Builder(conf).
         numDataNodes(ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits()).
         build();
     cluster.waitActive();

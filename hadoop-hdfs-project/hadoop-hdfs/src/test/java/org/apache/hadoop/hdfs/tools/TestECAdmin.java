@@ -19,7 +19,7 @@ package org.apache.hadoop.hdfs.tools;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 public class TestECAdmin {
   public static final Logger LOG = LoggerFactory.getLogger(TestECAdmin.class);
   private Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private ECAdmin admin = new ECAdmin(conf);
 
   private final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -80,7 +80,7 @@ public class TestECAdmin {
 
   @Test
   public void testRS63MinDN() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 6, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 6, 3, 0);
     String[] args = {"-verifyClusterSetup"};
     final int ret = admin.run(args);
     LOG.info("Command stdout: {}", out.toString());
@@ -94,7 +94,7 @@ public class TestECAdmin {
 
   @Test
   public void testRS104MinRacks() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 15, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 15, 3, 0);
     cluster.getFileSystem().enableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_10_4_POLICY_ID).getName());
@@ -111,7 +111,7 @@ public class TestECAdmin {
 
   @Test
   public void testXOR21MinRacks() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 2, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 2, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -131,7 +131,7 @@ public class TestECAdmin {
 
   @Test
   public void testRS32MinRacks() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 2, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 2, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -151,7 +151,7 @@ public class TestECAdmin {
 
   @Test
   public void testRS63Good() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 9, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 9, 3, 0);
     String[] args = {"-verifyClusterSetup"};
     final int ret = admin.run(args);
     LOG.info("Command stdout: {}", out.toString());
@@ -165,7 +165,7 @@ public class TestECAdmin {
 
   @Test
   public void testNoECEnabled() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 9, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 9, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -182,7 +182,7 @@ public class TestECAdmin {
 
   @Test
   public void testUnsuccessfulEnablePolicyMessage() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 2, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 2, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -204,7 +204,7 @@ public class TestECAdmin {
 
   @Test
   public void testSuccessfulEnablePolicyMessage() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -223,7 +223,7 @@ public class TestECAdmin {
 
   @Test
   public void testEnableNonExistentPolicyMessage() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 3, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 3, 0);
     cluster.getFileSystem().disableErasureCodingPolicy(
         SystemErasureCodingPolicies
             .getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID).getName());
@@ -242,7 +242,7 @@ public class TestECAdmin {
 
   @Test
   public void testVerifyClusterSetupWithGivenPolicies() throws Exception {
-    cluster = DFSTestUtil.setupCluster(conf, 5, 2, 0);
+    cluster = DFSTestUtil.setupJVMCluster(conf, 5, 2, 0);
 
     String[] args = new String[]{"-verifyClusterSetup", "-policy",
         "RS-3-2-1024k"};
