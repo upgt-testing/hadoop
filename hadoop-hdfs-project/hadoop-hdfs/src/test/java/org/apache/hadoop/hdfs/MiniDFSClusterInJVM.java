@@ -582,8 +582,23 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 builder.useConfiguredTopologyMappingClass);
 
         // restart immediately for DN-0 and NN-0
+        activeFirstNNIfAllStandby();
         //restartNodeForTesting(0);
         //upgradeNodeForTesting(0);
+    }
+
+    public void activeFirstNNIfAllStandby() throws IOException {
+        int activeNN = -1;
+        for (int i = 0; i < namenodes.size(); i++) {
+            NameNodeInfo nn = getNN(i);
+            if (nn.nameNode.getNamesystem().getHAState().equals(("active"))) {
+                activeNN = i;
+                break;
+            }
+        }
+        if (activeNN == -1) {
+            transitionToActive(0);
+        }
     }
 
     public static class DataNodeProperties {
