@@ -3,6 +3,7 @@ package org.apache.hadoop.hdfs.server.namenode;
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import edu.illinois.instance.Instance;
+import jdk.internal.org.jline.utils.Log;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
@@ -22,16 +23,12 @@ import static org.apache.hadoop.fs.FileSystem.FS_DEFAULT_NAME_KEY;
 public class NameNodeInstance extends Instance {
     private final static String NameNodeClassName = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     private final static String ConfigurationClassName = "org.apache.hadoop.conf.Configuration";
-    public final static String StartVersion = System.getProperty("upgt.start.version", "3.5.0-SNAPSHOT");
-    public final static String UpgradeVersion = System.getProperty("upgt.upgrade.version", "3.5.1-SNAPSHOT");
-    private String curVersion;
-    Class<?> nameNodeClass = null;
+    //public final static String StartVersion = System.getProperty("upgt.start.version");
+    //public final static String UpgradeVersion = System.getProperty("upgt.upgrade.version");
+    //Class<?> nameNodeClass = null;
 
     public NameNodeInstance(String version) {
-        super();
-        if (version == null) {
-            throw new IllegalArgumentException("Cluster Version cannot be null");
-        }
+        super(version);
         curVersion = version;
         init(version);
     }
@@ -40,15 +37,19 @@ public class NameNodeInstance extends Instance {
         this(StartVersion);
     }
 
+    /*
     public VersionClassLoader createVersionClassLoader() {
         return createVersionClassLoader(curVersion);
     }
 
+     */
+
     public void init(String version) {
-        createVersionClassLoader(version);
+        //createVersionClassLoader(version);
         setMiniClusterTestingMode();
     }
 
+    /*
     public VersionClassLoader createVersionClassLoader(String version) {
         VersionSelector versionSelector = new VersionSelector();
 
@@ -67,6 +68,8 @@ public class NameNodeInstance extends Instance {
 
         return versionClassLoader;
     }
+
+     */
 
     public void setMiniClusterTestingMode() {
         //DefaultMetricsSystem.setMiniClusterMode(true);
@@ -196,15 +199,16 @@ public class NameNodeInstance extends Instance {
      * @param newVersion the new version to upgrade to
      * @return the NameNodeJVMInterface object
      * @throws IOException if the new NN creation with target newVersion fails
-     */
+
     public NameNodeJVMInterface upgradeNameNodeForInJVMCluster(String[] args, Configuration hdfsConf, String newVersion) throws IOException {
-        // check if the new version is different from the current version, if so, upgrade the NameNode
-        if (newVersion != null && !newVersion.equals(curVersion)) {
-            curVersion = newVersion;
-            init(curVersion);
-        }
-        return createNameNodeForInJVMCluster(args, hdfsConf);
+    // check if the new version is different from the current version, if so, upgrade the NameNode
+    if (newVersion != null && !newVersion.equals(curVersion)) {
+    curVersion = newVersion;
+    init(curVersion);
     }
+    return createNameNodeForInJVMCluster(args, hdfsConf);
+    }
+     */
 
 
     /**
