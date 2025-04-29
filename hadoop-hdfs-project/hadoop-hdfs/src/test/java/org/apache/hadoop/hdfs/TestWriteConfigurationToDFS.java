@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs;
 
 import java.io.OutputStream;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -31,31 +30,157 @@ import org.junit.Test;
  * Configuration.writeXML holds a lock on itself while writing to DFS.
  */
 public class TestWriteConfigurationToDFS {
-  @Test(timeout=60000)
-  public void testWriteConf() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
-    System.out.println("Setting conf in: " + System.identityHashCode(conf));
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    FileSystem fs = null;
-    OutputStream os = null;
-    try {
-      fs = cluster.getFileSystem();
-      Path filePath = new Path("/testWriteConf.xml");
-      os = fs.create(filePath);
-      StringBuilder longString = new StringBuilder();
-      for (int i = 0; i < 100000; i++) {
-        longString.append("hello");
-      } // 500KB
-      conf.set("foobar", longString.toString());
-      conf.writeXml(os);
-      os.close();
-      os = null;
-      fs.close();
-      fs = null;
-    } finally {
-      IOUtils.cleanupWithLogger(null, os, fs);
-      cluster.shutdown();
+
+    @Test(timeout = 60000)
+    public void testWriteConf() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
+        System.out.println("Setting conf in: " + System.identityHashCode(conf));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        FileSystem fs = null;
+        OutputStream os = null;
+        try {
+            fs = cluster.getFileSystem();
+            Path filePath = new Path("/testWriteConf.xml");
+            os = fs.create(filePath);
+            StringBuilder longString = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+                longString.append("hello");
+            }
+            // 500KB
+            conf.set("foobar", longString.toString());
+            conf.writeXml(os);
+            os.close();
+            os = null;
+            fs.close();
+            fs = null;
+        } finally {
+            IOUtils.cleanupWithLogger(null, os, fs);
+            cluster.shutdown();
+        }
     }
-  }
+
+    @Test(timeout = 60000)
+    public void testWriteConf_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
+        System.out.println("Setting conf in: " + System.identityHashCode(conf));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        FileSystem fs = null;
+        OutputStream os = null;
+        try {
+            fs = cluster.getFileSystem();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Path filePath = new Path("/testWriteConf.xml");
+            os = fs.create(filePath);
+            StringBuilder longString = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+                longString.append("hello");
+            }
+            // 500KB
+            conf.set("foobar", longString.toString());
+            conf.writeXml(os);
+            os.close();
+            os = null;
+            fs.close();
+            fs = null;
+        } finally {
+            IOUtils.cleanupWithLogger(null, os, fs);
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testWriteConf_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
+        System.out.println("Setting conf in: " + System.identityHashCode(conf));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        FileSystem fs = null;
+        OutputStream os = null;
+        try {
+            fs = cluster.getFileSystem();
+            Path filePath = new Path("/testWriteConf.xml");
+            os = fs.create(filePath);
+            StringBuilder longString = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+                longString.append("hello");
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // 500KB
+            conf.set("foobar", longString.toString());
+            conf.writeXml(os);
+            os.close();
+            os = null;
+            fs.close();
+            fs = null;
+        } finally {
+            IOUtils.cleanupWithLogger(null, os, fs);
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testWriteConf_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
+        System.out.println("Setting conf in: " + System.identityHashCode(conf));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        FileSystem fs = null;
+        OutputStream os = null;
+        try {
+            fs = cluster.getFileSystem();
+            Path filePath = new Path("/testWriteConf.xml");
+            os = fs.create(filePath);
+            StringBuilder longString = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+                longString.append("hello");
+            }
+            // 500KB
+            conf.set("foobar", longString.toString());
+            conf.writeXml(os);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            os.close();
+            os = null;
+            fs.close();
+            fs = null;
+        } finally {
+            IOUtils.cleanupWithLogger(null, os, fs);
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testWriteConf_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 4096);
+        System.out.println("Setting conf in: " + System.identityHashCode(conf));
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        FileSystem fs = null;
+        OutputStream os = null;
+        try {
+            fs = cluster.getFileSystem();
+            Path filePath = new Path("/testWriteConf.xml");
+            os = fs.create(filePath);
+            StringBuilder longString = new StringBuilder();
+            for (int i = 0; i < 100000; i++) {
+                longString.append("hello");
+            }
+            // 500KB
+            conf.set("foobar", longString.toString());
+            conf.writeXml(os);
+            os.close();
+            os = null;
+            fs.close();
+            fs = null;
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            IOUtils.cleanupWithLogger(null, os, fs);
+            cluster.shutdown();
+        }
+    }
 }

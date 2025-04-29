@@ -15,18 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.ipc.RefreshHandler;
-
 import org.apache.hadoop.ipc.RefreshRegistry;
 import org.apache.hadoop.ipc.RefreshResponse;
 import org.junit.Test;
@@ -43,190 +40,599 @@ import org.mockito.Mockito;
  * After all tests, the cluster is spun down.
  */
 public class TestGenericRefresh {
-  private static MiniDFSClusterInJVM cluster;
-  private static Configuration config;
 
-  private static RefreshHandler firstHandler;
-  private static RefreshHandler secondHandler;
+    private static MiniDFSClusterInJVM cluster;
 
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-    config = new Configuration();
-    config.set("hadoop.security.authorization", "true");
+    private static Configuration config;
 
-    FileSystem.setDefaultUri(config, "hdfs://localhost:0");
-    cluster = new MiniDFSClusterInJVM.Builder(config).build();
-    cluster.waitActive();
-  }
+    private static RefreshHandler firstHandler;
 
-  @AfterClass
-  public static void tearDownBeforeClass() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    private static RefreshHandler secondHandler;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        config = new Configuration();
+        config.set("hadoop.security.authorization", "true");
+        FileSystem.setDefaultUri(config, "hdfs://localhost:0");
+        cluster = new MiniDFSClusterInJVM.Builder(config).build();
+        cluster.waitActive();
     }
-  }
 
-  @Before
-  public void setUp() throws Exception {
-    // Register Handlers, first one just sends an ok response
-    firstHandler = Mockito.mock(RefreshHandler.class);
-    Mockito.when(firstHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
-      .thenReturn(RefreshResponse.successResponse());
-    RefreshRegistry.defaultRegistry().register("firstHandler", firstHandler);
+    @AfterClass
+    public static void tearDownBeforeClass() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
 
-    // Second handler has conditional response for testing args
-    secondHandler = Mockito.mock(RefreshHandler.class);
-    Mockito.when(secondHandler.handleRefresh("secondHandler", new String[]{"one", "two"}))
-      .thenReturn(new RefreshResponse(3, "three"));
-    Mockito.when(secondHandler.handleRefresh("secondHandler", new String[]{"one"}))
-      .thenReturn(new RefreshResponse(2, "two"));
-    RefreshRegistry.defaultRegistry().register("secondHandler", secondHandler);
-  }
+    @Before
+    public void setUp() throws Exception {
+        // Register Handlers, first one just sends an ok response
+        firstHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(firstHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(RefreshResponse.successResponse());
+        RefreshRegistry.defaultRegistry().register("firstHandler", firstHandler);
+        // Second handler has conditional response for testing args
+        secondHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(secondHandler.handleRefresh("secondHandler", new String[] { "one", "two" })).thenReturn(new RefreshResponse(3, "three"));
+        Mockito.when(secondHandler.handleRefresh("secondHandler", new String[] { "one" })).thenReturn(new RefreshResponse(2, "two"));
+        RefreshRegistry.defaultRegistry().register("secondHandler", secondHandler);
+    }
 
-  @After
-  public void tearDown() throws Exception {
-    RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
-    RefreshRegistry.defaultRegistry().unregisterAll("secondHandler");
-  }
+    @After
+    public void tearDown() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        RefreshRegistry.defaultRegistry().unregisterAll("secondHandler");
+    }
 
-  @Test
-  public void testInvalidCommand() throws Exception {
-    DFSAdmin admin = new DFSAdmin(config);
-    String [] args = new String[]{"-refresh", "nn"};
-    int exitCode = admin.run(args);
-    assertEquals("DFSAdmin should fail due to bad args", -1, exitCode);
-  }
+    @Test
+    public void testInvalidCommand() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "nn" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should fail due to bad args", -1, exitCode);
+    }
 
-  @Test
-  public void testInvalidIdentifier() throws Exception {
-    DFSAdmin admin = new DFSAdmin(config);
-    String [] args = new String[]{"-refresh", "localhost:" + 
-        cluster.getNameNodePort(), "unregisteredIdentity"};
-    int exitCode = admin.run(args);
-    assertEquals("DFSAdmin should fail due to no handler registered", -1, exitCode);
-  }
+    @Test
+    public void testInvalidIdentifier() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "unregisteredIdentity" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should fail due to no handler registered", -1, exitCode);
+    }
 
-  @Test
-  public void testValidIdentifier() throws Exception {
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh",
-        "localhost:" + cluster.getNameNodePort(), "firstHandler"};
-    int exitCode = admin.run(args);
-    assertEquals("DFSAdmin should succeed", 0, exitCode);
+    @Test
+    public void testValidIdentifier() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should succeed", 0, exitCode);
+        Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[] {});
+        // Second handler was never called
+        Mockito.verify(secondHandler, Mockito.never()).handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
+    }
 
-    Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[]{});
-    // Second handler was never called
-    Mockito.verify(secondHandler, Mockito.never())
-      .handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
-  }
+    @Test
+    public void testVariableArgs() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return 2", 2, exitCode);
+        exitCode = admin.run(new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one", "two" });
+        assertEquals("DFSAdmin should now return 3", 3, exitCode);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one", "two" });
+    }
 
-  @Test
-  public void testVariableArgs() throws Exception {
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "secondHandler", "one"};
-    int exitCode = admin.run(args);
-    assertEquals("DFSAdmin should return 2", 2, exitCode);
+    @Test
+    public void testUnregistration() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        // And now this should fail
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return -1", -1, exitCode);
+    }
 
-    exitCode = admin.run(new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "secondHandler", "one", "two"});
-    assertEquals("DFSAdmin should now return 3", 3, exitCode);
+    @Test
+    public void testUnregistrationReturnValue() {
+        RefreshHandler mockHandler = Mockito.mock(RefreshHandler.class);
+        RefreshRegistry.defaultRegistry().register("test", mockHandler);
+        boolean ret = RefreshRegistry.defaultRegistry().unregister("test", mockHandler);
+        assertTrue(ret);
+    }
 
-    Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[]{"one"});
-    Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[]{"one", "two"});
-  }
+    @Test
+    public void testMultipleRegistration() throws Exception {
+        RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
+        RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+        // this should trigger both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "sharedId", "one" };
+        int exitCode = admin.run(args);
+        // -1 because one of the responses is unregistered
+        assertEquals(-1, exitCode);
+        // verify we called both
+        Mockito.verify(firstHandler).handleRefresh("sharedId", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("sharedId", new String[] { "one" });
+        RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
+    }
 
-  @Test
-  public void testUnregistration() throws Exception {
-    RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+    @Test
+    public void testMultipleReturnCodeMerging() throws Exception {
+        // Two handlers which return two non-zero values
+        RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(23, "Twenty Three"));
+        RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(10, "Ten"));
+        // Then registered to the same ID
+        RefreshRegistry.defaultRegistry().register("shared", handlerOne);
+        RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+        // We refresh both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "shared" };
+        int exitCode = admin.run(args);
+        // We get -1 because of our logic for melding non-zero return codes
+        assertEquals(-1, exitCode);
+        // Verify we called both
+        Mockito.verify(handlerOne).handleRefresh("shared", new String[] {});
+        Mockito.verify(handlerTwo).handleRefresh("shared", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("shared");
+    }
 
-    // And now this should fail
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "firstHandler"};
-    int exitCode = admin.run(args);
-    assertEquals("DFSAdmin should return -1", -1, exitCode);
-  }
+    @Test
+    public void testExceptionResultsInNormalError() throws Exception {
+        // In this test, we ensure that all handlers are called even if we throw an exception in one
+        RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+        RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("More Exceptions"));
+        RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
+        RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "exceptional" };
+        int exitCode = admin.run(args);
+        // Exceptions result in a -1
+        assertEquals(-1, exitCode);
+        Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[] {});
+        Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
+    }
 
-  @Test
-  public void testUnregistrationReturnValue() {
-    RefreshHandler mockHandler = Mockito.mock(RefreshHandler.class);
-    RefreshRegistry.defaultRegistry().register("test", mockHandler);
-    boolean ret = RefreshRegistry.defaultRegistry().unregister("test", mockHandler);
-    assertTrue(ret);
-  }
+    @Test
+    public void testInvalidIdentifier_withUpgrade20() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "unregisteredIdentity" };
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should fail due to no handler registered", -1, exitCode);
+    }
 
-  @Test
-  public void testMultipleRegistration() throws Exception {
-    RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
-    RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+    @Test
+    public void testInvalidIdentifier_withUpgrade40() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "unregisteredIdentity" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertEquals("DFSAdmin should fail due to no handler registered", -1, exitCode);
+    }
 
-    // this should trigger both
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "sharedId", "one"};
-    int exitCode = admin.run(args);
-    assertEquals(-1, exitCode); // -1 because one of the responses is unregistered
+    @Test
+    public void testInvalidIdentifier_withUpgrade80() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "unregisteredIdentity" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should fail due to no handler registered", -1, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 
-    // verify we called both
-    Mockito.verify(firstHandler).handleRefresh("sharedId", new String[]{"one"});
-    Mockito.verify(secondHandler).handleRefresh("sharedId", new String[]{"one"});
+    @Test
+    public void testValidIdentifier_withUpgrade20() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertEquals("DFSAdmin should succeed", 0, exitCode);
+        Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[] {});
+        // Second handler was never called
+        Mockito.verify(secondHandler, Mockito.never()).handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
+    }
 
-    RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
-  }
+    @Test
+    public void testValidIdentifier_withUpgrade40() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should succeed", 0, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[] {});
+        // Second handler was never called
+        Mockito.verify(secondHandler, Mockito.never()).handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
+    }
 
-  @Test
-  public void testMultipleReturnCodeMerging() throws Exception {
-    // Two handlers which return two non-zero values
-    RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
-    Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
-      .thenReturn(new RefreshResponse(23, "Twenty Three"));
+    @Test
+    public void testValidIdentifier_withUpgrade60() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should succeed", 0, exitCode);
+        Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[] {});
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Second handler was never called
+        Mockito.verify(secondHandler, Mockito.never()).handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
+    }
 
-    RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
-    Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
-      .thenReturn(new RefreshResponse(10, "Ten"));
+    @Test
+    public void testValidIdentifier_withUpgrade80() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should succeed", 0, exitCode);
+        Mockito.verify(firstHandler).handleRefresh("firstHandler", new String[] {});
+        // Second handler was never called
+        Mockito.verify(secondHandler, Mockito.never()).handleRefresh(Mockito.anyString(), Mockito.any(String[].class));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 
-    // Then registered to the same ID
-    RefreshRegistry.defaultRegistry().register("shared", handlerOne);
-    RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+    @Test
+    public void testVariableArgs_withUpgrade20() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertEquals("DFSAdmin should return 2", 2, exitCode);
+        exitCode = admin.run(new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one", "two" });
+        assertEquals("DFSAdmin should now return 3", 3, exitCode);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one", "two" });
+    }
 
-    // We refresh both
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "shared"};
-    int exitCode = admin.run(args);
-    assertEquals(-1, exitCode); // We get -1 because of our logic for melding non-zero return codes
+    @Test
+    public void testVariableArgs_withUpgrade40() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return 2", 2, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        exitCode = admin.run(new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one", "two" });
+        assertEquals("DFSAdmin should now return 3", 3, exitCode);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one", "two" });
+    }
 
-    // Verify we called both
-    Mockito.verify(handlerOne).handleRefresh("shared", new String[]{});
-    Mockito.verify(handlerTwo).handleRefresh("shared", new String[]{});
+    @Test
+    public void testVariableArgs_withUpgrade60() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return 2", 2, exitCode);
+        exitCode = admin.run(new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one", "two" });
+        assertEquals("DFSAdmin should now return 3", 3, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one", "two" });
+    }
 
-    RefreshRegistry.defaultRegistry().unregisterAll("shared");
-  }
+    @Test
+    public void testVariableArgs_withUpgrade80() throws Exception {
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return 2", 2, exitCode);
+        exitCode = admin.run(new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "secondHandler", "one", "two" });
+        assertEquals("DFSAdmin should now return 3", 3, exitCode);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one" });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Mockito.verify(secondHandler).handleRefresh("secondHandler", new String[] { "one", "two" });
+    }
 
-  @Test
-  public void testExceptionResultsInNormalError() throws Exception {
-    // In this test, we ensure that all handlers are called even if we throw an exception in one
-    RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
-    Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
-      .thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+    @Test
+    public void testUnregistration_withUpgrade20() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        // And now this should fail
+        DFSAdmin admin = new DFSAdmin(config);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return -1", -1, exitCode);
+    }
 
-    RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
-    Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class)))
-      .thenThrow(new RuntimeException("More Exceptions"));
+    @Test
+    public void testUnregistration_withUpgrade40() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        // And now this should fail
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return -1", -1, exitCode);
+    }
 
-    RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
-    RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+    @Test
+    public void testUnregistration_withUpgrade60() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        // And now this should fail
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertEquals("DFSAdmin should return -1", -1, exitCode);
+    }
 
-    DFSAdmin admin = new DFSAdmin(config);
-    String[] args = new String[]{"-refresh", "localhost:" +
-        cluster.getNameNodePort(), "exceptional"};
-    int exitCode = admin.run(args);
-    assertEquals(-1, exitCode); // Exceptions result in a -1
+    @Test
+    public void testUnregistration_withUpgrade80() throws Exception {
+        RefreshRegistry.defaultRegistry().unregisterAll("firstHandler");
+        // And now this should fail
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "firstHandler" };
+        int exitCode = admin.run(args);
+        assertEquals("DFSAdmin should return -1", -1, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 
-    Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[]{});
-    Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[]{});
+    @Test
+    public void testMultipleRegistration_withUpgrade20() throws Exception {
+        RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
+        RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+        // this should trigger both
+        DFSAdmin admin = new DFSAdmin(config);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "sharedId", "one" };
+        int exitCode = admin.run(args);
+        // -1 because one of the responses is unregistered
+        assertEquals(-1, exitCode);
+        // verify we called both
+        Mockito.verify(firstHandler).handleRefresh("sharedId", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("sharedId", new String[] { "one" });
+        RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
+    }
 
-    RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
-  }
+    @Test
+    public void testMultipleRegistration_withUpgrade40() throws Exception {
+        RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
+        RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+        // this should trigger both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "sharedId", "one" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // -1 because one of the responses is unregistered
+        assertEquals(-1, exitCode);
+        // verify we called both
+        Mockito.verify(firstHandler).handleRefresh("sharedId", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("sharedId", new String[] { "one" });
+        RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
+    }
+
+    @Test
+    public void testMultipleRegistration_withUpgrade60() throws Exception {
+        RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
+        RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+        // this should trigger both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "sharedId", "one" };
+        int exitCode = admin.run(args);
+        // -1 because one of the responses is unregistered
+        assertEquals(-1, exitCode);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // verify we called both
+        Mockito.verify(firstHandler).handleRefresh("sharedId", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("sharedId", new String[] { "one" });
+        RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
+    }
+
+    @Test
+    public void testMultipleRegistration_withUpgrade80() throws Exception {
+        RefreshRegistry.defaultRegistry().register("sharedId", firstHandler);
+        RefreshRegistry.defaultRegistry().register("sharedId", secondHandler);
+        // this should trigger both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "sharedId", "one" };
+        int exitCode = admin.run(args);
+        // -1 because one of the responses is unregistered
+        assertEquals(-1, exitCode);
+        // verify we called both
+        Mockito.verify(firstHandler).handleRefresh("sharedId", new String[] { "one" });
+        Mockito.verify(secondHandler).handleRefresh("sharedId", new String[] { "one" });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        RefreshRegistry.defaultRegistry().unregisterAll("sharedId");
+    }
+
+    @Test
+    public void testMultipleReturnCodeMerging_withUpgrade20() throws Exception {
+        // Two handlers which return two non-zero values
+        RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(23, "Twenty Three"));
+        RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(10, "Ten"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Then registered to the same ID
+        RefreshRegistry.defaultRegistry().register("shared", handlerOne);
+        RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+        // We refresh both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "shared" };
+        int exitCode = admin.run(args);
+        // We get -1 because of our logic for melding non-zero return codes
+        assertEquals(-1, exitCode);
+        // Verify we called both
+        Mockito.verify(handlerOne).handleRefresh("shared", new String[] {});
+        Mockito.verify(handlerTwo).handleRefresh("shared", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("shared");
+    }
+
+    @Test
+    public void testMultipleReturnCodeMerging_withUpgrade40() throws Exception {
+        // Two handlers which return two non-zero values
+        RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(23, "Twenty Three"));
+        RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(10, "Ten"));
+        // Then registered to the same ID
+        RefreshRegistry.defaultRegistry().register("shared", handlerOne);
+        RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // We refresh both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "shared" };
+        int exitCode = admin.run(args);
+        // We get -1 because of our logic for melding non-zero return codes
+        assertEquals(-1, exitCode);
+        // Verify we called both
+        Mockito.verify(handlerOne).handleRefresh("shared", new String[] {});
+        Mockito.verify(handlerTwo).handleRefresh("shared", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("shared");
+    }
+
+    @Test
+    public void testMultipleReturnCodeMerging_withUpgrade60() throws Exception {
+        // Two handlers which return two non-zero values
+        RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(23, "Twenty Three"));
+        RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(10, "Ten"));
+        // Then registered to the same ID
+        RefreshRegistry.defaultRegistry().register("shared", handlerOne);
+        RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+        // We refresh both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "shared" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // We get -1 because of our logic for melding non-zero return codes
+        assertEquals(-1, exitCode);
+        // Verify we called both
+        Mockito.verify(handlerOne).handleRefresh("shared", new String[] {});
+        Mockito.verify(handlerTwo).handleRefresh("shared", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("shared");
+    }
+
+    @Test
+    public void testMultipleReturnCodeMerging_withUpgrade80() throws Exception {
+        // Two handlers which return two non-zero values
+        RefreshHandler handlerOne = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerOne.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(23, "Twenty Three"));
+        RefreshHandler handlerTwo = Mockito.mock(RefreshHandler.class);
+        Mockito.when(handlerTwo.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenReturn(new RefreshResponse(10, "Ten"));
+        // Then registered to the same ID
+        RefreshRegistry.defaultRegistry().register("shared", handlerOne);
+        RefreshRegistry.defaultRegistry().register("shared", handlerTwo);
+        // We refresh both
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "shared" };
+        int exitCode = admin.run(args);
+        // We get -1 because of our logic for melding non-zero return codes
+        assertEquals(-1, exitCode);
+        // Verify we called both
+        Mockito.verify(handlerOne).handleRefresh("shared", new String[] {});
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Mockito.verify(handlerTwo).handleRefresh("shared", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("shared");
+    }
+
+    @Test
+    public void testExceptionResultsInNormalError_withUpgrade20() throws Exception {
+        // In this test, we ensure that all handlers are called even if we throw an exception in one
+        RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+        RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("More Exceptions"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
+        RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "exceptional" };
+        int exitCode = admin.run(args);
+        // Exceptions result in a -1
+        assertEquals(-1, exitCode);
+        Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[] {});
+        Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
+    }
+
+    @Test
+    public void testExceptionResultsInNormalError_withUpgrade40() throws Exception {
+        // In this test, we ensure that all handlers are called even if we throw an exception in one
+        RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+        RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("More Exceptions"));
+        RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
+        RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "exceptional" };
+        int exitCode = admin.run(args);
+        // Exceptions result in a -1
+        assertEquals(-1, exitCode);
+        Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[] {});
+        Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
+    }
+
+    @Test
+    public void testExceptionResultsInNormalError_withUpgrade60() throws Exception {
+        // In this test, we ensure that all handlers are called even if we throw an exception in one
+        RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+        RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("More Exceptions"));
+        RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
+        RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "exceptional" };
+        int exitCode = admin.run(args);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Exceptions result in a -1
+        assertEquals(-1, exitCode);
+        Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[] {});
+        Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
+    }
+
+    @Test
+    public void testExceptionResultsInNormalError_withUpgrade80() throws Exception {
+        // In this test, we ensure that all handlers are called even if we throw an exception in one
+        RefreshHandler exceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(exceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("Exceptional Handler Throws Exception"));
+        RefreshHandler otherExceptionalHandler = Mockito.mock(RefreshHandler.class);
+        Mockito.when(otherExceptionalHandler.handleRefresh(Mockito.anyString(), Mockito.any(String[].class))).thenThrow(new RuntimeException("More Exceptions"));
+        RefreshRegistry.defaultRegistry().register("exceptional", exceptionalHandler);
+        RefreshRegistry.defaultRegistry().register("exceptional", otherExceptionalHandler);
+        DFSAdmin admin = new DFSAdmin(config);
+        String[] args = new String[] { "-refresh", "localhost:" + cluster.getNameNodePort(), "exceptional" };
+        int exitCode = admin.run(args);
+        // Exceptions result in a -1
+        assertEquals(-1, exitCode);
+        Mockito.verify(exceptionalHandler).handleRefresh("exceptional", new String[] {});
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Mockito.verify(otherExceptionalHandler).handleRefresh("exceptional", new String[] {});
+        RefreshRegistry.defaultRegistry().unregisterAll("exceptional");
+    }
 }

@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
@@ -37,78 +36,77 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
 public class TestNameNodeRpcServerMethods {
-  private static NamenodeProtocolsJVMInterface nnRpc;
-  private static Configuration conf;
-  private static MiniDFSClusterInJVM cluster;
 
-  /** Start a cluster */
-  @Before
-  public void setup() throws Exception {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    cluster.waitActive();
-    nnRpc = cluster.getNameNode().getRpcServer();
-  }
+    private static NamenodeProtocolsJVMInterface nnRpc;
 
-  /**
-   * Cleanup after the test
-   *
-   * @throws IOException
-   * @throws UnresolvedLinkException
-   * @throws SafeModeException
-   * @throws AccessControlException
-   */
-  @After
-  public void cleanup() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private static Configuration conf;
 
-  @Test
-  public void testDeleteSnapshotWhenSnapshotNameIsEmpty() throws Exception {
-    String dir = "/testNamenodeRetryCache/testDelete";
-    try {
-      nnRpc.deleteSnapshot(dir, null);
-      Assert.fail("testdeleteSnapshot is not thrown expected exception ");
-    } catch (IOException e) {
-      // expected
-      GenericTestUtils.assertExceptionContains(
-          "The snapshot name is null or empty.", e);
-    }
-    try {
-      nnRpc.deleteSnapshot(dir, "");
-      Assert.fail("testdeleteSnapshot is not thrown expected exception");
-    } catch (IOException e) {
-      // expected
-      GenericTestUtils.assertExceptionContains(
-          "The snapshot name is null or empty.", e);
+    private static MiniDFSClusterInJVM cluster;
+
+    /**
+     * Start a cluster
+     */
+    @Before
+    public void setup() throws Exception {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        nnRpc = cluster.getNameNode().getRpcServer();
     }
 
-  }
-
-  @Test
-  public void testGetDatanodeStorageReportWithNumBLocksNotZero() throws Exception {
-    int buffSize = 1024;
-    long blockSize = 1024 * 1024;
-    String file = "/testFile";
-    DistributedFileSystem dfs = cluster.getFileSystem();
-    FSDataOutputStream outputStream = dfs.create(
-        new Path(file), true, buffSize, (short)1, blockSize);
-    byte[] outBuffer = new byte[buffSize];
-    for (int i = 0; i < buffSize; i++) {
-      outBuffer[i] = (byte) (i & 0x00ff);
+    /**
+     * Cleanup after the test
+     *
+     * @throws IOException
+     * @throws UnresolvedLinkException
+     * @throws SafeModeException
+     * @throws AccessControlException
+     */
+    @After
+    public void cleanup() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-    outputStream.write(outBuffer);
-    outputStream.close();
 
-    int numBlocks = 0;
-    /*
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
+
+    @Test
+    public void testGetDatanodeStorageReportWithNumBLocksNotZero() throws Exception {
+        int buffSize = 1024;
+        long blockSize = 1024 * 1024;
+        String file = "/testFile";
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FSDataOutputStream outputStream = dfs.create(new Path(file), true, buffSize, (short) 1, blockSize);
+        byte[] outBuffer = new byte[buffSize];
+        for (int i = 0; i < buffSize; i++) {
+            outBuffer[i] = (byte) (i & 0x00ff);
+        }
+        outputStream.write(outBuffer);
+        outputStream.close();
+        int numBlocks = 0;
+        /*
     DatanodeStorageReport[] reports
         = nnRpc.getDatanodeStorageReport(HdfsConstants.DatanodeReportType.ALL);
     for (DatanodeStorageReport r : reports) {
@@ -116,5 +114,77 @@ public class TestNameNodeRpcServerMethods {
     }
     assertEquals(1, numBlocks);
      */
-  }
+    }
+
+    @Test
+    public void testGetDatanodeStorageReportWithNumBLocksNotZero_withUpgrade20() throws Exception {
+        int buffSize = 1024;
+        long blockSize = 1024 * 1024;
+        String file = "/testFile";
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        FSDataOutputStream outputStream = dfs.create(new Path(file), true, buffSize, (short) 1, blockSize);
+        byte[] outBuffer = new byte[buffSize];
+        for (int i = 0; i < buffSize; i++) {
+            outBuffer[i] = (byte) (i & 0x00ff);
+        }
+        outputStream.write(outBuffer);
+        outputStream.close();
+        int numBlocks = 0;
+    }
+
+    @Test
+    public void testGetDatanodeStorageReportWithNumBLocksNotZero_withUpgrade40() throws Exception {
+        int buffSize = 1024;
+        long blockSize = 1024 * 1024;
+        String file = "/testFile";
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FSDataOutputStream outputStream = dfs.create(new Path(file), true, buffSize, (short) 1, blockSize);
+        byte[] outBuffer = new byte[buffSize];
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (int i = 0; i < buffSize; i++) {
+            outBuffer[i] = (byte) (i & 0x00ff);
+        }
+        outputStream.write(outBuffer);
+        outputStream.close();
+        int numBlocks = 0;
+    }
+
+    @Test
+    public void testGetDatanodeStorageReportWithNumBLocksNotZero_withUpgrade60() throws Exception {
+        int buffSize = 1024;
+        long blockSize = 1024 * 1024;
+        String file = "/testFile";
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FSDataOutputStream outputStream = dfs.create(new Path(file), true, buffSize, (short) 1, blockSize);
+        byte[] outBuffer = new byte[buffSize];
+        for (int i = 0; i < buffSize; i++) {
+            outBuffer[i] = (byte) (i & 0x00ff);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        outputStream.write(outBuffer);
+        outputStream.close();
+        int numBlocks = 0;
+    }
+
+    @Test
+    public void testGetDatanodeStorageReportWithNumBLocksNotZero_withUpgrade80() throws Exception {
+        int buffSize = 1024;
+        long blockSize = 1024 * 1024;
+        String file = "/testFile";
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FSDataOutputStream outputStream = dfs.create(new Path(file), true, buffSize, (short) 1, blockSize);
+        byte[] outBuffer = new byte[buffSize];
+        for (int i = 0; i < buffSize; i++) {
+            outBuffer[i] = (byte) (i & 0x00ff);
+        }
+        outputStream.write(outBuffer);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        outputStream.close();
+        int numBlocks = 0;
+    }
 }

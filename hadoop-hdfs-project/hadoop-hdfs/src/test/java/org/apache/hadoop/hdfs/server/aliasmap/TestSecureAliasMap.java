@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.aliasmap;
 
 import org.apache.hadoop.fs.FileSystem;
@@ -47,11 +46,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -60,103 +57,195 @@ import static org.junit.Assert.assertTrue;
  * Test DN & NN communication in secured hdfs with alias map.
  */
 public class TestSecureAliasMap {
-  private static HdfsConfiguration baseConf;
-  private static File baseDir;
-  private static MiniKdc kdc;
 
-  private static String keystoresDir;
-  private static String sslConfDir;
-  private MiniDFSClusterInJVM cluster;
-  private HdfsConfiguration conf;
-  private FileSystem fs;
+    private static HdfsConfiguration baseConf;
 
-  @BeforeClass
-  public static void init() throws Exception {
-    baseDir =
-        GenericTestUtils.getTestDir(TestSecureAliasMap.class.getSimpleName());
-    FileUtil.fullyDelete(baseDir);
-    assertTrue(baseDir.mkdirs());
+    private static File baseDir;
 
-    Properties kdcConf = MiniKdc.createConf();
-    kdc = new MiniKdc(kdcConf, baseDir);
-    kdc.start();
+    private static MiniKdc kdc;
 
-    baseConf = new HdfsConfiguration();
-    SecurityUtil.setAuthenticationMethod(
-        UserGroupInformation.AuthenticationMethod.KERBEROS, baseConf);
-    UserGroupInformation.setConfiguration(baseConf);
-    assertTrue("Expected configuration to enable security",
-        UserGroupInformation.isSecurityEnabled());
+    private static String keystoresDir;
 
-    String userName = UserGroupInformation.getLoginUser().getShortUserName();
-    File keytabFile = new File(baseDir, userName + ".keytab");
-    String keytab = keytabFile.getAbsolutePath();
-    // Windows will not reverse name lookup "127.0.0.1" to "localhost".
-    String krbInstance = Path.WINDOWS ? "127.0.0.1" : "localhost";
-    kdc.createPrincipal(keytabFile, userName + "/" + krbInstance,
-        "HTTP/" + krbInstance);
+    private static String sslConfDir;
 
-    keystoresDir = baseDir.getAbsolutePath();
-    sslConfDir = KeyStoreTestUtil.getClasspathDir(TestSecureNNWithQJM.class);
-    MiniDFSClusterInJVM.setupKerberosConfiguration(baseConf, userName,
-        kdc.getRealm(), keytab, keystoresDir, sslConfDir);
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  @AfterClass
-  public static void destroy() throws Exception {
-    if (kdc != null) {
-      kdc.stop();
-    }
-    FileUtil.fullyDelete(baseDir);
-    KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
-  }
+    private HdfsConfiguration conf;
 
-  @After
-  public void shutdown() throws IOException {
-    IOUtils.cleanupWithLogger(null, fs);
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private FileSystem fs;
 
-  @Test
-  public void testSecureConnectionToAliasMap() throws Exception {
-    conf = new HdfsConfiguration(baseConf);
-    MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
-    conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS,
-        "127.0.0.1:" + NetUtils.getFreeSocketPort());
-
-    int numNodes = 1;
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes)
-        .storageTypes(
-            new StorageType[] {StorageType.DISK, StorageType.PROVIDED})
-        .build();
-    cluster.waitActive();
-    fs = cluster.getFileSystem();
-
-    FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
-    BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
-    DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-
-    FsVolumeReferencesJVMInterface volumes =
-        dn.getFSDataset().getFsVolumeReferences();
-    FsVolumeSpi providedVolume = null;
-    for (FsVolumeSpi volume : volumes) {
-      if (volume.getStorageType().equals(StorageType.PROVIDED)) {
-        providedVolume = volume;
-        break;
-      }
+    @BeforeClass
+    public static void init() throws Exception {
+        baseDir = GenericTestUtils.getTestDir(TestSecureAliasMap.class.getSimpleName());
+        FileUtil.fullyDelete(baseDir);
+        assertTrue(baseDir.mkdirs());
+        Properties kdcConf = MiniKdc.createConf();
+        kdc = new MiniKdc(kdcConf, baseDir);
+        kdc.start();
+        baseConf = new HdfsConfiguration();
+        SecurityUtil.setAuthenticationMethod(UserGroupInformation.AuthenticationMethod.KERBEROS, baseConf);
+        UserGroupInformation.setConfiguration(baseConf);
+        assertTrue("Expected configuration to enable security", UserGroupInformation.isSecurityEnabled());
+        String userName = UserGroupInformation.getLoginUser().getShortUserName();
+        File keytabFile = new File(baseDir, userName + ".keytab");
+        String keytab = keytabFile.getAbsolutePath();
+        // Windows will not reverse name lookup "127.0.0.1" to "localhost".
+        String krbInstance = Path.WINDOWS ? "127.0.0.1" : "localhost";
+        kdc.createPrincipal(keytabFile, userName + "/" + krbInstance, "HTTP/" + krbInstance);
+        keystoresDir = baseDir.getAbsolutePath();
+        sslConfDir = KeyStoreTestUtil.getClasspathDir(TestSecureNNWithQJM.class);
+        MiniDFSClusterInJVM.setupKerberosConfiguration(baseConf, userName, kdc.getRealm(), keytab, keystoresDir, sslConfDir);
     }
 
-    String[] bps = providedVolume.getBlockPoolList();
-    assertEquals("Missing provided volume", 1, bps.length);
+    @AfterClass
+    public static void destroy() throws Exception {
+        if (kdc != null) {
+            kdc.stop();
+        }
+        FileUtil.fullyDelete(baseDir);
+        KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
+    }
 
-    /*
+    @After
+    public void shutdown() throws IOException {
+        IOUtils.cleanupWithLogger(null, fs);
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    @Test
+    public void testSecureConnectionToAliasMap() throws Exception {
+        conf = new HdfsConfiguration(baseConf);
+        MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS, "127.0.0.1:" + NetUtils.getFreeSocketPort());
+        int numNodes = 1;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes).storageTypes(new StorageType[] { StorageType.DISK, StorageType.PROVIDED }).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences();
+        FsVolumeSpi providedVolume = null;
+        for (FsVolumeSpi volume : volumes) {
+            if (volume.getStorageType().equals(StorageType.PROVIDED)) {
+                providedVolume = volume;
+                break;
+            }
+        }
+        String[] bps = providedVolume.getBlockPoolList();
+        assertEquals("Missing provided volume", 1, bps.length);
+        /*
     BlockAliasMap aliasMap = blockManager.getProvidedStorageMap().getAliasMap();
     BlockAliasMap.Reader reader = aliasMap.getReader(null, bps[0]);
     assertNotNull("Failed to create blockAliasMap reader", reader);
 
      */
-  }
+    }
+
+    @Test
+    public void testSecureConnectionToAliasMap_withUpgrade20() throws Exception {
+        conf = new HdfsConfiguration(baseConf);
+        MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS, "127.0.0.1:" + NetUtils.getFreeSocketPort());
+        int numNodes = 1;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes).storageTypes(new StorageType[] { StorageType.DISK, StorageType.PROVIDED }).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences();
+        FsVolumeSpi providedVolume = null;
+        for (FsVolumeSpi volume : volumes) {
+            if (volume.getStorageType().equals(StorageType.PROVIDED)) {
+                providedVolume = volume;
+                break;
+            }
+        }
+        String[] bps = providedVolume.getBlockPoolList();
+        assertEquals("Missing provided volume", 1, bps.length);
+    }
+
+    @Test
+    public void testSecureConnectionToAliasMap_withUpgrade40() throws Exception {
+        conf = new HdfsConfiguration(baseConf);
+        MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS, "127.0.0.1:" + NetUtils.getFreeSocketPort());
+        int numNodes = 1;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes).storageTypes(new StorageType[] { StorageType.DISK, StorageType.PROVIDED }).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences();
+        FsVolumeSpi providedVolume = null;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (FsVolumeSpi volume : volumes) {
+            if (volume.getStorageType().equals(StorageType.PROVIDED)) {
+                providedVolume = volume;
+                break;
+            }
+        }
+        String[] bps = providedVolume.getBlockPoolList();
+        assertEquals("Missing provided volume", 1, bps.length);
+    }
+
+    @Test
+    public void testSecureConnectionToAliasMap_withUpgrade60() throws Exception {
+        conf = new HdfsConfiguration(baseConf);
+        MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS, "127.0.0.1:" + NetUtils.getFreeSocketPort());
+        int numNodes = 1;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes).storageTypes(new StorageType[] { StorageType.DISK, StorageType.PROVIDED }).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences();
+        FsVolumeSpi providedVolume = null;
+        for (FsVolumeSpi volume : volumes) {
+            if (volume.getStorageType().equals(StorageType.PROVIDED)) {
+                providedVolume = volume;
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                break;
+            }
+        }
+        String[] bps = providedVolume.getBlockPoolList();
+        assertEquals("Missing provided volume", 1, bps.length);
+    }
+
+    @Test
+    public void testSecureConnectionToAliasMap_withUpgrade80() throws Exception {
+        conf = new HdfsConfiguration(baseConf);
+        MiniDFSClusterInJVM.setupNamenodeProvidedConfiguration(conf);
+        conf.set(DFSConfigKeys.DFS_PROVIDED_ALIASMAP_INMEMORY_RPC_ADDRESS, "127.0.0.1:" + NetUtils.getFreeSocketPort());
+        int numNodes = 1;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numNodes).storageTypes(new StorageType[] { StorageType.DISK, StorageType.PROVIDED }).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+        BlockManagerJVMInterface blockManager = namesystem.getBlockManager();
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences();
+        FsVolumeSpi providedVolume = null;
+        for (FsVolumeSpi volume : volumes) {
+            if (volume.getStorageType().equals(StorageType.PROVIDED)) {
+                providedVolume = volume;
+                break;
+            }
+        }
+        String[] bps = providedVolume.getBlockPoolList();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertEquals("Missing provided volume", 1, bps.length);
+    }
 }

@@ -15,19 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,50 +47,45 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestDataNodeMultipleRegistrations {
-  private static final Logger LOG =
-      LoggerFactory.getLogger(TestDataNodeMultipleRegistrations.class);
-  Configuration conf;
 
-  @Before
-  public void setUp() throws Exception {
-    conf = new HdfsConfiguration();
-  }
+    private static final Logger LOG = LoggerFactory.getLogger(TestDataNodeMultipleRegistrations.class);
 
-  /**
-   * start multiple NNs and single DN and verifies per BP registrations and
-   * handshakes.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void test2NNRegistration() throws IOException {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
-        .build();
-    try {
-      cluster.waitActive();
-      NameNodeJVMInterface nn1 = cluster.getNameNode(0);
-      NameNodeJVMInterface nn2 = cluster.getNameNode(1);
-      assertNotNull("cannot create nn1", nn1);
-      assertNotNull("cannot create nn2", nn2);
+    Configuration conf;
 
-      String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
-      String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
-      String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
-      String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
-      int lv1 =FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
-      int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
-      int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
-      int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
-      assertNotSame("namespace ids should be different", ns1, ns2);
-      LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri="
-          + nn1.getNameNodeAddress());
-      LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri="
-          + nn2.getNameNodeAddress());
+    @Before
+    public void setUp() throws Exception {
+        conf = new HdfsConfiguration();
+    }
 
-      // check number of volumes in fsdataset
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      /*
+    /**
+     * start multiple NNs and single DN and verifies per BP registrations and
+     * handshakes.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void test2NNRegistration() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            assertNotNull("cannot create nn1", nn1);
+            assertNotNull("cannot create nn2", nn2);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
+            int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
+            int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
+            assertNotSame("namespace ids should be different", ns1, ns2);
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri=" + nn2.getNameNodeAddress());
+            // check number of volumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
       final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
       Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
       int i = 0;
@@ -109,64 +101,55 @@ public class TestDataNodeMultipleRegistrations {
         LOG.info("BP: " + bpos);
       }
        */
-
-      BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
-      BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
-
-      // The order of bpos is not guaranteed, so fix the order
-      if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
-        BPOfferServiceJVMInterface tmp = bpos1;
-        bpos1 = bpos2;
-        bpos2 = tmp;
-      }
-
-      assertEquals("wrong nn address", getNNSocketAddress(bpos1),
-          nn1.getNameNodeAddress());
-      assertEquals("wrong nn address", getNNSocketAddress(bpos2),
-          nn2.getNameNodeAddress());
-      assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
-      assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
-      assertEquals("wrong cid", dn.getClusterId(), cid1);
-      assertEquals("cid should be same", cid2, cid1);
-      /*
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
+            // The order of bpos is not guaranteed, so fix the order
+            if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
+                BPOfferServiceJVMInterface tmp = bpos1;
+                bpos1 = bpos2;
+                bpos2 = tmp;
+            }
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong nn address", getNNSocketAddress(bpos2), nn2.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            assertEquals("cid should be same", cid2, cid1);
+            /*
       assertEquals("namespace should be same",
           bpos1.bpNSInfo.namespaceID, ns1);
       assertEquals("namespace should be same",
           bpos2.bpNSInfo.namespaceID, ns2);
        */
-    } finally {
-      cluster.shutdown();
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
-  
-  private static InetSocketAddress getNNSocketAddress(BPOfferServiceJVMInterface bpos) {
-    List<BPServiceActorJVMInterface> actors = (List<BPServiceActorJVMInterface>) bpos.getBPServiceActors();
-    assertEquals(1, actors.size());
-    return actors.get(0).getNNSocketAddress();
-  }
 
-  /**
-   * starts single nn and single dn and verifies registration and handshake
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testFedSingleNN() throws IOException {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nameNodePort(9927).build();
-    try {
-      NameNodeJVMInterface nn1 = cluster.getNameNode();
-      assertNotNull("cannot create nn1", nn1);
+    private static InetSocketAddress getNNSocketAddress(BPOfferServiceJVMInterface bpos) {
+        List<BPServiceActorJVMInterface> actors = (List<BPServiceActorJVMInterface>) bpos.getBPServiceActors();
+        assertEquals(1, actors.size());
+        return actors.get(0).getNNSocketAddress();
+    }
 
-      String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
-      String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
-      int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
-      LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri="
-          + nn1.getNameNodeAddress());
-
-      // check number of vlumes in fsdataset
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      /*
+    /**
+     * starts single nn and single dn and verifies registration and handshake
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testFedSingleNN() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(9927).build();
+        try {
+            NameNodeJVMInterface nn1 = cluster.getNameNode();
+            assertNotNull("cannot create nn1", nn1);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            // check number of vlumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
       final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
       Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
       int i = 0;
@@ -184,127 +167,97 @@ public class TestDataNodeMultipleRegistrations {
             getNNSocketAddress(bpos));
       }
        */
-
-      // try block report
-      BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
-      bpos1.triggerBlockReportForTests();
-
-      assertEquals("wrong nn address",
-          getNNSocketAddress(bpos1),
-          nn1.getNameNodeAddress());
-      assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
-      assertEquals("wrong cid", dn.getClusterId(), cid1);
-      cluster.shutdown();
-      
-      // Ensure all the BPOfferService threads are shutdown
-      assertEquals(0, dn.getAllBpOs().size());
-      cluster = null;
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+            // try block report
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            bpos1.triggerBlockReportForTests();
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            cluster.shutdown();
+            // Ensure all the BPOfferService threads are shutdown
+            assertEquals(0, dn.getAllBpOs().size());
+            cluster = null;
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
-  
-  @Test
-  public void testClusterIdMismatch() throws Exception {
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
-        .build();
-    try {
-      cluster.waitActive();
 
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
-      LOG.info("dn bpos len (should be 2):" + bposs.size());
-      Assert.assertEquals("should've registered with two namenodes", bposs.size(),2);
-      
-      // add another namenode
-      cluster.addNameNode(conf, 9938);
-      Thread.sleep(500);// lets wait for the registration to happen
-      bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
-      LOG.info("dn bpos len (should be 3):" + bposs.size());
-      Assert.assertEquals("should've registered with three namenodes", bposs.size(),3);
-      
-      // change cluster id and another Namenode
-      StartupOption.FORMAT.setClusterId("DifferentCID");
-      cluster.addNameNode(conf, 9948);
-      NameNodeJVMInterface nn4 = cluster.getNameNode(3);
-      assertNotNull("cannot create nn4", nn4);
-
-      Thread.sleep(500);// lets wait for the registration to happen
-      bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
-      LOG.info("dn bpos len (still should be 3):" + bposs.size());
-      Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
-    } finally {
-        cluster.shutdown();
+    @Test
+    public void testClusterIdMismatch() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 2):" + bposs.size());
+            Assert.assertEquals("should've registered with two namenodes", bposs.size(), 2);
+            // add another namenode
+            cluster.addNameNode(conf, 9938);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", bposs.size(), 3);
+            // change cluster id and another Namenode
+            StartupOption.FORMAT.setClusterId("DifferentCID");
+            cluster.addNameNode(conf, 9948);
+            NameNodeJVMInterface nn4 = cluster.getNameNode(3);
+            assertNotNull("cannot create nn4", nn4);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (still should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 
-  @Test(timeout = 20000)
-  public void testClusterIdMismatchAtStartupWithHA() throws Exception {
-    MiniDFSNNTopology top = new MiniDFSNNTopology()
-      .addNameservice(new MiniDFSNNTopology.NSConf("ns1")
-        .addNN(new MiniDFSNNTopology.NNConf("nn0"))
-        .addNN(new MiniDFSNNTopology.NNConf("nn1")))
-      .addNameservice(new MiniDFSNNTopology.NSConf("ns2")
-        .addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid"))
-        .addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
-
-    top.setFederation(true);
-
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top)
-        .numDataNodes(0).build();
-    
-    try {
-      cluster.startDataNodes(conf, 1, true, null, null);
-      // let the initialization be complete
-      cluster.waitActive();
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      assertTrue("Datanode should be running", dn.isDatanodeUp());
-      assertEquals("Only one BPOfferService should be running", 1,
-          dn.getAllBpOs().size());
-    } finally {
-      cluster.shutdown();
+    @Test(timeout = 20000)
+    public void testClusterIdMismatchAtStartupWithHA() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0")).addNN(new MiniDFSNNTopology.NNConf("nn1"))).addNameservice(new MiniDFSNNTopology.NSConf("ns2").addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid")).addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("Only one BPOfferService should be running", 1, dn.getAllBpOs().size());
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 
-  @Test
-  public void testDNWithInvalidStorageWithHA() throws Exception {
-    MiniDFSNNTopology top = new MiniDFSNNTopology()
-      .addNameservice(new MiniDFSNNTopology.NSConf("ns1")
-        .addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1"))
-        .addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
-
-    top.setFederation(true);
-
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top)
-        .numDataNodes(0).build();
-    try {
-      cluster.startDataNodes(conf, 1, true, null, null);
-      // let the initialization be complete
-      cluster.waitActive();
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      assertTrue("Datanode should be running", dn.isDatanodeUp());
-      assertEquals("BPOfferService should be running", 1,
-          dn.getAllBpOs().size());
-      DataNodeProperties dnProp = cluster.stopDataNode(0);
-
-      cluster.getNameNode(0).stop();
-      cluster.getNameNode(1).stop();
-      Configuration nn1 = cluster.getConfiguration(0);
-      Configuration nn2 = cluster.getConfiguration(1);
-      // setting up invalid cluster
-      StartupOption.FORMAT.setClusterId("cluster-2");
-      DFSTestUtil.formatNameNode(nn1);
-      MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1),
-          FSNamesystem.getNamespaceDirs(nn2), nn2);
-      cluster.restartNameNode(0, false);
-      cluster.restartNameNode(1, false);
-      cluster.restartDataNode(dnProp);
-      final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
-
-      /*
+    @Test
+    public void testDNWithInvalidStorageWithHA() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1")).addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("BPOfferService should be running", 1, dn.getAllBpOs().size());
+            DataNodeProperties dnProp = cluster.stopDataNode(0);
+            cluster.getNameNode(0).stop();
+            cluster.getNameNode(1).stop();
+            Configuration nn1 = cluster.getConfiguration(0);
+            Configuration nn2 = cluster.getConfiguration(1);
+            // setting up invalid cluster
+            StartupOption.FORMAT.setClusterId("cluster-2");
+            DFSTestUtil.formatNameNode(nn1);
+            MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1), FSNamesystem.getNamespaceDirs(nn2), nn2);
+            cluster.restartNameNode(0, false);
+            cluster.restartNameNode(1, false);
+            cluster.restartDataNode(dnProp);
+            final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
+            /*
       // Wait till datanode confirms FAILED running state.
       GenericTestUtils.waitFor(new Supplier<Boolean>() {
         @Override
@@ -320,71 +273,1122 @@ public class TestDataNodeMultipleRegistrations {
         }
       }, 500, 20000);
        */
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-  
-  @Test
-  public void testMiniDFSClusterInJVMWithMultipleNN() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    // start Federated cluster and add a node.
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2))
-      .build();
-    
-    // add a node
-    try {
-      cluster.waitActive();
-      Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
-
-      cluster.addNameNode(conf, 0);
-      Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
-    } catch (IOException ioe) {
-      Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
-    } finally {
-      cluster.shutdown();
-    }
-        
-    // 2. start with Federation flag set
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1))
-      .build();
-    
-    try {
-      Assert.assertNotNull(cluster);
-      cluster.waitActive();
-      Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
-    
-      // add a node
-      cluster.addNameNode(conf, 0);
-      Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
-    } catch (IOException ioe) {
-      Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
-    } finally {
-      cluster.shutdown();
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-    // 3. start non-federated
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    
-    // add a node
-    try {
-      cluster.waitActive();
-      Assert.assertNotNull(cluster);
-      Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
-
-      cluster.addNameNode(conf, 9929);
-      Assert.fail("shouldn't be able to add another NN to non federated cluster");
-    } catch (IOException e) {
-      // correct 
-      Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
-      Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
-    } finally {
-      cluster.shutdown();
+    @Test
+    public void testMiniDFSClusterInJVMWithMultipleNN() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        // start Federated cluster and add a node.
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 2. start with Federation flag set
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1)).build();
+        try {
+            Assert.assertNotNull(cluster);
+            cluster.waitActive();
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            // add a node
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 3. start non-federated
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertNotNull(cluster);
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 9929);
+            Assert.fail("shouldn't be able to add another NN to non federated cluster");
+        } catch (IOException e) {
+            // correct
+            Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
+            Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
+
+    @Test
+    public void test2NNRegistration_withUpgrade20() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            assertNotNull("cannot create nn1", nn1);
+            assertNotNull("cannot create nn2", nn2);
+            /*
+      assertEquals("namespace should be same",
+          bpos1.bpNSInfo.namespaceID, ns1);
+      assertEquals("namespace should be same",
+          bpos2.bpNSInfo.namespaceID, ns2);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
+            int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
+            int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
+            assertNotSame("namespace ids should be different", ns1, ns2);
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri=" + nn2.getNameNodeAddress());
+            // check number of volumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferService bpos : dn.getAllBpOs()) {
+        LOG.info("BP: " + bpos);
+      }
+       */
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
+            // The order of bpos is not guaranteed, so fix the order
+            if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
+                BPOfferServiceJVMInterface tmp = bpos1;
+                bpos1 = bpos2;
+                bpos2 = tmp;
+            }
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong nn address", getNNSocketAddress(bpos2), nn2.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            assertEquals("cid should be same", cid2, cid1);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void test2NNRegistration_withUpgrade40() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            assertNotNull("cannot create nn1", nn1);
+            assertNotNull("cannot create nn2", nn2);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
+            int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
+            /*
+      assertEquals("namespace should be same",
+          bpos1.bpNSInfo.namespaceID, ns1);
+      assertEquals("namespace should be same",
+          bpos2.bpNSInfo.namespaceID, ns2);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
+            assertNotSame("namespace ids should be different", ns1, ns2);
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri=" + nn2.getNameNodeAddress());
+            // check number of volumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferService bpos : dn.getAllBpOs()) {
+        LOG.info("BP: " + bpos);
+      }
+       */
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
+            // The order of bpos is not guaranteed, so fix the order
+            if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
+                BPOfferServiceJVMInterface tmp = bpos1;
+                bpos1 = bpos2;
+                bpos2 = tmp;
+            }
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong nn address", getNNSocketAddress(bpos2), nn2.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            assertEquals("cid should be same", cid2, cid1);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void test2NNRegistration_withUpgrade60() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            assertNotNull("cannot create nn1", nn1);
+            assertNotNull("cannot create nn2", nn2);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
+            int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
+            int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
+            assertNotSame("namespace ids should be different", ns1, ns2);
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri=" + nn2.getNameNodeAddress());
+            // check number of volumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferService bpos : dn.getAllBpOs()) {
+        LOG.info("BP: " + bpos);
+      }
+       */
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
+            /*
+      assertEquals("namespace should be same",
+          bpos1.bpNSInfo.namespaceID, ns1);
+      assertEquals("namespace should be same",
+          bpos2.bpNSInfo.namespaceID, ns2);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // The order of bpos is not guaranteed, so fix the order
+            if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
+                BPOfferServiceJVMInterface tmp = bpos1;
+                bpos1 = bpos2;
+                bpos2 = tmp;
+            }
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong nn address", getNNSocketAddress(bpos2), nn2.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            assertEquals("cid should be same", cid2, cid1);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void test2NNRegistration_withUpgrade80() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            assertNotNull("cannot create nn1", nn1);
+            assertNotNull("cannot create nn2", nn2);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String bpid2 = FSImageTestUtil.getFSImage(nn2).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            String cid2 = FSImageTestUtil.getFSImage(nn2).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            int lv2 = FSImageTestUtil.getFSImage(nn2).getLayoutVersion();
+            int ns1 = FSImageTestUtil.getFSImage(nn1).getNamespaceID();
+            int ns2 = FSImageTestUtil.getFSImage(nn2).getNamespaceID();
+            assertNotSame("namespace ids should be different", ns1, ns2);
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            LOG.info("nn2: lv=" + lv2 + ";cid=" + cid2 + ";bpid=" + bpid2 + ";uri=" + nn2.getNameNodeAddress());
+            // check number of volumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferService bpos : dn.getAllBpOs()) {
+        LOG.info("BP: " + bpos);
+      }
+       */
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            BPOfferServiceJVMInterface bpos2 = dn.getAllBpOs().get(1);
+            // The order of bpos is not guaranteed, so fix the order
+            if (getNNSocketAddress(bpos1).equals(nn2.getNameNodeAddress())) {
+                BPOfferServiceJVMInterface tmp = bpos1;
+                bpos1 = bpos2;
+                bpos2 = tmp;
+            }
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong nn address", getNNSocketAddress(bpos2), nn2.getNameNodeAddress());
+            /*
+      assertEquals("namespace should be same",
+          bpos1.bpNSInfo.namespaceID, ns1);
+      assertEquals("namespace should be same",
+          bpos2.bpNSInfo.namespaceID, ns2);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong bpid", bpos2.getBlockPoolId(), bpid2);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            assertEquals("cid should be same", cid2, cid1);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testFedSingleNN_withUpgrade20() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(9927).build();
+        try {
+            NameNodeJVMInterface nn1 = cluster.getNameNode();
+            assertNotNull("cannot create nn1", nn1);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            // check number of vlumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+        LOG.info("reg: bpid=" + "; name=" + bpos.bpRegistration + "; sid="
+            + bpos.bpRegistration.getDatanodeUuid() + "; nna=" +
+            getNNSocketAddress(bpos));
+      }
+       */
+            // try block report
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            bpos1.triggerBlockReportForTests();
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            cluster.shutdown();
+            // Ensure all the BPOfferService threads are shutdown
+            assertEquals(0, dn.getAllBpOs().size());
+            cluster = null;
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFedSingleNN_withUpgrade40() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(9927).build();
+        try {
+            NameNodeJVMInterface nn1 = cluster.getNameNode();
+            assertNotNull("cannot create nn1", nn1);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            // check number of vlumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+        LOG.info("reg: bpid=" + "; name=" + bpos.bpRegistration + "; sid="
+            + bpos.bpRegistration.getDatanodeUuid() + "; nna=" +
+            getNNSocketAddress(bpos));
+      }
+       */
+            // try block report
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            bpos1.triggerBlockReportForTests();
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            cluster.shutdown();
+            // Ensure all the BPOfferService threads are shutdown
+            assertEquals(0, dn.getAllBpOs().size());
+            cluster = null;
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFedSingleNN_withUpgrade60() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(9927).build();
+        try {
+            NameNodeJVMInterface nn1 = cluster.getNameNode();
+            assertNotNull("cannot create nn1", nn1);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            // check number of vlumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+        LOG.info("reg: bpid=" + "; name=" + bpos.bpRegistration + "; sid="
+            + bpos.bpRegistration.getDatanodeUuid() + "; nna=" +
+            getNNSocketAddress(bpos));
+      }
+       */
+            // try block report
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            bpos1.triggerBlockReportForTests();
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            cluster.shutdown();
+            // Ensure all the BPOfferService threads are shutdown
+            assertEquals(0, dn.getAllBpOs().size());
+            cluster = null;
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFedSingleNN_withUpgrade80() throws IOException {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nameNodePort(9927).build();
+        try {
+            NameNodeJVMInterface nn1 = cluster.getNameNode();
+            assertNotNull("cannot create nn1", nn1);
+            String bpid1 = FSImageTestUtil.getFSImage(nn1).getBlockPoolID();
+            String cid1 = FSImageTestUtil.getFSImage(nn1).getClusterID();
+            int lv1 = FSImageTestUtil.getFSImage(nn1).getLayoutVersion();
+            LOG.info("nn1: lv=" + lv1 + ";cid=" + cid1 + ";bpid=" + bpid1 + ";uri=" + nn1.getNameNodeAddress());
+            // check number of vlumes in fsdataset
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      final Map<String, Object> volInfos = dn.data.getVolumeInfoMap();
+      Assert.assertTrue("No volumes in the fsdataset", volInfos.size() > 0);
+      int i = 0;
+      for (Map.Entry<String, Object> e : volInfos.entrySet()) {
+        LOG.info("vol " + i++ + ") " + e.getKey() + ": " + e.getValue());
+      }
+      // number of volumes should be 2 - [data1, data2]
+      assertEquals("number of volumes is wrong",
+          cluster.getFsDatasetTestUtils(0).getDefaultNumOfDataDirs(),
+          volInfos.size());
+
+      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+        LOG.info("reg: bpid=" + "; name=" + bpos.bpRegistration + "; sid="
+            + bpos.bpRegistration.getDatanodeUuid() + "; nna=" +
+            getNNSocketAddress(bpos));
+      }
+       */
+            // try block report
+            BPOfferServiceJVMInterface bpos1 = dn.getAllBpOs().get(0);
+            bpos1.triggerBlockReportForTests();
+            assertEquals("wrong nn address", getNNSocketAddress(bpos1), nn1.getNameNodeAddress());
+            assertEquals("wrong bpid", bpos1.getBlockPoolId(), bpid1);
+            assertEquals("wrong cid", dn.getClusterId(), cid1);
+            cluster.shutdown();
+            // Ensure all the BPOfferService threads are shutdown
+            assertEquals(0, dn.getAllBpOs().size());
+            cluster = null;
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testClusterIdMismatch_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            LOG.info("dn bpos len (should be 2):" + bposs.size());
+            Assert.assertEquals("should've registered with two namenodes", bposs.size(), 2);
+            // add another namenode
+            cluster.addNameNode(conf, 9938);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", bposs.size(), 3);
+            // change cluster id and another Namenode
+            StartupOption.FORMAT.setClusterId("DifferentCID");
+            cluster.addNameNode(conf, 9948);
+            NameNodeJVMInterface nn4 = cluster.getNameNode(3);
+            assertNotNull("cannot create nn4", nn4);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (still should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testClusterIdMismatch_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 2):" + bposs.size());
+            Assert.assertEquals("should've registered with two namenodes", bposs.size(), 2);
+            // add another namenode
+            cluster.addNameNode(conf, 9938);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", bposs.size(), 3);
+            // change cluster id and another Namenode
+            StartupOption.FORMAT.setClusterId("DifferentCID");
+            cluster.addNameNode(conf, 9948);
+            NameNodeJVMInterface nn4 = cluster.getNameNode(3);
+            assertNotNull("cannot create nn4", nn4);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (still should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testClusterIdMismatch_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 2):" + bposs.size());
+            Assert.assertEquals("should've registered with two namenodes", bposs.size(), 2);
+            // add another namenode
+            cluster.addNameNode(conf, 9938);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", bposs.size(), 3);
+            // change cluster id and another Namenode
+            StartupOption.FORMAT.setClusterId("DifferentCID");
+            cluster.addNameNode(conf, 9948);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            NameNodeJVMInterface nn4 = cluster.getNameNode(3);
+            assertNotNull("cannot create nn4", nn4);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (still should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testClusterIdMismatch_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        try {
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            List<BPOfferServiceJVMInterface> bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 2):" + bposs.size());
+            Assert.assertEquals("should've registered with two namenodes", bposs.size(), 2);
+            // add another namenode
+            cluster.addNameNode(conf, 9938);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            LOG.info("dn bpos len (should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", bposs.size(), 3);
+            // change cluster id and another Namenode
+            StartupOption.FORMAT.setClusterId("DifferentCID");
+            cluster.addNameNode(conf, 9948);
+            NameNodeJVMInterface nn4 = cluster.getNameNode(3);
+            assertNotNull("cannot create nn4", nn4);
+            // lets wait for the registration to happen
+            Thread.sleep(500);
+            bposs = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            LOG.info("dn bpos len (still should be 3):" + bposs.size());
+            Assert.assertEquals("should've registered with three namenodes", 3, bposs.size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 20000)
+    public void testClusterIdMismatchAtStartupWithHA_withUpgrade20() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0")).addNN(new MiniDFSNNTopology.NNConf("nn1"))).addNameservice(new MiniDFSNNTopology.NSConf("ns2").addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid")).addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("Only one BPOfferService should be running", 1, dn.getAllBpOs().size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 20000)
+    public void testClusterIdMismatchAtStartupWithHA_withUpgrade40() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0")).addNN(new MiniDFSNNTopology.NNConf("nn1"))).addNameservice(new MiniDFSNNTopology.NSConf("ns2").addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid")).addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("Only one BPOfferService should be running", 1, dn.getAllBpOs().size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 20000)
+    public void testClusterIdMismatchAtStartupWithHA_withUpgrade60() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0")).addNN(new MiniDFSNNTopology.NNConf("nn1"))).addNameservice(new MiniDFSNNTopology.NSConf("ns2").addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid")).addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals("Only one BPOfferService should be running", 1, dn.getAllBpOs().size());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 20000)
+    public void testClusterIdMismatchAtStartupWithHA_withUpgrade80() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0")).addNN(new MiniDFSNNTopology.NNConf("nn1"))).addNameservice(new MiniDFSNNTopology.NSConf("ns2").addNN(new MiniDFSNNTopology.NNConf("nn2").setClusterId("bad-cid")).addNN(new MiniDFSNNTopology.NNConf("nn3").setClusterId("bad-cid")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("Only one BPOfferService should be running", 1, dn.getAllBpOs().size());
+        } finally {
+            cluster.shutdown();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
+
+    @Test
+    public void testDNWithInvalidStorageWithHA_withUpgrade20() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1")).addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            /*
+      // Wait till datanode confirms FAILED running state.
+      GenericTestUtils.waitFor(new Supplier<Boolean>() {
+        @Override
+        public Boolean get() {
+          for (BPOfferServiceJVMInterface bp : restartedDn.getAllBpOs()) {
+            for (BPServiceActorJVMInterface ba : bp.getBPServiceActors()) {
+              if (!ba.getRunningState().equals(RunningState.FAILED.name())) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      }, 500, 20000);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("BPOfferService should be running", 1, dn.getAllBpOs().size());
+            DataNodeProperties dnProp = cluster.stopDataNode(0);
+            cluster.getNameNode(0).stop();
+            cluster.getNameNode(1).stop();
+            Configuration nn1 = cluster.getConfiguration(0);
+            Configuration nn2 = cluster.getConfiguration(1);
+            // setting up invalid cluster
+            StartupOption.FORMAT.setClusterId("cluster-2");
+            DFSTestUtil.formatNameNode(nn1);
+            MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1), FSNamesystem.getNamespaceDirs(nn2), nn2);
+            cluster.restartNameNode(0, false);
+            cluster.restartNameNode(1, false);
+            cluster.restartDataNode(dnProp);
+            final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testDNWithInvalidStorageWithHA_withUpgrade40() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1")).addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("BPOfferService should be running", 1, dn.getAllBpOs().size());
+            DataNodeProperties dnProp = cluster.stopDataNode(0);
+            cluster.getNameNode(0).stop();
+            /*
+      // Wait till datanode confirms FAILED running state.
+      GenericTestUtils.waitFor(new Supplier<Boolean>() {
+        @Override
+        public Boolean get() {
+          for (BPOfferServiceJVMInterface bp : restartedDn.getAllBpOs()) {
+            for (BPServiceActorJVMInterface ba : bp.getBPServiceActors()) {
+              if (!ba.getRunningState().equals(RunningState.FAILED.name())) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      }, 500, 20000);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.getNameNode(1).stop();
+            Configuration nn1 = cluster.getConfiguration(0);
+            Configuration nn2 = cluster.getConfiguration(1);
+            // setting up invalid cluster
+            StartupOption.FORMAT.setClusterId("cluster-2");
+            DFSTestUtil.formatNameNode(nn1);
+            MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1), FSNamesystem.getNamespaceDirs(nn2), nn2);
+            cluster.restartNameNode(0, false);
+            cluster.restartNameNode(1, false);
+            cluster.restartDataNode(dnProp);
+            final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testDNWithInvalidStorageWithHA_withUpgrade60() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1")).addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("BPOfferService should be running", 1, dn.getAllBpOs().size());
+            DataNodeProperties dnProp = cluster.stopDataNode(0);
+            cluster.getNameNode(0).stop();
+            cluster.getNameNode(1).stop();
+            Configuration nn1 = cluster.getConfiguration(0);
+            Configuration nn2 = cluster.getConfiguration(1);
+            // setting up invalid cluster
+            StartupOption.FORMAT.setClusterId("cluster-2");
+            /*
+      // Wait till datanode confirms FAILED running state.
+      GenericTestUtils.waitFor(new Supplier<Boolean>() {
+        @Override
+        public Boolean get() {
+          for (BPOfferServiceJVMInterface bp : restartedDn.getAllBpOs()) {
+            for (BPServiceActorJVMInterface ba : bp.getBPServiceActors()) {
+              if (!ba.getRunningState().equals(RunningState.FAILED.name())) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      }, 500, 20000);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DFSTestUtil.formatNameNode(nn1);
+            MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1), FSNamesystem.getNamespaceDirs(nn2), nn2);
+            cluster.restartNameNode(0, false);
+            cluster.restartNameNode(1, false);
+            cluster.restartDataNode(dnProp);
+            final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testDNWithInvalidStorageWithHA_withUpgrade80() throws Exception {
+        MiniDFSNNTopology top = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn0").setClusterId("cluster-1")).addNN(new MiniDFSNNTopology.NNConf("nn1").setClusterId("cluster-1")));
+        top.setFederation(true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(top).numDataNodes(0).build();
+        try {
+            cluster.startDataNodes(conf, 1, true, null, null);
+            // let the initialization be complete
+            cluster.waitActive();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertTrue("Datanode should be running", dn.isDatanodeUp());
+            assertEquals("BPOfferService should be running", 1, dn.getAllBpOs().size());
+            DataNodeProperties dnProp = cluster.stopDataNode(0);
+            cluster.getNameNode(0).stop();
+            cluster.getNameNode(1).stop();
+            Configuration nn1 = cluster.getConfiguration(0);
+            Configuration nn2 = cluster.getConfiguration(1);
+            // setting up invalid cluster
+            StartupOption.FORMAT.setClusterId("cluster-2");
+            DFSTestUtil.formatNameNode(nn1);
+            MiniDFSClusterInJVM.copyNameDirs(FSNamesystem.getNamespaceDirs(nn1), FSNamesystem.getNamespaceDirs(nn2), nn2);
+            cluster.restartNameNode(0, false);
+            cluster.restartNameNode(1, false);
+            /*
+      // Wait till datanode confirms FAILED running state.
+      GenericTestUtils.waitFor(new Supplier<Boolean>() {
+        @Override
+        public Boolean get() {
+          for (BPOfferServiceJVMInterface bp : restartedDn.getAllBpOs()) {
+            for (BPServiceActorJVMInterface ba : bp.getBPServiceActors()) {
+              if (!ba.getRunningState().equals(RunningState.FAILED.name())) {
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+      }, 500, 20000);
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.restartDataNode(dnProp);
+            final DataNodeJVMInterface restartedDn = cluster.getDataNodes().get(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMiniDFSClusterInJVMWithMultipleNN_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        // start Federated cluster and add a node.
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            cluster.shutdown();
+        }
+        // 2. start with Federation flag set
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1)).build();
+        try {
+            Assert.assertNotNull(cluster);
+            cluster.waitActive();
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            // add a node
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 3. start non-federated
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertNotNull(cluster);
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 9929);
+            Assert.fail("shouldn't be able to add another NN to non federated cluster");
+        } catch (IOException e) {
+            // correct
+            Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
+            Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMiniDFSClusterInJVMWithMultipleNN_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        // start Federated cluster and add a node.
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 2. start with Federation flag set
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1)).build();
+        try {
+            Assert.assertNotNull(cluster);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.waitActive();
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            // add a node
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 3. start non-federated
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertNotNull(cluster);
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 9929);
+            Assert.fail("shouldn't be able to add another NN to non federated cluster");
+        } catch (IOException e) {
+            // correct
+            Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
+            Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMiniDFSClusterInJVMWithMultipleNN_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        // start Federated cluster and add a node.
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 2. start with Federation flag set
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1)).build();
+        try {
+            Assert.assertNotNull(cluster);
+            cluster.waitActive();
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            // add a node
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // 3. start non-federated
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertNotNull(cluster);
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 9929);
+            Assert.fail("shouldn't be able to add another NN to non federated cluster");
+        } catch (IOException e) {
+            // correct
+            Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
+            Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMiniDFSClusterInJVMWithMultipleNN_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        // start Federated cluster and add a node.
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(2)).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertEquals("(1)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(1)Should be 3 namenodes", 3, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 2. start with Federation flag set
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(1)).build();
+        try {
+            Assert.assertNotNull(cluster);
+            cluster.waitActive();
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            // add a node
+            cluster.addNameNode(conf, 0);
+            Assert.assertEquals("(2)Should be 2 namenodes", 2, cluster.getNumNameNodes());
+        } catch (IOException ioe) {
+            Assert.fail("Failed to add NN to cluster:" + StringUtils.stringifyException(ioe));
+        } finally {
+            cluster.shutdown();
+        }
+        // 3. start non-federated
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        // add a node
+        try {
+            cluster.waitActive();
+            Assert.assertNotNull(cluster);
+            Assert.assertEquals("(2)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.addNameNode(conf, 9929);
+            Assert.fail("shouldn't be able to add another NN to non federated cluster");
+        } catch (IOException e) {
+            // correct
+            Assert.assertTrue(e.getMessage().startsWith("cannot add namenode"));
+            Assert.assertEquals("(3)Should be 1 namenodes", 1, cluster.getNumNameNodes());
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }
