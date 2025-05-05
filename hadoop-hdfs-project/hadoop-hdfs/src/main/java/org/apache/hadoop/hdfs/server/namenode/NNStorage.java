@@ -42,14 +42,9 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.protocol.LayoutVersion;
-import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
+import org.apache.hadoop.hdfs.server.common.*;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
-import org.apache.hadoop.hdfs.server.common.InconsistentFSStateException;
-import org.apache.hadoop.hdfs.server.common.IncorrectVersionException;
-import org.apache.hadoop.hdfs.server.common.Storage;
-import org.apache.hadoop.hdfs.server.common.StorageErrorReporter;
-import org.apache.hadoop.hdfs.server.common.Util;
 import org.apache.hadoop.hdfs.server.protocol.NamespaceInfo;
 import org.apache.hadoop.hdfs.util.PersistentLongFile;
 import org.apache.hadoop.io.IOUtils;
@@ -67,7 +62,7 @@ import com.google.common.collect.Lists;
  */
 @InterfaceAudience.Private
 public class NNStorage extends Storage implements Closeable,
-    StorageErrorReporter {
+    StorageErrorReporter, NNStorageJVMInterface {
   static final String DEPRECATED_MESSAGE_DIGEST_PROPERTY = "imageMD5Digest";
   static final String LOCAL_URI_SCHEME = "file";
 
@@ -451,6 +446,11 @@ public class NNStorage extends Storage implements Closeable,
     File txidFile = getStorageFile(sd, NameNodeFile.SEEN_TXID);
     return PersistentLongFile.readFile(txidFile, 0);
   }
+
+  static long readTransactionIdFile(StorageDirectoryJVMInterface sd) throws IOException {
+    File txidFile = getStorageFile(sd, NameNodeFile.SEEN_TXID);
+    return PersistentLongFile.readFile(txidFile, 0);
+  }
   
   /**
    * Write last checkpoint time into a separate file.
@@ -744,6 +744,10 @@ public class NNStorage extends Storage implements Closeable,
    * (e.g version, seen_txid).
    */
   static File getStorageFile(StorageDirectory sd, NameNodeFile type) {
+    return new File(sd.getCurrentDir(), type.getName());
+  }
+
+  static File getStorageFile(StorageDirectoryJVMInterface sd, NameNodeFile type) {
     return new File(sd.getCurrentDir(), type.getName());
   }
 

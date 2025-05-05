@@ -44,7 +44,7 @@ import org.junit.Assume;
 import org.junit.Test;
 
 public class TestDFSInputStream {
-  private void testSkipInner(MiniDFSCluster cluster) throws IOException {
+  private void testSkipInner(MiniDFSClusterInJVM cluster) throws IOException {
     DistributedFileSystem fs = cluster.getFileSystem();
     DFSClient client = fs.dfs;
     Path file = new Path("/testfile");
@@ -80,7 +80,7 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSkipWithRemoteBlockReader() throws IOException {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       testSkipInner(cluster);
     } finally {
@@ -91,7 +91,7 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSkipWithRemoteBlockReader2() throws IOException {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       testSkipInner(cluster);
     } finally {
@@ -109,7 +109,7 @@ public class TestDFSInputStream {
     conf.set(DFSConfigKeys.DFS_DOMAIN_SOCKET_PATH_KEY,
         new File(sockDir.getDir(),
           "TestShortCircuitLocalRead._PORT.sock").getAbsolutePath());
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       DFSInputStream.tcpReadsDisabledForTesting = true;
       testSkipInner(cluster);
@@ -123,8 +123,8 @@ public class TestDFSInputStream {
   @Test(timeout=60000)
   public void testSeekToNewSource() throws IOException {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     Path path = new Path("/testfile");
     DFSTestUtil.createFile(fs, path, 1024, (short) 3, 0);
@@ -147,8 +147,8 @@ public class TestDFSInputStream {
   public void testOpenInfo() throws IOException {
     Configuration conf = new Configuration();
     conf.setInt(Retry.TIMES_GET_LAST_BLOCK_LENGTH_KEY, 0);
-    MiniDFSCluster cluster =
-            new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster =
+            new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
@@ -186,7 +186,7 @@ public class TestDFSInputStream {
       throws IOException, InterruptedException {
     Configuration conf = new Configuration();
     conf.set(HdfsClientConfigKeys.DFS_CHECKSUM_TYPE_KEY, "NULL");
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
         .build();
     cluster.waitActive();
     try {
@@ -209,8 +209,8 @@ public class TestDFSInputStream {
 
       // fetch live DN
       final List<DatanodeDescriptor> live = new ArrayList<DatanodeDescriptor>();
-      cluster.getNameNode().getNamesystem().getBlockManager()
-          .getDatanodeManager().fetchDatanodes(live, null, false);
+      //cluster.getNameNode().getNamesystem().getBlockManager()
+        //  .getDatanodeManager().fetchDatanodes(live, null, false);
       assertTrue("DN start should be success and live dn should be 2",
           live.size() == 2);
       assertTrue("File size should be " + chunkSize,

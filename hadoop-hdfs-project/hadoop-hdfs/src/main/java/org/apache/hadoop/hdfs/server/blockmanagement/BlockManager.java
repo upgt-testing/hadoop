@@ -159,7 +159,7 @@ import org.slf4j.LoggerFactory;
  * replicas + maintenance replicas.
  */
 @InterfaceAudience.Private
-public class BlockManager implements BlockStatsMXBean {
+public class BlockManager implements BlockStatsMXBean, BlockManagerJVMInterface {
 
   public static final Logger LOG = LoggerFactory.getLogger(BlockManager.class);
   public static final Logger blockLog = NameNode.blockStateChangeLog;
@@ -703,7 +703,7 @@ public class BlockManager implements BlockStatsMXBean {
 
   /** Allow silent termination of redundancy monitor for testing. */
   @VisibleForTesting
-  void enableRMTerminationForTesting() {
+  public void enableRMTerminationForTesting() {
     checkNSRunning = false;
   }
 
@@ -1870,7 +1870,7 @@ public class BlockManager implements BlockStatsMXBean {
   }
   
   
-  void updateState() {
+  public void updateState() {
     pendingReconstructionBlocksCount = pendingReconstruction.size();
     lowRedundancyBlocksCount = neededReconstruction.size();
     corruptReplicaBlocksCount = corruptReplicas.size();
@@ -1886,7 +1886,7 @@ public class BlockManager implements BlockStatsMXBean {
    * @param nodesToProcess number of datanodes to schedule deletion work
    * @return total number of block for deletion
    */
-  int computeInvalidateWork(int nodesToProcess) {
+  public int computeInvalidateWork(int nodesToProcess) {
     final List<DatanodeInfo> nodes = invalidateBlocks.getDatanodes();
     Collections.shuffle(nodes);
 
@@ -1915,7 +1915,7 @@ public class BlockManager implements BlockStatsMXBean {
    * @return number of blocks scheduled for reconstruction during this
    *         iteration.
    */
-  int computeBlockReconstructionWork(int blocksToProcess) {
+  public int computeBlockReconstructionWork(int blocksToProcess) {
     List<List<BlockInfo>> blocksToReconstruct = null;
     namesystem.writeLock();
     try {
@@ -2765,7 +2765,7 @@ public class BlockManager implements BlockStatsMXBean {
   /**
    * Rescan the list of blocks which were previously postponed.
    */
-  void rescanPostponedMisreplicatedBlocks() {
+  public void rescanPostponedMisreplicatedBlocks() {
     if (getPostponedMisreplicatedBlocksCount() == 0) {
       return;
     }
@@ -4926,7 +4926,7 @@ public class BlockManager implements BlockStatsMXBean {
    * 
    * @return number of blocks scheduled for replication or removal.
    */
-  int computeDatanodeWork() {
+  public int computeDatanodeWork() {
     // Blocks should not be replicated or removed if in safe mode.
     // It's OK to check safe mode here w/o holding lock, in the worst
     // case extra replications will be scheduled, and these will get
@@ -5220,7 +5220,7 @@ public class BlockManager implements BlockStatsMXBean {
    * @return redundancy thread.
    */
   @VisibleForTesting
-  Daemon getRedundancyThread() {
+  public Daemon getRedundancyThread() {
     return redundancyThread;
   }
 

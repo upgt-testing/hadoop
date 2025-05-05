@@ -43,7 +43,7 @@ public class TestSetrepIncreasing {
     conf.set(DFSConfigKeys.DFS_REPLICATION_KEY, "" + fromREP);
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
     conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(10).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(10).build();
     FileSystem fs = cluster.getFileSystem();
     assertTrue("Not a HDFS: "+fs.getUri(), fs instanceof DistributedFileSystem);
 
@@ -90,8 +90,8 @@ public class TestSetrepIncreasing {
   @Test
   public void testSetRepWithStoragePolicyOnEmptyFile() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     DistributedFileSystem dfs = cluster.getFileSystem();
     try {
       Path d = new Path("/tmp");
@@ -110,7 +110,7 @@ public class TestSetrepIncreasing {
   public void testSetRepOnECFile() throws Exception {
     ClientProtocol client;
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .build();
     cluster.waitActive();
     client = NameNodeProxies.createProxy(conf,

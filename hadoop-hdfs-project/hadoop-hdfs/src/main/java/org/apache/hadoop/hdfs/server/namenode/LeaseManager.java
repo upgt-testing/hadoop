@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * 2.10) Namenode commit changes to edit log
  */
 @InterfaceAudience.Private
-public class LeaseManager {
+public class LeaseManager implements LeaseManagerJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(LeaseManager.class
       .getName());
   private final FSNamesystem fsnamesystem;
@@ -349,7 +349,7 @@ public class LeaseManager {
   /**
    * Adds (or re-adds) the lease for the specified file.
    */
-  synchronized Lease addLease(String holder, long inodeId) {
+  public synchronized Lease addLease(String holder, long inodeId) {
     Lease lease = getLease(holder);
     if (lease == null) {
       lease = new Lease(holder);
@@ -448,7 +448,7 @@ public class LeaseManager {
    * checks in.  If the client dies and allows its lease to
    * expire, all the corresponding locks can be released.
    *************************************************************/
-  class Lease {
+  class Lease implements LeaseJVMInterface {
     private final String holder;
     private long lastUpdate;
     private final HashSet<Long> files = new HashSet<>();

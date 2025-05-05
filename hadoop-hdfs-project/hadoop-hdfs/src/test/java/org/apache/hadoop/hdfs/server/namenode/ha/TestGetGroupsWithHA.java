@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.tools.GetGroups;
 import org.apache.hadoop.tools.GetGroupsTestBase;
@@ -31,12 +31,12 @@ import org.junit.Before;
 
 public class TestGetGroupsWithHA extends GetGroupsTestBase {
   
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   
   @Before
   public void setUpNameNode() throws IOException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(0).build();
     HATestUtil.setFailoverConfigurations(cluster, conf);

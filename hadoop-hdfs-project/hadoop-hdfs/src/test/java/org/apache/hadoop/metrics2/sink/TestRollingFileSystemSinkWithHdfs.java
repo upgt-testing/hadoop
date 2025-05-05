@@ -25,7 +25,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.metrics2.MetricsException;
 import org.apache.hadoop.metrics2.MetricsSystem;
 import org.apache.hadoop.metrics2.sink.RollingFileSystemSinkTestBase.MyMetrics1;
@@ -42,10 +42,10 @@ import static org.junit.Assert.fail;
 public class TestRollingFileSystemSinkWithHdfs
     extends RollingFileSystemSinkTestBase {
   private static final int  NUM_DATANODES = 4;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
 
   /**
-   * Create a {@link MiniDFSCluster} instance with four nodes.  The
+   * Create a {@link MiniDFSClusterInJVM} instance with four nodes.  The
    * node count is required to allow append to function. Also clear the
    * sink's test flags.
    *
@@ -57,14 +57,14 @@ public class TestRollingFileSystemSinkWithHdfs
 
     // It appears that since HDFS-265, append is always enabled.
     cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES).build();
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATANODES).build();
 
     // Also clear sink flags
     RollingFileSystemSink.hasFlushed = false;
   }
 
   /**
-   * Stop the {@link MiniDFSCluster}.
+   * Stop the {@link MiniDFSClusterInJVM}.
    */
   @After
   public void shutdownHdfs() {

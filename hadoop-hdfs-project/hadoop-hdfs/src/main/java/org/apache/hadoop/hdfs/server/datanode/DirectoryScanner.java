@@ -59,7 +59,7 @@ import org.apache.hadoop.util.Time;
  * Reconciles the differences with block information maintained in the dataset.
  */
 @InterfaceAudience.Private
-public class DirectoryScanner implements Runnable {
+public class DirectoryScanner implements Runnable, DirectoryScannerJVMInterface  {
   private static final Log LOG = LogFactory.getLog(DirectoryScanner.class);
   private static final int MILLIS_PER_SECOND = 1000;
   private static final String START_MESSAGE =
@@ -376,7 +376,7 @@ public class DirectoryScanner implements Runnable {
     for (Entry<String, LinkedList<ScanInfo>> entry : diffs.entrySet()) {
       String bpid = entry.getKey();
       LinkedList<ScanInfo> diff = entry.getValue();
-      
+
       for (ScanInfo info : diff) {
         dataset.checkAndUpdate(bpid, info);
       }
@@ -406,7 +406,7 @@ public class DirectoryScanner implements Runnable {
         statsRecord.totalBlocks = blockpoolReport.length;
         final List<ReplicaInfo> bl = dataset.getFinalizedBlocks(bpid);
         Collections.sort(bl); // Sort based on blockId
-  
+
         int d = 0; // index for blockpoolReport
         int m = 0; // index for memReprot
         while (m < bl.size() && d < blockpoolReport.length) {

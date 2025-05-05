@@ -38,7 +38,7 @@ import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NamenodeRole;
 import org.apache.hadoop.hdfs.server.namenode.ha.HAContext;
@@ -57,7 +57,7 @@ public class TestFSNamesystem {
 
   @After
   public void cleanUp() {
-    FileUtil.fullyDeleteContents(new File(MiniDFSCluster.getBaseDirectory()));
+    FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
   }
 
   /**
@@ -81,7 +81,7 @@ public class TestFSNamesystem {
   @Test
   public void testFSNamespaceClearLeases() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    File nameDir = new File(MiniDFSCluster.getBaseDirectory(), "name");
+    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
     conf.set(DFS_NAMENODE_NAME_DIR_KEY, nameDir.getAbsolutePath());
 
     NameNode.initMetrics(conf, NamenodeRole.NAMENODE);

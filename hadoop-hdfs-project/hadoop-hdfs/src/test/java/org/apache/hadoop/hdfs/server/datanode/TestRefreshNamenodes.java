@@ -26,7 +26,10 @@ import java.net.InetSocketAddress;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.hdfs.DFSConfigKeys;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NSConf;
@@ -48,17 +51,17 @@ public class TestRefreshNamenodes {
   public void testRefreshNamenodes() throws IOException {
     // Start cluster with a single NN and DN
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       MiniDFSNNTopology topology = new MiniDFSNNTopology()
         .addNameservice(new NSConf("ns1").addNN(
             new NNConf(null).setIpcPort(nnPort1)))
         .setFederation(true);
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(topology)
         .build();
 
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       assertEquals(1, dn.getAllBpOs().size());
 
       cluster.addNameNode(conf, nnPort2);
@@ -78,8 +81,8 @@ public class TestRefreshNamenodes {
       }
       
       Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
-      for (BPOfferService bpos : dn.getAllBpOs()) {
-        for (BPServiceActor bpsa : bpos.getBPServiceActors()) {
+      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+        for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
           assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
         }
       }

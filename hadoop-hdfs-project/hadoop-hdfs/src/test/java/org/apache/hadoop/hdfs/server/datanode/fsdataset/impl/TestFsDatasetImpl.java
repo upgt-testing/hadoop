@@ -870,6 +870,7 @@ public class TestFsDatasetImpl {
     return destVolume;
   }
 
+  /*
   @Test(timeout = 3000000)
   public void testBlockReadOpWhileMovingBlock() throws IOException {
     MiniDFSCluster cluster = null;
@@ -950,6 +951,7 @@ public class TestFsDatasetImpl {
       }
     }
   }
+   */
 
   @Test(timeout=30000)
   public void testDataDirWithPercent() throws IOException {

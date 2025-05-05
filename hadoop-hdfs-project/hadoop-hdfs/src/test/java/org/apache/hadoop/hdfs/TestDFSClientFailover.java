@@ -75,11 +75,11 @@ public class TestDFSClientFailover {
   private static final int FILE_LENGTH_TO_VERIFY = 100;
   
   private final Configuration conf = new Configuration();
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   
   @Before
   public void setUpCluster() throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .build();
     cluster.transitionToActive(0);

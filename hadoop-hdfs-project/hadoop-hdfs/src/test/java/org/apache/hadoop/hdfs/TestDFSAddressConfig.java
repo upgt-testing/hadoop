@@ -17,9 +17,9 @@
  */
 
 /*
- * Test the MiniDFSCluster functionality that allows "dfs.datanode.address",
+ * Test the MiniDFSClusterInJVM functionality that allows "dfs.datanode.address",
  * "dfs.datanode.http.address", and "dfs.datanode.ipc.address" to be
- * configurable. The MiniDFSCluster.startDataNodes() API now has a parameter
+ * configurable. The MiniDFSClusterInJVM.startDataNodes() API now has a parameter
  * that will check these properties if told to do so.
  */
 package org.apache.hadoop.hdfs;
@@ -34,9 +34,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.junit.Test;
 
 
@@ -49,11 +50,11 @@ public class TestDFSAddressConfig {
     /*-------------------------------------------------------------------------
      * By default, the DataNode socket address should be localhost (127.0.0.1).
      *------------------------------------------------------------------------*/
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
 
-    ArrayList<DataNode> dns = cluster.getDataNodes();
-    DataNode dn = dns.get(0);
+    ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+    DataNodeJVMInterface dn = dns.get(0);
 
     String selfSocketAddr = dn.getXferAddress().toString();
     System.out.println("DN Self Socket Addr == " + selfSocketAddr);
@@ -62,7 +63,7 @@ public class TestDFSAddressConfig {
     /*-------------------------------------------------------------------------
      * Shut down the datanodes, reconfigure, and bring them back up.
      * Even if told to use the configuration properties for dfs.datanode,
-     * MiniDFSCluster.startDataNodes() should use localhost as the default if
+     * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
      * the dfs.datanode properties are not set.
      *------------------------------------------------------------------------*/
     for (int i = 0; i < dns.size(); i++) {
@@ -88,7 +89,7 @@ public class TestDFSAddressConfig {
     /*-------------------------------------------------------------------------
      * Shut down the datanodes, reconfigure, and bring them back up.
      * This time, modify the dfs.datanode properties and make sure that they
-     * are used to configure sockets by MiniDFSCluster.startDataNodes().
+     * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
      *------------------------------------------------------------------------*/
     for (int i = 0; i < dns.size(); i++) {
       DataNodeProperties dnp = cluster.stopDataNode(i);

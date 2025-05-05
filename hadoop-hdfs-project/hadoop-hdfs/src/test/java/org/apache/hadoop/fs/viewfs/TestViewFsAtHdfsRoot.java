@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,7 +40,7 @@ import org.junit.BeforeClass;
  */
 public class TestViewFsAtHdfsRoot extends ViewFsBaseTest {
   
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static final HdfsConfiguration CONF = new HdfsConfiguration();
   private static FileContext fc;
   
@@ -56,7 +56,7 @@ public class TestViewFsAtHdfsRoot extends ViewFsBaseTest {
     CONF.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(2).build();
     cluster.waitClusterUp();
     fc = FileContext.getFileContext(cluster.getURI(0), CONF);
   }

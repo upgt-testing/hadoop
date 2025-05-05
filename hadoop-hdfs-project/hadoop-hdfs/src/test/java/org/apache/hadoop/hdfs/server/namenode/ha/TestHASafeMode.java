@@ -47,7 +47,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSOutputStream;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
@@ -77,11 +77,11 @@ import com.google.common.collect.Lists;
 public class TestHASafeMode {
   private static final Log LOG = LogFactory.getLog(TestHASafeMode.class);
   private static final int BLOCK_SIZE = 1024;
-  private NameNode nn0;
-  private NameNode nn1;
+  private NameNodeJVMInterface nn0;
+  private NameNodeJVMInterface nn1;
   private FileSystem fs;
-  private MiniDFSCluster cluster;
-  
+  private MiniDFSClusterInJVM cluster;
+
   static {
     DFSTestUtil.setNameNodeLogLevel(Level.ALL);
     GenericTestUtils.setLogLevel(FSImage.LOG, Level.ALL);
@@ -94,11 +94,11 @@ public class TestHASafeMode {
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
 
-    cluster = new MiniDFSCluster.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleHATopology())
-      .numDataNodes(3)
-      .waitSafeMode(false)
-      .build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
+        .nnTopology(MiniDFSNNTopology.simpleHATopology())
+        .numDataNodes(3)
+        .waitSafeMode(false)
+        .build();
     cluster.waitActive();
     
     nn0 = cluster.getNameNode(0);
@@ -122,11 +122,11 @@ public class TestHASafeMode {
   @Test (timeout=300000)
   public void testClientRetrySafeMode() throws Exception {
     final Map<Path, Boolean> results = Collections
-        .synchronizedMap(new HashMap<Path, Boolean>());
+            .synchronizedMap(new HashMap<Path, Boolean>());
     final Path test = new Path("/test");
     // let nn0 enter safemode
     cluster.getConfiguration(0).setInt(
-        DFSConfigKeys.DFS_NAMENODE_SAFEMODE_MIN_DATANODES_KEY, 3);
+            DFSConfigKeys.DFS_NAMENODE_SAFEMODE_MIN_DATANODES_KEY, 3);
     NameNodeAdapter.enterSafeMode(nn0, false);
     Whitebox.setInternalState(nn0.getNamesystem(), "manualSafeMode", false);
     BlockManagerTestUtil.setStartupSafeModeForTest(nn0.getNamesystem()
@@ -194,7 +194,7 @@ public class TestHASafeMode {
     nn0.getRpcServer().transitionToActive(
         new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER));
 
-    FSNamesystem namesystem = nn0.getNamesystem();
+    FSNamesystemJVMInterface namesystem = nn0.getNamesystem();
     String status = namesystem.getSafemode();
     assertTrue("Bad safemode status: '" + status + "'", status
         .startsWith("Safe mode is ON."));
@@ -225,7 +225,7 @@ public class TestHASafeMode {
     fs.delete(new Path("/test"), true);
     banner("Restarting standby");
     restartStandby();
-    FSNamesystem namesystem = nn1.getNamesystem();
+    FSNamesystemJVMInterface namesystem = nn1.getNamesystem();
     String status = namesystem.getSafemode();
     assertTrue("Bad safemode status: '" + status + "'", status
         .startsWith("Safe mode is ON."));
@@ -488,9 +488,9 @@ public class TestHASafeMode {
 
     restartActive();
   }
-  
-  private static void assertSafeMode(NameNode nn, int safe, int total,
-    int numNodes, int nodeThresh) {
+
+  private static void assertSafeMode(NameNodeJVMInterface nn, int safe, int total,
+                                     int numNodes, int nodeThresh) {
     String status = nn.getNamesystem().getSafemode();
     if (total == 0 && nodeThresh == 0) {
       assertTrue("Bad safemode status: '" + status + "'",
@@ -780,7 +780,7 @@ public class TestHASafeMode {
   @Test
   public void testIsInSafemode() throws Exception {
     // Check for the standby nn without client failover.
-    NameNode nn2 = cluster.getNameNode(1);
+    NameNodeJVMInterface nn2 = cluster.getNameNode(1);
     assertTrue("nn2 should be in standby state", nn2.isStandbyState());
 
     InetSocketAddress nameNodeAddress = nn2.getNameNodeAddress();

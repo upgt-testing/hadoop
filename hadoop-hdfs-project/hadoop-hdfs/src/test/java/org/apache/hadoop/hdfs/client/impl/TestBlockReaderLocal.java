@@ -38,7 +38,7 @@ import org.apache.hadoop.hdfs.DFSInputStream;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.ExtendedBlockId;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsDataInputStream;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
@@ -129,7 +129,7 @@ public class TestBlockReaderLocal {
   public void runBlockReaderLocalTest(BlockReaderLocalTest test,
       boolean checksum, long readahead) throws IOException {
     Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY,
         !checksum);
@@ -149,7 +149,7 @@ public class TestBlockReaderLocal {
     ShortCircuitShm shm = null;
     RandomAccessFile raf = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -734,14 +734,14 @@ public class TestBlockReaderLocal {
     } else {
       conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
     }
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final long RANDOM_SEED = 4567L;
     FSDataInputStream fsIn = null;
     byte original[] = new byte[BlockReaderLocalTest.TEST_LENGTH];
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).
+      cluster = new MiniDFSClusterInJVM.Builder(conf).
           hosts(new String[] {NetUtils.getLocalHostname()}).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();

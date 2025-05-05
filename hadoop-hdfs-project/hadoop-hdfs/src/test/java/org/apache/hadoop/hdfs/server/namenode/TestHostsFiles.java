@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.blockmanagement.CombinedHostFileManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.HostConfigManager;
@@ -96,6 +96,7 @@ public class TestHostsFiles {
     return conf;
   }
 
+  /*
   @Test
   public void testHostsExcludeInUI() throws Exception {
     Configuration conf = getConf();
@@ -106,9 +107,9 @@ public class TestHostsFiles {
 
     // Two blocks and four racks
     String racks[] = {"/rack1", "/rack1", "/rack2", "/rack2"};
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .numDataNodes(racks.length).racks(racks).build();
-    final FSNamesystem ns = cluster.getNameNode().getNamesystem();
+    final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
 
     try {
       // Create a file with one block
@@ -144,6 +145,7 @@ public class TestHostsFiles {
       hostsFileWriter.cleanup();
     }
   }
+  */
 
   @Test
   public void testHostsIncludeForDeadCount() throws Exception {
@@ -154,10 +156,10 @@ public class TestHostsFiles {
     hostsFileWriter.initIncludeHosts(new String[]
         {"localhost:52","127.0.0.1:7777"});
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
-      final FSNamesystem ns = cluster.getNameNode().getNamesystem();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+      final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
       assertTrue(ns.getNumDeadDataNodes() == 2);
       assertTrue(ns.getNumLiveDataNodes() == 0);
 

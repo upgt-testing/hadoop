@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hdfs;
 
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -45,7 +47,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestMissingBlocksAlert {
   
-  private static final Log LOG = 
+  private static final Log LOG =
                            LogFactory.getLog(TestMissingBlocksAlert.class);
   
   @Test
@@ -55,7 +57,7 @@ public class TestMissingBlocksAlert {
                  MBeanException, ReflectionException,
                  InstanceNotFoundException {
     
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     
     try {
       Configuration conf = new HdfsConfiguration();
@@ -67,10 +69,10 @@ public class TestMissingBlocksAlert {
       conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen/2);
 
       //start a cluster with single datanode
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
 
-      final BlockManager bm = cluster.getNamesystem().getBlockManager();
+      final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
       DistributedFileSystem dfs =
           cluster.getFileSystem();
 
@@ -157,7 +159,7 @@ public class TestMissingBlocksAlert {
     conf.set(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY,
         AvailableSpaceBlockPlacementPolicy.class.getName());
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_INTERVAL_SECONDS_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(4)
         .hosts(hosts).racks(racks).build();
     Path file = new Path("/file2");
     try {

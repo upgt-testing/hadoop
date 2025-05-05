@@ -37,7 +37,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -58,12 +58,12 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
   @Test
   public void testDataNodeMXBean() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       Assert.assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
       ObjectName mxbeanName = new ObjectName(
@@ -126,11 +126,11 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
     Configuration secureConf = createSecureConfig("authentication");
 
     // get attribute "SecurityEnabled" with simple configuration
-    try (MiniDFSCluster cluster =
-                 new MiniDFSCluster.Builder(simpleConf).build()) {
-      List<DataNode> datanodes = cluster.getDataNodes();
+    try (MiniDFSClusterInJVM cluster =
+                 new MiniDFSClusterInJVM.Builder(simpleConf).build()) {
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       Assert.assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
@@ -143,11 +143,11 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
     }
 
     // get attribute "SecurityEnabled" with secure configuration
-    try (MiniDFSCluster cluster =
-                 new MiniDFSCluster.Builder(secureConf).build()) {
-      List<DataNode> datanodes = cluster.getDataNodes();
+    try (MiniDFSClusterInJVM cluster =
+                 new MiniDFSClusterInJVM.Builder(secureConf).build()) {
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       Assert.assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
@@ -171,9 +171,9 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
   public void testDataNodeMXBeanBlockSize() throws Exception {
     Configuration conf = new Configuration();
 
-    try(MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).build()) {
-      DataNode dn = cluster.getDataNodes().get(0);
+    try(MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).build()) {
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       for (int i = 0; i < 100; i++) {
         DFSTestUtil.writeFile(
             cluster.getFileSystem(),
@@ -212,10 +212,10 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
   @Test
   public void testDataNodeMXBeanBlockCount() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       assertEquals(datanodes.size(), 1);
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -269,12 +269,12 @@ public class TestDataNodeMXBean extends SaslDataTransferTestCase {
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys
         .DFS_DATANODE_FILEIO_PROFILING_SAMPLING_PERCENTAGE_KEY, 100);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       Assert.assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
       String slowDiskPath = "test/data1/slowVolume";
       datanode.getDiskMetrics().addSlowDiskForTesting(slowDiskPath, null);
 

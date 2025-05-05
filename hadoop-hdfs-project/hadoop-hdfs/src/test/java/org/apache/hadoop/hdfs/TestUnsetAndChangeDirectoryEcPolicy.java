@@ -48,7 +48,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy {
   public static final Log LOG =
       LogFactory.getLog(TestUnsetAndChangeDirectoryEcPolicy.class);
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private Configuration conf = new Configuration();
   private DistributedFileSystem fs;
   private ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
@@ -71,7 +71,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy {
           CodecUtil.IO_ERASURECODE_CODEC_RS_RAWCODERS_KEY,
           NativeRSRawErasureCoderFactory.CODER_NAME);
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(
         dataBlocks + parityBlocks).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();

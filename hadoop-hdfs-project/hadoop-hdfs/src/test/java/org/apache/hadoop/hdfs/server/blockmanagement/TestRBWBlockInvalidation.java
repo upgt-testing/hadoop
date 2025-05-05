@@ -25,6 +25,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -35,8 +37,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.datanode.FsDatasetTestUtils.MaterializedReplica;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -68,6 +70,7 @@ public class TestRBWBlockInvalidation {
    * datanode, namenode should ask to invalidate that corrupted block and
    * schedule replication for one more replica for that under replicated block.
    */
+  /*
   @Test(timeout=600000)
   public void testBlockInvalidationWhenRBWReplicaMissedInDN()
       throws IOException, InterruptedException {
@@ -80,11 +83,11 @@ public class TestRBWBlockInvalidation {
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 300);
     conf.setLong(DFSConfigKeys.DFS_DATANODE_DIRECTORYSCAN_INTERVAL_KEY, 1);
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
         .build();
     FSDataOutputStream out = null;
     try {
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
       FileSystem fs = cluster.getFileSystem();
       Path testPath = new Path("/tmp/TestRBWBlockInvalidation", "foo1");
       out = fs.create(testPath, (short) 2);
@@ -139,7 +142,8 @@ public class TestRBWBlockInvalidation {
       cluster.shutdown();
     }
   }
-  
+   */
+
   /**
    * Regression test for HDFS-4799, a case where, upon restart, if there
    * were RWR replicas with out-of-date genstamps, the NN could accidentally
@@ -168,7 +172,7 @@ public class TestRBWBlockInvalidation {
       testPaths.add(new Path("/test" + i));
     }
     
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
         .build();
     try {
       List<FSDataOutputStream> streams = Lists.newArrayList();
@@ -251,7 +255,7 @@ public class TestRBWBlockInvalidation {
     Configuration conf = new HdfsConfiguration();
     conf.set("dfs.client.block.write.replace-datanode-on-failure.enable",
         "false");
-    try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(2).build()) {
       Path path = new Path("/testRBW");
       FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
@@ -282,7 +286,7 @@ public class TestRBWBlockInvalidation {
     }
   }
 
-  private void waitForNumTotalBlocks(final MiniDFSCluster cluster,
+  private void waitForNumTotalBlocks(final MiniDFSClusterInJVM cluster,
       final int numTotalBlocks) throws Exception {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
 

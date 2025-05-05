@@ -25,7 +25,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.BlockStoragePolicy;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockStoragePolicySuite;
 import org.junit.After;
@@ -40,13 +40,13 @@ public class TestStoragePolicyCommands {
   private static final int SIZE = 128;
 
   protected static Configuration conf;
-  protected static MiniDFSCluster cluster;
+  protected static MiniDFSClusterInJVM cluster;
   protected static FileSystem fs;
 
   @Before
   public void clusterSetUp() throws IOException, URISyntaxException {
     conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPL).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
   }

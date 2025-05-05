@@ -273,7 +273,7 @@ public abstract class Storage extends StorageInfo {
    * One of the storage directories.
    */
   @InterfaceAudience.Private
-  public static class StorageDirectory implements FormatConfirmable {
+  public static class StorageDirectory implements FormatConfirmable, StorageDirectoryJVMInterface {
     final File root;              // root directory
     // whether or not this dir is shared between two separate NNs for HA, or
     // between multiple block pools in the case of federation.

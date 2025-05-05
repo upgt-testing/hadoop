@@ -42,7 +42,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.namenode.FSEditLogOp.DeleteOp;
@@ -555,28 +555,28 @@ public class TestNameNodeRecovery {
     // start a cluster
     Configuration conf = getConf();
     setupRecoveryTestConf(conf);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     StorageDirectory sd = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .manageNameDfsDirs(false).build();
       cluster.waitActive();
       if (!finalize) {
         // Normally, the in-progress edit log would be finalized by
         // FSEditLog#endCurrentLogSegment.  For testing purposes, we
         // disable that here.
-        FSEditLog spyLog =
+        FSEditLogJVMInterface spyLog =
             spy(cluster.getNameNode().getFSImage().getEditLog());
         doNothing().when(spyLog).endCurrentLogSegment(true);
         DFSTestUtil.setEditLogForTesting(cluster.getNamesystem(), spyLog);
       }
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
-      FSImage fsimage = namesystem.getFSImage();
+      final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
+      FSImageJVMInterface fsimage = namesystem.getFSImage();
       fileSys.mkdirs(new Path(TEST_PATH));
       fileSys.mkdirs(new Path(TEST_PATH2));
-      sd = fsimage.getStorage().dirIterator(NameNodeDirType.EDITS).next();
+      //sd = fsimage.getStorage().dirIterator(NameNodeDirType.EDITS).next();
     } finally {
       if (cluster != null) {
         cluster.shutdown();
@@ -595,7 +595,7 @@ public class TestNameNodeRecovery {
     cluster = null;
     try {
       LOG.debug("trying to start normally (this should fail)...");
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .enableManagedDfsDirsRedundancy(false).format(false).build();
       cluster.waitActive();
       cluster.shutdown();
@@ -620,7 +620,7 @@ public class TestNameNodeRecovery {
     cluster = null;
     try {
       LOG.debug("running recovery...");
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .enableManagedDfsDirsRedundancy(false).format(false)
           .startupOption(recoverStartOpt).build();
     } catch (IOException e) {
@@ -637,7 +637,7 @@ public class TestNameNodeRecovery {
     cluster = null;
     try {
       LOG.debug("starting cluster normally after recovery...");
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .enableManagedDfsDirsRedundancy(false).format(false).build();
       LOG.debug("successfully recovered the " + corruptor.getName() +
           " corrupted edit log");

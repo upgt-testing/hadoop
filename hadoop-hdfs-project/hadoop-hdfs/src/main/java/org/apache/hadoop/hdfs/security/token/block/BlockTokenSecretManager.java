@@ -59,7 +59,7 @@ import com.google.common.collect.Multiset;
  */
 @InterfaceAudience.Private
 public class BlockTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockTokenSecretManagerJVMInterface  {
   public static final Log LOG = LogFactory.getLog(BlockTokenSecretManager.class);
 
   public static final Token<BlockTokenIdentifier> DUMMY_TOKEN = new Token<BlockTokenIdentifier>();
@@ -150,7 +150,7 @@ public class BlockTokenSecretManager extends
     this.shouldWrapQOP = shouldWrapQOP;
     this.timer = new Timer();
     setSerialNo(new SecureRandom().nextInt(Integer.MAX_VALUE));
-    LOG.info("Block token key range: [" + 
+    LOG.info("Block token key range: [" +
         nnRangeStart + ", " + (nnRangeStart + intRange) + ")");
     generateKeys();
   }

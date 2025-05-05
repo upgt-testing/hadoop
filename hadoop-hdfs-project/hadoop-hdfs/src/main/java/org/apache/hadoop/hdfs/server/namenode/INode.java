@@ -55,7 +55,7 @@ import java.util.Map;
  * directory inodes.
  */
 @InterfaceAudience.Private
-public abstract class INode implements INodeAttributes, Diff.Element<byte[]> {
+public abstract class INode implements INodeAttributes, Diff.Element<byte[]>, INodeJVMInterface  {
   public static final Log LOG = LogFactory.getLog(INode.class);
 
   /** parent is either an {@link INodeDirectory} or an {@link INodeReference}.*/

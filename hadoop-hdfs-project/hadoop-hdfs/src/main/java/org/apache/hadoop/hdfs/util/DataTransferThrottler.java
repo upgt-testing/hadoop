@@ -25,7 +25,7 @@ import static org.apache.hadoop.util.Time.monotonicNow;
  * The parameter bandwidthPerSec specifies the total bandwidth shared by
  * threads.
  */
-public class DataTransferThrottler {
+public class DataTransferThrottler implements DataTransferThrottlerJVMInterface {
   private final long period;          // period over which bw is imposed
   private final long periodExtension; // Max period over which bw accumulates.
   private long bytesPerPeriod;  // total number of bytes can be sent in each period

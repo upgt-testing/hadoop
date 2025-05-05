@@ -31,7 +31,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem.NameNodeEditLogRoller;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
@@ -68,10 +68,10 @@ public class TestEditLogAutoroll {
   }
 
   private Configuration conf;
-  private MiniDFSCluster cluster;
-  private NameNode nn0;
+  private MiniDFSClusterInJVM cluster;
+  private NameNodeJVMInterface nn0;
   private FileSystem fs;
-  private FSEditLog editLog;
+  private FSEditLogJVMInterface editLog;
   private final Random random = new Random();
 
   public static final Logger LOG = LoggerFactory.getLogger(FSEditLog.class);
@@ -97,7 +97,7 @@ public class TestEditLogAutoroll {
                 .addNN(new MiniDFSNNTopology.NNConf("nn1").setHttpPort(basePort))
                 .addNN(new MiniDFSNNTopology.NNConf("nn2").setHttpPort(basePort + 1)));
 
-        cluster = new MiniDFSCluster.Builder(conf)
+        cluster = new MiniDFSClusterInJVM.Builder(conf)
             .nnTopology(topology)
             .numDataNodes(0)
             .build();
@@ -113,7 +113,7 @@ public class TestEditLogAutoroll {
         ++retryCount;
         break;
       } catch (BindException e) {
-        LOG.info("Set up MiniDFSCluster failed due to port conflicts, retry "
+        LOG.info("Set up MiniDFSClusterInJVM failed due to port conflicts, retry "
             + retryCount + " times");
       }
     }

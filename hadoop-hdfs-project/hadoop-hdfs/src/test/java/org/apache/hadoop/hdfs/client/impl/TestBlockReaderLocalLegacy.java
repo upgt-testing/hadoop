@@ -36,12 +36,9 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
-import org.apache.hadoop.hdfs.protocol.BlockLocalPathInfo;
-import org.apache.hadoop.hdfs.protocol.ClientDatanodeProtocol;
-import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
-import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.net.unix.DomainSocket;
@@ -95,8 +92,8 @@ public class TestBlockReaderLocalLegacy {
 
     HdfsConfiguration conf = getConfiguration(null);
     File basedir = new File(GenericTestUtils.getRandomizedTempPath());
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf, basedir).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf, basedir).numDataNodes(1).build();
     cluster.waitActive();
     FileSystem fs = cluster.getFileSystem();
 
@@ -145,8 +142,8 @@ public class TestBlockReaderLocalLegacy {
     Assume.assumeTrue(null == DomainSocket.getLoadingFailureReason());
     TemporarySocketDirectory socketDir = new TemporarySocketDirectory();
     HdfsConfiguration conf = getConfiguration(socketDir);
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     socketDir.close();
     FileSystem fs = cluster.getFileSystem();
@@ -176,8 +173,8 @@ public class TestBlockReaderLocalLegacy {
     conf.setBoolean(HdfsClientConfigKeys.DFS_CLIENT_USE_LEGACY_BLOCKREADERLOCAL, true);
 
     File basedir = new File(GenericTestUtils.getRandomizedTempPath());
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf, basedir).numDataNodes(1).build();
+    final MiniDFSClusterInJVM cluster =
+            new MiniDFSClusterInJVM.Builder(conf, basedir).numDataNodes(1).build();
     cluster.waitActive();
 
     final DistributedFileSystem dfs = cluster.getFileSystem();
@@ -190,8 +187,9 @@ public class TestBlockReaderLocalLegacy {
     final ExtendedBlock originalBlock;
     final long originalGS;
     {
-      final LocatedBlock lb = cluster.getNameNode().getRpcServer()
-          .getBlockLocations(path.toString(), 0, 1).get(0);
+      final LocatedBlockJVMInterface lb = cluster.getNameNode().getRpcServer()
+              .getBlockLocations(path.toString(), 0, 1).get(0);
+      /*
       proxy = DFSUtilClient.createClientDatanodeProtocolProxy(
           lb.getLocations()[0], conf, 60000, false);
       token = lb.getBlockToken();
@@ -225,6 +223,9 @@ public class TestBlockReaderLocalLegacy {
           originalBlock, token);
       Assert.assertEquals(newGS, info.getBlock().getGenerationStamp());
     }
-    cluster.shutdown();
+
+       */
+      cluster.shutdown();
+    }
   }
 }

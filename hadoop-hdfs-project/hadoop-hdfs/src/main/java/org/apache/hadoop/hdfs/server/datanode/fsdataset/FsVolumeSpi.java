@@ -43,7 +43,7 @@ import org.apache.hadoop.hdfs.server.datanode.checker.VolumeCheckResult;
  * This is an interface for the underlying volume.
  */
 public interface FsVolumeSpi
-    extends Checkable<FsVolumeSpi.VolumeCheckContext, VolumeCheckResult> {
+    extends Checkable<FsVolumeSpi.VolumeCheckContext, VolumeCheckResult>, FsVolumeSpiJVMInterface {
 
   /**
    * Obtain a reference object that had increased 1 reference count of the

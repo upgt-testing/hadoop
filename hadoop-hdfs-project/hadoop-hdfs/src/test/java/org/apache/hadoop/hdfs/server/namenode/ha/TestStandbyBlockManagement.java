@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -25,7 +27,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HAUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -54,7 +56,7 @@ public class TestStandbyBlockManagement {
     Configuration conf = new Configuration();
     HAUtil.setAllowStandbyReads(conf, true);
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(3)
         .build();
@@ -62,8 +64,8 @@ public class TestStandbyBlockManagement {
       cluster.waitActive();
       cluster.transitionToActive(0);
 
-      NameNode nn1 = cluster.getNameNode(0);
-      NameNode nn2 = cluster.getNameNode(1);
+      NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+      NameNodeJVMInterface nn2 = cluster.getNameNode(1);
 
       FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
 
