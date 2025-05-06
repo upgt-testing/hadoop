@@ -31,7 +31,6 @@ public interface DataNodeJVMInterface {
     void cancelDiskBalancePlan(String bpid) throws IOException;
     void checkDiskError() throws IOException;
     long getLastDiskErrorCheck();
-    void setIBRDisabledForTest(boolean disabled);
     long getBalancerBandwidth();
     RPCServerJVMInterface getRpcServer();
     DirectoryScannerJVMInterface getDirectoryScanner();
@@ -43,7 +42,6 @@ public interface DataNodeJVMInterface {
     DataXceiverServerJVMInterface getXferServer();
     DataStorageJVMInterface getStorage();
     ConfigurationJVMInterface getConf();
-    boolean isSecurityEnabled();
     String getClusterId();
     String getVersion();
     String getSoftwareVersion();
@@ -59,7 +57,6 @@ public interface DataNodeJVMInterface {
     DataNodeMetricsJVMInterface getMetrics();
     DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();
-    SaslDataTransferServerJVMInterface getSaslServer();
     SaslDataTransferClientJVMInterface getSaslClient();
     int getInfoPort();
     BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();

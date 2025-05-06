@@ -172,7 +172,7 @@ public class DatanodeStorageInfo implements DatanodeStorageInfoJVMInterface {
     this.state = state;
   }
 
-  boolean areBlocksOnFailedStorage() {
+  public boolean areBlocksOnFailedStorage() {
     return getState() == State.FAILED && !blocks.isEmpty();
   }
 

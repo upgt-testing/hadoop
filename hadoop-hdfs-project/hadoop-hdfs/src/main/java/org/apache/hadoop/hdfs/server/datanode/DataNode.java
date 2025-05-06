@@ -1678,7 +1678,7 @@ public class DataNode extends ReconfigurableBase
     initDiskBalancer(data, getConf());
   }
 
-  List<BPOfferService> getAllBpOs() {
+  public List<BPOfferService> getAllBpOs() {
     return blockPoolManager.getAllNamenodeThreads();
   }
 
@@ -1686,7 +1686,7 @@ public class DataNode extends ReconfigurableBase
     return blockPoolManager.get(bpid);
   }
   
-  int getBpOsCount() {
+  public int getBpOsCount() {
     return blockPoolManager.getAllNamenodeThreads().size();
   }
   

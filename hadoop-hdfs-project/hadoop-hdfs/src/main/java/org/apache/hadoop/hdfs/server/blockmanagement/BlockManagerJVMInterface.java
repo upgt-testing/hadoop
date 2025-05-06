@@ -33,7 +33,5 @@ public interface BlockManagerJVMInterface {
     void clear();
     BlockIdManagerJVMInterface getBlockIdManager();
     int getMaxReplicationStreams();
-    int getReplicationStreamsHardLimit();
-    int getBlocksReplWorkMultiplier();
     //int getReconstructionPendingTimeout();
 }

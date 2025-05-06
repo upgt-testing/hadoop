@@ -6,6 +6,5 @@ public interface SnapshotManagerJVMInterface {
     int getNumSnapshots();
     int getNumSnapshottableDirs();
     void setAllowNestedSnapshots(boolean allowNestedSnapshots);
-    void setCaptureOpenFiles(boolean captureOpenFiles);
     INodeDirectoryJVMInterface[] getSnapshottableDirs();
 }

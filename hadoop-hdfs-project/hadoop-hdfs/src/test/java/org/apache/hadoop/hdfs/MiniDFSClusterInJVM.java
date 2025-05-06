@@ -155,9 +155,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             GenericTestUtils.SYSPROP_TEST_DATA_DIR;
     /** Configuration option to set the data dir: {@value} */
     public static final String HDFS_MINIDFS_BASEDIR = "hdfs.minidfs.basedir";
-    /** Configuration option to set the provided data dir: {@value} */
-    public static final String HDFS_MINIDFS_BASEDIR_PROVIDED =
-            "hdfs.minidfs.basedir.provided";
     public static final String  DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY
             = DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + ".testing";
     public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
@@ -1003,8 +1000,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 }
                 copyKeys(conf, nnConf, nnInfo.nameserviceId, nnInfo.nnId);
             }
-            HttpServer2JVMInterface httpServer = nn.nameNode.getHttpServer();
-            httpServer.setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         }
     }
 
@@ -1406,21 +1401,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return uri;
     }
 
-    URI getURIForAuxiliaryPort(int nnIndex) {
-        String hostPort =
-                getNN(nnIndex).nameNode.getNNAuxiliaryRpcAddress();
-        if (hostPort == null) {
-            throw new RuntimeException("No auxiliary port found");
-        }
-        URI uri = null;
-        try {
-            uri = new URI("hdfs://" + hostPort);
-        } catch (URISyntaxException e) {
-            NameNode.LOG.warn("unexpected URISyntaxException", e);
-        }
-        return uri;
-    }
-
     public int getInstanceId() {
         return instanceId;
     }
@@ -1495,12 +1475,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             if ((storageTypes != null) && (j >= storageTypes.length)) {
                 break;
             }
-            File dir;
-            if (storageTypes != null && storageTypes[j] == StorageType.PROVIDED) {
-                dir = getProvidedStorageDir(dnIndex, j);
-            } else {
-                dir = getInstanceStorageDir(dnIndex, j);
-            }
+      File dir = getInstanceStorageDir(dnIndex, j);
             dir.mkdirs();
             if (!dir.isDirectory()) {
                 throw new IOException("Mkdirs failed to create directory for DataNode " + dir);
@@ -2048,26 +2023,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         Preconditions.checkArgument(dn != null);
         // TODO: FIX ME
         throw new UnsupportedOperationException("Not implemented");
-        //return FsDatasetTestUtils.Factory.getFactory(conf).newInstance(dn);
-    }
-
-    /**
-     * Wait for the datanodes in the cluster to process any block
-     * deletions that have already been asynchronously queued.
-     */
-    public void waitForDNDeletions()
-            throws TimeoutException, InterruptedException {
-        GenericTestUtils.waitFor(new Supplier<Boolean>() {
-            @Override
-            public Boolean get() {
-                for (DataNodeJVMInterface dn : getDataNodes()) {
-                    if (getFsDatasetTestUtils(dn).getPendingAsyncDeletions() > 0) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }, 1000, 10000);
+        //return FsDatasetTestUtils.Factory.getFactory(conf).newInstance(dn)
     }
 
     /**
@@ -2081,35 +2037,11 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     /**
-     * Get the auxiliary port of NameNode, NameNode specified by index.
-     */
-    public int getNameNodeAuxiliaryPort() {
-        checkSingleNameNode();
-        return getNameNodeAuxiliaryPort(0);
-    }
-
-    /**
      * Gets the rpc port used by the NameNode at the given index, because the
      * caller supplied port is not necessarily the actual port used.
      */
     public int getNameNodePort(int nnIndex) {
         return getNN(nnIndex).nameNode.getNameNodeAddress().getPort();
-    }
-
-    /**
-     * Gets the rpc port used by the NameNode at the given index, if the
-     * NameNode has multiple auxiliary ports configured, a arbitrary
-     * one is returned.
-     */
-    public int getNameNodeAuxiliaryPort(int nnIndex) {
-        Set<InetSocketAddress> allAuxiliaryAddresses =
-                getNN(nnIndex).nameNode.getAuxiliaryNameNodeAddresses();
-        if (allAuxiliaryAddresses.isEmpty()) {
-            return -1;
-        } else {
-            InetSocketAddress addr = allAuxiliaryAddresses.iterator().next();
-            return addr.getPort();
-        }
     }
 
     /**
@@ -2278,19 +2210,15 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         String curVersion =  info.nnInstance.getCurVersion();
         NameNodeInstance nnInstance = new NameNodeInstance(curVersion);
         NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(args, info.conf);
-        nn.getHttpServer()
-                .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         info.nameNode = nn;
         info.nameserviceId = info.conf.get(DFS_NAMESERVICE_ID);
         info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
         info.nnInstance = nnInstance;
         info.setStartOpt(startOpt);
         if (waitActive) {
-            if (numDataNodes > 0) {
-                waitNameNodeUp(nnIndex);
-            }
+            waitClusterUp();
             LOG.info("Restarted the namenode");
-            waitActive(nnIndex);
+            waitActive();
         }
     }
 
@@ -2437,8 +2365,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         argList.add("started");
         String[] newArgs = argList.toArray(new String[0]);
         NameNodeJVMInterface nn = nnInstance.createNameNodeForInJVMCluster(newArgs, info.conf);
-        nn.getHttpServer()
-                .setAttribute(ImageServlet.RECENT_IMAGE_CHECK_ENABLED, false);
         info.nameNode = nn;
         info.nameserviceId = info.conf.get(DFS_NAMESERVICE_ID);
         info.nnId = info.conf.get(DFS_HA_NAMENODE_ID_KEY);
@@ -3078,24 +3004,12 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return getFileSystem(0);
     }
 
-    public DistributedFileSystem getFileSystemFromAuxiliaryPort()
-            throws IOException {
-        checkSingleNameNode();
-        return getFileSystemFromAuxiliaryPort(0);
-    }
-
     /**
      * Get a client handle to the DFS cluster for the namenode at given index.
      */
     public DistributedFileSystem getFileSystem(int nnIndex) throws IOException {
         return (DistributedFileSystem) addFileSystem(FileSystem.get(getURI(nnIndex),
                 getNN(nnIndex).conf));
-    }
-
-    public DistributedFileSystem getFileSystemFromAuxiliaryPort(int nnIndex)
-            throws IOException {
-        return (DistributedFileSystem) addFileSystem(FileSystem.get(
-                getURIForAuxiliaryPort(nnIndex), getNN(nnIndex).conf));
     }
 
     /**
@@ -3146,18 +3060,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
-    public void transitionToObserver(int nnIndex) throws IOException,
-            ServiceFailedException {
-        getNameNode(nnIndex).getRpcServer().transitionToObserver(
-                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
-    }
-
-    public void rollEditLogAndTail(int nnIndex) throws Exception {
-        getNameNode(nnIndex).getRpcServer().rollEditLog();
-        for (int i = 2; i < getNumNameNodes(); i++) {
-            getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
-        }
-    }
 
     public void triggerBlockReports()
             throws IOException {
@@ -3482,26 +3384,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public File getInstanceStorageDir(int dnIndex, int dirIndex) {
         return new File(base_dir, getStorageDirPath(dnIndex, dirIndex));
-    }
-
-    /**
-     * Get a storage directory for PROVIDED storages.
-     * The PROVIDED directory to return can be set by using the configuration
-     * parameter {@link #HDFS_MINIDFS_BASEDIR_PROVIDED}. If this parameter is
-     * not set, this function behaves exactly the same as
-     * {@link #getInstanceStorageDir(int, int)}. Currently, the two parameters
-     * are ignored as only one PROVIDED storage is supported in HDFS-9806.
-     *
-     * @param dnIndex datanode index (starts from 0)
-     * @param dirIndex directory index
-     * @return Storage directory
-     */
-    public File getProvidedStorageDir(int dnIndex, int dirIndex) {
-        String base = conf.get(HDFS_MINIDFS_BASEDIR_PROVIDED, null);
-        if (base == null) {
-            return getInstanceStorageDir(dnIndex, dirIndex);
-        }
-        return new File(base);
     }
 
     /**

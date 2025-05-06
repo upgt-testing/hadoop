@@ -116,6 +116,12 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void triggerBlockReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerBlockReportForTests();
+    }
+  }
+
   public static InterDatanodeProtocol createInterDatanodeProtocolProxy(
       DataNode dn, DatanodeID datanodeid, final Configuration conf,
       boolean connectToDnViaHostname) throws IOException {

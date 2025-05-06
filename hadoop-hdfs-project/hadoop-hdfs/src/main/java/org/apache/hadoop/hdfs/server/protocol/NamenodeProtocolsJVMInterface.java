@@ -16,7 +16,6 @@ public interface NamenodeProtocolsJVMInterface {
     DatanodeInfoJVMInterface[] getDatanodeReport(HdfsConstants.DatanodeReportType type) throws IOException;
     NamespaceInfoJVMInterface versionRequest() throws IOException;
     void renewLease(String clientName) throws IOException;
-    void transitionToObserver(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     void transitionToActive(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     void transitionToStandby(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     CheckpointSignatureJVMInterface rollEditLog() throws IOException;

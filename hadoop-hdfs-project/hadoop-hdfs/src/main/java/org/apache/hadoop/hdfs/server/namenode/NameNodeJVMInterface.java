@@ -18,7 +18,6 @@ public interface NameNodeJVMInterface {
     void transitionToStandby() throws IOException;
     InetSocketAddress getHttpAddress();
     FSNamesystemJVMInterface getNamesystem();
-    HttpServer2JVMInterface getHttpServer();
     boolean isInSafeMode();
     java.lang.String getSlowDisksReport();
     //void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
@@ -59,7 +58,6 @@ public interface NameNodeJVMInterface {
     NamenodeProtocolsJVMInterface getRpcServer();
     long getProtocolVersion(java.lang.String arg0, long arg1) throws java.io.IOException;
     //HAServiceStatusInterface getServiceStatus() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
-    boolean isObserverState();
     long getBytesWithFutureGenerationStamps();
     //org.apache.hadoop.ha.HAServiceProtocol.HAServiceState getServiceState();
     long getLastHATransitionTime();
@@ -118,7 +116,6 @@ public interface NameNodeJVMInterface {
     //InMemoryLevelDBAliasMapServerInterface getAliasMapServer();
     //void stopAtException(java.lang.Exception arg0);
     //java.net.InetSocketAddress getRpcServerAddress(Configuration arg0);
-    java.lang.String getNNAuxiliaryRpcAddress();
     //java.lang.String getTrimmedOrNull(Configuration arg0, java.lang.String arg1);
     //void initReconfigurableBackoffKey();
     //void monitorHealth() throws org.apache.hadoop.ha.HealthCheckFailedException, org.apache.hadoop.security.AccessControlException;
@@ -133,7 +130,6 @@ public interface NameNodeJVMInterface {
     //java.lang.String reconfCallerContextEnabled(java.lang.String arg0);
     //NamenodeRegistrationInterface setRegistration();
     //UserGroupInformationInterface getRemoteUser() throws java.io.IOException;
-    java.util.Set<java.net.InetSocketAddress> getAuxiliaryNameNodeAddresses();
     //void loginAsNameNodeUser(Configuration arg0) throws java.io.IOException;
     //java.lang.String getRpcServerBindHost(Configuration arg0);
     java.net.InetSocketAddress getHttpsAddress();

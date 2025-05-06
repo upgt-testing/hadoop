@@ -260,15 +260,14 @@ public abstract class HATestUtil {
     setFailoverConfigurations(conf, logicalName, nnAddresses);
   }
 
-  public static <P extends FailoverProxyProvider<?>> void
-  setFailoverConfigurations(MiniDFSClusterInJVM cluster, Configuration conf,
-                            String logicalName, int nsIndex, Class<P> classFPP) {
+  public static void setFailoverConfigurations(MiniDFSClusterInJVM cluster,
+                                               Configuration conf, String logicalName, int nsIndex) {
     MiniDFSClusterInJVM.NameNodeInfo[] nns = cluster.getNameNodeInfos(nsIndex);
     List<InetSocketAddress> nnAddresses = new ArrayList<InetSocketAddress>(3);
     for (MiniDFSClusterInJVM.NameNodeInfo nn : nns) {
       nnAddresses.add(nn.nameNode.getNameNodeAddress());
     }
-    setFailoverConfigurations(conf, logicalName, nnAddresses, classFPP);
+    setFailoverConfigurations(conf, logicalName, nnAddresses);
   }
 
   public static void setFailoverConfigurations(Configuration conf, String logicalName,

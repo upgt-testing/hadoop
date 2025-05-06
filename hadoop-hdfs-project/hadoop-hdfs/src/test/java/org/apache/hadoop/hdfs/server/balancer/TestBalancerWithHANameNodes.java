@@ -105,5 +105,4 @@ public class TestBalancerWithHANameNodes {
       cluster.shutdown();
     }
   }
-   */
 }
