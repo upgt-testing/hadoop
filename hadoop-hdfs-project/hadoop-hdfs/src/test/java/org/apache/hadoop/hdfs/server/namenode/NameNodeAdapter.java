@@ -269,37 +269,6 @@ public class NameNodeAdapter {
     return fsn.getBlockManager().getBlockIdManager().getGenerationStamp();
   }
 
-  public static long getImpendingGenerationStamp(final FSNamesystem fsn) {
-    return fsn.getBlockManager().getBlockIdManager()
-        .getImpendingGenerationStamp();
-  }
-
-  public static BlockInfo addBlockNoJournal(final FSNamesystem fsn,
-      final String src, final DatanodeStorageInfo[] targets)
-      throws IOException {
-    fsn.writeLock();
-    try {
-      INodeFile file = (INodeFile)fsn.getFSDirectory().getINode(src);
-      Block newBlock = fsn.createNewBlock(BlockType.CONTIGUOUS);
-      INodesInPath inodesInPath = INodesInPath.fromINode(file);
-      FSDirWriteFileOp.saveAllocatedBlock(
-          fsn, src, inodesInPath, newBlock, targets, BlockType.CONTIGUOUS);
-      return file.getLastBlock();
-    } finally {
-      fsn.writeUnlock();
-    }
-  }
-
-  public static void persistBlocks(final FSNamesystem fsn,
-      final String src, final INodeFile file) throws IOException {
-    fsn.writeLock();
-    try {
-      FSDirWriteFileOp.persistBlocks(fsn.getFSDirectory(), src, file, true);
-    } finally {
-      fsn.writeUnlock();
-    }
-  }
-
   public static BlockInfo getStoredBlock(final FSNamesystem fsn,
       final Block b) {
     return fsn.getStoredBlock(b);

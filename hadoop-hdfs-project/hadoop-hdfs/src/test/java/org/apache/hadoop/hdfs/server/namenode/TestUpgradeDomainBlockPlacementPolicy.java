@@ -38,6 +38,7 @@ import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementStatus;
 import org.apache.hadoop.hdfs.server.blockmanagement.CombinedHostFileManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.HostConfigManager;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.hdfs.util.HostsFileWriter;
 import org.apache.hadoop.net.StaticMapping;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -65,10 +66,10 @@ public class TestUpgradeDomainBlockPlacementPolicy {
       {"host1", "host2", "host3", "host4", "host5", "host6"};
   static final String[] upgradeDomains =
       {"ud5", "ud2", "ud3", "ud1", "ud2", "ud4"};
-  static final Set<DatanodeID> expectedDatanodeIDs = new HashSet<>();
+  static final Set<DatanodeIDJVMInterface> expectedDatanodeIDs = new HashSet<>();
   private MiniDFSClusterInJVM cluster = null;
-  private NamenodeProtocols nameNodeRpc = null;
-  private FSNamesystemJMVInterface namesystem = null;
+  private NamenodeProtocolsJVMInterface nameNodeRpc = null;
+  private FSNamesystemJVMInterface namesystem = null;
   private PermissionStatus perm = null;
   private HostsFileWriter hostsFileWriter = new HostsFileWriter();
 
@@ -255,7 +256,6 @@ public class TestUpgradeDomainBlockPlacementPolicy {
               block.getLocations(), REPLICATION_FACTOR);
       assertTrue(status.isPlacementPolicySatisfied());
     }
-     */
      */
   }
 }

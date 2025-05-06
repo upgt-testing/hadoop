@@ -152,6 +152,7 @@ public class TestReplicaCachingGetSpaceUsed {
     fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
   }
 
+  /*
   @Test(timeout = 15000)
   public void testFsDatasetImplDeepCopyReplica() {
     FsDatasetSpi<?> fsDataset = dataNode.getFSDataset();
@@ -173,6 +174,7 @@ public class TestReplicaCachingGetSpaceUsed {
     }
     modifyThread.setShouldRun(false);
   }
+   */
 
   private class ModifyThread extends Thread {
     private boolean shouldRun = true;

@@ -5,7 +5,6 @@ import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPBJ
 
 public interface BPServiceActorJVMInterface {
     boolean isAlive();
-    void stopCommandProcessingThread();
     java.net.InetSocketAddress getNNSocketAddress();
     DatanodeProtocolClientSideTranslatorPBJVMInterface getNameNodeProxy();
 }

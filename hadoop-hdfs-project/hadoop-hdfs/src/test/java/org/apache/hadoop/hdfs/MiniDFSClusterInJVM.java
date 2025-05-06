@@ -21,9 +21,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DEFAULT_NAME
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_DEFAULT;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_CLIENT_CONNECT_MAX_RETRIES_ON_SASL_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_DATA_TRANSFER_PROTECTION_KEY;
-import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCKREPORT_INITIAL_DELAY_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY;
@@ -62,7 +60,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import java.util.function.Supplier;
+import com.google.common.base.Supplier;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.hadoop.hdfs.protocol.*;
@@ -76,8 +74,9 @@ import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.VolumeScanner;
 import org.apache.hadoop.hdfs.server.namenode.ImageServlet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hdfs.server.namenode.ImageServlet;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
@@ -92,9 +91,13 @@ import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.BlockListAsLongs;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
+import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.common.Util;
@@ -108,12 +111,15 @@ import org.apache.hadoop.hdfs.server.datanode.ReplicaNotFoundException;
 import org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter;
 import org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter.SecureResources;
 import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.hadoop.hdfs.server.namenode.EditLogFileOutputStream;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.apache.hadoop.net.DNSToSwitchMapping;
@@ -143,8 +149,7 @@ import com.google.common.collect.Sets;
 public class MiniDFSClusterInJVM implements AutoCloseable {
 
     private static final String NAMESERVICE_ID_PREFIX = "nameserviceId";
-    private static final Logger LOG =
-            LoggerFactory.getLogger(MiniDFSClusterInJVM.class);
+    private static final Log LOG = LogFactory.getLog(MiniDFSCluster.class);
     /** System property to set the data dir: {@value} */
     public static final String PROP_TEST_BUILD_DATA =
             GenericTestUtils.SYSPROP_TEST_DATA_DIR;
@@ -157,20 +162,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             = DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + ".testing";
     public static final String  DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY
             = DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing";
-    /**
-     * For the Junit tests, this is the default value of the The amount of time
-     * in milliseconds that the BlockScanner times out waiting for the
-     * {@link VolumeScanner} thread to join during a shutdown call.
-     */
-    public static final long DEFAULT_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC =
-            TimeUnit.SECONDS.toMillis(30);
 
     // Changing this default may break some tests that assume it is 2.
     private static final int DEFAULT_STORAGES_PER_DATANODE = 2;
-
-    // do not consider load factor when selecting a datanode.
-    private static final boolean DEFAULT_DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD =
-            false;
 
     static { DefaultMetricsSystem.setMiniClusterMode(true); }
 
@@ -214,7 +208,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         public Builder(Configuration conf) {
             this.conf = conf;
-            initDefaultConfigurations();
+      this.storagesPerDatanode =
+          FsDatasetTestUtils.Factory.getFactory(conf).getDefaultNumOfDataDirs();
             if (null == conf.get(HDFS_MINIDFS_BASEDIR)) {
                 conf.set(HDFS_MINIDFS_BASEDIR,
                         new File(getBaseDirectory()).getAbsolutePath());
@@ -223,7 +218,8 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         public Builder(Configuration conf, File basedir) {
             this.conf = conf;
-            initDefaultConfigurations();
+      this.storagesPerDatanode =
+          FsDatasetTestUtils.Factory.getFactory(conf).getDefaultNumOfDataDirs();
             if (null == basedir) {
                 throw new IllegalArgumentException(
                         "MiniDFSClusterInJVM base directory cannot be null");
@@ -482,40 +478,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
 
         /**
-         * set the value of DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY in the config
-         * file.
-         *
-         * @param val passed to the flag. This allows overriding the default value
-         *            {@link #DEFAULT_DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD}.
-         * @return the builder object.
+        * Construct the actual MiniDFSClusterInJVM
          */
-        public Builder setNNRedundancyConsiderLoad(final boolean val) {
-            conf.setBoolean(DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY, val);
-            return this;
-        }
-
-        /**
-         * Construct the actual MiniDFSClusterInJVM
-         */
-        public MiniDFSClusterInJVM build() throws IOException {
-            return new MiniDFSClusterInJVM(this);
-        }
-
-        /**
-         * Initializes default values for the cluster.
-         */
-        private void initDefaultConfigurations() {
-            long defaultScannerVolumeTimeOut =
-                    conf.getLong(DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY,
-                            DEFAULT_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC);
-            conf.setLong(DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY,
-                    defaultScannerVolumeTimeOut);
-            // default is false. do not consider load factor when selecting a
-            // datanode.
-            conf.setBoolean(DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY,
-                    DEFAULT_DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD);
-            this.storagesPerDatanode =
-                    FsDatasetTestUtils.Factory.getFactory(conf).getDefaultNumOfDataDirs();
+    public MiniDFSClusterInJVM build() throws IOException {
+      return new MiniDFSClusterInJVM(this);
         }
     }
 
@@ -2174,11 +2140,10 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         LOG.info("Shutting down the Mini HDFS Cluster");
         if (checkExitOnShutdown)  {
             if (ExitUtil.terminateCalled()) {
-                Exception cause = ExitUtil.getFirstExitException();
-                LOG.error("Test resulted in an unexpected exit", cause);
-                ExitUtil.resetFirstExitException();
-                throw new AssertionError("Test resulted in an unexpected exit: " +
-                        cause.toString(), cause);
+                LOG.fatal("Test resulted in an unexpected exit",
+                    ExitUtil.getFirstExitException());
+                        ExitUtil.resetFirstExitException();
+                throw new AssertionError("Test resulted in an unexpected exit");
             }
         }
         if (closeFileSystem) {
@@ -3190,8 +3155,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     public void rollEditLogAndTail(int nnIndex) throws Exception {
         getNameNode(nnIndex).getRpcServer().rollEditLog();
         for (int i = 2; i < getNumNameNodes(); i++) {
-            long el = getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
-            LOG.info("editsLoaded {}", el);
+            getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
         }
     }
 
@@ -3230,25 +3194,11 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         DFSClient client = new DFSClient(addr, conf);
 
         // ensure all datanodes have registered and sent heartbeat to the namenode
-        int failedCount = 0;
-        while (true) {
+        while (shouldWait(client.datanodeReport(DatanodeReportType.LIVE), addr)) {
             try {
-                while (shouldWait(client.datanodeReport(DatanodeReportType.LIVE), addr)) {
-                    LOG.info("Waiting for cluster to become active");
-                    Thread.sleep(100);
-                }
-                break;
-            } catch (IOException e) {
-                failedCount++;
-                // Cached RPC connection to namenode, if any, is expected to fail once
-                if (failedCount > 1) {
-                    LOG.warn("Tried waitActive() " + failedCount
-                            + " time(s) and failed, giving up.  " + StringUtils
-                            .stringifyException(e));
-                    throw e;
-                }
+                LOG.info("Waiting for cluster to become active");
+                Thread.sleep(100);
             } catch (InterruptedException e) {
-                throw new IOException(e);
             }
         }
 
@@ -3284,7 +3234,22 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      */
     public void waitActive() throws IOException {
         for (int index = 0; index < namenodes.size(); index++) {
-            waitActive(index);
+          int failedCount = 0;
+          while (true) {
+            try {
+                waitActive(index);
+              break;
+            } catch (IOException e) {
+              failedCount++;
+              // Cached RPC connection to namenode, if any, is expected to fail once
+              if (failedCount > 1) {
+                LOG.warn("Tried waitActive() " + failedCount
+                    + " time(s) and failed, giving up.  "
+                    + StringUtils.stringifyException(e));
+                throw e;
+              }
+            }
+          }
         }
         LOG.info("Cluster is active");
     }

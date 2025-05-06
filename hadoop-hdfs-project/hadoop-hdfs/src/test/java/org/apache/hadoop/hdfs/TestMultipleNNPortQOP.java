@@ -25,10 +25,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileSystemTestHelper;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient;
-import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServer;
-import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServerJVMInterface;
-import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.*;
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenIdentifier;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
@@ -254,8 +251,8 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
       FileSystem fsPrivacy = FileSystem.get(uriPrivacyPort, clientConf);
       doTest(fsPrivacy, PATH1);
       for (int i = 0; i < 2; i++) {
-        DataNode dn = dataNodes.get(i);
-        SaslDataTransferClient saslClient = dn.getSaslClient();
+        DataNodeJVMInterface dn = dataNodes.get(i);
+        SaslDataTransferClientJVMInterface saslClient = dn.getSaslClient();
         String qop = null;
         // It may take some time for the qop to populate
         // to all DNs, check in a loop.
@@ -273,8 +270,8 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
       FileSystem fsIntegrity = FileSystem.get(uriIntegrityPort, clientConf);
       doTest(fsIntegrity, PATH2);
       for (int i = 0; i < 2; i++) {
-        DataNode dn = dataNodes.get(i);
-        SaslDataTransferClient saslClient = dn.getSaslClient();
+        DataNodeJVMInterface dn = dataNodes.get(i);
+        SaslDataTransferClientJVMInterface saslClient = dn.getSaslClient();
         String qop = null;
         for (int trial = 0; trial < 10; trial++) {
           qop = saslClient.getTargetQOP();
@@ -290,8 +287,8 @@ public class TestMultipleNNPortQOP extends SaslDataTransferTestCase {
       FileSystem fsAuth = FileSystem.get(uriAuthPort, clientConf);
       doTest(fsAuth, PATH3);
       for (int i = 0; i < 3; i++) {
-        DataNode dn = dataNodes.get(i);
-        SaslDataTransferServer saslServer = dn.getSaslServer();
+        DataNodeJVMInterface dn = dataNodes.get(i);
+        SaslDataTransferServerJVMInterface saslServer = dn.getSaslServer();
         String qop = null;
         for (int trial = 0; trial < 10; trial++) {
           qop = saslServer.getNegotiatedQOP();
