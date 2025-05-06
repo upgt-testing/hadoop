@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * for placing block replicas.
  */
 @InterfaceAudience.Private
-public abstract class BlockPlacementPolicy {
+public abstract class BlockPlacementPolicy implements BlockPlacementPolicyJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(
       BlockPlacementPolicy.class);
 

@@ -33,11 +33,13 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.CacheDirectiveInfo;
 import org.apache.hadoop.hdfs.protocol.CachePoolInfo;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetCache;
 import org.apache.hadoop.io.nativeio.NativeIO;
 import org.apache.hadoop.io.nativeio.NativeIO.POSIX.CacheManipulator;
 import org.apache.hadoop.io.nativeio.NativeIO.POSIX.NoMlockCacheManipulator;
@@ -106,8 +108,8 @@ public class TestFsDatasetCacheRevocation {
         1800000L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster = null;
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     DistributedFileSystem dfs = cluster.getFileSystem();
 
@@ -120,7 +122,7 @@ public class TestFsDatasetCacheRevocation {
       dfs.addCacheDirective(new CacheDirectiveInfo.Builder().
         setPool("pool").setPath(new Path(TEST_FILE)).
           setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
     DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
 
     // Mmap the file.
@@ -157,8 +159,8 @@ public class TestFsDatasetCacheRevocation {
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_TIMEOUT_MS, 250L);
     // Poll very often
     conf.setLong(DFSConfigKeys.DFS_DATANODE_CACHE_REVOCATION_POLLING_MS, 2L);
-    MiniDFSCluster cluster = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster = null;
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     DistributedFileSystem dfs = cluster.getFileSystem();
 
@@ -171,7 +173,7 @@ public class TestFsDatasetCacheRevocation {
         dfs.addCacheDirective(new CacheDirectiveInfo.Builder().
             setPool("pool").setPath(new Path(TEST_FILE)).
             setReplication((short) 1).build());
-    FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
     DFSTestUtil.verifyExpectedCacheUsage(BLOCK_SIZE, 1, fsd);
 
     // Mmap the file.

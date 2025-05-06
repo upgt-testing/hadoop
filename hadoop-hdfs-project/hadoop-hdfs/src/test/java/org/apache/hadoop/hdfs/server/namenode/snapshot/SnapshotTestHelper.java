@@ -269,6 +269,13 @@ public class SnapshotTestHelper {
     out.close();
   }
 
+  public static void dumpTree2File(FSDirectoryJVMInterface fsdir, File f) throws IOException{
+    final PrintWriter out = new PrintWriter(new FileWriter(f, false), true);
+    fsdir.getINode("/").dumpTreeRecursively(out, new StringBuilder(),
+            Snapshot.CURRENT_STATE_ID);
+    out.close();
+  }
+
   /**
    * Generate the path for a snapshot file.
    * 

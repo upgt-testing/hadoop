@@ -31,12 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.BLOCK_SIZE;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.FILE_LENGTHS;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.NUM_DATA_UNITS;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.NUM_PARITY_UNITS;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.initializeCluster;
-import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.tearDownCluster;
+import static org.apache.hadoop.hdfs.ReadStripedFileWithDecodingHelper.*;
 
 /**
  * Test online recovery with failed DNs. This test is parameterized.
@@ -46,7 +41,7 @@ public class TestReadStripedFileWithDNFailure {
   static final Logger LOG =
       LoggerFactory.getLogger(TestReadStripedFileWithDNFailure.class);
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem dfs;
 
   @Rule
@@ -54,7 +49,7 @@ public class TestReadStripedFileWithDNFailure {
 
   @BeforeClass
   public static void setup() throws IOException {
-    cluster = initializeCluster();
+    cluster = initializeJVMCluster();
     dfs = cluster.getFileSystem();
   }
 

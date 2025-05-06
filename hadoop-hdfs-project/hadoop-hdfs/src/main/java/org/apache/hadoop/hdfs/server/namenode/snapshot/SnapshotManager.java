@@ -71,7 +71,7 @@ import com.google.common.base.Preconditions;
  * 2. Lock the {@link FSDirectory} lock for the {@link SnapshotManager} methods
  * if necessary.
  */
-public class SnapshotManager implements SnapshotStatsMXBean {
+public class SnapshotManager implements SnapshotStatsMXBean, SnapshotManagerJVMInterface {
   public static final Log LOG = LogFactory.getLog(SnapshotManager.class);
 
   private final FSDirectory fsdir;
@@ -129,7 +129,7 @@ public class SnapshotManager implements SnapshotStatsMXBean {
   }
 
   /** Used in tests only */
-  void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
+  public void setAllowNestedSnapshots(boolean allowNestedSnapshots) {
     this.allowNestedSnapshots = allowNestedSnapshots;
   }
 
@@ -354,7 +354,7 @@ public class SnapshotManager implements SnapshotStatsMXBean {
     snapshotCounter = counter;
   }
 
-  INodeDirectory[] getSnapshottableDirs() {
+  public INodeDirectory[] getSnapshottableDirs() {
     return snapshottables.values().toArray(
         new INodeDirectory[snapshottables.size()]);
   }

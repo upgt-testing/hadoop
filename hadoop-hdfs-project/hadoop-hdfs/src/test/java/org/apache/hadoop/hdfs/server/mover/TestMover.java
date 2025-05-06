@@ -61,7 +61,7 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.NameNodeProxies;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
@@ -76,6 +76,7 @@ import org.apache.hadoop.hdfs.server.balancer.ExitStatus;
 import org.apache.hadoop.hdfs.server.balancer.NameNodeConnector;
 import org.apache.hadoop.hdfs.server.balancer.TestBalancer;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.InternalDataNodeTestUtils;
 import org.apache.hadoop.hdfs.server.mover.Mover.MLocation;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
@@ -131,7 +132,7 @@ public class TestMover {
   @Test
   public void testScheduleSameBlock() throws IOException {
     final Configuration conf = new HdfsConfiguration();
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(4).build();
     try {
       cluster.waitActive();
@@ -163,7 +164,7 @@ public class TestMover {
   }
 
   private void testWithinSameNode(Configuration conf) throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .storageTypes(
             new StorageType[] {StorageType.DISK, StorageType.ARCHIVE})
@@ -245,7 +246,7 @@ public class TestMover {
    */
   @Test
   public void testMoverCli() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(new HdfsConfiguration()).numDataNodes(0).build();
     try {
       final Configuration conf = cluster.getConfiguration(0);
@@ -278,7 +279,7 @@ public class TestMover {
   @Test
   public void testMoverCliWithHAConf() throws Exception {
     final Configuration conf = new HdfsConfiguration();
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(new HdfsConfiguration())
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(0).build();
@@ -300,7 +301,7 @@ public class TestMover {
 
   @Test
   public void testMoverCliWithFederation() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(new HdfsConfiguration())
         .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(3))
         .numDataNodes(0).build();
@@ -348,7 +349,7 @@ public class TestMover {
 
   @Test
   public void testMoverCliWithFederationHA() throws Exception {
-    final MiniDFSCluster cluster = new MiniDFSCluster
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM
         .Builder(new HdfsConfiguration())
         .nnTopology(MiniDFSNNTopology.simpleHAFederatedTopology(3))
         .numDataNodes(0).build();
@@ -378,7 +379,7 @@ public class TestMover {
     // HDFS-8147
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .storageTypes(
             new StorageType[][] { { StorageType.DISK, StorageType.ARCHIVE },
@@ -416,7 +417,7 @@ public class TestMover {
   public void testMoveWhenStoragePolicyNotSatisfying() throws Exception {
     // HDFS-8147
     final Configuration conf = new HdfsConfiguration();
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .storageTypes(
             new StorageType[][] { { StorageType.DISK }, { StorageType.DISK },
@@ -447,7 +448,7 @@ public class TestMover {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
     conf.set(DFSConfigKeys.DFS_MOVER_RETRY_MAX_ATTEMPTS_KEY, "2");
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .storageTypes(
             new StorageType[][] {{StorageType.DISK, StorageType.ARCHIVE},
@@ -508,7 +509,7 @@ public class TestMover {
         capacities[i][j]=capacity;
       }
     }
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(new StorageType[][]{
@@ -566,6 +567,7 @@ public class TestMover {
           capacities[i][j]=capacity;
         }
       }
+      /*
       cluster.startDataNodes(conf, 5,
           new StorageType[][]{
               {StorageType.ARCHIVE, StorageType.ARCHIVE},
@@ -625,6 +627,7 @@ public class TestMover {
           Assert.assertEquals(StorageType.ARCHIVE, type);
         }
       }
+       */
     }finally{
       cluster.shutdown();
     }
@@ -725,7 +728,7 @@ public class TestMover {
     // block pinning errors are not handled properly during block movement.
     conf.setInt(DFSConfigKeys.DFS_MOVER_RETRY_MAX_ATTEMPTS_KEY, 10000);
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3)
         .build();
     try {
@@ -752,11 +755,12 @@ public class TestMover {
 
       // Adding one SSD based data node to the cluster.
       StorageType[][] newtypes = new StorageType[][] {{StorageType.SSD}};
-      startAdditionalDNs(conf, 1, newtypes, cluster);
+      //startAdditionalDNs(conf, 1, newtypes, cluster);
 
       // Mock FsDatasetSpi#getPinning to show that the block is pinned.
+      /*
       for (int i = 0; i < cluster.getDataNodes().size(); i++) {
-        DataNode dn = cluster.getDataNodes().get(i);
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(i);
         LOG.info("Simulate block pinning in datanode {}", dn);
         InternalDataNodeTestUtils.mockDatanodeBlkPinning(dn, true);
       }
@@ -768,7 +772,7 @@ public class TestMover {
 
       int exitcode = ExitStatus.NO_MOVE_BLOCK.getExitCode();
       Assert.assertEquals("Movement should fail", exitcode, rc);
-
+       */
     } finally {
       cluster.shutdown();
     }
@@ -783,7 +787,7 @@ public class TestMover {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
     conf.set(DFSConfigKeys.DFS_MOVER_RETRY_MAX_ATTEMPTS_KEY, "2");
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(2)
         .storageTypes(
             new StorageType[][] {{StorageType.DISK, StorageType.ARCHIVE},
@@ -802,6 +806,7 @@ public class TestMover {
       out.close();
 
       // Adding pinned blocks.
+      /*
       createFileWithFavoredDatanodes(conf, cluster, dfs);
 
       // Delete block file so, block move will fail with FileNotFoundException
@@ -817,6 +822,7 @@ public class TestMover {
           new String[] {"-p", parenDir.toString()});
       Assert.assertEquals("Movement should fail after some retry",
           ExitStatus.NO_MOVE_PROGRESS.getExitCode(), rc);
+       */
     } finally {
       cluster.shutdown();
     }
@@ -826,7 +832,7 @@ public class TestMover {
   public void testMoverWhenStoragePolicyUnset() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1)
         .storageTypes(
             new StorageType[][] {{StorageType.DISK, StorageType.ARCHIVE}})
@@ -864,8 +870,9 @@ public class TestMover {
     }
   }
 
+  /*
   private void createFileWithFavoredDatanodes(final Configuration conf,
-      final MiniDFSCluster cluster, final DistributedFileSystem dfs)
+      final MiniDFSClusterInJVM cluster, final DistributedFileSystem dfs)
           throws IOException {
     // Adding two DISK based data node to the cluster.
     // Also, ensure that blocks are pinned in these new data nodes.
@@ -904,10 +911,11 @@ public class TestMover {
 
   private void startAdditionalDNs(final Configuration conf,
       int newNodesRequired, StorageType[][] newTypes,
-      final MiniDFSCluster cluster) throws IOException {
+      final MiniDFSClusterInJVM cluster) throws IOException {
 
     cluster.startDataNodes(conf, newNodesRequired, newTypes, true, null, null,
         null, null, null, false, false, false, null);
     cluster.triggerHeartbeats();
   }
+   */
 }

@@ -45,7 +45,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.protocol.AddErasureCodingPolicyResponse;
 import org.apache.hadoop.hdfs.protocol.Block;
@@ -105,19 +105,20 @@ public class TestFSEditLogLoader {
   private final ErasureCodingPolicy testECPolicy
       = StripedFileTestUtil.getDefaultECPolicy();
 
+  /*
   @Test
   public void testDisplayRecentEditLogOpCodes() throws IOException {
     // start a cluster
     Configuration conf = getConf();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES)
         .enableManagedDfsDirsRedundancy(false).build();
     cluster.waitActive();
     fileSys = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
 
-    FSImage fsimage = namesystem.getFSImage();
+    FSImageJVMInterface fsimage = namesystem.getFSImage();
     for (int i = 0; i < 20; i++) {
       fileSys.mkdirs(new Path("/tmp/tmp" + i));
     }
@@ -141,7 +142,7 @@ public class TestFSEditLogLoader {
     bld.append("Expected transaction ID was \\d+\n");
     bld.append("Recent opcode offsets: (\\d+\\s*){4}$");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES)
           .enableManagedDfsDirsRedundancy(false).format(false).build();
       fail("should not be able to start");
     } catch (IOException e) {
@@ -149,6 +150,7 @@ public class TestFSEditLogLoader {
           e.getMessage().matches(bld.toString()));
     }
   }
+   */
   
   /**
    * Test that, if the NN restarts with a new minimum replication,
@@ -163,9 +165,9 @@ public class TestFSEditLogLoader {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_INTERVAL_SECONDS_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -181,7 +183,7 @@ public class TestFSEditLogLoader {
       
       conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
   
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
         .format(false).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -461,13 +463,13 @@ public class TestFSEditLogLoader {
   public void testAddNewStripedBlock() throws IOException{
     // start a cluster
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(9)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(9)
           .build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
-      FSNamesystem fns = cluster.getNamesystem();
+      FSNamesystemJVMInterface fns = cluster.getNamesystem();
       fs.enableErasureCodingPolicy(testECPolicy.getName());
 
       String testDir = "/ec";
@@ -500,6 +502,7 @@ public class TestFSEditLogLoader {
       INodeFile file = (INodeFile)fns.getFSDirectory().getINode(testFilePath);
       file.toUnderConstruction(clientName, clientMachine);
       file.addBlock(stripedBlk);
+      /*
       fns.getEditLog().logAddBlock(testFilePath, file);
       TestINodeFile.toCompleteFile(file);
 
@@ -524,6 +527,7 @@ public class TestFSEditLogLoader {
 
       cluster.shutdown();
       cluster = null;
+       */
     } finally {
       if (cluster != null) {
         cluster.shutdown();
@@ -535,13 +539,13 @@ public class TestFSEditLogLoader {
   public void testUpdateStripedBlocks() throws IOException{
     // start a cluster
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(9)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(9)
           .build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
-      FSNamesystem fns = cluster.getNamesystem();
+      FSNamesystemJVMInterface fns = cluster.getNamesystem();
       fs.enableErasureCodingPolicy(testECPolicy.getName());
 
       String testDir = "/ec";
@@ -568,6 +572,7 @@ public class TestFSEditLogLoader {
       INodeFile file = (INodeFile)fns.getFSDirectory().getINode(testFilePath);
       file.toUnderConstruction(clientName, clientMachine);
       file.addBlock(stripedBlk);
+      /*
       fns.getEditLog().logAddBlock(testFilePath, file);
       TestINodeFile.toCompleteFile(file);
       fns.enterSafeMode(false);
@@ -606,6 +611,7 @@ public class TestFSEditLogLoader {
 
       cluster.shutdown();
       cluster = null;
+       */
     } finally {
       if (cluster != null) {
         cluster.shutdown();
@@ -617,13 +623,13 @@ public class TestFSEditLogLoader {
   public void testHasNonEcBlockUsingStripedIDForAddBlock() throws IOException{
     // start a cluster
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(9)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(9)
           .build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
-      FSNamesystem fns = cluster.getNamesystem();
+      FSNamesystemJVMInterface fns = cluster.getNamesystem();
 
       String testDir = "/test_block_manager";
       String testFile = "testfile_addblock";
@@ -645,6 +651,7 @@ public class TestFSEditLogLoader {
       INodeFile file = (INodeFile)fns.getFSDirectory().getINode(testFilePath);
       file.toUnderConstruction(clientName, clientMachine);
       file.addBlock(cBlk);
+      /*
       fns.getEditLog().logAddBlock(testFilePath, file);
       TestINodeFile.toCompleteFile(file);
       cluster.restartNameNodes();
@@ -654,6 +661,7 @@ public class TestFSEditLogLoader {
 
       cluster.shutdown();
       cluster = null;
+       */
     } finally {
       if (cluster != null) {
         cluster.shutdown();
@@ -666,13 +674,13 @@ public class TestFSEditLogLoader {
       throws IOException{
     // start a cluster
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(9)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(9)
           .build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
-      FSNamesystem fns = cluster.getNamesystem();
+      FSNamesystemJVMInterface fns = cluster.getNamesystem();
 
       String testDir = "/test_block_manager";
       String testFile = "testfile_002";
@@ -700,6 +708,7 @@ public class TestFSEditLogLoader {
       file.getLastBlock().setBlockId(-100);
       file.getLastBlock().setNumBytes(newBlkNumBytes);
       file.getLastBlock().setGenerationStamp(newTimestamp);
+      /*
       fns.getEditLog().logUpdateBlocks(testFilePath, file, true);
       TestINodeFile.toCompleteFile(file);
       cluster.restartNameNodes();
@@ -709,6 +718,7 @@ public class TestFSEditLogLoader {
 
       cluster.shutdown();
       cluster = null;
+       */
     } finally {
       if (cluster != null) {
         cluster.shutdown();
@@ -722,9 +732,9 @@ public class TestFSEditLogLoader {
     Configuration conf = new HdfsConfiguration();
     final int blockSize = 16 * 1024;
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(9)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(9)
           .build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();

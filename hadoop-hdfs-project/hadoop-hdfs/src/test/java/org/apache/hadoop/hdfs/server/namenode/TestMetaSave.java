@@ -236,7 +236,7 @@ public class TestMetaSave {
   /**
    * Stop a DN, notify NN the death of DN and wait for NN to remove the DN.
    *
-   * @param dnIdx Index of the Datanode in MiniDFSCluster
+   * @param dnIdx Index of the Datanode in MiniDFSClusterInJVM
    * @throws TimeoutException
    * @throws InterruptedException
    */

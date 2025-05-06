@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.viewfs.ConfigUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class TestViewFSStoragePolicyCommands extends TestStoragePolicyCommands {
     conf = new HdfsConfiguration();
     String clusterName = "cluster";
     cluster =
-        new MiniDFSCluster.Builder(conf).nnTopology(
+        new MiniDFSClusterInJVM.Builder(conf).nnTopology(
             MiniDFSNNTopology.simpleFederatedTopology(2))
             .numDataNodes(2)
             .build();

@@ -228,7 +228,7 @@ import javax.annotation.Nonnull;
  */
 @InterfaceAudience.Private
 @VisibleForTesting
-public class NameNodeRpcServer implements NamenodeProtocols {
+public class NameNodeRpcServer implements NamenodeProtocols, NameNodeRpcServerJVMInterface {
   
   private static final Logger LOG = NameNode.LOG;
   private static final Logger stateChangeLog = NameNode.stateChangeLog;
@@ -538,7 +538,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
 
   /** Allow access to the lifeline RPC server for testing */
   @VisibleForTesting
-  RPC.Server getLifelineRpcServer() {
+  public RPC.Server getLifelineRpcServer() {
     return lifelineRpcServer;
   }
 
@@ -550,7 +550,7 @@ public class NameNodeRpcServer implements NamenodeProtocols {
   
   /** Allow access to the service RPC server for testing */
   @VisibleForTesting
-  RPC.Server getServiceRpcServer() {
+  public RPC.Server getServiceRpcServer() {
     return serviceRpcServer;
   }
   

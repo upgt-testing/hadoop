@@ -30,7 +30,7 @@ import org.apache.hadoop.util.StringUtils;
 /** Store the summary of a content (a directory or a file). */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class ContentSummary extends QuotaUsage implements Writable{
+public class ContentSummary extends QuotaUsage implements Writable, ContentSummaryJVMInterface {
   private long length;
   private long fileCount;
   private long directoryCount;

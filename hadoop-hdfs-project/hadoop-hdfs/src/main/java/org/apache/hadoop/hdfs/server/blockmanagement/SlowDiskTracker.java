@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public class SlowDiskTracker {
+public class SlowDiskTracker implements SlowDiskTrackerJVMInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(SlowPeerTracker.class);
 
@@ -161,7 +161,7 @@ public class SlowDiskTracker {
   /**
    * This structure is a thin wrapper over disk latencies.
    */
-  public static class DiskLatency {
+  public static class DiskLatency implements DiskLatencyJVMInterface {
     @JsonProperty("SlowDiskID")
     final private String slowDiskID;
     @JsonProperty("Latencies")
@@ -186,7 +186,7 @@ public class SlowDiskTracker {
       this.timestamp = timestamp;
     }
 
-    String getSlowDiskID() {
+    public String getSlowDiskID() {
       return this.slowDiskID;
     }
 
@@ -278,17 +278,17 @@ public class SlowDiskTracker {
   }
 
   @VisibleForTesting
-  ArrayList<DiskLatency> getSlowDisksReport() {
+  public ArrayList<DiskLatency> getSlowDisksReport() {
     return this.slowDisksReport;
   }
 
   @VisibleForTesting
-  long getReportValidityMs() {
+  public long getReportValidityMs() {
     return reportValidityMs;
   }
 
   @VisibleForTesting
-  void setReportValidityMs(long reportValidityMs) {
+  public void setReportValidityMs(long reportValidityMs) {
     this.reportValidityMs = reportValidityMs;
   }
 }

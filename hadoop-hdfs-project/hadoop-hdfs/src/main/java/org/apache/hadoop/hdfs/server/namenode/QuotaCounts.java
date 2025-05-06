@@ -24,7 +24,7 @@ import org.apache.hadoop.hdfs.util.EnumCounters;
 /**
  * Counters for namespace, storage space and storage type space quota and usage.
  */
-public class QuotaCounts {
+public class QuotaCounts implements QuotaCountsJVMInterface {
   // Name space and storage space counts (HDFS-7775 refactors the original disk
   // space count to storage space counts)
   private EnumCounters<Quota> nsSsCounts;

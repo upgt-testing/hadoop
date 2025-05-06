@@ -28,12 +28,9 @@ import java.util.Collection;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.common.Storage;
-import org.apache.hadoop.hdfs.server.datanode.DataNode;
-import org.apache.hadoop.hdfs.server.datanode.LocalReplica;
-import org.apache.hadoop.hdfs.server.datanode.ReplicaInfo;
-import org.apache.hadoop.hdfs.server.datanode.ReplicaNotFoundException;
-import org.apache.hadoop.hdfs.server.datanode.StorageLocation;
+import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -58,10 +55,22 @@ public class FsDatasetTestUtil {
     return new File(r.getBlockURI());
   }
 
+  public static File getBlockFile(FsDatasetSpiJVMInterface<?> fsd, String bpid, Block b
+  ) throws IOException {
+    ReplicaInfoJVMInterface r = ((FsDatasetImplJVMInterface)fsd).getReplicaInfo(bpid, b.getBlockId());
+    return new File(r.getBlockURI());
+  }
+
   public static File getMetaFile(FsDatasetSpi<?> fsd, String bpid, Block b)
       throws IOException {
     return FsDatasetUtil.getMetaFile(getBlockFile(fsd, bpid, b), b
         .getGenerationStamp());
+  }
+
+  public static File getMetaFile(FsDatasetSpiJVMInterface<?> fsd, String bpid, Block b)
+          throws IOException {
+    return FsDatasetUtil.getMetaFile(getBlockFile(fsd, bpid, b), b
+            .getGenerationStamp());
   }
 
   public static boolean breakHardlinksIfNeeded(FsDatasetSpi<?> fsd,

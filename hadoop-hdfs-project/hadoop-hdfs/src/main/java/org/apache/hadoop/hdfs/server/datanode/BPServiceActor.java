@@ -82,7 +82,7 @@ import com.google.common.base.Joiner;
  * </ul>
  */
 @InterfaceAudience.Private
-class BPServiceActor implements Runnable {
+class BPServiceActor implements Runnable, BPServiceActorJVMInterface {
   
   static final Logger LOG = DataNode.LOG;
   final InetSocketAddress nnAddr;
@@ -144,7 +144,7 @@ class BPServiceActor implements Runnable {
     return ibrManager;
   }
 
-  boolean isAlive() {
+  public boolean isAlive() {
     if (!shouldServiceRun || !bpThread.isAlive()) {
       return false;
     }
@@ -161,7 +161,7 @@ class BPServiceActor implements Runnable {
     return bpos.toString() + " service to " + nnAddr;
   }
   
-  InetSocketAddress getNNSocketAddress() {
+  public InetSocketAddress getNNSocketAddress() {
     return nnAddr;
   }
 
@@ -195,7 +195,7 @@ class BPServiceActor implements Runnable {
   }
 
   @VisibleForTesting
-  DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
+  public DatanodeProtocolClientSideTranslatorPB getNameNodeProxy() {
     return bpNamenode;
   }
 
@@ -864,9 +864,9 @@ class BPServiceActor implements Runnable {
 
   /**
    * Process an array of datanode commands
-   * 
+   *
    * @param cmds an array of datanode commands
-   * @return true if further processing may be required or false otherwise. 
+   * @return true if further processing may be required or false otherwise.
    */
   boolean processCommand(DatanodeCommand[] cmds) {
     if (cmds != null) {

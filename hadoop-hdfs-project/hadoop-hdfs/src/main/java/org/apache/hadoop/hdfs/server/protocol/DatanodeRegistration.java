@@ -35,7 +35,7 @@ import com.google.common.annotations.VisibleForTesting;
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class DatanodeRegistration extends DatanodeID
-    implements NodeRegistration {
+    implements NodeRegistration, DatanodeRegistrationJVMInterface {
 
   private final StorageInfo storageInfo;
   private ExportedBlockKeys exportedKeys;

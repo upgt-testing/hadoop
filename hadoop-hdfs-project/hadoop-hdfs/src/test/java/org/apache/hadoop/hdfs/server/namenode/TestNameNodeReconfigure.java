@@ -20,6 +20,7 @@ package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManagerJVMInterface;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
@@ -30,7 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ReconfigurationException;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManager;
 
@@ -48,7 +49,7 @@ public class TestNameNodeReconfigure {
   public static final Log LOG = LogFactory
       .getLog(TestNameNodeReconfigure.class);
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private final int customizedBlockInvalidateLimit = 500;
 
   @Before
@@ -56,15 +57,15 @@ public class TestNameNodeReconfigure {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFS_BLOCK_INVALIDATE_LIMIT_KEY,
         customizedBlockInvalidateLimit);
-    cluster = new MiniDFSCluster.Builder(conf).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     cluster.waitActive();
   }
 
   @Test
   public void testReconfigureCallerContextEnabled()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
-    final FSNamesystem nameSystem = nameNode.getNamesystem();
+    final NameNodeJVMInterface nameNode = cluster.getNameNode();
+    final FSNamesystemJVMInterface nameSystem = nameNode.getNamesystem();
 
     // try invalid values
     nameNode.reconfigureProperty(HADOOP_CALLER_CONTEXT_ENABLED_KEY, "text");
@@ -88,8 +89,8 @@ public class TestNameNodeReconfigure {
         nameNode.getConf().get(HADOOP_CALLER_CONTEXT_ENABLED_KEY));
   }
 
-  void verifyReconfigureCallerContextEnabled(final NameNode nameNode,
-      final FSNamesystem nameSystem, boolean expected) {
+  void verifyReconfigureCallerContextEnabled(final NameNodeJVMInterface nameNode,
+      final FSNamesystemJVMInterface nameSystem, boolean expected) {
     assertEquals(HADOOP_CALLER_CONTEXT_ENABLED_KEY + " has wrong value",
         expected, nameNode.getNamesystem().getCallerContextEnabled());
     assertEquals(
@@ -104,7 +105,7 @@ public class TestNameNodeReconfigure {
    */
   @Test
   public void testReconfigureIPCBackoff() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    final NameNodeJVMInterface nameNode = cluster.getNameNode();
     NameNodeRpcServer nnrs = (NameNodeRpcServer) nameNode.getRpcServer();
 
     String ipcClientRPCBackoffEnable = NameNode.buildBackoffEnableKey(nnrs
@@ -132,7 +133,7 @@ public class TestNameNodeReconfigure {
         nameNode.getConf().get(ipcClientRPCBackoffEnable));
   }
 
-  void verifyReconfigureIPCBackoff(final NameNode nameNode,
+  void verifyReconfigureIPCBackoff(final NameNodeJVMInterface nameNode,
       final NameNodeRpcServer nnrs, String property, boolean expected) {
     assertEquals(property + " has wrong value", expected, nnrs
         .getClientRpcServer().isClientBackoffEnabled());
@@ -145,8 +146,8 @@ public class TestNameNodeReconfigure {
    */
   @Test
   public void testReconfigureHearbeatCheck() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
-    final DatanodeManager datanodeManager = nameNode.namesystem
+    final NameNodeJVMInterface nameNode = cluster.getNameNode();
+    final DatanodeManagerJVMInterface datanodeManager = nameNode.getNamesystem()
         .getBlockManager().getDatanodeManager();
     // change properties
     nameNode.reconfigureProperty(DFS_HEARTBEAT_INTERVAL_KEY, "" + 6);
@@ -219,8 +220,8 @@ public class TestNameNodeReconfigure {
   @Test
   public void testBlockInvalidateLimitAfterReconfigured()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
-    final DatanodeManager datanodeManager = nameNode.namesystem
+    final NameNodeJVMInterface nameNode = cluster.getNameNode();
+    final DatanodeManagerJVMInterface datanodeManager = nameNode.getNamesystem()
         .getBlockManager().getDatanodeManager();
 
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not correctly set",

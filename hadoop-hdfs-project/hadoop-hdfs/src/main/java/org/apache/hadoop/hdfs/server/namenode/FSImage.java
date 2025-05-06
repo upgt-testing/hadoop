@@ -82,7 +82,7 @@ import com.google.common.collect.Lists;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class FSImage implements Closeable {
+public class FSImage implements Closeable, FSImageJVMInterface {
   public static final Log LOG = LogFactory.getLog(FSImage.class.getName());
 
   protected FSEditLog editLog = null;

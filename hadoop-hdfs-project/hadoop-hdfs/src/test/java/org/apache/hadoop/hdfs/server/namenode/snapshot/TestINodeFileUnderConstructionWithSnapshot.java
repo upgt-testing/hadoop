@@ -34,7 +34,7 @@ import org.apache.hadoop.hdfs.DFSClientAdapter;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+  import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsDataOutputStream;
 import org.apache.hadoop.hdfs.client.HdfsDataOutputStream.SyncFlag;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -67,13 +67,13 @@ public class TestINodeFileUnderConstructionWithSnapshot {
   static final int BLOCKSIZE = 1024;
 
   private final Path dir = new Path("/TestSnapshot");
-  
+
   Configuration conf;
   MiniDFSCluster cluster;
   FSNamesystem fsn;
   DistributedFileSystem hdfs;
   FSDirectory fsdir;
-  
+
   @Before
   public void setUp() throws Exception {
     conf = new Configuration();

@@ -40,11 +40,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.io.IOUtils;
@@ -70,7 +68,7 @@ public class TestWebHdfsTokens {
   public static void setUp() {
     conf = new Configuration();
     SecurityUtil.setAuthenticationMethod(KERBEROS, conf);
-    UserGroupInformation.setConfiguration(conf);    
+    UserGroupInformation.setConfiguration(conf);
     UserGroupInformation.setLoginUser(
         UserGroupInformation.createUserForTesting(
             "LoginUser", new String[]{"supergroup"}));
@@ -162,7 +160,7 @@ public class TestWebHdfsTokens {
   
   @Test
   public void testLazyTokenFetchForWebhdfs() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     WebHdfsFileSystem fs = null;
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -173,11 +171,11 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking security is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf).numDataNodes(1).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       UserGroupInformation.setConfiguration(clusterConf);
-      
+
       uri = DFSUtil.createUri(
           "webhdfs", cluster.getNameNode().getHttpAddress());
       validateLazyTokenFetch(clusterConf);
@@ -188,7 +186,7 @@ public class TestWebHdfsTokens {
       }
     }
   }
-  
+
   @Test
   public void testLazyTokenFetchForSWebhdfs() throws Exception {
     MiniDFSCluster cluster = null;
@@ -202,11 +200,11 @@ public class TestWebHdfsTokens {
 	    .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
       String baseDir =
           GenericTestUtils.getTempPath(TestWebHdfsTokens.class.getSimpleName());
-	    
+
       clusterConf.set(DFSConfigKeys.DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
       clusterConf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
       clusterConf.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
-	  
+
       File base = new File(baseDir);
       FileUtil.fullyDelete(base);
       base.mkdirs();
@@ -228,7 +226,7 @@ public class TestWebHdfsTokens {
       clusterConf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       UserGroupInformation.setConfiguration(clusterConf);
-      
+
       uri = DFSUtil.createUri(
         "swebhdfs", cluster.getNameNode().getHttpsAddress());
       validateLazyTokenFetch(clusterConf);
@@ -243,7 +241,7 @@ public class TestWebHdfsTokens {
 
   @Test
   public void testSetTokenServiceAndKind() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -254,7 +252,7 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking s[ecurity is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf).numDataNodes(0).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem

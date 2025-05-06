@@ -19,7 +19,7 @@ package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class TestLossyRetryInvocationHandler {
   
   @Test
   public void testStartNNWithTrashEmptier() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new HdfsConfiguration();
     
     // enable both trash emptier and dropping response
@@ -42,7 +42,7 @@ public class TestLossyRetryInvocationHandler {
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY, 2);
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0)
           .build();
       cluster.waitActive();

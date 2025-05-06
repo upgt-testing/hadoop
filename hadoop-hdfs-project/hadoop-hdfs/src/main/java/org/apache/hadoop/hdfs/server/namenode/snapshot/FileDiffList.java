@@ -30,7 +30,7 @@ import org.apache.hadoop.hdfs.server.namenode.INodeFileAttributes;
 
 /** A list of FileDiffs for storing snapshot data. */
 public class FileDiffList extends
-    AbstractINodeDiffList<INodeFile, INodeFileAttributes, FileDiff> {
+    AbstractINodeDiffList<INodeFile, INodeFileAttributes, FileDiff> implements FileDiffListJVMInterface {
   
   @Override
   FileDiff createDiff(int snapshotId, INodeFile file) {

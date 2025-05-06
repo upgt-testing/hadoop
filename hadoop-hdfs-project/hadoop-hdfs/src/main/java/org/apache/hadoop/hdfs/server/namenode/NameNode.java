@@ -203,7 +203,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DE
  **********************************************************/
 @InterfaceAudience.Private
 public class NameNode extends ReconfigurableBase implements
-    NameNodeStatusMXBean {
+    NameNodeStatusMXBean, NameNodeJVMInterface {
   static{
     HdfsConfiguration.init();
   }
@@ -944,7 +944,7 @@ public class NameNode extends ReconfigurableBase implements
   }
 
   protected HAState createHAState(StartupOption startOpt) {
-    if (!haEnabled || startOpt == StartupOption.UPGRADE 
+    if (!haEnabled || startOpt == StartupOption.UPGRADE
         || startOpt == StartupOption.UPGRADEONLY) {
       return ACTIVE_STATE;
     } else {
@@ -1724,8 +1724,8 @@ public class NameNode extends ReconfigurableBase implements
     }
     state.setState(haContext, ACTIVE_STATE);
   }
-  
-  synchronized void transitionToStandby() 
+
+  public synchronized void transitionToStandby()
       throws ServiceFailedException, AccessControlException {
     namesystem.checkSuperuserPrivilege();
     if (!haEnabled) {
@@ -2004,7 +2004,7 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();

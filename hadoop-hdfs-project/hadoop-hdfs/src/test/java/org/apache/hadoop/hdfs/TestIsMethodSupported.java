@@ -31,6 +31,7 @@ import org.apache.hadoop.hdfs.protocolPB.InterDatanodeProtocolTranslatorPB;
 import org.apache.hadoop.hdfs.protocolPB.JournalProtocolTranslatorPB;
 import org.apache.hadoop.hdfs.protocolPB.NamenodeProtocolPB;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.JournalProtocol;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocol;
 import org.apache.hadoop.ipc.RPC;
@@ -54,17 +55,17 @@ import org.junit.Test;
  * isMethodSupported method in ProtocolMetaInterface.
  */
 public class TestIsMethodSupported {
-  private static MiniDFSCluster cluster = null;
+  private static MiniDFSClusterInJVM cluster = null;
   private static final HdfsConfiguration conf = new HdfsConfiguration();
   private static InetSocketAddress nnAddress = null;
   private static InetSocketAddress dnAddress = null;
   
   @BeforeClass
   public static void setUp() throws Exception {
-    cluster = (new MiniDFSCluster.Builder(conf))
+    cluster = (new MiniDFSClusterInJVM.Builder(conf))
         .numDataNodes(1).build();
     nnAddress = cluster.getNameNode().getNameNodeAddress();
-    DataNode dn = cluster.getDataNodes().get(0);
+    DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
     dnAddress = new InetSocketAddress(dn.getDatanodeId().getIpAddr(),
                                       dn.getIpcPort());
   }

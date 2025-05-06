@@ -57,7 +57,7 @@ import org.apache.hadoop.util.Timer;
  */
 @InterfaceAudience.Private
 public class BlockTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockTokenSecretManagerJVMInterface  {
   public static final Log LOG = LogFactory.getLog(BlockTokenSecretManager.class);
 
   public static final Token<BlockTokenIdentifier> DUMMY_TOKEN = new Token<BlockTokenIdentifier>();

@@ -29,12 +29,9 @@ import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicyInfo;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
-import org.apache.hadoop.hdfs.server.namenode.ErasureCodingPolicyManager;
-import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
-import org.apache.hadoop.hdfs.server.namenode.INode;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.hdfs.client.HdfsAdmin;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
-import org.apache.hadoop.hdfs.server.namenode.INodeFile;
 import org.apache.hadoop.io.erasurecode.ECSchema;
 import org.apache.hadoop.io.erasurecode.ErasureCodeConstants;
 import org.apache.hadoop.security.AccessControlException;
@@ -61,11 +58,11 @@ import static org.junit.Assert.*;
 
 public class TestErasureCodingPolicies {
   private Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private static final int BLOCK_SIZE = 16 * 1024;
   private ErasureCodingPolicy ecPolicy;
-  private FSNamesystem namesystem;
+  private FSNamesystemJVMInterface namesystem;
 
   public ErasureCodingPolicy getEcPolicy() {
     return StripedFileTestUtil.getDefaultECPolicy();
@@ -79,7 +76,7 @@ public class TestErasureCodingPolicies {
     ecPolicy = getEcPolicy();
     conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
-    cluster = new MiniDFSCluster.Builder(conf).
+    cluster = new MiniDFSClusterInJVM.Builder(conf).
         numDataNodes(ecPolicy.getNumDataUnits() + ecPolicy.getNumParityUnits()).
         build();
     cluster.waitActive();
@@ -165,7 +162,7 @@ public class TestErasureCodingPolicies {
     /* Verify files under the directory are striped */
     final Path ECFilePath = new Path(testDir, "foo");
     fs.create(ECFilePath);
-    INode inode = namesystem.getFSDirectory().getINode(ECFilePath.toString());
+    INodeJVMInterface inode = namesystem.getFSDirectory().getINode(ECFilePath.toString());
     assertTrue(inode.asFile().isStriped());
 
     /**
@@ -179,9 +176,9 @@ public class TestErasureCodingPolicies {
     fs.setErasureCodingPolicy(notEmpty, ecPolicy.getName());
     final Path newFile = new Path(notEmpty, "new");
     fs.create(newFile);
-    INode oldInode = namesystem.getFSDirectory().getINode(oldFile.toString());
+    INodeJVMInterface oldInode = namesystem.getFSDirectory().getINode(oldFile.toString());
     assertFalse(oldInode.asFile().isStriped());
-    INode newInode = namesystem.getFSDirectory().getINode(newFile.toString());
+    INodeJVMInterface newInode = namesystem.getFSDirectory().getINode(newFile.toString());
     assertTrue(newInode.asFile().isStriped());
 
     /* Verify that nested EC policies are supported */
@@ -468,7 +465,7 @@ public class TestErasureCodingPolicies {
         fs.create(file).close();
         assertEquals(policy, fs.getErasureCodingPolicy(file));
         assertEquals(policy, fs.getErasureCodingPolicy(dir));
-        INode iNode = namesystem.getFSDirectory().getINode(file.toString());
+        INodeJVMInterface iNode = namesystem.getFSDirectory().getINode(file.toString());
         assertEquals(policy.getId(), iNode.asFile().getErasureCodingPolicyID());
         assertEquals(INodeFile.DEFAULT_REPL_FOR_STRIPED_BLOCKS,
             iNode.asFile().getFileReplication());

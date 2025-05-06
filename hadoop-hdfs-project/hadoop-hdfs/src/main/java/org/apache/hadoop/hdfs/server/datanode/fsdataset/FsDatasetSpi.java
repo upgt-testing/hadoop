@@ -67,7 +67,7 @@ import org.apache.hadoop.util.ReflectionUtils;
  * The default implementation stores replicas on local drives. 
  */
 @InterfaceAudience.Private
-public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean {
+public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsDatasetSpiJVMInterface<V> {
   /**
    * A factory for creating {@link FsDatasetSpi} objects.
    */
@@ -99,7 +99,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean {
    * This also holds the reference counts for these volumes. It releases all the
    * reference counts in {@link #close()}.
    */
-  class FsVolumeReferences implements Iterable<FsVolumeSpi>, Closeable {
+  class FsVolumeReferences implements Iterable<FsVolumeSpi>, Closeable, FsVolumeReferencesJVMInterface {
     private final List<FsVolumeReference> references;
 
     public <S extends FsVolumeSpi> FsVolumeReferences(List<S> curVolumes) {
@@ -233,7 +233,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean {
    *
    * @return info about volume failures, possibly null
    */
-  VolumeFailureSummary getVolumeFailureSummary();
+  public VolumeFailureSummary getVolumeFailureSummary();
 
   /**
    * Gets a list of references to the finalized blocks for the given block pool.
@@ -245,7 +245,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean {
    * @return a list of references to the finalized blocks for the given block
    *         pool.
    */
-  List<ReplicaInfo> getFinalizedBlocks(String bpid);
+  public List<ReplicaInfo> getFinalizedBlocks(String bpid);
 
   /**
    * Check whether the in-memory block record matches the block on the disk,

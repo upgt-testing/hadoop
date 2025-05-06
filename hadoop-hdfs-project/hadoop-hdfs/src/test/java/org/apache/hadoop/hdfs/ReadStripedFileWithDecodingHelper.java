@@ -29,6 +29,7 @@ import org.apache.hadoop.hdfs.protocol.LocatedStripedBlock;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.util.StripedBlockUtil;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -91,8 +92,31 @@ abstract public class ReadStripedFileWithDecodingHelper {
     return myCluster;
   }
 
-  public static void tearDownCluster(MiniDFSCluster cluster)
+  public static MiniDFSClusterInJVM initializeJVMCluster() throws IOException {
+    Configuration conf = new HdfsConfiguration();
+    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
+    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 0);
+    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_STREAMS_HARD_LIMIT_KEY,
+            0);
+    MiniDFSClusterInJVM myCluster = new MiniDFSClusterInJVM.Builder(conf)
+            .numDataNodes(NUM_DATANODES)
+            .build();
+    myCluster.getFileSystem().enableErasureCodingPolicy(
+            StripedFileTestUtil.getDefaultECPolicy().getName());
+    myCluster.getFileSystem().getClient().setErasureCodingPolicy("/",
+            StripedFileTestUtil.getDefaultECPolicy().getName());
+    return myCluster;
+  }
+
+  public static void tearDownCluster(MiniDFSClusterInJVM cluster)
       throws IOException {
+    if (cluster != null) {
+      cluster.shutdown();
+    }
+  }
+
+  public static void tearDownCluster(MiniDFSCluster cluster)
+          throws IOException {
     if (cluster != null) {
       cluster.shutdown();
     }
@@ -104,6 +128,21 @@ abstract public class ReadStripedFileWithDecodingHelper {
     String name = (locs[0].getNames())[0];
     int dnIndex = 0;
     for (DataNode dn : cluster.getDataNodes()) {
+      int port = dn.getXferPort();
+      if (name.contains(Integer.toString(port))) {
+        return dnIndex;
+      }
+      dnIndex++;
+    }
+    return -1;
+  }
+
+  public static int findFirstDataNode(MiniDFSClusterInJVM cluster,
+                                      DistributedFileSystem dfs, Path file, long length) throws IOException {
+    BlockLocation[] locs = dfs.getFileBlockLocations(file, 0, length);
+    String name = (locs[0].getNames())[0];
+    int dnIndex = 0;
+    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
       int port = dn.getXferPort();
       if (name.contains(Integer.toString(port))) {
         return dnIndex;
@@ -151,7 +190,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
         BLOCK_GROUP_SIZE);
   }
 
-  public static void testReadWithDNFailure(MiniDFSCluster cluster,
+  public static void testReadWithDNFailure(MiniDFSClusterInJVM cluster,
       DistributedFileSystem dfs, int fileLength, int dnFailureNum)
       throws Exception {
     String fileType = fileLength < (BLOCK_SIZE * NUM_DATA_UNITS) ?
@@ -171,7 +210,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
         CELL_SIZE);
     for (int failedDnIdx = 0; failedDnIdx < dnFailureNum; failedDnIdx++) {
       String name = (locs[0].getNames())[failedDnIdx];
-      for (DataNode dn : cluster.getDataNodes()) {
+      for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
         int port = dn.getXferPort();
         if (name.contains(Integer.toString(port))) {
           dn.shutdown();
@@ -196,7 +235,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
    *                        false is to corrupt the content of the block file.
    * @throws IOException
    */
-  public static void testReadWithBlockCorrupted(MiniDFSCluster cluster,
+  public static void testReadWithBlockCorrupted(MiniDFSClusterInJVM cluster,
       DistributedFileSystem dfs, String src, int fileNumBytes,
       int dataBlkDelNum, int parityBlkDelNum,
       boolean deleteBlockFile) throws IOException {
@@ -224,7 +263,7 @@ abstract public class ReadStripedFileWithDecodingHelper {
     verifyRead(dfs, srcPath, fileNumBytes, bytes);
   }
 
-  public static void corruptBlocks(MiniDFSCluster cluster,
+  public static void corruptBlocks(MiniDFSClusterInJVM cluster,
       DistributedFileSystem dfs, Path srcPath,
       int dataBlkDelNum, int parityBlkDelNum, boolean deleteBlockFile)
       throws IOException {

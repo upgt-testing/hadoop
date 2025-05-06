@@ -24,6 +24,7 @@ import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.test.LambdaTestUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
       // shutdown few datanodes to avoid getting sufficient data blocks number
       // of datanodes
       int numDatanodes = dataNodes.size();
@@ -207,7 +208,7 @@ public class TestDFSStripedOutputStreamWithFailure extends
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     try {
       setup(conf);
-      ArrayList<DataNode> dataNodes = cluster.getDataNodes();
+      ArrayList<DataNodeJVMInterface> dataNodes = cluster.getDataNodes();
       // shutdown few data nodes to avoid writing parity blocks
       int killDns = (parityBlocks - 1);
       int numDatanodes = dataNodes.size() - killDns;

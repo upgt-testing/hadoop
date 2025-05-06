@@ -25,7 +25,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.util.ExitUtil;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -40,7 +40,7 @@ public class TestNNThroughputBenchmark {
 
   @After
   public void cleanUp() {
-    FileUtil.fullyDeleteContents(new File(MiniDFSCluster.getBaseDirectory()));
+    FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
   }
 
   /**
@@ -49,7 +49,7 @@ public class TestNNThroughputBenchmark {
   @Test
   public void testNNThroughput() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    File nameDir = new File(MiniDFSCluster.getBaseDirectory(), "name");
+    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         nameDir.getAbsolutePath());
     DFSTestUtil.formatNameNode(conf);
@@ -63,7 +63,7 @@ public class TestNNThroughputBenchmark {
   @Test(timeout = 120000)
   public void testNNThroughputWithFsOption() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    File nameDir = new File(MiniDFSCluster.getBaseDirectory(), "name");
+    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         nameDir.getAbsolutePath());
     DFSTestUtil.formatNameNode(conf);
@@ -78,9 +78,9 @@ public class TestNNThroughputBenchmark {
   public void testNNThroughputAgainstRemoteNN() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
 
       final Configuration benchConf = new HdfsConfiguration();
@@ -101,9 +101,9 @@ public class TestNNThroughputBenchmark {
   public void testNNThroughputRemoteAgainstNNWithFsOption() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
 
       NNThroughputBenchmark.runBenchmark(new HdfsConfiguration(),

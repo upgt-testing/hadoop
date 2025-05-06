@@ -32,6 +32,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsAction;
+import org.apache.hadoop.hdfs.DFSTestUtil;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManager;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
@@ -167,7 +170,7 @@ public class TestWebHdfsUrl {
             new TokenArgumentParam(tokenString).toString(),
         },
         cancelTokenUrl);
-    
+
     // send token
     URL fileStatusUrl = webhdfs.toUrl(GetOpParam.Op.GETFILESTATUS, fsPath);
     checkQueryParams(
@@ -251,7 +254,7 @@ public class TestWebHdfsUrl {
             new TokenArgumentParam(tokenString).toString(),
         },
         cancelTokenUrl);
-    
+
     // send token
     URL fileStatusUrl = webhdfs.toUrl(GetOpParam.Op.GETFILESTATUS, fsPath);
     checkQueryParams(
@@ -275,7 +278,7 @@ public class TestWebHdfsUrl {
             new TokenArgumentParam(tokenString).toString()
         },
         cancelTokenUrl);
-    
+
     // send real+effective
     fileStatusUrl = webhdfs.toUrl(GetOpParam.Op.GETFILESTATUS, fsPath);
     checkQueryParams(

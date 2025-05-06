@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod;
@@ -47,13 +47,13 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
 
   @Test
   public void testName() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     HdfsConfiguration conf = createSecureConfig(
         "authentication,privacy");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES)
           .build();
-      final MiniDFSCluster clusterRef = cluster;
+      final MiniDFSClusterInJVM clusterRef = cluster;
       cluster.waitActive();
       FileSystem fsForSuperUser = UserGroupInformation
           .loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
@@ -100,14 +100,14 @@ public class TestSecureNameNode extends SaslDataTransferTestCase {
    */
   @Test
   public void testKerberosHdfsBlockTokenInconsistencyNNStartup() throws Exception {
-    MiniDFSCluster dfsCluster = null;
+    MiniDFSClusterInJVM dfsCluster = null;
     HdfsConfiguration conf = createSecureConfig(
         "authentication,privacy");
     try {
       conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
       exception.expect(IOException.class);
       exception.expectMessage("Security is enabled but block access tokens");
-      dfsCluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       dfsCluster.waitActive();
     } finally {
       if (dfsCluster != null) {
