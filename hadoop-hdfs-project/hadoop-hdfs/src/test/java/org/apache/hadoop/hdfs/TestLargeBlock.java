@@ -175,7 +175,7 @@ public class TestLargeBlock {
     final long fileSize = blockSize + 1L;
 
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     FileSystem fs = cluster.getFileSystem();
     try {
 

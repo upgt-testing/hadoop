@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Test for HDFS encryption zone without external Kerberos KDC by leveraging
- * Kerby-based MiniKDC, MiniKMS and MiniDFSCluster. This provides additional
+ * Kerby-based MiniKDC, MiniKMS and MiniDFSClusterInJVM. This provides additional
  * unit test coverage on Secure(Kerberos) KMS + HDFS.
  */
 public class TestSecureEncryptionZoneWithKMS {
@@ -109,7 +109,7 @@ public class TestSecureEncryptionZoneWithKMS {
   private final String testKey = "test_key";
 
   // MiniDFS
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private HdfsConfiguration conf;
   private FileSystem fs;
   private HdfsAdmin dfsAdmin;
@@ -248,7 +248,7 @@ public class TestSecureEncryptionZoneWithKMS {
         .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
 
     conf = new HdfsConfiguration(baseConf);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .build();
     cluster.waitActive();
 

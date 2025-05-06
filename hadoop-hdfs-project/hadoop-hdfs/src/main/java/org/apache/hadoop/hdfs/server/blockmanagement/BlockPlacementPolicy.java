@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * for placing block replicas.
  */
 @InterfaceAudience.Private
-public abstract class BlockPlacementPolicy {
+public abstract class BlockPlacementPolicy implements BlockPlacementPolicyJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(
       BlockPlacementPolicy.class);
 
@@ -156,21 +156,21 @@ public abstract class BlockPlacementPolicy {
    * @param stats retrieve cluster status from here
    * @param clusterMap cluster topology
    */
-  abstract protected void initialize(Configuration conf,  FSClusterStats stats, 
+  abstract protected void initialize(Configuration conf,  FSClusterStats stats,
                                      NetworkTopology clusterMap, 
                                      Host2NodesMap host2datanodeMap);
-    
+
   /**
    * Get an instance of the configured Block Placement Policy based on the
    * the configuration property
    * {@link  DFSConfigKeys#DFS_BLOCK_REPLICATOR_CLASSNAME_KEY}.
-   * 
+   *
    * @param conf the configuration to be used
    * @param stats an object that is used to retrieve the load on the cluster
    * @param clusterMap the network topology of the cluster
    * @return an instance of BlockPlacementPolicy
    */
-  public static BlockPlacementPolicy getInstance(Configuration conf, 
+  public static BlockPlacementPolicy getInstance(Configuration conf,
                                                  FSClusterStats stats,
                                                  NetworkTopology clusterMap,
                                                  Host2NodesMap host2datanodeMap) {
@@ -252,7 +252,7 @@ public abstract class BlockPlacementPolicy {
   /**
    * Split data nodes into two sets, one set includes nodes on rack with
    * more than one  replica, the other set contains the remaining nodes.
-   * 
+   *
    * @param storagesOrDataNodes DatanodeStorageInfo/DatanodeInfo to be split
    *        into two sets
    * @param rackMap a map from rack to datanodes

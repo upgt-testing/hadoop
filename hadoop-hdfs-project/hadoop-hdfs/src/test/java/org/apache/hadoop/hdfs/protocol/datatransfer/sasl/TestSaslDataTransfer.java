@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.net.Peer;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
@@ -63,7 +63,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
   private static final int NUM_BLOCKS = 3;
   private static final Path PATH  = new Path("/file1");
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private FileSystem fs;
 
   @Rule
@@ -204,7 +204,7 @@ public class TestSaslDataTransfer extends SaslDataTransferTestCase {
    * @throws IOException if there is an I/O error
    */
   private void startCluster(HdfsConfiguration conf) throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
 

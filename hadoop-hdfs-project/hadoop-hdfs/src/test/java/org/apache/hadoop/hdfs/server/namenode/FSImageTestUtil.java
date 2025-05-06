@@ -46,14 +46,18 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hdfs.server.common.StorageDirectoryJVMInterface;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirType;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
+import org.apache.hadoop.hdfs.server.common.StorageDirectoryJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.FSImageStorageInspector.FSImageFile;
 import org.apache.hadoop.hdfs.server.namenode.FileJournalManager.EditLogFile;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeDirType;
@@ -503,7 +507,12 @@ public abstract class FSImageTestUtil {
       List<Integer> txids) {
     assertNNHasCheckpoints(cluster, 0, txids);
   }
-  
+
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            List<Integer> txids) {
+    assertNNHasCheckpoints(cluster, 0, txids);
+  }
+
   public static void assertNNHasCheckpoints(MiniDFSCluster cluster,
       int nnIdx, List<Integer> txids) {
 
@@ -521,7 +530,32 @@ public abstract class FSImageTestUtil {
     }
   }
 
+  public static void assertNNHasCheckpoints(MiniDFSClusterInJVM cluster,
+                                            int nnIdx, List<Integer> txids) {
+
+    for (File nameDir : getNameNodeCurrentDirs(cluster, nnIdx)) {
+      LOG.info("examining name dir with files: " +
+          Joiner.on(",").join(nameDir.listFiles()));
+      // Should have fsimage_N for the three checkpoints
+      LOG.info("Examining storage dir " + nameDir + " with contents: "
+          + StringUtils.join(nameDir.listFiles(), ", "));
+      for (long checkpointTxId : txids) {
+        File image = new File(nameDir,
+                              NNStorage.getImageFileName(checkpointTxId));
+        assertTrue("Expected non-empty " + image, image.length() > 0);
+      }
+    }
+  }
+
   public static List<File> getNameNodeCurrentDirs(MiniDFSCluster cluster, int nnIdx) {
+    List<File> nameDirs = Lists.newArrayList();
+    for (URI u : cluster.getNameDirs(nnIdx)) {
+      nameDirs.add(new File(u.getPath(), "current"));
+    }
+    return nameDirs;
+  }
+
+  public static List<File> getNameNodeCurrentDirs(MiniDFSClusterInJVM cluster, int nnIdx) {
     List<File> nameDirs = Lists.newArrayList();
     for (URI u : cluster.getNameDirs(nnIdx)) {
       nameDirs.add(new File(u.getPath(), "current"));
@@ -591,7 +625,7 @@ public abstract class FSImageTestUtil {
       File[] files = curDir.listFiles();
       Arrays.sort(files);
       for (File f : files) {
-        LOG.info("  file " + f.getAbsolutePath() + "; len = " + f.length());  
+        LOG.info("  file " + f.getAbsolutePath() + "; len = " + f.length());
       }
     }
   }
@@ -601,13 +635,22 @@ public abstract class FSImageTestUtil {
     return node.getFSImage();
   }
 
+  /** get the fsImage*/
+  public static FSImageJVMInterface getFSImage(NameNodeJVMInterface node) {
+    return node.getFSImage();
+  }
+
   /**
    * get NameSpace quota.
    */
   public static long getNSQuota(FSNamesystem ns) {
     return ns.dir.rootDir.getQuotaCounts().getNameSpace();
   }
-  
+
+  public static long getNSQuota(FSNamesystemJVMInterface ns) {
+    return ns.getFSDirectory().getRoot().getQuotaCounts().getNameSpace();
+  }
+
   public static void assertNNFilesMatch(MiniDFSCluster cluster) throws Exception {
     List<File> curDirs = Lists.newArrayList();
     curDirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 0));
@@ -620,12 +663,31 @@ public abstract class FSImageTestUtil {
         ignoredFiles);
   }
 
+  public static void assertNNFilesMatch(MiniDFSClusterInJVM cluster) throws Exception {
+    List<File> curDirs = Lists.newArrayList();
+    curDirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 0));
+    curDirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 1));
+
+    // Ignore seen_txid file, since the newly bootstrapped standby
+    // will have a higher seen_txid than the one it bootstrapped from.
+    Set<String> ignoredFiles = ImmutableSet.of("seen_txid");
+    FSImageTestUtil.assertParallelFilesAreIdentical(curDirs,
+            ignoredFiles);
+  }
+
   public static long getStorageTxId(NameNode node, URI storageUri)
       throws IOException {
     StorageDirectory sDir = getFSImage(node).getStorage().
         getStorageDirectory(storageUri);
     return NNStorage.readTransactionIdFile(sDir);
   }
+
+    public static long getStorageTxId(NameNodeJVMInterface node, URI storageUri)
+            throws IOException {
+        StorageDirectoryJVMInterface sDir = getFSImage(node).getStorage().
+                getStorageDirectory(storageUri);
+        return NNStorage.readTransactionIdFile(sDir);
+    }
 
   /**
    * Returns the summary section from the latest fsimage stored on the cluster.
@@ -649,4 +711,6 @@ public abstract class FSImageTestUtil {
       }
     }
   }
+
+
 }

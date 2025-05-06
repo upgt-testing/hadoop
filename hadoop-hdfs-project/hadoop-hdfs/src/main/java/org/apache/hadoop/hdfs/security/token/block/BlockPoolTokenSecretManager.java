@@ -34,7 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
  * given a block pool Id to corresponding {@link BlockTokenSecretManager}
  */
 public class BlockPoolTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockPoolTokenSecretManagerJVMInterface {
   
   private final Map<String, BlockTokenSecretManager> map = 
     new HashMap<String, BlockTokenSecretManager>();

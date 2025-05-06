@@ -23,9 +23,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,10 +49,10 @@ public class TestDebugAdmin {
       new File(System.getProperty("test.build.data", "/tmp"),
           TestDebugAdmin.class.getSimpleName()).getAbsolutePath();
 
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem fs;
   private DebugAdmin admin;
-  private DataNode datanode;
+  private DataNodeJVMInterface datanode;
 
   @Before
   public void setUp() throws Exception {
@@ -56,7 +60,7 @@ public class TestDebugAdmin {
     testRoot.delete();
     testRoot.mkdirs();
     Configuration conf = new Configuration();
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     admin = new DebugAdmin(conf);
@@ -104,7 +108,7 @@ public class TestDebugAdmin {
   @Test(timeout = 60000)
   public void testVerifyMetaCommand() throws Exception {
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
@@ -129,7 +133,7 @@ public class TestDebugAdmin {
   @Test(timeout = 60000)
   public void testComputeMetaCommand() throws Exception {
     DFSTestUtil.createFile(fs, new Path("/bar"), 1234, (short) 1, 0xdeadbeef);
-    FsDatasetSpi<?> fsd = datanode.getFSDataset();
+    FsDatasetSpiJVMInterface<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());

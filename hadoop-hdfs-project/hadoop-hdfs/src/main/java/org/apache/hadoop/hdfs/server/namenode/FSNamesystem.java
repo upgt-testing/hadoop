@@ -326,7 +326,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class FSNamesystem implements Namesystem, FSNamesystemMBean,
-  NameNodeMXBean {
+  NameNodeMXBean, FSNamesystemJVMInterface  {
   public static final Log LOG = LogFactory.getLog(FSNamesystem.class);
   private final MetricsRegistry registry = new MetricsRegistry("FSNamesystem");
   @Metric final MutableRatesWithAggregation detailedLockHoldTimeMetrics =
@@ -605,7 +605,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   @VisibleForTesting
-  LeaseManager getLeaseManager() {
+  public LeaseManager getLeaseManager() {
     return leaseManager;
   }
 
@@ -1003,7 +1003,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return true, if CallerContext is enabled, otherwise false, if it's
    *         disabled.
    */
-  boolean getCallerContextEnabled() {
+  public boolean getCallerContextEnabled() {
     for (AuditLogger logger : auditLoggers) {
       if (logger instanceof DefaultAuditLogger) {
         return ((DefaultAuditLogger) logger).getCallerContextEnabled();
@@ -1659,7 +1659,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Causes heartbeat and lease daemons to stop; waits briefly for
    * them to finish, but a short timeout returns control back to caller.
    */
-  void close() {
+  public void close() {
     fsRunning = false;
     try {
       stopCommonServices();
@@ -1732,7 +1732,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     }
   }
 
-  private void metaSave(PrintWriter out) {
+  public void metaSave(PrintWriter out) {
     assert hasWriteLock();
     long totalInodes = this.dir.totalInodes();
     long totalBlocks = this.getBlocksTotal();
@@ -1841,7 +1841,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Get block locations within the specified range.
    * @see ClientProtocol#getBlockLocations(String, long, long)
    */
-  LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
+  public LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
       long offset, long length) throws IOException {
     final String operationName = "open";
     checkOperation(OperationCategory.READ);
@@ -2027,7 +2027,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return true if successful; 
    *         false if file does not exist or is a directory
    */
-  boolean setReplication(final String src, final short replication)
+  public boolean setReplication(final String src, final short replication)
       throws IOException {
     final String operationName = "setReplication";
     boolean success = false;
@@ -2238,7 +2238,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    */
   HdfsFileStatus startFile(String src, PermissionStatus permissions,
       String holder, String clientMachine, EnumSet<CreateFlag> flag,
-      boolean createParent, short replication, long blockSize, 
+      boolean createParent, short replication, long blockSize,
       CryptoProtocolVersion[] supportedVersions, boolean logRetryCache)
       throws IOException {
 
@@ -2361,7 +2361,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    *         if the lease can be released and the file can be closed.
    * @throws IOException
    */
-  boolean recoverLease(String src, String holder, String clientMachine)
+  public boolean recoverLease(String src, String holder, String clientMachine)
       throws IOException {
     boolean skipSync = false;
     FSPermissionChecker pc = getPermissionChecker();
@@ -4056,7 +4056,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /** @see ClientProtocol#getStats() */
-  long[] getStats() {
+  public long[] getStats() {
     final long[] stats = datanodeStatistics.getStats();
     stats[ClientProtocol.GET_STATS_UNDER_REPLICATED_IDX] = getUnderReplicatedBlocks();
     stats[ClientProtocol.GET_STATS_CORRUPT_BLOCKS_IDX] = getCorruptReplicaBlocks();
@@ -4233,11 +4233,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Save namespace image.
    * This will save current namespace into fsimage file and empty edits file.
    * Requires superuser privilege and safe mode.
-   * 
+   *
    * @throws AccessControlException if superuser privilege is violated.
-   * @throws IOException if 
+   * @throws IOException if
    */
-  void saveNamespace() throws AccessControlException, IOException {
+  public void saveNamespace() throws AccessControlException, IOException {
     checkOperation(OperationCategory.UNCHECKED);
     checkSuperuserPrivilege();
 
@@ -4276,10 +4276,10 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       // if it is disabled - enable it and vice versa.
       if(arg.equals("check"))
         return getFSImage().getStorage().getRestoreFailedStorage();
-      
+
       boolean val = arg.equals("true");  // false if not
       getFSImage().getStorage().setRestoreFailedStorage(val);
-      
+
       return val;
     } finally {
       writeUnlock("restoreFailedStorage");
@@ -4395,7 +4395,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Enter safe mode. If resourcesLow is false, then we assume it is manual
    * @throws IOException
    */
-  void enterSafeMode(boolean resourcesLow) throws IOException {
+  public void enterSafeMode(boolean resourcesLow) throws IOException {
     writeLock();
     try {
       // Stop the secret manager, since rolling the master key would
@@ -4423,7 +4423,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Leave safe mode.
    * @param force true if to leave safe mode forcefully with -forceExit option
    */
-  void leaveSafeMode(boolean force) {
+  public void leaveSafeMode(boolean force) {
     writeLock();
     try {
       if (!isInSafeMode()) {
@@ -4551,7 +4551,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /**
-   * Get the total number of objects in the system. 
+   * Get the total number of objects in the system.
    */
   @Override // FSNamesystemMBean
   public long getMaxObjects() {
@@ -4937,7 +4937,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
           NameNode.stateChangeLog.info("*DIR* reportBadBlocks for block: {} on"
               + " datanode: {}", blk, nodes[j].getXferAddr());
           blockManager.findAndMarkBlockAsCorrupt(blk, nodes[j],
-              storageIDs == null ? null: storageIDs[j], 
+              storageIDs == null ? null: storageIDs[j],
               "client machine reported it");
         }
       }
@@ -4958,7 +4958,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return a located block with a new generation stamp and an access token
    * @throws IOException if any error occurs
    */
-  LocatedBlock updateBlockForPipeline(ExtendedBlock block, 
+  LocatedBlock updateBlockForPipeline(ExtendedBlock block,
       String clientName) throws IOException {
     LocatedBlock locatedBlock;
     checkOperation(OperationCategory.WRITE);
@@ -5031,8 +5031,8 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     // check new GS & length: this is not expected
     if (newBlock.getGenerationStamp() <= blockinfo.getGenerationStamp() ||
         newBlock.getNumBytes() < blockinfo.getNumBytes()) {
-      String msg = "Update " + oldBlock + " (len = " + 
-        blockinfo.getNumBytes() + ") to an older state: " + newBlock + 
+      String msg = "Update " + oldBlock + " (len = " +
+        blockinfo.getNumBytes() + ") to an older state: " + newBlock +
         " (len = " + newBlock.getNumBytes() +")";
       LOG.warn(msg);
       throw new IOException(msg);
@@ -5106,7 +5106,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     }
   }
 
-  static class CorruptFileBlockInfo {
+  static class CorruptFileBlockInfo implements CorruptFileBlockInfoJVMInterface {
     final String path;
     final Block block;
     
@@ -5127,7 +5127,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return a list in which each entry describes a corrupt file/block
    * @throws IOException
    */
-  Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
+  public Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
   String[] cookieTab) throws IOException {
     checkSuperuserPrivilege();
     checkOperation(OperationCategory.READ);
@@ -5231,7 +5231,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Returns the DelegationTokenSecretManager instance in the namesystem.
    * @return delegation token secret manager object
    */
-  DelegationTokenSecretManager getDelegationTokenSecretManager() {
+  public DelegationTokenSecretManager getDelegationTokenSecretManager() {
     return dtSecretManager;
   }
 
@@ -5467,7 +5467,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Client invoked methods are invoked over RPC and will be in 
    * RPC call context even if the client exits.
    */
-  boolean isExternalInvocation() {
+  public boolean isExternalInvocation() {
     return Server.isRpcInvocation();
   }
 
@@ -6035,7 +6035,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
   
   @VisibleForTesting
-  void setFsLockForTests(ReentrantReadWriteLock lock) {
+  public void setFsLockForTests(ReentrantReadWriteLock lock) {
     this.fsLock.coarseLock = lock;
   }
   
@@ -6149,7 +6149,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(success, operationName, oldSnapshotRoot,
         newSnapshotRoot, null);
   }
-  
+
   /**
    * Get the list of snapshottable directories that are owned 
    * by the current user. Return all the snapshottable directories if the 
@@ -6178,16 +6178,16 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   /**
    * Get the difference between two snapshots (or between a snapshot and the
    * current status) of a snapshottable directory.
-   * 
+   *
    * @param path The full path of the snapshottable directory.
    * @param fromSnapshot Name of the snapshot to calculate the diff from. Null
    *          or empty string indicates the current tree.
    * @param toSnapshot Name of the snapshot to calculated the diff to. Null or
    *          empty string indicates the current tree.
-   * @return A report about the difference between {@code fromSnapshot} and 
-   *         {@code toSnapshot}. Modified/deleted/created/renamed files and 
-   *         directories belonging to the snapshottable directories are listed 
-   *         and labeled as M/-/+/R respectively. 
+   * @return A report about the difference between {@code fromSnapshot} and
+   *         {@code toSnapshot}. Modified/deleted/created/renamed files and
+   *         directories belonging to the snapshottable directories are listed
+   *         and labeled as M/-/+/R respectively.
    * @throws IOException
    */
   SnapshotDiffReport getSnapshotDiffReport(String path,
@@ -6211,7 +6211,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         toSnapshotRoot, null);
     return diffs;
   }
-  
+
   /**
    * Delete a snapshot of a snapshottable directory
    * @param snapshotRoot The snapshottable directory
@@ -6625,7 +6625,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       writeUnlock(operationName);
       logAuditEvent(success, operationName, poolInfoStr, null, null);
     }
-    
+
     getEditLog().logSync();
   }
 
@@ -6669,7 +6669,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       String poolNameStr = "{poolName: " + cachePoolName + "}";
       logAuditEvent(success, operationName, poolNameStr, null, null);
     }
-    
+
     getEditLog().logSync();
   }
 
@@ -6789,7 +6789,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, src, null, auditStat);
   }
 
-  AclStatus getAclStatus(String src) throws IOException {
+  public AclStatus getAclStatus(String src) throws IOException {
     final String operationName = "getAclStatus";
     checkOperation(OperationCategory.READ);
     boolean success = false;

@@ -205,7 +205,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.IPC_BACKOFF_ENABLE_DE
  **********************************************************/
 @InterfaceAudience.Private
 public class NameNode extends ReconfigurableBase implements
-    NameNodeStatusMXBean {
+    NameNodeStatusMXBean, NameNodeJVMInterface {
   static{
     HdfsConfiguration.init();
   }
@@ -922,7 +922,7 @@ public class NameNode extends ReconfigurableBase implements
    * metadata</li>
    * <li>{@link StartupOption#ROLLBACK ROLLBACK} - roll the  
    *            cluster back to the previous state</li>
-   * <li>{@link StartupOption#FINALIZE FINALIZE} - finalize 
+   * <li>{@link StartupOption#FINALIZE FINALIZE} - finalize
    *            previous upgrade</li>
    * <li>{@link StartupOption#IMPORT IMPORT} - import checkpoint</li>
    * </ul>
@@ -1054,7 +1054,7 @@ public class NameNode extends ReconfigurableBase implements
   public boolean isInSafeMode() {
     return namesystem.isInSafeMode();
   }
-    
+
   /** get FSImage */
   @VisibleForTesting
   public FSImage getFSImage() {
@@ -1823,7 +1823,7 @@ public class NameNode extends ReconfigurableBase implements
     state.setState(haContext, ACTIVE_STATE);
   }
 
-  synchronized void transitionToStandby()
+  public synchronized void transitionToStandby()
       throws ServiceFailedException, AccessControlException {
     namesystem.checkSuperuserPrivilege();
     if (!haEnabled) {
@@ -2124,7 +2124,7 @@ public class NameNode extends ReconfigurableBase implements
    * {@inheritDoc}
    * */
   @Override // ReconfigurableBase
-  protected String reconfigurePropertyImpl(String property, String newVal)
+  public String reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
     final DatanodeManager datanodeManager = namesystem.getBlockManager()
         .getDatanodeManager();

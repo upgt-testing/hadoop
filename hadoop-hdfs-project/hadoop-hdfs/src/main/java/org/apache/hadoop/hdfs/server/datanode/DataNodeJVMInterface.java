@@ -1,0 +1,86 @@
+package org.apache.hadoop.hdfs.server.datanode;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.conf.ReconfigurationException;
+import org.apache.hadoop.hdfs.protocol.DatanodeIDJVMInterface;
+import org.apache.hadoop.hdfs.protocol.datatransfer.PipelineAck;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClient;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferClientJVMInterface;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferServerJVMInterface;
+import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManager;
+import org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeDiskMetricsJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeMetrics;
+import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeMetricsJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.DatanodeRegistrationJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.StorageReport;
+import org.apache.hadoop.hdfs.server.protocol.VolumeFailureSummaryJVMInterface;
+import org.apache.hadoop.ipc.RPCServerJVMInterface;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
+
+public interface DataNodeJVMInterface {
+    int getBpOsCount();
+    ChangedVolumesJVMInterface parseChangedVolumes(String arg) throws IOException;
+    String getDiskBalancerStatus();
+    void cancelDiskBalancePlan(String bpid) throws IOException;
+    void checkDiskError() throws IOException;
+    long getLastDiskErrorCheck();
+    long getBalancerBandwidth();
+    RPCServerJVMInterface getRpcServer();
+    DirectoryScannerJVMInterface getDirectoryScanner();
+    void clearAllBlockSecretKeys();
+    String getDiskBalancerSetting(String key) throws IOException;
+    void deleteBlockPool(String blockPoolId, boolean force) throws IOException;
+    String reconfigurePropertyImpl(String property, String newVal)
+            throws ReconfigurationException;
+    DataXceiverServerJVMInterface getXferServer();
+    DataStorageJVMInterface getStorage();
+    ConfigurationJVMInterface getConf();
+    String getClusterId();
+    String getVersion();
+    String getSoftwareVersion();
+    String getRevision();
+    String getRpcPort();
+    String getHttpPort();
+    String getNamenodeAddresses();
+    String getVolumeInfo();
+    int getXmitsInProgress();
+    String getBPServiceActorInfo();
+    String getSlowDisks();
+    //PipelineAck.ECN getECN();
+    DataNodeMetricsJVMInterface getMetrics();
+    DataNodeDiskMetricsJVMInterface getDiskMetrics();
+    int getXferPort();
+    SaslDataTransferClientJVMInterface getSaslClient();
+    int getInfoPort();
+    BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();
+    int getXceiverCount();
+    boolean isBPServiceAlive(String bpid);
+    String getDatanodeUuid();
+    int getIpcPort();
+    void runDatanodeDaemon() throws IOException;
+    InetSocketAddress getXferAddress();
+    boolean isDatanodeFullyStarted();
+    String getDisplayName();
+    void shutdownDatanode(boolean forUpgrade) throws IOException;
+    void shutdown();
+    boolean isDatanodeUp();
+    boolean isConnectedToNN(InetSocketAddress addr);
+    void scheduleAllBlockReport(long delay);
+    String getDatanodeHostname();
+
+    FsDatasetSpiJVMInterface<?> getFSDataset();
+    List<? extends BPOfferServiceJVMInterface> getAllBpOs();
+    //RPC.Server getIpcServer();
+    DatanodeIDJVMInterface getDatanodeId();
+    //FsDatasetSpiInterface getFSDataset();
+    //void refreshNamenodes(Configuration conf) throws IOException;
+    DatanodeRegistrationJVMInterface getDNRegistrationForBP(String bpid) throws IOException;
+    void setHeartbeatsDisabledForTests(boolean heartbeatsDisabledForTests);
+}

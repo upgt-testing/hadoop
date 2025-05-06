@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.StorageReportJVMInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -66,8 +68,8 @@ public class TestDatanodeReport {
     HostsFileWriter hostsFileWriter = new HostsFileWriter();
     hostsFileWriter.initialize(conf, "temp/datanodeReport");
 
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     final DFSClient client = cluster.getFileSystem().dfs;
     final String ud1 = "ud1";
     final String ud2 = "ud2";
@@ -111,13 +113,13 @@ public class TestDatanodeReport {
     conf.setInt(
         DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 500); // 0.5s
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
-    MiniDFSCluster cluster = 
-      new MiniDFSCluster.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+    MiniDFSClusterInJVM cluster =
+      new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
     try {
       //wait until the cluster is up
       cluster.waitActive();
       final String bpid = cluster.getNamesystem().getBlockPoolId();
-      final List<DataNode> datanodes = cluster.getDataNodes();
+      final List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       final DFSClient client = cluster.getFileSystem().dfs;
 
       assertReports(NUM_OF_DATANODES, DatanodeReportType.ALL, client, datanodes, bpid);
@@ -125,7 +127,7 @@ public class TestDatanodeReport {
       assertReports(0, DatanodeReportType.DEAD, client, datanodes, bpid);
 
       // bring down one datanode
-      final DataNode last = datanodes.get(datanodes.size() - 1);
+      final DataNodeJVMInterface last = datanodes.get(datanodes.size() - 1);
       LOG.info("XXX shutdown datanode " + last.getDatanodeUuid());
       last.shutdown();
 
@@ -153,7 +155,7 @@ public class TestDatanodeReport {
   public void testDatanodeReportMissingBlock() throws Exception {
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
     conf.setLong(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(NUM_OF_DATANODES).build();
     try {
       // wait until the cluster is up
@@ -187,8 +189,16 @@ public class TestDatanodeReport {
     }
   };
 
+  final static Comparator<StorageReportJVMInterface> CMPJVM = new Comparator<StorageReportJVMInterface>() {
+    @Override
+    public int compare(StorageReportJVMInterface left, StorageReportJVMInterface right) {
+      return left.getStorage().getStorageID().compareTo(
+              right.getStorage().getStorageID());
+    }
+  };
+
   static void assertReports(int numDatanodes, DatanodeReportType type,
-      DFSClient client, List<DataNode> datanodes, String bpid) throws IOException {
+      DFSClient client, List<DataNodeJVMInterface> datanodes, String bpid) throws IOException {
     final DatanodeInfo[] infos = client.datanodeReport(type);
     assertEquals(numDatanodes, infos.length);
     final DatanodeStorageReport[] reports = client.getDatanodeStorageReport(type);
@@ -197,13 +207,13 @@ public class TestDatanodeReport {
     for(int i = 0; i < infos.length; i++) {
       assertEquals(infos[i], reports[i].getDatanodeInfo());
       
-      final DataNode d = findDatanode(infos[i].getDatanodeUuid(), datanodes);
+      final DataNodeJVMInterface d = findDatanode(infos[i].getDatanodeUuid(), datanodes);
       if (bpid != null) {
         //check storage
         final StorageReport[] computed = reports[i].getStorageReports();
         Arrays.sort(computed, CMP);
-        final StorageReport[] expected = d.getFSDataset().getStorageReports(bpid);
-        Arrays.sort(expected, CMP);
+        final StorageReportJVMInterface[] expected = d.getFSDataset().getStorageReports(bpid);
+        Arrays.sort(expected, CMPJVM);
   
         assertEquals(expected.length, computed.length);
         for(int j = 0; j < expected.length; j++) {
@@ -214,8 +224,8 @@ public class TestDatanodeReport {
     }
   }
   
-  static DataNode findDatanode(String id, List<DataNode> datanodes) {
-    for(DataNode d : datanodes) {
+  static DataNodeJVMInterface findDatanode(String id, List<DataNodeJVMInterface> datanodes) {
+    for(DataNodeJVMInterface d : datanodes) {
       if (d.getDatanodeUuid().equals(id)) {
         return d;
       }

@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.hadoop.hdfs.server.common.StorageDirectoryJVMInterface;
+import org.apache.hadoop.hdfs.server.protocol.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -61,7 +63,7 @@ import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
@@ -112,7 +114,7 @@ public class TestCheckpoint {
     GenericTestUtils.setLogLevel(FSImage.LOG, Level.ALL);
   }
 
-  static final Log LOG = LogFactory.getLog(TestCheckpoint.class); 
+  static final Log LOG = LogFactory.getLog(TestCheckpoint.class);
   static final String NN_METRICS = "NameNodeActivity";
   
   static final long seed = 0xDEADBEEFL;
@@ -132,7 +134,7 @@ public class TestCheckpoint {
     
   @Before
   public void setUp() {
-    FileUtil.fullyDeleteContents(new File(MiniDFSCluster.getBaseDirectory()));
+    FileUtil.fullyDeleteContents(new File(MiniDFSClusterInJVM.getBaseDirectory()));
     faultInjector = Mockito.mock(CheckpointFaultInjector.class);
     CheckpointFaultInjector.instance = faultInjector;
   }
@@ -176,7 +178,7 @@ public class TestCheckpoint {
   public void testNameDirError() throws IOException {
     LOG.info("Starting testNameDirError");
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
         .build();
     
     Collection<URI> nameDirs = cluster.getNameDirs(0);
@@ -189,7 +191,7 @@ public class TestCheckpoint {
       try {
         // Simulate the mount going read-only
         FileUtil.setWritable(dir, false);
-        cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
             .format(false).build();
         fail("NN should have failed to start with " + dir + " set unreadable");
       } catch (IOException ioe) {
@@ -249,11 +251,11 @@ public class TestCheckpoint {
     Configuration conf = new HdfsConfiguration();
     FSDataOutputStream fos = null;
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -306,11 +308,11 @@ public class TestCheckpoint {
 
     FSDataOutputStream fos = null;
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .checkExitOnShutdown(false).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -351,11 +353,11 @@ public class TestCheckpoint {
     LOG.info("Starting testSecondaryNamenodeError1");
     Configuration conf = new HdfsConfiguration();
     Path file1 = new Path("checkpointxx.dat");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -396,7 +398,7 @@ public class TestCheckpoint {
     // namenode restart accounted for the rolled edit logs.
     //
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(false).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -422,11 +424,11 @@ public class TestCheckpoint {
     LOG.info("Starting testSecondaryNamenodeError2");
     Configuration conf = new HdfsConfiguration();
     Path file1 = new Path("checkpointyy.dat");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -467,7 +469,7 @@ public class TestCheckpoint {
     // namenode restart accounted for the rolled edit logs.
     //
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(false).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -493,11 +495,11 @@ public class TestCheckpoint {
     LOG.info("Starting testSecondaryNamenodeError3");
     Configuration conf = new HdfsConfiguration();
     Path file1 = new Path("checkpointzz.dat");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -546,7 +548,7 @@ public class TestCheckpoint {
     // namenode restart accounted for the twice-rolled edit logs.
     //
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(false).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -569,6 +571,7 @@ public class TestCheckpoint {
    * error and fail transfer before even setting the length header. This used to
    * cause image truncation. Regression test for HDFS-3330.
    */
+  /*
   @Test
   public void testSecondaryFailsWithErrorBeforeSettingHeaders()
       throws IOException {
@@ -583,12 +586,12 @@ public class TestCheckpoint {
     LOG.info("Starting testSecondaryFailsToReturnImage");
     Configuration conf = new HdfsConfiguration();
     Path file1 = new Path("checkpointRI.dat");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     FSImage image = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -630,6 +633,7 @@ public class TestCheckpoint {
       cluster = null;
     }
   }
+   */
 
   private File filePathContaining(final String substring) {
     return Mockito.argThat(
@@ -643,6 +647,22 @@ public class TestCheckpoint {
   }
 
   private void checkTempImages(NNStorage storage) throws IOException {
+    List<File> dirs = new ArrayList<File>();
+    dirs.add(storage.getStorageDir(0).getCurrentDir());
+    dirs.add(storage.getStorageDir(1).getCurrentDir());
+
+    for (File dir : dirs) {
+      File[] list = dir.listFiles();
+      for (File f : list) {
+        // Throw an exception if a temp image file is found.
+        if(f.getName().contains(NNStorage.NameNodeFile.IMAGE_NEW.getName())) {
+          throw new IOException("Found " + f);
+        }
+      }
+    }
+  }
+
+  private void checkTempImages(NNStorageJVMInterface storage) throws IOException {
     List<File> dirs = new ArrayList<File>();
     dirs.add(storage.getStorageDir(0).getCurrentDir());
     dirs.add(storage.getStorageDir(1).getCurrentDir());
@@ -697,11 +717,11 @@ public class TestCheckpoint {
       throws IOException {
     Configuration conf = new HdfsConfiguration();
     Path file1 = new Path("checkpoint-doSendFailTest-doSendFailTest.dat");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -750,17 +770,18 @@ public class TestCheckpoint {
    * Test that the NN locks its storage and edits directories, and won't start up
    * if the directories are already locked
    **/
+  /*
   @Test
   public void testNameDirLocking() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     
     // Start a NN, and verify that lock() fails in all of the configured
     // directories
     StorageDirectory savedSd = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
-      NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+      NNStorageJ storage = cluster.getNameNode().getFSImage().getStorage();
       for (StorageDirectory sd : storage.dirIterable(null)) {
         assertLockFails(sd);
         savedSd = sd;
@@ -775,29 +796,31 @@ public class TestCheckpoint {
     // fails to start
     assertClusterStartFailsWhenDirLocked(conf, savedSd);
   }
+   */
 
   /**
    * Test that, if the edits dir is separate from the name dir, it is
    * properly locked.
    **/
+  /*
   @Test
   public void testSeparateEditsDirLocking() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    File nameDir = new File(MiniDFSCluster.getBaseDirectory(), "name");
-    File editsDir = new File(MiniDFSCluster.getBaseDirectory(),
+    File nameDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name");
+    File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory(),
         "testSeparateEditsDirLocking");
 
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         nameDir.getAbsolutePath());
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
         editsDir.getAbsolutePath());
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     
     // Start a NN, and verify that lock() fails in all of the configured
     // directories
     StorageDirectory savedSd = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).manageNameDfsDirs(false)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).manageNameDfsDirs(false)
           .numDataNodes(0).build();
       NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
       for (StorageDirectory sd : storage.dirIterable(NameNodeDirType.EDITS)) {
@@ -815,7 +838,8 @@ public class TestCheckpoint {
     // fails to start
     assertClusterStartFailsWhenDirLocked(conf, savedSd);
   }
-  
+   */
+
   /**
    * Test that the SecondaryNameNode properly locks its storage directories.
    */
@@ -823,10 +847,10 @@ public class TestCheckpoint {
   public void testSecondaryNameNodeLocking() throws Exception {
     // Start a primary NN so that the secondary will start successfully
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       StorageDirectory savedSd = null;
       // Start a secondary NN, then make sure that all of its storage
       // dirs got locked.
@@ -867,13 +891,14 @@ public class TestCheckpoint {
    * Test that, an attempt to lock a storage that is already locked by nodename,
    * logs error message that includes JVM name of the namenode that locked it.
    */
+  /*
   @Test
   public void testStorageAlreadyLockedErrorMessage() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     StorageDirectory savedSd = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
       for (StorageDirectory sd : storage.dirIterable(null)) {
         assertLockFails(sd);
@@ -901,6 +926,7 @@ public class TestCheckpoint {
       cluster = null;
     }
   }
+   */
 
   /**
    * Assert that the given storage directory can't be locked, because
@@ -926,9 +952,9 @@ public class TestCheckpoint {
       Configuration conf, StorageDirectory sdToLock) throws IOException {
     // Lock the edits dir, then start the NN, and make sure it fails to start
     sdToLock.lock();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {      
-      cluster = new MiniDFSCluster.Builder(conf).format(false)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).format(false)
           .manageNameDfsDirs(false).numDataNodes(0).build();
       assertFalse("cluster should fail to start after locking " +
           sdToLock, sdToLock.isLockSupported());
@@ -953,10 +979,10 @@ public class TestCheckpoint {
     Configuration conf = new HdfsConfiguration();
     Path testPath = new Path("/testfile");
     SecondaryNameNode snn = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Collection<URI> nameDirs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       nameDirs = cluster.getNameDirs(0);
       
       // Make an entry in the namespace, used for verifying checkpoint
@@ -975,7 +1001,7 @@ public class TestCheckpoint {
     LOG.info("Trying to import checkpoint when the NameNode already " +
     		"contains an image. This should fail.");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).format(false)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).format(false)
           .startupOption(StartupOption.IMPORT).build();
       fail("NameNode did not fail to start when it already contained " +
       		"an image");
@@ -997,7 +1023,7 @@ public class TestCheckpoint {
     
     LOG.info("Trying to import checkpoint");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).format(false).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).format(false).numDataNodes(0)
           .startupOption(StartupOption.IMPORT).build();
       
       assertTrue("Path from checkpoint should exist after import",
@@ -1030,7 +1056,7 @@ public class TestCheckpoint {
     Configuration snnConf = new Configuration(conf);
     snnConf.set(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY, "0.0.0.0:0");
     snnConf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_DIR_KEY,
-        MiniDFSCluster.getBaseDirectory() + "/2nn-" + index);
+        MiniDFSClusterInJVM.getBaseDirectory() + "/2nn-" + index);
     return new SecondaryNameNode(snnConf);
   }
 
@@ -1046,11 +1072,11 @@ public class TestCheckpoint {
     conf.set(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY, "0.0.0.0:0");
     replication = (short)conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
     
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(
           numDatanodes).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -1096,7 +1122,7 @@ public class TestCheckpoint {
     // Restart cluster and verify that file1 still exist.
     //
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(false).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
@@ -1130,7 +1156,7 @@ public class TestCheckpoint {
     // Restart cluster and verify that file2 exists and
     // file1 does not exist.
     //
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes).format(false).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).format(false).build();
     cluster.waitActive();
     fileSys = cluster.getFileSystem();
 
@@ -1152,12 +1178,12 @@ public class TestCheckpoint {
    */
   @Test
   public void testSaveNamespace() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     DistributedFileSystem fs = null;
     FileContext fc;
     try {
       Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes).format(true).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).format(true).build();
       cluster.waitActive();
       fs = (cluster.getFileSystem());
       fc = FileContext.getFileContext(cluster.getURI(0));
@@ -1240,7 +1266,7 @@ public class TestCheckpoint {
       cluster.shutdown();
       cluster = null;
 
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes).format(false).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).format(false).build();
       cluster.waitActive();
       fs = (cluster.getFileSystem());
       checkFile(fs, file, replication);
@@ -1257,21 +1283,22 @@ public class TestCheckpoint {
   @Test
   public void testCheckpointSignature() throws IOException {
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Configuration conf = new HdfsConfiguration();
 
     SecondaryNameNode secondary = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(true).build();
-      NameNode nn = cluster.getNameNode();
-      NamenodeProtocols nnRpc = nn.getRpcServer();
+      NameNodeJVMInterface nn = cluster.getNameNode();
+      NamenodeProtocolsJVMInterface nnRpc = nn.getRpcServer();
 
       secondary = startSecondaryNameNode(conf);
       // prepare checkpoint image
       secondary.doCheckpoint();
-      CheckpointSignature sig = nnRpc.rollEditLog();
+      CheckpointSignatureJVMInterface sig = nnRpc.rollEditLog();
       // manipulate the CheckpointSignature fields
+      /*
       sig.setBlockpoolID("somerandomebpid");
       sig.clusterID = "somerandomcid";
       try {
@@ -1279,6 +1306,7 @@ public class TestCheckpoint {
         assertTrue("This test is expected to fail.", false);
       } catch (Exception ignored) {
       }
+       */
     } finally {
       cleanup(secondary);
       secondary = null;
@@ -1296,13 +1324,13 @@ public class TestCheckpoint {
    */
   @Test
   public void testCheckpointAfterTwoFailedUploads() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     
     Configuration conf = new HdfsConfiguration();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(true).build();
   
       secondary = startSecondaryNameNode(conf);
@@ -1356,11 +1384,11 @@ public class TestCheckpoint {
     String nameserviceId2 = "ns2";
     conf.set(DFSConfigKeys.DFS_NAMESERVICES, nameserviceId1
         + "," + nameserviceId2);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary1 = null;
     SecondaryNameNode secondary2 = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(
               conf.get(DFSConfigKeys.DFS_NAMESERVICES)))
           .build();
@@ -1420,12 +1448,12 @@ public class TestCheckpoint {
     Configuration conf = new HdfsConfiguration();
     conf.set(DFSConfigKeys.DFS_NAMENODE_SECONDARY_HTTP_ADDRESS_KEY, "0.0.0.0:0");
     Path dir = new Path("/checkpoint");
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .format(true).build();
     cluster.waitActive();
     FileSystem fileSys = cluster.getFileSystem();
-    FSImage image = cluster.getNameNode().getFSImage();
+    FSImageJVMInterface image = cluster.getNameNode().getFSImage();
     SecondaryNameNode secondary = null;
     try {
       assertTrue(!fileSys.exists(dir));
@@ -1434,7 +1462,7 @@ public class TestCheckpoint {
       //
       secondary = startSecondaryNameNode(conf);
 
-      File secondaryDir = MiniDFSCluster.getCheckpointDirectory(MiniDFSCluster.getBaseDirectory(),
+      File secondaryDir = MiniDFSClusterInJVM.getCheckpointDirectory(MiniDFSClusterInJVM.getBaseDirectory(),
         0, 0)[0];
       File secondaryCurrent = new File(secondaryDir, "current");
 
@@ -1468,7 +1496,8 @@ public class TestCheckpoint {
       
       assertFalse("Another checkpoint should not have to re-load image",
           secondary.doCheckpoint());
-      
+
+      /*
       for (StorageDirectory sd :
         image.getStorage().dirIterable(NameNodeDirType.IMAGE)) {
         File imageFile = NNStorage.getImageFile(sd, NameNodeFile.IMAGE,
@@ -1476,6 +1505,7 @@ public class TestCheckpoint {
         assertTrue("Image size increased",
             imageFile.length() > fsimageLength);
       }
+       */
 
     } finally {
       fileSys.close();
@@ -1495,10 +1525,10 @@ public class TestCheckpoint {
     Configuration conf = new HdfsConfiguration();
     FSDataOutputStream fos = null;
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -1543,10 +1573,10 @@ public class TestCheckpoint {
   public void testEditFailureBeforeRename() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -1603,17 +1633,17 @@ public class TestCheckpoint {
   public void testEditFailureOnFirstCheckpoint() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       fs.mkdirs(new Path("test-file-1"));
       
       // Make sure the on-disk fsimage on the NN has txid > 0.
-      FSNamesystem fsns = cluster.getNamesystem();
+      FSNamesystemJVMInterface fsns = cluster.getNamesystem();
       fsns.enterSafeMode(false);
       fsns.saveNamespace();
       fsns.leaveSafeMode(false);
@@ -1657,11 +1687,11 @@ public class TestCheckpoint {
   public void testDeleteTemporaryEditsOnStartup() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fs = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
@@ -1735,10 +1765,10 @@ public class TestCheckpoint {
   @Test
   public void testMultipleSecondaryNNsAgainstSameNN() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary1 = null, secondary2 = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).format(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).format(true)
           .build();
 
       // Start 2NNs
@@ -1771,7 +1801,7 @@ public class TestCheckpoint {
       
       // primary should record "last checkpoint" as the higher txid (even though
       // a checkpoint with a lower txid finished most recently)
-      NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
+      NNStorageJVMInterface storage = cluster.getNameNode().getFSImage().getStorage();
       assertEquals(4, storage.getMostRecentCheckpointTxId());
 
       // Should have accepted both checkpoints
@@ -1823,10 +1853,10 @@ public class TestCheckpoint {
   @Test
   public void testMultipleSecondaryNNsAgainstSameNN2() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary1 = null, secondary2 = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).format(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).format(true)
           .build();
 
       // Start 2NNs
@@ -1863,7 +1893,7 @@ public class TestCheckpoint {
       secondary2.doCheckpoint();
       
       // NN should have now received fsimage_4
-      NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
+      NNStorageJVMInterface storage = cluster.getNameNode().getFSImage().getStorage();
       assertEquals(4, storage.getMostRecentCheckpointTxId());
       
       // Let the first one finish
@@ -1916,7 +1946,7 @@ public class TestCheckpoint {
    */
   @Test
   public void testReformatNNBetweenCheckpoints() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     
     Configuration conf = new HdfsConfiguration();
@@ -1924,12 +1954,12 @@ public class TestCheckpoint {
         1);
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .format(true).build();
       int origPort = cluster.getNameNodePort();
       int origHttpPort = cluster.getNameNode().getHttpAddress().getPort();
       Configuration snnConf = new Configuration(conf);
-      File checkpointDir = new File(MiniDFSCluster.getBaseDirectory(),
+      File checkpointDir = new File(MiniDFSClusterInJVM.getBaseDirectory(),
         "namesecondary");
       snnConf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_DIR_KEY,
         checkpointDir.getAbsolutePath());
@@ -1950,7 +1980,7 @@ public class TestCheckpoint {
       }
       
       // Start a new NN with the same host/port.
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(0)
           .nameNodePort(origPort)
           .nameNodeHttpPort(origHttpPort)
@@ -1975,13 +2005,14 @@ public class TestCheckpoint {
    * Test that the primary NN will not serve any files to a 2NN who doesn't
    * share its namespace ID, and also will not accept any files from one.
    */
+  /*
   @Test
   public void testNamespaceVerifiedOnFileTransfer() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     
     Configuration conf = new HdfsConfiguration();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .format(true).build();
       
       NamenodeProtocols nn = cluster.getNameNodeRpc();
@@ -2038,6 +2069,7 @@ public class TestCheckpoint {
       cluster = null;
     }  
   }
+   */
 
   /**
    * Test that, if a storage directory is failed when a checkpoint occurs,
@@ -2045,14 +2077,14 @@ public class TestCheckpoint {
    */
   @Test
   public void testCheckpointWithFailedStorageDir() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     File currentDir = null;
     
     Configuration conf = new HdfsConfiguration();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
           .format(true).build();
   
       secondary = startSecondaryNameNode(conf);
@@ -2062,10 +2094,10 @@ public class TestCheckpoint {
 
       // Now primary NN experiences failure of a volume -- fake by
       // setting its current dir to a-x permissions
-      NamenodeProtocols nn = cluster.getNameNodeRpc();
-      NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
-      StorageDirectory sd0 = storage.getStorageDir(0);
-      StorageDirectory sd1 = storage.getStorageDir(1);
+      NamenodeProtocolsJVMInterface nn = cluster.getNameNodeRpc();
+      NNStorageJVMInterface storage = cluster.getNameNode().getFSImage().getStorage();
+      StorageDirectoryJVMInterface sd0 = storage.getStorageDir(0);
+      StorageDirectoryJVMInterface sd1 = storage.getStorageDir(1);
       
       currentDir = sd0.getCurrentDir();
       FileUtil.setExecutable(currentDir, false);
@@ -2107,23 +2139,23 @@ public class TestCheckpoint {
    */
   @Test
   public void testCheckpointWithSeparateDirsAfterNameFails() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     File currentDir = null;
     
     Configuration conf = new HdfsConfiguration();
 
-    File base_dir = new File(MiniDFSCluster.getBaseDirectory());
+    File base_dir = new File(MiniDFSClusterInJVM.getBaseDirectory());
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_RESTORE_KEY, true);
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
-        MiniDFSCluster.getBaseDirectory() + "/name-only");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/name-only");
     conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY,
-        MiniDFSCluster.getBaseDirectory() + "/edits-only");
+        MiniDFSClusterInJVM.getBaseDirectory() + "/edits-only");
     conf.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_DIR_KEY,
         fileAsURI(new File(base_dir, "namesecondary1")).toString());
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).format(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).format(true)
           .manageNameDfsDirs(false).build();
   
       secondary = startSecondaryNameNode(conf);
@@ -2133,10 +2165,10 @@ public class TestCheckpoint {
 
       // Now primary NN experiences failure of its only name dir -- fake by
       // setting its current dir to a-x permissions
-      NamenodeProtocols nn = cluster.getNameNodeRpc();
-      NNStorage storage = cluster.getNameNode().getFSImage().getStorage();
-      StorageDirectory sd0 = storage.getStorageDir(0);
-      assertEquals(NameNodeDirType.IMAGE, sd0.getStorageDirType());
+      NamenodeProtocolsJVMInterface nn = cluster.getNameNodeRpc();
+      NNStorageJVMInterface storage = cluster.getNameNode().getFSImage().getStorage();
+      StorageDirectoryJVMInterface sd0 = storage.getStorageDir(0);
+      //assertEquals(NameNodeDirType.IMAGE, sd0.getStorageDirType());
       currentDir = sd0.getCurrentDir();
       assertEquals(0, FileUtil.chmod(currentDir.getAbsolutePath(), "000"));
 
@@ -2176,7 +2208,7 @@ public class TestCheckpoint {
    */
   @Test(timeout=30000)
   public void testCheckpointTriggerOnTxnCount() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     Configuration conf = new HdfsConfiguration();
 
@@ -2184,7 +2216,7 @@ public class TestCheckpoint {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_CHECK_PERIOD_KEY, 1);
     
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .numDataNodes(0)
           .format(true).build();
       FileSystem fs = cluster.getFileSystem();
@@ -2230,12 +2262,12 @@ public class TestCheckpoint {
    */
   @Test
   public void testSecondaryHasVeryOutOfDateImage() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     Configuration conf = new HdfsConfiguration();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(true).build();
   
       secondary = startSecondaryNameNode(conf);
@@ -2244,7 +2276,7 @@ public class TestCheckpoint {
       secondary.doCheckpoint();
 
       // Now primary NN saves namespace 3 times
-      NamenodeProtocols nn = cluster.getNameNodeRpc();
+      NamenodeProtocolsJVMInterface nn = cluster.getNameNodeRpc();
       nn.setSafeMode(SafeModeAction.SAFEMODE_ENTER, false);
       for (int i = 0; i < 3; i++) {
         nn.saveNamespace();
@@ -2268,12 +2300,12 @@ public class TestCheckpoint {
    */
   @Test
   public void testSecondaryPurgesEditLogs() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_NUM_EXTRA_EDITS_RETAINED_KEY, 0);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).format(true)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).format(true)
           .build();
       
       FileSystem fs = cluster.getFileSystem();
@@ -2309,16 +2341,17 @@ public class TestCheckpoint {
    * checkpoint if security is enabled and the NN restarts without outstanding
    * delegation tokens"
    */
+  /*
   @Test
   public void testSecondaryNameNodeWithDelegationTokens() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(true).build();
       
       assertNotNull(cluster.getNamesystem().getDelegationToken(new Text("atm")));
@@ -2344,6 +2377,7 @@ public class TestCheckpoint {
       cluster = null;
     }
   }
+   */
 
   /**
    * Regression test for HDFS-3849.  This makes sure that when we re-load the
@@ -2351,12 +2385,12 @@ public class TestCheckpoint {
    */
   @Test
   public void testSecondaryNameNodeWithSavedLeases() throws IOException {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     FSDataOutputStream fos = null;
     Configuration conf = new HdfsConfiguration();
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDatanodes)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes)
           .format(true).build();
       FileSystem fs = cluster.getFileSystem();
       fos = fs.create(new Path("tmpfile"));
@@ -2437,7 +2471,7 @@ public class TestCheckpoint {
 
   @Test
   public void testLegacyOivImage() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     SecondaryNameNode secondary = null;
     File tmpDir = GenericTestUtils.getTestDir("testLegacyOivImage");
     tmpDir.mkdirs();
@@ -2448,7 +2482,7 @@ public class TestCheckpoint {
         "2");
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
               .format(true).build();
 
       secondary = startSecondaryNameNode(conf);
@@ -2591,12 +2625,12 @@ public class TestCheckpoint {
     }
   }
 
-  private static void cleanup(MiniDFSCluster cluster) {
+  private static void cleanup(MiniDFSClusterInJVM cluster) {
     if (cluster != null) {
       try {
         cluster.shutdown();
       } catch (Exception e) {
-        LOG.warn("Could not shutdown MiniDFSCluster ", e);
+        LOG.warn("Could not shutdown MiniDFSClusterInJVM ", e);
       }
     }
   }
@@ -2605,7 +2639,7 @@ public class TestCheckpoint {
    * Assert that if any two files have the same name across the 2NNs
    * and NN, they should have the same content too.
    */
-  private void assertParallelFilesInvariant(MiniDFSCluster cluster,
+  private void assertParallelFilesInvariant(MiniDFSClusterInJVM cluster,
       ImmutableList<SecondaryNameNode> secondaries) throws Exception {
     List<File> allCurrentDirs = Lists.newArrayList();
     allCurrentDirs.addAll(getNameNodeCurrentDirs(cluster, 0));

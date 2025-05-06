@@ -73,7 +73,7 @@ import com.google.common.base.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class EditLogTailer {
+public class EditLogTailer implements EditLogTailerJVMInterface  {
   public static final Log LOG = LogFactory.getLog(EditLogTailer.class);
 
   private final EditLogTailerThread tailerThread;

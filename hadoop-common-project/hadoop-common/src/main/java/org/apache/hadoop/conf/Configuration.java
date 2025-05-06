@@ -181,7 +181,7 @@ import com.google.common.base.Strings;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class Configuration implements Iterable<Map.Entry<String,String>>,
-                                      Writable {
+                                      Writable, ConfigurationJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(Configuration.class);
 
@@ -196,7 +196,21 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   private static boolean restrictSystemPropsDefault = false;
   private boolean restrictSystemProps = restrictSystemPropsDefault;
   private boolean allowNullValueProperties = false;
-  
+
+  // This is upgt related methods to re-construct the configuration for each instance
+  private Map<String, String> setParameters = new HashMap<>();
+
+  public Map<String, String> getSetParameters() {
+    return setParameters;
+  }
+
+  public void setAllParameters(Map<String, String> parameters) {
+    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+      set(entry.getKey(), entry.getValue());
+    }
+  }
+
+
   private static class Resource {
     private final Object resource;
     private final String name;
@@ -276,7 +290,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   private static final WeakHashMap<Configuration,Object> REGISTRY = 
     new WeakHashMap<Configuration,Object>();
-  
+
   /**
    * List of default Resources. Resources are loaded in the order of the list 
    * entries
@@ -483,9 +497,9 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
         CommonConfigurationKeys.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY),
       new DeprecationDelta("dfs.df.interval", 
         CommonConfigurationKeys.FS_DF_INTERVAL_KEY),
-      new DeprecationDelta("hadoop.native.lib", 
+      new DeprecationDelta("hadoop.native.lib",
         CommonConfigurationKeys.IO_NATIVE_LIB_AVAILABLE_KEY),
-      new DeprecationDelta("fs.default.name", 
+      new DeprecationDelta("fs.default.name",
         CommonConfigurationKeys.FS_DEFAULT_NAME_KEY),
       new DeprecationDelta("dfs.umaskmode",
         CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY),
@@ -1080,7 +1094,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     throw new IllegalStateException("Variable substitution depth too large: " 
                                     + MAX_SUBST + " " + expr);
   }
-  
+
   /**
    * Get the value of the <code>name</code> property, <code>null</code> if
    * no such property exists. If the key is deprecated, it returns the value of
@@ -1251,6 +1265,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * @throws IllegalArgumentException when the value or name is null.
    */
   public void set(String name, String value, String source) {
+    setParameters.put(name, value);
     Preconditions.checkArgument(
         name != null,
         "Property name must not be null");

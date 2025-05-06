@@ -54,7 +54,7 @@ import com.google.common.base.Preconditions;
 /** I-node for closed file. */
 @InterfaceAudience.Private
 public class INodeFile extends INodeWithAdditionalFields
-    implements INodeFileAttributes, BlockCollection {
+    implements INodeFileAttributes, BlockCollection, INodeFileJVMInterface {
 
   /** The same as valueOf(inode, path, false). */
   public static INodeFile valueOf(INode inode, String path

@@ -31,7 +31,7 @@ import java.io.IOException;
  * {@see FSNamesystem} is responsible for persisting the allocations in the
  * {@see EditLog}.
  */
-public class BlockIdManager {
+public class BlockIdManager implements BlockIdManagerJVMInterface{
   /**
    * The global generation stamp for legacy blocks with randomly
    * generated block IDs.
@@ -115,7 +115,7 @@ public class BlockIdManager {
   }
 
   @VisibleForTesting
-  SequentialBlockIdGenerator getBlockIdGenerator() {
+  public SequentialBlockIdGenerator getBlockIdGenerator() {
     return blockIdGenerator;
   }
 

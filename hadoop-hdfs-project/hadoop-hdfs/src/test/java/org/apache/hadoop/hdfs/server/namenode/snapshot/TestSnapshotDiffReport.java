@@ -33,18 +33,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Options.Rename;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.client.HdfsDataOutputStream;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.client.HdfsDataOutputStream.SyncFlag;
 import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport;
 import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport.DiffReportEntry;
 import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport.DiffType;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
+import org.apache.hadoop.hdfs.protocol.SnapshotException;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.Time;
 import org.junit.After;
@@ -72,9 +71,9 @@ public class TestSnapshotDiffReport {
   private final Path sub1 = new Path(dir, "sub1");
   
   protected Configuration conf;
-  protected MiniDFSCluster cluster;
+  protected MiniDFSClusterInJVM cluster;
   protected DistributedFileSystem hdfs;
-  
+
   private final HashMap<Path, Integer> snapshotNumberMap = new HashMap<Path, Integer>();
 
   @Before
@@ -86,7 +85,7 @@ public class TestSnapshotDiffReport {
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_SKIP_CAPTURE_ACCESSTIME_ONLY_CHANGE,
         true);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION)
         .format(true).build();
     cluster.waitActive();
     hdfs = cluster.getFileSystem();
@@ -99,7 +98,7 @@ public class TestSnapshotDiffReport {
       cluster = null;
     }
   }
-  
+
   private String genSnapshotName(Path snapshotDir) {
     int sNum = -1;
     if (snapshotNumberMap.containsKey(snapshotDir)) {
@@ -108,11 +107,11 @@ public class TestSnapshotDiffReport {
     snapshotNumberMap.put(snapshotDir, ++sNum);
     return "s" + sNum;
   }
-  
+
   /**
    * Create/modify/delete files under a given directory, also create snapshots
    * of directories.
-   */ 
+   */
   private void modifyAndCreateSnapshot(Path modifyDir, Path[] snapshotDirs)
       throws Exception {
     Path file10 = new Path(modifyDir, "file10");
@@ -133,7 +132,7 @@ public class TestSnapshotDiffReport {
       hdfs.allowSnapshot(snapshotDir);
       hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
     }
-    
+
     // delete file11
     hdfs.delete(file11, true);
     // modify file12
@@ -146,12 +145,12 @@ public class TestSnapshotDiffReport {
     DFSTestUtil.createFile(hdfs, file14, BLOCKSIZE, REPLICATION, SEED);
     // create file15
     DFSTestUtil.createFile(hdfs, file15, BLOCKSIZE, REPLICATION, SEED);
-    
+
     // create snapshot
     for (Path snapshotDir : snapshotDirs) {
       hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
     }
-    
+
     // create file11 again
     DFSTestUtil.createFile(hdfs, file11, BLOCKSIZE, REPLICATION, SEED);
     // delete file12
@@ -164,7 +163,7 @@ public class TestSnapshotDiffReport {
     hdfs.delete(file14, true);
     // modify file15
     hdfs.setReplication(file15, (short) (REPLICATION - 1));
-    
+
     // create snapshot
     for (Path snapshotDir : snapshotDirs) {
       hdfs.createSnapshot(snapshotDir, genSnapshotName(snapshotDir));
@@ -172,7 +171,7 @@ public class TestSnapshotDiffReport {
     // modify file10
     hdfs.setReplication(file10, (short) (REPLICATION + 1));
   }
-  
+
   /** check the correctness of the diff reports */
   private void verifyDiffReport(Path dir, String from, String to,
       DiffReportEntry... entries) throws IOException {
@@ -182,10 +181,10 @@ public class TestSnapshotDiffReport {
         .getSnapshotDiffReport(dir, to, from);
     LOG.info(report.toString());
     LOG.info(inverseReport.toString() + "\n");
-    
+
     assertEquals(entries.length, report.getDiffList().size());
     assertEquals(entries.length, inverseReport.getDiffList().size());
-    
+
     for (DiffReportEntry entry : entries) {
       if (entry.getType() == DiffType.MODIFY) {
         assertTrue(report.getDiffList().contains(entry));
@@ -201,7 +200,7 @@ public class TestSnapshotDiffReport {
       }
     }
   }
-  
+
   /** Test the computation and representation of diff between snapshots */
   @Test (timeout=60000)
   public void testDiffReport() throws Exception {
@@ -212,7 +211,7 @@ public class TestSnapshotDiffReport {
     hdfs.mkdirs(subsubsub1);
     modifyAndCreateSnapshot(sub1, new Path[]{sub1, subsubsub1});
     modifyAndCreateSnapshot(subsubsub1, new Path[]{sub1, subsubsub1});
-    
+
     try {
       hdfs.getSnapshotDiffReport(subsub1, "s1", "s2");
       fail("Expect exception when getting snapshot diff report: " + subsub1
@@ -221,7 +220,7 @@ public class TestSnapshotDiffReport {
       GenericTestUtils.assertExceptionContains(
           "Directory is not a snapshottable directory: " + subsub1, e);
     }
-    
+
     final String invalidName = "invalid";
     try {
       hdfs.getSnapshotDiffReport(sub1, invalidName, invalidName);
@@ -231,16 +230,16 @@ public class TestSnapshotDiffReport {
           "Cannot find the snapshot of directory " + sub1 + " with name "
               + invalidName, e);
     }
-    
+
     // diff between the same snapshot
     SnapshotDiffReport report = hdfs.getSnapshotDiffReport(sub1, "s0", "s0");
     LOG.info(report.toString());
     assertEquals(0, report.getDiffList().size());
-    
+
     report = hdfs.getSnapshotDiffReport(sub1, "", "");
     LOG.info(report.toString());
     assertEquals(0, report.getDiffList().size());
-    
+
     report = hdfs.getSnapshotDiffReport(subsubsub1, "s0", "s2");
     LOG.info(report.toString());
     assertEquals(0, report.getDiffList().size());
@@ -250,7 +249,7 @@ public class TestSnapshotDiffReport {
     LOG.info(report.toString());
     assertEquals(0, report.getDiffList().size());
 
-    verifyDiffReport(sub1, "s0", "s2", 
+    verifyDiffReport(sub1, "s0", "s2",
         new DiffReportEntry(DiffType.MODIFY, DFSUtil.string2Bytes("")),
         new DiffReportEntry(DiffType.CREATE, DFSUtil.string2Bytes("file15")),
         new DiffReportEntry(DiffType.DELETE, DFSUtil.string2Bytes("file12")),
@@ -260,7 +259,7 @@ public class TestSnapshotDiffReport {
         new DiffReportEntry(DiffType.DELETE, DFSUtil.string2Bytes("link13")),
         new DiffReportEntry(DiffType.CREATE, DFSUtil.string2Bytes("link13")));
 
-    verifyDiffReport(sub1, "s0", "s5", 
+    verifyDiffReport(sub1, "s0", "s5",
         new DiffReportEntry(DiffType.MODIFY, DFSUtil.string2Bytes("")),
         new DiffReportEntry(DiffType.CREATE, DFSUtil.string2Bytes("file15")),
         new DiffReportEntry(DiffType.DELETE, DFSUtil.string2Bytes("file12")),
@@ -282,7 +281,7 @@ public class TestSnapshotDiffReport {
             DFSUtil.string2Bytes("subsub1/subsubsub1/link13")),
         new DiffReportEntry(DiffType.CREATE,
             DFSUtil.string2Bytes("subsub1/subsubsub1/file15")));
-    
+
     verifyDiffReport(sub1, "s2", "s5",
         new DiffReportEntry(DiffType.MODIFY, DFSUtil.string2Bytes("file10")),
         new DiffReportEntry(DiffType.MODIFY,
@@ -297,7 +296,7 @@ public class TestSnapshotDiffReport {
             DFSUtil.string2Bytes("subsub1/subsubsub1/link13")),
         new DiffReportEntry(DiffType.CREATE,
             DFSUtil.string2Bytes("subsub1/subsubsub1/file15")));
-    
+
     verifyDiffReport(sub1, "s3", "",
         new DiffReportEntry(DiffType.MODIFY,
             DFSUtil.string2Bytes("subsub1/subsubsub1")),
@@ -318,7 +317,7 @@ public class TestSnapshotDiffReport {
         new DiffReportEntry(DiffType.DELETE,
             DFSUtil.string2Bytes("subsub1/subsubsub1/link13")));
   }
-  
+
   /**
    * Make changes under a sub-directory, then delete the sub-directory. Make
    * sure the diff report computation correctly retrieve the diff from the
@@ -570,7 +569,7 @@ public class TestSnapshotDiffReport {
 
   private void restartNameNode() throws Exception {
     cluster.triggerBlockReports();
-    NameNode nameNode = cluster.getNameNode();
+    NameNodeJVMInterface nameNode = cluster.getNameNode();
     NameNodeAdapter.enterSafeMode(nameNode, false);
     NameNodeAdapter.saveNamespace(nameNode);
     NameNodeAdapter.leaveSafeMode(nameNode);

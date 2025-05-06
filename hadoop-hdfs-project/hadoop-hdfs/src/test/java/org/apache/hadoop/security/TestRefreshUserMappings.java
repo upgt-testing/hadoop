@@ -40,7 +40,8 @@ import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.security.authorize.DefaultImpersonationProvider;
@@ -53,7 +54,7 @@ import org.junit.Test;
 
 
 public class TestRefreshUserMappings {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   Configuration config;
   private static final long groupRefreshTimeoutSec = 1;
   private String tempResource = null;
@@ -93,7 +94,7 @@ public class TestRefreshUserMappings {
     Groups.getUserToGroupsMappingService(config);
     
     FileSystem.setDefaultUri(config, "hdfs://localhost:" + "0");
-    cluster = new MiniDFSCluster.Builder(config).build();
+    cluster = new MiniDFSClusterInJVM.Builder(config).build();
     cluster.waitActive();
 
     GenericTestUtils.setLogLevel(Groups.LOG, Level.DEBUG);
@@ -140,7 +141,7 @@ public class TestRefreshUserMappings {
     g3.toArray(str_groups);
     System.out.println(Arrays.toString(str_groups));
     for(int i=0; i<g3.size(); i++) {
-      assertFalse("Should be different group: " + g1.get(i) + " and " + g3.get(i), 
+      assertFalse("Should be different group: " + g1.get(i) + " and " + g3.get(i),
           g1.get(i).equals(g3.get(i)));
     }
     
@@ -154,7 +155,7 @@ public class TestRefreshUserMappings {
       assertFalse("Should be different group ", g3.get(i).equals(g4.get(i)));
     }
   }
-  
+
   @Test
   public void testRefreshSuperUserGroupsConfiguration() throws Exception {
     final String SUPER_USER = "super_user";
@@ -215,7 +216,7 @@ public class TestRefreshUserMappings {
     // add additional resource with the new value
     // so the server side will pick it up
     String rsrc = "testGroupMappingRefresh_rsrc.xml";
-    addNewConfigResource(rsrc, userKeyGroups, "gr2", userKeyHosts, "127.0.0.1");  
+    addNewConfigResource(rsrc, userKeyGroups, "gr2", userKeyHosts, "127.0.0.1");
     
     DFSAdmin admin = new DFSAdmin(config);
     String [] args = new String[]{"-refreshSuperUserGroupsConfiguration"};

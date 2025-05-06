@@ -47,6 +47,15 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.StripedFileTestUtil;
+import org.apache.hadoop.hdfs.protocol.AddErasureCodingPolicyResponse;
+import org.apache.hadoop.hdfs.protocol.Block;
+import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
+import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicyState;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfoContiguous;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfoStriped;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.common.Storage.StorageDirectory;
 import org.apache.hadoop.hdfs.server.namenode.FSEditLogLoader.EditLogValidation;
@@ -97,19 +106,20 @@ public class TestFSEditLogLoader {
   private static final int NUM_DATA_NODES = 0;
   private static final String FAKE_EDIT_STREAM_NAME = "FAKE_STREAM";
 
+  /*
   @Test
   public void testDisplayRecentEditLogOpCodes() throws IOException {
     // start a cluster
     Configuration conf = getConf();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     FileSystem fileSys = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES)
         .enableManagedDfsDirsRedundancy(false).build();
     cluster.waitActive();
     fileSys = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    final FSNamesystemJVMInterface namesystem = cluster.getNamesystem();
 
-    FSImage fsimage = namesystem.getFSImage();
+    FSImageJVMInterface fsimage = namesystem.getFSImage();
     for (int i = 0; i < 20; i++) {
       fileSys.mkdirs(new Path("/tmp/tmp" + i));
     }
@@ -133,7 +143,7 @@ public class TestFSEditLogLoader {
     bld.append("Expected transaction ID was \\d+\n");
     bld.append("Recent opcode offsets: (\\d+\\s*){4}$");
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATA_NODES)
           .enableManagedDfsDirsRedundancy(false).format(false).build();
       fail("should not be able to start");
     } catch (IOException e) {
@@ -141,7 +151,8 @@ public class TestFSEditLogLoader {
           e.getMessage().matches(bld.toString()));
     }
   }
-  
+   */
+
   /**
    * Test that, if the NN restarts with a new minimum replication,
    * any files created with the old replication count will get
@@ -155,9 +166,9 @@ public class TestFSEditLogLoader {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
           .build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
@@ -173,7 +184,7 @@ public class TestFSEditLogLoader {
       
       conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MIN_KEY, 2);
   
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
         .format(false).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();

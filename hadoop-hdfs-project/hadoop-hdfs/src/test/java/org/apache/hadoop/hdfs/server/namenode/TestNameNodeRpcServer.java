@@ -38,7 +38,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.ipc.CallerContext;
@@ -55,10 +55,10 @@ public class TestNameNodeRpcServer {
     // We can set the bind address to 0.0.0.0 to make it listen
     // to all interfaces.
     conf.set(DFS_NAMENODE_RPC_BIND_HOST_KEY, "0.0.0.0");
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
       cluster.waitActive();
       assertEquals("0.0.0.0", ((NameNodeRpcServer)cluster.getNameNodeRpc())
           .getClientRpcServer().getListenerAddress().getHostName());

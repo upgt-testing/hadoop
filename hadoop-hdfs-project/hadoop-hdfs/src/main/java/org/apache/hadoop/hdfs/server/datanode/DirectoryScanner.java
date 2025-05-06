@@ -60,7 +60,7 @@ import org.apache.hadoop.util.Time;
  * Reconciles the differences with block information maintained in the dataset.
  */
 @InterfaceAudience.Private
-public class DirectoryScanner implements Runnable {
+public class DirectoryScanner implements Runnable, DirectoryScannerJVMInterface  {
   private static final Log LOG = LogFactory.getLog(DirectoryScanner.class);
   private static final int MILLIS_PER_SECOND = 1000;
   private static final int RECONCILE_BLOCKS_BATCH_SIZE = 1000;
@@ -214,31 +214,31 @@ public class DirectoryScanner implements Runnable {
    * Tracks the files and other information related to a block on the disk
    * Missing file is indicated by setting the corresponding member
    * to null.
-   * 
+   *
    * Because millions of these structures may be created, we try to save
    * memory here.  So instead of storing full paths, we store path suffixes.
    * The block file, if it exists, will have a path like this:
    * <volume_base_path>/<block_path>
    * So we don't need to store the volume path, since we already know what the
    * volume is.
-   * 
+   *
    * The metadata file, if it exists, will have a path like this:
    * <volume_base_path>/<block_path>_<genstamp>.meta
    * So if we have a block file, there isn't any need to store the block path
    * again.
-   * 
+   *
    * The accessor functions take care of these manipulations.
    */
   static class ScanInfo implements Comparable<ScanInfo> {
     private final long blockId;
-    
+
     /**
      * The block file path, relative to the volume's base directory.
      * If there was no block file found, this may be null. If 'vol'
      * is null, then this is the full path of the block file.
      */
     private final String blockSuffix;
-    
+
     /**
      * The suffix of the meta file path relative to the block file.
      * If blockSuffix is null, then this will be the entire path relative
@@ -256,10 +256,10 @@ public class DirectoryScanner implements Runnable {
 
     private final static Pattern CONDENSED_PATH_REGEX =
         Pattern.compile("(?<!^)(\\\\|/){2,}");
-    
-    private final static String QUOTED_FILE_SEPARATOR = 
+
+    private final static String QUOTED_FILE_SEPARATOR =
         Matcher.quoteReplacement(File.separator);
-    
+
     /**
      * Get the most condensed version of the path.
      *
@@ -306,7 +306,7 @@ public class DirectoryScanner implements Runnable {
         getCondensedPath(vol.getBasePath());
       this.blockSuffix = blockFile == null ? null :
         getSuffix(blockFile, condensedVolPath);
-      this.blockFileLength = (blockFile != null) ? blockFile.length() : 0; 
+      this.blockFileLength = (blockFile != null) ? blockFile.length() : 0;
       if (metaFile == null) {
         this.metaSuffix = null;
       } else if (blockFile == null) {
@@ -400,7 +400,7 @@ public class DirectoryScanner implements Runnable {
 
     public long getGenStamp() {
       return metaSuffix != null ? Block.getGenerationStamp(
-          getMetaFile().getName()) : 
+          getMetaFile().getName()) :
             HdfsConstants.GRANDFATHER_GENERATION_STAMP;
     }
   }
@@ -566,7 +566,7 @@ public class DirectoryScanner implements Runnable {
    * Reconcile differences between disk and in-memory blocks
    */
   @VisibleForTesting
-  void reconcile() throws IOException {
+  public void reconcile() throws IOException {
     LOG.debug("reconcile start DirectoryScanning");
     scan();
 

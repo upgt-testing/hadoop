@@ -30,6 +30,7 @@ import org.apache.hadoop.hdfs.protocol.RollingUpgradeInfo;
 import org.apache.hadoop.hdfs.qjournal.MiniQJMHACluster;
 import org.apache.hadoop.hdfs.server.common.IncorrectVersionException;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage;
+import org.apache.hadoop.hdfs.server.namenode.NNStorageJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNodeLayoutVersion;
 import org.junit.Assert;
 import org.junit.Test;
@@ -91,15 +92,15 @@ public class TestRollingUpgradeDowngrade {
   @Test(expected = IncorrectVersionException.class)
   public void testRejectNewFsImage() throws IOException {
     final Configuration conf = new Configuration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
       fs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
       fs.saveNamespace();
       fs.setSafeMode(SafeModeAction.SAFEMODE_LEAVE);
-      NNStorage storage = spy(cluster.getNameNode().getFSImage().getStorage());
+      NNStorageJVMInterface storage = spy(cluster.getNameNode().getFSImage().getStorage());
       int futureVersion = NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION - 1;
       doReturn(futureVersion).when(storage).getServiceLayoutVersion();
       storage.writeAll();

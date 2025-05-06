@@ -45,7 +45,9 @@ import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.io.IOUtils;
@@ -71,7 +73,7 @@ public class TestWebHdfsTokens {
   public static void setUp() {
     conf = new Configuration();
     SecurityUtil.setAuthenticationMethod(KERBEROS, conf);
-    UserGroupInformation.setConfiguration(conf);    
+    UserGroupInformation.setConfiguration(conf);
     UserGroupInformation.setLoginUser(
         UserGroupInformation.createUserForTesting(
             "LoginUser", new String[]{"supergroup"}));
@@ -164,7 +166,7 @@ public class TestWebHdfsTokens {
   @SuppressWarnings("unchecked") // for any(Token.class)
   @Test
   public void testLazyTokenFetchForWebhdfs() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     WebHdfsFileSystem fs = null;
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -175,11 +177,11 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking security is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf).numDataNodes(1).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       UserGroupInformation.setConfiguration(clusterConf);
-      
+
       uri = DFSUtil.createUri(
           "webhdfs", cluster.getNameNode().getHttpAddress());
       validateLazyTokenFetch(clusterConf);
@@ -190,7 +192,7 @@ public class TestWebHdfsTokens {
       }
     }
   }
-  
+
   @SuppressWarnings("unchecked") // for any(Token.class)
   @Test
   public void testLazyTokenFetchForSWebhdfs() throws Exception {
@@ -205,12 +207,12 @@ public class TestWebHdfsTokens {
 	    .DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
       String baseDir =
           GenericTestUtils.getTempPath(TestWebHdfsTokens.class.getSimpleName());
-	    
+
       clusterConf.setBoolean(HdfsClientConfigKeys.DFS_WEBHDFS_ENABLED_KEY, true);
       clusterConf.set(DFSConfigKeys.DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
       clusterConf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
       clusterConf.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
-	  
+
       File base = new File(baseDir);
       FileUtil.fullyDelete(base);
       base.mkdirs();
@@ -232,7 +234,7 @@ public class TestWebHdfsTokens {
       clusterConf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       UserGroupInformation.setConfiguration(clusterConf);
-      
+
       uri = DFSUtil.createUri(
         "swebhdfs", cluster.getNameNode().getHttpsAddress());
       validateLazyTokenFetch(clusterConf);
@@ -247,7 +249,7 @@ public class TestWebHdfsTokens {
 
   @Test
   public void testSetTokenServiceAndKind() throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
       final Configuration clusterConf = new HdfsConfiguration(conf);
@@ -258,7 +260,7 @@ public class TestWebHdfsTokens {
       // trick the NN into thinking s[ecurity is enabled w/o it trying
       // to login from a keytab
       UserGroupInformation.setConfiguration(clusterConf);
-      cluster = new MiniDFSCluster.Builder(clusterConf).numDataNodes(0).build();
+      cluster = new MiniDFSClusterInJVM.Builder(clusterConf).numDataNodes(0).build();
       cluster.waitActive();
       SecurityUtil.setAuthenticationMethod(KERBEROS, clusterConf);
       final WebHdfsFileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem
@@ -306,14 +308,14 @@ public class TestWebHdfsTokens {
     final String testUser = "DummyUser";
     UserGroupInformation ugi = UserGroupInformation.createUserForTesting(
         testUser, new String[]{"supergroup"});
-  
+
     WebHdfsFileSystem fs = ugi.doAs(new PrivilegedExceptionAction<WebHdfsFileSystem>() {
       @Override
       public WebHdfsFileSystem run() throws IOException {
         return spy((WebHdfsFileSystem) FileSystem.newInstance(uri, clusterConf));
       }
     });
-  
+
     // verify token ops don't get a token
     Assert.assertNull(fs.getRenewToken());
     Token<?> token = fs.getDelegationToken(null);
@@ -481,14 +483,14 @@ public class TestWebHdfsTokens {
       Assert.assertSame(token, token2);
       reset(fs);
     }
-  
+
     // verify fs close does NOT cancel the ugi token
     fs.close();
     verify(fs, never()).getDelegationToken();
     verify(fs, never()).replaceExpiredDelegationToken();
     verify(fs, never()).getDelegationToken(anyString());
     verify(fs, never()).setDelegationToken(any(Token.class));
-    verify(fs, never()).cancelDelegationToken(any(Token.class));  
+    verify(fs, never()).cancelDelegationToken(any(Token.class));
   } 
   
   private String getTokenOwner(Token<?> token) throws IOException {

@@ -30,7 +30,7 @@ import org.apache.hadoop.test.GenericTestUtils;
 
 public class TestHDFSFileSystemContract extends FileSystemContractBaseTest {
   
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private String defaultWorkingDirectory;
 
   @Override
@@ -39,7 +39,7 @@ public class TestHDFSFileSystemContract extends FileSystemContractBaseTest {
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,
         FileSystemContractBaseTest.TEST_UMASK);
     File basedir = GenericTestUtils.getRandomizedTestDir();
-    cluster = new MiniDFSCluster.Builder(conf, basedir).numDataNodes(2)
+    cluster = new MiniDFSClusterInJVM.Builder(conf, basedir).numDataNodes(2)
         .build();
     fs = cluster.getFileSystem();
     defaultWorkingDirectory = "/user/" + 

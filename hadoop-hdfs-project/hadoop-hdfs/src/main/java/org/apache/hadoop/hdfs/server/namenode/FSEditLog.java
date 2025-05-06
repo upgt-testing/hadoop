@@ -117,7 +117,7 @@ import com.google.common.collect.Lists;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class FSEditLog implements LogsPurgeable {
+public class FSEditLog implements LogsPurgeable, FSEditLogJVMInterface {
 
   public static final Log LOG = LogFactory.getLog(FSEditLog.class);
 
@@ -1386,7 +1386,7 @@ public class FSEditLog implements LogsPurgeable {
   /**
    * Abort all current logs. Called from the backup node.
    */
-  synchronized void abortCurrentLogSegment() {
+  public synchronized void abortCurrentLogSegment() {
     try {
       //Check for null, as abort can be called any time.
       if (editLogStream != null) {
@@ -1453,7 +1453,7 @@ public class FSEditLog implements LogsPurgeable {
 
 
   // sets the initial capacity of the flush buffer.
-  synchronized void setOutputBufferCapacity(int size) {
+  public synchronized void setOutputBufferCapacity(int size) {
     journalSet.setOutputBufferCapacity(size);
   }
 

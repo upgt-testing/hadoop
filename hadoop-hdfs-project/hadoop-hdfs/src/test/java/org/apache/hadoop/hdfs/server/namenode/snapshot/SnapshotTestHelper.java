@@ -50,13 +50,7 @@ import org.apache.hadoop.hdfs.server.datanode.BlockPoolSliceStorage;
 import org.apache.hadoop.hdfs.server.datanode.BlockScanner;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DirectoryScanner;
-import org.apache.hadoop.hdfs.server.namenode.FSDirectory;
-import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
-import org.apache.hadoop.hdfs.server.namenode.INode;
-import org.apache.hadoop.hdfs.server.namenode.INodeDirectory;
-import org.apache.hadoop.hdfs.server.namenode.INodeFile;
-import org.apache.hadoop.hdfs.server.namenode.LeaseManager;
-import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.http.HttpServer2;
 import org.apache.hadoop.ipc.ProtobufRpcEngine.Server;
 import org.apache.hadoop.metrics2.impl.MetricsSystemImpl;
@@ -265,6 +259,13 @@ public class SnapshotTestHelper {
     final PrintWriter out = new PrintWriter(new FileWriter(f, false), true);
     fsdir.getINode("/").dumpTreeRecursively(out, new StringBuilder(),
         Snapshot.CURRENT_STATE_ID);
+    out.close();
+  }
+
+  public static void dumpTree2File(FSDirectoryJVMInterface fsdir, File f) throws IOException{
+    final PrintWriter out = new PrintWriter(new FileWriter(f, false), true);
+    fsdir.getINode("/").dumpTreeRecursively(out, new StringBuilder(),
+            Snapshot.CURRENT_STATE_ID);
     out.close();
   }
 

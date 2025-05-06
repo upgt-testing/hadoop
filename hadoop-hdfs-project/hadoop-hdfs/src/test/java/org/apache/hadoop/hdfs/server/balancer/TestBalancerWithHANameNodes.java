@@ -32,7 +32,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.NameNodeProxies;
@@ -51,7 +51,7 @@ import org.junit.Test;
  * Test balancer with HA NameNodes
  */
 public class TestBalancerWithHANameNodes {
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   ClientProtocol client;
 
   // array of racks for original nodes in cluster
@@ -79,7 +79,7 @@ public class TestBalancerWithHANameNodes {
     NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
     nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
     Configuration copiedConf = new Configuration(conf);
-    cluster = new MiniDFSCluster.Builder(copiedConf)
+    cluster = new MiniDFSClusterInJVM.Builder(copiedConf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(TEST_CAPACITIES.length)
         .racks(TEST_RACKS)
