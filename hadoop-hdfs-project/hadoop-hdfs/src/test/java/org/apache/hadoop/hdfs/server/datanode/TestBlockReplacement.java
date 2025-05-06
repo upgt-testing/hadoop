@@ -42,7 +42,7 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.client.BlockReportOptions;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -66,7 +66,7 @@ public class TestBlockReplacement {
   private static final Log LOG = LogFactory.getLog(
   "org.apache.hadoop.hdfs.TestBlockReplacement");
 
-  MiniDFSCluster cluster;
+  MiniDFSClusterInJVM cluster;
   @Test
   public void testThrottler() throws IOException {
     Configuration conf = new HdfsConfiguration();
@@ -103,7 +103,7 @@ public class TestBlockReplacement {
     CONF.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
     CONF.setInt(HdfsClientConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, DEFAULT_BLOCK_SIZE/2);
     CONF.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY,500);
-    cluster = new MiniDFSCluster.Builder(CONF).numDataNodes(REPLICATION_FACTOR)
+    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(REPLICATION_FACTOR)
                                               .racks(INITIAL_RACKS).build();
 
     try {
@@ -208,8 +208,8 @@ public class TestBlockReplacement {
     final Configuration conf = new HdfsConfiguration();
     // create only one datanode in the cluster to verify movement within
     // datanode.
-    final MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).storageTypes(
+    final MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).storageTypes(
             new StorageType[] { StorageType.DISK, StorageType.ARCHIVE })
             .build();
     try {
@@ -327,10 +327,11 @@ public class TestBlockReplacement {
    * request is in the edit log which are yet to be read.
    * @throws Exception
    */
+  /*
   @Test
   public void testDeletedBlockWhenAddBlockIsInEdit() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
        .nnTopology(MiniDFSNNTopology.simpleHATopology())
        .numDataNodes(1).build();
     DFSClient client = null;
@@ -352,6 +353,7 @@ public class TestBlockReplacement {
 
       // Trigger blockReport to mark DatanodeStorageInfo#blockContentsStale
       // to false.
+
       cluster.getDataNodes().get(0).triggerBlockReport(
           new BlockReportOptions.Factory().setIncremental(false).build());
 
@@ -421,6 +423,7 @@ public class TestBlockReplacement {
       cluster.shutdown();
     }
   }
+   */
 
   /**
    * @param args

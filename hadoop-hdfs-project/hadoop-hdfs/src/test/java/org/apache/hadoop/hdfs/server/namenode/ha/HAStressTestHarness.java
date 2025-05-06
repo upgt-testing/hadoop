@@ -23,12 +23,15 @@ import java.net.URISyntaxException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.test.MultithreadedTestUtil.RepeatingTestThread;
 import org.apache.hadoop.test.MultithreadedTestUtil.TestContext;
 
@@ -39,10 +42,10 @@ import org.apache.hadoop.test.MultithreadedTestUtil.TestContext;
  */
 public class HAStressTestHarness {
   final Configuration conf;
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   static final int BLOCK_SIZE = 1024;
   final TestContext testCtx = new TestContext();
-  
+
   public HAStressTestHarness() {
     conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
@@ -55,10 +58,10 @@ public class HAStressTestHarness {
   }
 
   /**
-   * Start and return the MiniDFSCluster.
+   * Start and return the MiniDFSClusterInJVM.
    */
-  public MiniDFSCluster startCluster() throws IOException {
-    cluster = new MiniDFSCluster.Builder(conf)
+  public MiniDFSClusterInJVM startCluster() throws IOException {
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .numDataNodes(3)
       .build();
@@ -84,14 +87,14 @@ public class HAStressTestHarness {
       
       @Override
       public void doAnAction() throws Exception {
-        for (DataNode dn : cluster.getDataNodes()) {
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
           DataNodeTestUtils.triggerDeletionReport(dn);
           DataNodeTestUtils.triggerHeartbeat(dn);
         }
         for (int i = 0; i < 2; i++) {
-          NameNode nn = cluster.getNameNode(i);
+          NameNodeJVMInterface nn = cluster.getNameNode(i);
           BlockManagerTestUtil.computeAllPendingWork(
-              nn.getNamesystem().getBlockManager());
+                  nn.getNamesystem().getBlockManager());
         }
         Thread.sleep(interval);
       }
@@ -104,7 +107,7 @@ public class HAStressTestHarness {
    */
   public void addFailoverThread(final int msBetweenFailovers) {
     testCtx.addThread(new RepeatingTestThread(testCtx) {
-      
+
       @Override
       public void doAnAction() throws Exception {
         System.err.println("==============================\n" +
@@ -112,7 +115,7 @@ public class HAStressTestHarness {
             "==================================");
         cluster.transitionToStandby(0);
         cluster.transitionToActive(1);
-        
+
         Thread.sleep(msBetweenFailovers);
         System.err.println("==============================\n" +
             "Failing over from 1->0\n" +

@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
  * Feature that represents the ACLs of the inode.
  */
 @InterfaceAudience.Private
-public class AclFeature implements INode.Feature, ReferenceCounter {
+public class AclFeature implements INode.Feature, ReferenceCounter, AclFeatureJVMInterface {
   public static final ImmutableList<AclEntry> EMPTY_ENTRY_LIST =
     ImmutableList.of();
   private int refCount = 0;

@@ -21,6 +21,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
+import org.apache.hadoop.hdfs.protocol.LocatedBlocksJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -29,8 +34,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HAUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
@@ -66,7 +71,7 @@ public class TestStandbyIsHot {
     // We read from the standby to watch block locations
     HAUtil.setAllowStandbyReads(conf, true);
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .numDataNodes(3)
       .build();
@@ -74,8 +79,8 @@ public class TestStandbyIsHot {
       cluster.waitActive();
       cluster.transitionToActive(0);
       
-      NameNode nn1 = cluster.getNameNode(0);
-      NameNode nn2 = cluster.getNameNode(1);
+      NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+      NameNodeJVMInterface nn2 = cluster.getNameNode(1);
       
       FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
       
@@ -140,13 +145,13 @@ public class TestStandbyIsHot {
     HAUtil.setAllowStandbyReads(conf, true);
     conf.setLong(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 0);
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .numDataNodes(1)
       .build();
     try {
-      NameNode nn0 = cluster.getNameNode(0);
-      NameNode nn1 = cluster.getNameNode(1);
+      NameNodeJVMInterface nn0 = cluster.getNameNode(0);
+      NameNodeJVMInterface nn1 = cluster.getNameNode(1);
 
       cluster.transitionToActive(0);
       
@@ -157,7 +162,7 @@ public class TestStandbyIsHot {
       HATestUtil.waitForStandbyToCatchUp(nn0, nn1);
       
       // Stop the DN.
-      DataNode dn = cluster.getDataNodes().get(0);
+      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
       String dnName = dn.getDatanodeId().getXferAddr(); 
       DataNodeProperties dnProps = cluster.stopDataNode(0);
       
@@ -173,7 +178,7 @@ public class TestStandbyIsHot {
       // since the SBN doesn't process replication.
       assertEquals(0, nn1.getNamesystem().getUnderReplicatedBlocks());
       
-      LocatedBlocks locs = nn1.getRpcServer().getBlockLocations(
+      LocatedBlocksJVMInterface locs = nn1.getRpcServer().getBlockLocations(
           TEST_FILE, 0, 1);
       assertEquals("Standby should have registered that the block has no replicas",
           0, locs.get(0).getLocations().length);
@@ -199,8 +204,8 @@ public class TestStandbyIsHot {
     }
   }
 
-  static void waitForBlockLocations(final MiniDFSCluster cluster,
-      final NameNode nn,
+  static void waitForBlockLocations(final MiniDFSClusterInJVM cluster,
+      final NameNodeJVMInterface nn,
       final String path, final int expectedReplicas)
       throws Exception {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
@@ -208,9 +213,9 @@ public class TestStandbyIsHot {
       @Override
       public Boolean get() {
         try {
-          LocatedBlocks locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
-          DatanodeInfo[] dnis = locs.getLastLocatedBlock().getLocations();
-          for (DatanodeInfo dni : dnis) {
+          LocatedBlocksJVMInterface locs = NameNodeAdapter.getBlockLocations(nn, path, 0, 1000);
+          DatanodeInfoJVMInterface[] dnis = locs.getLastLocatedBlock().getLocations();
+          for (DatanodeInfoJVMInterface dni : dnis) {
             Assert.assertNotNull(dni);
           }
           int numReplicas = dnis.length;

@@ -53,7 +53,7 @@ public class TestFileCreationClient {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, REPLICATION);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(REPLICATION).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
 
     try {
       final FileSystem fs = cluster.getFileSystem();

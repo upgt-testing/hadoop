@@ -80,7 +80,7 @@ public class TestQuota {
   private static final ByteArrayOutputStream ERR_STREAM = new ByteArrayOutputStream();
   private static final PrintStream OLD_OUT = System.out;
   private static final PrintStream OLD_ERR = System.err;
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
   private static DistributedFileSystem dfs;
   private static FileSystem webhdfs;
   /* set a smaller block size so that we can test with smaller space quotas */
@@ -93,7 +93,7 @@ public class TestQuota {
   public static void setUpClass() throws Exception {
     conf = new HdfsConfiguration();
     conf.set(
-        MiniDFSCluster.HDFS_MINIDFS_BASEDIR,
+        MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR,
         GenericTestUtils.getTestDir("my-test-quota").getAbsolutePath());
     conf.setInt("dfs.content-summary.limit", 4);
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
@@ -117,7 +117,7 @@ public class TestQuota {
     if (cluster != null) {
       cluster.shutdown();
     }
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     cluster.waitActive();
   }
 
@@ -1075,8 +1075,8 @@ public class TestQuota {
     // Make it relinquish locks. When run serially, the result should
     // be identical.
     dfsConf.setInt(DFSConfigKeys.DFS_CONTENT_SUMMARY_LIMIT_KEY, 2);
-    MiniDFSCluster dfsCluster =
-      new MiniDFSCluster.Builder(dfsConf).numDataNodes(3).build();
+    MiniDFSClusterInJVM dfsCluster =
+      new MiniDFSClusterInJVM.Builder(dfsConf).numDataNodes(3).build();
     dfsCluster.waitActive();
     FileSystem fs = dfsCluster.getFileSystem();
     DFSAdmin admin = new DFSAdmin(dfsConf);

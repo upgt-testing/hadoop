@@ -132,7 +132,10 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  ***************************************************/
 @InterfaceAudience.Private
-class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl> {
+class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl>, FsDatasetImplJVMInterface  {
+  static {
+    System.out.println("This FsDatasetImpl class is loaded by: " + FsDatasetImpl.class.getClassLoader());
+  }
   static final Logger LOG = LoggerFactory.getLogger(FsDatasetImpl.class);
   private final static boolean isNativeIOAvailable;
   private Timer timer;
@@ -781,7 +784,7 @@ class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl> {
   /**
    * Get File name for a given block.
    */
-  File getBlockFile(String bpid, long blockId) throws IOException {
+  public File getBlockFile(String bpid, long blockId) throws IOException {
     File f = validateBlockFile(bpid, blockId);
     if(f == null) {
       throw new FileNotFoundException("BlockId " + blockId + " is not valid.");
@@ -867,7 +870,7 @@ class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl> {
    * @throws ReplicaNotFoundException if no entry is in the map or
    *                        there is a generation stamp mismatch
    */
-  private ReplicaInfo getReplicaInfo(String bpid, long blkid)
+  public ReplicaInfo getReplicaInfo(String bpid, long blkid)
       throws ReplicaNotFoundException {
     ReplicaInfo info = volumeMap.get(bpid, blkid);
     if (info == null) {

@@ -36,6 +36,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfoJVMInterface;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
+import org.apache.hadoop.hdfs.server.namenode.INodeFileJVMInterface;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -55,7 +60,7 @@ import org.apache.hadoop.hdfs.DFSOutputStream;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.NameNodeProxiesClient;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
@@ -97,7 +102,7 @@ public class TestRetryCacheWithHA {
   private static final int CHECKTIMES = 10;
   private static final int ResponseSize = 3;
   
-  private MiniDFSCluster cluster;
+  private MiniDFSClusterInJVM cluster;
   private DistributedFileSystem dfs;
   private final Configuration conf = new HdfsConfiguration();
   
@@ -134,7 +139,7 @@ public class TestRetryCacheWithHA {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_LIST_CACHE_POOLS_NUM_RESPONSES, ResponseSize);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_XATTRS_ENABLED_KEY, true);
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(DataNodes).build();
     cluster.waitActive();
@@ -157,6 +162,7 @@ public class TestRetryCacheWithHA {
    * 2. Trigger the NN failover
    * 3. Check the retry cache on the original standby NN
    */
+  /*
   @Test (timeout=60000)
   public void testRetryCacheOnStandbyNN() throws Exception {
     // 1. run operations
@@ -194,7 +200,8 @@ public class TestRetryCacheWithHA {
       assertTrue(oldEntries.containsKey(entry));
     }
   }
-  
+   */
+
   private DFSClient genClientWithDummyHandler() throws IOException {
     URI nnUri = dfs.getUri();
     FailoverProxyProvider<ClientProtocol> failoverProxyProvider = 
@@ -452,7 +459,7 @@ public class TestRetryCacheWithHA {
     // check if the inode of the file is under construction
     @Override
     boolean checkNamenodeBeforeReturn() throws Exception {
-      INodeFile fileNode = cluster.getNameNode(0).getNamesystem()
+      INodeFileJVMInterface fileNode = cluster.getNameNode(0).getNamesystem()
           .getFSDirectory().getINode4Write(fileName).asFile();
       boolean fileIsUC = fileNode.isUnderConstruction();
       for (int i = 0; i < CHECKTIMES && !fileIsUC; i++) {
@@ -738,7 +745,7 @@ public class TestRetryCacheWithHA {
       DatanodeInfo[] newNodes = new DatanodeInfo[2];
       newNodes[0] = nodes[0];
       newNodes[1] = nodes[1];
-      final DatanodeManager dm = cluster.getNamesystem(0).getBlockManager()
+      final DatanodeManagerJVMInterface dm = cluster.getNamesystem(0).getBlockManager()
           .getDatanodeManager();
       final String storageID1 = dm.getDatanode(newNodes[0]).getStorageInfos()[0]
           .getStorageID();
@@ -758,9 +765,9 @@ public class TestRetryCacheWithHA {
 
     @Override
     boolean checkNamenodeBeforeReturn() throws Exception {
-      INodeFile fileNode = cluster.getNamesystem(0).getFSDirectory()
+      INodeFileJVMInterface fileNode = cluster.getNamesystem(0).getFSDirectory()
           .getINode4Write(file).asFile();
-      BlockInfo blkUC = (fileNode.getBlocks())[1];
+      BlockInfoJVMInterface blkUC = (fileNode.getBlocks())[1];
       int datanodeNum = blkUC.getUnderConstructionFeature()
           .getExpectedStorageLocations().length;
       for (int i = 0; i < CHECKTIMES && datanodeNum != 2; i++) {

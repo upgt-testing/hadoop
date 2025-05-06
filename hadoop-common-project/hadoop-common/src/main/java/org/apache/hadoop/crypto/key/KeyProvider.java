@@ -51,7 +51,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY
  */
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class KeyProvider {
+public abstract class KeyProvider implements KeyProviderJVMInterface {
   public static final String DEFAULT_CIPHER_NAME =
       "hadoop.security.key.default.cipher";
   public static final String DEFAULT_CIPHER = "AES/CTR/NoPadding";
@@ -72,7 +72,7 @@ public abstract class KeyProvider {
   /**
    * The combination of both the key version name and the key material.
    */
-  public static class KeyVersion {
+  public static class KeyVersion implements KeyVersionJVMInterface {
     private final String name;
     private final String versionName;
     private final byte[] material;

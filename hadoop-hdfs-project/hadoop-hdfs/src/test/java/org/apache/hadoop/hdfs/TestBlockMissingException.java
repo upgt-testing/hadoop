@@ -40,7 +40,7 @@ public class TestBlockMissingException {
   final static int NUM_DATANODES = 3;
 
   Configuration conf;
-  MiniDFSCluster dfs = null;
+  MiniDFSClusterInJVM dfs = null;
   DistributedFileSystem fileSys = null;
 
   /**
@@ -55,7 +55,7 @@ public class TestBlockMissingException {
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     try {
-      dfs = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES).build();
+      dfs = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATANODES).build();
       dfs.waitActive();
       fileSys = dfs.getFileSystem();
       Path file1 = new Path("/user/dhruba/raidtest/file1");

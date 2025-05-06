@@ -112,7 +112,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.HADOOP_HTTP_STATIC_US
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public final class HttpServer2 implements FilterContainer {
+public final class HttpServer2 implements FilterContainer, HttpServer2JVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(HttpServer2.class);
 
   static final String FILTER_INITIALIZER_PROPERTY

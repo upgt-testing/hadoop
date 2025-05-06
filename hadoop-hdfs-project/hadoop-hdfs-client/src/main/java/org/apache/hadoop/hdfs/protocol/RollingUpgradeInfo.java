@@ -27,7 +27,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class RollingUpgradeInfo extends RollingUpgradeStatus {
+public class RollingUpgradeInfo extends RollingUpgradeStatus implements RollingUpgradeInfoJVMInterface {
   private final long startTime;
   private long finalizeTime;
   private boolean createdRollbackImages;

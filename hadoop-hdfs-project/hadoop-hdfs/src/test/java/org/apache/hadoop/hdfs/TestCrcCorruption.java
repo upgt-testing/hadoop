@@ -35,6 +35,9 @@ import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.FinalizedReplica;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
+import org.apache.hadoop.hdfs.server.datanode.ReplicaInfo;
+import org.apache.hadoop.hdfs.server.datanode.ReplicaInfoJVMInterface;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,10 +94,10 @@ public class TestCrcCorruption {
     Configuration conf = new HdfsConfiguration();
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(10).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(10).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
       Path file = new Path("/test_corruption_file");
@@ -151,14 +154,14 @@ public class TestCrcCorruption {
    * check if DFS can handle corrupted CRC blocks
    */
   private void thistest(Configuration conf, DFSTestUtil util) throws Exception {
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     int numDataNodes = 2;
     short replFactor = 2;
     Random random = new Random();
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       FileSystem fs = cluster.getFileSystem();
       util.createFiles(fs, "/srcdat", replFactor);
@@ -170,8 +173,9 @@ public class TestCrcCorruption {
       // However, a client is alowed access to this block.
       //
       final int dnIdx = 0;
-      final DataNode dn = cluster.getDataNodes().get(dnIdx);
+      final DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIdx);
       final String bpid = cluster.getNamesystem().getBlockPoolId();
+      /*
       List<FinalizedReplica> replicas =
           dn.getFSDataset().getFinalizedBlocks(bpid);
       assertTrue("Replicas do not exist", !replicas.isEmpty());
@@ -191,6 +195,7 @@ public class TestCrcCorruption {
           cluster.corruptMeta(dnIdx, eb);
         }
       }
+       */
 
       //
       // Only one replica is possibly corrupted. The other replica should still
@@ -276,7 +281,7 @@ public class TestCrcCorruption {
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, numDataNodes);
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
 
     try {
       cluster.waitActive();

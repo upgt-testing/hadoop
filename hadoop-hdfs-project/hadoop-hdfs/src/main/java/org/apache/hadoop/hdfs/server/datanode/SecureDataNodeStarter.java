@@ -41,7 +41,7 @@ public class SecureDataNodeStarter implements Daemon {
   /**
    * Stash necessary resources needed for datanode operation in a secure env.
    */
-  public static class SecureResources {
+  public static class SecureResources implements SecureResourcesJVMInterface  {
     private final ServerSocket streamingSocket;
     private final ServerSocketChannel httpServerSocket;
     public SecureResources(ServerSocket streamingSocket, ServerSocketChannel httpServerSocket) {

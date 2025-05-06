@@ -25,7 +25,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.io.retry.RetryInvocationHandler;
 import org.apache.hadoop.ipc.Server;
@@ -111,7 +111,7 @@ public class TestDNFencingWithReplication {
     harness.conf.setInt(
         DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 1);
 
-    final MiniDFSCluster cluster = harness.startCluster();
+    final MiniDFSClusterInJVM cluster = harness.startCluster();
     try {
       cluster.waitActive();
       cluster.transitionToActive(0);

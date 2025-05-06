@@ -130,7 +130,7 @@ public class TestInjectionForSimulatedStorage {
   @Test
   public void testInjection() throws IOException {
     
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
 
     String testFile = "/replication-test-file";
     Path testPath = new Path(testFile);
@@ -146,7 +146,7 @@ public class TestInjectionForSimulatedStorage {
       conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, checksumSize);
       SimulatedFSDataset.setFactory(conf);
       //first time format
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
       cluster.waitActive();
       String bpid = cluster.getNamesystem().getBlockPoolId();
       DFSClient dfsClient = new DFSClient(new InetSocketAddress("localhost",
@@ -160,7 +160,7 @@ public class TestInjectionForSimulatedStorage {
       cluster.shutdown();
       cluster = null;
       
-      /* Start the MiniDFSCluster with more datanodes since once a writeBlock
+      /* Start the MiniDFSClusterInJVM with more datanodes since once a writeBlock
        * to a datanode node fails, same block can not be written to it
        * immediately. In our case some replication attempts will fail.
        */
@@ -170,7 +170,7 @@ public class TestInjectionForSimulatedStorage {
       SimulatedFSDataset.setFactory(conf);
       conf.set(DFSConfigKeys.DFS_NAMENODE_SAFEMODE_THRESHOLD_PCT_KEY, "0.0f"); 
       
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
                                   .numDataNodes(numDataNodes * 2)
                                   .format(false)
                                   .build();
