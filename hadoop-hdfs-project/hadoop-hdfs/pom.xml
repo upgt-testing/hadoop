@@ -225,6 +225,11 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
       <artifactId>curator-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>edu.illinois</groupId>
+      <artifactId>upgt-core</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -234,6 +239,9 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
+            <redirectTestOutputToFile>false</redirectTestOutputToFile>
+            <useFile>false</useFile>
+            <printSummary>true</printSummary>
             <startKdc>${startKdc}</startKdc>
             <kdc.resource.dir>${kdc.resource.dir}</kdc.resource.dir>
             <runningWithNative>${runningWithNative}</runningWithNative>

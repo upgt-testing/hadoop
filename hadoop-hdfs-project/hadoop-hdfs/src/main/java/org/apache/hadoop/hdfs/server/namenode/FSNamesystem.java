@@ -4237,7 +4237,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @throws AccessControlException if superuser privilege is violated.
    * @throws IOException if
    */
-  public void saveNamespace() throws AccessControlException, IOException {
+  public void saveNamespace() throws IOException {
     checkOperation(OperationCategory.UNCHECKED);
     checkSuperuserPrivilege();
 

@@ -121,6 +121,7 @@ public class TestDelegationTokensWithHA {
    * Test that, when using ObserverReadProxyProvider with DT authentication,
    * the ORPP gracefully handles when the Standby NN throws a StandbyException.
    */
+  /*
   @Test(timeout = 300000)
   public void testObserverReadProxyProviderWithDT() throws Exception {
     // Make the first node standby, so that the ORPP will try it first
@@ -166,7 +167,7 @@ public class TestDelegationTokensWithHA {
     }
   }
 
-  /*
+
   @Test(timeout = 300000)
   public void testDelegationTokenDFSApi() throws Exception {
     final Token<DelegationTokenIdentifier> token =

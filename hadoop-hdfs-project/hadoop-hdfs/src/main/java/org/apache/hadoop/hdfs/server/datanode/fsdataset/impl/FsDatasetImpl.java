@@ -816,7 +816,7 @@ class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl>, FsDatasetImplJVMInter
   /**
    * Get File name for a given block.
    */
-  File getBlockFile(String bpid, long blockId) throws IOException {
+  public File getBlockFile(String bpid, long blockId) throws IOException {
     File f = validateBlockFile(bpid, blockId);
     if(f == null) {
       throw new FileNotFoundException("BlockId " + blockId + " is not valid.");

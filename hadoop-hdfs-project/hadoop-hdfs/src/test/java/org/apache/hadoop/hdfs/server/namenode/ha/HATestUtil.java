@@ -390,6 +390,12 @@ public abstract class HATestUtil {
         ConfiguredFailoverProxyProvider.class);
   }
 
+  public static void setFailoverConfigurations(Configuration conf, String logicalName,
+                                               List<InetSocketAddress>  nnAddresses){
+    setFailoverConfigurations(conf, logicalName, nnAddresses,
+            ConfiguredFailoverProxyProvider.class);
+  }
+
   /**
    * Sets the required configurations for performing failover
    */
@@ -449,6 +455,23 @@ public abstract class HATestUtil {
 
   public static void waitForCheckpoint(MiniDFSCluster cluster, int nnIdx,
       List<Integer> txids) throws InterruptedException {
+    long start = Time.now();
+    while (true) {
+      try {
+        FSImageTestUtil.assertNNHasCheckpoints(cluster, nnIdx, txids);
+        return;
+      } catch (AssertionError err) {
+        if (Time.now() - start > 10000) {
+          throw err;
+        } else {
+          Thread.sleep(300);
+        }
+      }
+    }
+  }
+
+  public static void waitForCheckpoint(MiniDFSClusterInJVM cluster, int nnIdx,
+                                       List<Integer> txids) throws InterruptedException {
     long start = Time.now();
     while (true) {
       try {

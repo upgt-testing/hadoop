@@ -32,15 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsTracer;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.BlockReader;
-import org.apache.hadoop.hdfs.ClientContext;
-import org.apache.hadoop.hdfs.DFSClient;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtilClient;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
-import org.apache.hadoop.hdfs.RemotePeerFactory;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.net.Peer;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
@@ -186,7 +178,7 @@ public class BlockReaderTestUtil {
   /**
    * Get a BlockReader for the given block.
    */
-  public static BlockReader getBlockReader(MiniDFSCluster cluster,
+  public static BlockReader getBlockReader(MiniDFSClusterInJVM cluster,
       LocatedBlock testBlock, int offset, int lenToRead) throws IOException {
     InetSocketAddress targetAddr = null;
     ExtendedBlock block = testBlock.getBlock();
@@ -230,6 +222,52 @@ public class BlockReaderTestUtil {
         }
       }).
       build();
+  }
+
+  public static BlockReader getBlockReader(MiniDFSCluster cluster,
+                                           LocatedBlock testBlock, int offset, int lenToRead) throws IOException {
+    InetSocketAddress targetAddr = null;
+    ExtendedBlock block = testBlock.getBlock();
+    DatanodeInfo[] nodes = testBlock.getLocations();
+    targetAddr = NetUtils.createSocketAddr(nodes[0].getXferAddr());
+
+    final DistributedFileSystem fs = cluster.getFileSystem();
+    return new BlockReaderFactory(fs.getClient().getConf()).
+            setInetSocketAddress(targetAddr).
+            setBlock(block).
+            setFileName(targetAddr.toString()+ ":" + block.getBlockId()).
+            setBlockToken(testBlock.getBlockToken()).
+            setStartOffset(offset).
+            setLength(lenToRead).
+            setVerifyChecksum(true).
+            setClientName("BlockReaderTestUtil").
+            setDatanodeInfo(nodes[0]).
+            setClientCacheContext(ClientContext.getFromConf(fs.getConf())).
+            setCachingStrategy(CachingStrategy.newDefaultStrategy()).
+            setConfiguration(fs.getConf()).
+            setAllowShortCircuitLocalReads(true).
+            setTracer(FsTracer.get(fs.getConf())).
+            setRemotePeerFactory(new RemotePeerFactory() {
+              @Override
+              public Peer newConnectedPeer(InetSocketAddress addr,
+                                           Token<BlockTokenIdentifier> blockToken, DatanodeID datanodeId)
+                      throws IOException {
+                Peer peer = null;
+                Socket sock = NetUtils.
+                        getDefaultSocketFactory(fs.getConf()).createSocket();
+                try {
+                  sock.connect(addr, HdfsConstants.READ_TIMEOUT);
+                  sock.setSoTimeout(HdfsConstants.READ_TIMEOUT);
+                  peer = DFSUtilClient.peerFromSocket(sock);
+                } finally {
+                  if (peer == null) {
+                    IOUtils.closeQuietly(sock);
+                  }
+                }
+                return peer;
+              }
+            }).
+            build();
   }
 
   /**

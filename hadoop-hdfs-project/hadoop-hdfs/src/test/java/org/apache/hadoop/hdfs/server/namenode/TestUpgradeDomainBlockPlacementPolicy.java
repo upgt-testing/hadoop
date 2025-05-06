@@ -64,7 +64,7 @@ public class TestUpgradeDomainBlockPlacementPolicy {
       {"host1", "host2", "host3", "host4", "host5", "host6"};
   static final String[] upgradeDomains =
       {"ud5", "ud2", "ud3", "ud1", "ud2", "ud4"};
-  static final Set<DatanodeID> expectedDatanodeIDs = new HashSet<>();
+  static final Set<DatanodeIDJVMInterface> expectedDatanodeIDs = new HashSet<>();
   private MiniDFSClusterInJVM cluster = null;
   private HostsFileWriter hostsFileWriter = new HostsFileWriter();
 

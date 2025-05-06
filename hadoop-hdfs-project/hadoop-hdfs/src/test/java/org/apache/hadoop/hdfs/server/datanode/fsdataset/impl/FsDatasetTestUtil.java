@@ -53,8 +53,7 @@ public class FsDatasetTestUtil {
 
   public static File getBlockFile(FsDatasetSpiJVMInterface<?> fsd, String bpid, Block b
   ) throws IOException {
-    ReplicaInfoJVMInterface r = ((FsDatasetImplJVMInterface)fsd).getReplicaInfo(bpid, b.getBlockId());
-    return new File(r.getBlockURI());
+    return ((FsDatasetImplJVMInterface)fsd).getBlockFile(bpid, b.getBlockId());
   }
 
   public static File getMetaFile(FsDatasetSpi<?> fsd, String bpid, Block b)

@@ -104,11 +104,11 @@ public class TestNameNodeRpcServer {
     // our change overrides the random choice of datanode.
     final String[] racks = new String[]{"/rack1", "/rack2", "/rack3"};
     final String[] hosts = new String[]{"node1", "node2", "node3"};
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final CallerContext original = CallerContext.getCurrent();
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf)
+      cluster = new MiniDFSClusterInJVM.Builder(conf)
           .racks(racks).hosts(hosts).numDataNodes(hosts.length)
           .build();
       cluster.waitActive();

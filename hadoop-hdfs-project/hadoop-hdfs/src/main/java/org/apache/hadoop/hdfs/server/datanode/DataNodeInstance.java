@@ -125,17 +125,14 @@ public class DataNodeInstance extends Instance {
             // get SecureDataNodeStarter.SecureResources class
             Class<?> SecureResourcesClass = versionClassLoader.loadClass("org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter$SecureResources");
 
-            Constructor<?> secureResourcesConstructor = SecureResourcesClass.getConstructor(ServerSocket.class, ServerSocketChannel.class, boolean.class, boolean.class, boolean.class);
+            Constructor<?> secureResourcesConstructor = SecureResourcesClass.getConstructor(ServerSocket.class, ServerSocketChannel.class);
 
 
             SecureResourcesJVMInterface secureResourcesJVM = null;
             if (secureResources != null) {
                 ServerSocket streamingSocket = secureResources.getStreamingSocket();
                 ServerSocketChannel httpServerSocket = secureResources.getHttpServerChannel();
-                boolean isSaslEnabled = secureResources.isSaslEnabled();
-                boolean isRpcPortPrivileged = secureResources.isRpcPortPrivileged();
-                boolean isHttpPortPrivileged = secureResources.isHttpPortPrivileged();
-                secureResourcesJVM = (SecureResourcesJVMInterface) secureResourcesConstructor.newInstance(streamingSocket, httpServerSocket, isSaslEnabled, isRpcPortPrivileged, isHttpPortPrivileged);
+                secureResourcesJVM = (SecureResourcesJVMInterface) secureResourcesConstructor.newInstance(streamingSocket, httpServerSocket);
             }
 
             // get the DataNode class and create an instance of it

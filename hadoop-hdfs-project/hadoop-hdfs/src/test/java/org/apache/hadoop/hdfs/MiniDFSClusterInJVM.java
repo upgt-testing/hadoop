@@ -56,6 +56,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.PrivilegedExceptionAction;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -71,6 +72,7 @@ import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpiJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImplJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
+import org.apache.hadoop.hdfs.web.HftpFileSystem;
 import org.apache.hadoop.http.HttpServer2JVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.VolumeScanner;
 import org.apache.hadoop.hdfs.server.namenode.ImageServlet;
@@ -2436,16 +2438,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return null;
     }
 
-    public byte[] readBlockOnDataNodeAsBytes(int i, ExtendedBlock block)
-            throws IOException {
-        assert (i >= 0 && i < dataNodes.size()) : "Invalid datanode "+i;
-        File blockFile = getBlockFile(i, block);
-        if (blockFile != null && blockFile.exists()) {
-            return DFSTestUtil.readFileAsBytes(blockFile);
-        }
-        return null;
-    }
-
     /**
      * Corrupt a block on a particular datanode.
      *
@@ -2609,7 +2601,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return upgradeDataNode(dnprop, false);
     }
 
-    public void waitDatanodeFullyStarted(DataNodeJVMInterface dn, int timeout)
+    public void waitDatanodeFullyStarted(final DataNodeJVMInterface dn, int timeout)
             throws TimeoutException, InterruptedException {
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
             @Override
@@ -3035,6 +3027,36 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     /**
+     * @return a {@link HftpFileSystem} object.
+     */
+    public HftpFileSystem getHftpFileSystem(int nnIndex) throws IOException {
+        String uri = "hftp://"
+                + getNN(nnIndex).conf
+                .get(DFS_NAMENODE_HTTP_ADDRESS_KEY);
+        try {
+            return (HftpFileSystem)FileSystem.get(new URI(uri), conf);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     *  @return a {@link HftpFileSystem} object as specified user.
+     */
+    public HftpFileSystem getHftpFileSystemAs(final String username,
+                                              final Configuration conf, final int nnIndex, final String... groups)
+            throws IOException, InterruptedException {
+        final UserGroupInformation ugi = UserGroupInformation.createUserForTesting(
+                username, groups);
+        return ugi.doAs(new PrivilegedExceptionAction<HftpFileSystem>() {
+            @Override
+            public HftpFileSystem run() throws Exception {
+                return getHftpFileSystem(nnIndex);
+            }
+        });
+    }
+
+    /**
      * Get the directories where the namenode stores its image.
      */
     public Collection<URI> getNameDirs(int nnIndex) {
@@ -3060,6 +3082,19 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
     }
 
+    public void transitionToObserver(int nnIndex) throws IOException,
+            ServiceFailedException {
+        getNameNode(nnIndex).getRpcServer().transitionToObserver(
+                new StateChangeRequestInfo(RequestSource.REQUEST_BY_USER_FORCED));
+    }
+
+    public void rollEditLogAndTail(int nnIndex) throws Exception {
+        getNameNode(nnIndex).getRpcServer().rollEditLog();
+        for (int i = 2; i < getNumNameNodes(); i++) {
+            long el = getNameNode(i).getNamesystem().getEditLogTailer().doTailEdits();
+            LOG.info("editsLoaded " + el);
+        }
+    }
 
     public void triggerBlockReports()
             throws IOException {

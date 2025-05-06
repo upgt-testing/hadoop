@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.server.common.StorageDirectoryJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.*;
 import org.apache.commons.logging.Log;
@@ -58,13 +59,6 @@ import org.apache.hadoop.fs.FileContext;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSUtil;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
-import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
@@ -2626,6 +2620,16 @@ public class TestCheckpoint {
   }
 
   private static void cleanup(MiniDFSClusterInJVM cluster) {
+    if (cluster != null) {
+      try {
+        cluster.shutdown();
+      } catch (Exception e) {
+        LOG.warn("Could not shutdown MiniDFSClusterInJVM ", e);
+      }
+    }
+  }
+
+  private static void cleanup(MiniDFSCluster cluster) {
     if (cluster != null) {
       try {
         cluster.shutdown();

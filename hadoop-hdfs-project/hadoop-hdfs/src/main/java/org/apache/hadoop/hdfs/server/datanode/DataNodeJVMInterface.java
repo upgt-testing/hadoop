@@ -27,15 +27,12 @@ import java.util.Map;
 public interface DataNodeJVMInterface {
     int getBpOsCount();
     ChangedVolumesJVMInterface parseChangedVolumes(String arg) throws IOException;
-    String getDiskBalancerStatus();
-    void cancelDiskBalancePlan(String bpid) throws IOException;
     void checkDiskError() throws IOException;
     long getLastDiskErrorCheck();
     long getBalancerBandwidth();
     RPCServerJVMInterface getRpcServer();
     DirectoryScannerJVMInterface getDirectoryScanner();
     void clearAllBlockSecretKeys();
-    String getDiskBalancerSetting(String key) throws IOException;
     void deleteBlockPool(String blockPoolId, boolean force) throws IOException;
     String reconfigurePropertyImpl(String property, String newVal)
             throws ReconfigurationException;
@@ -44,8 +41,6 @@ public interface DataNodeJVMInterface {
     ConfigurationJVMInterface getConf();
     String getClusterId();
     String getVersion();
-    String getSoftwareVersion();
-    String getRevision();
     String getRpcPort();
     String getHttpPort();
     String getNamenodeAddresses();

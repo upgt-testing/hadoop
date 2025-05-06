@@ -313,34 +313,6 @@ public class TestBootstrapStandby {
   }
   */
 
-  /**
-   * Add enough content to the primary NN's fsimage so that it's larger than
-   * the IO transfer buffer size of bootstrapping. The return the correct
-   * timeout duration.
-   */
-  private int updatePrimaryNNAndGetTimeout() throws IOException{
-    // Any reasonable test machine should be able to transfer 1 byte per MS
-    // (which is ~1K/s)
-    final int minXferRatePerMS = 1;
-    int imageXferBufferSize = DFSUtilClient.getIoFileBufferSize(
-        new Configuration());
-    File imageFile = null;
-    int dirIdx = 0;
-    while (imageFile == null || imageFile.length() < imageXferBufferSize) {
-      for (int i = 0; i < 5; i++) {
-        cluster.getFileSystem(0).mkdirs(new Path("/foo" + dirIdx++));
-      }
-      nn0.getRpcServer().rollEditLog();
-      NameNodeAdapter.enterSafeMode(nn0, false);
-      NameNodeAdapter.saveNamespace(nn0);
-      NameNodeAdapter.leaveSafeMode(nn0);
-      imageFile = FSImageTestUtil.findLatestImageFile(FSImageTestUtil
-          .getFSImage(nn0).getStorage().getStorageDir(0));
-    }
-
-    return (int)(imageFile.length() / minXferRatePerMS) + 1;
-  }
-
   private void removeStandbyNameDirs() {
     for (int i = 1; i < maxNNCount; i++) {
       for (URI u : cluster.getNameDirs(i)) {

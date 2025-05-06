@@ -41,7 +41,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
-import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
@@ -509,25 +508,6 @@ public class TestDFSAdmin {
     return sb.toString();
   }
 
-    // get block details and check if the block is corrupt
-    private void waitForCorruptBlock(MiniDFSClusterInJVM miniCluster,
-                                     DFSClient client, Path file)
-            throws TimeoutException, InterruptedException {
-        GenericTestUtils.waitFor(new Supplier<Boolean>() {
-            @Override
-            public Boolean get() {
-                LocatedBlocks blocks = null;
-                try {
-                    miniCluster.triggerBlockReports();
-                    blocks = client.getNamenode().getBlockLocations(file.toString(), 0,
-                            Long.MAX_VALUE);
-                } catch (IOException e) {
-                    return false;
-                }
-                return blocks != null && blocks.get(0).isCorrupt();
-            }
-        }, 1000, 60000);
-    }
 
   @Test(timeout = 120000)
   public void testReportCommand() throws Exception {
@@ -626,7 +606,6 @@ public class TestDFSAdmin {
       verifyNodesAndCorruptBlocks(numDn, numDn - 1, 1, client);
     }
   }
-   */
 
   @Test(timeout = 300000L)
   public void testListOpenFiles() throws Exception {

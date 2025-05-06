@@ -11,6 +11,7 @@ import org.apache.hadoop.security.AccessControlException;
 import java.io.IOException;
 
 public interface NamenodeProtocolsJVMInterface {
+    void saveNamespace() throws IOException;
     boolean restoreFailedStorage(String arg0) throws IOException;
     boolean setReplication(String src, short replication) throws IOException;
     DatanodeInfoJVMInterface[] getDatanodeReport(HdfsConstants.DatanodeReportType type) throws IOException;
@@ -18,9 +19,9 @@ public interface NamenodeProtocolsJVMInterface {
     void renewLease(String clientName) throws IOException;
     void transitionToActive(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     void transitionToStandby(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
+    void transitionToObserver(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     CheckpointSignatureJVMInterface rollEditLog() throws IOException;
     boolean setSafeMode(HdfsConstants.SafeModeAction action, boolean isChecked) throws IOException;
-    boolean saveNamespace(long timeWindow, long txGap) throws IOException;
     LocatedBlocksJVMInterface getBlockLocations(String src, final long offset, final long length) throws IOException;
     long getTransactionID() throws IOException;
     ContentSummaryJVMInterface getContentSummary(String path) throws IOException;

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public interface FSNamesystemJVMInterface {
+    void saveNamespace() throws IOException;
     boolean isExternalInvocation();
     boolean isUpgradeFinalized();
     boolean recoverLease(String src, String holder, String clientMachine) throws IOException;
@@ -65,7 +66,6 @@ public interface FSNamesystemJVMInterface {
     void writeUnlock();
     AclStatusJVMInterface getAclStatus(String src) throws IOException;
     FSEditLogJVMInterface getEditLog();
-    boolean saveNamespace(final long timeWindow, final long txGap) throws IOException;
     void enterSafeMode(boolean resourcesLow) throws IOException;
     int getVolumeFailuresTotal();
     long getCompleteBlocksTotal();

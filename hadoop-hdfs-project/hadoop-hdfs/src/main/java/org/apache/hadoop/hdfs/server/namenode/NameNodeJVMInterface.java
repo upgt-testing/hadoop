@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public interface NameNodeJVMInterface {
+    boolean isObserverState();
     ConfigurationJVMInterface getConf();
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     //int getNameNodeState();

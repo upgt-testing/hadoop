@@ -123,7 +123,7 @@ public class TestDFSHAAdminMiniCluster {
 
   @Test
   public void testObserverTransition() throws Exception {
-    NameNode nnode1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
 
     // Should be able to transition from STANDBY to OBSERVER
@@ -143,7 +143,7 @@ public class TestDFSHAAdminMiniCluster {
 
   @Test
   public void testObserverIllegalTransition() throws Exception {
-    NameNode nnode1 = cluster.getNameNode(0);
+    NameNodeJVMInterface nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
     assertEquals(0, runTool("-transitionToActive", "nn1"));
     assertFalse(nnode1.isStandbyState());

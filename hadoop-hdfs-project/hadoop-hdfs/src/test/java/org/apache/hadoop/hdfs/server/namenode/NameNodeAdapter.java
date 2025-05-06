@@ -119,7 +119,7 @@ public class NameNodeAdapter {
 
   public static void saveNamespace(NameNodeJVMInterface namenode)
           throws AccessControlException, IOException {
-    namenode.getNamesystem().saveNamespace(0, 0);
+    namenode.getNamesystem().saveNamespace();
   }
 
 
@@ -275,7 +275,7 @@ public class NameNodeAdapter {
     return fsn.getStats();
   }
 
-  public static long getGenerationStamp(final FSNamesystem fsn)
+  public static long getGenerationStamp(final FSNamesystemJVMInterface fsn)
       throws IOException {
     return fsn.getBlockManager().getBlockIdManager().getGenerationStamp();
   }
@@ -323,11 +323,6 @@ public class NameNodeAdapter {
   public static long getGenerationStamp(final FSNamesystem fsn)
       throws IOException {
     return fsn.getBlockManager().getBlockIdManager().getGenerationStamp();
-  }
-
-  public static BlockInfo getStoredBlock(final FSNamesystem fsn,
-      final Block b) {
-    return fsn.getStoredBlock(b);
   }
 
   public static FSNamesystem spyOnNamesystem(NameNode nn) {

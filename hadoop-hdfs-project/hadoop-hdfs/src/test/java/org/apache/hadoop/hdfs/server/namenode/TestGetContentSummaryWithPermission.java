@@ -142,10 +142,10 @@ public class TestGetContentSummaryWithPermission {
     assertEquals((short)644, fileStatus.getPermission().toOctal());
 
     // by default, can get content summary
-    ContentSummary summary =
+    ContentSummaryJVMInterface summary =
         userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
           @Override
-          public ContentSummary run() throws IOException {
+          public ContentSummaryJVMInterface run() throws IOException {
             return cluster.getNameNodeRpc().getContentSummary(
                 foo.toString());
           }
@@ -157,7 +157,7 @@ public class TestGetContentSummaryWithPermission {
     try {
       userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
         @Override
-        public ContentSummary run() throws IOException {
+        public ContentSummaryJVMInterface run() throws IOException {
           return cluster.getNameNodeRpc().getContentSummary(
               foo.toString());
         }
@@ -177,7 +177,7 @@ public class TestGetContentSummaryWithPermission {
     try {
       userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
         @Override
-        public ContentSummary run() throws IOException {
+        public ContentSummaryJVMInterface run() throws IOException {
           return cluster.getNameNodeRpc().getContentSummary(
               foo.toString());
         }
@@ -194,7 +194,7 @@ public class TestGetContentSummaryWithPermission {
 
     summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
       @Override
-      public ContentSummary run() throws IOException {
+      public ContentSummaryJVMInterface run() throws IOException {
         return cluster.getNameNodeRpc().getContentSummary(
             foo.toString());
       }
@@ -206,7 +206,7 @@ public class TestGetContentSummaryWithPermission {
     dfs.setPermission(baz, new FsPermission((short)0));
     summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
       @Override
-      public ContentSummary run() throws IOException {
+      public ContentSummaryJVMInterface run() throws IOException {
         return cluster.getNameNodeRpc().getContentSummary(
             foo.toString());
       }

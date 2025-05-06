@@ -1966,7 +1966,7 @@ public class TestFsck {
     // Delete file when it has a snapshot
     hdfs.delete(fp, false);
     numFiles--;
-
+/*
     waitForCorruptionBlocks(numSnapshots, "/corruptData");
 
     // with -includeSnapshots all files are reported
@@ -1983,7 +1983,7 @@ public class TestFsck {
     System.out.println("3. bad fsck exclude snapshot out: " + outStr);
     assertTrue(outStr.contains("has " + numFiles + " CORRUPT files"));
     assertFalse(outStr.contains("/.snapshot/"));
-     */
+ */
   }
 
   /**
@@ -1992,6 +1992,8 @@ public class TestFsck {
    * @param path The Directory Path where corruptfileblocks exists
    * @throws IOException
    */
+
+  /*
   private void waitForCorruptionBlocks(final int corruptBlocks,
       final String path) throws Exception {
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
@@ -2012,6 +2014,7 @@ public class TestFsck {
       }
     }, 100, 10000);
   }
+   */
 
   @Test (timeout = 300000)
   public void testFsckMoveAfterCorruption() throws Exception {

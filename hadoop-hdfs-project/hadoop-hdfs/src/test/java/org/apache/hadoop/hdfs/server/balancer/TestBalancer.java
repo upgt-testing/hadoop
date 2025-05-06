@@ -457,6 +457,38 @@ public static void createFile(MiniDFSClusterInJVM cluster, Path filePath, long f
     }
   }
 
+  static void waitForHeartBeat(long expectedUsedSpace,
+                               long expectedTotalSpace, ClientProtocol client, MiniDFSCluster cluster)
+          throws IOException, TimeoutException {
+    long timeout = TIMEOUT;
+    long failtime = (timeout <= 0L) ? Long.MAX_VALUE
+            : Time.monotonicNow() + timeout;
+
+    while (true) {
+      long[] status = client.getStats();
+      double totalSpaceVariance = Math.abs((double)status[0] - expectedTotalSpace)
+              / expectedTotalSpace;
+      double usedSpaceVariance = Math.abs((double)status[1] - expectedUsedSpace)
+              / expectedUsedSpace;
+      if (totalSpaceVariance < CAPACITY_ALLOWED_VARIANCE
+              && usedSpaceVariance < CAPACITY_ALLOWED_VARIANCE)
+        break; //done
+
+      if (Time.monotonicNow() > failtime) {
+        throw new TimeoutException("Cluster failed to reached expected values of "
+                + "totalSpace (current: " + status[0]
+                + ", expected: " + expectedTotalSpace
+                + "), or usedSpace (current: " + status[1]
+                + ", expected: " + expectedUsedSpace
+                + "), in more than " + timeout + " msec.");
+      }
+      try {
+        Thread.sleep(100L);
+      } catch(InterruptedException ignored) {
+      }
+    }
+  }
+
   /**
    * Wait until balanced: each datanode gives utilization within
    * BALANCE_ALLOWED_VARIANCE of average
@@ -466,6 +498,12 @@ public static void createFile(MiniDFSClusterInJVM cluster, Path filePath, long f
   static void waitForBalancer(long totalUsedSpace, long totalCapacity,
       ClientProtocol client, MiniDFSClusterInJVM cluster, BalancerParameters p)
   throws IOException, TimeoutException {
+    waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, p, 0);
+  }
+
+  static void waitForBalancer(long totalUsedSpace, long totalCapacity,
+                              ClientProtocol client, MiniDFSCluster cluster, BalancerParameters p)
+          throws IOException, TimeoutException {
     waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, p, 0);
   }
 
@@ -637,6 +675,12 @@ public static void createFile(MiniDFSClusterInJVM cluster, Path filePath, long f
     waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, p, expectedExcludedNodes, true);
   }
 
+  static void waitForBalancer(long totalUsedSpace, long totalCapacity,
+                              ClientProtocol client, MiniDFSCluster cluster, BalancerParameters p,
+                              int expectedExcludedNodes) throws IOException, TimeoutException {
+    waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, p, expectedExcludedNodes, true);
+  }
+
   /**
    * Wait until balanced: each datanode gives utilization within.
    * BALANCE_ALLOWED_VARIANCE of average
@@ -685,6 +729,60 @@ public static void createFile(MiniDFSClusterInJVM cluster, Path filePath, long f
                 + avgUtilization + ", but on datanode " + datanode
                 + " it remains at " + nodeUtilization
                 + " after more than " + TIMEOUT + " msec.");
+          }
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException ignored) {
+          }
+          break;
+        }
+      }
+      assertEquals(expectedExcludedNodes,actualExcludedNodeCount);
+    } while (!balanced);
+  }
+
+  static void waitForBalancer(long totalUsedSpace, long totalCapacity,
+                              ClientProtocol client, MiniDFSCluster cluster, BalancerParameters p,
+                              int expectedExcludedNodes, boolean checkExcludeNodesUtilization)
+          throws IOException, TimeoutException {
+    long timeout = TIMEOUT;
+    long failtime = (timeout <= 0L) ? Long.MAX_VALUE
+            : Time.monotonicNow() + timeout;
+    if (!p.getIncludedNodes().isEmpty()) {
+      totalCapacity = p.getIncludedNodes().size() * CAPACITY;
+    }
+    if (!p.getExcludedNodes().isEmpty()) {
+      totalCapacity -= p.getExcludedNodes().size() * CAPACITY;
+    }
+    final double avgUtilization = ((double)totalUsedSpace) / totalCapacity;
+    boolean balanced;
+    do {
+      DatanodeInfo[] datanodeReport =
+              client.getDatanodeReport(DatanodeReportType.ALL);
+      assertEquals(datanodeReport.length, cluster.getDataNodes().size());
+      balanced = true;
+      int actualExcludedNodeCount = 0;
+      for (DatanodeInfo datanode : datanodeReport) {
+        double nodeUtilization = ((double)datanode.getDfsUsed())
+                / datanode.getCapacity();
+        if (Dispatcher.Util.isExcluded(p.getExcludedNodes(), datanode)) {
+          assertTrue(nodeUtilization == 0);
+          actualExcludedNodeCount++;
+          continue;
+        }
+        if (!Dispatcher.Util.isIncluded(p.getIncludedNodes(), datanode)) {
+          assertTrue(nodeUtilization == 0);
+          actualExcludedNodeCount++;
+          continue;
+        }
+        if (Math.abs(avgUtilization - nodeUtilization) > BALANCE_ALLOWED_VARIANCE) {
+          balanced = false;
+          if (Time.monotonicNow() > failtime) {
+            throw new TimeoutException(
+                    "Rebalancing expected avg utilization to become "
+                            + avgUtilization + ", but on datanode " + datanode
+                            + " it remains at " + nodeUtilization
+                            + " after more than " + TIMEOUT + " msec.");
           }
           try {
             Thread.sleep(100);
@@ -1603,7 +1701,7 @@ public static void createFile(MiniDFSClusterInJVM cluster, Path filePath, long f
     final long[] dnCapacities = new long[] {capacity, capacity};
     final short rep = 1;
     final long seed = 0xFAFAFA;
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(0)
         .build();
     try {

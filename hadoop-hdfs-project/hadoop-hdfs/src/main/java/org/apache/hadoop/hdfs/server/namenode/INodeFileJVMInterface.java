@@ -7,8 +7,6 @@ import org.apache.hadoop.hdfs.server.namenode.snapshot.FileDiffListJVMInterface;
 public interface INodeFileJVMInterface {
     BlockInfoJVMInterface[] getBlocks();
     boolean isUnderConstruction();
-    boolean isStriped();
-    byte getErasureCodingPolicyID();
     short getFileReplication();
     int numBlocks();
     BlockInfoJVMInterface getLastBlock();

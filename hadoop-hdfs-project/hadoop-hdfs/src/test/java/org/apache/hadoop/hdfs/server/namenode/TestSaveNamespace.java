@@ -533,7 +533,7 @@ public class TestSaveNamespace {
    */
   @Test
   public void testSaveNamespaceWithRenamedLease() throws Exception {
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(new Configuration())
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(new Configuration())
         .numDataNodes(1).build();
     cluster.waitActive();
     DistributedFileSystem fs = (DistributedFileSystem) cluster.getFileSystem();
@@ -699,7 +699,7 @@ public class TestSaveNamespace {
 
   @Test(timeout=30000)
   public void testTxFaultTolerance() throws Exception {
-    String baseDir = MiniDFSCluster.getBaseDirectory();
+    String baseDir = MiniDFSClusterInJVM.getBaseDirectory();
     List<String> nameDirs = new ArrayList<>();
     nameDirs.add(fileAsURI(new File(baseDir, "name1")).toString());
     nameDirs.add(fileAsURI(new File(baseDir, "name2")).toString());
