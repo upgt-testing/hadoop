@@ -659,4 +659,11 @@ public abstract class FSImageTestUtil {
         getStorageDirectory(storageUri);
     return NNStorage.readTransactionIdFile(sDir);
   }
+
+  public static long getStorageTxId(NameNodeJVMInterface node, URI storageUri)
+          throws IOException {
+    StorageDirectoryJVMInterface sDir = getFSImage(node).getStorage().
+            getStorageDirectory(storageUri);
+    return NNStorage.readTransactionIdFile(sDir);
+  }
 }

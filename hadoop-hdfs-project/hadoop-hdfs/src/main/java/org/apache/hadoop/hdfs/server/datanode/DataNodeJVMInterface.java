@@ -52,7 +52,6 @@ public interface DataNodeJVMInterface {
     DataNodeMetricsJVMInterface getMetrics();
     DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();
-    SaslDataTransferClientJVMInterface getSaslClient();
     int getInfoPort();
     BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();
     int getXceiverCount();

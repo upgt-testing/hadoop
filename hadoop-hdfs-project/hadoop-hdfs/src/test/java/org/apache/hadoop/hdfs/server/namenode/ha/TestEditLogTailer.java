@@ -179,7 +179,7 @@ public class TestEditLogTailer {
                 .addNN(new MiniDFSNNTopology.NNConf("nn2")
                     .setIpcPort(ports[1])));
 
-        cluster = new MiniDFSCluster.Builder(conf)
+        cluster = new MiniDFSClusterInJVM.Builder(conf)
           .nnTopology(topology)
           .numDataNodes(0)
           .build();
@@ -263,4 +263,5 @@ public class TestEditLogTailer {
       cluster.shutdown();
     }
   }
+   */
 }

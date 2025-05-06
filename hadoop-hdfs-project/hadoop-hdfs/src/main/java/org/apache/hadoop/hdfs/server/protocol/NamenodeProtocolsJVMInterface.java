@@ -19,7 +19,6 @@ public interface NamenodeProtocolsJVMInterface {
     void renewLease(String clientName) throws IOException;
     void transitionToActive(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     void transitionToStandby(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
-    void transitionToObserver(HAServiceProtocol.StateChangeRequestInfo req) throws ServiceFailedException, AccessControlException, IOException;
     CheckpointSignatureJVMInterface rollEditLog() throws IOException;
     boolean setSafeMode(HdfsConstants.SafeModeAction action, boolean isChecked) throws IOException;
     LocatedBlocksJVMInterface getBlockLocations(String src, final long offset, final long length) throws IOException;

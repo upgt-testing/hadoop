@@ -70,7 +70,7 @@ public class TestFailoverWithBlockTokensEnabled {
     // Set short retry timeouts so this test runs faster
     conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology(numNNs))
+        .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .numDataNodes(1)
         .build();
   }

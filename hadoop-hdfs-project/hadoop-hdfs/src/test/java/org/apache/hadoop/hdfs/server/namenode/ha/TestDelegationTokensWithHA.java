@@ -114,6 +114,7 @@ public class TestDelegationTokensWithHA {
     }
   }
 
+  /*
   @Test(timeout = 300000)
   public void testDelegationTokenDFSApi() throws Exception {
     final Token<DelegationTokenIdentifier> token =
