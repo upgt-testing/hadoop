@@ -30,7 +30,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,12 +47,12 @@ public class TestDataNodeMXBean {
   @Test
   public void testDataNodeMXBean() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       Assert.assertEquals(datanodes.size(), 1);
-      DataNode datanode = datanodes.get(0);
+      DataNodeJVMInterface datanode = datanodes.get(0);
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
       ObjectName mxbeanName = new ObjectName(
@@ -104,10 +106,10 @@ public class TestDataNodeMXBean {
   @Test
   public void testDataNodeMXBeanBlockCount() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     try {
-      List<DataNode> datanodes = cluster.getDataNodes();
+      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
       assertEquals(datanodes.size(), 1);
 
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();

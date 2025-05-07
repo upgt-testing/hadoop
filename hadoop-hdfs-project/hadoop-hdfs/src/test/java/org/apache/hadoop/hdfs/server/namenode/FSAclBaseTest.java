@@ -40,6 +40,7 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.AclException;
 import org.apache.hadoop.hdfs.protocol.FsPermissionExtension;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.SafeModeAction;
@@ -1677,6 +1678,15 @@ public abstract class FSAclBaseTest {
         .getINode(pathToCheck.toUri().getPath(), DirOp.READ_LINK);
     assertNotNull(inode);
     AclFeature aclFeature = inode.getAclFeature();
+    return aclFeature;
+  }
+
+  public static AclFeatureJVMInterface getAclFeature(Path pathToCheck,
+                                         MiniDFSClusterInJVM cluster) throws IOException {
+    INodeJVMInterface inode = cluster.getNamesystem().getFSDirectory()
+            .getINode(pathToCheck.toUri().getPath(), DirOp.READ_LINK);
+    assertNotNull(inode);
+    AclFeatureJVMInterface aclFeature = inode.getAclFeature();
     return aclFeature;
   }
 

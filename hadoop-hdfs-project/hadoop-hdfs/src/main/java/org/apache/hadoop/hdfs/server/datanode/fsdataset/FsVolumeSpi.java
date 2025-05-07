@@ -28,7 +28,7 @@ import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 /**
  * This is an interface for the underlying volume.
  */
-public interface FsVolumeSpi {
+public interface FsVolumeSpi, FsVolumeSpiJVMInterface {
   /**
    * Obtain a reference object that had increased 1 reference count of the
    * volume.

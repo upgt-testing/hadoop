@@ -40,7 +40,7 @@ import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocolPB.DatanodeProtocolClientSideTranslatorPB;
 import org.apache.hadoop.hdfs.server.protocol.BlockReportContext;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeCommand;
@@ -69,7 +69,7 @@ public class TestDatanodeProtocolRetryPolicy {
   private static final Log LOG = LogFactory.getLog(
       TestDatanodeProtocolRetryPolicy.class);
   private static final String DATA_DIR =
-      MiniDFSCluster.getBaseDirectory() + "data";
+      MiniDFSClusterInJVM.getBaseDirectory() + "data";
   private DataNode dn;
   private Configuration conf;
   private boolean tearDownDone;

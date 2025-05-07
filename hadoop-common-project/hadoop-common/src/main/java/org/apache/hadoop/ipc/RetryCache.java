@@ -43,7 +43,7 @@ import com.google.common.base.Preconditions;
  * To look an implementation using this cache, see HDFS FSNamesystem class.
  */
 @InterfaceAudience.Private
-public class RetryCache {
+public class RetryCache implements RetryCacheJVMInterface {
   public static final Log LOG = LogFactory.getLog(RetryCache.class);
   private final RetryCacheMetrics retryCacheMetrics;
   private static final int MAX_CAPACITY = 16;

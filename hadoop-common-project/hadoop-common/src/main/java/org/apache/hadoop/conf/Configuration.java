@@ -183,7 +183,7 @@ import com.google.common.base.Strings;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class Configuration implements Iterable<Map.Entry<String,String>>,
-                                      Writable {
+                                      Writable, ConfigurationJVMInterface {
   private static final Log LOG =
     LogFactory.getLog(Configuration.class);
 
@@ -201,6 +201,20 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   private static boolean restrictSystemPropsDefault = false;
   private boolean restrictSystemProps = restrictSystemPropsDefault;
   private boolean allowNullValueProperties = false;
+
+  // This is upgt related methods to re-construct the configuration for each instance
+  private Map<String, String> setParameters = new HashMap<>();
+
+  public Map<String, String> getSetParameters() {
+    return setParameters;
+  }
+
+  public void setAllParameters(Map<String, String> parameters) {
+    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+      set(entry.getKey(), entry.getValue());
+    }
+  }
+
 
   private static class Resource {
     private final Object resource;
@@ -281,7 +295,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   private static final WeakHashMap<Configuration,Object> REGISTRY = 
     new WeakHashMap<Configuration,Object>();
-  
+
   /**
    * List of default Resources. Resources are loaded in the order of the list 
    * entries
@@ -303,7 +317,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * the key most recently
    */
   private Map<String, String[]> updatingResource;
- 
+
   /**
    * Class to keep the information about the keys which replace the deprecated
    * ones.
@@ -481,9 +495,9 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
         CommonConfigurationKeys.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY),
       new DeprecationDelta("dfs.df.interval", 
         CommonConfigurationKeys.FS_DF_INTERVAL_KEY),
-      new DeprecationDelta("hadoop.native.lib", 
+      new DeprecationDelta("hadoop.native.lib",
         CommonConfigurationKeys.IO_NATIVE_LIB_AVAILABLE_KEY),
-      new DeprecationDelta("fs.default.name", 
+      new DeprecationDelta("fs.default.name",
         CommonConfigurationKeys.FS_DEFAULT_NAME_KEY),
       new DeprecationDelta("dfs.umaskmode",
         CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY),
@@ -726,7 +740,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     addDefaultResource("core-default.xml");
     addDefaultResource("core-site.xml");
   }
-  
+
   private Properties properties;
   private Properties overlay;
   private ClassLoader classLoader;
@@ -781,7 +795,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
          new ConcurrentHashMap<String, Boolean>());
      this.finalParameters.addAll(other.finalParameters);
    }
-   
+
     synchronized(Configuration.class) {
       REGISTRY.put(this, null);
     }
@@ -1071,7 +1085,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     throw new IllegalStateException("Variable substitution depth too large: " 
                                     + MAX_SUBST + " " + expr);
   }
-  
+
   /**
    * Get the value of the <code>name</code> property, <code>null</code> if
    * no such property exists. If the key is deprecated, it returns the value of
@@ -1242,6 +1256,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * @throws IllegalArgumentException when the value or name is null.
    */
   public void set(String name, String value, String source) {
+    setParameters.put(name, value);
     Preconditions.checkArgument(
         name != null,
         "Property name must not be null");
@@ -2695,7 +2710,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
       for (String resource : defaultResources) {
         loadResource(properties, new Resource(resource, false), quiet);
       }
-    
+
       //support the hadoop-site.xml as a deprecated case
       if(getResource("hadoop-site.xml")!=null) {
         loadResource(properties, new Resource("hadoop-site.xml", false), quiet);
@@ -2715,8 +2730,8 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     try {
       Object resource = wrapper.getResource();
       name = wrapper.getName();
-      
-      DocumentBuilderFactory docBuilderFactory 
+
+      DocumentBuilderFactory docBuilderFactory
         = DocumentBuilderFactory.newInstance();
       //ignore all comments inside the xml file
       docBuilderFactory.setIgnoringComments(true);
@@ -2738,7 +2753,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
       Document doc = null;
       Element root = null;
       boolean returnCachedProperties = false;
-      
+
       if (resource instanceof URL) {                  // an URL resource
         doc = parse(builder, (URL)resource);
       } else if (resource instanceof String) {        // a CLASSPATH resource
@@ -2824,7 +2839,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
                 ((Text)field.getFirstChild()).getData()));
         }
         source.add(name);
-        
+
         // Ignore this parameter if it has already been marked as 'final'
         if (attr != null) {
           if (deprecations.getDeprecatedKeyMap().containsKey(attr)) {
@@ -2832,18 +2847,18 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
                 deprecations.getDeprecatedKeyMap().get(attr);
             keyInfo.clearAccessed();
             for (String key:keyInfo.newKeys) {
-              // update new keys with deprecated key's value 
-              loadProperty(toAddTo, name, key, value, finalParameter, 
+              // update new keys with deprecated key's value
+              loadProperty(toAddTo, name, key, value, finalParameter,
                   source.toArray(new String[source.size()]));
             }
           }
           else {
-            loadProperty(toAddTo, name, attr, value, finalParameter, 
+            loadProperty(toAddTo, name, attr, value, finalParameter,
                 source.toArray(new String[source.size()]));
           }
         }
       }
-      
+
       if (returnCachedProperties) {
         overlay(properties, toAddTo);
         return new Resource(toAddTo, name, wrapper.isParserRestricted());
@@ -3265,7 +3280,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     for(Map.Entry<Object, Object> item: props.entrySet()) {
       org.apache.hadoop.io.Text.writeString(out, (String) item.getKey());
       org.apache.hadoop.io.Text.writeString(out, (String) item.getValue());
-      WritableUtils.writeCompressedStringArray(out, 
+      WritableUtils.writeCompressedStringArray(out,
           updatingResource.get(item.getKey()));
     }
   }

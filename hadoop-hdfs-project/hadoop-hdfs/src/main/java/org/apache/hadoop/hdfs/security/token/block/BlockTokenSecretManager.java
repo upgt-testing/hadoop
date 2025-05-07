@@ -52,19 +52,19 @@ import org.apache.hadoop.util.Timer;
  */
 @InterfaceAudience.Private
 public class BlockTokenSecretManager extends
-    SecretManager<BlockTokenIdentifier> {
+    SecretManager<BlockTokenIdentifier> implements BlockTokenSecretManagerJVMInterface {
   public static final Log LOG = LogFactory
       .getLog(BlockTokenSecretManager.class);
-  
+
   // We use these in an HA setup to ensure that the pair of NNs produce block
   // token serial numbers that are in different ranges.
   private static final int LOW_MASK  = ~(1 << 31);
-  
+
   public static final Token<BlockTokenIdentifier> DUMMY_TOKEN = new Token<BlockTokenIdentifier>();
 
   private final boolean isMaster;
   private int nnIndex;
-  
+
   /**
    * keyUpdateInterval is the interval that NN updates its block keys. It should
    * be set long enough so that all live DN's and Balancer should have sync'ed
@@ -78,7 +78,7 @@ public class BlockTokenSecretManager extends
   private final Map<Integer, BlockKey> allKeys;
   private String blockPoolId;
   private final String encryptionAlgorithm;
-  
+
   private final SecureRandom nonceGenerator = new SecureRandom();
 
   /**
@@ -88,7 +88,7 @@ public class BlockTokenSecretManager extends
   private Timer timer;
   /**
    * Constructor for slaves.
-   * 
+   *
    * @param keyUpdateInterval how often a new key will be generated
    * @param tokenLifetime how long an individual token is valid
    */
@@ -117,7 +117,7 @@ public class BlockTokenSecretManager extends
     setSerialNo(new SecureRandom().nextInt());
     generateKeys();
   }
-  
+
   private BlockTokenSecretManager(boolean isMaster, long keyUpdateInterval,
       long tokenLifetime, String blockPoolId, String encryptionAlgorithm) {
     this.isMaster = isMaster;
@@ -430,7 +430,7 @@ public class BlockTokenSecretManager extends
     }
     return createPassword(nonce, key.getKey());
   }
-  
+
   @VisibleForTesting
   public synchronized void setKeyUpdateIntervalForTesting(long millis) {
     this.keyUpdateInterval = millis;

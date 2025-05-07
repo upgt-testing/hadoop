@@ -34,7 +34,7 @@ import javax.annotation.Nonnull;
  **************************************************/
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class Block implements Writable, Comparable<Block> {
+public class Block implements Writable, Comparable<Block>, BlockJVMInterface {
   public static final String BLOCK_FILE_PREFIX = "blk_";
   public static final String METADATA_EXTENSION = ".meta";
   static {                                      // register a ctor

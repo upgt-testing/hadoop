@@ -32,7 +32,9 @@ import org.apache.hadoop.hdfs.server.common.Storage;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.ReplicaInfo;
 import org.apache.hadoop.hdfs.server.datanode.StorageLocation;
+import org.apache.hadoop.hdfs.server.datanode.*;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.io.IOUtils;
 
 import static org.junit.Assert.assertNotNull;
@@ -49,10 +51,21 @@ public class FsDatasetTestUtil {
     return ((FsDatasetImpl)fsd).getBlockFile(bpid, b.getBlockId());
   }
 
+  public static File getBlockFile(FsDatasetSpiJVMInterface<?> fsd, String bpid, Block b
+  ) throws IOException {
+    return ((FsDatasetImplJVMInterface)fsd).getBlockFile(bpid, b.getBlockId());
+  }
+
   public static File getMetaFile(FsDatasetSpi<?> fsd, String bpid, Block b)
       throws IOException {
     return FsDatasetUtil.getMetaFile(getBlockFile(fsd, bpid, b), b
         .getGenerationStamp());
+  }
+
+  public static File getMetaFile(FsDatasetSpiJVMInterface<?> fsd, String bpid, Block b)
+          throws IOException {
+    return FsDatasetUtil.getMetaFile(getBlockFile(fsd, bpid, b), b
+            .getGenerationStamp());
   }
 
   public static boolean breakHardlinksIfNeeded(FsDatasetSpi<?> fsd,

@@ -44,7 +44,7 @@ import com.google.common.collect.Lists;
 
 /** Snapshot of a sub-tree in the namesystem. */
 @InterfaceAudience.Private
-public class Snapshot implements Comparable<byte[]> {
+public class Snapshot implements Comparable<byte[]>, SnapshotJVMInterface {
   /**
    * This id is used to indicate the current state (vs. snapshots)
    */

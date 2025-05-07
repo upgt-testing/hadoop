@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.security.AccessControlException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class TestProtectedDirectories {
    * @return
    * @throws IOException
    */
-  public MiniDFSCluster setupTestCase(Configuration conf,
+  public MiniDFSClusterInJVM setupTestCase(Configuration conf,
                                       Collection<Path> protectedDirs,
                                       Collection<Path> unProtectedDirs)
       throws Throwable {
@@ -70,8 +70,8 @@ public class TestProtectedDirectories {
         Joiner.on(",").skipNulls().join(protectedDirs));
 
     // Start the cluster.
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
 
     // Create all the directories.
     try {
@@ -193,7 +193,7 @@ public class TestProtectedDirectories {
   public void testAll() throws Throwable {
     for (TestMatrixEntry testMatrixEntry : createTestMatrix()) {
       Configuration conf = new HdfsConfiguration();
-      MiniDFSCluster cluster = setupTestCase(
+      MiniDFSClusterInJVM cluster = setupTestCase(
           conf, testMatrixEntry.getProtectedPaths(),
           testMatrixEntry.getUnprotectedPaths());
 

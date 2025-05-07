@@ -33,11 +33,13 @@ import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.log4j.Level;
 import org.junit.Assert;
@@ -382,21 +384,21 @@ public class TestNetworkTopology {
   public void testInvalidNetworkTopologiesNotCachedInHdfs() throws Exception {
     // start a cluster
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
       // bad rack topology
       String racks[] = { "/a/b", "/c" };
       String hosts[] = { "foo1.example.com", "foo2.example.com" };
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).
           racks(racks).hosts(hosts).build();
       cluster.waitActive();
       
-      NamenodeProtocols nn = cluster.getNameNodeRpc();
+      NamenodeProtocolsJVMInterface nn = cluster.getNameNodeRpc();
       Assert.assertNotNull(nn);
       
       // Wait for one DataNode to register.
       // The other DataNode will not be able to register up because of the rack mismatch.
-      DatanodeInfo[] info;
+      DatanodeInfoJVMInterface[] info;
       while (true) {
         info = nn.getDatanodeReport(DatanodeReportType.LIVE);
         Assert.assertFalse(info.length == 2);

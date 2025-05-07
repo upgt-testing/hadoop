@@ -33,7 +33,7 @@ import org.apache.hadoop.metrics2.lib.MutableCounterLong;
  */
 @InterfaceAudience.Private
 @Metrics(about="Aggregate RetryCache metrics", context="rpc")
-public class RetryCacheMetrics {
+public class RetryCacheMetrics implements RetryCacheMetricsJVMInterface {
 
   static final Log LOG = LogFactory.getLog(RetryCacheMetrics.class);
   final MetricsRegistry registry;

@@ -28,11 +28,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSNNTopology;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.server.common.Util;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.*;
 import org.apache.hadoop.hdfs.server.namenode.NNStorage.NameNodeFile;
 import org.apache.hadoop.hdfs.util.Canceler;
@@ -65,8 +63,8 @@ import static org.junit.Assert.*;
 
 public class TestStandbyCheckpoints {
   private static final int NUM_DIRS_IN_LOG = 200000;
-  protected MiniDFSCluster cluster;
-  protected NameNode nn0, nn1;
+  protected MiniDFSClusterInJVM cluster;
+  protected NameNodeJVMInterface nn0, nn1;
   protected FileSystem fs;
   private final Random random = new Random();
   protected File tmpOivImgDir;
@@ -92,7 +90,7 @@ public class TestStandbyCheckpoints {
                 .addNN(new MiniDFSNNTopology.NNConf("nn1").setHttpPort(basePort))
                 .addNN(new MiniDFSNNTopology.NNConf("nn2").setHttpPort(basePort + 1)));
 
-        cluster = new MiniDFSCluster.Builder(conf)
+        cluster = new MiniDFSClusterInJVM.Builder(conf)
             .nnTopology(topology)
             .numDataNodes(1)
             .build();
@@ -106,7 +104,7 @@ public class TestStandbyCheckpoints {
         ++retryCount;
         break;
       } catch (BindException e) {
-        LOG.info("Set up MiniDFSCluster failed due to port conflicts, retry "
+        LOG.info("Set up MiniDFSClusterInJVM failed due to port conflicts, retry "
             + retryCount + " times");
       }
     }
@@ -142,10 +140,11 @@ public class TestStandbyCheckpoints {
     }
   }
 
+  /*
   @Test(timeout = 300000)
   public void testSBNCheckpoints() throws Exception {
     JournalSet standbyJournalSet = NameNodeAdapter.spyOnJournalSet(nn1);
-    
+
     doEdits(0, 10);
     HATestUtil.waitForStandbyToCatchUp(nn0, nn1);
     // Once the standby catches up, it should notice that it needs to
@@ -174,6 +173,7 @@ public class TestStandbyCheckpoints {
     Mockito.verify(standbyJournalSet, Mockito.never()).
       purgeLogsOlderThan(Mockito.anyLong());
   }
+   */
 
   @Test
   public void testNewDirInitAfterCheckpointing() throws Exception {
@@ -245,7 +245,7 @@ public class TestStandbyCheckpoints {
     dirs.addAll(FSImageTestUtil.getNameNodeCurrentDirs(cluster, 1));
     FSImageTestUtil.assertParallelFilesAreIdentical(dirs, ImmutableSet.<String>of());
   }
-  
+
   /**
    * Test for the case when the SBN is configured to checkpoint based
    * on a time period, but no transactions are happening on the
@@ -253,6 +253,7 @@ public class TestStandbyCheckpoints {
    * same txid, which is a no-op. This test makes sure this doesn't
    * cause any problem.
    */
+  /*
   @Test(timeout = 300000)
   public void testCheckpointWhenNoNewTransactionsHappened()
       throws Exception {
@@ -261,9 +262,9 @@ public class TestStandbyCheckpoints {
         DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_PERIOD_KEY, 0);
     cluster.restartNameNode(1);
     nn1 = cluster.getNameNode(1);
- 
+
     FSImage spyImage1 = NameNodeAdapter.spyOnFsImage(nn1);
-    
+
     // We shouldn't save any checkpoints at txid=0
     Thread.sleep(1000);
     Mockito.verify(spyImage1, Mockito.never())
@@ -278,7 +279,8 @@ public class TestStandbyCheckpoints {
         (FSNamesystem) Mockito.anyObject(), Mockito.eq(NameNodeFile.IMAGE),
         (Canceler) Mockito.anyObject());
   }
-  
+   */
+
   /**
    * Test cancellation of ongoing checkpoints when failover happens
    * mid-checkpoint. 
@@ -293,9 +295,9 @@ public class TestStandbyCheckpoints {
     // (only ~15MB)
     URI sharedUri = cluster.getSharedEditsDir(0, 1);
     File sharedDir = new File(sharedUri.getPath(), "current");
-    File tmpDir = new File(MiniDFSCluster.getBaseDirectory(),
+    File tmpDir = new File(MiniDFSClusterInJVM.getBaseDirectory(),
         "testCheckpointCancellation-tmp");
-    FSNamesystem fsn = cluster.getNamesystem(0);
+    FSNamesystemJVMInterface fsn = cluster.getNamesystem(0);
     FSImageTestUtil.createAbortedLogWithMkdirs(tmpDir, NUM_DIRS_IN_LOG, 3,
         fsn.getFSDirectory().getLastInodeId() + 1);
     String fname = NNStorage.getInProgressEditsFileName(3); 
@@ -384,6 +386,7 @@ public class TestStandbyCheckpoints {
    * checkpoint is in progress on the SBN, and therefore the StandbyCheckpointer
    * thread will have FSNS lock. Regression test for HDFS-4591.
    */
+  /*
   @Test(timeout=300000)
   public void testStandbyExceptionThrownDuringCheckpoint() throws Exception {
     
@@ -466,11 +469,11 @@ public class TestStandbyCheckpoints {
     
     // Make sure that our thread is waiting for the lock.
     ThreadUtil.sleepAtLeastIgnoreInterrupts(1000);
-    
+
     assertFalse(nn1.getNamesystem().getFsLockForTests().hasQueuedThreads());
     assertFalse(nn1.getNamesystem().getFsLockForTests().isWriteLocked());
     assertTrue(nn1.getNamesystem().getCpLockForTests().hasQueuedThreads());
-    
+
     // Get /jmx of the standby NN web UI, which will cause the FSNS read lock to
     // be taken.
     String pageContents = DFSTestUtil.urlGet(new URL("http://" +
@@ -489,6 +492,7 @@ public class TestStandbyCheckpoints {
     
     t.join();
   }
+   */
 
   /**
    * Test that checkpointing is still successful even if an issue

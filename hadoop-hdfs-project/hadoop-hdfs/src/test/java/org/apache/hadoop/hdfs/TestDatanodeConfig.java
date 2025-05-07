@@ -43,9 +43,9 @@ import org.junit.Test;
  */
 public class TestDatanodeConfig {
   private static final File BASE_DIR =
-                                new File(MiniDFSCluster.getBaseDirectory());
+                                new File(MiniDFSClusterInJVM.getBaseDirectory());
 
-  private static MiniDFSCluster cluster;
+  private static MiniDFSClusterInJVM cluster;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -55,7 +55,7 @@ public class TestDatanodeConfig {
     conf.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY, "localhost:0");
     conf.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY, "localhost:0");
     conf.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY, "localhost:0");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
     cluster.waitActive();
   }
 

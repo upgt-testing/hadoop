@@ -48,7 +48,7 @@ public class TestDatanodeLayoutUpgrade {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         new File(System.getProperty("test.build.data"),
             "dfs" + File.separator + "name").toURI().toString());
-    upgrade.upgradeAndVerify(new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    upgrade.upgradeAndVerify(new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
     .manageDataDfsDirs(false).manageNameDfsDirs(false), null);
   }
 
@@ -67,7 +67,7 @@ public class TestDatanodeLayoutUpgrade {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         new File(System.getProperty("test.build.data"), "dfs" + File.separator
             + "name").toURI().toString());
-    upgrade.upgradeAndVerify(new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    upgrade.upgradeAndVerify(new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .manageDataDfsDirs(false).manageNameDfsDirs(false), null);
   }
 }

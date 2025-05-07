@@ -52,6 +52,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.crypto.key.JavaKeyStoreProvider;
+import org.apache.hadoop.crypto.key.KeyProvider;
+import org.apache.hadoop.crypto.key.KeyProviderJVMInterface;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.BlockStorageLocation;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
@@ -82,7 +85,9 @@ import org.apache.hadoop.hdfs.net.Peer;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeFaultInjector;
+import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil;
 import org.apache.hadoop.hdfs.web.HftpFileSystem;
@@ -125,7 +130,7 @@ public class TestDistributedFileSystem {
     HdfsConfiguration conf;
     if (noXmlDefaults) {
       conf = new HdfsConfiguration(false);
-      String namenodeDir = new File(MiniDFSCluster.getBaseDirectory(), "name").
+      String namenodeDir = new File(MiniDFSClusterInJVM.getBaseDirectory(), "name").
           getAbsolutePath();
       conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY, namenodeDir);
       conf.set(DFSConfigKeys.DFS_NAMENODE_EDITS_DIR_KEY, namenodeDir);
@@ -144,9 +149,9 @@ public class TestDistributedFileSystem {
   @Test
   public void testEmptyDelegationToken() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       FileSystem fileSys = cluster.getFileSystem();
       fileSys.getDelegationToken("");
     } finally {
@@ -159,7 +164,7 @@ public class TestDistributedFileSystem {
   @Test
   public void testFileSystemCloseAll() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).
         build();
     URI address = FileSystem.getDefaultUri(conf);
 
@@ -185,23 +190,23 @@ public class TestDistributedFileSystem {
   @Test
   public void testDFSClose() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
-      FileSystem fileSys = cluster.getFileSystem();
-      
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+      DistributedFileSystem fileSys = cluster.getFileSystem();
+
       // create two files, leaving them open
       fileSys.create(new Path("/test/dfsclose/file-0"));
       fileSys.create(new Path("/test/dfsclose/file-1"));
-      
+
       // create another file, close it, and read it, so
       // the client gets a socket in its SocketCache
       Path p = new Path("/non-empty-file");
       DFSTestUtil.createFile(fileSys, p, 1L, (short)1, 0L);
       DFSTestUtil.readFile(fileSys, p);
-      
+
       fileSys.close();
-      
+
     } finally {
       if (cluster != null) {cluster.shutdown();}
     }
@@ -240,9 +245,9 @@ public class TestDistributedFileSystem {
   @Test
   public void testDFSSeekExceptions() throws IOException {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
       FileSystem fileSys = cluster.getFileSystem();
       String file = "/test/fileclosethenseek/file-0";
       Path path = new Path(file);
@@ -280,11 +285,11 @@ public class TestDistributedFileSystem {
   public void testDFSClient() throws Exception {
     Configuration conf = getTestConfiguration();
     final long grace = 1000L;
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     LeaseRenewer.setLeaseRenewerGraceDefault(grace);
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
       final String filepathstring = "/test/LeaseChecker/foo";
       final Path[] filepaths = new Path[4];
       for(int i = 0; i < filepaths.length; i++) {
@@ -441,7 +446,7 @@ public class TestDistributedFileSystem {
   @Test
   public void testClearStatistics() throws Exception {
     final Configuration conf = getTestConfiguration();
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       FileSystem dfs = cluster.getFileSystem();
@@ -485,7 +490,7 @@ public class TestDistributedFileSystem {
     int lsLimit = 2;
     final Configuration conf = getTestConfiguration();
     conf.setInt(DFSConfigKeys.DFS_LIST_LIMIT, lsLimit);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       final FileSystem fs = cluster.getFileSystem();
@@ -605,7 +610,7 @@ public class TestDistributedFileSystem {
     } finally {
       if (cluster != null) cluster.shutdown();
     }
-    
+
   }
 
   @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -615,7 +620,7 @@ public class TestDistributedFileSystem {
     FileSystem.getStatistics(HdfsConstants.HDFS_URI_SCHEME,
         DistributedFileSystem.class).reset();
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(
         new Configuration()).build();
     cluster.waitActive();
     final FileSystem fs = cluster.getFileSystem();
@@ -683,7 +688,7 @@ public class TestDistributedFileSystem {
   }
 
   /** Checks statistics. -1 indicates do not check for the operations */
-  private void checkStatistics(FileSystem fs, int readOps, int writeOps,
+  public static void checkStatistics(FileSystem fs, int readOps, int writeOps,
       int largeReadOps) {
     assertEquals(readOps, DFSTestUtil.getStatistics(fs).getReadOps());
     assertEquals(writeOps, DFSTestUtil.getStatistics(fs).getWriteOps());
@@ -695,7 +700,7 @@ public class TestDistributedFileSystem {
         count, getOpStatistics(op));
   }
 
-  private static long getOpStatistics(OpType op) {
+  public static long getOpStatistics(OpType op) {
     return GlobalStorageStatistics.INSTANCE.get(
         DFSOpsCountStatistics.NAME)
         .getLong(op.getSymbol());
@@ -712,7 +717,7 @@ public class TestDistributedFileSystem {
     final Configuration conf = getTestConfiguration();
     conf.setBoolean(HdfsClientConfigKeys.DFS_WEBHDFS_ENABLED_KEY, true);
 
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(2).build();
     final FileSystem hdfs = cluster.getFileSystem();
 
@@ -739,7 +744,7 @@ public class TestDistributedFileSystem {
       assertTrue("Not throwing the intended exception message", e.getMessage()
           .contains("Path is not a file: /test/TestExistingDir"));
     }
-    
+
     //hftp
     final String hftpuri = "hftp://" + nnAddr;
     System.out.println("hftpuri=" + hftpuri);
@@ -873,7 +878,7 @@ public class TestDistributedFileSystem {
       }
 
       hdfs.setPermission(dir, new FsPermission((short)0));
-      { //test permission error on hftp 
+      { //test permission error on hftp
         try {
           hftp.getFileChecksum(qualified);
           fail();
@@ -928,7 +933,7 @@ public class TestDistributedFileSystem {
   @Test(timeout=120000)
   public void testLocatedFileStatusStorageIdsTypes() throws Exception {
     final Configuration conf = getTestConfiguration();
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(3).build();
     try {
       final DistributedFileSystem fs = cluster.getFileSystem();
@@ -948,8 +953,8 @@ public class TestDistributedFileSystem {
       assertEquals("Unexpected number of locations", numBlocks, locs.length);
 
       Set<String> dnStorageIds = new HashSet<>();
-      for (DataNode d : cluster.getDataNodes()) {
-        try (FsDatasetSpi.FsVolumeReferences volumes = d.getFSDataset()
+      for (DataNodeJVMInterface d : cluster.getDataNodes()) {
+        try (FsVolumeReferencesJVMInterface volumes = d.getFSDataset()
             .getFsVolumeReferences()) {
           for (FsVolumeSpi vol : volumes) {
             dnStorageIds.add(vol.getStorageID());
@@ -1078,13 +1083,13 @@ public class TestDistributedFileSystem {
         DFSConfigKeys.DFS_CLIENT_FILE_BLOCK_STORAGE_LOCATIONS_TIMEOUT_MS, 1500);
     conf.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 0);
-    
+
     MiniDFSCluster cluster = null;
     try {
       cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
       cluster.getDataNodes();
       final DistributedFileSystem fs = cluster.getFileSystem();
-      
+
       // Create a few files and add together their block locations into
       // a list.
       final Path tmpFile1 = new Path("/errorfile1.dat");
@@ -1116,7 +1121,7 @@ public class TestDistributedFileSystem {
           return false;
         }
       }, 500, 30000);
-      
+
       BlockLocation[] blockLocs1 = fs.getFileBlockLocations(tmpFile1, 0, 1024);
       BlockLocation[] blockLocs2 = fs.getFileBlockLocations(tmpFile2, 0, 1024);
 
@@ -1147,12 +1152,12 @@ public class TestDistributedFileSystem {
 
       // Stop a datanode to simulate a failure.
       DataNodeProperties stoppedNode = cluster.stopDataNode(0);
-      
+
       // Fetch VolumeBlockLocations
       locs = fs.getFileBlockStorageLocations(allLocs);
       assertEquals("Expected two HdfsBlockLocation for two 1-block files", 2,
           locs.length);
-  
+
       for (BlockStorageLocation l : locs) {
         assertEquals("Expected two replicas for each block", 2,
             l.getHosts().length);
@@ -1161,18 +1166,18 @@ public class TestDistributedFileSystem {
         assertTrue("Expected one valid and one invalid volume",
             (l.getVolumeIds()[0] == null) ^ (l.getVolumeIds()[1] == null));
       }
-      
+
       // Start the datanode again, and remove one of the blocks.
       // This is a different type of failure where the block itself
       // is invalid.
       cluster.restartDataNode(stoppedNode, true /*keepPort*/);
       cluster.waitActive();
-      
+
       fs.delete(tmpFile2, true);
       HATestUtil.waitForNNToIssueDeletions(cluster.getNameNode());
       cluster.triggerHeartbeats();
       HATestUtil.waitForDNDeletions(cluster);
-  
+
       locs = fs.getFileBlockStorageLocations(allLocs);
       assertEquals("Expected two HdfsBlockLocations for two 1-block files", 2,
           locs.length);
@@ -1190,7 +1195,7 @@ public class TestDistributedFileSystem {
   @Test
   public void testCreateWithCustomChecksum() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     Path testBasePath = new Path("/test/csum");
     // create args 
     Path path1 = new Path(testBasePath, "file_wtih_crc1");
@@ -1206,7 +1211,7 @@ public class TestDistributedFileSystem {
     short repl = 1;
 
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       FileSystem dfs = cluster.getFileSystem();
 
       dfs.mkdirs(testBasePath);
@@ -1246,7 +1251,7 @@ public class TestDistributedFileSystem {
   @Test(timeout=60000)
   public void testFileCloseStatus() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     DistributedFileSystem fs = cluster.getFileSystem();
     try {
       // create a new file.
@@ -1262,11 +1267,11 @@ public class TestDistributedFileSystem {
       cluster.shutdown();
     }
   }
-  
+
   @Test(timeout=60000)
   public void testListFiles() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM  cluster = new MiniDFSClusterInJVM .Builder(conf).build();
     
     try {
       DistributedFileSystem fs = cluster.getFileSystem();
@@ -1293,7 +1298,7 @@ public class TestDistributedFileSystem {
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, timeout);
 
     // only need cluster to create a dfs client to get a peer
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();     
       DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1324,7 +1329,7 @@ public class TestDistributedFileSystem {
   @Test(timeout=60000)
   public void testGetServerDefaults() throws IOException {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1342,7 +1347,7 @@ public class TestDistributedFileSystem {
     conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, timeout);
 
     // only need cluster to create a dfs client to get a peer
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
     try {
       cluster.waitActive();
       DistributedFileSystem dfs = cluster.getFileSystem();
@@ -1376,9 +1381,9 @@ public class TestDistributedFileSystem {
   @Test(timeout = 30000)
   public void testTotalDfsUsed() throws Exception {
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       FileSystem fs = cluster.getFileSystem();
       // create file under root
       FSDataOutputStream File1 = fs.create(new Path("/File1"));
@@ -1403,9 +1408,9 @@ public class TestDistributedFileSystem {
   @Test
   public void testDFSCloseFilesBeingWritten() throws Exception {
     Configuration conf = getTestConfiguration();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       DistributedFileSystem fileSys = cluster.getFileSystem();
 
       // Create one file then delete it to trigger the FileNotFoundException

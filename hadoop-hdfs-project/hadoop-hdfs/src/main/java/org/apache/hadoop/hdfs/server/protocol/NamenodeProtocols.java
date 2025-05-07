@@ -41,5 +41,6 @@ public interface NamenodeProtocols
           GenericRefreshProtocol,
           GetUserMappingsProtocol,
           HAServiceProtocol,
-          TraceAdminProtocol {
+          TraceAdminProtocol,
+          NamenodeProtocolsJVMInterface{
 }

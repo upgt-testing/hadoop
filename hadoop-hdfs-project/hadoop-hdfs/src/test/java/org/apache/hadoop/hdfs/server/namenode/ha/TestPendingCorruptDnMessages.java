@@ -32,12 +32,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptor;
+import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeDescriptorJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils;
 import org.apache.hadoop.test.GenericTestUtils;
 
@@ -54,7 +55,7 @@ public class TestPendingCorruptDnMessages {
       InterruptedException, TimeoutException {
     HdfsConfiguration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
+    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
         .numDataNodes(1)
         .nnTopology(MiniDFSNNTopology.simpleHATopology())
         .build();
@@ -122,15 +123,15 @@ public class TestPendingCorruptDnMessages {
   }
   
   private static String getRegisteredDatanodeUid(
-      MiniDFSCluster cluster, int nnIndex) {
-    List<DatanodeDescriptor> registeredDatanodes = cluster.getNamesystem(nnIndex)
+      MiniDFSClusterInJVM cluster, int nnIndex) {
+    List<DatanodeDescriptorJVMInterface> registeredDatanodes = (List<DatanodeDescriptorJVMInterface>) cluster.getNamesystem(nnIndex)
         .getBlockManager().getDatanodeManager()
         .getDatanodeListForReport(DatanodeReportType.ALL);
     return registeredDatanodes.isEmpty() ? null :
-        registeredDatanodes.get(0).getDatanodeUuid();
+            registeredDatanodes.get(0).getDatanodeUuid();
   }
   
-  private static boolean wipeAndRestartDn(MiniDFSCluster cluster, int dnIndex)
+  private static boolean wipeAndRestartDn(MiniDFSClusterInJVM cluster, int dnIndex)
       throws IOException {
     // stop the DN, reformat it, then start it again with the same xfer port.
     DataNodeProperties dnProps = cluster.stopDataNode(dnIndex);

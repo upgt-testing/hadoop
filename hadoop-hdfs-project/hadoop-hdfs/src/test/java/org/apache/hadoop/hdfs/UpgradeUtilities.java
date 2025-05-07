@@ -560,12 +560,26 @@ public class UpgradeUtilities {
     }
     return namenodeStorageNamespaceID;
   }
+
+  public static int getCurrentNamespaceIDJVM(MiniDFSClusterInJVM cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getNamespaceID();
+    }
+    return namenodeStorageNamespaceID;
+  }
   
   /**
    * Return the cluster ID inherent in the currently running
    * Namenode. 
    */
   public static String getCurrentClusterID(MiniDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getClusterID();
+    }
+    return namenodeStorageClusterID;
+  }
+
+  public static String getCurrentClusterIDJVM(MiniDFSClusterInJVM cluster) throws IOException {
     if (cluster != null) {
       return cluster.getNameNodeRpc().versionRequest().getClusterID();
     }
@@ -582,6 +596,13 @@ public class UpgradeUtilities {
     }
     return namenodeStorageBlockPoolID;
   }
+
+  public static String getCurrentBlockPoolIDJVM(MiniDFSClusterInJVM cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getBlockPoolID();
+    }
+    return namenodeStorageBlockPoolID;
+  }
   
   /**
    * Return the File System State Creation Timestamp (FSSCTime) inherent
@@ -592,6 +613,13 @@ public class UpgradeUtilities {
    * calling this method.
    */
   public static long getCurrentFsscTime(MiniDFSCluster cluster) throws IOException {
+    if (cluster != null) {
+      return cluster.getNameNodeRpc().versionRequest().getCTime();
+    }
+    return namenodeStorageFsscTime;
+  }
+
+  public static long getCurrentFsscTimeJVM(MiniDFSClusterInJVM cluster) throws IOException {
     if (cluster != null) {
       return cluster.getNameNodeRpc().versionRequest().getCTime();
     }

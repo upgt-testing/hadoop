@@ -27,7 +27,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
 import org.apache.hadoop.hdfs.server.protocol.BlockReportContext;
 import org.apache.hadoop.test.GenericTestUtils;
@@ -131,8 +131,8 @@ public class TestBlockReportRateLimiting {
     BlockManagerFaultInjector.instance = injector;
 
     final int NUM_DATANODES = 5;
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATANODES).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATANODES).build();
     cluster.waitActive();
     for (int n = 1; n <= NUM_DATANODES; n++) {
       LOG.info("Waiting for " + n + " datanode(s) to report in.");
@@ -170,7 +170,7 @@ public class TestBlockReportRateLimiting {
 
     final Semaphore gotFbrSem = new Semaphore(0);
     final AtomicReference<String> failure = new AtomicReference<>();
-    final AtomicReference<MiniDFSCluster> cluster =
+    final AtomicReference<MiniDFSClusterInJVM> cluster =
         new AtomicReference<>();
     final AtomicReference<String> datanodeToStop = new AtomicReference<>();
     final BlockManagerFaultInjector injector = new BlockManagerFaultInjector() {
@@ -204,7 +204,7 @@ public class TestBlockReportRateLimiting {
     };
     try {
       BlockManagerFaultInjector.instance = injector;
-      cluster.set(new MiniDFSCluster.Builder(conf).numDataNodes(2).build());
+      cluster.set(new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build());
       cluster.get().waitActive();
       Assert.assertNotNull(cluster.get().stopDataNode(datanodeToStop.get()));
       gotFbrSem.acquire();

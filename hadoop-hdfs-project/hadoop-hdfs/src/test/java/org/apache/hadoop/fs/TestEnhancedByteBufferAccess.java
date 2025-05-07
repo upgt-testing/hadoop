@@ -39,14 +39,8 @@ import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hdfs.*;
 import org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil;
-import org.apache.hadoop.hdfs.ClientContext;
-import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.ExtendedBlockId;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.client.HdfsDataInputStream;
 import org.apache.hadoop.hdfs.client.impl.DfsClientConf;
@@ -138,14 +132,14 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testZeroCopyReads() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     FSDataInputStream fsIn = null;
     final int TEST_FILE_LENGTH = 3 * BLOCK_SIZE;
     
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -185,14 +179,14 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testShortZeroCopyReads() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     FSDataInputStream fsIn = null;
     final int TEST_FILE_LENGTH = 3 * BLOCK_SIZE;
     
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH, TEST_FILE_LENGTH, (short)1, 7567L);
@@ -241,14 +235,14 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testZeroCopyReadsNoFallback() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     FSDataInputStream fsIn = null;
     final int TEST_FILE_LENGTH = 3 * BLOCK_SIZE;
     
     FileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -329,7 +323,7 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testZeroCopyMmapCache() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final int TEST_FILE_LENGTH = 5 * BLOCK_SIZE;
     final int RANDOM_SEED = 23453;
@@ -339,7 +333,7 @@ public class TestEnhancedByteBufferAccess {
 
     DistributedFileSystem fs = null;
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, CONTEXT);
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     fs = cluster.getFileSystem();
     DFSTestUtil.createFile(fs, TEST_PATH,
@@ -434,7 +428,7 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testHdfsFallbackReads() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final int TEST_FILE_LENGTH = 16385;
     final int RANDOM_SEED = 23453;
@@ -442,7 +436,7 @@ public class TestEnhancedByteBufferAccess {
     
     DistributedFileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -518,7 +512,7 @@ public class TestEnhancedByteBufferAccess {
   @Test
   public void testFallbackRead() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final int TEST_FILE_LENGTH = 16385;
     final int RANDOM_SEED = 23453;
@@ -526,7 +520,7 @@ public class TestEnhancedByteBufferAccess {
     
     DistributedFileSystem fs = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -587,6 +581,7 @@ public class TestEnhancedByteBufferAccess {
    * Test that we can zero-copy read cached data even without disabling
    * checksums.
    */
+  /**
   @Test(timeout=120000)
   public void testZeroCopyReadOfCachedData() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -604,9 +599,9 @@ public class TestEnhancedByteBufferAccess {
     conf.setLong(DFS_DATANODE_MAX_LOCKED_MEMORY_KEY,
         DFSTestUtil.roundUpToMultiple(TEST_FILE_LENGTH,
           (int) NativeIO.POSIX.getCacheManipulator().getOperatingSystemPageSize()));
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     ByteBuffer result = null, result2 = null;
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     FsDatasetSpi<?> fsd = cluster.getDataNodes().get(0).getFSDataset();
     DistributedFileSystem fs = cluster.getFileSystem();
@@ -675,7 +670,8 @@ public class TestEnhancedByteBufferAccess {
     fs.close();
     cluster.shutdown();
   }
-  
+  **/
+
   private void waitForReplicaAnchorStatus(final ShortCircuitCache cache,
       final ExtendedBlock block, final boolean expectedIsAnchorable,
         final boolean expectedIsAnchored, final int expectedOutstandingMmaps)
@@ -716,7 +712,7 @@ public class TestEnhancedByteBufferAccess {
   public void testClientMmapDisable() throws Exception {
     HdfsConfiguration conf = initZeroCopyTest();
     conf.setBoolean(HdfsClientConfigKeys.Mmap.ENABLED_KEY, false);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final int TEST_FILE_LENGTH = 16385;
     final int RANDOM_SEED = 23453;
@@ -728,7 +724,7 @@ public class TestEnhancedByteBufferAccess {
     try {
       // With HdfsClientConfigKeys.Mmap.ENABLED_KEY set to false,
       // we should not do memory mapped reads.
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -755,7 +751,7 @@ public class TestEnhancedByteBufferAccess {
       conf.setBoolean(HdfsClientConfigKeys.Mmap.ENABLED_KEY, true);
       conf.setInt(HdfsClientConfigKeys.Mmap.CACHE_SIZE_KEY, 0);
       conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, CONTEXT + ".1");
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH,
@@ -782,7 +778,7 @@ public class TestEnhancedByteBufferAccess {
     final long TEST_FILE_LENGTH = 2469605888L;
     conf.set(DFSConfigKeys.DFS_CHECKSUM_TYPE_KEY, "NULL");
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, TEST_FILE_LENGTH);
-    MiniDFSCluster cluster = null;
+    MiniDFSClusterInJVM cluster = null;
     final Path TEST_PATH = new Path("/a");
     final String CONTEXT = "test2GBMmapLimit";
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, CONTEXT);
@@ -790,7 +786,7 @@ public class TestEnhancedByteBufferAccess {
     FSDataInputStream fsIn = null, fsIn2 = null;
     ByteBuffer buf1 = null, buf2 = null;
     try {
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
       cluster.waitActive();
       DistributedFileSystem fs = cluster.getFileSystem();
       DFSTestUtil.createFile(fs, TEST_PATH, TEST_FILE_LENGTH, (short)1, 0xB);

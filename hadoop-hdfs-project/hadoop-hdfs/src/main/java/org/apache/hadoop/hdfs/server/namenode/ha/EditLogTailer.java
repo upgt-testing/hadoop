@@ -60,7 +60,7 @@ import com.google.common.base.Preconditions;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class EditLogTailer {
+public class EditLogTailer implements EditLogTailerJVMInterface  {
   public static final Log LOG = LogFactory.getLog(EditLogTailer.class);
   
   private final EditLogTailerThread tailerThread;
@@ -197,7 +197,7 @@ public class EditLogTailer {
   }
   
   @VisibleForTesting
-  void doTailEdits() throws IOException, InterruptedException {
+  public void doTailEdits() throws IOException, InterruptedException {
     // Write lock needs to be interruptible here because the 
     // transitionToActive RPC takes the write lock before calling
     // tailer.stop() -- so if we're not interruptible, it will

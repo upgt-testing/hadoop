@@ -80,7 +80,7 @@ import com.google.common.util.concurrent.Futures;
  * @see Storage
  */
 @InterfaceAudience.Private
-public class DataStorage extends Storage {
+public class DataStorage extends Storage implements DataStorageJVMInterface {
 
   public final static String BLOCK_SUBDIR_PREFIX = "subdir";
   final static String STORAGE_DIR_DETACHED = "detach";

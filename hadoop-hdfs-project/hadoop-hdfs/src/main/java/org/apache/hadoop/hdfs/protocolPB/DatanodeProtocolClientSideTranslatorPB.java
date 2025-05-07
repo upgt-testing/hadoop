@@ -79,7 +79,7 @@ import com.google.protobuf.ServiceException;
 @InterfaceAudience.Private
 @InterfaceStability.Stable
 public class DatanodeProtocolClientSideTranslatorPB implements
-    ProtocolMetaInterface, DatanodeProtocol, Closeable {
+    ProtocolMetaInterface, DatanodeProtocol, Closeable, DatanodeProtocolClientSideTranslatorPBJVMInterface {
   
   /** RpcController is not used and hence is set to null */
   private final DatanodeProtocolPB rpcProxy;

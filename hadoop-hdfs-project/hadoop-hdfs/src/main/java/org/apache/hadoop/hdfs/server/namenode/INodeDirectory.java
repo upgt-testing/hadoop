@@ -50,7 +50,7 @@ import static org.apache.hadoop.hdfs.protocol.HdfsConstants.BLOCK_STORAGE_POLICY
  * Directory INode class.
  */
 public class INodeDirectory extends INodeWithAdditionalFields
-    implements INodeDirectoryAttributes {
+    implements INodeDirectoryAttributes, INodeDirectoryJVMInterface {
 
   /** Cast INode to INodeDirectory. */
   public static INodeDirectory valueOf(INode inode, Object path

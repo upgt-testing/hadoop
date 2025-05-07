@@ -40,7 +40,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @InterfaceAudience.Private
 abstract public class ReplicaInfo extends Block
-    implements Replica, LightWeightResizableGSet.LinkedElement {
+    implements Replica, LightWeightResizableGSet.LinkedElement, ReplicaInfoJVMInterface {
 
   /** For implementing {@link LightWeightResizableGSet.LinkedElement} interface */
   private LightWeightResizableGSet.LinkedElement next;

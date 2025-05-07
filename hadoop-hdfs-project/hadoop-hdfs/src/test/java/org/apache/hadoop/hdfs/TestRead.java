@@ -34,7 +34,7 @@ import org.junit.Test;
 public class TestRead {
   final private int BLOCK_SIZE = 512;
 
-  private void testEOF(MiniDFSCluster cluster, int fileLength) throws IOException {
+  private void testEOF(MiniDFSClusterInJVM cluster, int fileLength) throws IOException {
     FileSystem fs = cluster.getFileSystem();
     Path path = new Path("testEOF." + fileLength);
     DFSTestUtil.createFile(fs, path, fileLength, (short)1, 0xBEEFBEEF);
@@ -60,7 +60,7 @@ public class TestRead {
     try {
       final Configuration conf = testContext.newConfiguration();
       conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-      MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+      MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
           .format(true).build();
       testEOF(cluster, 1);
       testEOF(cluster, 14);
@@ -75,7 +75,7 @@ public class TestRead {
   public void testEOFWithRemoteBlockReader() throws Exception {
     final Configuration conf = new Configuration();
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1)
         .format(true).build();
     testEOF(cluster, 1);
     testEOF(cluster, 14);
@@ -91,7 +91,7 @@ public class TestRead {
   @Test(timeout=60000)
   public void testReadReservedPath() throws Exception {
     Configuration conf = new Configuration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).
         numDataNodes(1).format(true).build();
     try {
       FileSystem fs = cluster.getFileSystem();

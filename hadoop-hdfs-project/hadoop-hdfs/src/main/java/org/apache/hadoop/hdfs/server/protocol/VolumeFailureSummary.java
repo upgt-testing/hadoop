@@ -20,7 +20,7 @@ package org.apache.hadoop.hdfs.server.protocol;
 /**
  * Summarizes information about data volume failures on a DataNode.
  */
-public class VolumeFailureSummary {
+public class VolumeFailureSummary implements VolumeFailureSummaryJVMInterface {
   private final String[] failedStorageLocations;
   private final long lastVolumeFailureDate;
   private final long estimatedCapacityLostTotal;

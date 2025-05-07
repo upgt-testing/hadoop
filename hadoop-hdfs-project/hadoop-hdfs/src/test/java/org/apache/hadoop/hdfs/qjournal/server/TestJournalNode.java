@@ -34,6 +34,8 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.DFSUtilClient;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.qjournal.QJMTestUtil;
 import org.apache.hadoop.hdfs.qjournal.client.IPCLoggerChannel;
 import org.apache.hadoop.hdfs.qjournal.protocol.QJournalProtocolProtos.NewEpochResponseProto;
@@ -76,10 +78,10 @@ public class TestJournalNode {
   
   @Before
   public void setup() throws Exception {
-    File editsDir = new File(MiniDFSCluster.getBaseDirectory() +
+    File editsDir = new File(MiniDFSClusterInJVM.getBaseDirectory() +
         File.separator + "TestJournalNode");
     FileUtil.fullyDelete(editsDir);
-    
+
     conf.set(DFSConfigKeys.DFS_JOURNALNODE_EDITS_DIR_KEY,
         editsDir.getAbsolutePath());
     conf.set(DFSConfigKeys.DFS_JOURNALNODE_RPC_ADDRESS_KEY,
@@ -98,7 +100,7 @@ public class TestJournalNode {
   public void teardown() throws Exception {
     jn.stop(0);
   }
-  
+
   @Test(timeout=100000)
   public void testJournal() throws Exception {
     MetricsRecordBuilder metrics = MetricsAsserts.getMetrics(

@@ -54,7 +54,7 @@ public class TestDFSRollback {
                                                    "org.apache.hadoop.hdfs.TestDFSRollback");
   private Configuration conf;
   private int testCounter = 0;
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
   
   /**
    * Writes an INFO log message containing the parameters.
@@ -102,7 +102,7 @@ public class TestDFSRollback {
   void startNameNodeShouldFail(String searchString) {
     try {
       NameNode.doRollback(conf, false);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -159,7 +159,7 @@ public class TestDFSRollback {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       NameNode.doRollback(conf, false);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -177,7 +177,7 @@ public class TestDFSRollback {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       NameNode.doRollback(conf, false);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -185,16 +185,16 @@ public class TestDFSRollback {
                                                 .build();
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "current",
-          UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
       // Create a previous snapshot for the blockpool
       UpgradeUtilities.createBlockPoolStorageDirs(dataNodeDirs, "previous",
-          UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
       // Put newer layout version in current.
       storageInfo = new StorageInfo(
           HdfsServerConstants.DATANODE_LAYOUT_VERSION - 1,
-          UpgradeUtilities.getCurrentNamespaceID(cluster),
-          UpgradeUtilities.getCurrentClusterID(cluster),
-          UpgradeUtilities.getCurrentFsscTime(cluster),
+          UpgradeUtilities.getCurrentNamespaceIDJVM(cluster),
+          UpgradeUtilities.getCurrentClusterIDJVM(cluster),
+          UpgradeUtilities.getCurrentFsscTimeJVM(cluster),
           NodeType.DATA_NODE);
 
       // Overwrite VERSION file in the current directory of
@@ -208,7 +208,7 @@ public class TestDFSRollback {
       UpgradeUtilities.createDataNodeVersionFile(
           dataCurrentDirs,
           storageInfo,
-          UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
 
       cluster.startDataNodes(conf, 1, false, StartupOption.ROLLBACK, null);
       assertTrue(cluster.isDataNodeUp());
@@ -225,7 +225,7 @@ public class TestDFSRollback {
       
       log("DataNode rollback without existing previous dir", numDirs);
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -241,7 +241,7 @@ public class TestDFSRollback {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       NameNode.doRollback(conf, false);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -250,13 +250,13 @@ public class TestDFSRollback {
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       baseDirs = UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "previous");
       storageInfo = new StorageInfo(Integer.MIN_VALUE, 
-          UpgradeUtilities.getCurrentNamespaceID(cluster), 
-          UpgradeUtilities.getCurrentClusterID(cluster), 
-          UpgradeUtilities.getCurrentFsscTime(cluster),
+          UpgradeUtilities.getCurrentNamespaceIDJVM(cluster),
+          UpgradeUtilities.getCurrentClusterIDJVM(cluster),
+          UpgradeUtilities.getCurrentFsscTimeJVM(cluster),
           NodeType.DATA_NODE);
       
       UpgradeUtilities.createDataNodeVersionFile(baseDirs, storageInfo,
-          UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
       
       startBlockPoolShouldFail(StartupOption.ROLLBACK, 
           cluster.getNamesystem().getBlockPoolId());
@@ -268,7 +268,7 @@ public class TestDFSRollback {
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "current");
       UpgradeUtilities.createNameNodeStorageDirs(nameNodeDirs, "previous");
       NameNode.doRollback(conf, false);
-      cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                                 .format(false)
                                                 .manageDataDfsDirs(false)
                                                 .manageNameDfsDirs(false)
@@ -278,12 +278,12 @@ public class TestDFSRollback {
       UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "current");
       baseDirs = UpgradeUtilities.createDataNodeStorageDirs(dataNodeDirs, "previous");
       storageInfo = new StorageInfo(HdfsServerConstants.DATANODE_LAYOUT_VERSION,
-          UpgradeUtilities.getCurrentNamespaceID(cluster),
-          UpgradeUtilities.getCurrentClusterID(cluster), Long.MAX_VALUE,
+          UpgradeUtilities.getCurrentNamespaceIDJVM(cluster),
+          UpgradeUtilities.getCurrentClusterIDJVM(cluster), Long.MAX_VALUE,
           NodeType.DATA_NODE);
      
       UpgradeUtilities.createDataNodeVersionFile(baseDirs, storageInfo,
-          UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
       
       startBlockPoolShouldFail(StartupOption.ROLLBACK, 
           cluster.getNamesystem().getBlockPoolId());
@@ -327,7 +327,7 @@ public class TestDFSRollback {
           UpgradeUtilities.getCurrentFsscTime(null), NodeType.NAME_NODE);
       
       UpgradeUtilities.createNameNodeVersionFile(conf, baseDirs,
-          storageInfo, UpgradeUtilities.getCurrentBlockPoolID(cluster));
+          storageInfo, UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
       startNameNodeShouldFail("Cannot rollback to storage version 1 using this version");
       UpgradeUtilities.createEmptyDirs(nameNodeDirs);
     } // end numDir loop
@@ -345,7 +345,7 @@ public class TestDFSRollback {
 
   @After
   public void tearDown() throws Exception {
-    LOG.info("Shutting down MiniDFSCluster");
+    LOG.info("Shutting down MiniDFSClusterInJVM");
     if (cluster != null) {
       cluster.shutdown();
       cluster = null;

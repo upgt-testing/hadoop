@@ -108,7 +108,7 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public final class HttpServer2 implements FilterContainer {
+public final class HttpServer2 implements FilterContainer, HttpServer2JVMInterface {
   public static final Log LOG = LogFactory.getLog(HttpServer2.class);
 
   static final String FILTER_INITIALIZER_PROPERTY

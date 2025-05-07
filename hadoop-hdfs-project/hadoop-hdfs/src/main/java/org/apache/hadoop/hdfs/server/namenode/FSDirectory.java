@@ -94,7 +94,7 @@ import static org.apache.hadoop.hdfs.server.namenode.snapshot.Snapshot.CURRENT_S
  * @see org.apache.hadoop.hdfs.server.namenode.FSNamesystem
  **/
 @InterfaceAudience.Private
-public class FSDirectory implements Closeable {
+public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
   static final Logger LOG = LoggerFactory.getLogger(FSDirectory.class);
 
   private static INodeDirectory createRoot(FSNamesystem namesystem) {
@@ -202,11 +202,11 @@ public class FSDirectory implements Closeable {
     this.dirLock.readLock().unlock();
   }
 
-  void writeLock() {
-    this.dirLock.writeLock().lock();
+  public void writeLock() {
+      this.dirLock.writeLock().lock();
   }
 
-  void writeUnlock() {
+  public void writeUnlock() {
     this.dirLock.writeLock().unlock();
   }
 
@@ -402,7 +402,7 @@ public class FSDirectory implements Closeable {
     return protectedDirectories;
   }
 
-  BlockManager getBlockManager() {
+  public BlockManager getBlockManager() {
     return getFSNamesystem().getBlockManager();
   }
 
@@ -455,7 +455,7 @@ public class FSDirectory implements Closeable {
     return contentSleepMicroSec;
   }
 
-  int getInodeXAttrsLimit() {
+  public int getInodeXAttrsLimit() {
     return inodeXAttrsLimit;
   }
 
@@ -483,12 +483,12 @@ public class FSDirectory implements Closeable {
   }
 
   /** Enable quota verification */
-  void enableQuotaChecks() {
+  public void enableQuotaChecks() {
     skipQuotaCheck = false;
   }
 
   /** Disable quota verification */
-  void disableQuotaChecks() {
+  public void disableQuotaChecks() {
     skipQuotaCheck = true;
   }
 
@@ -657,7 +657,7 @@ public class FSDirectory implements Closeable {
     }
   }
 
-  void updateCountForQuota() {
+  public void updateCountForQuota() {
     updateCountForQuota(quotaInitThreads);
   }
 
@@ -1283,11 +1283,11 @@ public class FSDirectory implements Closeable {
   }
   
   @VisibleForTesting
-  int getInodeMapSize() {
+  public int getInodeMapSize() {
     return inodeMap.size();
   }
 
-  long totalInodes() {
+  public long totalInodes() {
     return getInodeMapSize();
   }
 

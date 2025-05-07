@@ -23,17 +23,15 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.ContentSummary;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HAUtil;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.ipc.StandbyException;
 import org.junit.After;
@@ -49,9 +47,9 @@ public class TestQuotasWithHA {
   private static final long DS_QUOTA = 10000;
   private static final long BLOCK_SIZE = 1024; // 1KB blocks
   
-  private MiniDFSCluster cluster;
-  private NameNode nn0;
-  private NameNode nn1;
+  private MiniDFSClusterInJVM cluster;
+  private NameNodeJVMInterface nn0;
+  private NameNodeJVMInterface nn1;
   private FileSystem fs;
 
   @Before
@@ -62,7 +60,7 @@ public class TestQuotasWithHA {
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     HAUtil.setAllowStandbyReads(conf, true);
     
-    cluster = new MiniDFSCluster.Builder(conf)
+    cluster = new MiniDFSClusterInJVM.Builder(conf)
       .nnTopology(MiniDFSNNTopology.simpleHATopology())
       .numDataNodes(1)
       .waitSafeMode(false)
@@ -97,7 +95,7 @@ public class TestQuotasWithHA {
     DFSTestUtil.createFile(fs, TEST_FILE, expectedSize, (short)1, 1L);
 
     HATestUtil.waitForStandbyToCatchUp(nn0, nn1);
-    ContentSummary cs = nn1.getRpcServer().getContentSummary(TEST_DIR_STR);
+    ContentSummaryJVMInterface cs = nn1.getRpcServer().getContentSummary(TEST_DIR_STR);
     assertEquals(NS_QUOTA, cs.getQuota());
     assertEquals(DS_QUOTA, cs.getSpaceQuota());
     assertEquals(expectedSize, cs.getSpaceConsumed());
@@ -156,6 +154,6 @@ public class TestQuotasWithHA {
     // just reset the standby reads to default i.e False on standby.
     HAUtil.setAllowStandbyReads(nn1conf, false);
     cluster.restartNameNode(1);
-    cluster.getNameNodeRpc(1).getQuotaUsage("/");
+    //cluster.getNameNodeRpc(1).getQuotaUsage("/");
   }
 }

@@ -22,6 +22,10 @@ package org.apache.hadoop.hdfs.server.datanode;
 import java.io.File;
 import java.io.IOException;
 
+import com.google.common.base.Supplier;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpiJVMInterface;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.protocol.DatanodeID;
@@ -51,6 +55,11 @@ public class DataNodeTestUtils {
     dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
   }
 
+  public static void setHeartbeatsDisabledForTests(DataNodeJVMInterface dn,
+                                                   boolean heartbeatsDisabledForTests) {
+    dn.setHeartbeatsDisabledForTests(heartbeatsDisabledForTests);
+  }
+
   /**
    * Set if cache reports are disabled for all DNs in a mini cluster.
    */
@@ -67,14 +76,32 @@ public class DataNodeTestUtils {
     }
   }
 
+  public static void triggerDeletionReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerDeletionReportForTests();
+    }
+  }
+
   public static void triggerHeartbeat(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
       bpos.triggerHeartbeatForTests();
     }
   }
-  
+
+  public static void triggerHeartbeat(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+      bpos.triggerHeartbeatForTests();
+    }
+  }
+
   public static void triggerBlockReport(DataNode dn) throws IOException {
     for (BPOfferService bpos : dn.getAllBpOs()) {
+      bpos.triggerBlockReportForTests();
+    }
+  }
+
+  public static void triggerBlockReport(DataNodeJVMInterface dn) throws IOException {
+    for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
       bpos.triggerBlockReportForTests();
     }
   }
@@ -99,6 +126,16 @@ public class DataNodeTestUtils {
   public static FsDatasetSpi<?> getFSDataset(DataNode dn) {
     return dn.getFSDataset();
   }
+
+
+  public static FsDatasetSpiJVMInterface<?> getFSDataset(DataNodeJVMInterface dn) {
+    return dn.getFSDataset();
+    // TODO: FIX ME
+    //throw new UnsupportedOperationException("Not implemented");
+    //return null;
+  }
+
+
 
   public static long getPendingAsyncDeletions(DataNode dn) {
     return FsDatasetTestUtil.getPendingAsyncDeletions(dn.getFSDataset());
@@ -179,4 +216,11 @@ public class DataNodeTestUtils {
       dn.getDirectoryScanner().reconcile();
     }
   }
+
+    public static void runDirectoryScanner(DataNodeJVMInterface dn) throws IOException {
+        DirectoryScannerJVMInterface directoryScanner = dn.getDirectoryScanner();
+        if (directoryScanner != null) {
+            dn.getDirectoryScanner().reconcile();
+        }
+    }
 }

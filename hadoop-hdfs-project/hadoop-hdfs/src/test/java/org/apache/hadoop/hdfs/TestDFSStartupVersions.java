@@ -43,7 +43,7 @@ public class TestDFSStartupVersions {
   
   private static final Log LOG = LogFactory.getLog(
                                                    "org.apache.hadoop.hdfs.TestDFSStartupVersions");
-  private MiniDFSCluster cluster = null;
+  private MiniDFSClusterInJVM cluster = null;
   
   /**
    * Writes an INFO log message containing the parameters.
@@ -245,7 +245,7 @@ public class TestDFSStartupVersions {
     StorageData[] versions = initializeVersions();
     UpgradeUtilities.createNameNodeStorageDirs(
         conf.getStrings(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY), "current");
-    cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0)
+    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0)
                                               .format(false)
                                               .manageDataDfsDirs(false)
                                               .manageNameDfsDirs(false)
@@ -253,13 +253,13 @@ public class TestDFSStartupVersions {
                                               .build();
     StorageData nameNodeVersion = new StorageData(
         HdfsServerConstants.NAMENODE_LAYOUT_VERSION,
-        UpgradeUtilities.getCurrentNamespaceID(cluster),
-        UpgradeUtilities.getCurrentClusterID(cluster),
-        UpgradeUtilities.getCurrentFsscTime(cluster),
-        UpgradeUtilities.getCurrentBlockPoolID(cluster));
+        UpgradeUtilities.getCurrentNamespaceIDJVM(cluster),
+        UpgradeUtilities.getCurrentClusterIDJVM(cluster),
+        UpgradeUtilities.getCurrentFsscTimeJVM(cluster),
+        UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster));
     
     log("NameNode version info", NAME_NODE, null, nameNodeVersion);
-    String bpid = UpgradeUtilities.getCurrentBlockPoolID(cluster);
+    String bpid = UpgradeUtilities.getCurrentBlockPoolIDJVM(cluster);
     for (int i = 0; i < versions.length; i++) {
       File[] storage = UpgradeUtilities.createDataNodeStorageDirs(
           conf.getStrings(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY), "current");
@@ -281,7 +281,7 @@ public class TestDFSStartupVersions {
   
   @After
   public void tearDown() throws Exception {
-    LOG.info("Shutting down MiniDFSCluster");
+    LOG.info("Shutting down MiniDFSClusterInJVM");
     if (cluster != null) {
       cluster.shutdown();
       cluster = null;

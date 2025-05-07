@@ -326,7 +326,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @InterfaceAudience.Private
 @Metrics(context="dfs")
 public class FSNamesystem implements Namesystem, FSNamesystemMBean,
-  NameNodeMXBean {
+  NameNodeMXBean, FSNamesystemJVMInterface  {
   public static final Log LOG = LogFactory.getLog(FSNamesystem.class);
   private final MetricsRegistry registry = new MetricsRegistry("FSNamesystem");
   @Metric final MutableRatesWithAggregation detailedLockHoldTimeMetrics =
@@ -450,10 +450,10 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   // Block pool ID used by this namenode
   private String blockPoolId;
 
-  final LeaseManager leaseManager = new LeaseManager(this); 
+  final LeaseManager leaseManager = new LeaseManager(this);
 
   volatile Daemon smmthread = null;  // SafeModeMonitor thread
-  
+
   Daemon nnrmthread = null; // NamenodeResourceMonitor thread
 
   Daemon nnEditLogRoller = null; // NameNodeEditLogRoller thread
@@ -623,10 +623,10 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   @VisibleForTesting
-  LeaseManager getLeaseManager() {
+  public LeaseManager getLeaseManager() {
     return leaseManager;
   }
-  
+
   boolean isHaEnabled() {
     return haEnabled;
   }
@@ -1190,7 +1190,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
               "replication and invalidation queues during failover:\n" +
               metaSaveAsString());
         }
-        
+
         long nextTxId = getFSImage().getLastAppliedTxId() + 1;
         LOG.info("Will take over writing edit logs at txnid " + 
             nextTxId);
@@ -1373,7 +1373,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       getFSImage().editLog.close();
     }
   }
-  
+
   @Override
   public void checkOperation(OperationCategory op) throws StandbyException {
     if (haContext != null) {
@@ -1423,7 +1423,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       return !safeMode.isManual() && !safeMode.areResourcesLow();
     }
   }
-  
+
   public static Collection<URI> getNamespaceDirs(Configuration conf) {
     return getStorageDirs(conf, DFS_NAMENODE_NAME_DIR_KEY);
   }
@@ -1643,7 +1643,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Causes heartbeat and lease daemons to stop; waits briefly for
    * them to finish, but a short timeout returns control back to caller.
    */
-  void close() {
+  public void close() {
     fsRunning = false;
     try {
       stopCommonServices();
@@ -1665,7 +1665,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   public boolean isRunning() {
     return fsRunning;
   }
-  
+
   @Override
   public boolean isInStandbyState() {
     if (haContext == null || haContext.getState() == null) {
@@ -1698,7 +1698,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     }
   }
 
-  private void metaSave(PrintWriter out) {
+  public void metaSave(PrintWriter out) {
     assert hasWriteLock();
     long totalInodes = this.dir.totalInodes();
     long totalBlocks = this.getBlocksTotal();
@@ -1807,7 +1807,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Get block locations within the specified range.
    * @see ClientProtocol#getBlockLocations(String, long, long)
    */
-  LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
+  public LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
       long offset, long length) throws IOException {
     final String operationName = "open";
     checkOperation(OperationCategory.READ);
@@ -2001,7 +2001,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return true if successful; 
    *         false if file does not exist or is a directory
    */
-  boolean setReplication(final String src, final short replication)
+  public boolean setReplication(final String src, final short replication)
       throws IOException {
     final String operationName = "setReplication";
     boolean success = false;
@@ -2216,7 +2216,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    */
   HdfsFileStatus startFile(String src, PermissionStatus permissions,
       String holder, String clientMachine, EnumSet<CreateFlag> flag,
-      boolean createParent, short replication, long blockSize, 
+      boolean createParent, short replication, long blockSize,
       CryptoProtocolVersion[] supportedVersions, boolean logRetryCache)
       throws IOException {
 
@@ -2340,7 +2340,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    *         if the lease can be released and the file can be closed.
    * @throws IOException
    */
-  boolean recoverLease(String src, String holder, String clientMachine)
+  public boolean recoverLease(String src, String holder, String clientMachine)
       throws IOException {
     boolean skipSync = false;
     FSPermissionChecker pc = getPermissionChecker();
@@ -2929,7 +2929,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
 
   /**
    * Removes the blocks from blocksmap and updates the safemode blocks total
-   * 
+   *
    * @param blocks
    *          An instance of {@link BlocksMapUpdateInfo} which contains a list
    *          of blocks that need to be removed from blocksMap
@@ -3738,11 +3738,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * The given node has reported in.  This method should:
    * 1) Record the heartbeat, so the datanode isn't timed out
    * 2) Adjust usage stats for future block allocation
-   * 
-   * If a substantial amount of time passed since the last datanode 
-   * heartbeat then request an immediate block report.  
-   * 
-   * @return an array of datanode commands 
+   *
+   * If a substantial amount of time passed since the last datanode
+   * heartbeat then request an immediate block report.
+   *
+   * @return an array of datanode commands
    * @throws IOException
    */
   HeartbeatResponse handleHeartbeat(DatanodeRegistration nodeReg,
@@ -4077,7 +4077,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /** @see ClientProtocol#getStats() */
-  long[] getStats() {
+  public long[] getStats() {
     final long[] stats = datanodeStatistics.getStats();
     stats[ClientProtocol.GET_STATS_UNDER_REPLICATED_IDX] = getUnderReplicatedBlocks();
     stats[ClientProtocol.GET_STATS_CORRUPT_BLOCKS_IDX] = getCorruptReplicaBlocks();
@@ -4238,11 +4238,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Save namespace image.
    * This will save current namespace into fsimage file and empty edits file.
    * Requires superuser privilege and safe mode.
-   * 
+   *
    * @throws AccessControlException if superuser privilege is violated.
-   * @throws IOException if 
+   * @throws IOException if
    */
-  void saveNamespace() throws AccessControlException, IOException {
+  public void saveNamespace() throws IOException {
     checkOperation(OperationCategory.UNCHECKED);
     checkSuperuserPrivilege();
 
@@ -4281,10 +4281,10 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       // if it is disabled - enable it and vice versa.
       if(arg.equals("check"))
         return getFSImage().getStorage().getRestoreFailedStorage();
-      
+
       boolean val = arg.equals("true");  // false if not
       getFSImage().getStorage().setRestoreFailedStorage(val);
-      
+
       return val;
     } finally {
       writeUnlock("restoreFailedStorage");
@@ -4363,12 +4363,12 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     /** Time when threshold was reached.
      * <br> -1 safe mode is off
      * <br> 0 safe mode is on, and threshold is not reached yet
-     * <br> >0 safe mode is on, but we are in extension period 
+     * <br> >0 safe mode is on, but we are in extension period
      */
-    private long reached = -1;  
+    private long reached = -1;
     private long reachedTimestamp = -1;
     /** Total number of blocks. */
-    int blockTotal; 
+    int blockTotal;
     /** Number of safe blocks. */
     int blockSafe;
     /** Number of blocks needed to satisfy safe mode threshold condition */
@@ -4387,11 +4387,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     private boolean shouldIncrementallyTrackBlocks = false;
     /** counter for tracking startup progress of reported blocks */
     private Counter awaitingReportedBlocksCounter;
-    
+
     /**
      * Creates SafeModeInfo when the name node enters
      * automatic safe mode at startup.
-     *  
+     *
      * @param conf configuration
      */
     private SafeModeInfo(Configuration conf) {
@@ -4420,10 +4420,10 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       LOG.info(DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + "     = " + extension);
 
       // default to safe mode threshold (i.e., don't populate queues before leaving safe mode)
-      this.replQueueThreshold = 
+      this.replQueueThreshold =
         conf.getFloat(DFS_NAMENODE_REPL_QUEUE_THRESHOLD_PCT_KEY,
                       (float) threshold);
-      this.blockTotal = 0; 
+      this.blockTotal = 0;
       this.blockSafe = 0;
     }
 
@@ -4445,7 +4445,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
      *
      * The {@link #threshold} is set to 1.5 so that it could never be reached.
      * {@link #blockTotal} is set to -1 to indicate that safe mode is manual.
-     * 
+     *
      * @see SafeModeInfo
      */
     private SafeModeInfo(boolean resourcesLow) {
@@ -4460,7 +4460,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       enter();
       reportStatus("STATE* Safe mode is ON.", true);
     }
-      
+
     /**
      * Check if safe mode is on.
      * @return true if in safe mode
@@ -4469,7 +4469,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       doConsistencyCheck();
       return this.reached >= 0;
     }
-      
+
     /**
      * Enter safe mode.
      */
@@ -4477,7 +4477,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       this.reached = 0;
       this.reachedTimestamp = 0;
     }
-      
+
     /**
      * Leave safe mode.
      * <p>
@@ -4502,13 +4502,13 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       }
 
       long timeInSafemode = now() - startTime;
-      NameNode.stateChangeLog.info("STATE* Leaving safe mode after " 
+      NameNode.stateChangeLog.info("STATE* Leaving safe mode after "
                                     + timeInSafemode/1000 + " secs");
       NameNode.getNameNodeMetrics().setSafeModeTime((int) timeInSafemode);
 
       //Log the following only once (when transitioning from ON -> OFF)
       if (reached >= 0) {
-        NameNode.stateChangeLog.info("STATE* Safe mode is OFF"); 
+        NameNode.stateChangeLog.info("STATE* Safe mode is OFF");
       }
       reached = -1;
       reachedTimestamp = -1;
@@ -4531,17 +4531,17 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     }
 
     /**
-     * Check whether we have reached the threshold for 
+     * Check whether we have reached the threshold for
      * initializing replication queues.
      */
     private synchronized boolean canInitializeReplQueues() {
       return blockManager.shouldPopulateReplQueues()
           && blockSafe >= blockReplQueueThreshold;
     }
-      
-    /** 
-     * Safe mode can be turned off iff 
-     * the threshold is reached and 
+
+    /**
+     * Safe mode can be turned off iff
+     * the threshold is reached and
      * the extension time have passed.
      * @return true if can leave or false otherwise.
      */
@@ -4562,9 +4562,9 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
 
       return true;
     }
-      
-    /** 
-     * There is no need to enter safe mode 
+
+    /**
+     * There is no need to enter safe mode
      * if DFS is empty or {@link #threshold} == 0
      */
     private boolean needEnter() {
@@ -4572,9 +4572,9 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         (datanodeThreshold != 0 && getNumLiveDataNodes() < datanodeThreshold) ||
         (!nameNodeHasResourcesAvailable());
     }
-      
+
     /**
-     * Check and trigger safe mode if needed. 
+     * Check and trigger safe mode if needed.
      */
     private void checkMode() {
       // Have to have write-lock since leaving safemode initializes
@@ -4583,7 +4583,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       if (inTransitionToActive()) {
         return;
       }
-      // if smmthread is already running, the block threshold must have been 
+      // if smmthread is already running, the block threshold must have been
       // reached before, there is no need to enter the safe mode again
       if (smmthread == null && needEnter()) {
         enter();
@@ -4619,14 +4619,14 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         blockManager.initializeReplQueues();
       }
     }
-      
+
     /**
      * Set total number of blocks.
      */
     private synchronized void setBlockTotal(int total) {
       this.blockTotal = total;
       this.blockThreshold = (int) (blockTotal * threshold);
-      this.blockReplQueueThreshold = 
+      this.blockReplQueueThreshold =
         (int) (blockTotal * replQueueThreshold);
       if (haEnabled) {
         // After we initialize the block count, any further namespace
@@ -4638,11 +4638,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         this.blockSafe = 0;
       checkMode();
     }
-      
+
     /**
-     * Increment number of safe blocks if current block has 
+     * Increment number of safe blocks if current block has
      * reached minimal replication.
-     * @param replication current replication 
+     * @param replication current replication
      */
     private synchronized void incrementSafeBlockCount(short replication) {
       if (replication == safeReplication) {
@@ -4661,11 +4661,11 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         checkMode();
       }
     }
-      
+
     /**
-     * Decrement number of safe blocks if current block has 
+     * Decrement number of safe blocks if current block has
      * fallen below minimal replication.
-     * @param replication current replication 
+     * @param replication current replication
      */
     private synchronized void decrementSafeBlockCount(short replication) {
       if (replication == safeReplication-1) {
@@ -4791,15 +4791,15 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
 
     @Override
     public String toString() {
-      String resText = "Current safe blocks = " 
-        + blockSafe 
+      String resText = "Current safe blocks = "
+        + blockSafe
         + ". Target blocks = " + blockThreshold + " for threshold = %" + threshold
         + ". Minimal replication = " + safeReplication + ".";
-      if (reached > 0) 
+      if (reached > 0)
         resText += " Threshold was reached " + new Date(reachedTimestamp) + ".";
       return resText;
     }
-      
+
     /**
      * Checks consistency of the class state.
      * This is costly so only runs if asserts are enabled.
@@ -4808,7 +4808,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       boolean assertsOn = false;
       assert assertsOn = true; // set to true if asserts are on
       if (!assertsOn) return;
-      
+
       if (blockTotal == -1 && blockSafe == -1) {
         return; // manual safe mode
       }
@@ -4828,7 +4828,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         return;
       }
       assert haEnabled;
-      
+
       if (LOG.isDebugEnabled()) {
         LOG.debug("Adjusting block totals from " +
             blockSafe + "/" + blockTotal + " to " +
@@ -4838,12 +4838,12 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         blockSafe + " by " + deltaSafe + ": would be negative";
       assert blockTotal + deltaTotal >= 0 : "Can't reduce blockTotal " +
         blockTotal + " by " + deltaTotal + ": would be negative";
-      
+
       blockSafe += deltaSafe;
       setBlockTotal(blockTotal + deltaTotal);
     }
   }
-    
+
   /**
    * Periodically check whether it is time to leave safe mode.
    * This thread starts when the threshold level is reached.
@@ -4852,7 +4852,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   class SafeModeMonitor implements Runnable {
     /** interval in msec for checking safe mode: {@value} */
     private static final long recheckInterval = 1000;
-      
+
     /**
      */
     @Override
@@ -4884,7 +4884,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       }
     }
   }
-    
+
   boolean setSafeMode(SafeModeAction action) throws IOException {
     if (action != SafeModeAction.SAFEMODE_GET) {
       checkSuperuserPrivilege();
@@ -4974,7 +4974,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       safeMode.decrementSafeBlockCount((short)blockManager.countNodes(b).liveReplicas());
     }
   }
-  
+
   /**
    * Adjust the total number of blocks safe and expected during safe mode.
    * If safe mode is not currently on, this is a no-op.
@@ -4991,7 +4991,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /**
-   * Set the total number of blocks in the system. 
+   * Set the total number of blocks in the system.
    */
   public void setBlockTotal(long completeBlocksTotal) {
     // safeMode is volatile, and may be set to null at any time
@@ -5048,7 +5048,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Enter safe mode. If resourcesLow is false, then we assume it is manual
    * @throws IOException
    */
-  void enterSafeMode(boolean resourcesLow) throws IOException {
+  public void enterSafeMode(boolean resourcesLow) throws IOException {
     writeLock();
     try {
       // Stop the secret manager, since rolling the master key would
@@ -5086,7 +5086,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   /**
    * Leave safe mode.
    */
-  void leaveSafeMode() {
+ public void leaveSafeMode() {
     writeLock();
     try {
       if (!isInSafeMode()) {
@@ -5098,7 +5098,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       writeUnlock("leaveSafeMode");
     }
   }
-    
+
   String getSafeModeTip() {
     // There is no need to take readLock.
     // Don't use isInSafeMode as this.safeMode might be set to null.
@@ -5201,7 +5201,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
 
   /**
-   * Get the total number of objects in the system. 
+   * Get the total number of objects in the system.
    */
   @Override // FSNamesystemMBean
   public long getMaxObjects() {
@@ -5587,7 +5587,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
           NameNode.stateChangeLog.info("*DIR* reportBadBlocks for block: {} on"
               + " datanode: {}", blk, nodes[j].getXferAddr());
           blockManager.findAndMarkBlockAsCorrupt(blk, nodes[j],
-              storageIDs == null ? null: storageIDs[j], 
+              storageIDs == null ? null: storageIDs[j],
               "client machine reported it");
         }
       }
@@ -5608,7 +5608,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return a located block with a new generation stamp and an access token
    * @throws IOException if any error occurs
    */
-  LocatedBlock updateBlockForPipeline(ExtendedBlock block, 
+  LocatedBlock updateBlockForPipeline(ExtendedBlock block,
       String clientName) throws IOException {
     LocatedBlock locatedBlock;
     checkOperation(OperationCategory.WRITE);
@@ -5682,8 +5682,8 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     // check new GS & length: this is not expected
     if (newBlock.getGenerationStamp() <= blockinfo.getGenerationStamp() ||
         newBlock.getNumBytes() < blockinfo.getNumBytes()) {
-      String msg = "Update " + oldBlock + " (len = " + 
-        blockinfo.getNumBytes() + ") to an older state: " + newBlock + 
+      String msg = "Update " + oldBlock + " (len = " +
+        blockinfo.getNumBytes() + ") to an older state: " + newBlock +
         " (len = " + newBlock.getNumBytes() +")";
       LOG.warn(msg);
       throw new IOException(msg);
@@ -5757,7 +5757,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     }
   }
 
-  static class CorruptFileBlockInfo {
+  static class CorruptFileBlockInfo implements CorruptFileBlockInfoJVMInterface {
     final String path;
     final Block block;
     
@@ -5778,7 +5778,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return a list in which each entry describes a corrupt file/block
    * @throws IOException
    */
-  Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
+  public Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
   String[] cookieTab) throws IOException {
     checkSuperuserPrivilege();
     checkOperation(OperationCategory.READ);
@@ -5882,7 +5882,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Returns the DelegationTokenSecretManager instance in the namesystem.
    * @return delegation token secret manager object
    */
-  DelegationTokenSecretManager getDelegationTokenSecretManager() {
+  public DelegationTokenSecretManager getDelegationTokenSecretManager() {
     return dtSecretManager;
   }
 
@@ -6084,7 +6084,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Client invoked methods are invoked over RPC and will be in 
    * RPC call context even if the client exits.
    */
-  boolean isExternalInvocation() {
+  public boolean isExternalInvocation() {
     return Server.isRpcInvocation();
   }
 
@@ -6599,7 +6599,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       throw it;
     }
   }
-  
+
   @Override
   public boolean isGenStampInFuture(Block block) {
     return blockIdManager.isGenStampInFuture(block);
@@ -6616,7 +6616,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   }
   
   @VisibleForTesting
-  void setFsLockForTests(ReentrantReadWriteLock lock) {
+  public void setFsLockForTests(ReentrantReadWriteLock lock) {
     this.fsLock.coarseLock = lock;
   }
   
@@ -6634,7 +6634,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   public SafeModeInfo getSafeModeInfoForTests() {
     return safeMode;
   }
-  
+
   @VisibleForTesting
   public void setNNResourceChecker(NameNodeResourceChecker nnResourceChecker) {
     this.nnResourceChecker = nnResourceChecker;
@@ -6735,7 +6735,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(success, operationName, oldSnapshotRoot,
         newSnapshotRoot, null);
   }
-  
+
   /**
    * Get the list of snapshottable directories that are owned 
    * by the current user. Return all the snapshottable directories if the 
@@ -6764,16 +6764,16 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
   /**
    * Get the difference between two snapshots (or between a snapshot and the
    * current status) of a snapshottable directory.
-   * 
+   *
    * @param path The full path of the snapshottable directory.
    * @param fromSnapshot Name of the snapshot to calculate the diff from. Null
    *          or empty string indicates the current tree.
    * @param toSnapshot Name of the snapshot to calculated the diff to. Null or
    *          empty string indicates the current tree.
-   * @return A report about the difference between {@code fromSnapshot} and 
-   *         {@code toSnapshot}. Modified/deleted/created/renamed files and 
-   *         directories belonging to the snapshottable directories are listed 
-   *         and labeled as M/-/+/R respectively. 
+   * @return A report about the difference between {@code fromSnapshot} and
+   *         {@code toSnapshot}. Modified/deleted/created/renamed files and
+   *         directories belonging to the snapshottable directories are listed
+   *         and labeled as M/-/+/R respectively.
    * @throws IOException
    */
   SnapshotDiffReport getSnapshotDiffReport(String path,
@@ -6797,7 +6797,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
         toSnapshotRoot, null);
     return diffs;
   }
-  
+
   /**
    * Delete a snapshot of a snapshottable directory
    * @param snapshotRoot The snapshottable directory
@@ -7211,7 +7211,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       writeUnlock(operationName);
       logAuditEvent(success, operationName, poolInfoStr, null, null);
     }
-    
+
     getEditLog().logSync();
   }
 
@@ -7255,7 +7255,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
       String poolNameStr = "{poolName: " + cachePoolName + "}";
       logAuditEvent(success, operationName, poolNameStr, null, null);
     }
-    
+
     getEditLog().logSync();
   }
 
@@ -7375,7 +7375,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     logAuditEvent(true, operationName, src, null, auditStat);
   }
 
-  AclStatus getAclStatus(String src) throws IOException {
+  public AclStatus getAclStatus(String src) throws IOException {
     final String operationName = "getAclStatus";
     checkOperation(OperationCategory.READ);
     boolean success = false;

@@ -34,6 +34,8 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.server.namenode.INodeAttributeProvider.AccessControlEnforcer;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
@@ -44,7 +46,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 public class TestINodeAttributeProvider {
-  private MiniDFSCluster miniDFS;
+  private MiniDFSClusterInJVM miniDFS;
   private static final Set<String> CALLED = new HashSet<String>();
 
   public static class MyAuthorizationProvider extends INodeAttributeProvider {
@@ -178,7 +180,7 @@ public class TestINodeAttributeProvider {
         MyAuthorizationProvider.class.getName());
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     EditLogFileOutputStream.setShouldSkipFsyncForTesting(true);
-    miniDFS = new MiniDFSCluster.Builder(conf).build();
+    miniDFS = new MiniDFSClusterInJVM.Builder(conf).build();
   }
 
   @After

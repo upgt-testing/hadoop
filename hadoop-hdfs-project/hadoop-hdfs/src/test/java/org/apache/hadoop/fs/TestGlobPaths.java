@@ -30,20 +30,21 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
+import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.server.namenode.INodeId;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.*;
 
 public class TestGlobPaths {
-  
+
   private static final UserGroupInformation unprivilegedUser =
     UserGroupInformation.createUserForTesting("myuser",
         new String[] { "mygroup" });
 
   static class RegexPathFilter implements PathFilter {
-    
+
     private final String regex;
     public RegexPathFilter(String regex) {
       this.regex = regex;
@@ -55,8 +56,8 @@ public class TestGlobPaths {
     }
 
   }
-  
-  static private MiniDFSCluster dfsCluster;
+
+  static private MiniDFSClusterInJVM dfsCluster;
   static private FileSystem fs;
   static private FileSystem privilegedFs;
   static private FileContext fc;
@@ -64,11 +65,11 @@ public class TestGlobPaths {
   static final private int NUM_OF_PATHS = 4;
   static private String USER_DIR;
   private final Path[] path = new Path[NUM_OF_PATHS];
-  
+
   @BeforeClass
   public static void setUp() throws Exception {
     final Configuration conf = new HdfsConfiguration();
-    dfsCluster = new MiniDFSCluster.Builder(conf).build();
+    dfsCluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
     privilegedFs = FileSystem.get(conf);
     privilegedFc = FileContext.getFileContext(conf);

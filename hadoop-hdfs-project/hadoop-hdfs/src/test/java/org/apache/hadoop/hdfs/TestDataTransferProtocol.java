@@ -33,6 +33,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import org.apache.hadoop.hdfs.protocol.*;
+import org.apache.hadoop.hdfs.server.datanode.*;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.FsVolumeImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -80,7 +83,7 @@ public class TestDataTransferProtocol {
   private static final DataChecksum DEFAULT_CHECKSUM =
     DataChecksum.newDataChecksum(DataChecksum.Type.CRC32C, 512);
   
-  DatanodeID datanode;
+  DatanodeIDJVMInterface datanode;
   InetSocketAddress dnAddr;
   final ByteArrayOutputStream sendBuf = new ByteArrayOutputStream(128);
   final DataOutputStream sendOut = new DataOutputStream(sendBuf);
@@ -213,7 +216,7 @@ public class TestDataTransferProtocol {
     int numDataNodes = 1;
     final long BLOCK_ID_FUDGE = 128;
     Configuration conf = new HdfsConfiguration();
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
     try {
       cluster.waitActive();
       String poolId = cluster.getNamesystem().getBlockPoolId(); 
@@ -348,7 +351,7 @@ public class TestDataTransferProtocol {
     
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, numDataNodes); 
-    MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(numDataNodes).build();
+    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDataNodes).build();
     try {
     cluster.waitActive();
     datanode = cluster.getFileSystem().getDataNodeStats(DatanodeReportType.LIVE)[0];
