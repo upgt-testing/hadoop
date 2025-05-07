@@ -114,9 +114,6 @@ import org.apache.hadoop.hdfs.DFSUtil.ConfiguredNNAddress;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
-import org.apache.hadoop.hdfs.server.datanode.checker.DatasetVolumeChecker;
-import org.apache.hadoop.hdfs.server.datanode.checker.StorageLocationChecker;
-import org.apache.hadoop.hdfs.util.DataTransferThrottler;
 import org.apache.hadoop.ipc.RPCServerJVMInterface;
 import org.apache.hadoop.util.AutoCloseableLock;
 import org.apache.hadoop.hdfs.client.BlockReportOptions;
@@ -3178,7 +3175,7 @@ public class DataNode extends ReconfigurableBase
   /**
    * Check the disk error
    */
-  private void checkDiskError() {
+  public void checkDiskError() {
     Set<File> unhealthyDataDirs = data.checkDataDir();
     if (unhealthyDataDirs != null && !unhealthyDataDirs.isEmpty()) {
       try {

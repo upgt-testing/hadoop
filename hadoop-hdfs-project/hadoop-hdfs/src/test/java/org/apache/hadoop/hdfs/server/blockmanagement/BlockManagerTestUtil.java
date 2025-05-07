@@ -30,7 +30,6 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfoJVMInterface;
-import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerSafeMode.BMSafeModeStatus;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
@@ -398,13 +397,6 @@ public class BlockManagerTestUtil {
   public static void recheckDecommissionState(DatanodeManager dm)
       throws ExecutionException, InterruptedException {
     dm.getDecomManager().runMonitorForTest();
-  }
-
-  public static void setStartupSafeModeForTest(BlockManagerJVMInterface bm) {
-    BlockManagerSafeMode bmSafeMode = (BlockManagerSafeMode)Whitebox
-            .getInternalState(bm, "bmSafeMode");
-    Whitebox.setInternalState(bmSafeMode, "extension", Integer.MAX_VALUE);
-    Whitebox.setInternalState(bmSafeMode, "status", BMSafeModeStatus.EXTENSION);
   }
 
   /**

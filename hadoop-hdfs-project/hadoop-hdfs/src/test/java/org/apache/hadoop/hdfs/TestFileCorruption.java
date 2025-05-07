@@ -21,7 +21,6 @@ package org.apache.hadoop.hdfs;
 import com.google.common.base.Supplier;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.protocol.BlockListAsLongsJVMInterface;
-import org.apache.hadoop.hdfs.protocol.DatanodeInfo.DatanodeInfoBuilder;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
 import static org.junit.Assert.assertEquals;

@@ -516,7 +516,7 @@ public class TestNameNodeRecovery {
     conf.set(DFSUtil.addKeySuffixes(DFSConfigKeys.DFS_HA_NAMENODES_KEY_PREFIX,
       "ns1"), "nn1,nn2");
     String baseDir = System.getProperty(
-        MiniDFSCluster.PROP_TEST_BUILD_DATA, "build/test/data") + "/dfs/";
+        MiniDFSClusterInJVM.PROP_TEST_BUILD_DATA, "build/test/data") + "/dfs/";
     File nameDir = new File(baseDir, "nameR");
     File secondaryDir = new File(baseDir, "namesecondaryR");
     conf.set(DFSUtil.addKeySuffixes(DFSConfigKeys.

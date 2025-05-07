@@ -5,6 +5,7 @@ import org.apache.hadoop.fs.permission.AclStatusJVMInterface;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocksJVMInterface;
 import org.apache.hadoop.hdfs.protocol.RollingUpgradeInfoJVMInterface;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManagerJVMInterface;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockIdManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.ha.EditLogTailerJVMInterface;
 import org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManagerJVMInterface;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public interface FSNamesystemJVMInterface {
+    BlockIdManagerJVMInterface getBlockIdManager();
     void saveNamespace() throws IOException;
     boolean isExternalInvocation();
     boolean isUpgradeFinalized();
@@ -37,7 +39,6 @@ public interface FSNamesystemJVMInterface {
     long getTotal();
     long getUsed();
     String getVersion();
-    boolean getCallerContextEnabled();
     void close();
     boolean setReplication(String src, short replication) throws IOException;
     long getPostponedMisreplicatedBlocks();
@@ -51,7 +52,7 @@ public interface FSNamesystemJVMInterface {
     int getNumDecomLiveDataNodes();
     int getNumDecomDeadDataNodes();
     KeyProviderJVMInterface getProvider();
-    void leaveSafeMode(boolean force);
+    void leaveSafeMode();
     SnapshotManagerJVMInterface getSnapshotManager();
     CacheManagerJVMInterface getCacheManager();
     int getPendingDataNodeMessageCount();

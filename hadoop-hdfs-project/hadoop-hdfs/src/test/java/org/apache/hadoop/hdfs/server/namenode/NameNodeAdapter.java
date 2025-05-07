@@ -25,7 +25,6 @@ import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.apache.hadoop.hdfs.protocol.*;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenSecretManagerJVMInterface;
 import org.apache.hadoop.hdfs.server.blockmanagement.*;
-import org.apache.hadoop.hdfs.server.protocol.SlowDiskReports;
 import static org.mockito.Mockito.spy;
 
 import java.io.File;
@@ -128,7 +127,7 @@ public class NameNodeAdapter {
   }
 
   public static void leaveSafeMode(NameNodeJVMInterface namenode) {
-    namenode.getNamesystem().leaveSafeMode(false);
+    namenode.getNamesystem().leaveSafeMode();
   }
 
 

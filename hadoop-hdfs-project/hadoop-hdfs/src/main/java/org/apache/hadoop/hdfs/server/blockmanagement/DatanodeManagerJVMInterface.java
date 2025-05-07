@@ -8,10 +8,6 @@ import org.apache.hadoop.hdfs.protocol.UnregisteredNodeException;
 import java.util.List;
 
 public interface DatanodeManagerJVMInterface {
-    DatanodeAdminManagerJVMInterface getDatanodeAdminManager();
-    long getHeartbeatRecheckInterval();
-    long getHeartbeatInterval();
-    int getBlockInvalidateLimit();
     void fetchDatanodesJVM(final List<DatanodeDescriptorJVMInterface> live,
                         final List<DatanodeDescriptorJVMInterface> dead, final boolean removeDecommissionNode);
     void setHeartbeatExpireInterval(long expireInterval);
@@ -22,5 +18,4 @@ public interface DatanodeManagerJVMInterface {
     List<? extends DatanodeDescriptorJVMInterface> getDatanodeListForReport(final HdfsConstants.DatanodeReportType type);
     //void fetchDatanodes(final List<DatanodeDescriptor> live,
       //                  final List<DatanodeDescriptor> dead, final boolean removeDecommissionNode);
-    SlowDiskTrackerJVMInterface getSlowDiskTracker();
 }

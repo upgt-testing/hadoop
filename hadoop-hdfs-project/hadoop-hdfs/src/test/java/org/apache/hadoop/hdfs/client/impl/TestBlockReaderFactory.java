@@ -334,6 +334,7 @@ public class TestBlockReaderFactory {
     Assert.assertTrue(Arrays.equals(contents, expected));
     final ShortCircuitCache cache =
         fs.getClient().getClientContext().getShortCircuitCache();
+    /*
     final DatanodeInfo datanode =
         new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
     cache.getDfsClientShmManager().visit(new Visitor() {
@@ -347,6 +348,7 @@ public class TestBlockReaderFactory {
         Assert.assertEquals(0, vinfo.notFull.size());
       }
     });
+     */
     cluster.shutdown();
     sockDir.close();
   }

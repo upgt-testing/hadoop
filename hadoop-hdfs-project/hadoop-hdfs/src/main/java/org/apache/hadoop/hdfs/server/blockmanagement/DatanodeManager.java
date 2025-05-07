@@ -485,7 +485,7 @@ public class DatanodeManager implements DatanodeManagerJVMInterface {
 
 
   /** Get a datanode descriptor given corresponding DatanodeUUID */
-  DatanodeDescriptor getDatanode(final String datanodeUuid) {
+  public DatanodeDescriptor getDatanode(final String datanodeUuid) {
     if (datanodeUuid == null) {
       return null;
     }

@@ -196,7 +196,7 @@ class BPOfferService implements BPOfferServiceJVMInterface {
     return nameserviceId;
   }
 
-  String getBlockPoolId() {
+  public String getBlockPoolId() {
     // avoid lock contention unless the registration hasn't completed.
     String id = bpId;
     if (id != null) {

@@ -43,7 +43,7 @@ public class TestDatanodeHttpXFrame {
   @Test
   public void testDataNodeXFrameOptionsEnabled() throws Exception {
     boolean xFrameEnabled = true;
-    MiniDFSCluster cluster = createCluster(xFrameEnabled, null);
+    MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
     HttpURLConnection conn = getConn(cluster);
     String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
     Assert.assertTrue("X-FRAME-OPTIONS is absent in the header",
@@ -55,7 +55,7 @@ public class TestDatanodeHttpXFrame {
   @Test
   public void testNameNodeXFrameOptionsDisabled() throws Exception {
     boolean xFrameEnabled = false;
-    MiniDFSCluster cluster = createCluster(xFrameEnabled, null);
+    MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
     HttpURLConnection conn = getConn(cluster);
     String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
     Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
@@ -67,22 +67,22 @@ public class TestDatanodeHttpXFrame {
     createCluster(false, "Hadoop");
   }
 
-  private MiniDFSCluster createCluster(boolean enabled, String
+  private MiniDFSClusterInJVM createCluster(boolean enabled, String
       value) throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_XFRAME_OPTION_ENABLED, enabled);
     if (value != null) {
       conf.set(DFSConfigKeys.DFS_XFRAME_OPTION_VALUE, value);
     }
-    MiniDFSCluster cluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
+    MiniDFSClusterInJVM cluster =
+        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
     return cluster;
   }
 
-  private HttpURLConnection getConn(MiniDFSCluster cluster)
+  private HttpURLConnection getConn(MiniDFSClusterInJVM cluster)
       throws IOException {
-    DataNode datanode = cluster.getDataNodes().get(0);
+    DataNodeJVMInterface datanode = cluster.getDataNodes().get(0);
     URL newURL = new URL("http://localhost:" + datanode.getInfoPort());
     HttpURLConnection conn = (HttpURLConnection) newURL.openConnection();
     conn.connect();

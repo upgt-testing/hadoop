@@ -372,7 +372,6 @@ public class TestDFSAdmin {
     scanIntoList(bufOut, outputs);
     return outputs;
   }
-   */
 
   @Test(timeout = 30000)
   public void testGetReconfigAllowedProperties() throws IOException {

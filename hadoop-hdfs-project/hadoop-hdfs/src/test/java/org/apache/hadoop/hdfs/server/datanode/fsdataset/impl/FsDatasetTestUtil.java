@@ -82,6 +82,10 @@ public class FsDatasetTestUtil {
   public static long getPendingAsyncDeletions(FsDatasetSpi<?> fsd) {
     return ((FsDatasetImpl)fsd).asyncDiskService.countPendingDeletions();
   }
+
+  public static long getPendingAsyncDeletions(FsDatasetSpiJVMInterface<?> fsd) {
+    return ((FsDatasetImplJVMInterface)fsd).getAsyncDiskService().countPendingDeletions();
+  }
   
   public static Collection<ReplicaInfo> getReplicas(FsDatasetSpi<?> fsd,
       String bpid) {

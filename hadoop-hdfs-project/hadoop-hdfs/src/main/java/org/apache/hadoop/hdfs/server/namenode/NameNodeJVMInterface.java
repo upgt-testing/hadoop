@@ -13,13 +13,11 @@ public interface NameNodeJVMInterface {
     ConfigurationJVMInterface getConf();
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
     //int getNameNodeState();
-    String reconfigurePropertyImpl(String property, String newVal) throws ReconfigurationException;
     String getNNRole();
     void transitionToStandby() throws IOException;
     InetSocketAddress getHttpAddress();
     FSNamesystemJVMInterface getNamesystem();
     boolean isInSafeMode();
-    java.lang.String getSlowDisksReport();
     //void transitionToActive() throws org.apache.hadoop.ha.ServiceFailedException, org.apache.hadoop.security.AccessControlException;
     java.net.InetSocketAddress getServiceRpcAddress();
     //java.net.InetSocketAddress getServiceRpcServerAddress(Configuration arg0);
@@ -32,7 +30,6 @@ public interface NameNodeJVMInterface {
     //org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NamenodeRole getRole();
     //void startTrashEmptier(Configuration arg0) throws java.io.IOException;
     //java.lang.String reconfigureParallelLoad(java.lang.String arg0);
-    java.lang.String getSlowPeersReport();
     //void setStartupOption(Configuration arg0, org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption arg1);
     //void stopHttpServer();
     //ReconfigurationTaskStatusInterface getReconfigurationTaskStatus();
@@ -45,8 +42,6 @@ public interface NameNodeJVMInterface {
     //void format(Configuration arg0) throws java.io.IOException;
     java.lang.String getTokenServiceName();
     java.lang.String getNameNodeAddressHostPortString();
-    void shutdownReconfigurationTask();
-    void startReconfigurationTask() throws java.io.IOException;
     //Configuration getConfigurationWithoutSharedEdits(Configuration arg0) throws java.io.IOException;
     //void setRpcServiceServerAddress(Configuration arg0, java.net.InetSocketAddress arg1);
     //void checkHaStateChange(StateChangeRequestInfoInterface arg0) throws org.apache.hadoop.security.AccessControlException;
@@ -92,7 +87,6 @@ public interface NameNodeJVMInterface {
     //java.net.InetSocketAddress getHttpAddress();
     //void stopTrashEmptier();
     //org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption getStartupOption(Configuration arg0);
-    boolean isPropertyReconfigurable(java.lang.String arg0);
     //void reconfBlockPlacementPolicy();
     //java.lang.String reconfigurePropertyImpl(java.lang.String arg0, java.lang.String arg1) throws org.apache.hadoop.conf.ReconfigurationException;
     //int adjustNewVal(int arg0, java.lang.String arg1);
@@ -140,10 +134,8 @@ public interface NameNodeJVMInterface {
     java.lang.String getClientNamenodeAddress();
     //StartupProgressInterface getStartupProgress();
     //boolean isStopRequested();
-    java.util.Collection<java.lang.String> getReconfigurableProperties();
     void join();
     //java.util.Collection<org.apache.hadoop.conf.ReconfigurationUtil.PropertyChange> getChangedProperties(Configuration arg0, Configuration arg1);
-    void reconfigureProperty(java.lang.String arg0, java.lang.String arg1) throws org.apache.hadoop.conf.ReconfigurationException;
     //NameNodeInterface createNameNode(java.lang.String[] arg0, Configuration arg1) throws java.io.IOException;
     //java.net.InetSocketAddress getHttpServerBindAddress(Configuration arg0);
     //java.util.List<NameNodeFakeInterface> getFakeNameNodes();

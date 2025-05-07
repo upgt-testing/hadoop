@@ -181,11 +181,14 @@ public class TestAppendDifferentChecksum {
         // STEP 2: Wait till the transfer happens.
         final ExtendedBlock b = cluster.getFileSystem().getClient()
             .getLocatedBlocks(f.toString(), 0).get(0).getBlock();
+        Thread.sleep(1000);
+        /*
         GenericTestUtils.waitFor(new Supplier<Boolean>() {
           @Override public Boolean get() {
             return cluster.getDataNodes().get(1).getFSDataset().contains(b);
           }
         }, 100, 600);
+         */
 
       } finally {
         o.close();

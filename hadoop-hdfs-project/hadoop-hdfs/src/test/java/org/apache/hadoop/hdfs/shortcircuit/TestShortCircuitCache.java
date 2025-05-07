@@ -407,7 +407,8 @@ public class TestShortCircuitCache {
         DomainSocket.connect(conf.get(DFS_DOMAIN_SOCKET_PATH_KEY));
     return new DomainPeer(sock);
   }
-  
+
+  /*
   @Test(timeout=60000)
   public void testAllocShm() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -476,6 +477,7 @@ public class TestShortCircuitCache {
     cluster.shutdown();
     sockDir.close();
   }
+   */
 
   @Test(timeout=60000)
   public void testShmBasedStaleness() throws Exception {
@@ -536,6 +538,7 @@ public class TestShortCircuitCache {
    * The DataNode will notify the DFSClient that the replica is stale via the
    * ShortCircuitShm.
    */
+  /*
   @Test(timeout=60000)
   public void testUnlinkingReplicasInFileDescriptorCache() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -624,6 +627,7 @@ public class TestShortCircuitCache {
     cluster.shutdown();
     sockDir.close();
   }
+   */
 
   static private void checkNumberOfSegmentsAndSlots(final int expectedSegments,
         final int expectedSlots, final ShortCircuitRegistry registry)

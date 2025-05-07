@@ -55,7 +55,7 @@ import org.apache.hadoop.io.nativeio.NativeIOException;
  * This class and {@link org.apache.hadoop.util.AsyncDiskService} are similar.
  * They should be combined.
  */
-class FsDatasetAsyncDiskService {
+class FsDatasetAsyncDiskService implements FsDatasetAsyncDiskServiceJVMInterface {
   public static final Log LOG = LogFactory.getLog(FsDatasetAsyncDiskService.class);
   
   // ThreadPool core pool size
@@ -148,7 +148,7 @@ class FsDatasetAsyncDiskService {
     }
   }
   
-  synchronized long countPendingDeletions() {
+  public synchronized long countPendingDeletions() {
     long count = 0;
     for (ThreadPoolExecutor exec : executors.values()) {
       count += exec.getTaskCount() - exec.getCompletedTaskCount();

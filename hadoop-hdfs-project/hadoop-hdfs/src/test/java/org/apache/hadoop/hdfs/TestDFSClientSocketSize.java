@@ -88,12 +88,12 @@ public class TestDFSClientSocketSize {
   }
 
   private int getSendBufferSize(Configuration conf) throws IOException {
-    final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
+    final MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
         .numDataNodes(1)
         .build();
     try {
       cluster.waitActive();
-      LOG.info("MiniDFSClusterInJVM started.");
+      LOG.info("MiniDFSCluster started.");
       try (Socket socket = DataStreamer.createSocketForPipeline(
           new DatanodeInfo(cluster.dataNodes.get(0).datanode.getDatanodeId()),
           1, cluster.getFileSystem().getClient())) {

@@ -28,7 +28,6 @@ public interface BlockManagerJVMInterface {
     int getUnderReplicatedNotMissingBlocks();
     void updateState();
     void clear();
-    BlockIdManagerJVMInterface getBlockIdManager();
     int getMaxReplicationStreams();
     //int getReconstructionPendingTimeout();
 }

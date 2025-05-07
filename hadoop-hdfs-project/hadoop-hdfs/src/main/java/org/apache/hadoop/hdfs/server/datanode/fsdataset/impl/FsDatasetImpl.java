@@ -244,6 +244,10 @@ class FsDatasetImpl implements FsDatasetSpi<FsVolumeImpl>, FsDatasetImplJVMInter
     return new LengthInputStream(new FileInputStream(meta), meta.length());
   }
 
+  public FsDatasetAsyncDiskService getAsyncDiskService() {
+    return asyncDiskService;
+  }
+
   final DataNode datanode;
   final DataStorage dataStorage;
   private final FsVolumeList volumes;

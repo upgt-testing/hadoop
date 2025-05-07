@@ -124,6 +124,7 @@ import org.apache.hadoop.hdfs.server.namenode.NameNodeAdapter;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
+import org.apache.hadoop.hdfs.web.HftpFileSystem;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.apache.hadoop.net.DNSToSwitchMapping;
 import org.apache.hadoop.net.NetUtils;
@@ -154,8 +155,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     private static final String NAMESERVICE_ID_PREFIX = "nameserviceId";
     private static final Log LOG = LogFactory.getLog(MiniDFSCluster.class);
     /** System property to set the data dir: {@value} */
-    public static final String PROP_TEST_BUILD_DATA =
-            GenericTestUtils.SYSPROP_TEST_DATA_DIR;
+  public static final String PROP_TEST_BUILD_DATA = "test.build.data";
     /** Configuration option to set the data dir: {@value} */
     public static final String HDFS_MINIDFS_BASEDIR = "hdfs.minidfs.basedir";
     public static final String  DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY
@@ -204,32 +204,11 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         private boolean checkDataNodeHostConfig = false;
         private Configuration[] dnConfOverlays;
         private boolean skipFsyncForTesting = true;
-        private boolean useConfiguredTopologyMappingClass = false;
 
         public Builder(Configuration conf) {
             this.conf = conf;
       this.storagesPerDatanode =
           FsDatasetTestUtils.Factory.getFactory(conf).getDefaultNumOfDataDirs();
-            if (null == conf.get(HDFS_MINIDFS_BASEDIR)) {
-                conf.set(HDFS_MINIDFS_BASEDIR,
-                        new File(getBaseDirectory()).getAbsolutePath());
-            }
-        }
-
-        public Builder(Configuration conf, File basedir) {
-            this.conf = conf;
-      this.storagesPerDatanode =
-          FsDatasetTestUtils.Factory.getFactory(conf).getDefaultNumOfDataDirs();
-            if (null == basedir) {
-                throw new IllegalArgumentException(
-                        "MiniDFSClusterInJVM base directory cannot be null");
-            }
-            String cdir = conf.get(HDFS_MINIDFS_BASEDIR);
-            if (cdir != null) {
-                throw new IllegalArgumentException(
-                        "MiniDFSClusterInJVM base directory already defined (" + cdir + ")");
-            }
-            conf.set(HDFS_MINIDFS_BASEDIR, basedir.getAbsolutePath());
         }
 
         /**
@@ -470,13 +449,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             return this;
         }
 
-        public Builder useConfiguredTopologyMappingClass(
-                boolean useConfiguredTopologyMappingClass) {
-            this.useConfiguredTopologyMappingClass =
-                    useConfiguredTopologyMappingClass;
-            return this;
-        }
-
         /**
         * Construct the actual MiniDFSClusterInJVM
          */
@@ -544,8 +516,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 builder.checkDataNodeAddrConfig,
                 builder.checkDataNodeHostConfig,
                 builder.dnConfOverlays,
-                builder.skipFsyncForTesting,
-                builder.useConfiguredTopologyMappingClass);
+                builder.skipFsyncForTesting);
 
         // restart immediately for DN-0 and NN-0
         activeFirstNNIfAllStandby();
@@ -567,7 +538,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
     }
 
-    public static class DataNodeProperties {
+    public class DataNodeProperties {
         final DataNodeJVMInterface datanode;
         public DataNodeInstance dnInstance;
         final Configuration conf;
@@ -588,11 +559,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         public void setDnArgs(String ... args) {
             dnArgs = args;
         }
-
-        public DataNodeJVMInterface getDatanode() {
-            return datanode;
-        }
-
     }
 
     private Configuration conf;
@@ -644,14 +610,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         public void setStartOpt(StartupOption startOpt) {
             this.startOpt = startOpt;
-        }
-
-        public String getNameserviceId() {
-            return this.nameserviceId;
-        }
-
-        public String getNamenodeId() {
-            return this.nnId;
         }
     }
 
@@ -844,7 +802,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
                 operation, null, racks, hosts,
                 null, simulatedCapacities, null, true, false,
                 MiniDFSNNTopology.simpleSingleNN(nameNodePort, 0),
-                true, false, false, null, true, false);
+                       true, false, false, null, true);
     }
 
     private void initMiniDFSCluster(
@@ -861,8 +819,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             boolean checkDataNodeAddrConfig,
             boolean checkDataNodeHostConfig,
             Configuration[] dnConfOverlays,
-            boolean skipFsyncForTesting,
-            boolean useConfiguredTopologyMappingClass)
+      boolean skipFsyncForTesting)
             throws IOException {
         boolean success = false;
         try {
@@ -883,27 +840,14 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
             int replication = conf.getInt(DFS_REPLICATION_KEY, 3);
             conf.setInt(DFS_REPLICATION_KEY, Math.min(replication, numDataNodes));
-            int maintenanceMinReplication = conf.getInt(
-                    DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_KEY,
-                    DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_DEFAULT);
-            if (maintenanceMinReplication ==
-                    DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_DEFAULT) {
-                conf.setInt(DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_KEY,
-                        Math.min(maintenanceMinReplication, numDataNodes));
-            }
             int safemodeExtension = conf.getInt(
                     DFS_NAMENODE_SAFEMODE_EXTENSION_TESTING_KEY, 0);
             conf.setInt(DFS_NAMENODE_SAFEMODE_EXTENSION_KEY, safemodeExtension);
             int decommissionInterval = conf.getInt(
                 DFS_NAMENODE_DECOMMISSION_INTERVAL_TESTING_KEY, 3);
             conf.setInt(DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY, decommissionInterval);
-            if (!useConfiguredTopologyMappingClass) {
                 conf.setClass(NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY,
                         StaticMapping.class, DNSToSwitchMapping.class);
-            }
-            // Set to the minimum number of threads possible to avoid starting
-            // unnecessary threads in unit tests
-            conf.setInt(DatanodeHttpServer.DATANODE_HTTP_MAX_THREADS_KEY, 2);
 
             // In an HA cluster, in order for the StandbyNode to perform checkpoints,
             // it needs to know the HTTP port of the Active. So, if ephemeral ports
@@ -1321,7 +1265,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
      * @return Configuration of for the given namenode
      */
     public Configuration getConfiguration(int nnIndex) {
-        return getNN(nnIndex).conf;
+    return nameNodes[nnIndex].conf;
     }
 
     private NameNodeInfo getNN(int nnIndex) {
@@ -1333,18 +1277,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             count++;
         }
         return null;
-    }
-
-    public List<Integer> getNNIndexes(String nameserviceId) {
-        int count = 0;
-        List<Integer> nnIndexes = new ArrayList<>();
-        for (NameNodeInfo nn : nameNodes) {
-            if (nn.getNameserviceId().equals(nameserviceId)) {
-                nnIndexes.add(count);
-            }
-            count++;
-        }
-        return nnIndexes;
     }
 
     /**
@@ -1824,10 +1756,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         return getNameNode(nnIndex).getRpcServer();
     }
 
-    public NameNodeJVMInterface fakeGetNameNode() {
-        return getNN(0).nameNode;
-    }
-
     /**
      * Gets the NameNode for the index.  May be null.
      */
@@ -1964,9 +1892,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         ShutdownHookManager.get().clearShutdownHooks();
         if (base_dir != null) {
             if (deleteDfsDir) {
-                FileUtil.fullyDelete(base_dir);
+        base_dir.delete();
             } else {
-                FileUtil.fullyDeleteOnExit(base_dir);
+        base_dir.deleteOnExit();
             }
         }
     }
@@ -2088,6 +2016,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
             waitActive();
         }
     }
+
 
 
     /**
@@ -3622,17 +3551,6 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
         // Wait for new namenode to get registrations from all the datanodes
         waitActive(nnIndex);
-    }
-
-    /**
-     * Sets the timeout for re-issuing a block recovery.
-     */
-    public void setBlockRecoveryTimeout(long timeout) {
-        for (int nnIndex = 0; nnIndex < getNumNameNodes(); nnIndex++) {
-            // TODO: FIX ME
-            throw new UnsupportedOperationException("Not implemented");
-            //getNamesystem(nnIndex).getBlockManager().setBlockRecoveryTimeout(timeout);
-        }
     }
 
     protected void setupDatanodeAddress(Configuration conf, boolean setupHostsFile,

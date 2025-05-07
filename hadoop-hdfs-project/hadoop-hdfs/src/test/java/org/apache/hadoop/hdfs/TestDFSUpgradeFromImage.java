@@ -663,7 +663,7 @@ public class TestDFSUpgradeFromImage {
         System.getProperty("test.build.data") + File.separator +
         "dfs" + File.separator + 
         "data" + File.separator + 
-        "data1"));
+        "data1");
     upgradeAndVerify(new MiniDFSClusterInJVM.Builder(conf).
           numDataNodes(1).enableManagedDfsDirsRedundancy(false).
           manageDataDfsDirs(false), null);

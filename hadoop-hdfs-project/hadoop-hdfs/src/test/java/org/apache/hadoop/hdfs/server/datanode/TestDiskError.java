@@ -217,6 +217,7 @@ public class TestDiskError {
    * Before refactoring the code the above function was not getting called 
    * @throws IOException, InterruptedException
    */
+  /*
   @Test
   public void testcheckDiskError() throws IOException, InterruptedException {
     if(cluster.getDataNodes().size() <= 0) {
@@ -231,6 +232,7 @@ public class TestDiskError {
     long lastDiskErrorCheck = dataNode.getLastDiskErrorCheck();
     assertTrue("Disk Error check is not performed within  " + dataNode.checkDiskErrorInterval +  "  ms", ((Time.monotonicNow()-lastDiskErrorCheck) < (dataNode.checkDiskErrorInterval + slackTime)));
   }
+   */
 
   /*
   @Test

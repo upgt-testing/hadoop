@@ -1153,6 +1153,10 @@ public class NameNode implements NameNodeStatusMXBean, NameNodeJVMInterface {
     return initializeSharedEdits(conf, force, false);
   }
 
+  public Configuration getConf() {
+    return conf;
+  }
+
   /**
    * Clone the supplied configuration but remove the shared edits dirs.
    *

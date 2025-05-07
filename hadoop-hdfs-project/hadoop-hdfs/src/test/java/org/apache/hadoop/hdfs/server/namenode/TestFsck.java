@@ -867,7 +867,9 @@ public class TestFsck {
     fsckOut = runFsck(conf, 0, true, testFile, "-files", "-blocks",
         "-replicaDetails");
     assertTrue(fsckOut.contains("(DECOMMISSIONED)"));
+     */
   }
+
 
   /** Test if fsck can return -1 in case of failure.
    * 

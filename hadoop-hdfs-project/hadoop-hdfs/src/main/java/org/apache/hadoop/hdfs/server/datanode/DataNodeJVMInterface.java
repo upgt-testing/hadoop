@@ -47,10 +47,8 @@ public interface DataNodeJVMInterface {
     String getVolumeInfo();
     int getXmitsInProgress();
     String getBPServiceActorInfo();
-    String getSlowDisks();
     //PipelineAck.ECN getECN();
     DataNodeMetricsJVMInterface getMetrics();
-    DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();
     int getInfoPort();
     BlockPoolTokenSecretManagerJVMInterface getBlockPoolTokenSecretManager();

@@ -627,7 +627,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
     return leaseManager;
   }
 
-  boolean isHaEnabled() {
+  public boolean isHaEnabled() {
     return haEnabled;
   }
 
