@@ -8,6 +8,5 @@ public interface DatanodeInfoJVMInterface {
     void setUpgradeDomain(String upgradeDomain);
     String getHostName();
     String getNetworkLocation();
-    void setInMaintenance();
     void setDecommissioned();
 }
