@@ -20,13 +20,10 @@ package org.apache.hadoop.hdfs.server.blockmanagement;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystemJVMInterface;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -44,7 +41,6 @@ import org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencing.RandomDeleterPoli
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
-
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
@@ -53,21 +49,20 @@ import com.google.common.collect.Lists;
  * and then the under replicated block gets replicated to the datanode.
  */
 public class TestRBWBlockInvalidation {
-  private static final Log LOG = LogFactory.getLog(TestRBWBlockInvalidation.class);
-  
-  private static NumberReplicas countReplicas(final FSNamesystem namesystem,
-      ExtendedBlock block) {
-    final BlockManager blockManager = namesystem.getBlockManager();
-    return blockManager.countNodes(blockManager.getStoredBlock(
-        block.getLocalBlock()));
-  }
 
-  /**
-   * Test when a block's replica is removed from RBW folder in one of the
-   * datanode, namenode should ask to invalidate that corrupted block and
-   * schedule replication for one more replica for that under replicated block.
-   */
-  /*
+    private static final Log LOG = LogFactory.getLog(TestRBWBlockInvalidation.class);
+
+    private static NumberReplicas countReplicas(final FSNamesystem namesystem, ExtendedBlock block) {
+        final BlockManager blockManager = namesystem.getBlockManager();
+        return blockManager.countNodes(blockManager.getStoredBlock(block.getLocalBlock()));
+    }
+
+    /**
+     * Test when a block's replica is removed from RBW folder in one of the
+     * datanode, namenode should ask to invalidate that corrupted block and
+     * schedule replication for one more replica for that under replicated block.
+     */
+    /*
   @Test(timeout=600000)
   public void testBlockInvalidationWhenRBWReplicaMissedInDN()
       throws IOException, InterruptedException {
@@ -140,132 +135,415 @@ public class TestRBWBlockInvalidation {
     }
   }
    */
-
-  /**
-   * Regression test for HDFS-4799, a case where, upon restart, if there
-   * were RWR replicas with out-of-date genstamps, the NN could accidentally
-   * delete good replicas instead of the bad replicas.
-   */
-  @Test(timeout=120000)
-  public void testRWRInvalidation() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-
-    // Set the deletion policy to be randomized rather than the default.
-    // The default is based on disk space, which isn't controllable
-    // in the context of the test, whereas a random one is more accurate
-    // to what is seen in real clusters (nodes have random amounts of free
-    // space)
-    conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY,
-        RandomDeleterPolicy.class, BlockPlacementPolicy.class); 
-
-    // Speed up the test a bit with faster heartbeats.
-    conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
-
-    int numFiles = 10;
-    // Test with a bunch of separate files, since otherwise the test may
-    // fail just due to "good luck", even if a bug is present.
-    List<Path> testPaths = Lists.newArrayList();
-    for (int i = 0; i < numFiles; i++) {
-      testPaths.add(new Path("/test" + i));
-    }
-    
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2)
-        .build();
-    try {
-      List<FSDataOutputStream> streams = Lists.newArrayList();
-      try {
-        // Open the test files and write some data to each
-        for (Path path : testPaths) {
-          FSDataOutputStream out = cluster.getFileSystem().create(path, (short)2);
-          streams.add(out);
-
-          out.writeBytes("old gs data\n");
-          out.hflush();
+    /**
+     * Regression test for HDFS-4799, a case where, upon restart, if there
+     * were RWR replicas with out-of-date genstamps, the NN could accidentally
+     * delete good replicas instead of the bad replicas.
+     */
+    @Test(timeout = 120000)
+    public void testRWRInvalidation() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // Set the deletion policy to be randomized rather than the default.
+        // The default is based on disk space, which isn't controllable
+        // in the context of the test, whereas a random one is more accurate
+        // to what is seen in real clusters (nodes have random amounts of free
+        // space)
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, RandomDeleterPolicy.class, BlockPlacementPolicy.class);
+        // Speed up the test a bit with faster heartbeats.
+        conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        int numFiles = 10;
+        // Test with a bunch of separate files, since otherwise the test may
+        // fail just due to "good luck", even if a bug is present.
+        List<Path> testPaths = Lists.newArrayList();
+        for (int i = 0; i < numFiles; i++) {
+            testPaths.add(new Path("/test" + i));
         }
-
-        for (Path path : testPaths) {
-          DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short)2);
-        }
-
-        // Shutdown one of the nodes in the pipeline
-        DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
-
-        // Write some more data and flush again. This data will only
-        // be in the latter genstamp copy of the blocks.
-        for (int i = 0; i < streams.size(); i++) {
-          Path path = testPaths.get(i);
-          FSDataOutputStream out = streams.get(i);
-
-          out.writeBytes("new gs data\n");
-          out.hflush();
-
-          // Set replication so that only one node is necessary for this block,
-          // and close it.
-          cluster.getFileSystem().setReplication(path, (short)1);
-          out.close();
-        }
-
-        for (Path path : testPaths) {
-          DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short)1);
-        }
-
-        // Upon restart, there will be two replicas, one with an old genstamp
-        // and one current copy. This test wants to ensure that the old genstamp
-        // copy is the one that is deleted.
-
-        LOG.info("=========================== restarting cluster");
-        DataNodeProperties otherNode = cluster.stopDataNode(0);
-        cluster.restartNameNode();
-        
-        // Restart the datanode with the corrupt replica first.
-        cluster.restartDataNode(oldGenstampNode);
-        cluster.waitActive();
-
-        // Then the other node
-        cluster.restartDataNode(otherNode);
-        cluster.waitActive();
-        
-        // Compute and send invalidations, waiting until they're fully processed.
-        cluster.getNameNode().getNamesystem().getBlockManager()
-          .computeInvalidateWork(2);
-        cluster.triggerHeartbeats();
-        HATestUtil.waitForDNDeletions(cluster);
-        cluster.triggerDeletionReports();
-
-        waitForNumTotalBlocks(cluster, numFiles);
-        // Make sure we can still read the blocks.
-        for (Path path : testPaths) {
-          String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
-          assertEquals("old gs data\n" + "new gs data\n", ret);
-        }
-      } finally {
-        IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
-      }
-    } finally {
-      cluster.shutdown();
-    }
-
-  }
-
-  private void waitForNumTotalBlocks(final MiniDFSClusterInJVM cluster,
-      final int numTotalBlocks) throws Exception {
-    GenericTestUtils.waitFor(new Supplier<Boolean>() {
-
-      @Override
-      public Boolean get() {
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
         try {
-          cluster.triggerBlockReports();
-
-          // Wait total blocks
-          if (cluster.getNamesystem().getBlocksTotal() == numTotalBlocks) {
-            return true;
-          }
-        } catch (Exception ignored) {
-          // Ignore the exception
+            List<FSDataOutputStream> streams = Lists.newArrayList();
+            try {
+                // Open the test files and write some data to each
+                for (Path path : testPaths) {
+                    FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
+                    streams.add(out);
+                    out.writeBytes("old gs data\n");
+                    out.hflush();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
+                }
+                // Shutdown one of the nodes in the pipeline
+                DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
+                // Write some more data and flush again. This data will only
+                // be in the latter genstamp copy of the blocks.
+                for (int i = 0; i < streams.size(); i++) {
+                    Path path = testPaths.get(i);
+                    FSDataOutputStream out = streams.get(i);
+                    out.writeBytes("new gs data\n");
+                    out.hflush();
+                    // Set replication so that only one node is necessary for this block,
+                    // and close it.
+                    cluster.getFileSystem().setReplication(path, (short) 1);
+                    out.close();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
+                }
+                // Upon restart, there will be two replicas, one with an old genstamp
+                // and one current copy. This test wants to ensure that the old genstamp
+                // copy is the one that is deleted.
+                LOG.info("=========================== restarting cluster");
+                DataNodeProperties otherNode = cluster.stopDataNode(0);
+                cluster.restartNameNode();
+                // Restart the datanode with the corrupt replica first.
+                cluster.restartDataNode(oldGenstampNode);
+                cluster.waitActive();
+                // Then the other node
+                cluster.restartDataNode(otherNode);
+                cluster.waitActive();
+                // Compute and send invalidations, waiting until they're fully processed.
+                cluster.getNameNode().getNamesystem().getBlockManager().computeInvalidateWork(2);
+                cluster.triggerHeartbeats();
+                HATestUtil.waitForDNDeletions(cluster);
+                cluster.triggerDeletionReports();
+                waitForNumTotalBlocks(cluster, numFiles);
+                // Make sure we can still read the blocks.
+                for (Path path : testPaths) {
+                    String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
+                    assertEquals("old gs data\n" + "new gs data\n", ret);
+                }
+            } finally {
+                IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
+            }
+        } finally {
+            cluster.shutdown();
         }
+    }
 
-        return false;
-      }
-    }, 1000, 60000);
-  }
+    private void waitForNumTotalBlocks(final MiniDFSClusterInJVM cluster, final int numTotalBlocks) throws Exception {
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                try {
+                    cluster.triggerBlockReports();
+                    // Wait total blocks
+                    if (cluster.getNamesystem().getBlocksTotal() == numTotalBlocks) {
+                        return true;
+                    }
+                } catch (Exception ignored) {
+                    // Ignore the exception
+                }
+                return false;
+            }
+        }, 1000, 60000);
+    }
+
+    @Test(timeout = 120000)
+    public void testRWRInvalidation_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // space)
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, RandomDeleterPolicy.class, BlockPlacementPolicy.class);
+        // Speed up the test a bit with faster heartbeats.
+        conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        int numFiles = 10;
+        // fail just due to "good luck", even if a bug is present.
+        List<Path> testPaths = Lists.newArrayList();
+        for (int i = 0; i < numFiles; i++) {
+            testPaths.add(new Path("/test" + i));
+        }
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        try {
+            List<FSDataOutputStream> streams = Lists.newArrayList();
+            try {
+                // Open the test files and write some data to each
+                for (Path path : testPaths) {
+                    FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
+                    streams.add(out);
+                    out.writeBytes("old gs data\n");
+                    out.hflush();
+                }
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
+                }
+                // Shutdown one of the nodes in the pipeline
+                DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
+                // Write some more data and flush again. This data will only
+                // be in the latter genstamp copy of the blocks.
+                for (int i = 0; i < streams.size(); i++) {
+                    Path path = testPaths.get(i);
+                    FSDataOutputStream out = streams.get(i);
+                    out.writeBytes("new gs data\n");
+                    out.hflush();
+                    // Set replication so that only one node is necessary for this block,
+                    // and close it.
+                    cluster.getFileSystem().setReplication(path, (short) 1);
+                    out.close();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
+                }
+                // Upon restart, there will be two replicas, one with an old genstamp
+                // and one current copy. This test wants to ensure that the old genstamp
+                // copy is the one that is deleted.
+                LOG.info("=========================== restarting cluster");
+                DataNodeProperties otherNode = cluster.stopDataNode(0);
+                cluster.restartNameNode();
+                // Restart the datanode with the corrupt replica first.
+                cluster.restartDataNode(oldGenstampNode);
+                cluster.waitActive();
+                // Then the other node
+                cluster.restartDataNode(otherNode);
+                cluster.waitActive();
+                // Compute and send invalidations, waiting until they're fully processed.
+                cluster.getNameNode().getNamesystem().getBlockManager().computeInvalidateWork(2);
+                cluster.triggerHeartbeats();
+                HATestUtil.waitForDNDeletions(cluster);
+                cluster.triggerDeletionReports();
+                waitForNumTotalBlocks(cluster, numFiles);
+                // Make sure we can still read the blocks.
+                for (Path path : testPaths) {
+                    String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
+                    assertEquals("old gs data\n" + "new gs data\n", ret);
+                }
+            } finally {
+                IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 120000)
+    public void testRWRInvalidation_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // space)
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, RandomDeleterPolicy.class, BlockPlacementPolicy.class);
+        // Speed up the test a bit with faster heartbeats.
+        conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        int numFiles = 10;
+        // fail just due to "good luck", even if a bug is present.
+        List<Path> testPaths = Lists.newArrayList();
+        for (int i = 0; i < numFiles; i++) {
+            testPaths.add(new Path("/test" + i));
+        }
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        try {
+            List<FSDataOutputStream> streams = Lists.newArrayList();
+            try {
+                // Open the test files and write some data to each
+                for (Path path : testPaths) {
+                    FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
+                    streams.add(out);
+                    out.writeBytes("old gs data\n");
+                    out.hflush();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
+                }
+                // Shutdown one of the nodes in the pipeline
+                DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
+                // Write some more data and flush again. This data will only
+                // be in the latter genstamp copy of the blocks.
+                for (int i = 0; i < streams.size(); i++) {
+                    Path path = testPaths.get(i);
+                    FSDataOutputStream out = streams.get(i);
+                    out.writeBytes("new gs data\n");
+                    out.hflush();
+                    // Set replication so that only one node is necessary for this block,
+                    // and close it.
+                    cluster.getFileSystem().setReplication(path, (short) 1);
+                    out.close();
+                }
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
+                }
+                // Upon restart, there will be two replicas, one with an old genstamp
+                // and one current copy. This test wants to ensure that the old genstamp
+                // copy is the one that is deleted.
+                LOG.info("=========================== restarting cluster");
+                DataNodeProperties otherNode = cluster.stopDataNode(0);
+                cluster.restartNameNode();
+                // Restart the datanode with the corrupt replica first.
+                cluster.restartDataNode(oldGenstampNode);
+                cluster.waitActive();
+                // Then the other node
+                cluster.restartDataNode(otherNode);
+                cluster.waitActive();
+                // Compute and send invalidations, waiting until they're fully processed.
+                cluster.getNameNode().getNamesystem().getBlockManager().computeInvalidateWork(2);
+                cluster.triggerHeartbeats();
+                HATestUtil.waitForDNDeletions(cluster);
+                cluster.triggerDeletionReports();
+                waitForNumTotalBlocks(cluster, numFiles);
+                // Make sure we can still read the blocks.
+                for (Path path : testPaths) {
+                    String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
+                    assertEquals("old gs data\n" + "new gs data\n", ret);
+                }
+            } finally {
+                IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 120000)
+    public void testRWRInvalidation_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // space)
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, RandomDeleterPolicy.class, BlockPlacementPolicy.class);
+        // Speed up the test a bit with faster heartbeats.
+        conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        int numFiles = 10;
+        // fail just due to "good luck", even if a bug is present.
+        List<Path> testPaths = Lists.newArrayList();
+        for (int i = 0; i < numFiles; i++) {
+            testPaths.add(new Path("/test" + i));
+        }
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        try {
+            List<FSDataOutputStream> streams = Lists.newArrayList();
+            try {
+                // Open the test files and write some data to each
+                for (Path path : testPaths) {
+                    FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
+                    streams.add(out);
+                    out.writeBytes("old gs data\n");
+                    out.hflush();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
+                }
+                // Shutdown one of the nodes in the pipeline
+                DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
+                // Write some more data and flush again. This data will only
+                // be in the latter genstamp copy of the blocks.
+                for (int i = 0; i < streams.size(); i++) {
+                    Path path = testPaths.get(i);
+                    FSDataOutputStream out = streams.get(i);
+                    out.writeBytes("new gs data\n");
+                    out.hflush();
+                    // Set replication so that only one node is necessary for this block,
+                    // and close it.
+                    cluster.getFileSystem().setReplication(path, (short) 1);
+                    out.close();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
+                }
+                // Upon restart, there will be two replicas, one with an old genstamp
+                // and one current copy. This test wants to ensure that the old genstamp
+                // copy is the one that is deleted.
+                LOG.info("=========================== restarting cluster");
+                DataNodeProperties otherNode = cluster.stopDataNode(0);
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                cluster.restartNameNode();
+                // Restart the datanode with the corrupt replica first.
+                cluster.restartDataNode(oldGenstampNode);
+                cluster.waitActive();
+                // Then the other node
+                cluster.restartDataNode(otherNode);
+                cluster.waitActive();
+                // Compute and send invalidations, waiting until they're fully processed.
+                cluster.getNameNode().getNamesystem().getBlockManager().computeInvalidateWork(2);
+                cluster.triggerHeartbeats();
+                HATestUtil.waitForDNDeletions(cluster);
+                cluster.triggerDeletionReports();
+                waitForNumTotalBlocks(cluster, numFiles);
+                // Make sure we can still read the blocks.
+                for (Path path : testPaths) {
+                    String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
+                    assertEquals("old gs data\n" + "new gs data\n", ret);
+                }
+            } finally {
+                IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 120000)
+    public void testRWRInvalidation_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // space)
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, RandomDeleterPolicy.class, BlockPlacementPolicy.class);
+        // Speed up the test a bit with faster heartbeats.
+        conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
+        int numFiles = 10;
+        // fail just due to "good luck", even if a bug is present.
+        List<Path> testPaths = Lists.newArrayList();
+        for (int i = 0; i < numFiles; i++) {
+            testPaths.add(new Path("/test" + i));
+        }
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        try {
+            List<FSDataOutputStream> streams = Lists.newArrayList();
+            try {
+                // Open the test files and write some data to each
+                for (Path path : testPaths) {
+                    FSDataOutputStream out = cluster.getFileSystem().create(path, (short) 2);
+                    streams.add(out);
+                    out.writeBytes("old gs data\n");
+                    out.hflush();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 2);
+                }
+                // Shutdown one of the nodes in the pipeline
+                DataNodeProperties oldGenstampNode = cluster.stopDataNode(0);
+                // Write some more data and flush again. This data will only
+                // be in the latter genstamp copy of the blocks.
+                for (int i = 0; i < streams.size(); i++) {
+                    Path path = testPaths.get(i);
+                    FSDataOutputStream out = streams.get(i);
+                    out.writeBytes("new gs data\n");
+                    out.hflush();
+                    // Set replication so that only one node is necessary for this block,
+                    // and close it.
+                    cluster.getFileSystem().setReplication(path, (short) 1);
+                    out.close();
+                }
+                for (Path path : testPaths) {
+                    DFSTestUtil.waitReplication(cluster.getFileSystem(), path, (short) 1);
+                }
+                // Upon restart, there will be two replicas, one with an old genstamp
+                // and one current copy. This test wants to ensure that the old genstamp
+                // copy is the one that is deleted.
+                LOG.info("=========================== restarting cluster");
+                DataNodeProperties otherNode = cluster.stopDataNode(0);
+                cluster.restartNameNode();
+                // Restart the datanode with the corrupt replica first.
+                cluster.restartDataNode(oldGenstampNode);
+                cluster.waitActive();
+                // Then the other node
+                cluster.restartDataNode(otherNode);
+                cluster.waitActive();
+                // Compute and send invalidations, waiting until they're fully processed.
+                cluster.getNameNode().getNamesystem().getBlockManager().computeInvalidateWork(2);
+                cluster.triggerHeartbeats();
+                HATestUtil.waitForDNDeletions(cluster);
+                cluster.triggerDeletionReports();
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                waitForNumTotalBlocks(cluster, numFiles);
+                // Make sure we can still read the blocks.
+                for (Path path : testPaths) {
+                    String ret = DFSTestUtil.readFile(cluster.getFileSystem(), path);
+                    assertEquals("old gs data\n" + "new gs data\n", ret);
+                }
+            } finally {
+                IOUtils.cleanup(LOG, streams.toArray(new Closeable[0]));
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }

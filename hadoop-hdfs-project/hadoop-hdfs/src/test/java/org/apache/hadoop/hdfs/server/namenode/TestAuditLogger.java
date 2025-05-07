@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.namenode;
 
 import com.google.common.collect.Lists;
@@ -39,22 +38,17 @@ import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.test.GenericTestUtils.LogCapturer;
 import org.apache.log4j.Level;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.Mockito;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_CALLER_CONTEXT_ENABLED_KEY;
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY;
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY;
@@ -72,52 +66,49 @@ import static org.mockito.Mockito.doThrow;
  * Tests for the {@link AuditLogger} custom audit logging interface.
  */
 public class TestAuditLogger {
-  private static final Logger LOG = LoggerFactory.getLogger(
-      TestAuditLogger.class);
-  static {
-    GenericTestUtils.setLogLevel(LOG, Level.ALL);
-  }
 
-  private static final short TEST_PERMISSION = (short) 0654;
+    private static final Logger LOG = LoggerFactory.getLogger(TestAuditLogger.class);
 
-  @Before
-  public void setup() {
-    DummyAuditLogger.initialized = false;
-    DummyAuditLogger.logCount = 0;
-    DummyAuditLogger.remoteAddr = null;
-
-    Configuration conf = new HdfsConfiguration();
-    ProxyUsers.refreshSuperUserGroupsConfiguration(conf);    
-  }
-
-  /**
-   * Tests that AuditLogger works as expected.
-   */
-  @Test
-  public void testAuditLogger() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY,
-        DummyAuditLogger.class.getName());
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-
-    try {
-      cluster.waitClusterUp();
-      assertTrue(DummyAuditLogger.initialized);
-      DummyAuditLogger.resetLogCount();
-
-      FileSystem fs = cluster.getFileSystem();
-      long time = System.currentTimeMillis();
-      fs.setTimes(new Path("/"), time, time);
-      assertEquals(1, DummyAuditLogger.logCount);
-    } finally {
-      cluster.shutdown();
+    static {
+        GenericTestUtils.setLogLevel(LOG, Level.ALL);
     }
-  }
 
-  /**
-   * Tests that TopAuditLogger can be disabled
-   */
-  /*
+    private static final short TEST_PERMISSION = (short) 0654;
+
+    @Before
+    public void setup() {
+        DummyAuditLogger.initialized = false;
+        DummyAuditLogger.logCount = 0;
+        DummyAuditLogger.remoteAddr = null;
+        Configuration conf = new HdfsConfiguration();
+        ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+    }
+
+    /**
+     * Tests that AuditLogger works as expected.
+     */
+    @Test
+    public void testAuditLogger() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            assertEquals(1, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    /**
+     * Tests that TopAuditLogger can be disabled
+     */
+    /*
   @Test
   public void testDisableTopAuditLogger() throws IOException {
     Configuration conf = new HdfsConfiguration();
@@ -139,260 +130,209 @@ public class TestAuditLogger {
   }
 
    */
-
-  @Test
-  public void testWebHdfsAuditLogger() throws IOException, URISyntaxException {
-    Configuration conf = new HdfsConfiguration();
-    conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY,
-        DummyAuditLogger.class.getName());
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
-    try {
-      cluster.waitClusterUp();
-      assertTrue(DummyAuditLogger.initialized);      
-      URI uri = new URI(
-          "http",
-          NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()),
-          "/webhdfs/v1/", op.toQueryString(), null);
-      
-      // non-proxy request
-      HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
-      conn.setRequestMethod(op.getType().toString());
-      conn.connect();
-      assertEquals(200, conn.getResponseCode());
-      conn.disconnect();
-      assertEquals(1, DummyAuditLogger.logCount);
-      assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
-      
-      // non-trusted proxied request
-      conn = (HttpURLConnection) uri.toURL().openConnection();
-      conn.setRequestMethod(op.getType().toString());
-      conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
-      conn.connect();
-      assertEquals(200, conn.getResponseCode());
-      conn.disconnect();
-      assertEquals(2, DummyAuditLogger.logCount);
-      assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
-      
-      // trusted proxied request
-      conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
-      ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
-      conn = (HttpURLConnection) uri.toURL().openConnection();
-      conn.setRequestMethod(op.getType().toString());
-      conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
-      conn.connect();
-      assertEquals(200, conn.getResponseCode());
-      conn.disconnect();
-      assertEquals(3, DummyAuditLogger.logCount);
-      assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
-    } finally {
-      cluster.shutdown();
+    @Test
+    public void testWebHdfsAuditLogger() throws IOException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            URI uri = new URI("http", NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()), "/webhdfs/v1/", op.toQueryString(), null);
+            // non-proxy request
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(1, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // non-trusted proxied request
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(2, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // trusted proxied request
+            conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
+            ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(3, DummyAuditLogger.logCount);
+            assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 
-  /**
-   * Minor test related to HADOOP-9155. Verify that during a
-   * FileSystem.setPermission() operation, the stat passed in during the
-   * logAuditEvent() call returns the new permission rather than the old
-   * permission.
-   */
-  @Test
-  public void testAuditLoggerWithSetPermission() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY,
-        DummyAuditLogger.class.getName());
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-
-    try {
-      cluster.waitClusterUp();
-      assertTrue(DummyAuditLogger.initialized);
-      DummyAuditLogger.resetLogCount();
-
-      FileSystem fs = cluster.getFileSystem();
-      long time = System.currentTimeMillis();
-      final Path p = new Path("/");
-      fs.setTimes(p, time, time);
-      fs.setPermission(p, new FsPermission(TEST_PERMISSION));
-      assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
-      assertEquals(2, DummyAuditLogger.logCount);
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-  /**
-   * Verify that the audit logger is aware of the call context
-   */
-  @Test
-  public void testAuditLoggerWithCallContext() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
-    conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
-    conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
-
-    try {
-      cluster.waitClusterUp();
-      final FileSystem fs = cluster.getFileSystem();
-      final long time = System.currentTimeMillis();
-      final Path p = new Path("/");
-
-      assertNull(CallerContext.getCurrent());
-
-      // context-only
-      CallerContext context = new CallerContext.Builder("setTimes").build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.setTimes(p, time, time);
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setTimes%n")));
-      auditlog.clearOutput();
-
-      // context with signature
-      context = new CallerContext.Builder("setTimes")
-          .setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING))
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.setTimes(p, time, time);
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setTimes:L%n")));
-      auditlog.clearOutput();
-
-      // long context is truncated
-      final String longContext = StringUtils.repeat("foo", 100);
-      context = new CallerContext.Builder(longContext)
-          .setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING))
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.setTimes(p, time, time);
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
-      auditlog.clearOutput();
-
-      // empty context is ignored
-      context = new CallerContext.Builder("")
-          .setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING))
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set empty caller context");
-      fs.setTimes(p, time, time);
-      assertFalse(auditlog.getOutput().contains("callerContext="));
-      auditlog.clearOutput();
-
-      // caller context is inherited in child thread
-      context = new CallerContext.Builder("setTimes")
-          .setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING))
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      Thread child = new Thread(new Runnable()
-      {
-        @Override
-        public void run() {
-          try {
+    /**
+     * Minor test related to HADOOP-9155. Verify that during a
+     * FileSystem.setPermission() operation, the stat passed in during the
+     * logAuditEvent() call returns the new permission rather than the old
+     * permission.
+     */
+    @Test
+    public void testAuditLoggerWithSetPermission() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            final Path p = new Path("/");
             fs.setTimes(p, time, time);
-          } catch (IOException e) {
-            fail("Unexpected exception found." + e);
-          }
+            fs.setPermission(p, new FsPermission(TEST_PERMISSION));
+            assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
+            assertEquals(2, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
         }
-      });
-      child.start();
-      try {
-        child.join();
-      } catch (InterruptedException ignored) {
-        // Ignore
-      }
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setTimes:L%n")));
-      auditlog.clearOutput();
-
-      // caller context is overridden in child thread
-      final CallerContext childContext =
-          new CallerContext.Builder("setPermission")
-              .setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING))
-              .build();
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      child = new Thread(new Runnable()
-      {
-        @Override
-        public void run() {
-          try {
-            CallerContext.setCurrent(childContext);
-            fs.setPermission(p, new FsPermission((short)777));
-          } catch (IOException e) {
-            fail("Unexpected exception found." + e);
-          }
-        }
-      });
-      child.start();
-      try {
-        child.join();
-      } catch (InterruptedException ignored) {
-        // Ignore
-      }
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setPermission:L%n")));
-      auditlog.clearOutput();
-
-      // reuse the current context's signature
-       context = new CallerContext.Builder("mkdirs")
-           .setSignature(CallerContext.getCurrent().getSignature()).build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.mkdirs(new Path("/reuse-context-signature"));
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=mkdirs:L%n")));
-      auditlog.clearOutput();
-
-      // too long signature is ignored
-      context = new CallerContext.Builder("setTimes")
-          .setSignature(new byte[41])
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.setTimes(p, time, time);
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setTimes%n")));
-      auditlog.clearOutput();
-
-      // null signature is ignored
-      context = new CallerContext.Builder("setTimes").setSignature(null)
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.setTimes(p, time, time);
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=setTimes%n")));
-      auditlog.clearOutput();
-
-      // empty signature is ignored
-      context = new CallerContext.Builder("mkdirs")
-          .setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING))
-          .build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.mkdirs(new Path("/empty-signature"));
-      assertTrue(auditlog.getOutput().endsWith(
-          String.format("callerContext=mkdirs%n")));
-      auditlog.clearOutput();
-
-      // invalid context is not passed to the rpc
-      context = new CallerContext.Builder(null).build();
-      CallerContext.setCurrent(context);
-      LOG.info("Set current caller context as {}", CallerContext.getCurrent());
-      fs.mkdirs(new Path("/empty-signature"));
-      assertFalse(auditlog.getOutput().contains("callerContext="));
-      auditlog.clearOutput();
-
-    } finally {
-      cluster.shutdown();
     }
-  }
 
-  /*
+    /**
+     * Verify that the audit logger is aware of the call context
+     */
+    @Test
+    public void testAuditLoggerWithCallContext() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
+        conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
+        conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
+        try {
+            cluster.waitClusterUp();
+            final FileSystem fs = cluster.getFileSystem();
+            final long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            assertNull(CallerContext.getCurrent());
+            // context-only
+            CallerContext context = new CallerContext.Builder("setTimes").build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // context with signature
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // long context is truncated
+            final String longContext = StringUtils.repeat("foo", 100);
+            context = new CallerContext.Builder(longContext).setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
+            auditlog.clearOutput();
+            // empty context is ignored
+            context = new CallerContext.Builder("").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set empty caller context");
+            fs.setTimes(p, time, time);
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+            // caller context is inherited in child thread
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            Thread child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        fs.setTimes(p, time, time);
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // caller context is overridden in child thread
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        CallerContext.setCurrent(childContext);
+                        fs.setPermission(p, new FsPermission((short) 777));
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
+            auditlog.clearOutput();
+            // reuse the current context's signature
+            context = new CallerContext.Builder("mkdirs").setSignature(CallerContext.getCurrent().getSignature()).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/reuse-context-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs:L%n")));
+            auditlog.clearOutput();
+            // too long signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(new byte[41]).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // null signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // empty signature is ignored
+            context = new CallerContext.Builder("mkdirs").setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs%n")));
+            auditlog.clearOutput();
+            // invalid context is not passed to the rpc
+            context = new CallerContext.Builder(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    /*
   @Test
   public void testAuditLogWithAclFailure() throws Exception {
     final Configuration conf = new HdfsConfiguration();
@@ -449,71 +389,1021 @@ public class TestAuditLogger {
   /**
    * Tests that a broken audit logger causes requests to fail.
    */
-  @Test
-  public void testBrokenLogger() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY,
-        BrokenAuditLogger.class.getName());
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-
-    try {
-      cluster.waitClusterUp();
-
-      FileSystem fs = cluster.getFileSystem();
-      long time = System.currentTimeMillis();
-      fs.setTimes(new Path("/"), time, time);
-      fail("Expected exception due to broken audit logger.");
-    } catch (RemoteException re) {
-      // Expected.
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-  public static class DummyAuditLogger implements AuditLogger {
-
-    static boolean initialized;
-    static int logCount;
-    static int unsuccessfulCount;
-    static short foundPermission;
-    static String remoteAddr;
-    
-    public void initialize(Configuration conf) {
-      initialized = true;
+    @Test
+    public void testBrokenLogger() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, BrokenAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            fail("Expected exception due to broken audit logger.");
+        } catch (RemoteException re) {
+            // Expected.
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-    public static void resetLogCount() {
-      logCount = 0;
-      unsuccessfulCount = 0;
+    public static class DummyAuditLogger implements AuditLogger {
+
+        static boolean initialized;
+
+        static int logCount;
+
+        static int unsuccessfulCount;
+
+        static short foundPermission;
+
+        static String remoteAddr;
+
+        public void initialize(Configuration conf) {
+            initialized = true;
+        }
+
+        public static void resetLogCount() {
+            logCount = 0;
+            unsuccessfulCount = 0;
+        }
+
+        public void logAuditEvent(boolean succeeded, String userName, InetAddress addr, String cmd, String src, String dst, FileStatus stat) {
+            remoteAddr = addr.getHostAddress();
+            logCount++;
+            if (!succeeded) {
+                unsuccessfulCount++;
+            }
+            if (stat != null) {
+                foundPermission = stat.getPermission().toShort();
+            }
+        }
     }
 
-    public void logAuditEvent(boolean succeeded, String userName,
-        InetAddress addr, String cmd, String src, String dst,
-        FileStatus stat) {
-      remoteAddr = addr.getHostAddress();
-      logCount++;
-      if (!succeeded) {
-        unsuccessfulCount++;
-      }
-      if (stat != null) {
-        foundPermission = stat.getPermission().toShort();
-      }
+    public static class BrokenAuditLogger implements AuditLogger {
+
+        public void initialize(Configuration conf) {
+            // No op.
+        }
+
+        public void logAuditEvent(boolean succeeded, String userName, InetAddress addr, String cmd, String src, String dst, FileStatus stat) {
+            throw new RuntimeException("uh oh");
+        }
     }
 
-  }
-
-  public static class BrokenAuditLogger implements AuditLogger {
-
-    public void initialize(Configuration conf) {
-      // No op.
+    @Test
+    public void testAuditLogger_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            assertEquals(1, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-    public void logAuditEvent(boolean succeeded, String userName,
-        InetAddress addr, String cmd, String src, String dst,
-        FileStatus stat) {
-      throw new RuntimeException("uh oh");
+    @Test
+    public void testAuditLogger_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            assertEquals(1, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-  }
+    @Test
+    public void testAuditLogger_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fs.setTimes(new Path("/"), time, time);
+            assertEquals(1, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
+    }
 
+    @Test
+    public void testAuditLogger_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            assertEquals(1, DummyAuditLogger.logCount);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testWebHdfsAuditLogger_withUpgrade20() throws IOException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            URI uri = new URI("http", NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()), "/webhdfs/v1/", op.toQueryString(), null);
+            // non-proxy request
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            conn.setRequestMethod(op.getType().toString());
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(1, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // non-trusted proxied request
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(2, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // trusted proxied request
+            conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
+            ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(3, DummyAuditLogger.logCount);
+            assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testWebHdfsAuditLogger_withUpgrade40() throws IOException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            URI uri = new URI("http", NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()), "/webhdfs/v1/", op.toQueryString(), null);
+            // non-proxy request
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(1, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // non-trusted proxied request
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(2, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // trusted proxied request
+            conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
+            ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(3, DummyAuditLogger.logCount);
+            assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testWebHdfsAuditLogger_withUpgrade60() throws IOException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            URI uri = new URI("http", NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()), "/webhdfs/v1/", op.toQueryString(), null);
+            // non-proxy request
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(1, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // non-trusted proxied request
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(2, DummyAuditLogger.logCount);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // trusted proxied request
+            conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
+            ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(3, DummyAuditLogger.logCount);
+            assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testWebHdfsAuditLogger_withUpgrade80() throws IOException, URISyntaxException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        GetOpParam.Op op = GetOpParam.Op.GETFILESTATUS;
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            URI uri = new URI("http", NetUtils.getHostPortString(cluster.getNameNode().getHttpAddress()), "/webhdfs/v1/", op.toQueryString(), null);
+            // non-proxy request
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(1, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // non-trusted proxied request
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(2, DummyAuditLogger.logCount);
+            assertEquals("127.0.0.1", DummyAuditLogger.remoteAddr);
+            // trusted proxied request
+            conf.set(ProxyServers.CONF_HADOOP_PROXYSERVERS, "127.0.0.1");
+            ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+            conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod(op.getType().toString());
+            conn.setRequestProperty("X-Forwarded-For", "1.1.1.1");
+            conn.connect();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals(200, conn.getResponseCode());
+            conn.disconnect();
+            assertEquals(3, DummyAuditLogger.logCount);
+            assertEquals("1.1.1.1", DummyAuditLogger.remoteAddr);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithSetPermission_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            fs.setTimes(p, time, time);
+            fs.setPermission(p, new FsPermission(TEST_PERMISSION));
+            assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
+            assertEquals(2, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithSetPermission_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            fs.setTimes(p, time, time);
+            fs.setPermission(p, new FsPermission(TEST_PERMISSION));
+            assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
+            assertEquals(2, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithSetPermission_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            fs.setTimes(p, time, time);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fs.setPermission(p, new FsPermission(TEST_PERMISSION));
+            assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
+            assertEquals(2, DummyAuditLogger.logCount);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithSetPermission_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, DummyAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            assertTrue(DummyAuditLogger.initialized);
+            DummyAuditLogger.resetLogCount();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            fs.setTimes(p, time, time);
+            fs.setPermission(p, new FsPermission(TEST_PERMISSION));
+            assertEquals(TEST_PERMISSION, DummyAuditLogger.foundPermission);
+            assertEquals(2, DummyAuditLogger.logCount);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithCallContext_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
+        conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
+        conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
+        try {
+            cluster.waitClusterUp();
+            final FileSystem fs = cluster.getFileSystem();
+            final long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            assertNull(CallerContext.getCurrent());
+            // context-only
+            CallerContext context = new CallerContext.Builder("setTimes").build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // context with signature
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // long context is truncated
+            final String longContext = StringUtils.repeat("foo", 100);
+            context = new CallerContext.Builder(longContext).setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
+            auditlog.clearOutput();
+            // empty context is ignored
+            context = new CallerContext.Builder("").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set empty caller context");
+            fs.setTimes(p, time, time);
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+            // caller context is inherited in child thread
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            Thread child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        fs.setTimes(p, time, time);
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // caller context is overridden in child thread
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        CallerContext.setCurrent(childContext);
+                        fs.setPermission(p, new FsPermission((short) 777));
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
+            auditlog.clearOutput();
+            // reuse the current context's signature
+            context = new CallerContext.Builder("mkdirs").setSignature(CallerContext.getCurrent().getSignature()).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/reuse-context-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs:L%n")));
+            auditlog.clearOutput();
+            // too long signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(new byte[41]).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // null signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // empty signature is ignored
+            context = new CallerContext.Builder("mkdirs").setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs%n")));
+            auditlog.clearOutput();
+            // invalid context is not passed to the rpc
+            context = new CallerContext.Builder(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithCallContext_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
+        conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
+        conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
+        try {
+            cluster.waitClusterUp();
+            final FileSystem fs = cluster.getFileSystem();
+            final long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            assertNull(CallerContext.getCurrent());
+            // context-only
+            CallerContext context = new CallerContext.Builder("setTimes").build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // context with signature
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // long context is truncated
+            final String longContext = StringUtils.repeat("foo", 100);
+            context = new CallerContext.Builder(longContext).setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
+            auditlog.clearOutput();
+            // empty context is ignored
+            context = new CallerContext.Builder("").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set empty caller context");
+            fs.setTimes(p, time, time);
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+            // caller context is inherited in child thread
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            Thread child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        fs.setTimes(p, time, time);
+                        cluster.restartNodeForTesting(0);
+                        cluster.upgradeNodeForTesting(0);
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // caller context is overridden in child thread
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        CallerContext.setCurrent(childContext);
+                        fs.setPermission(p, new FsPermission((short) 777));
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
+            auditlog.clearOutput();
+            // reuse the current context's signature
+            context = new CallerContext.Builder("mkdirs").setSignature(CallerContext.getCurrent().getSignature()).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/reuse-context-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs:L%n")));
+            auditlog.clearOutput();
+            // too long signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(new byte[41]).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // null signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // empty signature is ignored
+            context = new CallerContext.Builder("mkdirs").setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs%n")));
+            auditlog.clearOutput();
+            // invalid context is not passed to the rpc
+            context = new CallerContext.Builder(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithCallContext_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
+        conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
+        conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
+        try {
+            cluster.waitClusterUp();
+            final FileSystem fs = cluster.getFileSystem();
+            final long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            assertNull(CallerContext.getCurrent());
+            // context-only
+            CallerContext context = new CallerContext.Builder("setTimes").build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // context with signature
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // long context is truncated
+            final String longContext = StringUtils.repeat("foo", 100);
+            context = new CallerContext.Builder(longContext).setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
+            auditlog.clearOutput();
+            // empty context is ignored
+            context = new CallerContext.Builder("").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set empty caller context");
+            fs.setTimes(p, time, time);
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+            // caller context is inherited in child thread
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            Thread child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        fs.setTimes(p, time, time);
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // caller context is overridden in child thread
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        CallerContext.setCurrent(childContext);
+                        fs.setPermission(p, new FsPermission((short) 777));
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                        cluster.restartNodeForTesting(0);
+                        cluster.upgradeNodeForTesting(0);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
+            auditlog.clearOutput();
+            // reuse the current context's signature
+            context = new CallerContext.Builder("mkdirs").setSignature(CallerContext.getCurrent().getSignature()).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/reuse-context-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs:L%n")));
+            auditlog.clearOutput();
+            // too long signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(new byte[41]).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // null signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // empty signature is ignored
+            context = new CallerContext.Builder("mkdirs").setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs%n")));
+            auditlog.clearOutput();
+            // invalid context is not passed to the rpc
+            context = new CallerContext.Builder(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testAuditLoggerWithCallContext_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(HADOOP_CALLER_CONTEXT_ENABLED_KEY, true);
+        conf.setInt(HADOOP_CALLER_CONTEXT_MAX_SIZE_KEY, 128);
+        conf.setInt(HADOOP_CALLER_CONTEXT_SIGNATURE_MAX_SIZE_KEY, 40);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        LogCapturer auditlog = LogCapturer.captureLogs(FSNamesystem.auditLog);
+        try {
+            cluster.waitClusterUp();
+            final FileSystem fs = cluster.getFileSystem();
+            final long time = System.currentTimeMillis();
+            final Path p = new Path("/");
+            assertNull(CallerContext.getCurrent());
+            // context-only
+            CallerContext context = new CallerContext.Builder("setTimes").build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // context with signature
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // long context is truncated
+            final String longContext = StringUtils.repeat("foo", 100);
+            context = new CallerContext.Builder(longContext).setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=%s:L%n", longContext.substring(0, 128))));
+            auditlog.clearOutput();
+            // empty context is ignored
+            context = new CallerContext.Builder("").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set empty caller context");
+            fs.setTimes(p, time, time);
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+            // caller context is inherited in child thread
+            context = new CallerContext.Builder("setTimes").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            Thread child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        fs.setTimes(p, time, time);
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes:L%n")));
+            auditlog.clearOutput();
+            // caller context is overridden in child thread
+            final CallerContext childContext = new CallerContext.Builder("setPermission").setSignature("L".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            child = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        CallerContext.setCurrent(childContext);
+                        fs.setPermission(p, new FsPermission((short) 777));
+                    } catch (IOException e) {
+                        fail("Unexpected exception found." + e);
+                    }
+                }
+            });
+            child.start();
+            try {
+                child.join();
+            } catch (InterruptedException ignored) {
+                // Ignore
+            }
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
+            auditlog.clearOutput();
+            // reuse the current context's signature
+            context = new CallerContext.Builder("mkdirs").setSignature(CallerContext.getCurrent().getSignature()).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/reuse-context-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs:L%n")));
+            auditlog.clearOutput();
+            // too long signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(new byte[41]).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // null signature is ignored
+            context = new CallerContext.Builder("setTimes").setSignature(null).build();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.setTimes(p, time, time);
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setTimes%n")));
+            auditlog.clearOutput();
+            // empty signature is ignored
+            context = new CallerContext.Builder("mkdirs").setSignature("".getBytes(CallerContext.SIGNATURE_ENCODING)).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=mkdirs%n")));
+            auditlog.clearOutput();
+            // invalid context is not passed to the rpc
+            context = new CallerContext.Builder(null).build();
+            CallerContext.setCurrent(context);
+            LOG.info("Set current caller context as {}", CallerContext.getCurrent());
+            fs.mkdirs(new Path("/empty-signature"));
+            assertFalse(auditlog.getOutput().contains("callerContext="));
+            auditlog.clearOutput();
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testBrokenLogger_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, BrokenAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            fail("Expected exception due to broken audit logger.");
+        } catch (RemoteException re) {
+            // Expected.
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testBrokenLogger_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, BrokenAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fs.setTimes(new Path("/"), time, time);
+            fail("Expected exception due to broken audit logger.");
+        } catch (RemoteException re) {
+            // Expected.
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testBrokenLogger_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, BrokenAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            fail("Expected exception due to broken audit logger.");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } catch (RemoteException re) {
+            // Expected.
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testBrokenLogger_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.set(DFS_NAMENODE_AUDIT_LOGGERS_KEY, BrokenAuditLogger.class.getName());
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            cluster.waitClusterUp();
+            FileSystem fs = cluster.getFileSystem();
+            long time = System.currentTimeMillis();
+            fs.setTimes(new Path("/"), time, time);
+            fail("Expected exception due to broken audit logger.");
+        } catch (RemoteException re) {
+            // Expected.
+        } finally {
+            cluster.shutdown();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
 }

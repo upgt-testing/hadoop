@@ -14,7 +14,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode.web;
 
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -37,55 +35,132 @@ import java.net.URL;
  * Test that X-Frame-Options works correctly with DatanodeHTTPServer.
  */
 public class TestDatanodeHttpXFrame {
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
-  @Test
-  public void testDataNodeXFrameOptionsEnabled() throws Exception {
-    boolean xFrameEnabled = true;
-    MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
-    HttpURLConnection conn = getConn(cluster);
-    String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
-    Assert.assertTrue("X-FRAME-OPTIONS is absent in the header",
-        xfoHeader != null);
-    Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption
-        .SAMEORIGIN.toString()));
-  }
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-  @Test
-  public void testNameNodeXFrameOptionsDisabled() throws Exception {
-    boolean xFrameEnabled = false;
-    MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
-    HttpURLConnection conn = getConn(cluster);
-    String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
-    Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
-  }
-
-  @Test
-  public void testDataNodeXFramewithInvalidOptions() throws Exception {
-    exception.expect(IllegalArgumentException.class);
-    createCluster(false, "Hadoop");
-  }
-
-  private MiniDFSClusterInJVM createCluster(boolean enabled, String
-      value) throws IOException {
-    Configuration conf = new HdfsConfiguration();
-    conf.setBoolean(DFSConfigKeys.DFS_XFRAME_OPTION_ENABLED, enabled);
-    if (value != null) {
-      conf.set(DFSConfigKeys.DFS_XFRAME_OPTION_VALUE, value);
+    @Test
+    public void testDataNodeXFrameOptionsEnabled() throws Exception {
+        boolean xFrameEnabled = true;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("X-FRAME-OPTIONS is absent in the header", xfoHeader != null);
+        Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption.SAMEORIGIN.toString()));
     }
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    return cluster;
-  }
 
-  private HttpURLConnection getConn(MiniDFSClusterInJVM cluster)
-      throws IOException {
-    DataNodeJVMInterface datanode = cluster.getDataNodes().get(0);
-    URL newURL = new URL("http://localhost:" + datanode.getInfoPort());
-    HttpURLConnection conn = (HttpURLConnection) newURL.openConnection();
-    conn.connect();
-    return conn;
-  }
+    @Test
+    public void testNameNodeXFrameOptionsDisabled() throws Exception {
+        boolean xFrameEnabled = false;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
+    }
+
+    @Test
+    public void testDataNodeXFramewithInvalidOptions() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        createCluster(false, "Hadoop");
+    }
+
+    private MiniDFSClusterInJVM createCluster(boolean enabled, String value) throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(DFSConfigKeys.DFS_XFRAME_OPTION_ENABLED, enabled);
+        if (value != null) {
+            conf.set(DFSConfigKeys.DFS_XFRAME_OPTION_VALUE, value);
+        }
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        return cluster;
+    }
+
+    private HttpURLConnection getConn(MiniDFSClusterInJVM cluster) throws IOException {
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(0);
+        URL newURL = new URL("http://localhost:" + datanode.getInfoPort());
+        HttpURLConnection conn = (HttpURLConnection) newURL.openConnection();
+        conn.connect();
+        return conn;
+    }
+
+    @Test
+    public void testDataNodeXFrameOptionsEnabled_withUpgrade20() throws Exception {
+        boolean xFrameEnabled = true;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("X-FRAME-OPTIONS is absent in the header", xfoHeader != null);
+        Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption.SAMEORIGIN.toString()));
+    }
+
+    @Test
+    public void testDataNodeXFrameOptionsEnabled_withUpgrade40() throws Exception {
+        boolean xFrameEnabled = true;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue("X-FRAME-OPTIONS is absent in the header", xfoHeader != null);
+        Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption.SAMEORIGIN.toString()));
+    }
+
+    @Test
+    public void testDataNodeXFrameOptionsEnabled_withUpgrade60() throws Exception {
+        boolean xFrameEnabled = true;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("X-FRAME-OPTIONS is absent in the header", xfoHeader != null);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption.SAMEORIGIN.toString()));
+    }
+
+    @Test
+    public void testDataNodeXFrameOptionsEnabled_withUpgrade80() throws Exception {
+        boolean xFrameEnabled = true;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("X-FRAME-OPTIONS is absent in the header", xfoHeader != null);
+        Assert.assertTrue(xfoHeader.endsWith(HttpServer2.XFrameOption.SAMEORIGIN.toString()));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testNameNodeXFrameOptionsDisabled_withUpgrade20() throws Exception {
+        boolean xFrameEnabled = false;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
+    }
+
+    @Test
+    public void testNameNodeXFrameOptionsDisabled_withUpgrade40() throws Exception {
+        boolean xFrameEnabled = false;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
+    }
+
+    @Test
+    public void testNameNodeXFrameOptionsDisabled_withUpgrade80() throws Exception {
+        boolean xFrameEnabled = false;
+        MiniDFSClusterInJVM cluster = createCluster(xFrameEnabled, null);
+        HttpURLConnection conn = getConn(cluster);
+        String xfoHeader = conn.getHeaderField("X-FRAME-OPTIONS");
+        Assert.assertTrue("unexpected X-FRAME-OPTION in header", xfoHeader == null);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }

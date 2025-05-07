@@ -23,7 +23,6 @@ import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_DOMA
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DOMAIN_SOCKET_PATH_KEY;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS;
 import static org.hamcrest.CoreMatchers.equalTo;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.ClosedByInterruptException;
@@ -35,7 +34,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -60,155 +58,139 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-
 import com.google.common.util.concurrent.Uninterruptibles;
 
 public class TestBlockReaderFactory {
-  static final Log LOG = LogFactory.getLog(TestBlockReaderFactory.class);
 
-  @Before
-  public void init() {
-    DomainSocket.disableBindPathValidation();
-    Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
-  }
+    static final Log LOG = LogFactory.getLog(TestBlockReaderFactory.class);
 
-  @After
-  public void cleanup() {
-    DFSInputStream.tcpReadsDisabledForTesting = false;
-    BlockReaderFactory.createShortCircuitReplicaInfoCallback = null;
-  }
-
-  public static Configuration createShortCircuitConf(String testName,
-      TemporarySocketDirectory sockDir) {
-    Configuration conf = new Configuration();
-    conf.set(DFS_CLIENT_CONTEXT, testName);
-    conf.setLong(DFS_BLOCK_SIZE_KEY, 4096);
-    conf.set(DFS_DOMAIN_SOCKET_PATH_KEY, new File(sockDir.getDir(),
-        testName + "._PORT").getAbsolutePath());
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY,
-        false);
-    conf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, false);
-    return conf;
-  }
-
-  /**
-   * If we have a UNIX domain socket configured,
-   * and we have dfs.client.domain.socket.data.traffic set to true,
-   * and short-circuit access fails, we should still be able to pass
-   * data traffic over the UNIX domain socket.  Test this.
-   */
-  @Test(timeout=60000)
-  public void testFallbackFromShortCircuitToUnixDomainTraffic()
-      throws Exception {
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-
-    // The server is NOT configured with short-circuit local reads;
-    // the client is.  Both support UNIX domain reads.
-    Configuration clientConf = createShortCircuitConf(
-        "testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
-    clientConf.set(DFS_CLIENT_CONTEXT,
-        "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
-    clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
-    Configuration serverConf = new Configuration(clientConf);
-    serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
-    cluster.waitActive();
-    FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
-    String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 8193;
-    final int SEED = 0xFADED;
-    DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    byte contents[] = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
-    byte expected[] = DFSTestUtil.
-        calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
-    Assert.assertTrue(Arrays.equals(contents, expected));
-    cluster.shutdown();
-    sockDir.close();
-  }
-
-  /**
-   * Test the case where we have multiple threads waiting on the
-   * ShortCircuitCache delivering a certain ShortCircuitReplica.
-   *
-   * In this case, there should only be one call to
-   * createShortCircuitReplicaInfo.  This one replica should be shared
-   * by all threads.
-   */
-  @Test(timeout=60000)
-  public void testMultipleWaitersOnShortCircuitCache()
-      throws Exception {
-    final CountDownLatch latch = new CountDownLatch(1);
-    final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
-    final AtomicBoolean testFailed = new AtomicBoolean(false);
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    BlockReaderFactory.createShortCircuitReplicaInfoCallback =
-      new ShortCircuitCache.ShortCircuitReplicaCreator() {
-        @Override
-        public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          Uninterruptibles.awaitUninterruptibly(latch);
-          if (!creationIsBlocked.compareAndSet(true, false)) {
-            Assert.fail("there were multiple calls to "
-                + "createShortCircuitReplicaInfo.  Only one was expected.");
-          }
-          return null;
-        }
-      };
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf(
-        "testMultipleWaitersOnShortCircuitCache", sockDir);
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    final DistributedFileSystem dfs = cluster.getFileSystem();
-    final String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 4000;
-    final int SEED = 0xFADED;
-    final int NUM_THREADS = 10;
-    DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    Runnable readerRunnable = new Runnable() {
-      @Override
-      public void run() {
-        try {
-          byte contents[] = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
-          Assert.assertFalse(creationIsBlocked.get());
-          byte expected[] = DFSTestUtil.
-              calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
-          Assert.assertTrue(Arrays.equals(contents, expected));
-        } catch (Throwable e) {
-          LOG.error("readerRunnable error", e);
-          testFailed.set(true);
-        }
-      }
-    };
-    Thread threads[] = new Thread[NUM_THREADS];
-    for (int i = 0; i < NUM_THREADS; i++) {
-      threads[i] = new Thread(readerRunnable);
-      threads[i].start();
+    @Before
+    public void init() {
+        DomainSocket.disableBindPathValidation();
+        Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
     }
-    Thread.sleep(500);
-    latch.countDown();
-    for (int i = 0; i < NUM_THREADS; i++) {
-      Uninterruptibles.joinUninterruptibly(threads[i]);
-    }
-    cluster.shutdown();
-    sockDir.close();
-    Assert.assertFalse(testFailed.get());
-  }
 
-  /**
-   * Test the case where we have a failure to complete a short circuit read
-   * that occurs, and then later on, we have a success.
-   * Any thread waiting on a cache load should receive the failure (if it
-   * occurs);  however, the failure result should not be cached.  We want
-   * to be able to retry later and succeed.
-   */
-  /*
+    @After
+    public void cleanup() {
+        DFSInputStream.tcpReadsDisabledForTesting = false;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = null;
+    }
+
+    public static Configuration createShortCircuitConf(String testName, TemporarySocketDirectory sockDir) {
+        Configuration conf = new Configuration();
+        conf.set(DFS_CLIENT_CONTEXT, testName);
+        conf.setLong(DFS_BLOCK_SIZE_KEY, 4096);
+        conf.set(DFS_DOMAIN_SOCKET_PATH_KEY, new File(sockDir.getDir(), testName + "._PORT").getAbsolutePath());
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY, false);
+        conf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, false);
+        return conf;
+    }
+
+    /**
+     * If we have a UNIX domain socket configured,
+     * and we have dfs.client.domain.socket.data.traffic set to true,
+     * and short-circuit access fails, we should still be able to pass
+     * data traffic over the UNIX domain socket.  Test this.
+     */
+    @Test(timeout = 60000)
+    public void testFallbackFromShortCircuitToUnixDomainTraffic() throws Exception {
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        // The server is NOT configured with short-circuit local reads;
+        // the client is.  Both support UNIX domain reads.
+        Configuration clientConf = createShortCircuitConf("testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
+        clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    /**
+     * Test the case where we have multiple threads waiting on the
+     * ShortCircuitCache delivering a certain ShortCircuitReplica.
+     *
+     * In this case, there should only be one call to
+     * createShortCircuitReplicaInfo.  This one replica should be shared
+     * by all threads.
+     */
+    @Test(timeout = 60000)
+    public void testMultipleWaitersOnShortCircuitCache() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
+        final AtomicBoolean testFailed = new AtomicBoolean(false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = new ShortCircuitCache.ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Uninterruptibles.awaitUninterruptibly(latch);
+                if (!creationIsBlocked.compareAndSet(true, false)) {
+                    Assert.fail("there were multiple calls to " + "createShortCircuitReplicaInfo.  Only one was expected.");
+                }
+                return null;
+            }
+        };
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testMultipleWaitersOnShortCircuitCache", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADED;
+        final int NUM_THREADS = 10;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        Runnable readerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+                    Assert.assertFalse(creationIsBlocked.get());
+                    byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+                    Assert.assertTrue(Arrays.equals(contents, expected));
+                } catch (Throwable e) {
+                    LOG.error("readerRunnable error", e);
+                    testFailed.set(true);
+                }
+            }
+        };
+        Thread[] threads = new Thread[NUM_THREADS];
+        for (int i = 0; i < NUM_THREADS; i++) {
+            threads[i] = new Thread(readerRunnable);
+            threads[i].start();
+        }
+        Thread.sleep(500);
+        latch.countDown();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            Uninterruptibles.joinUninterruptibly(threads[i]);
+        }
+        cluster.shutdown();
+        sockDir.close();
+        Assert.assertFalse(testFailed.get());
+    }
+
+    /**
+     * Test the case where we have a failure to complete a short circuit read
+     * that occurs, and then later on, we have a success.
+     * Any thread waiting on a cache load should receive the failure (if it
+     * occurs);  however, the failure result should not be cached.  We want
+     * to be able to retry later and succeed.
+     */
+    /*
   @Test(timeout=60000)
   public void testShortCircuitCacheTemporaryFailure()
       throws Exception {
@@ -307,34 +289,26 @@ public class TestBlockReaderFactory {
    * shared memory can fall back to not using shared memory when
    * the server doesn't support it.
    */
-  @Test
-  public void testShortCircuitReadFromServerWithoutShm() throws Exception {
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration clientConf = createShortCircuitConf(
-        "testShortCircuitReadFromServerWithoutShm", sockDir);
-    Configuration serverConf = new Configuration(clientConf);
-    serverConf.setInt(
-        DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    final MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
-    cluster.waitActive();
-    clientConf.set(DFS_CLIENT_CONTEXT,
-        "testShortCircuitReadFromServerWithoutShm_clientContext");
-    final DistributedFileSystem fs =
-        (DistributedFileSystem)FileSystem.get(cluster.getURI(0), clientConf);
-    final String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 4000;
-    final int SEED = 0xFADEC;
-    DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    byte contents[] = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
-    byte expected[] = DFSTestUtil.
-        calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
-    Assert.assertTrue(Arrays.equals(contents, expected));
-    final ShortCircuitCache cache =
-        fs.getClient().getClientContext().getShortCircuitCache();
-    /*
+    @Test
+    public void testShortCircuitReadFromServerWithoutShm() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadFromServerWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromServerWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        /*
     final DatanodeInfo datanode =
         new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
     cache.getDfsClientShmManager().visit(new Visitor() {
@@ -349,98 +323,83 @@ public class TestBlockReaderFactory {
       }
     });
      */
-    cluster.shutdown();
-    sockDir.close();
-  }
+        cluster.shutdown();
+        sockDir.close();
+    }
 
-  /**
-   * Test that a client which does not support short-circuit reads using
-   * shared memory can talk with a server which supports it.
-   */
-  @Test
-  public void testShortCircuitReadFromClientWithoutShm() throws Exception {
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration clientConf = createShortCircuitConf(
-        "testShortCircuitReadWithoutShm", sockDir);
-    Configuration serverConf = new Configuration(clientConf);
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    final MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
-    cluster.waitActive();
-    clientConf.setInt(
-        DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
-    clientConf.set(DFS_CLIENT_CONTEXT,
-        "testShortCircuitReadFromClientWithoutShm_clientContext");
-    final DistributedFileSystem fs =
-        (DistributedFileSystem)FileSystem.get(cluster.getURI(0), clientConf);
-    final String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 4000;
-    final int SEED = 0xFADEC;
-    DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    byte contents[] = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
-    byte expected[] = DFSTestUtil.
-        calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
-    Assert.assertTrue(Arrays.equals(contents, expected));
-    final ShortCircuitCache cache =
-        fs.getClient().getClientContext().getShortCircuitCache();
-    Assert.assertEquals(null, cache.getDfsClientShmManager());
-    cluster.shutdown();
-    sockDir.close();
-  }
+    /**
+     * Test that a client which does not support short-circuit reads using
+     * shared memory can talk with a server which supports it.
+     */
+    @Test
+    public void testShortCircuitReadFromClientWithoutShm() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromClientWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        Assert.assertEquals(null, cache.getDfsClientShmManager());
+        cluster.shutdown();
+        sockDir.close();
+    }
 
-  /**
-   * Test shutting down the ShortCircuitCache while there are things in it.
-   */
-  @Test
-  public void testShortCircuitCacheShutdown() throws Exception {
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf(
-        "testShortCircuitCacheShutdown", sockDir);
-    conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
-    Configuration serverConf = new Configuration(conf);
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    final MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
-    cluster.waitActive();
-    final DistributedFileSystem fs =
-        (DistributedFileSystem)FileSystem.get(cluster.getURI(0), conf);
-    final String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 4000;
-    final int SEED = 0xFADEC;
-    DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    byte contents[] = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
-    byte expected[] = DFSTestUtil.
-        calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
-    Assert.assertTrue(Arrays.equals(contents, expected));
-    final ShortCircuitCache cache =
-        fs.getClient().getClientContext().getShortCircuitCache();
-    cache.close();
-    Assert.assertTrue(cache.getDfsClientShmManager().
-        getDomainSocketWatcher().isClosed());
-    cluster.shutdown();
-    sockDir.close();
-  }
+    /**
+     * Test shutting down the ShortCircuitCache while there are things in it.
+     */
+    @Test
+    public void testShortCircuitCacheShutdown() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShortCircuitCacheShutdown", sockDir);
+        conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
+        Configuration serverConf = new Configuration(conf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), conf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cache.close();
+        Assert.assertTrue(cache.getDfsClientShmManager().getDomainSocketWatcher().isClosed());
+        cluster.shutdown();
+        sockDir.close();
+    }
 
-  /**
-   * When an InterruptedException is sent to a thread calling
-   * FileChannel#read, the FileChannel is immediately closed and the
-   * thread gets an exception.  This effectively means that we might have
-   * someone asynchronously calling close() on the file descriptors we use
-   * in BlockReaderLocal.  So when unreferencing a ShortCircuitReplica in
-   * ShortCircuitCache#unref, we should check if the FileChannel objects
-   * are still open.  If not, we should purge the replica to avoid giving
-   * it out to any future readers.
-   *
-   * This is a regression test for HDFS-6227: Short circuit read failed
-   * due to ClosedChannelException.
-   *
-   * Note that you may still get ClosedChannelException errors if two threads
-   * are reading from the same replica and an InterruptedException is delivered
-   * to one of them.
-   */
-  /*
+    /**
+     * When an InterruptedException is sent to a thread calling
+     * FileChannel#read, the FileChannel is immediately closed and the
+     * thread gets an exception.  This effectively means that we might have
+     * someone asynchronously calling close() on the file descriptors we use
+     * in BlockReaderLocal.  So when unreferencing a ShortCircuitReplica in
+     * ShortCircuitCache#unref, we should check if the FileChannel objects
+     * are still open.  If not, we should purge the replica to avoid giving
+     * it out to any future readers.
+     *
+     * This is a regression test for HDFS-6227: Short circuit read failed
+     * due to ClosedChannelException.
+     *
+     * Note that you may still get ClosedChannelException errors if two threads
+     * are reading from the same replica and an InterruptedException is delivered
+     * to one of them.
+     */
+    /*
   @Test(timeout=120000)
   public void testPurgingClosedReplicas() throws Exception {
     BlockReaderTestUtil.enableBlockReaderFactoryTracing();
@@ -542,4 +501,711 @@ public class TestBlockReaderFactory {
   }
 
    */
+    @Test(timeout = 60000)
+    public void testFallbackFromShortCircuitToUnixDomainTraffic_withUpgrade20() throws Exception {
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        // the client is.  Both support UNIX domain reads.
+        Configuration clientConf = createShortCircuitConf("testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
+        clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
+        String TEST_FILE = "/test_file";
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testFallbackFromShortCircuitToUnixDomainTraffic_withUpgrade40() throws Exception {
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        // the client is.  Both support UNIX domain reads.
+        Configuration clientConf = createShortCircuitConf("testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
+        clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testFallbackFromShortCircuitToUnixDomainTraffic_withUpgrade60() throws Exception {
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        // the client is.  Both support UNIX domain reads.
+        Configuration clientConf = createShortCircuitConf("testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
+        clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testFallbackFromShortCircuitToUnixDomainTraffic_withUpgrade80() throws Exception {
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        // the client is.  Both support UNIX domain reads.
+        Configuration clientConf = createShortCircuitConf("testFallbackFromShortCircuitToUnixDomainTraffic", sockDir);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testFallbackFromShortCircuitToUnixDomainTraffic_clientContext");
+        clientConf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, true);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        FileSystem dfs = FileSystem.get(cluster.getURI(0), clientConf);
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testMultipleWaitersOnShortCircuitCache_withUpgrade20() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
+        final AtomicBoolean testFailed = new AtomicBoolean(false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = new ShortCircuitCache.ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Uninterruptibles.awaitUninterruptibly(latch);
+                if (!creationIsBlocked.compareAndSet(true, false)) {
+                    Assert.fail("there were multiple calls to " + "createShortCircuitReplicaInfo.  Only one was expected.");
+                }
+                return null;
+            }
+        };
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testMultipleWaitersOnShortCircuitCache", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADED;
+        final int NUM_THREADS = 10;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Runnable readerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+                    Assert.assertFalse(creationIsBlocked.get());
+                    byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+                    Assert.assertTrue(Arrays.equals(contents, expected));
+                } catch (Throwable e) {
+                    LOG.error("readerRunnable error", e);
+                    testFailed.set(true);
+                }
+            }
+        };
+        Thread[] threads = new Thread[NUM_THREADS];
+        for (int i = 0; i < NUM_THREADS; i++) {
+            threads[i] = new Thread(readerRunnable);
+            threads[i].start();
+        }
+        Thread.sleep(500);
+        latch.countDown();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            Uninterruptibles.joinUninterruptibly(threads[i]);
+        }
+        cluster.shutdown();
+        sockDir.close();
+        Assert.assertFalse(testFailed.get());
+    }
+
+    @Test(timeout = 60000)
+    public void testMultipleWaitersOnShortCircuitCache_withUpgrade40() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
+        final AtomicBoolean testFailed = new AtomicBoolean(false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = new ShortCircuitCache.ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Uninterruptibles.awaitUninterruptibly(latch);
+                if (!creationIsBlocked.compareAndSet(true, false)) {
+                    Assert.fail("there were multiple calls to " + "createShortCircuitReplicaInfo.  Only one was expected.");
+                }
+                return null;
+            }
+        };
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testMultipleWaitersOnShortCircuitCache", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADED;
+        final int NUM_THREADS = 10;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        Runnable readerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+                    Assert.assertFalse(creationIsBlocked.get());
+                    cluster.restartNodeForTesting(0);
+                    cluster.upgradeNodeForTesting(0);
+                    byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+                    Assert.assertTrue(Arrays.equals(contents, expected));
+                } catch (Throwable e) {
+                    LOG.error("readerRunnable error", e);
+                    testFailed.set(true);
+                }
+            }
+        };
+        Thread[] threads = new Thread[NUM_THREADS];
+        for (int i = 0; i < NUM_THREADS; i++) {
+            threads[i] = new Thread(readerRunnable);
+            threads[i].start();
+        }
+        Thread.sleep(500);
+        latch.countDown();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            Uninterruptibles.joinUninterruptibly(threads[i]);
+        }
+        cluster.shutdown();
+        sockDir.close();
+        Assert.assertFalse(testFailed.get());
+    }
+
+    @Test(timeout = 60000)
+    public void testMultipleWaitersOnShortCircuitCache_withUpgrade60() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
+        final AtomicBoolean testFailed = new AtomicBoolean(false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = new ShortCircuitCache.ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Uninterruptibles.awaitUninterruptibly(latch);
+                if (!creationIsBlocked.compareAndSet(true, false)) {
+                    Assert.fail("there were multiple calls to " + "createShortCircuitReplicaInfo.  Only one was expected.");
+                }
+                return null;
+            }
+        };
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testMultipleWaitersOnShortCircuitCache", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADED;
+        final int NUM_THREADS = 10;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        Runnable readerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+                    Assert.assertFalse(creationIsBlocked.get());
+                    byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+                    Assert.assertTrue(Arrays.equals(contents, expected));
+                } catch (Throwable e) {
+                    LOG.error("readerRunnable error", e);
+                    testFailed.set(true);
+                }
+            }
+        };
+        Thread[] threads = new Thread[NUM_THREADS];
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (int i = 0; i < NUM_THREADS; i++) {
+            threads[i] = new Thread(readerRunnable);
+            threads[i].start();
+        }
+        Thread.sleep(500);
+        latch.countDown();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            Uninterruptibles.joinUninterruptibly(threads[i]);
+        }
+        cluster.shutdown();
+        sockDir.close();
+        Assert.assertFalse(testFailed.get());
+    }
+
+    @Test(timeout = 60000)
+    public void testMultipleWaitersOnShortCircuitCache_withUpgrade80() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean creationIsBlocked = new AtomicBoolean(true);
+        final AtomicBoolean testFailed = new AtomicBoolean(false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        BlockReaderFactory.createShortCircuitReplicaInfoCallback = new ShortCircuitCache.ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Uninterruptibles.awaitUninterruptibly(latch);
+                if (!creationIsBlocked.compareAndSet(true, false)) {
+                    Assert.fail("there were multiple calls to " + "createShortCircuitReplicaInfo.  Only one was expected.");
+                }
+                return null;
+            }
+        };
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testMultipleWaitersOnShortCircuitCache", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem dfs = cluster.getFileSystem();
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADED;
+        final int NUM_THREADS = 10;
+        DFSTestUtil.createFile(dfs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        Runnable readerRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
+                    Assert.assertFalse(creationIsBlocked.get());
+                    byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+                    Assert.assertTrue(Arrays.equals(contents, expected));
+                } catch (Throwable e) {
+                    LOG.error("readerRunnable error", e);
+                    testFailed.set(true);
+                }
+            }
+        };
+        Thread[] threads = new Thread[NUM_THREADS];
+        for (int i = 0; i < NUM_THREADS; i++) {
+            threads[i] = new Thread(readerRunnable);
+            threads[i].start();
+        }
+        Thread.sleep(500);
+        latch.countDown();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (int i = 0; i < NUM_THREADS; i++) {
+            Uninterruptibles.joinUninterruptibly(threads[i]);
+        }
+        cluster.shutdown();
+        sockDir.close();
+        Assert.assertFalse(testFailed.get());
+    }
+
+    @Test
+    public void testShortCircuitReadFromServerWithoutShm_withUpgrade20() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadFromServerWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromServerWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        /*
+    final DatanodeInfo datanode =
+        new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
+    cache.getDfsClientShmManager().visit(new Visitor() {
+      @Override
+      public void visit(HashMap<DatanodeInfo, PerDatanodeVisitorInfo> info)
+          throws IOException {
+        Assert.assertEquals(1,  info.size());
+        PerDatanodeVisitorInfo vinfo = info.get(datanode);
+        Assert.assertTrue(vinfo.disabled);
+        Assert.assertEquals(0, vinfo.full.size());
+        Assert.assertEquals(0, vinfo.notFull.size());
+      }
+    });
+     */
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromServerWithoutShm_withUpgrade40() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadFromServerWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromServerWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        /*
+    final DatanodeInfo datanode =
+        new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
+    cache.getDfsClientShmManager().visit(new Visitor() {
+      @Override
+      public void visit(HashMap<DatanodeInfo, PerDatanodeVisitorInfo> info)
+          throws IOException {
+        Assert.assertEquals(1,  info.size());
+        PerDatanodeVisitorInfo vinfo = info.get(datanode);
+        Assert.assertTrue(vinfo.disabled);
+        Assert.assertEquals(0, vinfo.full.size());
+        Assert.assertEquals(0, vinfo.notFull.size());
+      }
+    });
+     */
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromServerWithoutShm_withUpgrade60() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadFromServerWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromServerWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        /*
+    final DatanodeInfo datanode =
+        new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
+    cache.getDfsClientShmManager().visit(new Visitor() {
+      @Override
+      public void visit(HashMap<DatanodeInfo, PerDatanodeVisitorInfo> info)
+          throws IOException {
+        Assert.assertEquals(1,  info.size());
+        PerDatanodeVisitorInfo vinfo = info.get(datanode);
+        Assert.assertTrue(vinfo.disabled);
+        Assert.assertEquals(0, vinfo.full.size());
+        Assert.assertEquals(0, vinfo.notFull.size());
+      }
+    });
+     */
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromServerWithoutShm_withUpgrade80() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadFromServerWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        serverConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromServerWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        /*
+    final DatanodeInfo datanode =
+        new DatanodeInfo(cluster.getDataNodes().get(0).getDatanodeId());
+    cache.getDfsClientShmManager().visit(new Visitor() {
+      @Override
+      public void visit(HashMap<DatanodeInfo, PerDatanodeVisitorInfo> info)
+          throws IOException {
+        Assert.assertEquals(1,  info.size());
+        PerDatanodeVisitorInfo vinfo = info.get(datanode);
+        Assert.assertTrue(vinfo.disabled);
+        Assert.assertEquals(0, vinfo.full.size());
+        Assert.assertEquals(0, vinfo.notFull.size());
+      }
+    });
+     */
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromClientWithoutShm_withUpgrade20() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromClientWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        Assert.assertEquals(null, cache.getDfsClientShmManager());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromClientWithoutShm_withUpgrade40() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromClientWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        Assert.assertEquals(null, cache.getDfsClientShmManager());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromClientWithoutShm_withUpgrade60() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromClientWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        Assert.assertEquals(null, cache.getDfsClientShmManager());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitReadFromClientWithoutShm_withUpgrade80() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration clientConf = createShortCircuitConf("testShortCircuitReadWithoutShm", sockDir);
+        Configuration serverConf = new Configuration(clientConf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        clientConf.setInt(DFS_SHORT_CIRCUIT_SHARED_MEMORY_WATCHER_INTERRUPT_CHECK_MS, 0);
+        clientConf.set(DFS_CLIENT_CONTEXT, "testShortCircuitReadFromClientWithoutShm_clientContext");
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), clientConf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        Assert.assertEquals(null, cache.getDfsClientShmManager());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitCacheShutdown_withUpgrade20() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShortCircuitCacheShutdown", sockDir);
+        conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
+        Configuration serverConf = new Configuration(conf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), conf);
+        final String TEST_FILE = "/test_file";
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cache.close();
+        Assert.assertTrue(cache.getDfsClientShmManager().getDomainSocketWatcher().isClosed());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitCacheShutdown_withUpgrade40() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShortCircuitCacheShutdown", sockDir);
+        conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
+        Configuration serverConf = new Configuration(conf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), conf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cache.close();
+        Assert.assertTrue(cache.getDfsClientShmManager().getDomainSocketWatcher().isClosed());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitCacheShutdown_withUpgrade60() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShortCircuitCacheShutdown", sockDir);
+        conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
+        Configuration serverConf = new Configuration(conf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), conf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cache.close();
+        Assert.assertTrue(cache.getDfsClientShmManager().getDomainSocketWatcher().isClosed());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test
+    public void testShortCircuitCacheShutdown_withUpgrade80() throws Exception {
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShortCircuitCacheShutdown", sockDir);
+        conf.set(DFS_CLIENT_CONTEXT, "testShortCircuitCacheShutdown");
+        Configuration serverConf = new Configuration(conf);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(serverConf).numDataNodes(1).build();
+        cluster.waitActive();
+        final DistributedFileSystem fs = (DistributedFileSystem) FileSystem.get(cluster.getURI(0), conf);
+        final String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 4000;
+        final int SEED = 0xFADEC;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        byte[] contents = DFSTestUtil.readFileBuffer(fs, new Path(TEST_FILE));
+        byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
+        Assert.assertTrue(Arrays.equals(contents, expected));
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        cache.close();
+        Assert.assertTrue(cache.getDfsClientShmManager().getDomainSocketWatcher().isClosed());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        cluster.shutdown();
+        sockDir.close();
+    }
 }

@@ -19,7 +19,6 @@ package org.apache.hadoop.fs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
@@ -39,121 +37,229 @@ import org.junit.Test;
  */
 public class TestUrlStreamHandler {
 
-  private static final File TEST_ROOT_DIR = PathUtils.getTestDir(TestUrlStreamHandler.class);
-    
-  /**
-   * Test opening and reading from an InputStream through a hdfs:// URL.
-   * <p>
-   * First generate a file with some content through the FileSystem API, then
-   * try to open and read the file through the URL stream API.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testDfsUrls() throws IOException {
+    private static final File TEST_ROOT_DIR = PathUtils.getTestDir(TestUrlStreamHandler.class);
 
-    Configuration conf = new HdfsConfiguration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    FileSystem fs = cluster.getFileSystem();
-
-    // Setup our own factory
-    // setURLSteramHandlerFactor is can be set at most once in the JVM
-    // the new URLStreamHandler is valid for all tests cases 
-    // in TestStreamHandler
-    FsUrlStreamHandlerFactory factory =
-        new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
-    java.net.URL.setURLStreamHandlerFactory(factory);
-
-    Path filePath = new Path("/thefile");
-
-    try {
-      byte[] fileContent = new byte[1024];
-      for (int i = 0; i < fileContent.length; ++i)
-        fileContent[i] = (byte) i;
-
-      // First create the file through the FileSystem API
-      OutputStream os = fs.create(filePath);
-      os.write(fileContent);
-      os.close();
-
-      // Second, open and read the file content through the URL API
-      URI uri = fs.getUri();
-      URL fileURL =
-          new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath
-              .toString());
-
-      InputStream is = fileURL.openStream();
-      assertNotNull(is);
-
-      byte[] bytes = new byte[4096];
-      assertEquals(1024, is.read(bytes));
-      is.close();
-
-      for (int i = 0; i < fileContent.length; ++i)
-        assertEquals(fileContent[i], bytes[i]);
-
-      // Cleanup: delete the file
-      fs.delete(filePath, false);
-
-    } finally {
-      fs.close();
-      cluster.shutdown();
+    /**
+     * Test opening and reading from an InputStream through a hdfs:// URL.
+     * <p>
+     * First generate a file with some content through the FileSystem API, then
+     * try to open and read the file through the URL stream API.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testDfsUrls() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = cluster.getFileSystem();
+        // Setup our own factory
+        // setURLSteramHandlerFactor is can be set at most once in the JVM
+        // the new URLStreamHandler is valid for all tests cases
+        // in TestStreamHandler
+        FsUrlStreamHandlerFactory factory = new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
+        java.net.URL.setURLStreamHandlerFactory(factory);
+        Path filePath = new Path("/thefile");
+        try {
+            byte[] fileContent = new byte[1024];
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(filePath);
+            os.write(fileContent);
+            os.close();
+            // Second, open and read the file content through the URL API
+            URI uri = fs.getUri();
+            URL fileURL = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath.toString());
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            // Cleanup: delete the file
+            fs.delete(filePath, false);
+        } finally {
+            fs.close();
+            cluster.shutdown();
+        }
     }
 
-  }
-
-  /**
-   * Test opening and reading from an InputStream through a file:// URL.
-   * 
-   * @throws IOException
-   * @throws URISyntaxException
-   */
-  @Test
-  public void testFileUrls() throws IOException, URISyntaxException {
-    // URLStreamHandler is already set in JVM by testDfsUrls() 
-    Configuration conf = new HdfsConfiguration();
-
-    // Locate the test temporary directory.
-    if (!TEST_ROOT_DIR.exists()) {
-      if (!TEST_ROOT_DIR.mkdirs())
-        throw new IOException("Cannot create temporary directory: " + TEST_ROOT_DIR);
+    /**
+     * Test opening and reading from an InputStream through a file:// URL.
+     *
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testFileUrls() throws IOException, URISyntaxException {
+        // URLStreamHandler is already set in JVM by testDfsUrls()
+        Configuration conf = new HdfsConfiguration();
+        // Locate the test temporary directory.
+        if (!TEST_ROOT_DIR.exists()) {
+            if (!TEST_ROOT_DIR.mkdirs())
+                throw new IOException("Cannot create temporary directory: " + TEST_ROOT_DIR);
+        }
+        File tmpFile = new File(TEST_ROOT_DIR, "thefile");
+        URI uri = tmpFile.toURI();
+        FileSystem fs = FileSystem.get(uri, conf);
+        try {
+            byte[] fileContent = new byte[1024];
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(new Path(uri.getPath()));
+            os.write(fileContent);
+            os.close();
+            // Second, open and read the file content through the URL API.
+            URL fileURL = uri.toURL();
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            // Cleanup: delete the file
+            fs.delete(new Path(uri.getPath()), false);
+        } finally {
+            fs.close();
+        }
     }
 
-    File tmpFile = new File(TEST_ROOT_DIR, "thefile");
-    URI uri = tmpFile.toURI();
-
-    FileSystem fs = FileSystem.get(uri, conf);
-
-    try {
-      byte[] fileContent = new byte[1024];
-      for (int i = 0; i < fileContent.length; ++i)
-        fileContent[i] = (byte) i;
-
-      // First create the file through the FileSystem API
-      OutputStream os = fs.create(new Path(uri.getPath()));
-      os.write(fileContent);
-      os.close();
-
-      // Second, open and read the file content through the URL API.
-      URL fileURL = uri.toURL();
-
-      InputStream is = fileURL.openStream();
-      assertNotNull(is);
-
-      byte[] bytes = new byte[4096];
-      assertEquals(1024, is.read(bytes));
-      is.close();
-
-      for (int i = 0; i < fileContent.length; ++i)
-        assertEquals(fileContent[i], bytes[i]);
-
-      // Cleanup: delete the file
-      fs.delete(new Path(uri.getPath()), false);
-
-    } finally {
-      fs.close();
+    @Test
+    public void testDfsUrls_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = cluster.getFileSystem();
+        // in TestStreamHandler
+        FsUrlStreamHandlerFactory factory = new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
+        java.net.URL.setURLStreamHandlerFactory(factory);
+        Path filePath = new Path("/thefile");
+        try {
+            byte[] fileContent = new byte[1024];
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(filePath);
+            os.write(fileContent);
+            os.close();
+            // Second, open and read the file content through the URL API
+            URI uri = fs.getUri();
+            URL fileURL = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath.toString());
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            // Cleanup: delete the file
+            fs.delete(filePath, false);
+        } finally {
+            fs.close();
+            cluster.shutdown();
+        }
     }
 
-  }
+    @Test
+    public void testDfsUrls_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = cluster.getFileSystem();
+        // in TestStreamHandler
+        FsUrlStreamHandlerFactory factory = new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
+        java.net.URL.setURLStreamHandlerFactory(factory);
+        Path filePath = new Path("/thefile");
+        try {
+            byte[] fileContent = new byte[1024];
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(filePath);
+            os.write(fileContent);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            os.close();
+            // Second, open and read the file content through the URL API
+            URI uri = fs.getUri();
+            URL fileURL = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath.toString());
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            // Cleanup: delete the file
+            fs.delete(filePath, false);
+        } finally {
+            fs.close();
+            cluster.shutdown();
+        }
+    }
 
+    @Test
+    public void testDfsUrls_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = cluster.getFileSystem();
+        // in TestStreamHandler
+        FsUrlStreamHandlerFactory factory = new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
+        java.net.URL.setURLStreamHandlerFactory(factory);
+        Path filePath = new Path("/thefile");
+        try {
+            byte[] fileContent = new byte[1024];
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(filePath);
+            os.write(fileContent);
+            os.close();
+            // Second, open and read the file content through the URL API
+            URI uri = fs.getUri();
+            URL fileURL = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath.toString());
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            // Cleanup: delete the file
+            fs.delete(filePath, false);
+        } finally {
+            fs.close();
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testDfsUrls_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        FileSystem fs = cluster.getFileSystem();
+        // in TestStreamHandler
+        FsUrlStreamHandlerFactory factory = new org.apache.hadoop.fs.FsUrlStreamHandlerFactory();
+        java.net.URL.setURLStreamHandlerFactory(factory);
+        Path filePath = new Path("/thefile");
+        try {
+            byte[] fileContent = new byte[1024];
+            for (int i = 0; i < fileContent.length; ++i) fileContent[i] = (byte) i;
+            // First create the file through the FileSystem API
+            OutputStream os = fs.create(filePath);
+            os.write(fileContent);
+            os.close();
+            // Second, open and read the file content through the URL API
+            URI uri = fs.getUri();
+            URL fileURL = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath.toString());
+            InputStream is = fileURL.openStream();
+            assertNotNull(is);
+            byte[] bytes = new byte[4096];
+            assertEquals(1024, is.read(bytes));
+            is.close();
+            for (int i = 0; i < fileContent.length; ++i) assertEquals(fileContent[i], bytes[i]);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // Cleanup: delete the file
+            fs.delete(filePath, false);
+        } finally {
+            fs.close();
+            cluster.shutdown();
+        }
+    }
 }

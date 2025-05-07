@@ -18,13 +18,10 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertTrue;
-
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -46,57 +43,49 @@ import org.junit.runners.Parameterized;
 
 /**
  * DFS_HOSTS and DFS_HOSTS_EXCLUDE tests
- * 
  */
 @RunWith(Parameterized.class)
 public class TestHostsFiles {
-  private static final Log LOG =
-    LogFactory.getLog(TestHostsFiles.class.getName());
-  private Class hostFileMgrClass;
 
-  public TestHostsFiles(Class hostFileMgrClass) {
-    this.hostFileMgrClass = hostFileMgrClass;
-  }
+    private static final Log LOG = LogFactory.getLog(TestHostsFiles.class.getName());
 
-  @Parameterized.Parameters
-  public static Iterable<Object[]> data() {
-    return Arrays.asList(new Object[][]{
-        {HostFileManager.class}, {CombinedHostFileManager.class}});
-  }
+    private Class hostFileMgrClass;
 
-  /*
+    public TestHostsFiles(Class hostFileMgrClass) {
+        this.hostFileMgrClass = hostFileMgrClass;
+    }
+
+    @Parameterized.Parameters
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][] { { HostFileManager.class }, { CombinedHostFileManager.class } });
+    }
+
+    /*
    * Return a configuration object with low timeouts for testing and 
    * a topology script set (which enables rack awareness).  
    */
-  private Configuration getConf() {
-    Configuration conf = new HdfsConfiguration();
+    private Configuration getConf() {
+        Configuration conf = new HdfsConfiguration();
+        // Lower the heart beat interval so the NN quickly learns of dead
+        // or decommissioned DNs and the NN issues replication and invalidation
+        // commands quickly (as replies to heartbeats)
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
+        // Have the NN ReplicationMonitor compute the replication and
+        // invalidation commands to send DNs every second.
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 1);
+        // Have the NN check for pending replications every second so it
+        // quickly schedules additional replicas as they are identified.
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_PENDING_TIMEOUT_SEC_KEY, 1);
+        // The DNs report blocks every second.
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
+        // Indicates we have multiple racks
+        conf.set(DFSConfigKeys.NET_TOPOLOGY_SCRIPT_FILE_NAME_KEY, "xyz");
+        // Host file manager
+        conf.setClass(DFSConfigKeys.DFS_NAMENODE_HOSTS_PROVIDER_CLASSNAME_KEY, hostFileMgrClass, HostConfigManager.class);
+        return conf;
+    }
 
-    // Lower the heart beat interval so the NN quickly learns of dead
-    // or decommissioned DNs and the NN issues replication and invalidation
-    // commands quickly (as replies to heartbeats)
-    conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
-
-    // Have the NN ReplicationMonitor compute the replication and
-    // invalidation commands to send DNs every second.
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 1);
-
-    // Have the NN check for pending replications every second so it
-    // quickly schedules additional replicas as they are identified.
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_PENDING_TIMEOUT_SEC_KEY, 1);
-
-    // The DNs report blocks every second.
-    conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);
-
-    // Indicates we have multiple racks
-    conf.set(DFSConfigKeys.NET_TOPOLOGY_SCRIPT_FILE_NAME_KEY, "xyz");
-
-    // Host file manager
-    conf.setClass(DFSConfigKeys.DFS_NAMENODE_HOSTS_PROVIDER_CLASSNAME_KEY,
-        hostFileMgrClass, HostConfigManager.class);
-    return conf;
-  }
-
-  /*
+    /*
   @Test
   public void testHostsExcludeInUI() throws Exception {
     Configuration conf = getConf();
@@ -146,35 +135,141 @@ public class TestHostsFiles {
     }
   }
   */
-
-  @Test
-  public void testHostsIncludeForDeadCount() throws Exception {
-    Configuration conf = getConf();
-
-    HostsFileWriter hostsFileWriter = new HostsFileWriter();
-    hostsFileWriter.initialize(conf, "temp/decommission");
-    hostsFileWriter.initIncludeHosts(new String[]
-        {"localhost:52","127.0.0.1:7777"});
-
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
-      final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
-      assertTrue(ns.getNumDeadDataNodes() == 2);
-      assertTrue(ns.getNumLiveDataNodes() == 0);
-
-      // Testing using MBeans
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      ObjectName mxbeanName = new ObjectName(
-          "Hadoop:service=NameNode,name=FSNamesystemState");
-      String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
-      assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
-      assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
-      hostsFileWriter.cleanup();
+    @Test
+    public void testHostsIncludeForDeadCount() throws Exception {
+        Configuration conf = getConf();
+        HostsFileWriter hostsFileWriter = new HostsFileWriter();
+        hostsFileWriter.initialize(conf, "temp/decommission");
+        hostsFileWriter.initIncludeHosts(new String[] { "localhost:52", "127.0.0.1:7777" });
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
+            assertTrue(ns.getNumDeadDataNodes() == 2);
+            assertTrue(ns.getNumLiveDataNodes() == 0);
+            // Testing using MBeans
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+            String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            hostsFileWriter.cleanup();
+        }
     }
-  }
+
+    @Test
+    public void testHostsIncludeForDeadCount_withUpgrade20() throws Exception {
+        Configuration conf = getConf();
+        HostsFileWriter hostsFileWriter = new HostsFileWriter();
+        hostsFileWriter.initialize(conf, "temp/decommission");
+        hostsFileWriter.initIncludeHosts(new String[] { "localhost:52", "127.0.0.1:7777" });
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue(ns.getNumDeadDataNodes() == 2);
+            assertTrue(ns.getNumLiveDataNodes() == 0);
+            // Testing using MBeans
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+            String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            hostsFileWriter.cleanup();
+        }
+    }
+
+    @Test
+    public void testHostsIncludeForDeadCount_withUpgrade40() throws Exception {
+        Configuration conf = getConf();
+        HostsFileWriter hostsFileWriter = new HostsFileWriter();
+        hostsFileWriter.initialize(conf, "temp/decommission");
+        hostsFileWriter.initIncludeHosts(new String[] { "localhost:52", "127.0.0.1:7777" });
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
+            assertTrue(ns.getNumDeadDataNodes() == 2);
+            assertTrue(ns.getNumLiveDataNodes() == 0);
+            // Testing using MBeans
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+            String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            hostsFileWriter.cleanup();
+        }
+    }
+
+    @Test
+    public void testHostsIncludeForDeadCount_withUpgrade60() throws Exception {
+        Configuration conf = getConf();
+        HostsFileWriter hostsFileWriter = new HostsFileWriter();
+        hostsFileWriter.initialize(conf, "temp/decommission");
+        hostsFileWriter.initIncludeHosts(new String[] { "localhost:52", "127.0.0.1:7777" });
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
+            assertTrue(ns.getNumDeadDataNodes() == 2);
+            assertTrue(ns.getNumLiveDataNodes() == 0);
+            // Testing using MBeans
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+            String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            hostsFileWriter.cleanup();
+        }
+    }
+
+    @Test
+    public void testHostsIncludeForDeadCount_withUpgrade80() throws Exception {
+        Configuration conf = getConf();
+        HostsFileWriter hostsFileWriter = new HostsFileWriter();
+        hostsFileWriter.initialize(conf, "temp/decommission");
+        hostsFileWriter.initIncludeHosts(new String[] { "localhost:52", "127.0.0.1:7777" });
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).build();
+            final FSNamesystemJVMInterface ns = cluster.getNameNode().getNamesystem();
+            assertTrue(ns.getNumDeadDataNodes() == 2);
+            assertTrue(ns.getNumLiveDataNodes() == 0);
+            // Testing using MBeans
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=FSNamesystemState");
+            String nodes = mbs.getAttribute(mxbeanName, "NumDeadDataNodes") + "";
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumDeadDataNodes") == 2);
+            assertTrue((Integer) mbs.getAttribute(mxbeanName, "NumLiveDataNodes") == 0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+            hostsFileWriter.cleanup();
+        }
+    }
 }

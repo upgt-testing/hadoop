@@ -22,7 +22,6 @@ import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_CONT
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DOMAIN_SOCKET_PATH_KEY;
 import static org.hamcrest.CoreMatchers.equalTo;
-
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.logging.Log;
@@ -75,340 +73,286 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.HashMultimap;
 
 public class TestShortCircuitCache {
-  static final Log LOG = LogFactory.getLog(TestShortCircuitCache.class);
-  
-  private static class TestFileDescriptorPair {
-    final TemporarySocketDirectory dir = new TemporarySocketDirectory();
-    final FileInputStream[] fis;
 
-    public TestFileDescriptorPair() throws IOException {
-      fis = new FileInputStream[2];
-      for (int i = 0; i < 2; i++) {
-        String name = dir.getDir() + "/file" + i;
-        FileOutputStream fos = new FileOutputStream(name);
-        if (i == 0) {
-          // write 'data' file
-          fos.write(1);
-        } else {
-          // write 'metadata' file
-          BlockMetadataHeader header =
-              new BlockMetadataHeader((short)1,
-                  DataChecksum.newDataChecksum(DataChecksum.Type.NULL, 4));
-          DataOutputStream dos = new DataOutputStream(fos);
-          BlockMetadataHeader.writeHeader(dos, header);
-          dos.close();
+    static final Log LOG = LogFactory.getLog(TestShortCircuitCache.class);
+
+    private static class TestFileDescriptorPair {
+
+        final TemporarySocketDirectory dir = new TemporarySocketDirectory();
+
+        final FileInputStream[] fis;
+
+        public TestFileDescriptorPair() throws IOException {
+            fis = new FileInputStream[2];
+            for (int i = 0; i < 2; i++) {
+                String name = dir.getDir() + "/file" + i;
+                FileOutputStream fos = new FileOutputStream(name);
+                if (i == 0) {
+                    // write 'data' file
+                    fos.write(1);
+                } else {
+                    // write 'metadata' file
+                    BlockMetadataHeader header = new BlockMetadataHeader((short) 1, DataChecksum.newDataChecksum(DataChecksum.Type.NULL, 4));
+                    DataOutputStream dos = new DataOutputStream(fos);
+                    BlockMetadataHeader.writeHeader(dos, header);
+                    dos.close();
+                }
+                fos.close();
+                fis[i] = new FileInputStream(name);
+            }
         }
-        fos.close();
-        fis[i] = new FileInputStream(name);
-      }
+
+        public FileInputStream[] getFileInputStreams() {
+            return fis;
+        }
+
+        public void close() throws IOException {
+            IOUtils.cleanup(LOG, fis);
+            dir.close();
+        }
+
+        public boolean compareWith(FileInputStream data, FileInputStream meta) {
+            return ((data == fis[0]) && (meta == fis[1]));
+        }
     }
 
-    public FileInputStream[] getFileInputStreams() {
-      return fis;
-    }
+    private static class SimpleReplicaCreator implements ShortCircuitReplicaCreator {
 
-    public void close() throws IOException {
-      IOUtils.cleanup(LOG, fis);
-      dir.close();
-    }
+        private final int blockId;
 
-    public boolean compareWith(FileInputStream data, FileInputStream meta) {
-      return ((data == fis[0]) && (meta == fis[1]));
-    }
-  }
+        private final ShortCircuitCache cache;
 
-  private static class SimpleReplicaCreator
-      implements ShortCircuitReplicaCreator {
-    private final int blockId;
-    private final ShortCircuitCache cache;
-    private final TestFileDescriptorPair pair;
+        private final TestFileDescriptorPair pair;
 
-    SimpleReplicaCreator(int blockId, ShortCircuitCache cache,
-        TestFileDescriptorPair pair) {
-      this.blockId = blockId;
-      this.cache = cache;
-      this.pair = pair;
-    }
+        SimpleReplicaCreator(int blockId, ShortCircuitCache cache, TestFileDescriptorPair pair) {
+            this.blockId = blockId;
+            this.cache = cache;
+            this.pair = pair;
+        }
 
-    @Override
-    public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-      try {
-        ExtendedBlockId key = new ExtendedBlockId(blockId, "test_bp1");
-        return new ShortCircuitReplicaInfo(
-            new ShortCircuitReplica(key,
-                pair.getFileInputStreams()[0], pair.getFileInputStreams()[1],
-                cache, Time.monotonicNow(), null));
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  @Test(timeout=60000)
-  public void testCreateAndDestroy() throws Exception {
-    ShortCircuitCache cache =
-        new ShortCircuitCache(10, 1, 10, 1, 1, 10000, 0);
-    cache.close();
-  }
-  
-  @Test(timeout=60000)
-  public void testAddAndRetrieve() throws Exception {
-    final ShortCircuitCache cache =
-        new ShortCircuitCache(10, 10000000, 10, 10000000, 1, 10000, 0);
-    final TestFileDescriptorPair pair = new TestFileDescriptorPair();
-    ShortCircuitReplicaInfo replicaInfo1 =
-      cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"),
-        new SimpleReplicaCreator(123, cache, pair));
-    Preconditions.checkNotNull(replicaInfo1.getReplica());
-    Preconditions.checkState(replicaInfo1.getInvalidTokenException() == null);
-    pair.compareWith(replicaInfo1.getReplica().getDataStream(),
-                     replicaInfo1.getReplica().getMetaStream());
-    ShortCircuitReplicaInfo replicaInfo2 =
-      cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"),
-          new ShortCircuitReplicaCreator() {
         @Override
         public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          Assert.fail("expected to use existing entry.");
-          return null;
+            try {
+                ExtendedBlockId key = new ExtendedBlockId(blockId, "test_bp1");
+                return new ShortCircuitReplicaInfo(new ShortCircuitReplica(key, pair.getFileInputStreams()[0], pair.getFileInputStreams()[1], cache, Time.monotonicNow(), null));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-      });
-    Preconditions.checkNotNull(replicaInfo2.getReplica());
-    Preconditions.checkState(replicaInfo2.getInvalidTokenException() == null);
-    Preconditions.checkState(replicaInfo1 == replicaInfo2);
-    pair.compareWith(replicaInfo2.getReplica().getDataStream(),
-                     replicaInfo2.getReplica().getMetaStream());
-    replicaInfo1.getReplica().unref();
-    replicaInfo2.getReplica().unref();
-    
-    // Even after the reference count falls to 0, we still keep the replica
-    // around for a while (we have configured the expiry period to be really,
-    // really long here)
-    ShortCircuitReplicaInfo replicaInfo3 =
-      cache.fetchOrCreate(
-          new ExtendedBlockId(123, "test_bp1"), new ShortCircuitReplicaCreator() {
-        @Override
-        public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          Assert.fail("expected to use existing entry.");
-          return null;
-        }
-      });
-    Preconditions.checkNotNull(replicaInfo3.getReplica());
-    Preconditions.checkState(replicaInfo3.getInvalidTokenException() == null);
-    replicaInfo3.getReplica().unref();
-    
-    pair.close();
-    cache.close();
-  }
+    }
 
-  @Test(timeout=100000)
-  public void testExpiry() throws Exception {
-    final ShortCircuitCache cache =
-        new ShortCircuitCache(2, 1, 1, 10000000, 1, 10000000, 0);
-    final TestFileDescriptorPair pair = new TestFileDescriptorPair();
-    ShortCircuitReplicaInfo replicaInfo1 =
-      cache.fetchOrCreate(
-        new ExtendedBlockId(123, "test_bp1"),
-          new SimpleReplicaCreator(123, cache, pair));
-    Preconditions.checkNotNull(replicaInfo1.getReplica());
-    Preconditions.checkState(replicaInfo1.getInvalidTokenException() == null);
-    pair.compareWith(replicaInfo1.getReplica().getDataStream(),
-                     replicaInfo1.getReplica().getMetaStream());
-    replicaInfo1.getReplica().unref();
-    final MutableBoolean triedToCreate = new MutableBoolean(false);
-    do {
-      Thread.sleep(10);
-      ShortCircuitReplicaInfo replicaInfo2 =
-        cache.fetchOrCreate(
-          new ExtendedBlockId(123, "test_bp1"), new ShortCircuitReplicaCreator() {
-          @Override
-          public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-            triedToCreate.setValue(true);
-            return null;
-          }
+    @Test(timeout = 60000)
+    public void testCreateAndDestroy() throws Exception {
+        ShortCircuitCache cache = new ShortCircuitCache(10, 1, 10, 1, 1, 10000, 0);
+        cache.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testAddAndRetrieve() throws Exception {
+        final ShortCircuitCache cache = new ShortCircuitCache(10, 10000000, 10, 10000000, 1, 10000, 0);
+        final TestFileDescriptorPair pair = new TestFileDescriptorPair();
+        ShortCircuitReplicaInfo replicaInfo1 = cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"), new SimpleReplicaCreator(123, cache, pair));
+        Preconditions.checkNotNull(replicaInfo1.getReplica());
+        Preconditions.checkState(replicaInfo1.getInvalidTokenException() == null);
+        pair.compareWith(replicaInfo1.getReplica().getDataStream(), replicaInfo1.getReplica().getMetaStream());
+        ShortCircuitReplicaInfo replicaInfo2 = cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"), new ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Assert.fail("expected to use existing entry.");
+                return null;
+            }
         });
-      if ((replicaInfo2 != null) && (replicaInfo2.getReplica() != null)) {
+        Preconditions.checkNotNull(replicaInfo2.getReplica());
+        Preconditions.checkState(replicaInfo2.getInvalidTokenException() == null);
+        Preconditions.checkState(replicaInfo1 == replicaInfo2);
+        pair.compareWith(replicaInfo2.getReplica().getDataStream(), replicaInfo2.getReplica().getMetaStream());
+        replicaInfo1.getReplica().unref();
         replicaInfo2.getReplica().unref();
-      }
-    } while (triedToCreate.isFalse());
-    cache.close();
-  }
-  
-  
-  @Test(timeout=60000)
-  public void testEviction() throws Exception {
-    final ShortCircuitCache cache =
-        new ShortCircuitCache(2, 10000000, 1, 10000000, 1, 10000, 0);
-    final TestFileDescriptorPair pairs[] = new TestFileDescriptorPair[] {
-      new TestFileDescriptorPair(),
-      new TestFileDescriptorPair(),
-      new TestFileDescriptorPair(),
-    };
-    ShortCircuitReplicaInfo replicaInfos[] = new ShortCircuitReplicaInfo[] {
-      null,
-      null,
-      null
-    };
-    for (int i = 0; i < pairs.length; i++) {
-      replicaInfos[i] = cache.fetchOrCreate(
-          new ExtendedBlockId(i, "test_bp1"), 
-            new SimpleReplicaCreator(i, cache, pairs[i]));
-      Preconditions.checkNotNull(replicaInfos[i].getReplica());
-      Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
-      pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(),
-                           replicaInfos[i].getReplica().getMetaStream());
-    }
-    // At this point, we have 3 replicas in use.
-    // Let's close them all.
-    for (int i = 0; i < pairs.length; i++) {
-      replicaInfos[i].getReplica().unref();
-    }
-    // The last two replicas should still be cached.
-    for (int i = 1; i < pairs.length; i++) {
-      final Integer iVal = i;
-      replicaInfos[i] = cache.fetchOrCreate(
-          new ExtendedBlockId(i, "test_bp1"),
-            new ShortCircuitReplicaCreator() {
-        @Override
-        public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          Assert.fail("expected to use existing entry for " + iVal);
-          return null;
-        }
-      });
-      Preconditions.checkNotNull(replicaInfos[i].getReplica());
-      Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
-      pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(),
-                           replicaInfos[i].getReplica().getMetaStream());
-    }
-    // The first (oldest) replica should not be cached.
-    final MutableBoolean calledCreate = new MutableBoolean(false);
-    replicaInfos[0] = cache.fetchOrCreate(
-        new ExtendedBlockId(0, "test_bp1"),
-          new ShortCircuitReplicaCreator() {
-        @Override
-        public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          calledCreate.setValue(true);
-          return null;
-        }
-      });
-    Preconditions.checkState(replicaInfos[0].getReplica() == null);
-    Assert.assertTrue(calledCreate.isTrue());
-    // Clean up
-    for (int i = 1; i < pairs.length; i++) {
-      replicaInfos[i].getReplica().unref();
-    }
-    for (int i = 0; i < pairs.length; i++) {
-      pairs[i].close();
-    }
-    cache.close();
-  }
-  
-  @Test(timeout=60000)
-  public void testTimeBasedStaleness() throws Exception {
-    // Set up the cache with a short staleness time.
-    final ShortCircuitCache cache =
-        new ShortCircuitCache(2, 10000000, 1, 10000000, 1, 10, 0);
-    final TestFileDescriptorPair pairs[] = new TestFileDescriptorPair[] {
-      new TestFileDescriptorPair(),
-      new TestFileDescriptorPair(),
-    };
-    ShortCircuitReplicaInfo replicaInfos[] = new ShortCircuitReplicaInfo[] {
-      null,
-      null
-    };
-    final long HOUR_IN_MS = 60 * 60 * 1000;
-    for (int i = 0; i < pairs.length; i++) {
-      final Integer iVal = i;
-      final ExtendedBlockId key = new ExtendedBlockId(i, "test_bp1");
-      replicaInfos[i] = cache.fetchOrCreate(key,
-          new ShortCircuitReplicaCreator() {
-        @Override
-        public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-          try {
-            return new ShortCircuitReplicaInfo(
-                new ShortCircuitReplica(key,
-                    pairs[iVal].getFileInputStreams()[0],
-                    pairs[iVal].getFileInputStreams()[1],
-                    cache, Time.monotonicNow() + (iVal * HOUR_IN_MS), null));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      });
-      Preconditions.checkNotNull(replicaInfos[i].getReplica());
-      Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
-      pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(),
-                           replicaInfos[i].getReplica().getMetaStream());
-    }
+        // Even after the reference count falls to 0, we still keep the replica
+        // around for a while (we have configured the expiry period to be really,
+        // really long here)
+        ShortCircuitReplicaInfo replicaInfo3 = cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"), new ShortCircuitReplicaCreator() {
 
-    // Keep trying to getOrCreate block 0 until it goes stale (and we must re-create.)
-    GenericTestUtils.waitFor(new Supplier<Boolean>() {
-      @Override
-      public Boolean get() {
-        ShortCircuitReplicaInfo info = cache.fetchOrCreate(
-          new ExtendedBlockId(0, "test_bp1"), new ShortCircuitReplicaCreator() {
-          @Override
-          public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-            return null;
-          }
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Assert.fail("expected to use existing entry.");
+                return null;
+            }
         });
-        if (info.getReplica() != null) {
-          info.getReplica().unref();
-          return false;
-        }
-        return true;
-      }
-    }, 500, 60000);
-
-    // Make sure that second replica did not go stale.
-    ShortCircuitReplicaInfo info = cache.fetchOrCreate(
-        new ExtendedBlockId(1, "test_bp1"), new ShortCircuitReplicaCreator() {
-      @Override
-      public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
-        Assert.fail("second replica went stale, despite 1 " +
-            "hour staleness time.");
-        return null;
-      }
-    });
-    info.getReplica().unref();
-
-    // Clean up
-    for (int i = 1; i < pairs.length; i++) {
-      replicaInfos[i].getReplica().unref();
+        Preconditions.checkNotNull(replicaInfo3.getReplica());
+        Preconditions.checkState(replicaInfo3.getInvalidTokenException() == null);
+        replicaInfo3.getReplica().unref();
+        pair.close();
+        cache.close();
     }
-    cache.close();
-  }
 
-  private static Configuration createShortCircuitConf(String testName,
-      TemporarySocketDirectory sockDir) {
-    Configuration conf = new Configuration();
-    conf.set(DFS_CLIENT_CONTEXT, testName);
-    conf.setLong(DFS_BLOCK_SIZE_KEY, 4096);
-    conf.set(DFS_DOMAIN_SOCKET_PATH_KEY, new File(sockDir.getDir(),
-        testName).getAbsolutePath());
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY,
-        false);
-    conf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, false);
-    DFSInputStream.tcpReadsDisabledForTesting = true;
-    DomainSocket.disableBindPathValidation();
-    Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
-    return conf;
-  }
-  
-  private static DomainPeer getDomainPeerToDn(Configuration conf)
-      throws IOException {
-    DomainSocket sock =
-        DomainSocket.connect(conf.get(DFS_DOMAIN_SOCKET_PATH_KEY));
-    return new DomainPeer(sock);
-  }
+    @Test(timeout = 100000)
+    public void testExpiry() throws Exception {
+        final ShortCircuitCache cache = new ShortCircuitCache(2, 1, 1, 10000000, 1, 10000000, 0);
+        final TestFileDescriptorPair pair = new TestFileDescriptorPair();
+        ShortCircuitReplicaInfo replicaInfo1 = cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"), new SimpleReplicaCreator(123, cache, pair));
+        Preconditions.checkNotNull(replicaInfo1.getReplica());
+        Preconditions.checkState(replicaInfo1.getInvalidTokenException() == null);
+        pair.compareWith(replicaInfo1.getReplica().getDataStream(), replicaInfo1.getReplica().getMetaStream());
+        replicaInfo1.getReplica().unref();
+        final MutableBoolean triedToCreate = new MutableBoolean(false);
+        do {
+            Thread.sleep(10);
+            ShortCircuitReplicaInfo replicaInfo2 = cache.fetchOrCreate(new ExtendedBlockId(123, "test_bp1"), new ShortCircuitReplicaCreator() {
 
-  /*
+                @Override
+                public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                    triedToCreate.setValue(true);
+                    return null;
+                }
+            });
+            if ((replicaInfo2 != null) && (replicaInfo2.getReplica() != null)) {
+                replicaInfo2.getReplica().unref();
+            }
+        } while (triedToCreate.isFalse());
+        cache.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testEviction() throws Exception {
+        final ShortCircuitCache cache = new ShortCircuitCache(2, 10000000, 1, 10000000, 1, 10000, 0);
+        final TestFileDescriptorPair[] pairs = new TestFileDescriptorPair[] { new TestFileDescriptorPair(), new TestFileDescriptorPair(), new TestFileDescriptorPair() };
+        ShortCircuitReplicaInfo[] replicaInfos = new ShortCircuitReplicaInfo[] { null, null, null };
+        for (int i = 0; i < pairs.length; i++) {
+            replicaInfos[i] = cache.fetchOrCreate(new ExtendedBlockId(i, "test_bp1"), new SimpleReplicaCreator(i, cache, pairs[i]));
+            Preconditions.checkNotNull(replicaInfos[i].getReplica());
+            Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
+            pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(), replicaInfos[i].getReplica().getMetaStream());
+        }
+        // At this point, we have 3 replicas in use.
+        // Let's close them all.
+        for (int i = 0; i < pairs.length; i++) {
+            replicaInfos[i].getReplica().unref();
+        }
+        // The last two replicas should still be cached.
+        for (int i = 1; i < pairs.length; i++) {
+            final Integer iVal = i;
+            replicaInfos[i] = cache.fetchOrCreate(new ExtendedBlockId(i, "test_bp1"), new ShortCircuitReplicaCreator() {
+
+                @Override
+                public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                    Assert.fail("expected to use existing entry for " + iVal);
+                    return null;
+                }
+            });
+            Preconditions.checkNotNull(replicaInfos[i].getReplica());
+            Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
+            pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(), replicaInfos[i].getReplica().getMetaStream());
+        }
+        // The first (oldest) replica should not be cached.
+        final MutableBoolean calledCreate = new MutableBoolean(false);
+        replicaInfos[0] = cache.fetchOrCreate(new ExtendedBlockId(0, "test_bp1"), new ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                calledCreate.setValue(true);
+                return null;
+            }
+        });
+        Preconditions.checkState(replicaInfos[0].getReplica() == null);
+        Assert.assertTrue(calledCreate.isTrue());
+        // Clean up
+        for (int i = 1; i < pairs.length; i++) {
+            replicaInfos[i].getReplica().unref();
+        }
+        for (int i = 0; i < pairs.length; i++) {
+            pairs[i].close();
+        }
+        cache.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testTimeBasedStaleness() throws Exception {
+        // Set up the cache with a short staleness time.
+        final ShortCircuitCache cache = new ShortCircuitCache(2, 10000000, 1, 10000000, 1, 10, 0);
+        final TestFileDescriptorPair[] pairs = new TestFileDescriptorPair[] { new TestFileDescriptorPair(), new TestFileDescriptorPair() };
+        ShortCircuitReplicaInfo[] replicaInfos = new ShortCircuitReplicaInfo[] { null, null };
+        final long HOUR_IN_MS = 60 * 60 * 1000;
+        for (int i = 0; i < pairs.length; i++) {
+            final Integer iVal = i;
+            final ExtendedBlockId key = new ExtendedBlockId(i, "test_bp1");
+            replicaInfos[i] = cache.fetchOrCreate(key, new ShortCircuitReplicaCreator() {
+
+                @Override
+                public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                    try {
+                        return new ShortCircuitReplicaInfo(new ShortCircuitReplica(key, pairs[iVal].getFileInputStreams()[0], pairs[iVal].getFileInputStreams()[1], cache, Time.monotonicNow() + (iVal * HOUR_IN_MS), null));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            Preconditions.checkNotNull(replicaInfos[i].getReplica());
+            Preconditions.checkState(replicaInfos[i].getInvalidTokenException() == null);
+            pairs[i].compareWith(replicaInfos[i].getReplica().getDataStream(), replicaInfos[i].getReplica().getMetaStream());
+        }
+        // Keep trying to getOrCreate block 0 until it goes stale (and we must re-create.)
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                ShortCircuitReplicaInfo info = cache.fetchOrCreate(new ExtendedBlockId(0, "test_bp1"), new ShortCircuitReplicaCreator() {
+
+                    @Override
+                    public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                        return null;
+                    }
+                });
+                if (info.getReplica() != null) {
+                    info.getReplica().unref();
+                    return false;
+                }
+                return true;
+            }
+        }, 500, 60000);
+        // Make sure that second replica did not go stale.
+        ShortCircuitReplicaInfo info = cache.fetchOrCreate(new ExtendedBlockId(1, "test_bp1"), new ShortCircuitReplicaCreator() {
+
+            @Override
+            public ShortCircuitReplicaInfo createShortCircuitReplicaInfo() {
+                Assert.fail("second replica went stale, despite 1 " + "hour staleness time.");
+                return null;
+            }
+        });
+        info.getReplica().unref();
+        // Clean up
+        for (int i = 1; i < pairs.length; i++) {
+            replicaInfos[i].getReplica().unref();
+        }
+        cache.close();
+    }
+
+    private static Configuration createShortCircuitConf(String testName, TemporarySocketDirectory sockDir) {
+        Configuration conf = new Configuration();
+        conf.set(DFS_CLIENT_CONTEXT, testName);
+        conf.setLong(DFS_BLOCK_SIZE_KEY, 4096);
+        conf.set(DFS_DOMAIN_SOCKET_PATH_KEY, new File(sockDir.getDir(), testName).getAbsolutePath());
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, true);
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.SKIP_CHECKSUM_KEY, false);
+        conf.setBoolean(DFS_CLIENT_DOMAIN_SOCKET_DATA_TRAFFIC, false);
+        DFSInputStream.tcpReadsDisabledForTesting = true;
+        DomainSocket.disableBindPathValidation();
+        Assume.assumeThat(DomainSocket.getLoadingFailureReason(), equalTo(null));
+        return conf;
+    }
+
+    private static DomainPeer getDomainPeerToDn(Configuration conf) throws IOException {
+        DomainSocket sock = DomainSocket.connect(conf.get(DFS_DOMAIN_SOCKET_PATH_KEY));
+        return new DomainPeer(sock);
+    }
+
+    /*
   @Test(timeout=60000)
   public void testAllocShm() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -478,67 +422,54 @@ public class TestShortCircuitCache {
     sockDir.close();
   }
    */
+    @Test(timeout = 60000)
+    public void testShmBasedStaleness() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        FSDataInputStream fis = fs.open(new Path(TEST_FILE));
+        int first = fis.read();
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        Assert.assertTrue(first != -1);
+        cache.accept(new CacheVisitor() {
 
-  @Test(timeout=60000)
-  public void testShmBasedStaleness() throws Exception {
-    BlockReaderTestUtil.enableShortCircuitShmTracing();
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    final ShortCircuitCache cache =
-        fs.getClient().getClientContext().getShortCircuitCache();
-    String TEST_FILE = "/test_file";
-    final int TEST_FILE_LEN = 8193;
-    final int SEED = 0xFADED;
-    DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN,
-        (short)1, SEED);
-    FSDataInputStream fis = fs.open(new Path(TEST_FILE));
-    int first = fis.read();
-    final ExtendedBlock block =
-        DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
-    Assert.assertTrue(first != -1);
-    cache.accept(new CacheVisitor() {
-      @Override
-      public void visit(int numOutstandingMmaps,
-          Map<ExtendedBlockId, ShortCircuitReplica> replicas,
-          Map<ExtendedBlockId, InvalidToken> failedLoads,
-          LinkedMap evictable,
-          LinkedMap evictableMmapped) {
-        ShortCircuitReplica replica = replicas.get(
-            ExtendedBlockId.fromExtendedBlock(block));
-        Assert.assertNotNull(replica);
-        Assert.assertTrue(replica.getSlot().isValid());
-      }
-    });
-    // Stop the Namenode.  This will close the socket keeping the client's
-    // shared memory segment alive, and make it stale.
-    cluster.getDataNodes().get(0).shutdown();
-    cache.accept(new CacheVisitor() {
-      @Override
-      public void visit(int numOutstandingMmaps,
-          Map<ExtendedBlockId, ShortCircuitReplica> replicas,
-          Map<ExtendedBlockId, InvalidToken> failedLoads,
-          LinkedMap evictable,
-          LinkedMap evictableMmapped) {
-        ShortCircuitReplica replica = replicas.get(
-            ExtendedBlockId.fromExtendedBlock(block));
-        Assert.assertNotNull(replica);
-        Assert.assertFalse(replica.getSlot().isValid());
-      }
-    });
-    cluster.shutdown();
-    sockDir.close();
-  }
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertTrue(replica.getSlot().isValid());
+            }
+        });
+        // Stop the Namenode.  This will close the socket keeping the client's
+        // shared memory segment alive, and make it stale.
+        cluster.getDataNodes().get(0).shutdown();
+        cache.accept(new CacheVisitor() {
 
-  /**
-   * Test unlinking a file whose blocks we are caching in the DFSClient.
-   * The DataNode will notify the DFSClient that the replica is stale via the
-   * ShortCircuitShm.
-   */
-  /*
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertFalse(replica.getSlot().isValid());
+            }
+        });
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    /**
+     * Test unlinking a file whose blocks we are caching in the DFSClient.
+     * The DataNode will notify the DFSClient that the replica is stale via the
+     * ShortCircuitShm.
+     */
+    /*
   @Test(timeout=60000)
   public void testUnlinkingReplicasInFileDescriptorCache() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -628,168 +559,692 @@ public class TestShortCircuitCache {
     sockDir.close();
   }
    */
+    static private void checkNumberOfSegmentsAndSlots(final int expectedSegments, final int expectedSlots, final ShortCircuitRegistry registry) throws InterruptedException, TimeoutException {
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
 
-  static private void checkNumberOfSegmentsAndSlots(final int expectedSegments,
-        final int expectedSlots, final ShortCircuitRegistry registry)
-  throws InterruptedException, TimeoutException {
-    GenericTestUtils.waitFor(new Supplier<Boolean>() {
-      @Override
-      public Boolean get() {
-        return registry.visit(new ShortCircuitRegistry.Visitor() {
-          @Override
-          public boolean accept(HashMap<ShmId, RegisteredShm> segments,
-              HashMultimap<ExtendedBlockId, Slot> slots) {
-            return (expectedSegments == segments.size()) &&
-                (expectedSlots == slots.size());
-          }
+            @Override
+            public Boolean get() {
+                return registry.visit(new ShortCircuitRegistry.Visitor() {
+
+                    @Override
+                    public boolean accept(HashMap<ShmId, RegisteredShm> segments, HashMultimap<ExtendedBlockId, Slot> slots) {
+                        return (expectedSegments == segments.size()) && (expectedSlots == slots.size());
+                    }
+                });
+            }
+        }, 100, 10000);
+    }
+
+    public static class TestCleanupFailureInjector extends BlockReaderFactory.FailureInjector {
+
+        @Override
+        public void injectRequestFileDescriptorsFailure() throws IOException {
+            throw new IOException("injected I/O error");
+        }
+    }
+
+    // Regression test for HDFS-7915
+    @Test(timeout = 60000)
+    public void testDataXceiverCleansUpSlotsOnFailure() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverCleansUpSlotsOnFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        final Path TEST_PATH2 = new Path("/test_file2");
+        final int TEST_FILE_LEN = 4096;
+        final int SEED = 0xFADE1;
+        DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN, (short) 1, SEED);
+        DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN, (short) 1, SEED);
+        // The first read should allocate one shared memory segment and slot.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // The second read should fail, and we should only have 1 segment and 1 slot
+        // left.
+        BlockReaderFactory.setFailureInjectorForTesting(new TestCleanupFailureInjector());
+        try {
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        //checkNumberOfSegmentsAndSlots(1, 1,
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    // Regression test for HADOOP-11802
+    @Test(timeout = 60000)
+    public void testDataXceiverHandlesRequestShortCircuitShmFailure() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE1);
+        LOG.info("Setting failure injector and performing a read which " + "should fail...");
+        DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
+        Mockito.doAnswer(new Answer<Void>() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException("injected error into sendShmResponse");
+            }
+        }).when(failureInjector).sendShortCircuitShmResponse();
+        DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
+        DataNodeFaultInjector.instance = failureInjector;
+        try {
+            // The first read will try to allocate a shared memory segment and slot.
+            // The shared memory segment allocation will fail because of the failure
+            // injector.
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+            Assert.fail("expected readFileBuffer to fail, but it succeeded.");
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        //checkNumberOfSegmentsAndSlots(0, 0,
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        LOG.info("Clearing failure injector and performing another read...");
+        DataNodeFaultInjector.instance = prevInjector;
+        fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
+        // The second read should succeed.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // We should have added a new short-circuit shared memory segment and slot.
+        //checkNumberOfSegmentsAndSlots(1, 1,
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    public static class TestPreReceiptVerificationFailureInjector extends BlockReaderFactory.FailureInjector {
+
+        @Override
+        public boolean getSupportsReceiptVerification() {
+            return false;
+        }
+    }
+
+    // Regression test for HDFS-8070
+    @Test(timeout = 60000)
+    public void testPreReceiptVerificationDfsClientCanDoScr() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testPreReceiptVerificationDfsClientCanDoScr", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        BlockReaderFactory.setFailureInjectorForTesting(new TestPreReceiptVerificationFailureInjector());
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE2);
+        final Path TEST_PATH2 = new Path("/test_file2");
+        DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short) 1, 0xFADE2);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        //checkNumberOfSegmentsAndSlots(1, 2,
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testShmBasedStaleness_withUpgrade20() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        FSDataInputStream fis = fs.open(new Path(TEST_FILE));
+        int first = fis.read();
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        Assert.assertTrue(first != -1);
+        cache.accept(new CacheVisitor() {
+
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertTrue(replica.getSlot().isValid());
+            }
         });
-      }
-    }, 100, 10000);
+        // shared memory segment alive, and make it stale.
+        cluster.getDataNodes().get(0).shutdown();
+        cache.accept(new CacheVisitor() {
 
-  }
-
-  public static class TestCleanupFailureInjector
-        extends BlockReaderFactory.FailureInjector {
-    @Override
-    public void injectRequestFileDescriptorsFailure() throws IOException {
-      throw new IOException("injected I/O error");
-    }
-  }
-
-  // Regression test for HDFS-7915
-  @Test(timeout=60000)
-  public void testDataXceiverCleansUpSlotsOnFailure() throws Exception {
-    BlockReaderTestUtil.enableShortCircuitShmTracing();
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf(
-        "testDataXceiverCleansUpSlotsOnFailure", sockDir);
-    conf.setLong(
-        HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY,
-        1000000000L);
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    final Path TEST_PATH1 = new Path("/test_file1");
-    final Path TEST_PATH2 = new Path("/test_file2");
-    final int TEST_FILE_LEN = 4096;
-    final int SEED = 0xFADE1;
-    DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN,
-        (short)1, SEED);
-    DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN,
-        (short)1, SEED);
-
-    // The first read should allocate one shared memory segment and slot.
-    DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
-
-    // The second read should fail, and we should only have 1 segment and 1 slot
-    // left.
-    BlockReaderFactory.setFailureInjectorForTesting(
-        new TestCleanupFailureInjector());
-    try {
-      DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
-    } catch (Throwable t) {
-      GenericTestUtils.assertExceptionContains("TCP reads were disabled for " +
-          "testing, but we failed to do a non-TCP read.", t);
-    }
-    //checkNumberOfSegmentsAndSlots(1, 1,
-      //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
-    cluster.shutdown();
-    sockDir.close();
-  }
-
-  // Regression test for HADOOP-11802
-  @Test(timeout=60000)
-  public void testDataXceiverHandlesRequestShortCircuitShmFailure()
-      throws Exception {
-    BlockReaderTestUtil.enableShortCircuitShmTracing();
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf(
-        "testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
-    conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY,
-        1000000000L);
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    final Path TEST_PATH1 = new Path("/test_file1");
-    DFSTestUtil.createFile(fs, TEST_PATH1, 4096,
-        (short)1, 0xFADE1);
-    LOG.info("Setting failure injector and performing a read which " +
-        "should fail...");
-    DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
-    Mockito.doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        throw new IOException("injected error into sendShmResponse");
-      }
-    }).when(failureInjector).sendShortCircuitShmResponse();
-    DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
-    DataNodeFaultInjector.instance = failureInjector;
-
-    try {
-      // The first read will try to allocate a shared memory segment and slot.
-      // The shared memory segment allocation will fail because of the failure
-      // injector.
-      DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
-      Assert.fail("expected readFileBuffer to fail, but it succeeded.");
-    } catch (Throwable t) {
-      GenericTestUtils.assertExceptionContains("TCP reads were disabled for " +
-          "testing, but we failed to do a non-TCP read.", t);
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertFalse(replica.getSlot().isValid());
+            }
+        });
+        cluster.shutdown();
+        sockDir.close();
     }
 
-    //checkNumberOfSegmentsAndSlots(0, 0,
-      //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+    @Test(timeout = 60000)
+    public void testShmBasedStaleness_withUpgrade40() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        FSDataInputStream fis = fs.open(new Path(TEST_FILE));
+        int first = fis.read();
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue(first != -1);
+        cache.accept(new CacheVisitor() {
 
-    LOG.info("Clearing failure injector and performing another read...");
-    DataNodeFaultInjector.instance = prevInjector;
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertTrue(replica.getSlot().isValid());
+            }
+        });
+        // shared memory segment alive, and make it stale.
+        cluster.getDataNodes().get(0).shutdown();
+        cache.accept(new CacheVisitor() {
 
-    fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
-
-    // The second read should succeed.
-    DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
-
-    // We should have added a new short-circuit shared memory segment and slot.
-    //checkNumberOfSegmentsAndSlots(1, 1,
-      //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
-
-    cluster.shutdown();
-    sockDir.close();
-  }
-
-  public static class TestPreReceiptVerificationFailureInjector
-      extends BlockReaderFactory.FailureInjector {
-    @Override
-    public boolean getSupportsReceiptVerification() {
-      return false;
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertFalse(replica.getSlot().isValid());
+            }
+        });
+        cluster.shutdown();
+        sockDir.close();
     }
-  }
 
-  // Regression test for HDFS-8070
-  @Test(timeout=60000)
-  public void testPreReceiptVerificationDfsClientCanDoScr() throws Exception {
-    BlockReaderTestUtil.enableShortCircuitShmTracing();
-    TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
-    Configuration conf = createShortCircuitConf(
-        "testPreReceiptVerificationDfsClientCanDoScr", sockDir);
-    conf.setLong(
-        HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY,
-        1000000000L);
-    MiniDFSClusterInJVM cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    BlockReaderFactory.setFailureInjectorForTesting(
-        new TestPreReceiptVerificationFailureInjector());
-    final Path TEST_PATH1 = new Path("/test_file1");
-    DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short)1, 0xFADE2);
-    final Path TEST_PATH2 = new Path("/test_file2");
-    DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short)1, 0xFADE2);
-    DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
-    DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
-    //checkNumberOfSegmentsAndSlots(1, 2,
-      //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
-    cluster.shutdown();
-    sockDir.close();
-  }
+    @Test(timeout = 60000)
+    public void testShmBasedStaleness_withUpgrade60() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        FSDataInputStream fis = fs.open(new Path(TEST_FILE));
+        int first = fis.read();
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        Assert.assertTrue(first != -1);
+        cache.accept(new CacheVisitor() {
+
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                Assert.assertTrue(replica.getSlot().isValid());
+            }
+        });
+        // shared memory segment alive, and make it stale.
+        cluster.getDataNodes().get(0).shutdown();
+        cache.accept(new CacheVisitor() {
+
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertFalse(replica.getSlot().isValid());
+            }
+        });
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testShmBasedStaleness_withUpgrade80() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testShmBasedStaleness", sockDir);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final ShortCircuitCache cache = fs.getClient().getClientContext().getShortCircuitCache();
+        String TEST_FILE = "/test_file";
+        final int TEST_FILE_LEN = 8193;
+        final int SEED = 0xFADED;
+        DFSTestUtil.createFile(fs, new Path(TEST_FILE), TEST_FILE_LEN, (short) 1, SEED);
+        FSDataInputStream fis = fs.open(new Path(TEST_FILE));
+        int first = fis.read();
+        final ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path(TEST_FILE));
+        Assert.assertTrue(first != -1);
+        cache.accept(new CacheVisitor() {
+
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                Assert.assertNotNull(replica);
+                Assert.assertTrue(replica.getSlot().isValid());
+            }
+        });
+        // shared memory segment alive, and make it stale.
+        cluster.getDataNodes().get(0).shutdown();
+        cache.accept(new CacheVisitor() {
+
+            @Override
+            public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
+                ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                Assert.assertNotNull(replica);
+                Assert.assertFalse(replica.getSlot().isValid());
+            }
+        });
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverCleansUpSlotsOnFailure_withUpgrade20() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverCleansUpSlotsOnFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        final Path TEST_PATH2 = new Path("/test_file2");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final int TEST_FILE_LEN = 4096;
+        final int SEED = 0xFADE1;
+        DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN, (short) 1, SEED);
+        DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN, (short) 1, SEED);
+        // The first read should allocate one shared memory segment and slot.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // left.
+        BlockReaderFactory.setFailureInjectorForTesting(new TestCleanupFailureInjector());
+        try {
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverCleansUpSlotsOnFailure_withUpgrade40() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverCleansUpSlotsOnFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        final Path TEST_PATH2 = new Path("/test_file2");
+        final int TEST_FILE_LEN = 4096;
+        final int SEED = 0xFADE1;
+        DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN, (short) 1, SEED);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN, (short) 1, SEED);
+        // The first read should allocate one shared memory segment and slot.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // left.
+        BlockReaderFactory.setFailureInjectorForTesting(new TestCleanupFailureInjector());
+        try {
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverCleansUpSlotsOnFailure_withUpgrade60() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverCleansUpSlotsOnFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        final Path TEST_PATH2 = new Path("/test_file2");
+        final int TEST_FILE_LEN = 4096;
+        final int SEED = 0xFADE1;
+        DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN, (short) 1, SEED);
+        DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN, (short) 1, SEED);
+        // The first read should allocate one shared memory segment and slot.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // left.
+        BlockReaderFactory.setFailureInjectorForTesting(new TestCleanupFailureInjector());
+        try {
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverCleansUpSlotsOnFailure_withUpgrade80() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverCleansUpSlotsOnFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        final Path TEST_PATH2 = new Path("/test_file2");
+        final int TEST_FILE_LEN = 4096;
+        final int SEED = 0xFADE1;
+        DFSTestUtil.createFile(fs, TEST_PATH1, TEST_FILE_LEN, (short) 1, SEED);
+        DFSTestUtil.createFile(fs, TEST_PATH2, TEST_FILE_LEN, (short) 1, SEED);
+        // The first read should allocate one shared memory segment and slot.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        // left.
+        BlockReaderFactory.setFailureInjectorForTesting(new TestCleanupFailureInjector());
+        try {
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverHandlesRequestShortCircuitShmFailure_withUpgrade20() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE1);
+        LOG.info("Setting failure injector and performing a read which " + "should fail...");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
+        Mockito.doAnswer(new Answer<Void>() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException("injected error into sendShmResponse");
+            }
+        }).when(failureInjector).sendShortCircuitShmResponse();
+        DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
+        DataNodeFaultInjector.instance = failureInjector;
+        try {
+            // The first read will try to allocate a shared memory segment and slot.
+            // The shared memory segment allocation will fail because of the failure
+            // injector.
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+            Assert.fail("expected readFileBuffer to fail, but it succeeded.");
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        LOG.info("Clearing failure injector and performing another read...");
+        DataNodeFaultInjector.instance = prevInjector;
+        fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
+        // The second read should succeed.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverHandlesRequestShortCircuitShmFailure_withUpgrade40() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE1);
+        LOG.info("Setting failure injector and performing a read which " + "should fail...");
+        DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
+        Mockito.doAnswer(new Answer<Void>() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException("injected error into sendShmResponse");
+            }
+        }).when(failureInjector).sendShortCircuitShmResponse();
+        DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DataNodeFaultInjector.instance = failureInjector;
+        try {
+            // The first read will try to allocate a shared memory segment and slot.
+            // The shared memory segment allocation will fail because of the failure
+            // injector.
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+            Assert.fail("expected readFileBuffer to fail, but it succeeded.");
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        LOG.info("Clearing failure injector and performing another read...");
+        DataNodeFaultInjector.instance = prevInjector;
+        fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
+        // The second read should succeed.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverHandlesRequestShortCircuitShmFailure_withUpgrade60() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE1);
+        LOG.info("Setting failure injector and performing a read which " + "should fail...");
+        DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
+        Mockito.doAnswer(new Answer<Void>() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException("injected error into sendShmResponse");
+            }
+        }).when(failureInjector).sendShortCircuitShmResponse();
+        DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
+        DataNodeFaultInjector.instance = failureInjector;
+        try {
+            // The first read will try to allocate a shared memory segment and slot.
+            // The shared memory segment allocation will fail because of the failure
+            // injector.
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Assert.fail("expected readFileBuffer to fail, but it succeeded.");
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        LOG.info("Clearing failure injector and performing another read...");
+        DataNodeFaultInjector.instance = prevInjector;
+        fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
+        // The second read should succeed.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testDataXceiverHandlesRequestShortCircuitShmFailure_withUpgrade80() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testDataXceiverHandlesRequestShortCircuitShmFailure", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE1);
+        LOG.info("Setting failure injector and performing a read which " + "should fail...");
+        DataNodeFaultInjector failureInjector = Mockito.mock(DataNodeFaultInjector.class);
+        Mockito.doAnswer(new Answer<Void>() {
+
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException("injected error into sendShmResponse");
+            }
+        }).when(failureInjector).sendShortCircuitShmResponse();
+        DataNodeFaultInjector prevInjector = DataNodeFaultInjector.instance;
+        DataNodeFaultInjector.instance = failureInjector;
+        try {
+            // The first read will try to allocate a shared memory segment and slot.
+            // The shared memory segment allocation will fail because of the failure
+            // injector.
+            DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+            Assert.fail("expected readFileBuffer to fail, but it succeeded.");
+        } catch (Throwable t) {
+            GenericTestUtils.assertExceptionContains("TCP reads were disabled for " + "testing, but we failed to do a non-TCP read.", t);
+        }
+        LOG.info("Clearing failure injector and performing another read...");
+        DataNodeFaultInjector.instance = prevInjector;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.getClient().getClientContext().getDomainSocketFactory().clearPathMap();
+        // The second read should succeed.
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testPreReceiptVerificationDfsClientCanDoScr_withUpgrade20() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testPreReceiptVerificationDfsClientCanDoScr", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        BlockReaderFactory.setFailureInjectorForTesting(new TestPreReceiptVerificationFailureInjector());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE2);
+        final Path TEST_PATH2 = new Path("/test_file2");
+        DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short) 1, 0xFADE2);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testPreReceiptVerificationDfsClientCanDoScr_withUpgrade40() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testPreReceiptVerificationDfsClientCanDoScr", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        BlockReaderFactory.setFailureInjectorForTesting(new TestPreReceiptVerificationFailureInjector());
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE2);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final Path TEST_PATH2 = new Path("/test_file2");
+        DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short) 1, 0xFADE2);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testPreReceiptVerificationDfsClientCanDoScr_withUpgrade60() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testPreReceiptVerificationDfsClientCanDoScr", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        BlockReaderFactory.setFailureInjectorForTesting(new TestPreReceiptVerificationFailureInjector());
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE2);
+        final Path TEST_PATH2 = new Path("/test_file2");
+        DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short) 1, 0xFADE2);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
+
+    @Test(timeout = 60000)
+    public void testPreReceiptVerificationDfsClientCanDoScr_withUpgrade80() throws Exception {
+        BlockReaderTestUtil.enableShortCircuitShmTracing();
+        TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
+        Configuration conf = createShortCircuitConf("testPreReceiptVerificationDfsClientCanDoScr", sockDir);
+        conf.setLong(HdfsClientConfigKeys.Read.ShortCircuit.STREAMS_CACHE_EXPIRY_MS_KEY, 1000000000L);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        DistributedFileSystem fs = cluster.getFileSystem();
+        BlockReaderFactory.setFailureInjectorForTesting(new TestPreReceiptVerificationFailureInjector());
+        final Path TEST_PATH1 = new Path("/test_file1");
+        DFSTestUtil.createFile(fs, TEST_PATH1, 4096, (short) 1, 0xFADE2);
+        final Path TEST_PATH2 = new Path("/test_file2");
+        DFSTestUtil.createFile(fs, TEST_PATH2, 4096, (short) 1, 0xFADE2);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH1);
+        DFSTestUtil.readFileBuffer(fs, TEST_PATH2);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        //  cluster.getDataNodes().get(0).getShortCircuitRegistry());
+        cluster.shutdown();
+        sockDir.close();
+    }
 }

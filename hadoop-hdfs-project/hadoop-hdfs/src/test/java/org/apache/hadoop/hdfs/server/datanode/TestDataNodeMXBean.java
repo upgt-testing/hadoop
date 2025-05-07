@@ -21,10 +21,8 @@ import java.lang.management.ManagementFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
 import com.google.common.base.Supplier;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,124 +35,472 @@ import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mortbay.util.ajax.JSON;
-
 import static org.junit.Assert.assertEquals;
 
 /**
  * Class for testing {@link DataNodeMXBean} implementation
  */
 public class TestDataNodeMXBean {
-  @Test
-  public void testDataNodeMXBean() throws Exception {
-    Configuration conf = new Configuration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
 
-    try {
-      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
-      Assert.assertEquals(datanodes.size(), 1);
-      DataNodeJVMInterface datanode = datanodes.get(0);
-
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
-      ObjectName mxbeanName = new ObjectName(
-          "Hadoop:service=DataNode,name=DataNodeInfo");
-      // get attribute "ClusterId"
-      String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
-      Assert.assertEquals(datanode.getClusterId(), clusterId);
-      // get attribute "Version"
-      String version = (String)mbs.getAttribute(mxbeanName, "Version");
-      Assert.assertEquals(datanode.getVersion(),version);
-      // get attribute "RpcPort"
-      String rpcPort = (String)mbs.getAttribute(mxbeanName, "RpcPort");
-      Assert.assertEquals(datanode.getRpcPort(),rpcPort);
-      // get attribute "HttpPort"
-      String httpPort = (String)mbs.getAttribute(mxbeanName, "HttpPort");
-      Assert.assertEquals(datanode.getHttpPort(),httpPort);
-      // get attribute "NamenodeAddresses"
-      String namenodeAddresses = (String)mbs.getAttribute(mxbeanName, 
-          "NamenodeAddresses");
-      Assert.assertEquals(datanode.getNamenodeAddresses(),namenodeAddresses);
-      // get attribute "getDatanodeHostname"
-      String datanodeHostname = (String)mbs.getAttribute(mxbeanName,
-          "DatanodeHostname");
-      Assert.assertEquals(datanode.getDatanodeHostname(),datanodeHostname);
-      // get attribute "getVolumeInfo"
-      String volumeInfo = (String)mbs.getAttribute(mxbeanName, "VolumeInfo");
-      Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()),
-          replaceDigits(volumeInfo));
-      // Ensure mxbean's XceiverCount is same as the DataNode's
-      // live value.
-      int xceiverCount = (Integer)mbs.getAttribute(mxbeanName,
-          "XceiverCount");
-      Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
-      // Ensure mxbean's XmitsInProgress is same as the DataNode's
-      // live value.
-      int xmitsInProgress =
-          (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
-      Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
-      String bpActorInfo = (String)mbs.getAttribute(mxbeanName,
-          "BPServiceActorInfo");
-      Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
-    } finally {
-      if (cluster != null) {cluster.shutdown();}
-    }
-  }
-  
-  private static String replaceDigits(final String s) {
-    return s.replaceAll("[0-9]+", "_DIGITS_");
-  }
-
-  @Test
-  public void testDataNodeMXBeanBlockCount() throws Exception {
-    Configuration conf = new Configuration();
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-
-    try {
-      List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
-      assertEquals(datanodes.size(), 1);
-
-      final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      final ObjectName mxbeanName =
-              new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
-      FileSystem fs = cluster.getFileSystem();
-      for (int i = 0; i < 5; i++) {
-        DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1,
-                1L);
-      }
-      assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
-      cluster.restartDataNode(0);
-      cluster.waitActive();
-      assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
-      fs.delete(new Path("/tmp.txt1"), true);
-      // The total numBlocks should be updated after one file is deleted
-      GenericTestUtils.waitFor(new Supplier<Boolean>() {
-        @Override
-        public Boolean get() {
-          try {
-            return getTotalNumBlocks(mbs, mxbeanName) == 4;
-          } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-          }
+    @Test
+    public void testDataNodeMXBean() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            Assert.assertEquals(datanodes.size(), 1);
+            DataNodeJVMInterface datanode = datanodes.get(0);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            // get attribute "ClusterId"
+            String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
+            Assert.assertEquals(datanode.getClusterId(), clusterId);
+            // get attribute "Version"
+            String version = (String) mbs.getAttribute(mxbeanName, "Version");
+            Assert.assertEquals(datanode.getVersion(), version);
+            // get attribute "RpcPort"
+            String rpcPort = (String) mbs.getAttribute(mxbeanName, "RpcPort");
+            Assert.assertEquals(datanode.getRpcPort(), rpcPort);
+            // get attribute "HttpPort"
+            String httpPort = (String) mbs.getAttribute(mxbeanName, "HttpPort");
+            Assert.assertEquals(datanode.getHttpPort(), httpPort);
+            // get attribute "NamenodeAddresses"
+            String namenodeAddresses = (String) mbs.getAttribute(mxbeanName, "NamenodeAddresses");
+            Assert.assertEquals(datanode.getNamenodeAddresses(), namenodeAddresses);
+            // get attribute "getDatanodeHostname"
+            String datanodeHostname = (String) mbs.getAttribute(mxbeanName, "DatanodeHostname");
+            Assert.assertEquals(datanode.getDatanodeHostname(), datanodeHostname);
+            // get attribute "getVolumeInfo"
+            String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+            Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()), replaceDigits(volumeInfo));
+            // Ensure mxbean's XceiverCount is same as the DataNode's
+            // live value.
+            int xceiverCount = (Integer) mbs.getAttribute(mxbeanName, "XceiverCount");
+            Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
+            // Ensure mxbean's XmitsInProgress is same as the DataNode's
+            // live value.
+            int xmitsInProgress = (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
+            Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
+            String bpActorInfo = (String) mbs.getAttribute(mxbeanName, "BPServiceActorInfo");
+            Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-      }, 100, 30000);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
 
-  @SuppressWarnings("unchecked")
-  private int getTotalNumBlocks(MBeanServer mbs, ObjectName mxbeanName)
-          throws Exception {
-    int totalBlocks = 0;
-    String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
-    Map<?, ?> m = (Map<?, ?>) JSON.parse(volumeInfo);
-    Collection<Map<String, Long>> values =
-            (Collection<Map<String, Long>>) m.values();
-    for (Map<String, Long> volumeInfoMap : values) {
-      totalBlocks += volumeInfoMap.get("numBlocks");
+    private static String replaceDigits(final String s) {
+        return s.replaceAll("[0-9]+", "_DIGITS_");
     }
-    return totalBlocks;
-  }
+
+    @Test
+    public void testDataNodeMXBeanBlockCount() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            assertEquals(datanodes.size(), 1);
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            final ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            FileSystem fs = cluster.getFileSystem();
+            for (int i = 0; i < 5; i++) {
+                DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1, 1L);
+            }
+            assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            cluster.restartDataNode(0);
+            cluster.waitActive();
+            assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            fs.delete(new Path("/tmp.txt1"), true);
+            // The total numBlocks should be updated after one file is deleted
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return getTotalNumBlocks(mbs, mxbeanName) == 4;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 100, 30000);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private int getTotalNumBlocks(MBeanServer mbs, ObjectName mxbeanName) throws Exception {
+        int totalBlocks = 0;
+        String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+        Map<?, ?> m = (Map<?, ?>) JSON.parse(volumeInfo);
+        Collection<Map<String, Long>> values = (Collection<Map<String, Long>>) m.values();
+        for (Map<String, Long> volumeInfoMap : values) {
+            totalBlocks += volumeInfoMap.get("numBlocks");
+        }
+        return totalBlocks;
+    }
+
+    @Test
+    public void testDataNodeMXBean_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            Assert.assertEquals(datanodes.size(), 1);
+            DataNodeJVMInterface datanode = datanodes.get(0);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // get attribute "ClusterId"
+            String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
+            Assert.assertEquals(datanode.getClusterId(), clusterId);
+            // get attribute "Version"
+            String version = (String) mbs.getAttribute(mxbeanName, "Version");
+            Assert.assertEquals(datanode.getVersion(), version);
+            // get attribute "RpcPort"
+            String rpcPort = (String) mbs.getAttribute(mxbeanName, "RpcPort");
+            Assert.assertEquals(datanode.getRpcPort(), rpcPort);
+            // get attribute "HttpPort"
+            String httpPort = (String) mbs.getAttribute(mxbeanName, "HttpPort");
+            Assert.assertEquals(datanode.getHttpPort(), httpPort);
+            // get attribute "NamenodeAddresses"
+            String namenodeAddresses = (String) mbs.getAttribute(mxbeanName, "NamenodeAddresses");
+            Assert.assertEquals(datanode.getNamenodeAddresses(), namenodeAddresses);
+            // get attribute "getDatanodeHostname"
+            String datanodeHostname = (String) mbs.getAttribute(mxbeanName, "DatanodeHostname");
+            Assert.assertEquals(datanode.getDatanodeHostname(), datanodeHostname);
+            // get attribute "getVolumeInfo"
+            String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+            Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()), replaceDigits(volumeInfo));
+            // Ensure mxbean's XceiverCount is same as the DataNode's
+            // live value.
+            int xceiverCount = (Integer) mbs.getAttribute(mxbeanName, "XceiverCount");
+            Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
+            // Ensure mxbean's XmitsInProgress is same as the DataNode's
+            // live value.
+            int xmitsInProgress = (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
+            Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
+            String bpActorInfo = (String) mbs.getAttribute(mxbeanName, "BPServiceActorInfo");
+            Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBean_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            Assert.assertEquals(datanodes.size(), 1);
+            DataNodeJVMInterface datanode = datanodes.get(0);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            // get attribute "ClusterId"
+            String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
+            Assert.assertEquals(datanode.getClusterId(), clusterId);
+            // get attribute "Version"
+            String version = (String) mbs.getAttribute(mxbeanName, "Version");
+            Assert.assertEquals(datanode.getVersion(), version);
+            // get attribute "RpcPort"
+            String rpcPort = (String) mbs.getAttribute(mxbeanName, "RpcPort");
+            Assert.assertEquals(datanode.getRpcPort(), rpcPort);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // get attribute "HttpPort"
+            String httpPort = (String) mbs.getAttribute(mxbeanName, "HttpPort");
+            Assert.assertEquals(datanode.getHttpPort(), httpPort);
+            // get attribute "NamenodeAddresses"
+            String namenodeAddresses = (String) mbs.getAttribute(mxbeanName, "NamenodeAddresses");
+            Assert.assertEquals(datanode.getNamenodeAddresses(), namenodeAddresses);
+            // get attribute "getDatanodeHostname"
+            String datanodeHostname = (String) mbs.getAttribute(mxbeanName, "DatanodeHostname");
+            Assert.assertEquals(datanode.getDatanodeHostname(), datanodeHostname);
+            // get attribute "getVolumeInfo"
+            String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+            Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()), replaceDigits(volumeInfo));
+            // Ensure mxbean's XceiverCount is same as the DataNode's
+            // live value.
+            int xceiverCount = (Integer) mbs.getAttribute(mxbeanName, "XceiverCount");
+            Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
+            // Ensure mxbean's XmitsInProgress is same as the DataNode's
+            // live value.
+            int xmitsInProgress = (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
+            Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
+            String bpActorInfo = (String) mbs.getAttribute(mxbeanName, "BPServiceActorInfo");
+            Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBean_withUpgrade60() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            Assert.assertEquals(datanodes.size(), 1);
+            DataNodeJVMInterface datanode = datanodes.get(0);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            // get attribute "ClusterId"
+            String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
+            Assert.assertEquals(datanode.getClusterId(), clusterId);
+            // get attribute "Version"
+            String version = (String) mbs.getAttribute(mxbeanName, "Version");
+            Assert.assertEquals(datanode.getVersion(), version);
+            // get attribute "RpcPort"
+            String rpcPort = (String) mbs.getAttribute(mxbeanName, "RpcPort");
+            Assert.assertEquals(datanode.getRpcPort(), rpcPort);
+            // get attribute "HttpPort"
+            String httpPort = (String) mbs.getAttribute(mxbeanName, "HttpPort");
+            Assert.assertEquals(datanode.getHttpPort(), httpPort);
+            // get attribute "NamenodeAddresses"
+            String namenodeAddresses = (String) mbs.getAttribute(mxbeanName, "NamenodeAddresses");
+            Assert.assertEquals(datanode.getNamenodeAddresses(), namenodeAddresses);
+            // get attribute "getDatanodeHostname"
+            String datanodeHostname = (String) mbs.getAttribute(mxbeanName, "DatanodeHostname");
+            Assert.assertEquals(datanode.getDatanodeHostname(), datanodeHostname);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // get attribute "getVolumeInfo"
+            String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+            Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()), replaceDigits(volumeInfo));
+            // Ensure mxbean's XceiverCount is same as the DataNode's
+            // live value.
+            int xceiverCount = (Integer) mbs.getAttribute(mxbeanName, "XceiverCount");
+            Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
+            // Ensure mxbean's XmitsInProgress is same as the DataNode's
+            // live value.
+            int xmitsInProgress = (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
+            Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
+            String bpActorInfo = (String) mbs.getAttribute(mxbeanName, "BPServiceActorInfo");
+            Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBean_withUpgrade80() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            Assert.assertEquals(datanodes.size(), 1);
+            DataNodeJVMInterface datanode = datanodes.get(0);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            // get attribute "ClusterId"
+            String clusterId = (String) mbs.getAttribute(mxbeanName, "ClusterId");
+            Assert.assertEquals(datanode.getClusterId(), clusterId);
+            // get attribute "Version"
+            String version = (String) mbs.getAttribute(mxbeanName, "Version");
+            Assert.assertEquals(datanode.getVersion(), version);
+            // get attribute "RpcPort"
+            String rpcPort = (String) mbs.getAttribute(mxbeanName, "RpcPort");
+            Assert.assertEquals(datanode.getRpcPort(), rpcPort);
+            // get attribute "HttpPort"
+            String httpPort = (String) mbs.getAttribute(mxbeanName, "HttpPort");
+            Assert.assertEquals(datanode.getHttpPort(), httpPort);
+            // get attribute "NamenodeAddresses"
+            String namenodeAddresses = (String) mbs.getAttribute(mxbeanName, "NamenodeAddresses");
+            Assert.assertEquals(datanode.getNamenodeAddresses(), namenodeAddresses);
+            // get attribute "getDatanodeHostname"
+            String datanodeHostname = (String) mbs.getAttribute(mxbeanName, "DatanodeHostname");
+            Assert.assertEquals(datanode.getDatanodeHostname(), datanodeHostname);
+            // get attribute "getVolumeInfo"
+            String volumeInfo = (String) mbs.getAttribute(mxbeanName, "VolumeInfo");
+            Assert.assertEquals(replaceDigits(datanode.getVolumeInfo()), replaceDigits(volumeInfo));
+            // Ensure mxbean's XceiverCount is same as the DataNode's
+            // live value.
+            int xceiverCount = (Integer) mbs.getAttribute(mxbeanName, "XceiverCount");
+            Assert.assertEquals(datanode.getXceiverCount(), xceiverCount);
+            // Ensure mxbean's XmitsInProgress is same as the DataNode's
+            // live value.
+            int xmitsInProgress = (Integer) mbs.getAttribute(mxbeanName, "XmitsInProgress");
+            Assert.assertEquals(datanode.getXmitsInProgress(), xmitsInProgress);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            String bpActorInfo = (String) mbs.getAttribute(mxbeanName, "BPServiceActorInfo");
+            Assert.assertEquals(datanode.getBPServiceActorInfo(), bpActorInfo);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBeanBlockCount_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            assertEquals(datanodes.size(), 1);
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            final ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            FileSystem fs = cluster.getFileSystem();
+            for (int i = 0; i < 5; i++) {
+                DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1, 1L);
+            }
+            assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            cluster.restartDataNode(0);
+            cluster.waitActive();
+            assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            fs.delete(new Path("/tmp.txt1"), true);
+            // The total numBlocks should be updated after one file is deleted
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return getTotalNumBlocks(mbs, mxbeanName) == 4;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 100, 30000);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBeanBlockCount_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            assertEquals(datanodes.size(), 1);
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            final ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            FileSystem fs = cluster.getFileSystem();
+            for (int i = 0; i < 5; i++) {
+                DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1, 1L);
+            }
+            assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.restartDataNode(0);
+            cluster.waitActive();
+            assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            fs.delete(new Path("/tmp.txt1"), true);
+            // The total numBlocks should be updated after one file is deleted
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return getTotalNumBlocks(mbs, mxbeanName) == 4;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 100, 30000);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBeanBlockCount_withUpgrade60() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            assertEquals(datanodes.size(), 1);
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            final ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            FileSystem fs = cluster.getFileSystem();
+            for (int i = 0; i < 5; i++) {
+                DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1, 1L);
+            }
+            assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            cluster.restartDataNode(0);
+            cluster.waitActive();
+            assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            fs.delete(new Path("/tmp.txt1"), true);
+            // The total numBlocks should be updated after one file is deleted
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return getTotalNumBlocks(mbs, mxbeanName) == 4;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 100, 30000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testDataNodeMXBeanBlockCount_withUpgrade80() throws Exception {
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            List<DataNodeJVMInterface> datanodes = cluster.getDataNodes();
+            assertEquals(datanodes.size(), 1);
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            final ObjectName mxbeanName = new ObjectName("Hadoop:service=DataNode,name=DataNodeInfo");
+            FileSystem fs = cluster.getFileSystem();
+            for (int i = 0; i < 5; i++) {
+                DFSTestUtil.createFile(fs, new Path("/tmp.txt" + i), 1024, (short) 1, 1L);
+            }
+            assertEquals("Before restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            cluster.restartDataNode(0);
+            cluster.waitActive();
+            assertEquals("After restart DN", 5, getTotalNumBlocks(mbs, mxbeanName));
+            fs.delete(new Path("/tmp.txt1"), true);
+            // The total numBlocks should be updated after one file is deleted
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return getTotalNumBlocks(mbs, mxbeanName) == 4;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        cluster.restartNodeForTesting(0);
+                        cluster.upgradeNodeForTesting(0);
+                        return false;
+                    }
+                }
+            }, 100, 30000);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 }

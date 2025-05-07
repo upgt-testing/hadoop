@@ -19,11 +19,8 @@ package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import java.io.IOException;
 import java.util.EnumSet;
-
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
-
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -46,159 +43,145 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestOpenFilesWithSnapshot {
-  private final Configuration conf = new Configuration();
-  MiniDFSClusterInJVM cluster = null;
-  DistributedFileSystem fs = null;
 
-  @Before
-  public void setup() throws IOException {
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-    conf.set("dfs.blocksize", "1048576");
-    fs = cluster.getFileSystem();
-  }
+    private final Configuration conf = new Configuration();
 
-  @After
-  public void teardown() throws IOException {
-    if (fs != null) {
-      fs.close();
-      fs = null;
-    }
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    MiniDFSClusterInJVM cluster = null;
+
+    DistributedFileSystem fs = null;
+
+    @Before
+    public void setup() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+        conf.set("dfs.blocksize", "1048576");
+        fs = cluster.getFileSystem();
     }
 
-  }
-
-  @Test
-  public void testUCFileDeleteWithSnapShot() throws Exception {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
-
-    // delete files separately
-    fs.delete(new Path("/test/test/test2"), true);
-    fs.delete(new Path("/test/test/test3"), true);
-    restartNameNode();
-  }
-
-  @Test
-  public void testParentDirWithUCFileDeleteWithSnapShot() throws Exception {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
-
-    // delete parent directory
-    fs.delete(new Path("/test/test"), true);
-    restartNameNode();
-  }
-
-  @Test
-  public void testWithCheckpoint() throws Exception {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
-    fs.delete(new Path("/test/test"), true);
-    restartNameNode();
-    
-    // read snapshot file after restart
-    String test2snapshotPath = Snapshot.getSnapshotPath(path.toString(),
-        "s1/test/test2");
-    DFSTestUtil.readFile(fs, new Path(test2snapshotPath));
-    String test3snapshotPath = Snapshot.getSnapshotPath(path.toString(),
-        "s1/test/test3");
-    DFSTestUtil.readFile(fs, new Path(test3snapshotPath));
-  }
-
-  @Test
-  public void testFilesDeletionWithCheckpoint() throws Exception {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
-    fs.delete(new Path("/test/test/test2"), true);
-    fs.delete(new Path("/test/test/test3"), true);
-    restartNameNode();
-    
-    // read snapshot file after restart
-    String test2snapshotPath = Snapshot.getSnapshotPath(path.toString(),
-        "s1/test/test2");
-    DFSTestUtil.readFile(fs, new Path(test2snapshotPath));
-    String test3snapshotPath = Snapshot.getSnapshotPath(path.toString(),
-        "s1/test/test3");
-    DFSTestUtil.readFile(fs, new Path(test3snapshotPath));
-  }
-
-  private void doWriteAndAbort(DistributedFileSystem fs, Path path)
-      throws IOException {
-    fs.mkdirs(path);
-    fs.allowSnapshot(path);
-    DFSTestUtil
-        .createFile(fs, new Path("/test/test1"), 100, (short) 2, 100024L);
-    DFSTestUtil
-        .createFile(fs, new Path("/test/test2"), 100, (short) 2, 100024L);
-    Path file = new Path("/test/test/test2");
-    FSDataOutputStream out = fs.create(file);
-    for (int i = 0; i < 2; i++) {
-      long count = 0;
-      while (count < 1048576) {
-        out.writeBytes("hell");
-        count += 4;
-      }
+    @After
+    public void teardown() throws IOException {
+        if (fs != null) {
+            fs.close();
+            fs = null;
+        }
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-    ((DFSOutputStream) out.getWrappedStream()).hsync(EnumSet
-        .of(SyncFlag.UPDATE_LENGTH));
-    DFSTestUtil.abortStream((DFSOutputStream) out.getWrappedStream());
-    Path file2 = new Path("/test/test/test3");
-    FSDataOutputStream out2 = fs.create(file2);
-    for (int i = 0; i < 2; i++) {
-      long count = 0;
-      while (count < 1048576) {
-        out2.writeBytes("hell");
-        count += 4;
-      }
+
+    @Test
+    public void testUCFileDeleteWithSnapShot() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // delete files separately
+        fs.delete(new Path("/test/test/test2"), true);
+        fs.delete(new Path("/test/test/test3"), true);
+        restartNameNode();
     }
-    ((DFSOutputStream) out2.getWrappedStream()).hsync(EnumSet
-        .of(SyncFlag.UPDATE_LENGTH));
-    DFSTestUtil.abortStream((DFSOutputStream) out2.getWrappedStream());
-    fs.createSnapshot(path, "s1");
-  }
 
-  @Test
-  public void testOpenFilesWithMultipleSnapshots() throws Exception {
-    doTestMultipleSnapshots(true);
-  }
-
-  @Test
-  public void testOpenFilesWithMultipleSnapshotsWithoutCheckpoint()
-      throws Exception {
-    doTestMultipleSnapshots(false);
-  }
-
-  private void doTestMultipleSnapshots(boolean saveNamespace)
-      throws IOException {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
-    fs.createSnapshot(path, "s2");
-    fs.delete(new Path("/test/test"), true);
-    fs.deleteSnapshot(path, "s2");
-    cluster.triggerBlockReports();
-    if (saveNamespace) {
-      NameNodeJVMInterface nameNode = cluster.getNameNode();
-      NameNodeAdapter.enterSafeMode(nameNode, false);
-      NameNodeAdapter.saveNamespace(nameNode);
-      NameNodeAdapter.leaveSafeMode(nameNode);
+    @Test
+    public void testParentDirWithUCFileDeleteWithSnapShot() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // delete parent directory
+        fs.delete(new Path("/test/test"), true);
+        restartNameNode();
     }
-    cluster.restartNameNode(true);
-  }
-  
-  @Test
-  public void testOpenFilesWithRename() throws Exception {
-    Path path = new Path("/test");
-    doWriteAndAbort(fs, path);
 
-    // check for zero sized blocks
-    Path fileWithEmptyBlock = new Path("/test/test/test4");
-    fs.create(fileWithEmptyBlock);
-    NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
-    String clientName = fs.getClient().getClientName();
-    // create one empty block
-    /*
+    @Test
+    public void testWithCheckpoint() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        fs.delete(new Path("/test/test"), true);
+        restartNameNode();
+        // read snapshot file after restart
+        String test2snapshotPath = Snapshot.getSnapshotPath(path.toString(), "s1/test/test2");
+        DFSTestUtil.readFile(fs, new Path(test2snapshotPath));
+        String test3snapshotPath = Snapshot.getSnapshotPath(path.toString(), "s1/test/test3");
+        DFSTestUtil.readFile(fs, new Path(test3snapshotPath));
+    }
+
+    @Test
+    public void testFilesDeletionWithCheckpoint() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        fs.delete(new Path("/test/test/test2"), true);
+        fs.delete(new Path("/test/test/test3"), true);
+        restartNameNode();
+        // read snapshot file after restart
+        String test2snapshotPath = Snapshot.getSnapshotPath(path.toString(), "s1/test/test2");
+        DFSTestUtil.readFile(fs, new Path(test2snapshotPath));
+        String test3snapshotPath = Snapshot.getSnapshotPath(path.toString(), "s1/test/test3");
+        DFSTestUtil.readFile(fs, new Path(test3snapshotPath));
+    }
+
+    private void doWriteAndAbort(DistributedFileSystem fs, Path path) throws IOException {
+        fs.mkdirs(path);
+        fs.allowSnapshot(path);
+        DFSTestUtil.createFile(fs, new Path("/test/test1"), 100, (short) 2, 100024L);
+        DFSTestUtil.createFile(fs, new Path("/test/test2"), 100, (short) 2, 100024L);
+        Path file = new Path("/test/test/test2");
+        FSDataOutputStream out = fs.create(file);
+        for (int i = 0; i < 2; i++) {
+            long count = 0;
+            while (count < 1048576) {
+                out.writeBytes("hell");
+                count += 4;
+            }
+        }
+        ((DFSOutputStream) out.getWrappedStream()).hsync(EnumSet.of(SyncFlag.UPDATE_LENGTH));
+        DFSTestUtil.abortStream((DFSOutputStream) out.getWrappedStream());
+        Path file2 = new Path("/test/test/test3");
+        FSDataOutputStream out2 = fs.create(file2);
+        for (int i = 0; i < 2; i++) {
+            long count = 0;
+            while (count < 1048576) {
+                out2.writeBytes("hell");
+                count += 4;
+            }
+        }
+        ((DFSOutputStream) out2.getWrappedStream()).hsync(EnumSet.of(SyncFlag.UPDATE_LENGTH));
+        DFSTestUtil.abortStream((DFSOutputStream) out2.getWrappedStream());
+        fs.createSnapshot(path, "s1");
+    }
+
+    @Test
+    public void testOpenFilesWithMultipleSnapshots() throws Exception {
+        doTestMultipleSnapshots(true);
+    }
+
+    @Test
+    public void testOpenFilesWithMultipleSnapshotsWithoutCheckpoint() throws Exception {
+        doTestMultipleSnapshots(false);
+    }
+
+    private void doTestMultipleSnapshots(boolean saveNamespace) throws IOException {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        fs.createSnapshot(path, "s2");
+        fs.delete(new Path("/test/test"), true);
+        fs.deleteSnapshot(path, "s2");
+        cluster.triggerBlockReports();
+        if (saveNamespace) {
+            NameNodeJVMInterface nameNode = cluster.getNameNode();
+            NameNodeAdapter.enterSafeMode(nameNode, false);
+            NameNodeAdapter.saveNamespace(nameNode);
+            NameNodeAdapter.leaveSafeMode(nameNode);
+        }
+        cluster.restartNameNode(true);
+    }
+
+    @Test
+    public void testOpenFilesWithRename() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // check for zero sized blocks
+        Path fileWithEmptyBlock = new Path("/test/test/test4");
+        fs.create(fileWithEmptyBlock);
+        NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
+        String clientName = fs.getClient().getClientName();
+        // create one empty block
+        /*
     nameNodeRpc.addBlock(fileWithEmptyBlock.toString(), clientName, null, null,
         HdfsConstants.GRANDFATHER_INODE_ID, null, null);
     fs.createSnapshot(path, "s2");
@@ -208,14 +191,66 @@ public class TestOpenFilesWithSnapshot {
     restartNameNode();
     }
      */
-  }
+    }
 
-  private void restartNameNode() throws Exception {
-    cluster.triggerBlockReports();
-    NameNodeJVMInterface nameNode = cluster.getNameNode();
-    NameNodeAdapter.enterSafeMode(nameNode, false);
-    NameNodeAdapter.saveNamespace(nameNode);
-    NameNodeAdapter.leaveSafeMode(nameNode);
-    cluster.restartNameNode(true);
-  }
+    private void restartNameNode() throws Exception {
+        cluster.triggerBlockReports();
+        NameNodeJVMInterface nameNode = cluster.getNameNode();
+        NameNodeAdapter.enterSafeMode(nameNode, false);
+        NameNodeAdapter.saveNamespace(nameNode);
+        NameNodeAdapter.leaveSafeMode(nameNode);
+        cluster.restartNameNode(true);
+    }
+
+    @Test
+    public void testOpenFilesWithRename_withUpgrade20() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // check for zero sized blocks
+        Path fileWithEmptyBlock = new Path("/test/test/test4");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.create(fileWithEmptyBlock);
+        NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
+        String clientName = fs.getClient().getClientName();
+    }
+
+    @Test
+    public void testOpenFilesWithRename_withUpgrade40() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // check for zero sized blocks
+        Path fileWithEmptyBlock = new Path("/test/test/test4");
+        fs.create(fileWithEmptyBlock);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
+        String clientName = fs.getClient().getClientName();
+    }
+
+    @Test
+    public void testOpenFilesWithRename_withUpgrade60() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // check for zero sized blocks
+        Path fileWithEmptyBlock = new Path("/test/test/test4");
+        fs.create(fileWithEmptyBlock);
+        NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String clientName = fs.getClient().getClientName();
+    }
+
+    @Test
+    public void testOpenFilesWithRename_withUpgrade80() throws Exception {
+        Path path = new Path("/test");
+        doWriteAndAbort(fs, path);
+        // check for zero sized blocks
+        Path fileWithEmptyBlock = new Path("/test/test/test4");
+        fs.create(fileWithEmptyBlock);
+        NamenodeProtocolsJVMInterface nameNodeRpc = cluster.getNameNodeRpc();
+        String clientName = fs.getClient().getClientName();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }

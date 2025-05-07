@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -45,86 +44,236 @@ import java.io.IOException;
  * 2. The given path is a snapshot path
  */
 public class TestGetContentSummaryWithSnapshot {
-  protected static final short REPLICATION = 3;
-  protected static final long BLOCKSIZE = 1024;
 
-  protected Configuration conf;
-  protected MiniDFSClusterInJVM cluster;
-  protected FSNamesystemJVMInterface fsn;
-  protected FSDirectoryJVMInterface fsdir;
-  protected DistributedFileSystem dfs;
+    protected static final short REPLICATION = 3;
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+    protected static final long BLOCKSIZE = 1024;
 
-  @Before
-  public void setUp() throws Exception {
-    conf = new Configuration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
-    cluster.waitActive();
+    protected Configuration conf;
 
-    fsn = cluster.getNamesystem();
-    fsdir = fsn.getFSDirectory();
-    dfs = cluster.getFileSystem();
-  }
+    protected MiniDFSClusterInJVM cluster;
 
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    protected FSNamesystemJVMInterface fsn;
+
+    protected FSDirectoryJVMInterface fsdir;
+
+    protected DistributedFileSystem dfs;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Before
+    public void setUp() throws Exception {
+        conf = new Configuration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
+        cluster.waitActive();
+        fsn = cluster.getNamesystem();
+        fsdir = fsn.getFSDirectory();
+        dfs = cluster.getFileSystem();
     }
-  }
 
-  /**
-   * Calculate against a snapshot path.
-   * 1. create dirs /foo/bar
-   * 2. take snapshot s1 on /foo
-   * 3. create a 10 byte file /foo/bar/baz
-   * Make sure for "/foo/bar" and "/foo/.snapshot/s1/bar" have correct results:
-   * the 1 byte file is not included in snapshot s1.
-   */
-  @Test
-  public void testGetContentSummary() throws IOException {
-    final Path foo = new Path("/foo");
-    final Path bar = new Path(foo, "bar");
-    final Path baz = new Path(bar, "baz");
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-    dfs.mkdirs(bar);
-    dfs.allowSnapshot(foo);
-    dfs.createSnapshot(foo, "s1");
+    /**
+     * Calculate against a snapshot path.
+     * 1. create dirs /foo/bar
+     * 2. take snapshot s1 on /foo
+     * 3. create a 10 byte file /foo/bar/baz
+     * Make sure for "/foo/bar" and "/foo/.snapshot/s1/bar" have correct results:
+     * the 1 byte file is not included in snapshot s1.
+     */
+    @Test
+    public void testGetContentSummary() throws IOException {
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path baz = new Path(bar, "baz");
+        dfs.mkdirs(bar);
+        dfs.allowSnapshot(foo);
+        dfs.createSnapshot(foo, "s1");
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        // also check /foo and /foo/.snapshot/s1
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        try {
+            cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
+            Assert.fail("should get FileNotFoundException");
+        } catch (FileNotFoundException ignored) {
+        }
+    }
 
-    DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+    @Test
+    public void testGetContentSummary_withUpgrade20() throws IOException {
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path baz = new Path(bar, "baz");
+        dfs.mkdirs(bar);
+        dfs.allowSnapshot(foo);
+        dfs.createSnapshot(foo, "s1");
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        // also check /foo and /foo/.snapshot/s1
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        try {
+            cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
+            Assert.fail("should get FileNotFoundException");
+        } catch (FileNotFoundException ignored) {
+        }
+    }
 
-    ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(
-        bar.toString());
-    Assert.assertEquals(1, summary.getDirectoryCount());
-    Assert.assertEquals(1, summary.getFileCount());
-    Assert.assertEquals(10, summary.getLength());
+    @Test
+    public void testGetContentSummary_withUpgrade40() throws IOException {
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path baz = new Path(bar, "baz");
+        dfs.mkdirs(bar);
+        dfs.allowSnapshot(foo);
+        dfs.createSnapshot(foo, "s1");
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        // also check /foo and /foo/.snapshot/s1
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        try {
+            cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
+            Assert.fail("should get FileNotFoundException");
+        } catch (FileNotFoundException ignored) {
+        }
+    }
 
-    final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
-    summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
-    Assert.assertEquals(1, summary.getDirectoryCount());
-    Assert.assertEquals(0, summary.getFileCount());
-    Assert.assertEquals(0, summary.getLength());
+    @Test
+    public void testGetContentSummary_withUpgrade60() throws IOException {
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path baz = new Path(bar, "baz");
+        dfs.mkdirs(bar);
+        dfs.allowSnapshot(foo);
+        dfs.createSnapshot(foo, "s1");
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        // also check /foo and /foo/.snapshot/s1
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        try {
+            cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
+            Assert.fail("should get FileNotFoundException");
+        } catch (FileNotFoundException ignored) {
+        }
+    }
 
-    // also check /foo and /foo/.snapshot/s1
-    summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
-    Assert.assertEquals(2, summary.getDirectoryCount());
-    Assert.assertEquals(1, summary.getFileCount());
-    Assert.assertEquals(10, summary.getLength());
-
-    final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
-    summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
-    Assert.assertEquals(2, summary.getDirectoryCount());
-    Assert.assertEquals(0, summary.getFileCount());
-    Assert.assertEquals(0, summary.getLength());
-
-    final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
-    try {
-      cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
-      Assert.fail("should get FileNotFoundException");
-    } catch (FileNotFoundException ignored) {}
-  }
+    @Test
+    public void testGetContentSummary_withUpgrade80() throws IOException {
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path baz = new Path(bar, "baz");
+        dfs.mkdirs(bar);
+        dfs.allowSnapshot(foo);
+        dfs.createSnapshot(foo, "s1");
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary = cluster.getNameNodeRpc().getContentSummary(bar.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path barS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar");
+        summary = cluster.getNameNodeRpc().getContentSummary(barS1.toString());
+        Assert.assertEquals(1, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        // also check /foo and /foo/.snapshot/s1
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(10, summary.getLength());
+        final Path fooS1 = SnapshotTestHelper.getSnapshotRoot(foo, "s1");
+        summary = cluster.getNameNodeRpc().getContentSummary(fooS1.toString());
+        Assert.assertEquals(2, summary.getDirectoryCount());
+        Assert.assertEquals(0, summary.getFileCount());
+        Assert.assertEquals(0, summary.getLength());
+        final Path bazS1 = SnapshotTestHelper.getSnapshotPath(foo, "s1", "bar/baz");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            cluster.getNameNodeRpc().getContentSummary(bazS1.toString());
+            Assert.fail("should get FileNotFoundException");
+        } catch (FileNotFoundException ignored) {
+        }
+    }
 }

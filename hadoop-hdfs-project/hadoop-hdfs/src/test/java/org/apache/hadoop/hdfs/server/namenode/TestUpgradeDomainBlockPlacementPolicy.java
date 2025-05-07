@@ -18,11 +18,9 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
@@ -54,7 +52,6 @@ import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import com.google.common.base.Supplier;
 
 /**
@@ -63,198 +60,181 @@ import com.google.common.base.Supplier;
  * config file and put some nodes to decommission state.
  * The test then verifies replicas are placed on the nodes that
  * satisfy the upgrade domain policy.
- *
  */
 public class TestUpgradeDomainBlockPlacementPolicy {
 
-  private static final short REPLICATION_FACTOR = (short) 3;
-  private static final int DEFAULT_BLOCK_SIZE = 1024;
-  static final String[] racks =
-      { "/RACK1", "/RACK1", "/RACK1", "/RACK2", "/RACK2", "/RACK2" };
-  /**
-   *  Use host names that can be resolved (
-   *  InetSocketAddress#isUnresolved == false). Otherwise,
-   *  CombinedHostFileManager won't allow those hosts.
-   */
-  static final String[] hosts =
-      {"127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1",
-          "127.0.0.1", "127.0.0.1"};
-  static final String[] upgradeDomains =
-      {"ud5", "ud2", "ud3", "ud1", "ud2", "ud4"};
-  static final Set<DatanodeIDJVMInterface> expectedDatanodeIDs = new HashSet<>();
-  private MiniDFSClusterInJVM cluster = null;
-  private NamenodeProtocolsJVMInterface nameNodeRpc = null;
-  private FSNamesystemJVMInterface namesystem = null;
-  private PermissionStatus perm = null;
-  private HostsFileWriter hostsFileWriter = new HostsFileWriter();
+    private static final short REPLICATION_FACTOR = (short) 3;
 
-  @Before
-  public void setup() throws IOException {
-    StaticMapping.resetMap();
-    Configuration conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
-    conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, DEFAULT_BLOCK_SIZE / 2);
-    conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY,
-            BlockPlacementPolicyWithUpgradeDomain.class,
-            BlockPlacementPolicy.class);
-    conf.setClass(DFSConfigKeys.DFS_NAMENODE_HOSTS_PROVIDER_CLASSNAME_KEY,
-            CombinedHostFileManager.class, HostConfigManager.class);
-    hostsFileWriter.initialize(conf, "temp/upgradedomainpolicy");
+    private static final int DEFAULT_BLOCK_SIZE = 1024;
 
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(6).racks(racks)
-        .hosts(hosts).build();
-    cluster.waitActive();
-    nameNodeRpc = cluster.getNameNodeRpc();
-    namesystem = cluster.getNamesystem();
-    perm = new PermissionStatus("TestDefaultBlockPlacementPolicy", null,
-        FsPermission.getDefault());
-    refreshDatanodeAdminProperties();
-  }
+    static final String[] racks = { "/RACK1", "/RACK1", "/RACK1", "/RACK2", "/RACK2", "/RACK2" };
 
-  @After
-  public void teardown() throws IOException {
-    hostsFileWriter.cleanup();
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    /**
+     *  Use host names that can be resolved (
+     *  InetSocketAddress#isUnresolved == false). Otherwise,
+     *  CombinedHostFileManager won't allow those hosts.
+     */
+    static final String[] hosts = { "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1" };
+
+    static final String[] upgradeDomains = { "ud5", "ud2", "ud3", "ud1", "ud2", "ud4" };
+
+    static final Set<DatanodeIDJVMInterface> expectedDatanodeIDs = new HashSet<>();
+
+    private MiniDFSClusterInJVM cluster = null;
+
+    private NamenodeProtocolsJVMInterface nameNodeRpc = null;
+
+    private FSNamesystemJVMInterface namesystem = null;
+
+    private PermissionStatus perm = null;
+
+    private HostsFileWriter hostsFileWriter = new HostsFileWriter();
+
+    @Before
+    public void setup() throws IOException {
+        StaticMapping.resetMap();
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, DEFAULT_BLOCK_SIZE / 2);
+        conf.setClass(DFSConfigKeys.DFS_BLOCK_REPLICATOR_CLASSNAME_KEY, BlockPlacementPolicyWithUpgradeDomain.class, BlockPlacementPolicy.class);
+        conf.setClass(DFSConfigKeys.DFS_NAMENODE_HOSTS_PROVIDER_CLASSNAME_KEY, CombinedHostFileManager.class, HostConfigManager.class);
+        hostsFileWriter.initialize(conf, "temp/upgradedomainpolicy");
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(6).racks(racks).hosts(hosts).build();
+        cluster.waitActive();
+        nameNodeRpc = cluster.getNameNodeRpc();
+        namesystem = cluster.getNamesystem();
+        perm = new PermissionStatus("TestDefaultBlockPlacementPolicy", null, FsPermission.getDefault());
+        refreshDatanodeAdminProperties();
     }
-  }
 
-  /**
-   * Define admin properties for these datanodes as follows.
-   * dn0's upgrade domain is ud5.
-   * dn1's upgrade domain is ud2.
-   * dn2's upgrade domain is ud3.
-   * dn3's upgrade domain is ud1.
-   * dn4's upgrade domain is ud2.
-   * dn5's upgrade domain is ud4.
-   * dn0 and dn5 are decommissioned.
-   * Given dn0, dn1 and dn2 are on rack1 and dn3, dn4 and dn5 are on
-   * rack2. Then any block's replicas should be on either
-   * {dn1, dn2, d3} or {dn2, dn3, dn4}.
-   */
-  private void refreshDatanodeAdminProperties()
-      throws IOException {
-    DatanodeAdminProperties[] datanodes = new DatanodeAdminProperties[
-        hosts.length];
-    for (int i = 0; i < hosts.length; i++) {
-      datanodes[i] = new DatanodeAdminProperties();
-      DatanodeIDJVMInterface datanodeID = cluster.getDataNodes().get(i).getDatanodeId();
-      datanodes[i].setHostName(datanodeID.getHostName());
-      datanodes[i].setPort(datanodeID.getXferPort());
-      datanodes[i].setUpgradeDomain(upgradeDomains[i]);
-    }
-    datanodes[0].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
-    datanodes[5].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
-    hostsFileWriter.initIncludeHosts(datanodes);
-    cluster.getFileSystem().refreshNodes();
-
-    expectedDatanodeIDs.clear();
-    expectedDatanodeIDs.add(cluster.getDataNodes().get(2).getDatanodeId());
-    expectedDatanodeIDs.add(cluster.getDataNodes().get(3).getDatanodeId());
-  }
-
-  /**
-   * Define admin properties for these datanodes as follows.
-   * dn0's upgrade domain is ud5.
-   * dn1's upgrade domain is ud2.
-   * dn2's upgrade domain is ud3.
-   * dn3's upgrade domain is ud1.
-   * dn4's upgrade domain is ud2.
-   * dn5's upgrade domain is ud4.
-   * dn2 and dn3 are decommissioned.
-   * Given dn0, dn1 and dn2 are on rack1 and dn3, dn4 and dn5 are on
-   * rack2. Then any block's replicas should be on either
-   * {dn0, dn1, d5} or {dn0, dn4, dn5}.
-   */
-  private void refreshDatanodeAdminProperties2()
-      throws IOException {
-    DatanodeAdminProperties[] datanodes = new DatanodeAdminProperties[
-        hosts.length];
-    for (int i = 0; i < hosts.length; i++) {
-      datanodes[i] = new DatanodeAdminProperties();
-      DatanodeIDJVMInterface datanodeID = cluster.getDataNodes().get(i).getDatanodeId();
-      datanodes[i].setHostName(datanodeID.getHostName());
-      datanodes[i].setPort(datanodeID.getXferPort());
-      datanodes[i].setUpgradeDomain(upgradeDomains[i]);
-    }
-    datanodes[2].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
-    datanodes[3].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
-    hostsFileWriter.initIncludeHosts(datanodes);
-    cluster.getFileSystem().refreshNodes();
-
-    expectedDatanodeIDs.clear();
-    expectedDatanodeIDs.add(cluster.getDataNodes().get(0).getDatanodeId());
-    expectedDatanodeIDs.add(cluster.getDataNodes().get(5).getDatanodeId());
-  }
-
-  @Test
-  public void testPlacement() throws Exception {
-    final long fileSize = DEFAULT_BLOCK_SIZE * 5;
-    final String testFile = new String("/testfile");
-    final Path path = new Path(testFile);
-    DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize,
-        REPLICATION_FACTOR, 1000L);
-    LocatedBlocks locatedBlocks =
-        cluster.getFileSystem().getClient().getLocatedBlocks(
-            path.toString(), 0, fileSize);
-    for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
-      Set<DatanodeInfo> locs = new HashSet<>();
-      for(DatanodeInfo datanodeInfo : block.getLocations()) {
-        if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
-          locs.add(datanodeInfo);
+    @After
+    public void teardown() throws IOException {
+        hostsFileWriter.cleanup();
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
         }
-      }
-      for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
-        assertTrue(locs.contains(datanodeID));
-      }
     }
-  }
 
-  @Test(timeout = 300000)
-  public void testPlacementAfterDecommission() throws Exception {
-    final long fileSize = DEFAULT_BLOCK_SIZE * 5;
-    final String testFile = new String("/testfile");
-    final Path path = new Path(testFile);
-    DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize,
-        REPLICATION_FACTOR, 1000L);
-
-    // Decommission some nodes and wait until decommissions have finished.
-    refreshDatanodeAdminProperties2();
-    GenericTestUtils.waitFor(new Supplier<Boolean>() {
-      @Override
-      public Boolean get() {
-        boolean successful = true;
-        LocatedBlocks locatedBlocks;
-        try {
-          locatedBlocks =
-              cluster.getFileSystem().getClient().getLocatedBlocks(
-                  path.toString(), 0, fileSize);
-        } catch (IOException ioe) {
-          return false;
+    /**
+     * Define admin properties for these datanodes as follows.
+     * dn0's upgrade domain is ud5.
+     * dn1's upgrade domain is ud2.
+     * dn2's upgrade domain is ud3.
+     * dn3's upgrade domain is ud1.
+     * dn4's upgrade domain is ud2.
+     * dn5's upgrade domain is ud4.
+     * dn0 and dn5 are decommissioned.
+     * Given dn0, dn1 and dn2 are on rack1 and dn3, dn4 and dn5 are on
+     * rack2. Then any block's replicas should be on either
+     * {dn1, dn2, d3} or {dn2, dn3, dn4}.
+     */
+    private void refreshDatanodeAdminProperties() throws IOException {
+        DatanodeAdminProperties[] datanodes = new DatanodeAdminProperties[hosts.length];
+        for (int i = 0; i < hosts.length; i++) {
+            datanodes[i] = new DatanodeAdminProperties();
+            DatanodeIDJVMInterface datanodeID = cluster.getDataNodes().get(i).getDatanodeId();
+            datanodes[i].setHostName(datanodeID.getHostName());
+            datanodes[i].setPort(datanodeID.getXferPort());
+            datanodes[i].setUpgradeDomain(upgradeDomains[i]);
         }
-        for(LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
-          Set<DatanodeInfo> locs = new HashSet<>();
-          for (DatanodeInfo datanodeInfo : block.getLocations()) {
-            if (datanodeInfo.getAdminState() ==
-                DatanodeInfo.AdminStates.NORMAL) {
-              locs.add(datanodeInfo);
+        datanodes[0].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
+        datanodes[5].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
+        hostsFileWriter.initIncludeHosts(datanodes);
+        cluster.getFileSystem().refreshNodes();
+        expectedDatanodeIDs.clear();
+        expectedDatanodeIDs.add(cluster.getDataNodes().get(2).getDatanodeId());
+        expectedDatanodeIDs.add(cluster.getDataNodes().get(3).getDatanodeId());
+    }
+
+    /**
+     * Define admin properties for these datanodes as follows.
+     * dn0's upgrade domain is ud5.
+     * dn1's upgrade domain is ud2.
+     * dn2's upgrade domain is ud3.
+     * dn3's upgrade domain is ud1.
+     * dn4's upgrade domain is ud2.
+     * dn5's upgrade domain is ud4.
+     * dn2 and dn3 are decommissioned.
+     * Given dn0, dn1 and dn2 are on rack1 and dn3, dn4 and dn5 are on
+     * rack2. Then any block's replicas should be on either
+     * {dn0, dn1, d5} or {dn0, dn4, dn5}.
+     */
+    private void refreshDatanodeAdminProperties2() throws IOException {
+        DatanodeAdminProperties[] datanodes = new DatanodeAdminProperties[hosts.length];
+        for (int i = 0; i < hosts.length; i++) {
+            datanodes[i] = new DatanodeAdminProperties();
+            DatanodeIDJVMInterface datanodeID = cluster.getDataNodes().get(i).getDatanodeId();
+            datanodes[i].setHostName(datanodeID.getHostName());
+            datanodes[i].setPort(datanodeID.getXferPort());
+            datanodes[i].setUpgradeDomain(upgradeDomains[i]);
+        }
+        datanodes[2].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
+        datanodes[3].setAdminState(DatanodeInfo.AdminStates.DECOMMISSIONED);
+        hostsFileWriter.initIncludeHosts(datanodes);
+        cluster.getFileSystem().refreshNodes();
+        expectedDatanodeIDs.clear();
+        expectedDatanodeIDs.add(cluster.getDataNodes().get(0).getDatanodeId());
+        expectedDatanodeIDs.add(cluster.getDataNodes().get(5).getDatanodeId());
+    }
+
+    @Test
+    public void testPlacement() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+            Set<DatanodeInfo> locs = new HashSet<>();
+            for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                    locs.add(datanodeInfo);
+                }
             }
-          }
-          for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
-            successful = successful && locs.contains(datanodeID);
-          }
+            for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                assertTrue(locs.contains(datanodeID));
+            }
         }
-        return successful;
-      }
-    }, 1000, 60000);
+    }
 
-    // Verify block placement policy of each block.
-    LocatedBlocks locatedBlocks;
-    locatedBlocks =
-        cluster.getFileSystem().getClient().getLocatedBlocks(
-            path.toString(), 0, fileSize);
-    /*
+    @Test(timeout = 300000)
+    public void testPlacementAfterDecommission() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        // Decommission some nodes and wait until decommissions have finished.
+        refreshDatanodeAdminProperties2();
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                boolean successful = true;
+                LocatedBlocks locatedBlocks;
+                try {
+                    locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+                } catch (IOException ioe) {
+                    return false;
+                }
+                for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+                    Set<DatanodeInfo> locs = new HashSet<>();
+                    for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                        if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                            locs.add(datanodeInfo);
+                        }
+                    }
+                    for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                        successful = successful && locs.contains(datanodeID);
+                    }
+                }
+                return successful;
+            }
+        }, 1000, 60000);
+        // Verify block placement policy of each block.
+        LocatedBlocks locatedBlocks;
+        locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        /*
     for(LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
       BlockPlacementStatus status = cluster.getNamesystem().getBlockManager().
           getBlockPlacementPolicy().verifyBlockPlacement(
@@ -262,5 +242,151 @@ public class TestUpgradeDomainBlockPlacementPolicy {
       assertTrue(status.isPlacementPolicySatisfied());
     }
      */
-  }
+    }
+
+    @Test
+    public void testPlacement_withUpgrade20() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+            Set<DatanodeInfo> locs = new HashSet<>();
+            for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                    locs.add(datanodeInfo);
+                }
+            }
+            for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                assertTrue(locs.contains(datanodeID));
+            }
+        }
+    }
+
+    @Test
+    public void testPlacement_withUpgrade40() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+            Set<DatanodeInfo> locs = new HashSet<>();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                    locs.add(datanodeInfo);
+                }
+            }
+            for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                assertTrue(locs.contains(datanodeID));
+            }
+        }
+    }
+
+    @Test
+    public void testPlacement_withUpgrade60() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+        for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+            Set<DatanodeInfo> locs = new HashSet<>();
+            for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                    locs.add(datanodeInfo);
+                    cluster.restartNodeForTesting(0);
+                    cluster.upgradeNodeForTesting(0);
+                }
+            }
+            for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                assertTrue(locs.contains(datanodeID));
+            }
+        }
+    }
+
+    @Test(timeout = 300000)
+    public void testPlacementAfterDecommission_withUpgrade20() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        // Decommission some nodes and wait until decommissions have finished.
+        refreshDatanodeAdminProperties2();
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                boolean successful = true;
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                LocatedBlocks locatedBlocks;
+                try {
+                    locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+                } catch (IOException ioe) {
+                    return false;
+                }
+                for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+                    Set<DatanodeInfo> locs = new HashSet<>();
+                    for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                        if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                            locs.add(datanodeInfo);
+                        }
+                    }
+                    for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                        successful = successful && locs.contains(datanodeID);
+                    }
+                }
+                return successful;
+            }
+        }, 1000, 60000);
+        // Verify block placement policy of each block.
+        LocatedBlocks locatedBlocks;
+        locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+    }
+
+    @Test(timeout = 300000)
+    public void testPlacementAfterDecommission_withUpgrade40() throws Exception {
+        final long fileSize = DEFAULT_BLOCK_SIZE * 5;
+        final String testFile = new String("/testfile");
+        final Path path = new Path(testFile);
+        DFSTestUtil.createFile(cluster.getFileSystem(), path, fileSize, REPLICATION_FACTOR, 1000L);
+        // Decommission some nodes and wait until decommissions have finished.
+        refreshDatanodeAdminProperties2();
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                boolean successful = true;
+                LocatedBlocks locatedBlocks;
+                try {
+                    locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+                    cluster.restartNodeForTesting(0);
+                    cluster.upgradeNodeForTesting(0);
+                } catch (IOException ioe) {
+                    return false;
+                }
+                for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
+                    Set<DatanodeInfo> locs = new HashSet<>();
+                    for (DatanodeInfo datanodeInfo : block.getLocations()) {
+                        if (datanodeInfo.getAdminState() == DatanodeInfo.AdminStates.NORMAL) {
+                            locs.add(datanodeInfo);
+                        }
+                    }
+                    for (DatanodeIDJVMInterface datanodeID : expectedDatanodeIDs) {
+                        successful = successful && locs.contains(datanodeID);
+                    }
+                }
+                return successful;
+            }
+        }, 1000, 60000);
+        // Verify block placement policy of each block.
+        LocatedBlocks locatedBlocks;
+        locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
+    }
 }

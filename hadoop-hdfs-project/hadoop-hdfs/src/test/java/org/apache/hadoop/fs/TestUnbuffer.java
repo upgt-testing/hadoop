@@ -33,115 +33,368 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 public class TestUnbuffer {
-  private static final Log LOG =
-      LogFactory.getLog(TestUnbuffer.class.getName());
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+    private static final Log LOG = LogFactory.getLog(TestUnbuffer.class.getName());
 
-  /**
-   * Test that calling Unbuffer closes sockets.
-   */
-  @Test
-  public void testUnbufferClosesSockets() throws Exception {
-    Configuration conf = new Configuration();
-    // Set a new ClientContext.  This way, we will have our own PeerCache,
-    // rather than sharing one with other unit tests.
-    conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT,
-        "testUnbufferClosesSocketsContext");
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-    // Disable short-circuit reads.  With short-circuit, we wouldn't hold open a
-    // TCP socket.
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-
-    // Set a really long socket timeout to avoid test timing issues.
-    conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY,
-        100000000L);
-    conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY,
-        100000000L);
-
-    MiniDFSClusterInJVM cluster = null;
-    FSDataInputStream stream = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-      DistributedFileSystem dfs = (DistributedFileSystem)
-          FileSystem.newInstance(conf);
-      final Path TEST_PATH = new Path("/test1");
-      DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short)1, 1);
-      stream = dfs.open(TEST_PATH);
-      // Read a byte.  This will trigger the creation of a block reader.
-      stream.seek(2);
-      int b = stream.read();
-      Assert.assertTrue(-1 != b);
-
-      // The Peer cache should start off empty.
-      PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
-      Assert.assertEquals(0, cache.size());
-
-      // Unbuffer should clear the block reader and return the socket to the
-      // cache.
-      stream.unbuffer();
-      stream.seek(2);
-      Assert.assertEquals(1, cache.size());
-      int b2 = stream.read();
-      Assert.assertEquals(b, b2);
-    } finally {
-      if (stream != null) {
-        IOUtils.cleanup(null, stream);
-      }
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    /**
+     * Test that calling Unbuffer closes sockets.
+     */
+    @Test
+    public void testUnbufferClosesSockets() throws Exception {
+        Configuration conf = new Configuration();
+        // Set a new ClientContext.  This way, we will have our own PeerCache,
+        // rather than sharing one with other unit tests.
+        conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, "testUnbufferClosesSocketsContext");
+        // Disable short-circuit reads.  With short-circuit, we wouldn't hold open a
+        // TCP socket.
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        // Set a really long socket timeout to avoid test timing issues.
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 100000000L);
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY, 100000000L);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream stream = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.newInstance(conf);
+            final Path TEST_PATH = new Path("/test1");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short) 1, 1);
+            stream = dfs.open(TEST_PATH);
+            // Read a byte.  This will trigger the creation of a block reader.
+            stream.seek(2);
+            int b = stream.read();
+            Assert.assertTrue(-1 != b);
+            // The Peer cache should start off empty.
+            PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
+            Assert.assertEquals(0, cache.size());
+            // Unbuffer should clear the block reader and return the socket to the
+            // cache.
+            stream.unbuffer();
+            stream.seek(2);
+            Assert.assertEquals(1, cache.size());
+            int b2 = stream.read();
+            Assert.assertEquals(b, b2);
+        } finally {
+            if (stream != null) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  /**
-   * Test opening many files via TCP (not short-circuit).
-   *
-   * This is practical when using unbuffer, because it reduces the number of
-   * sockets and amount of memory that we use.
-   */
-  @Test
-  public void testOpenManyFilesViaTcp() throws Exception {
-    final int NUM_OPENS = 500;
-    Configuration conf = new Configuration();
-    conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-    MiniDFSClusterInJVM cluster = null;
-    FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-      DistributedFileSystem dfs = cluster.getFileSystem();
-      final Path TEST_PATH = new Path("/testFile");
-      DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short)1, 1);
-
-      for (int i = 0; i < NUM_OPENS; i++) {
-        streams[i] = dfs.open(TEST_PATH);
-        LOG.info("opening file " + i + "...");
-        Assert.assertTrue(-1 != streams[i].read());
-        streams[i].unbuffer();
-      }
-    } finally {
-      for (FSDataInputStream stream : streams) {
-        IOUtils.cleanup(null, stream);
-      }
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    /**
+     * Test opening many files via TCP (not short-circuit).
+     *
+     * This is practical when using unbuffer, because it reduces the number of
+     * sockets and amount of memory that we use.
+     */
+    @Test
+    public void testOpenManyFilesViaTcp() throws Exception {
+        final int NUM_OPENS = 500;
+        Configuration conf = new Configuration();
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            final Path TEST_PATH = new Path("/testFile");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short) 1, 1);
+            for (int i = 0; i < NUM_OPENS; i++) {
+                streams[i] = dfs.open(TEST_PATH);
+                LOG.info("opening file " + i + "...");
+                Assert.assertTrue(-1 != streams[i].read());
+                streams[i].unbuffer();
+            }
+        } finally {
+            for (FSDataInputStream stream : streams) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  /**
-   * Test unbuffer method which throws an Exception with class name included.
-   */
-  @Test
-  public void testUnbufferException() {
-    FSInputStream in = Mockito.mock(FSInputStream.class);
-    FSDataInputStream fs = new FSDataInputStream(in);
+    /**
+     * Test unbuffer method which throws an Exception with class name included.
+     */
+    @Test
+    public void testUnbufferException() {
+        FSInputStream in = Mockito.mock(FSInputStream.class);
+        FSDataInputStream fs = new FSDataInputStream(in);
+        exception.expect(UnsupportedOperationException.class);
+        exception.expectMessage("this stream " + in.getClass().getName() + " does not support unbuffering");
+        fs.unbuffer();
+    }
 
-    exception.expect(UnsupportedOperationException.class);
-    exception.expectMessage("this stream " + in.getClass().getName()
-        + " does not support unbuffering");
+    @Test
+    public void testUnbufferClosesSockets_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        // rather than sharing one with other unit tests.
+        conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, "testUnbufferClosesSocketsContext");
+        // TCP socket.
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        // Set a really long socket timeout to avoid test timing issues.
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 100000000L);
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY, 100000000L);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream stream = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.newInstance(conf);
+            final Path TEST_PATH = new Path("/test1");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short) 1, 1);
+            stream = dfs.open(TEST_PATH);
+            // Read a byte.  This will trigger the creation of a block reader.
+            stream.seek(2);
+            int b = stream.read();
+            Assert.assertTrue(-1 != b);
+            // The Peer cache should start off empty.
+            PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
+            Assert.assertEquals(0, cache.size());
+            // Unbuffer should clear the block reader and return the socket to the
+            // cache.
+            stream.unbuffer();
+            stream.seek(2);
+            Assert.assertEquals(1, cache.size());
+            int b2 = stream.read();
+            Assert.assertEquals(b, b2);
+        } finally {
+            if (stream != null) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 
-    fs.unbuffer();
-  }
+    @Test
+    public void testUnbufferClosesSockets_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        // rather than sharing one with other unit tests.
+        conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, "testUnbufferClosesSocketsContext");
+        // TCP socket.
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        // Set a really long socket timeout to avoid test timing issues.
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 100000000L);
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY, 100000000L);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream stream = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.newInstance(conf);
+            final Path TEST_PATH = new Path("/test1");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short) 1, 1);
+            stream = dfs.open(TEST_PATH);
+            // Read a byte.  This will trigger the creation of a block reader.
+            stream.seek(2);
+            int b = stream.read();
+            Assert.assertTrue(-1 != b);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // The Peer cache should start off empty.
+            PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
+            Assert.assertEquals(0, cache.size());
+            // Unbuffer should clear the block reader and return the socket to the
+            // cache.
+            stream.unbuffer();
+            stream.seek(2);
+            Assert.assertEquals(1, cache.size());
+            int b2 = stream.read();
+            Assert.assertEquals(b, b2);
+        } finally {
+            if (stream != null) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testUnbufferClosesSockets_withUpgrade60() throws Exception {
+        Configuration conf = new Configuration();
+        // rather than sharing one with other unit tests.
+        conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, "testUnbufferClosesSocketsContext");
+        // TCP socket.
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        // Set a really long socket timeout to avoid test timing issues.
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 100000000L);
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY, 100000000L);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream stream = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.newInstance(conf);
+            final Path TEST_PATH = new Path("/test1");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short) 1, 1);
+            stream = dfs.open(TEST_PATH);
+            // Read a byte.  This will trigger the creation of a block reader.
+            stream.seek(2);
+            int b = stream.read();
+            Assert.assertTrue(-1 != b);
+            // The Peer cache should start off empty.
+            PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
+            Assert.assertEquals(0, cache.size());
+            // Unbuffer should clear the block reader and return the socket to the
+            // cache.
+            stream.unbuffer();
+            stream.seek(2);
+            Assert.assertEquals(1, cache.size());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            int b2 = stream.read();
+            Assert.assertEquals(b, b2);
+        } finally {
+            if (stream != null) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testUnbufferClosesSockets_withUpgrade80() throws Exception {
+        Configuration conf = new Configuration();
+        // rather than sharing one with other unit tests.
+        conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT, "testUnbufferClosesSocketsContext");
+        // TCP socket.
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        // Set a really long socket timeout to avoid test timing issues.
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, 100000000L);
+        conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY, 100000000L);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream stream = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.newInstance(conf);
+            final Path TEST_PATH = new Path("/test1");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short) 1, 1);
+            stream = dfs.open(TEST_PATH);
+            // Read a byte.  This will trigger the creation of a block reader.
+            stream.seek(2);
+            int b = stream.read();
+            Assert.assertTrue(-1 != b);
+            // The Peer cache should start off empty.
+            PeerCache cache = dfs.getClient().getClientContext().getPeerCache();
+            Assert.assertEquals(0, cache.size());
+            // Unbuffer should clear the block reader and return the socket to the
+            // cache.
+            stream.unbuffer();
+            stream.seek(2);
+            Assert.assertEquals(1, cache.size());
+            int b2 = stream.read();
+            Assert.assertEquals(b, b2);
+        } finally {
+            if (stream != null) {
+                IOUtils.cleanup(null, stream);
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testOpenManyFilesViaTcp_withUpgrade20() throws Exception {
+        final int NUM_OPENS = 500;
+        Configuration conf = new Configuration();
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            final Path TEST_PATH = new Path("/testFile");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short) 1, 1);
+            for (int i = 0; i < NUM_OPENS; i++) {
+                streams[i] = dfs.open(TEST_PATH);
+                LOG.info("opening file " + i + "...");
+                Assert.assertTrue(-1 != streams[i].read());
+                streams[i].unbuffer();
+            }
+        } finally {
+            for (FSDataInputStream stream : streams) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testOpenManyFilesViaTcp_withUpgrade40() throws Exception {
+        final int NUM_OPENS = 500;
+        Configuration conf = new Configuration();
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            final Path TEST_PATH = new Path("/testFile");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short) 1, 1);
+            for (int i = 0; i < NUM_OPENS; i++) {
+                streams[i] = dfs.open(TEST_PATH);
+                LOG.info("opening file " + i + "...");
+                Assert.assertTrue(-1 != streams[i].read());
+                streams[i].unbuffer();
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            for (FSDataInputStream stream : streams) {
+                IOUtils.cleanup(null, stream);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testOpenManyFilesViaTcp_withUpgrade80() throws Exception {
+        final int NUM_OPENS = 500;
+        Configuration conf = new Configuration();
+        conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
+        MiniDFSClusterInJVM cluster = null;
+        FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            final Path TEST_PATH = new Path("/testFile");
+            DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short) 1, 1);
+            for (int i = 0; i < NUM_OPENS; i++) {
+                streams[i] = dfs.open(TEST_PATH);
+                LOG.info("opening file " + i + "...");
+                Assert.assertTrue(-1 != streams[i].read());
+                streams[i].unbuffer();
+            }
+        } finally {
+            for (FSDataInputStream stream : streams) {
+                IOUtils.cleanup(null, stream);
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 }

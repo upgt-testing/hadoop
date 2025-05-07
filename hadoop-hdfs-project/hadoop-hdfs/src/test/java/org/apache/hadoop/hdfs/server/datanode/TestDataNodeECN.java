@@ -23,23 +23,59 @@ import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
 import org.apache.hadoop.hdfs.protocol.datatransfer.PipelineAck;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.io.IOException;
 
 public class TestDataNodeECN {
-  @Test
-  public void testECNFlag() throws IOException {
-    Configuration conf = new Configuration();
-    conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-      //PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
-      //Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+
+    @Test
+    public void testECNFlag() throws IOException {
+        Configuration conf = new Configuration();
+        conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            //PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
+            //Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
+
+    @Test
+    public void testECNFlag_withUpgrade20() throws IOException {
+        Configuration conf = new Configuration();
+        conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            //PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
+            //Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testECNFlag_withUpgrade60() throws IOException {
+        Configuration conf = new Configuration();
+        conf.setBoolean(DFSConfigKeys.DFS_PIPELINE_ECN_ENABLED, true);
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            //PipelineAck.ECN ecn = cluster.getDataNodes().get(0).getECN();
+            //Assert.assertNotEquals(PipelineAck.ECN.DISABLED, ecn);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+        }
+    }
 }

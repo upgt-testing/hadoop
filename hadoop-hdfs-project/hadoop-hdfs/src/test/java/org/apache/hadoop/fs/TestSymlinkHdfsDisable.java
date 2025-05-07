@@ -18,9 +18,7 @@
 package org.apache.hadoop.fs;
 
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
@@ -31,37 +29,166 @@ import org.junit.Test;
 
 public class TestSymlinkHdfsDisable {
 
-  @Test(timeout=60000)
-  public void testSymlinkHdfsDisable() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    // disable symlink resolution
-    conf.setBoolean(
-        CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
-    // spin up minicluster, get dfs and filecontext
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    DistributedFileSystem dfs = cluster.getFileSystem();
-    FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
-    // Create test files/links
-    FileContextTestHelper helper = new FileContextTestHelper(
-        "/tmp/TestSymlinkHdfsDisable");
-    Path root = helper.getTestRootPath(fc);
-    Path target = new Path(root, "target");
-    Path link = new Path(root, "link");
-    DFSTestUtil.createFile(dfs, target, 4096, (short)1, 0xDEADDEAD);
-    fc.createSymlink(target, link, false);
+    @Test(timeout = 60000)
+    public void testSymlinkHdfsDisable() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // disable symlink resolution
+        conf.setBoolean(CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
+        // spin up minicluster, get dfs and filecontext
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        // Create test files/links
+        FileContextTestHelper helper = new FileContextTestHelper("/tmp/TestSymlinkHdfsDisable");
+        Path root = helper.getTestRootPath(fc);
+        Path target = new Path(root, "target");
+        Path link = new Path(root, "link");
+        DFSTestUtil.createFile(dfs, target, 4096, (short) 1, 0xDEADDEAD);
+        fc.createSymlink(target, link, false);
+        // Try to resolve links with FileSystem and FileContext
+        try {
+            fc.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+        try {
+            dfs.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+    }
 
-    // Try to resolve links with FileSystem and FileContext
-    try {
-      fc.open(link);
-      fail("Expected error when attempting to resolve link");
-    } catch (IOException e) {
-      GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+    @Test(timeout = 60000)
+    public void testSymlinkHdfsDisable_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // disable symlink resolution
+        conf.setBoolean(CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
+        // spin up minicluster, get dfs and filecontext
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        // Create test files/links
+        FileContextTestHelper helper = new FileContextTestHelper("/tmp/TestSymlinkHdfsDisable");
+        Path root = helper.getTestRootPath(fc);
+        Path target = new Path(root, "target");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Path link = new Path(root, "link");
+        DFSTestUtil.createFile(dfs, target, 4096, (short) 1, 0xDEADDEAD);
+        fc.createSymlink(target, link, false);
+        // Try to resolve links with FileSystem and FileContext
+        try {
+            fc.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+        try {
+            dfs.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
     }
-    try {
-      dfs.open(link);
-      fail("Expected error when attempting to resolve link");
-    } catch (IOException e) {
-      GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+
+    @Test(timeout = 60000)
+    public void testSymlinkHdfsDisable_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // disable symlink resolution
+        conf.setBoolean(CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
+        // spin up minicluster, get dfs and filecontext
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        // Create test files/links
+        FileContextTestHelper helper = new FileContextTestHelper("/tmp/TestSymlinkHdfsDisable");
+        Path root = helper.getTestRootPath(fc);
+        Path target = new Path(root, "target");
+        Path link = new Path(root, "link");
+        DFSTestUtil.createFile(dfs, target, 4096, (short) 1, 0xDEADDEAD);
+        fc.createSymlink(target, link, false);
+        // Try to resolve links with FileSystem and FileContext
+        try {
+            fc.open(link);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+        try {
+            dfs.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
     }
-  }
+
+    @Test(timeout = 60000)
+    public void testSymlinkHdfsDisable_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // disable symlink resolution
+        conf.setBoolean(CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
+        // spin up minicluster, get dfs and filecontext
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        // Create test files/links
+        FileContextTestHelper helper = new FileContextTestHelper("/tmp/TestSymlinkHdfsDisable");
+        Path root = helper.getTestRootPath(fc);
+        Path target = new Path(root, "target");
+        Path link = new Path(root, "link");
+        DFSTestUtil.createFile(dfs, target, 4096, (short) 1, 0xDEADDEAD);
+        fc.createSymlink(target, link, false);
+        // Try to resolve links with FileSystem and FileContext
+        try {
+            fc.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        try {
+            dfs.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testSymlinkHdfsDisable_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        // disable symlink resolution
+        conf.setBoolean(CommonConfigurationKeys.FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY, false);
+        // spin up minicluster, get dfs and filecontext
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        DistributedFileSystem dfs = cluster.getFileSystem();
+        FileContext fc = FileContext.getFileContext(cluster.getURI(0), conf);
+        // Create test files/links
+        FileContextTestHelper helper = new FileContextTestHelper("/tmp/TestSymlinkHdfsDisable");
+        Path root = helper.getTestRootPath(fc);
+        Path target = new Path(root, "target");
+        Path link = new Path(root, "link");
+        DFSTestUtil.createFile(dfs, target, 4096, (short) 1, 0xDEADDEAD);
+        fc.createSymlink(target, link, false);
+        // Try to resolve links with FileSystem and FileContext
+        try {
+            fc.open(link);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+        try {
+            dfs.open(link);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fail("Expected error when attempting to resolve link");
+        } catch (IOException e) {
+            GenericTestUtils.assertExceptionContains("resolution is disabled", e);
+        }
+    }
 }

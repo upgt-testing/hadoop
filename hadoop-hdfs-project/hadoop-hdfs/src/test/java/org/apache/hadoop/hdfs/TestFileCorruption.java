@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs;
 
 import com.google.common.base.Supplier;
@@ -26,14 +25,12 @@ import org.apache.hadoop.hdfs.server.blockmanagement.DatanodeStorageInfo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.util.*;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ChecksumException;
 import org.apache.hadoop.fs.FileSystem;
@@ -63,31 +60,33 @@ import org.slf4j.Logger;
  * A JUnit test for corrupted file handling.
  */
 public class TestFileCorruption {
-  {
-    DFSTestUtil.setNameNodeLogLevel(Level.ALL);
-    GenericTestUtils.setLogLevel(DataNode.LOG, Level.ALL);
-    GenericTestUtils.setLogLevel(DFSClient.LOG, Level.ALL);
-  }
-  static Logger LOG = NameNode.stateChangeLog;
 
-  /** check if DFS can handle corrupted blocks properly */
-  @Test
-  public void testFileCorruption() throws Exception {
-    MiniDFSClusterInJVM cluster = null;
-    DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").
-        setNumFiles(20).build();
-    try {
-      Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-      FileSystem fs = cluster.getFileSystem();
-      util.createFiles(fs, "/srcdat");
-      // Now deliberately remove the blocks
-      String bpid = cluster.getNamesystem().getBlockPoolId();
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
-      Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports =
-          new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
-      assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
-      /*
+    {
+        DFSTestUtil.setNameNodeLogLevel(Level.ALL);
+        GenericTestUtils.setLogLevel(DataNode.LOG, Level.ALL);
+        GenericTestUtils.setLogLevel(DFSClient.LOG, Level.ALL);
+    }
+
+    static Logger LOG = NameNode.stateChangeLog;
+
+    /**
+     * check if DFS can handle corrupted blocks properly
+     */
+    @Test
+    public void testFileCorruption() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").setNumFiles(20).build();
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            FileSystem fs = cluster.getFileSystem();
+            util.createFiles(fs, "/srcdat");
+            // Now deliberately remove the blocks
+            String bpid = cluster.getNamesystem().getBlockPoolId();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
+            Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports = new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
+            assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
+            /*
       for (BlockListAsLongsJVMInterface report : blockReports.values()) {
         for (BlockReportReplica brr : report) {
           LOG.info("Deliberately removing block {}", brr.getBlockName());
@@ -98,56 +97,59 @@ public class TestFileCorruption {
       assertTrue("Corrupted replicas not handled properly.",
                  util.checkFiles(fs, "/srcdat"));
        */
-      util.cleanup(fs, "/srcdat");
-    } finally {
-      if (cluster != null) { cluster.shutdown(); }
+            util.cleanup(fs, "/srcdat");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  /** check if local FS can handle corrupted blocks properly */
-  @Test
-  public void testLocalFileCorruption() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    Path file = new Path(PathUtils.getTestDirName(getClass()), "corruptFile");
-    FileSystem fs = FileSystem.getLocal(conf);
-    DataOutputStream dos = fs.create(file);
-    dos.writeBytes("original bytes");
-    dos.close();
-    // Now deliberately corrupt the file
-    dos = new DataOutputStream(new FileOutputStream(file.toString()));
-    dos.writeBytes("corruption");
-    dos.close();
-    // Now attempt to read the file
-    DataInputStream dis = fs.open(file, 512);
-    try {
-      LOG.info("A ChecksumException is expected to be logged.");
-      dis.readByte();
-    } catch (ChecksumException ignore) {
-      //expect this exception but let any NPE get thrown
+    /**
+     * check if local FS can handle corrupted blocks properly
+     */
+    @Test
+    public void testLocalFileCorruption() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path(PathUtils.getTestDirName(getClass()), "corruptFile");
+        FileSystem fs = FileSystem.getLocal(conf);
+        DataOutputStream dos = fs.create(file);
+        dos.writeBytes("original bytes");
+        dos.close();
+        // Now deliberately corrupt the file
+        dos = new DataOutputStream(new FileOutputStream(file.toString()));
+        dos.writeBytes("corruption");
+        dos.close();
+        // Now attempt to read the file
+        DataInputStream dis = fs.open(file, 512);
+        try {
+            LOG.info("A ChecksumException is expected to be logged.");
+            dis.readByte();
+        } catch (ChecksumException ignore) {
+            //expect this exception but let any NPE get thrown
+        }
+        fs.delete(file, true);
     }
-    fs.delete(file, true);
-  }
-  
-  /** Test the case that a replica is reported corrupt while it is not
-   * in blocksMap. Make sure that ArrayIndexOutOfBounds does not thrown.
-   * See Hadoop-4351.
-   */
-  @Test
-  public void testArrayOutOfBoundsException() throws Exception {
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-      cluster.waitActive();
-      
-      FileSystem fs = cluster.getFileSystem();
-      final Path FILE_PATH = new Path("/tmp.txt");
-      final long FILE_LEN = 1L;
-      DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short)2, 1L);
-      
-      // get the block
-      final String bpid = cluster.getNamesystem().getBlockPoolId();
-      /*
+
+    /**
+     * Test the case that a replica is reported corrupt while it is not
+     * in blocksMap. Make sure that ArrayIndexOutOfBounds does not thrown.
+     * See Hadoop-4351.
+     */
+    @Test
+    public void testArrayOutOfBoundsException() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+            cluster.waitActive();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 2, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            /*
       ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
       assertFalse("Data directory does not contain any blocks or there was an "
           + "IO error", blk==null);
@@ -173,34 +175,33 @@ public class TestFileCorruption {
       // open the file
       fs.open(FILE_PATH);
        */
-      //clean up
-      fs.delete(FILE_PATH, false);
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  @Test
-  public void testCorruptionWithDiskFailure() throws Exception {
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      Configuration conf = new HdfsConfiguration();
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-      cluster.waitActive();
-      BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
-      FileSystem fs = cluster.getFileSystem();
-      final Path FILE_PATH = new Path("/tmp.txt");
-      final long FILE_LEN = 1L;
-      DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
-
-      // get the block
-      final String bpid = cluster.getNamesystem().getBlockPoolId();
-      File storageDir = cluster.getInstanceStorageDir(0, 0);
-      File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
-      assertTrue("Data directory does not exist", dataDir.exists());
-      /*
+    @Test
+    public void testCorruptionWithDiskFailure() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.waitActive();
+            BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            File storageDir = cluster.getInstanceStorageDir(0, 0);
+            File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
+            assertTrue("Data directory does not exist", dataDir.exists());
+            /*
       ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
       if (blk == null) {
         blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
@@ -229,105 +230,913 @@ public class TestFileCorruption {
       fs.open(FILE_PATH);
 
        */
-      //clean up
-      fs.delete(FILE_PATH, false);
-    } finally {
-      if (cluster != null) { cluster.shutdown(); }
-    }
-
-  }
-
-  @Test
-  public void testSetReplicationWhenBatchIBR() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
-    conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY,
-        30000);
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
-    conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY,
-        1);
-    DistributedFileSystem dfs;
-    try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(3).build()) {
-      final int bufferSize = 1024; // 1024 Bytes each time
-      byte[] outBuffer = new byte[bufferSize];
-      dfs = cluster.getFileSystem();
-      String fileName = "/testSetRep1";
-      Path filePath = new Path(fileName);
-      FSDataOutputStream out = dfs.create(filePath);
-      out.write(outBuffer, 0, bufferSize);
-      out.close();
-      //sending the FBR to Delay next IBR
-      cluster.triggerBlockReports();
-      GenericTestUtils.waitFor(new Supplier<Boolean>() {
-        @Override
-        public Boolean get() {
-          try {
-            cluster.triggerBlockReports();
-            if (cluster.getNamesystem().getBlocksTotal() == 1) {
-              return true;
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
             }
-          } catch (Exception e) {
-            // Ignore the exception
-          }
-          return false;
         }
-      }, 10, 3000);
-      fileName = "/testSetRep2";
-      filePath = new Path(fileName);
-      out = dfs.create(filePath);
-      out.write(outBuffer, 0, bufferSize);
-      out.close();
-      dfs.setReplication(filePath, (short) 10);
-      cluster.triggerBlockReports();
-      // underreplicated Blocks should be one after setrep
-      GenericTestUtils.waitFor(new Supplier<Boolean>() {
-        @Override public Boolean get() {
-          try {
-            return cluster.getNamesystem().getBlockManager()
-                .getUnderReplicatedBlocksCount() == 1;
-          } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-          }
+    }
+
+    @Test
+    public void testSetReplicationWhenBatchIBR() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY, 30000);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY, 1);
+        DistributedFileSystem dfs;
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            // 1024 Bytes each time
+            final int bufferSize = 1024;
+            byte[] outBuffer = new byte[bufferSize];
+            dfs = cluster.getFileSystem();
+            String fileName = "/testSetRep1";
+            Path filePath = new Path(fileName);
+            FSDataOutputStream out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            //sending the FBR to Delay next IBR
+            cluster.triggerBlockReports();
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        cluster.triggerBlockReports();
+                        if (cluster.getNamesystem().getBlocksTotal() == 1) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        // Ignore the exception
+                    }
+                    return false;
+                }
+            }, 10, 3000);
+            fileName = "/testSetRep2";
+            filePath = new Path(fileName);
+            out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            dfs.setReplication(filePath, (short) 10);
+            cluster.triggerBlockReports();
+            // underreplicated Blocks should be one after setrep
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return cluster.getNamesystem().getBlockManager().getUnderReplicatedBlocksCount() == 1;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 10, 3000);
+            assertEquals(0, cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
         }
-      }, 10, 3000);
-      assertEquals(0,
-          cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
     }
-  }
 
-  private void markAllBlocksAsCorrupt(BlockManager bm,
-                                      ExtendedBlock blk) throws IOException {
-    for (DatanodeStorageInfo info : bm.getStorages(blk.getLocalBlock())) {
-      bm.findAndMarkBlockAsCorrupt(
-          blk, info.getDatanodeDescriptor(), info.getStorageID(), "STORAGE_ID");
+    private void markAllBlocksAsCorrupt(BlockManager bm, ExtendedBlock blk) throws IOException {
+        for (DatanodeStorageInfo info : bm.getStorages(blk.getLocalBlock())) {
+            bm.findAndMarkBlockAsCorrupt(blk, info.getDatanodeDescriptor(), info.getStorageID(), "STORAGE_ID");
+        }
     }
-  }
 
-  private void updateAllStorages(BlockManager bm) {
-    for (DatanodeDescriptor dd : bm.getDatanodeManager().getDatanodes()) {
-      Set<DatanodeStorageInfo> setInfos = new HashSet<DatanodeStorageInfo>();
-      DatanodeStorageInfo[] infos = dd.getStorageInfos();
-      Random random = new Random();
-      for (int i = 0; i < infos.length; i++) {
-        int blkId = random.nextInt(101);
-        DatanodeStorage storage = new DatanodeStorage(Integer.toString(blkId),
-            DatanodeStorage.State.FAILED, StorageType.DISK);
-        infos[i].updateFromStorage(storage);
-        setInfos.add(infos[i]);
+    private void updateAllStorages(BlockManager bm) {
+        for (DatanodeDescriptor dd : bm.getDatanodeManager().getDatanodes()) {
+            Set<DatanodeStorageInfo> setInfos = new HashSet<DatanodeStorageInfo>();
+            DatanodeStorageInfo[] infos = dd.getStorageInfos();
+            Random random = new Random();
+            for (int i = 0; i < infos.length; i++) {
+                int blkId = random.nextInt(101);
+                DatanodeStorage storage = new DatanodeStorage(Integer.toString(blkId), DatanodeStorage.State.FAILED, StorageType.DISK);
+                infos[i].updateFromStorage(storage);
+                setInfos.add(infos[i]);
+            }
+        }
+    }
+
+    private static ExtendedBlock getFirstBlock(DataNode dn, String bpid) {
+        Map<DatanodeStorage, BlockListAsLongs> blockReports = dn.getFSDataset().getBlockReports(bpid);
+        for (BlockListAsLongs blockLongs : blockReports.values()) {
+            for (BlockReportReplica block : blockLongs) {
+                return new ExtendedBlock(bpid, block);
+            }
+        }
+        return null;
+    }
+
+    @Test
+    public void testFileCorruption_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").setNumFiles(20).build();
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            FileSystem fs = cluster.getFileSystem();
+            util.createFiles(fs, "/srcdat");
+            // Now deliberately remove the blocks
+            String bpid = cluster.getNamesystem().getBlockPoolId();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
+            Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports = new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
+            assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
+            /*
+      for (BlockListAsLongsJVMInterface report : blockReports.values()) {
+        for (BlockReportReplica brr : report) {
+          LOG.info("Deliberately removing block {}", brr.getBlockName());
+          cluster.getFsDatasetTestUtils(2).getMaterializedReplica(
+              new ExtendedBlock(bpid, brr)).deleteData();
+        }
       }
+      assertTrue("Corrupted replicas not handled properly.",
+                 util.checkFiles(fs, "/srcdat"));
+       */
+            util.cleanup(fs, "/srcdat");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
 
-  private static ExtendedBlock getFirstBlock(DataNode dn, String bpid) {
-    Map<DatanodeStorage, BlockListAsLongs> blockReports =
-        dn.getFSDataset().getBlockReports(bpid);
-    for (BlockListAsLongs blockLongs : blockReports.values()) {
-      for (BlockReportReplica block : blockLongs) {
-        return new ExtendedBlock(bpid, block);
+    @Test
+    public void testFileCorruption_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").setNumFiles(20).build();
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            FileSystem fs = cluster.getFileSystem();
+            util.createFiles(fs, "/srcdat");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // Now deliberately remove the blocks
+            String bpid = cluster.getNamesystem().getBlockPoolId();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
+            Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports = new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
+            assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
+            /*
+      for (BlockListAsLongsJVMInterface report : blockReports.values()) {
+        for (BlockReportReplica brr : report) {
+          LOG.info("Deliberately removing block {}", brr.getBlockName());
+          cluster.getFsDatasetTestUtils(2).getMaterializedReplica(
+              new ExtendedBlock(bpid, brr)).deleteData();
+        }
       }
+      assertTrue("Corrupted replicas not handled properly.",
+                 util.checkFiles(fs, "/srcdat"));
+       */
+            util.cleanup(fs, "/srcdat");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-    return null;
-  }
+
+    @Test
+    public void testFileCorruption_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").setNumFiles(20).build();
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            FileSystem fs = cluster.getFileSystem();
+            util.createFiles(fs, "/srcdat");
+            // Now deliberately remove the blocks
+            String bpid = cluster.getNamesystem().getBlockPoolId();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
+            Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports = new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
+            /*
+      for (BlockListAsLongsJVMInterface report : blockReports.values()) {
+        for (BlockReportReplica brr : report) {
+          LOG.info("Deliberately removing block {}", brr.getBlockName());
+          cluster.getFsDatasetTestUtils(2).getMaterializedReplica(
+              new ExtendedBlock(bpid, brr)).deleteData();
+        }
+      }
+      assertTrue("Corrupted replicas not handled properly.",
+                 util.checkFiles(fs, "/srcdat"));
+       */
+            util.cleanup(fs, "/srcdat");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFileCorruption_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        DFSTestUtil util = new DFSTestUtil.Builder().setName("TestFileCorruption").setNumFiles(20).build();
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            FileSystem fs = cluster.getFileSystem();
+            util.createFiles(fs, "/srcdat");
+            // Now deliberately remove the blocks
+            String bpid = cluster.getNamesystem().getBlockPoolId();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(2);
+            Map<DatanodeStorageJVMInterface, BlockListAsLongsJVMInterface> blockReports = new HashMap<>(dn.getFSDataset().getBlockReports(bpid));
+            assertTrue("Blocks do not exist on data-dir", !blockReports.isEmpty());
+            /*
+      for (BlockListAsLongsJVMInterface report : blockReports.values()) {
+        for (BlockReportReplica brr : report) {
+          LOG.info("Deliberately removing block {}", brr.getBlockName());
+          cluster.getFsDatasetTestUtils(2).getMaterializedReplica(
+              new ExtendedBlock(bpid, brr)).deleteData();
+        }
+      }
+      assertTrue("Corrupted replicas not handled properly.",
+                 util.checkFiles(fs, "/srcdat"));
+       */
+            util.cleanup(fs, "/srcdat");
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
+
+    @Test
+    public void testArrayOutOfBoundsException_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.waitActive();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 2, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      assertFalse("Data directory does not contain any blocks or there was an "
+          + "IO error", blk==null);
+
+      // start a third datanode
+      cluster.startDataNodes(conf, 1, true, null, null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      DataNode dataNode = datanodes.get(2);
+      
+      // report corrupted block by the third datanode
+      DatanodeRegistration dnR = InternalDataNodeTestUtils.
+        getDNRegistrationForBP(dataNode, blk.getBlockPoolId());
+      FSNamesystem ns = cluster.getNamesystem();
+      ns.writeLock();
+      try {
+        cluster.getNamesystem().getBlockManager().findAndMarkBlockAsCorrupt(
+            blk, new DatanodeInfo(dnR), "TEST", "STORAGE_ID");
+      } finally {
+        ns.writeUnlock();
+      }
+      
+      // open the file
+      fs.open(FILE_PATH);
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testArrayOutOfBoundsException_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+            cluster.waitActive();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 2, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      assertFalse("Data directory does not contain any blocks or there was an "
+          + "IO error", blk==null);
+
+      // start a third datanode
+      cluster.startDataNodes(conf, 1, true, null, null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      DataNode dataNode = datanodes.get(2);
+      
+      // report corrupted block by the third datanode
+      DatanodeRegistration dnR = InternalDataNodeTestUtils.
+        getDNRegistrationForBP(dataNode, blk.getBlockPoolId());
+      FSNamesystem ns = cluster.getNamesystem();
+      ns.writeLock();
+      try {
+        cluster.getNamesystem().getBlockManager().findAndMarkBlockAsCorrupt(
+            blk, new DatanodeInfo(dnR), "TEST", "STORAGE_ID");
+      } finally {
+        ns.writeUnlock();
+      }
+      
+      // open the file
+      fs.open(FILE_PATH);
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testArrayOutOfBoundsException_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+            cluster.waitActive();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 2, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      assertFalse("Data directory does not contain any blocks or there was an "
+          + "IO error", blk==null);
+
+      // start a third datanode
+      cluster.startDataNodes(conf, 1, true, null, null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      DataNode dataNode = datanodes.get(2);
+      
+      // report corrupted block by the third datanode
+      DatanodeRegistration dnR = InternalDataNodeTestUtils.
+        getDNRegistrationForBP(dataNode, blk.getBlockPoolId());
+      FSNamesystem ns = cluster.getNamesystem();
+      ns.writeLock();
+      try {
+        cluster.getNamesystem().getBlockManager().findAndMarkBlockAsCorrupt(
+            blk, new DatanodeInfo(dnR), "TEST", "STORAGE_ID");
+      } finally {
+        ns.writeUnlock();
+      }
+      
+      // open the file
+      fs.open(FILE_PATH);
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testArrayOutOfBoundsException_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+            cluster.waitActive();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 2, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      assertFalse("Data directory does not contain any blocks or there was an "
+          + "IO error", blk==null);
+
+      // start a third datanode
+      cluster.startDataNodes(conf, 1, true, null, null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      DataNode dataNode = datanodes.get(2);
+      
+      // report corrupted block by the third datanode
+      DatanodeRegistration dnR = InternalDataNodeTestUtils.
+        getDNRegistrationForBP(dataNode, blk.getBlockPoolId());
+      FSNamesystem ns = cluster.getNamesystem();
+      ns.writeLock();
+      try {
+        cluster.getNamesystem().getBlockManager().findAndMarkBlockAsCorrupt(
+            blk, new DatanodeInfo(dnR), "TEST", "STORAGE_ID");
+      } finally {
+        ns.writeUnlock();
+      }
+      
+      // open the file
+      fs.open(FILE_PATH);
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+        }
+    }
+
+    @Test
+    public void testCorruptionWithDiskFailure_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.waitActive();
+            BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            File storageDir = cluster.getInstanceStorageDir(0, 0);
+            File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
+            assertTrue("Data directory does not exist", dataDir.exists());
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      if (blk == null) {
+        blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      }
+      assertFalse("Data directory does not contain any blocks or there was an" +
+          " " +
+          "IO error", blk == null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      FSNamesystem ns = cluster.getNamesystem();
+      //fail the storage on that node which has the block
+      try {
+        ns.writeLock();
+        updateAllStorages(bm);
+      } finally {
+        ns.writeUnlock();
+      }
+      ns.writeLock();
+      try {
+        markAllBlocksAsCorrupt(bm, blk);
+      } finally {
+        ns.writeUnlock();
+      }
+
+      // open the file
+      fs.open(FILE_PATH);
+
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testCorruptionWithDiskFailure_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.waitActive();
+            BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            File storageDir = cluster.getInstanceStorageDir(0, 0);
+            File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
+            assertTrue("Data directory does not exist", dataDir.exists());
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      if (blk == null) {
+        blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      }
+      assertFalse("Data directory does not contain any blocks or there was an" +
+          " " +
+          "IO error", blk == null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      FSNamesystem ns = cluster.getNamesystem();
+      //fail the storage on that node which has the block
+      try {
+        ns.writeLock();
+        updateAllStorages(bm);
+      } finally {
+        ns.writeUnlock();
+      }
+      ns.writeLock();
+      try {
+        markAllBlocksAsCorrupt(bm, blk);
+      } finally {
+        ns.writeUnlock();
+      }
+
+      // open the file
+      fs.open(FILE_PATH);
+
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testCorruptionWithDiskFailure_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.waitActive();
+            BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            File storageDir = cluster.getInstanceStorageDir(0, 0);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
+            assertTrue("Data directory does not exist", dataDir.exists());
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      if (blk == null) {
+        blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      }
+      assertFalse("Data directory does not contain any blocks or there was an" +
+          " " +
+          "IO error", blk == null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      FSNamesystem ns = cluster.getNamesystem();
+      //fail the storage on that node which has the block
+      try {
+        ns.writeLock();
+        updateAllStorages(bm);
+      } finally {
+        ns.writeUnlock();
+      }
+      ns.writeLock();
+      try {
+        markAllBlocksAsCorrupt(bm, blk);
+      } finally {
+        ns.writeUnlock();
+      }
+
+      // open the file
+      fs.open(FILE_PATH);
+
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testCorruptionWithDiskFailure_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
+            cluster.waitActive();
+            BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            FileSystem fs = cluster.getFileSystem();
+            final Path FILE_PATH = new Path("/tmp.txt");
+            final long FILE_LEN = 1L;
+            DFSTestUtil.createFile(fs, FILE_PATH, FILE_LEN, (short) 3, 1L);
+            // get the block
+            final String bpid = cluster.getNamesystem().getBlockPoolId();
+            File storageDir = cluster.getInstanceStorageDir(0, 0);
+            File dataDir = MiniDFSClusterInJVM.getFinalizedDir(storageDir, bpid);
+            assertTrue("Data directory does not exist", dataDir.exists());
+            /*
+      ExtendedBlock blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      if (blk == null) {
+        blk = getFirstBlock(cluster.getDataNodes().get(0), bpid);
+      }
+      assertFalse("Data directory does not contain any blocks or there was an" +
+          " " +
+          "IO error", blk == null);
+      ArrayList<DataNode> datanodes = cluster.getDataNodes();
+      assertEquals(datanodes.size(), 3);
+      FSNamesystem ns = cluster.getNamesystem();
+      //fail the storage on that node which has the block
+      try {
+        ns.writeLock();
+        updateAllStorages(bm);
+      } finally {
+        ns.writeUnlock();
+      }
+      ns.writeLock();
+      try {
+        markAllBlocksAsCorrupt(bm, blk);
+      } finally {
+        ns.writeUnlock();
+      }
+
+      // open the file
+      fs.open(FILE_PATH);
+
+       */
+            //clean up
+            fs.delete(FILE_PATH, false);
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
+
+    @Test
+    public void testSetReplicationWhenBatchIBR_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY, 30000);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY, 1);
+        DistributedFileSystem dfs;
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            // 1024 Bytes each time
+            final int bufferSize = 1024;
+            byte[] outBuffer = new byte[bufferSize];
+            dfs = cluster.getFileSystem();
+            String fileName = "/testSetRep1";
+            Path filePath = new Path(fileName);
+            FSDataOutputStream out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            out.close();
+            //sending the FBR to Delay next IBR
+            cluster.triggerBlockReports();
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        cluster.triggerBlockReports();
+                        if (cluster.getNamesystem().getBlocksTotal() == 1) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        // Ignore the exception
+                    }
+                    return false;
+                }
+            }, 10, 3000);
+            fileName = "/testSetRep2";
+            filePath = new Path(fileName);
+            out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            dfs.setReplication(filePath, (short) 10);
+            cluster.triggerBlockReports();
+            // underreplicated Blocks should be one after setrep
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return cluster.getNamesystem().getBlockManager().getUnderReplicatedBlocksCount() == 1;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 10, 3000);
+            assertEquals(0, cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
+        }
+    }
+
+    @Test
+    public void testSetReplicationWhenBatchIBR_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY, 30000);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY, 1);
+        DistributedFileSystem dfs;
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            // 1024 Bytes each time
+            final int bufferSize = 1024;
+            byte[] outBuffer = new byte[bufferSize];
+            dfs = cluster.getFileSystem();
+            String fileName = "/testSetRep1";
+            Path filePath = new Path(fileName);
+            FSDataOutputStream out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            //sending the FBR to Delay next IBR
+            cluster.triggerBlockReports();
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        cluster.triggerBlockReports();
+                        cluster.restartNodeForTesting(0);
+                        cluster.upgradeNodeForTesting(0);
+                        if (cluster.getNamesystem().getBlocksTotal() == 1) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        // Ignore the exception
+                    }
+                    return false;
+                }
+            }, 10, 3000);
+            fileName = "/testSetRep2";
+            filePath = new Path(fileName);
+            out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            dfs.setReplication(filePath, (short) 10);
+            cluster.triggerBlockReports();
+            // underreplicated Blocks should be one after setrep
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return cluster.getNamesystem().getBlockManager().getUnderReplicatedBlocksCount() == 1;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 10, 3000);
+            assertEquals(0, cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
+        }
+    }
+
+    @Test
+    public void testSetReplicationWhenBatchIBR_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY, 30000);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY, 1);
+        DistributedFileSystem dfs;
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            // 1024 Bytes each time
+            final int bufferSize = 1024;
+            byte[] outBuffer = new byte[bufferSize];
+            dfs = cluster.getFileSystem();
+            String fileName = "/testSetRep1";
+            Path filePath = new Path(fileName);
+            FSDataOutputStream out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            //sending the FBR to Delay next IBR
+            cluster.triggerBlockReports();
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        cluster.triggerBlockReports();
+                        if (cluster.getNamesystem().getBlocksTotal() == 1) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        // Ignore the exception
+                    }
+                    return false;
+                }
+            }, 10, 3000);
+            fileName = "/testSetRep2";
+            filePath = new Path(fileName);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            dfs.setReplication(filePath, (short) 10);
+            cluster.triggerBlockReports();
+            // underreplicated Blocks should be one after setrep
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return cluster.getNamesystem().getBlockManager().getUnderReplicatedBlocksCount() == 1;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 10, 3000);
+            assertEquals(0, cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
+        }
+    }
+
+    @Test
+    public void testSetReplicationWhenBatchIBR_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 100);
+        conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_INTERVAL_MSEC_KEY, 30000);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_FILE_CLOSE_NUM_COMMITTED_ALLOWED_KEY, 1);
+        DistributedFileSystem dfs;
+        try (MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build()) {
+            // 1024 Bytes each time
+            final int bufferSize = 1024;
+            byte[] outBuffer = new byte[bufferSize];
+            dfs = cluster.getFileSystem();
+            String fileName = "/testSetRep1";
+            Path filePath = new Path(fileName);
+            FSDataOutputStream out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            //sending the FBR to Delay next IBR
+            cluster.triggerBlockReports();
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        cluster.triggerBlockReports();
+                        if (cluster.getNamesystem().getBlocksTotal() == 1) {
+                            return true;
+                        }
+                    } catch (Exception e) {
+                        // Ignore the exception
+                    }
+                    return false;
+                }
+            }, 10, 3000);
+            fileName = "/testSetRep2";
+            filePath = new Path(fileName);
+            out = dfs.create(filePath);
+            out.write(outBuffer, 0, bufferSize);
+            out.close();
+            dfs.setReplication(filePath, (short) 10);
+            cluster.triggerBlockReports();
+            // underreplicated Blocks should be one after setrep
+            GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    try {
+                        return cluster.getNamesystem().getBlockManager().getUnderReplicatedBlocksCount() == 1;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+            }, 10, 3000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals(0, cluster.getNamesystem().getBlockManager().getMissingBlocksCount());
+        }
+    }
 }

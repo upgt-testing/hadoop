@@ -19,14 +19,12 @@ package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -59,103 +57,98 @@ import org.mockito.Mockito;
  */
 public class TestDiskError {
 
-  private FileSystem fs;
-  private MiniDFSClusterInJVM cluster;
-  private Configuration conf;
+    private FileSystem fs;
 
-  @Before
-  public void setUp() throws Exception {
-    conf = new HdfsConfiguration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 512L);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    fs = cluster.getFileSystem();
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private Configuration conf;
+
+    @Before
+    public void setUp() throws Exception {
+        conf = new HdfsConfiguration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 512L);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
     }
-  }
 
-  /**
-   * Test to check that a DN goes down when all its volumes have failed.
-   */
-  @Test
-  public void testShutdown() throws Exception {
-    if (System.getProperty("os.name").startsWith("Windows")) {
-      /**
-       * This test depends on OS not allowing file creations on a directory
-       * that does not have write permissions for the user. Apparently it is 
-       * not the case on Windows (at least under Cygwin), and possibly AIX.
-       * This is disabled on Windows.
-       */
-      return;
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-    // Bring up two more datanodes
-    cluster.startDataNodes(conf, 2, true, null, null);
-    cluster.waitActive();
-    final int dnIndex = 0;
-    String bpid = cluster.getNamesystem().getBlockPoolId();
-    File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
-    File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
-    storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
-    File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
-    try {
-      // make the data directory of the first datanode to be readonly
-      assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
-      assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
 
-      // create files and make sure that first datanode will be down
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
-      for (int i=0; dn.isDatanodeUp(); i++) {
-        Path fileName = new Path("/test.txt"+i);
-        DFSTestUtil.createFile(fs, fileName, 1024, (short)2, 1L);
-        DFSTestUtil.waitReplication(fs, fileName, (short)2);
-        fs.delete(fileName, true);
-      }
-    } finally {
-      // restore its old permission
-      FileUtil.setWritable(dir1, true);
-      FileUtil.setWritable(dir2, true);
+    /**
+     * Test to check that a DN goes down when all its volumes have failed.
+     */
+    @Test
+    public void testShutdown() throws Exception {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /**
+             * This test depends on OS not allowing file creations on a directory
+             * that does not have write permissions for the user. Apparently it is
+             * not the case on Windows (at least under Cygwin), and possibly AIX.
+             * This is disabled on Windows.
+             */
+            return;
+        }
+        // Bring up two more datanodes
+        cluster.startDataNodes(conf, 2, true, null, null);
+        cluster.waitActive();
+        final int dnIndex = 0;
+        String bpid = cluster.getNamesystem().getBlockPoolId();
+        File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
+        File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
+        File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        try {
+            // make the data directory of the first datanode to be readonly
+            assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
+            assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
+            // create files and make sure that first datanode will be down
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
+            for (int i = 0; dn.isDatanodeUp(); i++) {
+                Path fileName = new Path("/test.txt" + i);
+                DFSTestUtil.createFile(fs, fileName, 1024, (short) 2, 1L);
+                DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+                fs.delete(fileName, true);
+            }
+        } finally {
+            // restore its old permission
+            FileUtil.setWritable(dir1, true);
+            FileUtil.setWritable(dir2, true);
+        }
     }
-  }
 
-  /**
-   * Test that when there is a failure replicating a block the temporary
-   * and meta files are cleaned up and subsequent replication succeeds.
-   */
-  @Test
-  public void testReplicationError() throws Exception {
-    // create a file of replication factor of 1
-    final Path fileName = new Path("/test.txt");
-    final int fileLen = 1;
-    DFSTestUtil.createFile(fs, fileName, 1, (short)1, 1L);
-    DFSTestUtil.waitReplication(fs, fileName, (short)1);
-
-    // get the block belonged to the created file
-    LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(
-        cluster.getNameNode(), fileName.toString(), 0, (long)fileLen);
-    assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
-    LocatedBlockJVMInterface block = blocks.get(0);
-
-    // bring up a second datanode
-    cluster.startDataNodes(conf, 1, true, null, null);
-    cluster.waitActive();
-    final int sndNode = 1;
-    DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
-
-    // replicate the block to the second datanode
-    InetSocketAddress target = datanode.getXferAddress();
-    Socket s = new Socket(target.getAddress(), target.getPort());
-    // write the header.
-    DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
-    DataChecksum checksum = DataChecksum.newDataChecksum(
-        DataChecksum.Type.CRC32, 512);
-    /*
+    /**
+     * Test that when there is a failure replicating a block the temporary
+     * and meta files are cleaned up and subsequent replication succeeds.
+     */
+    @Test
+    public void testReplicationError() throws Exception {
+        // create a file of replication factor of 1
+        final Path fileName = new Path("/test.txt");
+        final int fileLen = 1;
+        DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
+        DFSTestUtil.waitReplication(fs, fileName, (short) 1);
+        // get the block belonged to the created file
+        LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
+        LocatedBlockJVMInterface block = blocks.get(0);
+        // bring up a second datanode
+        cluster.startDataNodes(conf, 1, true, null, null);
+        cluster.waitActive();
+        final int sndNode = 1;
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
+        // replicate the block to the second datanode
+        InetSocketAddress target = datanode.getXferAddress();
+        Socket s = new Socket(target.getAddress(), target.getPort());
+        // write the header.
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+        /*
     new Sender(out).writeBlock(block.getBlock(), StorageType.DEFAULT,
         BlockTokenSecretManager.DUMMY_TOKEN, "",
         new DatanodeInfo[0], new StorageType[0], null,
@@ -184,40 +177,36 @@ public class TestDiskError {
     // clean up the file
     fs.delete(fileName, false);
      */
-  }
-
-  /**
-   * Check that the permissions of the local DN directories are as expected.
-   */
-  @Test
-  public void testLocalDirs() throws Exception {
-    Configuration conf = new Configuration();
-    final String permStr = conf.get(
-      DFSConfigKeys.DFS_DATANODE_DATA_DIR_PERMISSION_KEY);
-    FsPermission expected = new FsPermission(permStr);
-
-    // Check permissions on directories in 'dfs.datanode.data.dir'
-    FileSystem localFS = FileSystem.getLocal(conf);
-    for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
-      try (FsVolumeReferencesJVMInterface volumes =
-          dn.getFSDataset().getFsVolumeReferences()) {
-        for (FsVolumeSpi vol : volumes) {
-          String dir = vol.getBasePath();
-          Path dataDir = new Path(dir);
-          FsPermission actual = localFS.getFileStatus(dataDir).getPermission();
-          assertEquals("Permission for dir: " + dataDir + ", is " + actual +
-              ", while expected is " + expected, expected, actual);
-        }
-      }
     }
-  }
-  
-  /**
-   * Checks whether {@link DataNode#checkDiskErrorAsync()} is being called or not.
-   * Before refactoring the code the above function was not getting called 
-   * @throws IOException, InterruptedException
-   */
-  /*
+
+    /**
+     * Check that the permissions of the local DN directories are as expected.
+     */
+    @Test
+    public void testLocalDirs() throws Exception {
+        Configuration conf = new Configuration();
+        final String permStr = conf.get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_PERMISSION_KEY);
+        FsPermission expected = new FsPermission(permStr);
+        // Check permissions on directories in 'dfs.datanode.data.dir'
+        FileSystem localFS = FileSystem.getLocal(conf);
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
+            try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+                for (FsVolumeSpi vol : volumes) {
+                    String dir = vol.getBasePath();
+                    Path dataDir = new Path(dir);
+                    FsPermission actual = localFS.getFileStatus(dataDir).getPermission();
+                    assertEquals("Permission for dir: " + dataDir + ", is " + actual + ", while expected is " + expected, expected, actual);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks whether {@link DataNode#checkDiskErrorAsync()} is being called or not.
+     * Before refactoring the code the above function was not getting called
+     * @throws IOException, InterruptedException
+     */
+    /*
   @Test
   public void testcheckDiskError() throws IOException, InterruptedException {
     if(cluster.getDataNodes().size() <= 0) {
@@ -233,8 +222,7 @@ public class TestDiskError {
     assertTrue("Disk Error check is not performed within  " + dataNode.checkDiskErrorInterval +  "  ms", ((Time.monotonicNow()-lastDiskErrorCheck) < (dataNode.checkDiskErrorInterval + slackTime)));
   }
    */
-
-  /*
+    /*
   @Test
   public void testDataTransferWhenBytesPerChecksumIsZero() throws IOException {
     DataNode dn0 = cluster.getDataNodes().get(0);
@@ -284,4 +272,313 @@ public class TestDiskError {
         Mockito.eq(block));
   }
    */
+    @Test
+    public void testShutdown_withUpgrade20() throws Exception {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /**
+             * This test depends on OS not allowing file creations on a directory
+             * that does not have write permissions for the user. Apparently it is
+             * not the case on Windows (at least under Cygwin), and possibly AIX.
+             * This is disabled on Windows.
+             */
+            return;
+        }
+        // Bring up two more datanodes
+        cluster.startDataNodes(conf, 2, true, null, null);
+        cluster.waitActive();
+        final int dnIndex = 0;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        String bpid = cluster.getNamesystem().getBlockPoolId();
+        File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
+        File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
+        File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        try {
+            // make the data directory of the first datanode to be readonly
+            assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
+            assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
+            // create files and make sure that first datanode will be down
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
+            for (int i = 0; dn.isDatanodeUp(); i++) {
+                Path fileName = new Path("/test.txt" + i);
+                DFSTestUtil.createFile(fs, fileName, 1024, (short) 2, 1L);
+                DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+                fs.delete(fileName, true);
+            }
+        } finally {
+            // restore its old permission
+            FileUtil.setWritable(dir1, true);
+            FileUtil.setWritable(dir2, true);
+        }
+    }
+
+    @Test
+    public void testShutdown_withUpgrade40() throws Exception {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /**
+             * This test depends on OS not allowing file creations on a directory
+             * that does not have write permissions for the user. Apparently it is
+             * not the case on Windows (at least under Cygwin), and possibly AIX.
+             * This is disabled on Windows.
+             */
+            return;
+        }
+        // Bring up two more datanodes
+        cluster.startDataNodes(conf, 2, true, null, null);
+        cluster.waitActive();
+        final int dnIndex = 0;
+        String bpid = cluster.getNamesystem().getBlockPoolId();
+        File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
+        File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
+        File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            // make the data directory of the first datanode to be readonly
+            assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
+            assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
+            // create files and make sure that first datanode will be down
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
+            for (int i = 0; dn.isDatanodeUp(); i++) {
+                Path fileName = new Path("/test.txt" + i);
+                DFSTestUtil.createFile(fs, fileName, 1024, (short) 2, 1L);
+                DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+                fs.delete(fileName, true);
+            }
+        } finally {
+            // restore its old permission
+            FileUtil.setWritable(dir1, true);
+            FileUtil.setWritable(dir2, true);
+        }
+    }
+
+    @Test
+    public void testShutdown_withUpgrade60() throws Exception {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /**
+             * This test depends on OS not allowing file creations on a directory
+             * that does not have write permissions for the user. Apparently it is
+             * not the case on Windows (at least under Cygwin), and possibly AIX.
+             * This is disabled on Windows.
+             */
+            return;
+        }
+        // Bring up two more datanodes
+        cluster.startDataNodes(conf, 2, true, null, null);
+        cluster.waitActive();
+        final int dnIndex = 0;
+        String bpid = cluster.getNamesystem().getBlockPoolId();
+        File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
+        File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
+        File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        try {
+            // make the data directory of the first datanode to be readonly
+            assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
+            assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
+            // create files and make sure that first datanode will be down
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            for (int i = 0; dn.isDatanodeUp(); i++) {
+                Path fileName = new Path("/test.txt" + i);
+                DFSTestUtil.createFile(fs, fileName, 1024, (short) 2, 1L);
+                DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+                fs.delete(fileName, true);
+            }
+        } finally {
+            // restore its old permission
+            FileUtil.setWritable(dir1, true);
+            FileUtil.setWritable(dir2, true);
+        }
+    }
+
+    @Test
+    public void testShutdown_withUpgrade80() throws Exception {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            /**
+             * This test depends on OS not allowing file creations on a directory
+             * that does not have write permissions for the user. Apparently it is
+             * not the case on Windows (at least under Cygwin), and possibly AIX.
+             * This is disabled on Windows.
+             */
+            return;
+        }
+        // Bring up two more datanodes
+        cluster.startDataNodes(conf, 2, true, null, null);
+        cluster.waitActive();
+        final int dnIndex = 0;
+        String bpid = cluster.getNamesystem().getBlockPoolId();
+        File storageDir = cluster.getInstanceStorageDir(dnIndex, 0);
+        File dir1 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        storageDir = cluster.getInstanceStorageDir(dnIndex, 1);
+        File dir2 = MiniDFSClusterInJVM.getRbwDir(storageDir, bpid);
+        try {
+            // make the data directory of the first datanode to be readonly
+            assertTrue("Couldn't chmod local vol", dir1.setReadOnly());
+            assertTrue("Couldn't chmod local vol", dir2.setReadOnly());
+            // create files and make sure that first datanode will be down
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(dnIndex);
+            for (int i = 0; dn.isDatanodeUp(); i++) {
+                Path fileName = new Path("/test.txt" + i);
+                DFSTestUtil.createFile(fs, fileName, 1024, (short) 2, 1L);
+                DFSTestUtil.waitReplication(fs, fileName, (short) 2);
+                fs.delete(fileName, true);
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            // restore its old permission
+            FileUtil.setWritable(dir1, true);
+            FileUtil.setWritable(dir2, true);
+        }
+    }
+
+    @Test
+    public void testReplicationError_withUpgrade20() throws Exception {
+        // create a file of replication factor of 1
+        final Path fileName = new Path("/test.txt");
+        final int fileLen = 1;
+        DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
+        DFSTestUtil.waitReplication(fs, fileName, (short) 1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // get the block belonged to the created file
+        LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
+        LocatedBlockJVMInterface block = blocks.get(0);
+        // bring up a second datanode
+        cluster.startDataNodes(conf, 1, true, null, null);
+        cluster.waitActive();
+        final int sndNode = 1;
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
+        // replicate the block to the second datanode
+        InetSocketAddress target = datanode.getXferAddress();
+        Socket s = new Socket(target.getAddress(), target.getPort());
+        // write the header.
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+    }
+
+    @Test
+    public void testReplicationError_withUpgrade40() throws Exception {
+        // create a file of replication factor of 1
+        final Path fileName = new Path("/test.txt");
+        final int fileLen = 1;
+        DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
+        DFSTestUtil.waitReplication(fs, fileName, (short) 1);
+        // get the block belonged to the created file
+        LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
+        LocatedBlockJVMInterface block = blocks.get(0);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // bring up a second datanode
+        cluster.startDataNodes(conf, 1, true, null, null);
+        cluster.waitActive();
+        final int sndNode = 1;
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
+        // replicate the block to the second datanode
+        InetSocketAddress target = datanode.getXferAddress();
+        Socket s = new Socket(target.getAddress(), target.getPort());
+        // write the header.
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+    }
+
+    @Test
+    public void testReplicationError_withUpgrade60() throws Exception {
+        // create a file of replication factor of 1
+        final Path fileName = new Path("/test.txt");
+        final int fileLen = 1;
+        DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
+        DFSTestUtil.waitReplication(fs, fileName, (short) 1);
+        // get the block belonged to the created file
+        LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
+        LocatedBlockJVMInterface block = blocks.get(0);
+        // bring up a second datanode
+        cluster.startDataNodes(conf, 1, true, null, null);
+        cluster.waitActive();
+        final int sndNode = 1;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
+        // replicate the block to the second datanode
+        InetSocketAddress target = datanode.getXferAddress();
+        Socket s = new Socket(target.getAddress(), target.getPort());
+        // write the header.
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+    }
+
+    @Test
+    public void testReplicationError_withUpgrade80() throws Exception {
+        // create a file of replication factor of 1
+        final Path fileName = new Path("/test.txt");
+        final int fileLen = 1;
+        DFSTestUtil.createFile(fs, fileName, 1, (short) 1, 1L);
+        DFSTestUtil.waitReplication(fs, fileName, (short) 1);
+        // get the block belonged to the created file
+        LocatedBlocksJVMInterface blocks = NameNodeAdapter.getBlockLocations(cluster.getNameNode(), fileName.toString(), 0, (long) fileLen);
+        assertEquals("Should only find 1 block", blocks.locatedBlockCount(), 1);
+        LocatedBlockJVMInterface block = blocks.get(0);
+        // bring up a second datanode
+        cluster.startDataNodes(conf, 1, true, null, null);
+        cluster.waitActive();
+        final int sndNode = 1;
+        DataNodeJVMInterface datanode = cluster.getDataNodes().get(sndNode);
+        // replicate the block to the second datanode
+        InetSocketAddress target = datanode.getXferAddress();
+        Socket s = new Socket(target.getAddress(), target.getPort());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // write the header.
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataChecksum checksum = DataChecksum.newDataChecksum(DataChecksum.Type.CRC32, 512);
+    }
+
+    @Test
+    public void testLocalDirs_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        final String permStr = conf.get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_PERMISSION_KEY);
+        FsPermission expected = new FsPermission(permStr);
+        // Check permissions on directories in 'dfs.datanode.data.dir'
+        FileSystem localFS = FileSystem.getLocal(conf);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
+            try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+                for (FsVolumeSpi vol : volumes) {
+                    String dir = vol.getBasePath();
+                    Path dataDir = new Path(dir);
+                    FsPermission actual = localFS.getFileStatus(dataDir).getPermission();
+                    assertEquals("Permission for dir: " + dataDir + ", is " + actual + ", while expected is " + expected, expected, actual);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDirs_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        final String permStr = conf.get(DFSConfigKeys.DFS_DATANODE_DATA_DIR_PERMISSION_KEY);
+        FsPermission expected = new FsPermission(permStr);
+        // Check permissions on directories in 'dfs.datanode.data.dir'
+        FileSystem localFS = FileSystem.getLocal(conf);
+        for (DataNodeJVMInterface dn : cluster.getDataNodes()) {
+            try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+                for (FsVolumeSpi vol : volumes) {
+                    String dir = vol.getBasePath();
+                    Path dataDir = new Path(dir);
+                    FsPermission actual = localFS.getFileStatus(dataDir).getPermission();
+                    assertEquals("Permission for dir: " + dataDir + ", is " + actual + ", while expected is " + expected, expected, actual);
+                }
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+        }
+    }
 }

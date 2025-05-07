@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs;
 
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerJVMInterface;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -30,12 +29,9 @@ import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
 import org.junit.Assert;
 import org.junit.Test;
-
 import javax.management.*;
-
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,105 +41,369 @@ import static org.junit.Assert.assertTrue;
  * a warning in such a case.
  */
 public class TestMissingBlocksAlert {
-  
-  private static final Log LOG =
-                           LogFactory.getLog(TestMissingBlocksAlert.class);
-  
-  @Test
-  public void testMissingBlocksAlert()
-          throws IOException, InterruptedException,
-                 MalformedObjectNameException, AttributeNotFoundException,
-                 MBeanException, ReflectionException,
-                 InstanceNotFoundException {
-    
-    MiniDFSClusterInJVM cluster = null;
-    
-    try {
-      Configuration conf = new HdfsConfiguration();
-      //minimize test delay
-      conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
-      conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
-      int fileLen = 10*1024;
-      conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen/2);
 
-      //start a cluster with single datanode
-      cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-      cluster.waitActive();
+    private static final Log LOG = LogFactory.getLog(TestMissingBlocksAlert.class);
 
-      final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
-      DistributedFileSystem dfs =
-          cluster.getFileSystem();
-
-      // create a normal file
-      DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), 
-                             fileLen, (short)3, 0);
-
-      Path corruptFile = new Path("/testMissingBlocks/corruptFile");
-      DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short)3, 0);
-
-      // Corrupt the block
-      ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
-      cluster.corruptReplica(0, block);
-
-      // read the file so that the corrupt block is reported to NN
-      FSDataInputStream in = dfs.open(corruptFile); 
-      try {
-        in.readFully(new byte[fileLen]);
-      } catch (ChecksumException ignored) { // checksum error is expected.      
-      }
-      in.close();
-
-      LOG.info("Waiting for missing blocks count to increase...");
-
-      while (dfs.getMissingBlocksCount() <= 0) {
-        Thread.sleep(100);
-      }
-      assertTrue(dfs.getMissingBlocksCount() == 1);
-      assertEquals(4, dfs.getUnderReplicatedBlocksCount());
-      assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
-
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      ObjectName mxbeanName = new ObjectName(
-              "Hadoop:service=NameNode,name=NameNodeInfo");
-      Assert.assertEquals(1, (long)(Long) mbs.getAttribute(mxbeanName,
-                      "NumberOfMissingBlocks"));
-
-      // now do the reverse : remove the file expect the number of missing 
-      // blocks to go to zero
-
-      dfs.delete(corruptFile, true);
-
-      LOG.info("Waiting for missing blocks count to be zero...");
-      while (dfs.getMissingBlocksCount() > 0) {
-        Thread.sleep(100);
-      }
-
-      assertEquals(2, dfs.getUnderReplicatedBlocksCount());
-      assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
-
-      Assert.assertEquals(0, (long)(Long) mbs.getAttribute(mxbeanName,
-              "NumberOfMissingBlocks"));
-
-      Path replOneFile = new Path("/testMissingBlocks/replOneFile");
-      DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short)1, 0);
-      ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(
-          dfs, replOneFile);
-      cluster.corruptReplica(0, replOneBlock);
-
-      // read the file so that the corrupt block is reported to NN
-      in = dfs.open(replOneFile);
-      try {
-        in.readFully(new byte[fileLen]);
-      } catch (ChecksumException ignored) { // checksum error is expected.
-      }
-      in.close();
-      assertEquals(1, dfs.getMissingReplOneBlocksCount());
-      Assert.assertEquals(1, (long)(Long) mbs.getAttribute(mxbeanName,
-          "NumberOfMissingBlocksWithReplicationFactorOne"));
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    @Test
+    public void testMissingBlocksAlert() throws IOException, InterruptedException, MalformedObjectNameException, AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            //minimize test delay
+            conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
+            conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+            int fileLen = 10 * 1024;
+            conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen / 2);
+            //start a cluster with single datanode
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            cluster.waitActive();
+            final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            // create a normal file
+            DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), fileLen, (short) 3, 0);
+            Path corruptFile = new Path("/testMissingBlocks/corruptFile");
+            DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short) 3, 0);
+            // Corrupt the block
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
+            cluster.corruptReplica(0, block);
+            // read the file so that the corrupt block is reported to NN
+            FSDataInputStream in = dfs.open(corruptFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            LOG.info("Waiting for missing blocks count to increase...");
+            while (dfs.getMissingBlocksCount() <= 0) {
+                Thread.sleep(100);
+            }
+            assertTrue(dfs.getMissingBlocksCount() == 1);
+            assertEquals(4, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            // now do the reverse : remove the file expect the number of missing
+            // blocks to go to zero
+            dfs.delete(corruptFile, true);
+            LOG.info("Waiting for missing blocks count to be zero...");
+            while (dfs.getMissingBlocksCount() > 0) {
+                Thread.sleep(100);
+            }
+            assertEquals(2, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
+            Assert.assertEquals(0, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            Path replOneFile = new Path("/testMissingBlocks/replOneFile");
+            DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short) 1, 0);
+            ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(dfs, replOneFile);
+            cluster.corruptReplica(0, replOneBlock);
+            // read the file so that the corrupt block is reported to NN
+            in = dfs.open(replOneFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            assertEquals(1, dfs.getMissingReplOneBlocksCount());
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocksWithReplicationFactorOne"));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
+
+    @Test
+    public void testMissingBlocksAlert_withUpgrade20() throws IOException, InterruptedException, MalformedObjectNameException, AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            //minimize test delay
+            conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
+            conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+            int fileLen = 10 * 1024;
+            conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen / 2);
+            //start a cluster with single datanode
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            cluster.waitActive();
+            final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            // create a normal file
+            DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), fileLen, (short) 3, 0);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Path corruptFile = new Path("/testMissingBlocks/corruptFile");
+            DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short) 3, 0);
+            // Corrupt the block
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
+            cluster.corruptReplica(0, block);
+            // read the file so that the corrupt block is reported to NN
+            FSDataInputStream in = dfs.open(corruptFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            LOG.info("Waiting for missing blocks count to increase...");
+            while (dfs.getMissingBlocksCount() <= 0) {
+                Thread.sleep(100);
+            }
+            assertTrue(dfs.getMissingBlocksCount() == 1);
+            assertEquals(4, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            // now do the reverse : remove the file expect the number of missing
+            // blocks to go to zero
+            dfs.delete(corruptFile, true);
+            LOG.info("Waiting for missing blocks count to be zero...");
+            while (dfs.getMissingBlocksCount() > 0) {
+                Thread.sleep(100);
+            }
+            assertEquals(2, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
+            Assert.assertEquals(0, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            Path replOneFile = new Path("/testMissingBlocks/replOneFile");
+            DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short) 1, 0);
+            ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(dfs, replOneFile);
+            cluster.corruptReplica(0, replOneBlock);
+            // read the file so that the corrupt block is reported to NN
+            in = dfs.open(replOneFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            assertEquals(1, dfs.getMissingReplOneBlocksCount());
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocksWithReplicationFactorOne"));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testMissingBlocksAlert_withUpgrade40() throws IOException, InterruptedException, MalformedObjectNameException, AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            //minimize test delay
+            conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
+            conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+            int fileLen = 10 * 1024;
+            conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen / 2);
+            //start a cluster with single datanode
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            cluster.waitActive();
+            final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            // create a normal file
+            DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), fileLen, (short) 3, 0);
+            Path corruptFile = new Path("/testMissingBlocks/corruptFile");
+            DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short) 3, 0);
+            // Corrupt the block
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
+            cluster.corruptReplica(0, block);
+            // read the file so that the corrupt block is reported to NN
+            FSDataInputStream in = dfs.open(corruptFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            LOG.info("Waiting for missing blocks count to increase...");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            while (dfs.getMissingBlocksCount() <= 0) {
+                Thread.sleep(100);
+            }
+            assertTrue(dfs.getMissingBlocksCount() == 1);
+            assertEquals(4, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            // now do the reverse : remove the file expect the number of missing
+            // blocks to go to zero
+            dfs.delete(corruptFile, true);
+            LOG.info("Waiting for missing blocks count to be zero...");
+            while (dfs.getMissingBlocksCount() > 0) {
+                Thread.sleep(100);
+            }
+            assertEquals(2, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
+            Assert.assertEquals(0, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            Path replOneFile = new Path("/testMissingBlocks/replOneFile");
+            DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short) 1, 0);
+            ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(dfs, replOneFile);
+            cluster.corruptReplica(0, replOneBlock);
+            // read the file so that the corrupt block is reported to NN
+            in = dfs.open(replOneFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            assertEquals(1, dfs.getMissingReplOneBlocksCount());
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocksWithReplicationFactorOne"));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testMissingBlocksAlert_withUpgrade60() throws IOException, InterruptedException, MalformedObjectNameException, AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            //minimize test delay
+            conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
+            conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+            int fileLen = 10 * 1024;
+            conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen / 2);
+            //start a cluster with single datanode
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            cluster.waitActive();
+            final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            // create a normal file
+            DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), fileLen, (short) 3, 0);
+            Path corruptFile = new Path("/testMissingBlocks/corruptFile");
+            DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short) 3, 0);
+            // Corrupt the block
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
+            cluster.corruptReplica(0, block);
+            // read the file so that the corrupt block is reported to NN
+            FSDataInputStream in = dfs.open(corruptFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            LOG.info("Waiting for missing blocks count to increase...");
+            while (dfs.getMissingBlocksCount() <= 0) {
+                Thread.sleep(100);
+            }
+            assertTrue(dfs.getMissingBlocksCount() == 1);
+            assertEquals(4, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            // now do the reverse : remove the file expect the number of missing
+            // blocks to go to zero
+            dfs.delete(corruptFile, true);
+            LOG.info("Waiting for missing blocks count to be zero...");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            while (dfs.getMissingBlocksCount() > 0) {
+                Thread.sleep(100);
+            }
+            assertEquals(2, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
+            Assert.assertEquals(0, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            Path replOneFile = new Path("/testMissingBlocks/replOneFile");
+            DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short) 1, 0);
+            ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(dfs, replOneFile);
+            cluster.corruptReplica(0, replOneBlock);
+            // read the file so that the corrupt block is reported to NN
+            in = dfs.open(replOneFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            assertEquals(1, dfs.getMissingReplOneBlocksCount());
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocksWithReplicationFactorOne"));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testMissingBlocksAlert_withUpgrade80() throws IOException, InterruptedException, MalformedObjectNameException, AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new HdfsConfiguration();
+            //minimize test delay
+            conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_INTERVAL_KEY, 0);
+            conf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
+            int fileLen = 10 * 1024;
+            conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, fileLen / 2);
+            //start a cluster with single datanode
+            cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+            cluster.waitActive();
+            final BlockManagerJVMInterface bm = cluster.getNamesystem().getBlockManager();
+            DistributedFileSystem dfs = cluster.getFileSystem();
+            // create a normal file
+            DFSTestUtil.createFile(dfs, new Path("/testMissingBlocksAlert/file1"), fileLen, (short) 3, 0);
+            Path corruptFile = new Path("/testMissingBlocks/corruptFile");
+            DFSTestUtil.createFile(dfs, corruptFile, fileLen, (short) 3, 0);
+            // Corrupt the block
+            ExtendedBlock block = DFSTestUtil.getFirstBlock(dfs, corruptFile);
+            cluster.corruptReplica(0, block);
+            // read the file so that the corrupt block is reported to NN
+            FSDataInputStream in = dfs.open(corruptFile);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            LOG.info("Waiting for missing blocks count to increase...");
+            while (dfs.getMissingBlocksCount() <= 0) {
+                Thread.sleep(100);
+            }
+            assertTrue(dfs.getMissingBlocksCount() == 1);
+            assertEquals(4, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(3, bm.getUnderReplicatedNotMissingBlocks());
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName mxbeanName = new ObjectName("Hadoop:service=NameNode,name=NameNodeInfo");
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            // now do the reverse : remove the file expect the number of missing
+            // blocks to go to zero
+            dfs.delete(corruptFile, true);
+            LOG.info("Waiting for missing blocks count to be zero...");
+            while (dfs.getMissingBlocksCount() > 0) {
+                Thread.sleep(100);
+            }
+            assertEquals(2, dfs.getUnderReplicatedBlocksCount());
+            assertEquals(2, bm.getUnderReplicatedNotMissingBlocks());
+            Assert.assertEquals(0, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocks"));
+            Path replOneFile = new Path("/testMissingBlocks/replOneFile");
+            DFSTestUtil.createFile(dfs, replOneFile, fileLen, (short) 1, 0);
+            ExtendedBlock replOneBlock = DFSTestUtil.getFirstBlock(dfs, replOneFile);
+            cluster.corruptReplica(0, replOneBlock);
+            // read the file so that the corrupt block is reported to NN
+            in = dfs.open(replOneFile);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            try {
+                in.readFully(new byte[fileLen]);
+            } catch (ChecksumException ignored) {
+                // checksum error is expected.
+            }
+            in.close();
+            assertEquals(1, dfs.getMissingReplOneBlocksCount());
+            Assert.assertEquals(1, (long) (Long) mbs.getAttribute(mxbeanName, "NumberOfMissingBlocksWithReplicationFactorOne"));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 }
