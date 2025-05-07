@@ -19,9 +19,7 @@ package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM;
@@ -34,35 +32,130 @@ import org.junit.Test;
  */
 public class TestStateTransitionFailure {
 
-  /**
-   * Ensure that a failure to fully transition to the active state causes a
-   * shutdown of the NameNode.
-   */
-  @Test
-  public void testFailureToTransitionCausesShutdown() throws IOException {
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      Configuration conf = new Configuration();
-      // Set an illegal value for the trash emptier interval. This will cause
-      // the NN to fail to transition to the active state.
-      conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
-      cluster = new MiniDFSClusterInJVM.Builder(conf)
-          .nnTopology(MiniDFSNNTopology.simpleHATopology())
-          .numDataNodes(0)
-          .checkExitOnShutdown(false)
-          .build();
-      cluster.waitActive();
-      try {
-        cluster.transitionToActive(0);
-        fail("Transitioned to active but should not have been able to.");
-      } catch (ExitException ee) {
-        assertExceptionContains(
-            "Cannot start trash emptier with negative interval", ee);
-      }
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
+    /**
+     * Ensure that a failure to fully transition to the active state causes a
+     * shutdown of the NameNode.
+     */
+    @Test
+    public void testFailureToTransitionCausesShutdown() throws IOException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new Configuration();
+            // Set an illegal value for the trash emptier interval. This will cause
+            // the NN to fail to transition to the active state.
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).checkExitOnShutdown(false).build();
+            cluster.waitActive();
+            try {
+                cluster.transitionToActive(0);
+                fail("Transitioned to active but should not have been able to.");
+            } catch (ExitException ee) {
+                assertExceptionContains("Cannot start trash emptier with negative interval", ee);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
     }
-  }
+
+    @Test
+    public void testFailureToTransitionCausesShutdown_withUpgrade20() throws IOException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new Configuration();
+            // Set an illegal value for the trash emptier interval. This will cause
+            // the NN to fail to transition to the active state.
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).checkExitOnShutdown(false).build();
+            cluster.waitActive();
+            try {
+                cluster.transitionToActive(0);
+                fail("Transitioned to active but should not have been able to.");
+            } catch (ExitException ee) {
+                assertExceptionContains("Cannot start trash emptier with negative interval", ee);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFailureToTransitionCausesShutdown_withUpgrade40() throws IOException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new Configuration();
+            // Set an illegal value for the trash emptier interval. This will cause
+            // the NN to fail to transition to the active state.
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).checkExitOnShutdown(false).build();
+            cluster.waitActive();
+            try {
+                cluster.transitionToActive(0);
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                fail("Transitioned to active but should not have been able to.");
+            } catch (ExitException ee) {
+                assertExceptionContains("Cannot start trash emptier with negative interval", ee);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFailureToTransitionCausesShutdown_withUpgrade60() throws IOException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new Configuration();
+            // Set an illegal value for the trash emptier interval. This will cause
+            // the NN to fail to transition to the active state.
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).checkExitOnShutdown(false).build();
+            cluster.waitActive();
+            try {
+                cluster.transitionToActive(0);
+                fail("Transitioned to active but should not have been able to.");
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            } catch (ExitException ee) {
+                assertExceptionContains("Cannot start trash emptier with negative interval", ee);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testFailureToTransitionCausesShutdown_withUpgrade80() throws IOException {
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            Configuration conf = new Configuration();
+            // Set an illegal value for the trash emptier interval. This will cause
+            // the NN to fail to transition to the active state.
+            conf.setLong(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, -1);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).checkExitOnShutdown(false).build();
+            cluster.waitActive();
+            try {
+                cluster.transitionToActive(0);
+                fail("Transitioned to active but should not have been able to.");
+            } catch (ExitException ee) {
+                assertExceptionContains("Cannot start trash emptier with negative interval", ee);
+            }
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
 }

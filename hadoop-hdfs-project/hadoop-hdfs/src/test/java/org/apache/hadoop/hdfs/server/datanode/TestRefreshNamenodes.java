@@ -15,16 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Set;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -34,7 +31,6 @@ import org.apache.hadoop.hdfs.MiniDFSNNTopology;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NNConf;
 import org.apache.hadoop.hdfs.MiniDFSNNTopology.NSConf;
 import org.junit.Test;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
@@ -42,58 +38,195 @@ import com.google.common.collect.Sets;
  * Tests datanode refresh namenode list functionality.
  */
 public class TestRefreshNamenodes {
-  private final int nnPort1 = 2221;
-  private final int nnPort2 = 2224;
-  private final int nnPort3 = 2227;
-  private final int nnPort4 = 2230;
 
-  @Test
-  public void testRefreshNamenodes() throws IOException {
-    // Start cluster with a single NN and DN
-    Configuration conf = new Configuration();
-    MiniDFSClusterInJVM cluster = null;
-    try {
-      MiniDFSNNTopology topology = new MiniDFSNNTopology()
-        .addNameservice(new NSConf("ns1").addNN(
-            new NNConf(null).setIpcPort(nnPort1)))
-        .setFederation(true);
-      cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(topology)
-        .build();
+    private final int nnPort1 = 2221;
 
-      DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-      assertEquals(1, dn.getAllBpOs().size());
+    private final int nnPort2 = 2224;
 
-      cluster.addNameNode(conf, nnPort2);
-      assertEquals(2, dn.getAllBpOs().size());
+    private final int nnPort3 = 2227;
 
-      cluster.addNameNode(conf, nnPort3);
-      assertEquals(3, dn.getAllBpOs().size());
+    private final int nnPort4 = 2230;
 
-      cluster.addNameNode(conf, nnPort4);
-
-      // Ensure a BPOfferService in the datanodes corresponds to
-      // a namenode in the cluster
-      Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
-      for (int i = 0; i < 4; i++) {
-        assertTrue(nnAddrsFromCluster.add(
-            cluster.getNameNode(i).getNameNodeAddress()));
-      }
-      
-      Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
-      for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
-        for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
-          assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+    @Test
+    public void testRefreshNamenodes() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
         }
-      }
-      
-      assertEquals("",
-          Joiner.on(",").join(
-            Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
+
+    @Test
+    public void testRefreshNamenodes_withUpgrade20() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testRefreshNamenodes_withUpgrade40() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testRefreshNamenodes_withUpgrade60() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testRefreshNamenodes_withUpgrade80() throws IOException {
+        // Start cluster with a single NN and DN
+        Configuration conf = new Configuration();
+        MiniDFSClusterInJVM cluster = null;
+        try {
+            MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new NSConf("ns1").addNN(new NNConf(null).setIpcPort(nnPort1))).setFederation(true);
+            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).build();
+            DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+            assertEquals(1, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort2);
+            assertEquals(2, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort3);
+            assertEquals(3, dn.getAllBpOs().size());
+            cluster.addNameNode(conf, nnPort4);
+            // Ensure a BPOfferService in the datanodes corresponds to
+            // a namenode in the cluster
+            Set<InetSocketAddress> nnAddrsFromCluster = Sets.newHashSet();
+            for (int i = 0; i < 4; i++) {
+                assertTrue(nnAddrsFromCluster.add(cluster.getNameNode(i).getNameNodeAddress()));
+            }
+            Set<InetSocketAddress> nnAddrsFromDN = Sets.newHashSet();
+            for (BPOfferServiceJVMInterface bpos : dn.getAllBpOs()) {
+                for (BPServiceActorJVMInterface bpsa : bpos.getBPServiceActors()) {
+                    assertTrue(nnAddrsFromDN.add(bpsa.getNNSocketAddress()));
+                }
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals("", Joiner.on(",").join(Sets.symmetricDifference(nnAddrsFromCluster, nnAddrsFromDN)));
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
 }

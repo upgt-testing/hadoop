@@ -15,17 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hdfs.server.datanode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
@@ -36,65 +33,65 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-/** 
- * Tests if DataNode process exits if all Block Pool services exit. 
+/**
+ * Tests if DataNode process exits if all Block Pool services exit.
  */
 public class TestDataNodeExit {
-  private static final long WAIT_TIME_IN_MILLIS = 10;
-  Configuration conf;
-  MiniDFSClusterInJVM cluster = null;
-  
-  @Before
-  public void setUp() throws IOException {
-    conf = new HdfsConfiguration();
-    conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 100);
-    conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, 100);
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleFederatedTopology(3))
-      .build();
-    for (int i = 0; i < 3; i++) {
-      cluster.waitActive(i);
-    }
-  }
 
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
-  
-  private void stopBPServiceThreads(int numStopThreads, DataNodeJVMInterface dn)
-      throws Exception {
-    List<BPOfferServiceJVMInterface> bpoList = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
-    int expected = dn.getBpOsCount() - numStopThreads;
-    int index = numStopThreads - 1;
-    while (index >= 0) {
-      bpoList.get(index--).stop();
-    }
-    int iterations = 3000; // Total 30 seconds MAX wait time
-    while(dn.getBpOsCount() != expected && iterations > 0) {
-      Thread.sleep(WAIT_TIME_IN_MILLIS);
-      iterations--;
-    }
-    assertEquals("Mismatch in number of BPServices running", expected,
-        dn.getBpOsCount());
-  }
+    private static final long WAIT_TIME_IN_MILLIS = 10;
 
-  /**
-   * Test BPService Thread Exit
-   */
-  @Test
-  public void testBPServiceExit() throws Exception {
-    DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-    stopBPServiceThreads(1, dn);
-    assertTrue("DataNode should not exit", dn.isDatanodeUp());
-    stopBPServiceThreads(2, dn);
-    assertFalse("DataNode should exit", dn.isDatanodeUp());
-  }
+    Configuration conf;
 
-  /*
+    MiniDFSClusterInJVM cluster = null;
+
+    @Before
+    public void setUp() throws IOException {
+        conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 100);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, 100);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(3)).build();
+        for (int i = 0; i < 3; i++) {
+            cluster.waitActive(i);
+        }
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    private void stopBPServiceThreads(int numStopThreads, DataNodeJVMInterface dn) throws Exception {
+        List<BPOfferServiceJVMInterface> bpoList = (List<BPOfferServiceJVMInterface>) dn.getAllBpOs();
+        int expected = dn.getBpOsCount() - numStopThreads;
+        int index = numStopThreads - 1;
+        while (index >= 0) {
+            bpoList.get(index--).stop();
+        }
+        // Total 30 seconds MAX wait time
+        int iterations = 3000;
+        while (dn.getBpOsCount() != expected && iterations > 0) {
+            Thread.sleep(WAIT_TIME_IN_MILLIS);
+            iterations--;
+        }
+        assertEquals("Mismatch in number of BPServices running", expected, dn.getBpOsCount());
+    }
+
+    /**
+     * Test BPService Thread Exit
+     */
+    @Test
+    public void testBPServiceExit() throws Exception {
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        stopBPServiceThreads(2, dn);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+    }
+
+    /*
   @Test
   public void testSendOOBToPeers() throws Exception {
     DataNode dn = cluster.getDataNodes().get(0);
@@ -109,4 +106,47 @@ public class TestDataNodeExit {
     }
   }
    */
+    @Test
+    public void testBPServiceExit_withUpgrade20() throws Exception {
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        stopBPServiceThreads(2, dn);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+    }
+
+    @Test
+    public void testBPServiceExit_withUpgrade40() throws Exception {
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        stopBPServiceThreads(2, dn);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+    }
+
+    @Test
+    public void testBPServiceExit_withUpgrade60() throws Exception {
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        stopBPServiceThreads(2, dn);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+    }
+
+    @Test
+    public void testBPServiceExit_withUpgrade80() throws Exception {
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        stopBPServiceThreads(2, dn);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }
