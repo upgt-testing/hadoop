@@ -29,11 +29,9 @@ import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -43,210 +41,569 @@ import static org.junit.Assert.assertTrue;
  * FileSystem.listFiles for erasure coded files.
  */
 public class TestDistributedFileSystemWithECFile {
-  private ErasureCodingPolicy ecPolicy;
-  private int cellSize;
-  private short dataBlocks;
-  private short parityBlocks;
-  private int numDNs;
-  private int stripesPerBlock;
-  private int blockSize;
-  private int blockGroupSize;
 
-  private MiniDFSClusterInJVM cluster;
-  private FileContext fileContext;
-  private DistributedFileSystem fs;
-  private Configuration conf = new HdfsConfiguration();
+    private ErasureCodingPolicy ecPolicy;
 
-  public ErasureCodingPolicy getEcPolicy() {
-    return StripedFileTestUtil.getDefaultECPolicy();
-  }
+    private int cellSize;
 
-  @Before
-  public void setup() throws IOException {
-    ecPolicy = getEcPolicy();
-    cellSize = ecPolicy.getCellSize();
-    dataBlocks = (short) ecPolicy.getNumDataUnits();
-    parityBlocks = (short) ecPolicy.getNumParityUnits();
-    numDNs = dataBlocks + parityBlocks;
-    stripesPerBlock = 4;
-    blockSize = stripesPerBlock * cellSize;
-    blockGroupSize = blockSize * dataBlocks;
+    private short dataBlocks;
 
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-    conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY,
-        false);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
-    fileContext = FileContext.getFileContext(cluster.getURI(0), conf);
-    fs = cluster.getFileSystem();
-    fs.enableErasureCodingPolicy(ecPolicy.getName());
-    fs.mkdirs(new Path("/ec"));
-    cluster.getFileSystem().getClient().setErasureCodingPolicy("/ec",
-        ecPolicy.getName());
-  }
+    private short parityBlocks;
 
-  @After
-  public void tearDown() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private int numDNs;
 
-  private void createFile(String path, int size) throws Exception {
-    byte[] expected = StripedFileTestUtil.generateBytes(size);
-    Path src = new Path(path);
-    DFSTestUtil.writeFile(fs, src, new String(expected));
-    StripedFileTestUtil.waitBlockGroupsReported(fs, src.toString());
-    StripedFileTestUtil.verifyLength(fs, src, size);
-  }
+    private int stripesPerBlock;
 
-  @Test(timeout=60000)
-  public void testListECFilesSmallerThanOneCell() throws Exception {
-    createFile("/ec/smallcell", 1);
-    final List<LocatedFileStatus> retVal = new ArrayList<>();
-    final RemoteIterator<LocatedFileStatus> iter =
-        cluster.getFileSystem().listFiles(new Path("/ec"), true);
-    while (iter.hasNext()) {
-      retVal.add(iter.next());
-    }
-    assertTrue(retVal.size() == 1);
-    LocatedFileStatus fileStatus = retVal.get(0);
-    assertSmallerThanOneCell(fileStatus.getBlockLocations());
+    private int blockSize;
 
-    BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(
-        fileStatus, 0, fileStatus.getLen());
-    assertSmallerThanOneCell(locations);
+    private int blockGroupSize;
 
-    //Test FileContext
-    fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
-    assertSmallerThanOneCell(fileStatus.getBlockLocations());
-    locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"),
-        0, fileStatus.getLen());
-    assertSmallerThanOneCell(locations);
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  private void assertSmallerThanOneCell(BlockLocation[] locations)
-      throws IOException {
-    assertTrue(locations.length == 1);
-    BlockLocation blockLocation = locations[0];
-    assertTrue(blockLocation.getOffset() == 0);
-    assertTrue(blockLocation.getLength() == 1);
-    assertTrue(blockLocation.getHosts().length == 1 + parityBlocks);
-  }
+    private FileContext fileContext;
 
-  @Test(timeout=60000)
-  public void testListECFilesSmallerThanOneStripe() throws Exception {
-    int dataBlocksNum = dataBlocks;
-    createFile("/ec/smallstripe", cellSize * dataBlocksNum);
-    RemoteIterator<LocatedFileStatus> iter =
-        cluster.getFileSystem().listFiles(new Path("/ec"), true);
-    LocatedFileStatus fileStatus = iter.next();
-    assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+    private DistributedFileSystem fs;
 
-    BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(
-        fileStatus, 0, fileStatus.getLen());
-    assertSmallerThanOneStripe(locations, dataBlocksNum);
+    private Configuration conf = new HdfsConfiguration();
 
-    //Test FileContext
-    fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
-    assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
-    locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"),
-        0, fileStatus.getLen());
-    assertSmallerThanOneStripe(locations, dataBlocksNum);
-  }
-
-  private void assertSmallerThanOneStripe(BlockLocation[] locations,
-      int dataBlocksNum) throws IOException {
-    int expectedHostNum = dataBlocksNum + parityBlocks;
-    assertTrue(locations.length == 1);
-    BlockLocation blockLocation = locations[0];
-    assertTrue(blockLocation.getHosts().length == expectedHostNum);
-    assertTrue(blockLocation.getOffset() == 0);
-    assertTrue(blockLocation.getLength() == dataBlocksNum * cellSize);
-  }
-
-  @Test(timeout=60000)
-  public void testListECFilesMoreThanOneBlockGroup() throws Exception {
-    createFile("/ec/group", blockGroupSize + 123);
-    RemoteIterator<LocatedFileStatus> iter =
-        cluster.getFileSystem().listFiles(new Path("/ec"), true);
-    LocatedFileStatus fileStatus = iter.next();
-    assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
-
-    BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(
-        fileStatus, 0, fileStatus.getLen());
-    assertMoreThanOneBlockGroup(locations, 123);
-
-    //Test FileContext
-    iter = fileContext.listLocatedStatus(new Path("/ec"));
-    fileStatus = iter.next();
-    assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
-    locations = fileContext.getFileBlockLocations(new Path("/ec/group"),
-        0, fileStatus.getLen());
-    assertMoreThanOneBlockGroup(locations, 123);
-  }
-
-  private void assertMoreThanOneBlockGroup(BlockLocation[] locations,
-      int lastBlockSize) throws IOException {
-    assertTrue(locations.length == 2);
-    BlockLocation fistBlockGroup = locations[0];
-    assertTrue(fistBlockGroup.getHosts().length == numDNs);
-    assertTrue(fistBlockGroup.getOffset() == 0);
-    assertTrue(fistBlockGroup.getLength() == blockGroupSize);
-    BlockLocation lastBlock = locations[1];
-    assertTrue(lastBlock.getHosts().length == 1 + parityBlocks);
-    assertTrue(lastBlock.getOffset() == blockGroupSize);
-    assertTrue(lastBlock.getLength() == lastBlockSize);
-  }
-
-  @Test(timeout=60000)
-  public void testReplayEditLogsForReplicatedFile() throws Exception {
-    cluster.shutdown();
-
-    ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(
-        SystemErasureCodingPolicies.RS_6_3_POLICY_ID
-    );
-    ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(
-        SystemErasureCodingPolicies.RS_3_2_POLICY_ID
-    );
-    // Test RS(6,3) as default policy
-    int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(numDataNodes)
-        .build();
-
-    cluster.transitionToActive(0);
-    fs = cluster.getFileSystem(0);
-    fs.enableErasureCodingPolicy(rs63.getName());
-    fs.enableErasureCodingPolicy(rs32.getName());
-
-    Path dir = new Path("/ec");
-    fs.mkdirs(dir);
-    fs.setErasureCodingPolicy(dir, rs63.getName());
-
-    // Create an erasure coded file with the default policy.
-    Path ecFile = new Path(dir, "ecFile");
-    createFile(ecFile.toString(), 10);
-    // Create a replicated file.
-    Path replicatedFile = new Path(dir, "replicated");
-    try (FSDataOutputStream out = fs.createFile(replicatedFile)
-      .replicate().build()) {
-      out.write(123);
-    }
-    // Create an EC file with a different policy.
-    Path ecFile2 = new Path(dir, "RS-3-2");
-    try (FSDataOutputStream out = fs.createFile(ecFile2)
-         .ecPolicyName(rs32.getName()).build()) {
-      out.write(456);
+    public ErasureCodingPolicy getEcPolicy() {
+        return StripedFileTestUtil.getDefaultECPolicy();
     }
 
-    cluster.transitionToStandby(0);
-    cluster.transitionToActive(1);
+    @Before
+    public void setup() throws IOException {
+        ecPolicy = getEcPolicy();
+        cellSize = ecPolicy.getCellSize();
+        dataBlocks = (short) ecPolicy.getNumDataUnits();
+        parityBlocks = (short) ecPolicy.getNumParityUnits();
+        numDNs = dataBlocks + parityBlocks;
+        stripesPerBlock = 4;
+        blockSize = stripesPerBlock * cellSize;
+        blockGroupSize = blockSize * dataBlocks;
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY, false);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDNs).build();
+        fileContext = FileContext.getFileContext(cluster.getURI(0), conf);
+        fs = cluster.getFileSystem();
+        fs.enableErasureCodingPolicy(ecPolicy.getName());
+        fs.mkdirs(new Path("/ec"));
+        cluster.getFileSystem().getClient().setErasureCodingPolicy("/ec", ecPolicy.getName());
+    }
 
-    fs = cluster.getFileSystem(1);
-    assertNull(fs.getErasureCodingPolicy(replicatedFile));
-    assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
-    assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
-  }
+    @After
+    public void tearDown() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    private void createFile(String path, int size) throws Exception {
+        byte[] expected = StripedFileTestUtil.generateBytes(size);
+        Path src = new Path(path);
+        DFSTestUtil.writeFile(fs, src, new String(expected));
+        StripedFileTestUtil.waitBlockGroupsReported(fs, src.toString());
+        StripedFileTestUtil.verifyLength(fs, src, size);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneCell() throws Exception {
+        createFile("/ec/smallcell", 1);
+        final List<LocatedFileStatus> retVal = new ArrayList<>();
+        final RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        while (iter.hasNext()) {
+            retVal.add(iter.next());
+        }
+        assertTrue(retVal.size() == 1);
+        LocatedFileStatus fileStatus = retVal.get(0);
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"), 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+    }
+
+    private void assertSmallerThanOneCell(BlockLocation[] locations) throws IOException {
+        assertTrue(locations.length == 1);
+        BlockLocation blockLocation = locations[0];
+        assertTrue(blockLocation.getOffset() == 0);
+        assertTrue(blockLocation.getLength() == 1);
+        assertTrue(blockLocation.getHosts().length == 1 + parityBlocks);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneStripe() throws Exception {
+        int dataBlocksNum = dataBlocks;
+        createFile("/ec/smallstripe", cellSize * dataBlocksNum);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"), 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+    }
+
+    private void assertSmallerThanOneStripe(BlockLocation[] locations, int dataBlocksNum) throws IOException {
+        int expectedHostNum = dataBlocksNum + parityBlocks;
+        assertTrue(locations.length == 1);
+        BlockLocation blockLocation = locations[0];
+        assertTrue(blockLocation.getHosts().length == expectedHostNum);
+        assertTrue(blockLocation.getOffset() == 0);
+        assertTrue(blockLocation.getLength() == dataBlocksNum * cellSize);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesMoreThanOneBlockGroup() throws Exception {
+        createFile("/ec/group", blockGroupSize + 123);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+        //Test FileContext
+        iter = fileContext.listLocatedStatus(new Path("/ec"));
+        fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/group"), 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+    }
+
+    private void assertMoreThanOneBlockGroup(BlockLocation[] locations, int lastBlockSize) throws IOException {
+        assertTrue(locations.length == 2);
+        BlockLocation fistBlockGroup = locations[0];
+        assertTrue(fistBlockGroup.getHosts().length == numDNs);
+        assertTrue(fistBlockGroup.getOffset() == 0);
+        assertTrue(fistBlockGroup.getLength() == blockGroupSize);
+        BlockLocation lastBlock = locations[1];
+        assertTrue(lastBlock.getHosts().length == 1 + parityBlocks);
+        assertTrue(lastBlock.getOffset() == blockGroupSize);
+        assertTrue(lastBlock.getLength() == lastBlockSize);
+    }
+
+    @Test(timeout = 60000)
+    public void testReplayEditLogsForReplicatedFile() throws Exception {
+        cluster.shutdown();
+        ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        // Test RS(6,3) as default policy
+        int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(numDataNodes).build();
+        cluster.transitionToActive(0);
+        fs = cluster.getFileSystem(0);
+        fs.enableErasureCodingPolicy(rs63.getName());
+        fs.enableErasureCodingPolicy(rs32.getName());
+        Path dir = new Path("/ec");
+        fs.mkdirs(dir);
+        fs.setErasureCodingPolicy(dir, rs63.getName());
+        // Create an erasure coded file with the default policy.
+        Path ecFile = new Path(dir, "ecFile");
+        createFile(ecFile.toString(), 10);
+        // Create a replicated file.
+        Path replicatedFile = new Path(dir, "replicated");
+        try (FSDataOutputStream out = fs.createFile(replicatedFile).replicate().build()) {
+            out.write(123);
+        }
+        // Create an EC file with a different policy.
+        Path ecFile2 = new Path(dir, "RS-3-2");
+        try (FSDataOutputStream out = fs.createFile(ecFile2).ecPolicyName(rs32.getName()).build()) {
+            out.write(456);
+        }
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        fs = cluster.getFileSystem(1);
+        assertNull(fs.getErasureCodingPolicy(replicatedFile));
+        assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
+        assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneCell_withUpgrade20() throws Exception {
+        createFile("/ec/smallcell", 1);
+        final List<LocatedFileStatus> retVal = new ArrayList<>();
+        final RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        while (iter.hasNext()) {
+            retVal.add(iter.next());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        assertTrue(retVal.size() == 1);
+        LocatedFileStatus fileStatus = retVal.get(0);
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"), 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneCell_withUpgrade40() throws Exception {
+        createFile("/ec/smallcell", 1);
+        final List<LocatedFileStatus> retVal = new ArrayList<>();
+        final RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        while (iter.hasNext()) {
+            retVal.add(iter.next());
+        }
+        assertTrue(retVal.size() == 1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        LocatedFileStatus fileStatus = retVal.get(0);
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"), 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneCell_withUpgrade60() throws Exception {
+        createFile("/ec/smallcell", 1);
+        final List<LocatedFileStatus> retVal = new ArrayList<>();
+        final RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        while (iter.hasNext()) {
+            retVal.add(iter.next());
+        }
+        assertTrue(retVal.size() == 1);
+        LocatedFileStatus fileStatus = retVal.get(0);
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertSmallerThanOneCell(locations);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"), 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneCell_withUpgrade80() throws Exception {
+        createFile("/ec/smallcell", 1);
+        final List<LocatedFileStatus> retVal = new ArrayList<>();
+        final RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        while (iter.hasNext()) {
+            retVal.add(iter.next());
+        }
+        assertTrue(retVal.size() == 1);
+        LocatedFileStatus fileStatus = retVal.get(0);
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneCell(fileStatus.getBlockLocations());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallcell"), 0, fileStatus.getLen());
+        assertSmallerThanOneCell(locations);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneStripe_withUpgrade20() throws Exception {
+        int dataBlocksNum = dataBlocks;
+        createFile("/ec/smallstripe", cellSize * dataBlocksNum);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"), 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneStripe_withUpgrade40() throws Exception {
+        int dataBlocksNum = dataBlocks;
+        createFile("/ec/smallstripe", cellSize * dataBlocksNum);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"), 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneStripe_withUpgrade60() throws Exception {
+        int dataBlocksNum = dataBlocks;
+        createFile("/ec/smallstripe", cellSize * dataBlocksNum);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"), 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesSmallerThanOneStripe_withUpgrade80() throws Exception {
+        int dataBlocksNum = dataBlocks;
+        createFile("/ec/smallstripe", cellSize * dataBlocksNum);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+        //Test FileContext
+        fileStatus = fileContext.listLocatedStatus(new Path("/ec")).next();
+        assertSmallerThanOneStripe(fileStatus.getBlockLocations(), dataBlocksNum);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/smallstripe"), 0, fileStatus.getLen());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertSmallerThanOneStripe(locations, dataBlocksNum);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesMoreThanOneBlockGroup_withUpgrade20() throws Exception {
+        createFile("/ec/group", blockGroupSize + 123);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+        //Test FileContext
+        iter = fileContext.listLocatedStatus(new Path("/ec"));
+        fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/group"), 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesMoreThanOneBlockGroup_withUpgrade40() throws Exception {
+        createFile("/ec/group", blockGroupSize + 123);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        //Test FileContext
+        iter = fileContext.listLocatedStatus(new Path("/ec"));
+        fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/group"), 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesMoreThanOneBlockGroup_withUpgrade60() throws Exception {
+        createFile("/ec/group", blockGroupSize + 123);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+        //Test FileContext
+        iter = fileContext.listLocatedStatus(new Path("/ec"));
+        fileStatus = iter.next();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/group"), 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+    }
+
+    @Test(timeout = 60000)
+    public void testListECFilesMoreThanOneBlockGroup_withUpgrade80() throws Exception {
+        createFile("/ec/group", blockGroupSize + 123);
+        RemoteIterator<LocatedFileStatus> iter = cluster.getFileSystem().listFiles(new Path("/ec"), true);
+        LocatedFileStatus fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        BlockLocation[] locations = cluster.getFileSystem().getFileBlockLocations(fileStatus, 0, fileStatus.getLen());
+        assertMoreThanOneBlockGroup(locations, 123);
+        //Test FileContext
+        iter = fileContext.listLocatedStatus(new Path("/ec"));
+        fileStatus = iter.next();
+        assertMoreThanOneBlockGroup(fileStatus.getBlockLocations(), 123);
+        locations = fileContext.getFileBlockLocations(new Path("/ec/group"), 0, fileStatus.getLen());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertMoreThanOneBlockGroup(locations, 123);
+    }
+
+    @Test(timeout = 60000)
+    public void testReplayEditLogsForReplicatedFile_withUpgrade20() throws Exception {
+        cluster.shutdown();
+        ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        // Test RS(6,3) as default policy
+        int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(numDataNodes).build();
+        cluster.transitionToActive(0);
+        fs = cluster.getFileSystem(0);
+        fs.enableErasureCodingPolicy(rs63.getName());
+        fs.enableErasureCodingPolicy(rs32.getName());
+        Path dir = new Path("/ec");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.mkdirs(dir);
+        fs.setErasureCodingPolicy(dir, rs63.getName());
+        // Create an erasure coded file with the default policy.
+        Path ecFile = new Path(dir, "ecFile");
+        createFile(ecFile.toString(), 10);
+        // Create a replicated file.
+        Path replicatedFile = new Path(dir, "replicated");
+        try (FSDataOutputStream out = fs.createFile(replicatedFile).replicate().build()) {
+            out.write(123);
+        }
+        // Create an EC file with a different policy.
+        Path ecFile2 = new Path(dir, "RS-3-2");
+        try (FSDataOutputStream out = fs.createFile(ecFile2).ecPolicyName(rs32.getName()).build()) {
+            out.write(456);
+        }
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        fs = cluster.getFileSystem(1);
+        assertNull(fs.getErasureCodingPolicy(replicatedFile));
+        assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
+        assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
+    }
+
+    @Test(timeout = 60000)
+    public void testReplayEditLogsForReplicatedFile_withUpgrade40() throws Exception {
+        cluster.shutdown();
+        ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        // Test RS(6,3) as default policy
+        int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(numDataNodes).build();
+        cluster.transitionToActive(0);
+        fs = cluster.getFileSystem(0);
+        fs.enableErasureCodingPolicy(rs63.getName());
+        fs.enableErasureCodingPolicy(rs32.getName());
+        Path dir = new Path("/ec");
+        fs.mkdirs(dir);
+        fs.setErasureCodingPolicy(dir, rs63.getName());
+        // Create an erasure coded file with the default policy.
+        Path ecFile = new Path(dir, "ecFile");
+        createFile(ecFile.toString(), 10);
+        // Create a replicated file.
+        Path replicatedFile = new Path(dir, "replicated");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try (FSDataOutputStream out = fs.createFile(replicatedFile).replicate().build()) {
+            out.write(123);
+        }
+        // Create an EC file with a different policy.
+        Path ecFile2 = new Path(dir, "RS-3-2");
+        try (FSDataOutputStream out = fs.createFile(ecFile2).ecPolicyName(rs32.getName()).build()) {
+            out.write(456);
+        }
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        fs = cluster.getFileSystem(1);
+        assertNull(fs.getErasureCodingPolicy(replicatedFile));
+        assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
+        assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
+    }
+
+    @Test(timeout = 60000)
+    public void testReplayEditLogsForReplicatedFile_withUpgrade60() throws Exception {
+        cluster.shutdown();
+        ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        // Test RS(6,3) as default policy
+        int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(numDataNodes).build();
+        cluster.transitionToActive(0);
+        fs = cluster.getFileSystem(0);
+        fs.enableErasureCodingPolicy(rs63.getName());
+        fs.enableErasureCodingPolicy(rs32.getName());
+        Path dir = new Path("/ec");
+        fs.mkdirs(dir);
+        fs.setErasureCodingPolicy(dir, rs63.getName());
+        // Create an erasure coded file with the default policy.
+        Path ecFile = new Path(dir, "ecFile");
+        createFile(ecFile.toString(), 10);
+        // Create a replicated file.
+        Path replicatedFile = new Path(dir, "replicated");
+        try (FSDataOutputStream out = fs.createFile(replicatedFile).replicate().build()) {
+            out.write(123);
+        }
+        // Create an EC file with a different policy.
+        Path ecFile2 = new Path(dir, "RS-3-2");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try (FSDataOutputStream out = fs.createFile(ecFile2).ecPolicyName(rs32.getName()).build()) {
+            out.write(456);
+        }
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        fs = cluster.getFileSystem(1);
+        assertNull(fs.getErasureCodingPolicy(replicatedFile));
+        assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
+        assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
+    }
+
+    @Test(timeout = 60000)
+    public void testReplayEditLogsForReplicatedFile_withUpgrade80() throws Exception {
+        cluster.shutdown();
+        ErasureCodingPolicy rs63 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_6_3_POLICY_ID);
+        ErasureCodingPolicy rs32 = SystemErasureCodingPolicies.getByID(SystemErasureCodingPolicies.RS_3_2_POLICY_ID);
+        // Test RS(6,3) as default policy
+        int numDataNodes = rs63.getNumDataUnits() + rs63.getNumParityUnits();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(numDataNodes).build();
+        cluster.transitionToActive(0);
+        fs = cluster.getFileSystem(0);
+        fs.enableErasureCodingPolicy(rs63.getName());
+        fs.enableErasureCodingPolicy(rs32.getName());
+        Path dir = new Path("/ec");
+        fs.mkdirs(dir);
+        fs.setErasureCodingPolicy(dir, rs63.getName());
+        // Create an erasure coded file with the default policy.
+        Path ecFile = new Path(dir, "ecFile");
+        createFile(ecFile.toString(), 10);
+        // Create a replicated file.
+        Path replicatedFile = new Path(dir, "replicated");
+        try (FSDataOutputStream out = fs.createFile(replicatedFile).replicate().build()) {
+            out.write(123);
+        }
+        // Create an EC file with a different policy.
+        Path ecFile2 = new Path(dir, "RS-3-2");
+        try (FSDataOutputStream out = fs.createFile(ecFile2).ecPolicyName(rs32.getName()).build()) {
+            out.write(456);
+        }
+        cluster.transitionToStandby(0);
+        cluster.transitionToActive(1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs = cluster.getFileSystem(1);
+        assertNull(fs.getErasureCodingPolicy(replicatedFile));
+        assertEquals(rs63, fs.getErasureCodingPolicy(ecFile));
+        assertEquals(rs32, fs.getErasureCodingPolicy(ecFile2));
+    }
 }

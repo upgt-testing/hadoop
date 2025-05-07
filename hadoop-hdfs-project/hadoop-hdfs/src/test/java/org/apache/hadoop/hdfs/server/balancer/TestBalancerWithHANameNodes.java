@@ -19,10 +19,8 @@ package org.apache.hadoop.hdfs.server.balancer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.net.URI;
 import java.util.Collection;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSUtil;
@@ -40,69 +38,241 @@ import org.junit.Test;
  * Test balancer with HA NameNodes
  */
 public class TestBalancerWithHANameNodes {
-  private MiniDFSClusterInJVM cluster;
-  ClientProtocol client;
 
-  static {
-    TestBalancer.initTestSetup();
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  /**
-   * Test a cluster with even distribution, then a new empty node is added to
-   * the cluster. Test start a cluster with specified number of nodes, and fills
-   * it to be 30% full (with a single file replicated identically to all
-   * datanodes); It then adds one new empty node and starts balancing.
-   */
-  @Test(timeout = 60000)
-  public void testBalancerWithHANameNodes() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    TestBalancer.initConf(conf);
-    long newNodeCapacity = TestBalancer.CAPACITY; // new node's capacity
-    String newNodeRack = TestBalancer.RACK2; // new node's rack
-    // array of racks for original nodes in cluster
-    String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
-    // array of capacities of original nodes in cluster
-    long[] capacities = new long[] { TestBalancer.CAPACITY,
-        TestBalancer.CAPACITY };
-    assertEquals(capacities.length, racks.length);
-    int numOfDatanodes = capacities.length;
-    NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
-    nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
-    Configuration copiedConf = new Configuration(conf);
-    cluster = new MiniDFSClusterInJVM.Builder(copiedConf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(capacities.length)
-        .racks(racks)
-        .simulatedCapacities(capacities)
-        .build();
-    HATestUtil.setFailoverConfigurations(cluster, conf);
-    try {
-      cluster.waitActive();
-      cluster.transitionToActive(1);
-      Thread.sleep(500);
-      client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf),
-          ClientProtocol.class).getProxy();
-      long totalCapacity = TestBalancer.sum(capacities);
-      // fill up the cluster to be 30% full
-      long totalUsedSpace = totalCapacity * 3 / 10;
-      TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace
-          / numOfDatanodes, (short) numOfDatanodes, 1);
+    ClientProtocol client;
 
-      // start up an empty node with the same capacity and on the same rack
-      cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack },
-          new long[] { newNodeCapacity });
-      totalCapacity += newNodeCapacity;
-      TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client,
-          cluster);
-      Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
-      assertEquals(1, namenodes.size());
-      assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
-      final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
-      assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
-      TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client,
-          cluster, BalancerParameters.DEFAULT);
-    } finally {
-      cluster.shutdown();
+    static {
+        TestBalancer.initTestSetup();
     }
-  }
+
+    /**
+     * Test a cluster with even distribution, then a new empty node is added to
+     * the cluster. Test start a cluster with specified number of nodes, and fills
+     * it to be 30% full (with a single file replicated identically to all
+     * datanodes); It then adds one new empty node and starts balancing.
+     */
+    @Test(timeout = 60000)
+    public void testBalancerWithHANameNodes() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        TestBalancer.initConf(conf);
+        // new node's capacity
+        long newNodeCapacity = TestBalancer.CAPACITY;
+        // new node's rack
+        String newNodeRack = TestBalancer.RACK2;
+        // array of racks for original nodes in cluster
+        String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
+        // array of capacities of original nodes in cluster
+        long[] capacities = new long[] { TestBalancer.CAPACITY, TestBalancer.CAPACITY };
+        assertEquals(capacities.length, racks.length);
+        int numOfDatanodes = capacities.length;
+        NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
+        nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
+        Configuration copiedConf = new Configuration(conf);
+        cluster = new MiniDFSClusterInJVM.Builder(copiedConf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(capacities.length).racks(racks).simulatedCapacities(capacities).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(1);
+            Thread.sleep(500);
+            client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf), ClientProtocol.class).getProxy();
+            long totalCapacity = TestBalancer.sum(capacities);
+            // fill up the cluster to be 30% full
+            long totalUsedSpace = totalCapacity * 3 / 10;
+            TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace / numOfDatanodes, (short) numOfDatanodes, 1);
+            // start up an empty node with the same capacity and on the same rack
+            cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack }, new long[] { newNodeCapacity });
+            totalCapacity += newNodeCapacity;
+            TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client, cluster);
+            Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
+            assertEquals(1, namenodes.size());
+            assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
+            final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
+            assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
+            TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, BalancerParameters.DEFAULT);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testBalancerWithHANameNodes_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        TestBalancer.initConf(conf);
+        // new node's capacity
+        long newNodeCapacity = TestBalancer.CAPACITY;
+        // new node's rack
+        String newNodeRack = TestBalancer.RACK2;
+        // array of racks for original nodes in cluster
+        String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
+        // array of capacities of original nodes in cluster
+        long[] capacities = new long[] { TestBalancer.CAPACITY, TestBalancer.CAPACITY };
+        assertEquals(capacities.length, racks.length);
+        int numOfDatanodes = capacities.length;
+        NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
+        nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
+        Configuration copiedConf = new Configuration(conf);
+        cluster = new MiniDFSClusterInJVM.Builder(copiedConf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(capacities.length).racks(racks).simulatedCapacities(capacities).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(1);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Thread.sleep(500);
+            client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf), ClientProtocol.class).getProxy();
+            long totalCapacity = TestBalancer.sum(capacities);
+            // fill up the cluster to be 30% full
+            long totalUsedSpace = totalCapacity * 3 / 10;
+            TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace / numOfDatanodes, (short) numOfDatanodes, 1);
+            // start up an empty node with the same capacity and on the same rack
+            cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack }, new long[] { newNodeCapacity });
+            totalCapacity += newNodeCapacity;
+            TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client, cluster);
+            Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
+            assertEquals(1, namenodes.size());
+            assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
+            final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
+            assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
+            TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, BalancerParameters.DEFAULT);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testBalancerWithHANameNodes_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        TestBalancer.initConf(conf);
+        // new node's capacity
+        long newNodeCapacity = TestBalancer.CAPACITY;
+        // new node's rack
+        String newNodeRack = TestBalancer.RACK2;
+        // array of racks for original nodes in cluster
+        String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
+        // array of capacities of original nodes in cluster
+        long[] capacities = new long[] { TestBalancer.CAPACITY, TestBalancer.CAPACITY };
+        assertEquals(capacities.length, racks.length);
+        int numOfDatanodes = capacities.length;
+        NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
+        nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
+        Configuration copiedConf = new Configuration(conf);
+        cluster = new MiniDFSClusterInJVM.Builder(copiedConf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(capacities.length).racks(racks).simulatedCapacities(capacities).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(1);
+            Thread.sleep(500);
+            client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf), ClientProtocol.class).getProxy();
+            long totalCapacity = TestBalancer.sum(capacities);
+            // fill up the cluster to be 30% full
+            long totalUsedSpace = totalCapacity * 3 / 10;
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace / numOfDatanodes, (short) numOfDatanodes, 1);
+            // start up an empty node with the same capacity and on the same rack
+            cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack }, new long[] { newNodeCapacity });
+            totalCapacity += newNodeCapacity;
+            TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client, cluster);
+            Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
+            assertEquals(1, namenodes.size());
+            assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
+            final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
+            assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
+            TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, BalancerParameters.DEFAULT);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testBalancerWithHANameNodes_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        TestBalancer.initConf(conf);
+        // new node's capacity
+        long newNodeCapacity = TestBalancer.CAPACITY;
+        // new node's rack
+        String newNodeRack = TestBalancer.RACK2;
+        // array of racks for original nodes in cluster
+        String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
+        // array of capacities of original nodes in cluster
+        long[] capacities = new long[] { TestBalancer.CAPACITY, TestBalancer.CAPACITY };
+        assertEquals(capacities.length, racks.length);
+        int numOfDatanodes = capacities.length;
+        NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
+        nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
+        Configuration copiedConf = new Configuration(conf);
+        cluster = new MiniDFSClusterInJVM.Builder(copiedConf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(capacities.length).racks(racks).simulatedCapacities(capacities).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(1);
+            Thread.sleep(500);
+            client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf), ClientProtocol.class).getProxy();
+            long totalCapacity = TestBalancer.sum(capacities);
+            // fill up the cluster to be 30% full
+            long totalUsedSpace = totalCapacity * 3 / 10;
+            TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace / numOfDatanodes, (short) numOfDatanodes, 1);
+            // start up an empty node with the same capacity and on the same rack
+            cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack }, new long[] { newNodeCapacity });
+            totalCapacity += newNodeCapacity;
+            TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client, cluster);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
+            assertEquals(1, namenodes.size());
+            assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
+            final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
+            assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
+            TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, BalancerParameters.DEFAULT);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testBalancerWithHANameNodes_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        TestBalancer.initConf(conf);
+        // new node's capacity
+        long newNodeCapacity = TestBalancer.CAPACITY;
+        // new node's rack
+        String newNodeRack = TestBalancer.RACK2;
+        // array of racks for original nodes in cluster
+        String[] racks = new String[] { TestBalancer.RACK0, TestBalancer.RACK1 };
+        // array of capacities of original nodes in cluster
+        long[] capacities = new long[] { TestBalancer.CAPACITY, TestBalancer.CAPACITY };
+        assertEquals(capacities.length, racks.length);
+        int numOfDatanodes = capacities.length;
+        NNConf nn1Conf = new MiniDFSNNTopology.NNConf("nn1");
+        nn1Conf.setIpcPort(HdfsClientConfigKeys.DFS_NAMENODE_RPC_PORT_DEFAULT);
+        Configuration copiedConf = new Configuration(conf);
+        cluster = new MiniDFSClusterInJVM.Builder(copiedConf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(capacities.length).racks(racks).simulatedCapacities(capacities).build();
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(1);
+            Thread.sleep(500);
+            client = NameNodeProxies.createProxy(conf, FileSystem.getDefaultUri(conf), ClientProtocol.class).getProxy();
+            long totalCapacity = TestBalancer.sum(capacities);
+            // fill up the cluster to be 30% full
+            long totalUsedSpace = totalCapacity * 3 / 10;
+            TestBalancer.createFile(cluster, TestBalancer.filePath, totalUsedSpace / numOfDatanodes, (short) numOfDatanodes, 1);
+            // start up an empty node with the same capacity and on the same rack
+            cluster.startDataNodes(conf, 1, true, null, new String[] { newNodeRack }, new long[] { newNodeCapacity });
+            totalCapacity += newNodeCapacity;
+            TestBalancer.waitForHeartBeat(totalUsedSpace, totalCapacity, client, cluster);
+            Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
+            assertEquals(1, namenodes.size());
+            assertTrue(namenodes.contains(HATestUtil.getLogicalUri(cluster)));
+            final int r = Balancer.run(namenodes, BalancerParameters.DEFAULT, conf);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals(ExitStatus.SUCCESS.getExitCode(), r);
+            TestBalancer.waitForBalancer(totalUsedSpace, totalCapacity, client, cluster, BalancerParameters.DEFAULT);
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }

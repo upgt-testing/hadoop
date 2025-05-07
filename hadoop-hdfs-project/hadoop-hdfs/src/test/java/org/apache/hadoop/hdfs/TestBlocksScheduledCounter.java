@@ -18,10 +18,8 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -41,97 +39,283 @@ import org.junit.Test;
  * scheduled to a datanode.
  */
 public class TestBlocksScheduledCounter {
-  MiniDFSClusterInJVM cluster = null;
-  FileSystem fs = null;
 
-  @After
-  public void tearDown() throws IOException {
-    if (fs != null) {
-      fs.close();
-      fs = null;
-    }
-    if(cluster!=null){
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    MiniDFSClusterInJVM cluster = null;
 
-  @Test
-  public void testBlocksScheduledCounter() throws IOException {
-    cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+    FileSystem fs = null;
 
-    cluster.waitActive();
-    fs = cluster.getFileSystem();
-    
-    //open a file an write a few bytes:
-    FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
-    for (int i=0; i<1024; i++) {
-      out.write(i);
-    }
-    // flush to make sure a block is allocated.
-    out.hflush();
-    
-    ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
-    final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager(
-        ).getDatanodeManager();
-    dm.fetchDatanodesJVM(dnList, dnList, false);
-    DatanodeDescriptorJVMInterface dn = dnList.get(0);
-    
-    assertEquals(1, dn.getBlocksScheduled());
-   
-    // close the file and the counter should go to zero.
-    out.close();   
-    assertEquals(0, dn.getBlocksScheduled());
-  }
-
-  /**
-   * Abandon block should decrement the scheduledBlocks count for the dataNode.
-   */
-  @Test
-  public void testScheduledBlocksCounterShouldDecrementOnAbandonBlock()
-      throws Exception {
-    cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(
-        2).build();
-
-    cluster.waitActive();
-    fs = cluster.getFileSystem();
-
-    DatanodeManagerJVMInterface datanodeManager = cluster.getNamesystem().getBlockManager()
-        .getDatanodeManager();
-    ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
-    datanodeManager.fetchDatanodesJVM(dnList, dnList, false);
-    for (DatanodeDescriptorJVMInterface descriptor : dnList) {
-      assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(),
-          0, descriptor.getBlocksScheduled());
+    @After
+    public void tearDown() throws IOException {
+        if (fs != null) {
+            fs.close();
+            fs = null;
+        }
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
 
-    cluster.getDataNodes().get(0).shutdown();
-    // open a file an write a few bytes:
-    FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"),
-        (short) 2);
-    for (int i = 0; i < 1024; i++) {
-      out.write(i);
+    @Test
+    public void testBlocksScheduledCounter() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        //open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        dm.fetchDatanodesJVM(dnList, dnList, false);
+        DatanodeDescriptorJVMInterface dn = dnList.get(0);
+        assertEquals(1, dn.getBlocksScheduled());
+        // close the file and the counter should go to zero.
+        out.close();
+        assertEquals(0, dn.getBlocksScheduled());
     }
-    // flush to make sure a block is allocated.
-    out.hflush();
 
-    DatanodeDescriptorJVMInterface abandonedDn = datanodeManager.getDatanode(cluster
-        .getDataNodes().get(0).getDatanodeId());
-    assertEquals("for the abandoned dn scheduled counts should be 0", 0,
-        abandonedDn.getBlocksScheduled());
+    /**
+     * Abandon block should decrement the scheduledBlocks count for the dataNode.
+     */
+    @Test
+    public void testScheduledBlocksCounterShouldDecrementOnAbandonBlock() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(2).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        DatanodeManagerJVMInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        datanodeManager.fetchDatanodesJVM(dnList, dnList, false);
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+        cluster.getDataNodes().get(0).shutdown();
+        // open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"), (short) 2);
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        DatanodeDescriptorJVMInterface abandonedDn = datanodeManager.getDatanode(cluster.getDataNodes().get(0).getDatanodeId());
+        assertEquals("for the abandoned dn scheduled counts should be 0", 0, abandonedDn.getBlocksScheduled());
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            if (descriptor.equals(abandonedDn)) {
+                continue;
+            }
+            assertEquals("Blocks scheduled should be 1 for " + descriptor.getName(), 1, descriptor.getBlocksScheduled());
+        }
+        // close the file and the counter should go to zero.
+        out.close();
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+    }
 
-    for (DatanodeDescriptorJVMInterface descriptor : dnList) {
-      if (descriptor.equals(abandonedDn)) {
-        continue;
-      }
-      assertEquals("Blocks scheduled should be 1 for " + descriptor.getName(),
-          1, descriptor.getBlocksScheduled());
+    @Test
+    public void testBlocksScheduledCounter_withUpgrade20() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        //open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        dm.fetchDatanodesJVM(dnList, dnList, false);
+        DatanodeDescriptorJVMInterface dn = dnList.get(0);
+        assertEquals(1, dn.getBlocksScheduled());
+        // close the file and the counter should go to zero.
+        out.close();
+        assertEquals(0, dn.getBlocksScheduled());
     }
-    // close the file and the counter should go to zero.
-    out.close();
-    for (DatanodeDescriptorJVMInterface descriptor : dnList) {
-      assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(),
-          0, descriptor.getBlocksScheduled());
+
+    @Test
+    public void testBlocksScheduledCounter_withUpgrade40() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        //open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        dm.fetchDatanodesJVM(dnList, dnList, false);
+        DatanodeDescriptorJVMInterface dn = dnList.get(0);
+        assertEquals(1, dn.getBlocksScheduled());
+        // close the file and the counter should go to zero.
+        out.close();
+        assertEquals(0, dn.getBlocksScheduled());
     }
-  }
+
+    @Test
+    public void testBlocksScheduledCounter_withUpgrade60() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        //open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dm.fetchDatanodesJVM(dnList, dnList, false);
+        DatanodeDescriptorJVMInterface dn = dnList.get(0);
+        assertEquals(1, dn.getBlocksScheduled());
+        // close the file and the counter should go to zero.
+        out.close();
+        assertEquals(0, dn.getBlocksScheduled());
+    }
+
+    @Test
+    public void testBlocksScheduledCounter_withUpgrade80() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        //open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"));
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        final DatanodeManagerJVMInterface dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        dm.fetchDatanodesJVM(dnList, dnList, false);
+        DatanodeDescriptorJVMInterface dn = dnList.get(0);
+        assertEquals(1, dn.getBlocksScheduled());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // close the file and the counter should go to zero.
+        out.close();
+        assertEquals(0, dn.getBlocksScheduled());
+    }
+
+    @Test
+    public void testScheduledBlocksCounterShouldDecrementOnAbandonBlock_withUpgrade40() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(2).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        DatanodeManagerJVMInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        datanodeManager.fetchDatanodesJVM(dnList, dnList, false);
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+        cluster.getDataNodes().get(0).shutdown();
+        // open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"), (short) 2);
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        DatanodeDescriptorJVMInterface abandonedDn = datanodeManager.getDatanode(cluster.getDataNodes().get(0).getDatanodeId());
+        assertEquals("for the abandoned dn scheduled counts should be 0", 0, abandonedDn.getBlocksScheduled());
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            if (descriptor.equals(abandonedDn)) {
+                continue;
+            }
+            assertEquals("Blocks scheduled should be 1 for " + descriptor.getName(), 1, descriptor.getBlocksScheduled());
+        }
+        // close the file and the counter should go to zero.
+        out.close();
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+    }
+
+    @Test
+    public void testScheduledBlocksCounterShouldDecrementOnAbandonBlock_withUpgrade60() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(2).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        DatanodeManagerJVMInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        datanodeManager.fetchDatanodesJVM(dnList, dnList, false);
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+        cluster.getDataNodes().get(0).shutdown();
+        // open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"), (short) 2);
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        DatanodeDescriptorJVMInterface abandonedDn = datanodeManager.getDatanode(cluster.getDataNodes().get(0).getDatanodeId());
+        assertEquals("for the abandoned dn scheduled counts should be 0", 0, abandonedDn.getBlocksScheduled());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            if (descriptor.equals(abandonedDn)) {
+                continue;
+            }
+            assertEquals("Blocks scheduled should be 1 for " + descriptor.getName(), 1, descriptor.getBlocksScheduled());
+        }
+        // close the file and the counter should go to zero.
+        out.close();
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+    }
+
+    @Test
+    public void testScheduledBlocksCounterShouldDecrementOnAbandonBlock_withUpgrade80() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(new HdfsConfiguration()).numDataNodes(2).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+        DatanodeManagerJVMInterface datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
+        ArrayList<DatanodeDescriptorJVMInterface> dnList = new ArrayList<DatanodeDescriptorJVMInterface>();
+        datanodeManager.fetchDatanodesJVM(dnList, dnList, false);
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+        cluster.getDataNodes().get(0).shutdown();
+        // open a file an write a few bytes:
+        FSDataOutputStream out = fs.create(new Path("/testBlockScheduledCounter"), (short) 2);
+        for (int i = 0; i < 1024; i++) {
+            out.write(i);
+        }
+        // flush to make sure a block is allocated.
+        out.hflush();
+        DatanodeDescriptorJVMInterface abandonedDn = datanodeManager.getDatanode(cluster.getDataNodes().get(0).getDatanodeId());
+        assertEquals("for the abandoned dn scheduled counts should be 0", 0, abandonedDn.getBlocksScheduled());
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            if (descriptor.equals(abandonedDn)) {
+                continue;
+            }
+            assertEquals("Blocks scheduled should be 1 for " + descriptor.getName(), 1, descriptor.getBlocksScheduled());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // close the file and the counter should go to zero.
+        out.close();
+        for (DatanodeDescriptorJVMInterface descriptor : dnList) {
+            assertEquals("Blocks scheduled should be 0 for " + descriptor.getName(), 0, descriptor.getBlocksScheduled());
+        }
+    }
 }

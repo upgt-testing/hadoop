@@ -5,25 +5,22 @@
  * licenses this file to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
@@ -37,84 +34,319 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-
 public class TestSecureNameNode extends SaslDataTransferTestCase {
-  final static private int NUM_OF_DATANODES = 0;
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+    final static private int NUM_OF_DATANODES = 0;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-  @Test
-  public void testName() throws Exception {
-    MiniDFSClusterInJVM cluster = null;
-    HdfsConfiguration conf = createSecureConfig(
-        "authentication,privacy");
-    try {
-      cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES)
-          .build();
-      final MiniDFSClusterInJVM clusterRef = cluster;
-      cluster.waitActive();
-      FileSystem fsForSuperUser = UserGroupInformation
-          .loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
-            @Override
-            public FileSystem run() throws Exception {
-              return clusterRef.getFileSystem();
+    @Test
+    public void testName() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+            final MiniDFSClusterInJVM clusterRef = cluster;
+            cluster.waitActive();
+            FileSystem fsForSuperUser = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            fsForSuperUser.mkdirs(new Path("/tmp"));
+            fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            Path p = new Path("/mydir");
+            exception.expect(IOException.class);
+            fs.mkdirs(p);
+            Path tmp = new Path("/tmp/alpha");
+            fs.mkdirs(tmp);
+            assertNotNull(fs.listStatus(tmp));
+            assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
             }
-          });
-      fsForSuperUser.mkdirs(new Path("/tmp"));
-      fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission(
-          (short) 511));
-
-      UserGroupInformation ugi = UserGroupInformation
-          .loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
-      FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
-        @Override
-        public FileSystem run() throws Exception {
-          return clusterRef.getFileSystem();
         }
-      });
-      Path p = new Path("/mydir");
-      exception.expect(IOException.class);
-      fs.mkdirs(p);
-
-      Path tmp = new Path("/tmp/alpha");
-      fs.mkdirs(tmp);
-      assertNotNull(fs.listStatus(tmp));
-      assertEquals(AuthenticationMethod.KERBEROS,
-          ugi.getAuthenticationMethod());
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
     }
-  }
 
-  /**
-   * Verify the following scenario.
-   * 1. Kerberos is enabled.
-   * 2. HDFS block tokens are not enabled.
-   * 3. Start the NN.
-   * 4. NN should throw an IOException and abort
-   * @throws Exception
-   */
-  @Test
-  public void testKerberosHdfsBlockTokenInconsistencyNNStartup() throws Exception {
-    MiniDFSClusterInJVM dfsCluster = null;
-    HdfsConfiguration conf = createSecureConfig(
-        "authentication,privacy");
-    try {
-      conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
-      exception.expect(IOException.class);
-      exception.expectMessage("Security is enabled but block access tokens");
-      dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-      dfsCluster.waitActive();
-    } finally {
-      if (dfsCluster != null) {
-        dfsCluster.shutdown();
-      }
+    /**
+     * Verify the following scenario.
+     * 1. Kerberos is enabled.
+     * 2. HDFS block tokens are not enabled.
+     * 3. Start the NN.
+     * 4. NN should throw an IOException and abort
+     * @throws Exception
+     */
+    @Test
+    public void testKerberosHdfsBlockTokenInconsistencyNNStartup() throws Exception {
+        MiniDFSClusterInJVM dfsCluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
+            exception.expect(IOException.class);
+            exception.expectMessage("Security is enabled but block access tokens");
+            dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+            }
+        }
+        return;
     }
-    return;
-  }
 
+    @Test
+    public void testName_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+            final MiniDFSClusterInJVM clusterRef = cluster;
+            cluster.waitActive();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            FileSystem fsForSuperUser = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            fsForSuperUser.mkdirs(new Path("/tmp"));
+            fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            Path p = new Path("/mydir");
+            exception.expect(IOException.class);
+            fs.mkdirs(p);
+            Path tmp = new Path("/tmp/alpha");
+            fs.mkdirs(tmp);
+            assertNotNull(fs.listStatus(tmp));
+            assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testName_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+            final MiniDFSClusterInJVM clusterRef = cluster;
+            cluster.waitActive();
+            FileSystem fsForSuperUser = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            fsForSuperUser.mkdirs(new Path("/tmp"));
+            fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            Path p = new Path("/mydir");
+            exception.expect(IOException.class);
+            fs.mkdirs(p);
+            Path tmp = new Path("/tmp/alpha");
+            fs.mkdirs(tmp);
+            assertNotNull(fs.listStatus(tmp));
+            assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testName_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+            final MiniDFSClusterInJVM clusterRef = cluster;
+            cluster.waitActive();
+            FileSystem fsForSuperUser = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            fsForSuperUser.mkdirs(new Path("/tmp"));
+            fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            Path p = new Path("/mydir");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            exception.expect(IOException.class);
+            fs.mkdirs(p);
+            Path tmp = new Path("/tmp/alpha");
+            fs.mkdirs(tmp);
+            assertNotNull(fs.listStatus(tmp));
+            assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testName_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM cluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_OF_DATANODES).build();
+            final MiniDFSClusterInJVM clusterRef = cluster;
+            cluster.waitActive();
+            FileSystem fsForSuperUser = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getHdfsPrincipal(), getHdfsKeytab()).doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            fsForSuperUser.mkdirs(new Path("/tmp"));
+            fsForSuperUser.setPermission(new Path("/tmp"), new FsPermission((short) 511));
+            UserGroupInformation ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(getUserPrincipal(), getUserKeyTab());
+            FileSystem fs = ugi.doAs(new PrivilegedExceptionAction<FileSystem>() {
+
+                @Override
+                public FileSystem run() throws Exception {
+                    return clusterRef.getFileSystem();
+                }
+            });
+            Path p = new Path("/mydir");
+            exception.expect(IOException.class);
+            fs.mkdirs(p);
+            Path tmp = new Path("/tmp/alpha");
+            fs.mkdirs(tmp);
+            assertNotNull(fs.listStatus(tmp));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+        } finally {
+            if (cluster != null) {
+                cluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testKerberosHdfsBlockTokenInconsistencyNNStartup_withUpgrade20() throws Exception {
+        MiniDFSClusterInJVM dfsCluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
+            dfsCluster.restartNodeForTesting(0);
+            dfsCluster.upgradeNodeForTesting(0);
+            exception.expect(IOException.class);
+            exception.expectMessage("Security is enabled but block access tokens");
+            dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+            }
+        }
+        return;
+    }
+
+    @Test
+    public void testKerberosHdfsBlockTokenInconsistencyNNStartup_withUpgrade40() throws Exception {
+        MiniDFSClusterInJVM dfsCluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
+            exception.expect(IOException.class);
+            exception.expectMessage("Security is enabled but block access tokens");
+            dfsCluster.restartNodeForTesting(0);
+            dfsCluster.upgradeNodeForTesting(0);
+            dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+            }
+        }
+        return;
+    }
+
+    @Test
+    public void testKerberosHdfsBlockTokenInconsistencyNNStartup_withUpgrade60() throws Exception {
+        MiniDFSClusterInJVM dfsCluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
+            exception.expect(IOException.class);
+            exception.expectMessage("Security is enabled but block access tokens");
+            dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+            dfsCluster.restartNodeForTesting(0);
+            dfsCluster.upgradeNodeForTesting(0);
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+            }
+        }
+        return;
+    }
+
+    @Test
+    public void testKerberosHdfsBlockTokenInconsistencyNNStartup_withUpgrade80() throws Exception {
+        MiniDFSClusterInJVM dfsCluster = null;
+        HdfsConfiguration conf = createSecureConfig("authentication,privacy");
+        try {
+            conf.setBoolean(DFSConfigKeys.DFS_BLOCK_ACCESS_TOKEN_ENABLE_KEY, false);
+            exception.expect(IOException.class);
+            exception.expectMessage("Security is enabled but block access tokens");
+            dfsCluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+                dfsCluster.restartNodeForTesting(0);
+                dfsCluster.upgradeNodeForTesting(0);
+            }
+        }
+        return;
+    }
 }
