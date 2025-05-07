@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode.ha;
 
 import org.apache.hadoop.hdfs.server.namenode.NameNodeJVMInterface;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -33,7 +32,6 @@ import org.apache.hadoop.hdfs.server.blockmanagement.BlockManagerTestUtil;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.apache.log4j.Level;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -41,62 +39,189 @@ import static org.junit.Assert.assertEquals;
  * invalidate block, etc.
  */
 public class TestStandbyBlockManagement {
-  protected static final Log LOG = LogFactory.getLog(
-      TestStandbyBlockManagement.class);
-  private static final String TEST_FILE_DATA = "hello world";
-  private static final String TEST_FILE = "/TestStandbyBlockManagement";
-  private static final Path TEST_FILE_PATH = new Path(TEST_FILE);
 
-  static {
-    DFSTestUtil.setNameNodeLogLevel(Level.ALL);
-  }
+    protected static final Log LOG = LogFactory.getLog(TestStandbyBlockManagement.class);
 
-  @Test(timeout=60000)
-  public void testInvalidateBlock() throws Exception {
-    Configuration conf = new Configuration();
-    HAUtil.setAllowStandbyReads(conf, true);
-    conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .numDataNodes(3)
-        .build();
-    try {
-      cluster.waitActive();
-      cluster.transitionToActive(0);
+    private static final String TEST_FILE_DATA = "hello world";
 
-      NameNodeJVMInterface nn1 = cluster.getNameNode(0);
-      NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+    private static final String TEST_FILE = "/TestStandbyBlockManagement";
 
-      FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+    private static final Path TEST_FILE_PATH = new Path(TEST_FILE);
 
-      Thread.sleep(1000);
-      LOG.info("==================================");
-      DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
-      // Have to force an edit log roll so that the standby catches up
-      nn1.getRpcServer().rollEditLog();
-      LOG.info("==================================");
-
-      // delete the file
-      fs.delete(TEST_FILE_PATH, false);
-      BlockManagerTestUtil.computeAllPendingWork(
-          nn1.getNamesystem().getBlockManager());
-
-      nn1.getRpcServer().rollEditLog();
-
-      // standby nn doesn't need to invalidate blocks.
-      assertEquals(0,
-          nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
-
-      cluster.triggerHeartbeats();
-      cluster.triggerBlockReports();
-
-      // standby nn doesn't need to invalidate blocks.
-      assertEquals(0,
-          nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
-
-    } finally {
-      cluster.shutdown();
+    static {
+        DFSTestUtil.setNameNodeLogLevel(Level.ALL);
     }
-  }
 
+    @Test(timeout = 60000)
+    public void testInvalidateBlock() throws Exception {
+        Configuration conf = new Configuration();
+        HAUtil.setAllowStandbyReads(conf, true);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(0);
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+            Thread.sleep(1000);
+            LOG.info("==================================");
+            DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
+            // Have to force an edit log roll so that the standby catches up
+            nn1.getRpcServer().rollEditLog();
+            LOG.info("==================================");
+            // delete the file
+            fs.delete(TEST_FILE_PATH, false);
+            BlockManagerTestUtil.computeAllPendingWork(nn1.getNamesystem().getBlockManager());
+            nn1.getRpcServer().rollEditLog();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+            cluster.triggerHeartbeats();
+            cluster.triggerBlockReports();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testInvalidateBlock_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        HAUtil.setAllowStandbyReads(conf, true);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(0);
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+            Thread.sleep(1000);
+            LOG.info("==================================");
+            DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
+            // Have to force an edit log roll so that the standby catches up
+            nn1.getRpcServer().rollEditLog();
+            LOG.info("==================================");
+            // delete the file
+            fs.delete(TEST_FILE_PATH, false);
+            BlockManagerTestUtil.computeAllPendingWork(nn1.getNamesystem().getBlockManager());
+            nn1.getRpcServer().rollEditLog();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+            cluster.triggerHeartbeats();
+            cluster.triggerBlockReports();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testInvalidateBlock_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        HAUtil.setAllowStandbyReads(conf, true);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(0);
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+            Thread.sleep(1000);
+            LOG.info("==================================");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
+            // Have to force an edit log roll so that the standby catches up
+            nn1.getRpcServer().rollEditLog();
+            LOG.info("==================================");
+            // delete the file
+            fs.delete(TEST_FILE_PATH, false);
+            BlockManagerTestUtil.computeAllPendingWork(nn1.getNamesystem().getBlockManager());
+            nn1.getRpcServer().rollEditLog();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+            cluster.triggerHeartbeats();
+            cluster.triggerBlockReports();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testInvalidateBlock_withUpgrade60() throws Exception {
+        Configuration conf = new Configuration();
+        HAUtil.setAllowStandbyReads(conf, true);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(0);
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+            Thread.sleep(1000);
+            LOG.info("==================================");
+            DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
+            // Have to force an edit log roll so that the standby catches up
+            nn1.getRpcServer().rollEditLog();
+            LOG.info("==================================");
+            // delete the file
+            fs.delete(TEST_FILE_PATH, false);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            BlockManagerTestUtil.computeAllPendingWork(nn1.getNamesystem().getBlockManager());
+            nn1.getRpcServer().rollEditLog();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+            cluster.triggerHeartbeats();
+            cluster.triggerBlockReports();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test(timeout = 60000)
+    public void testInvalidateBlock_withUpgrade80() throws Exception {
+        Configuration conf = new Configuration();
+        HAUtil.setAllowStandbyReads(conf, true);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        try {
+            cluster.waitActive();
+            cluster.transitionToActive(0);
+            NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+            NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+            FileSystem fs = HATestUtil.configureFailoverFs(cluster, conf);
+            Thread.sleep(1000);
+            LOG.info("==================================");
+            DFSTestUtil.writeFile(fs, TEST_FILE_PATH, TEST_FILE_DATA);
+            // Have to force an edit log roll so that the standby catches up
+            nn1.getRpcServer().rollEditLog();
+            LOG.info("==================================");
+            // delete the file
+            fs.delete(TEST_FILE_PATH, false);
+            BlockManagerTestUtil.computeAllPendingWork(nn1.getNamesystem().getBlockManager());
+            nn1.getRpcServer().rollEditLog();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+            cluster.triggerHeartbeats();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            cluster.triggerBlockReports();
+            // standby nn doesn't need to invalidate blocks.
+            assertEquals(0, nn2.getNamesystem().getBlockManager().getPendingDeletionBlocksCount());
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }

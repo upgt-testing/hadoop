@@ -33,10 +33,8 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-
 import static org.apache.hadoop.fs.permission.FsAction.READ_EXECUTE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,186 +44,575 @@ import static org.junit.Assert.fail;
  * This class tests get content summary with permission settings.
  */
 public class TestGetContentSummaryWithPermission {
-  protected static final short REPLICATION = 3;
-  protected static final long BLOCKSIZE = 1024;
 
-  private Configuration conf;
-  private MiniDFSClusterInJVM cluster;
-  private DistributedFileSystem dfs;
+    protected static final short REPLICATION = 3;
 
-  @Before
-  public void setUp() throws Exception {
-    conf = new Configuration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
-    cluster =
-        new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
-    cluster.waitActive();
+    protected static final long BLOCKSIZE = 1024;
 
-    dfs = cluster.getFileSystem();
-  }
+    private Configuration conf;
 
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private MiniDFSClusterInJVM cluster;
+
+    private DistributedFileSystem dfs;
+
+    @Before
+    public void setUp() throws Exception {
+        conf = new Configuration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCKSIZE);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPLICATION).build();
+        cluster.waitActive();
+        dfs = cluster.getFileSystem();
     }
-  }
 
-  /**
-   * Test getContentSummary for super user. For super user, whatever
-   * permission the directories are with, always allowed to access
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testGetContentSummarySuperUser() throws Exception {
-    final Path foo = new Path("/fooSuper");
-    final Path bar = new Path(foo, "barSuper");
-    final Path baz = new Path(bar, "bazSuper");
-    dfs.mkdirs(bar);
-    DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-    ContentSummaryJVMInterface summary;
+    /**
+     * Test getContentSummary for super user. For super user, whatever
+     * permission the directories are with, always allowed to access
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetContentSummarySuperUser() throws Exception {
+        final Path foo = new Path("/fooSuper");
+        final Path bar = new Path(foo, "barSuper");
+        final Path baz = new Path(bar, "bazSuper");
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary;
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+    }
 
-    summary = cluster.getNameNodeRpc().getContentSummary(
-        foo.toString());
-    verifySummary(summary, 2, 1, 10);
+    /**
+     * Test getContentSummary for non-super, non-owner. Such users are restricted
+     * by permission of subdirectories. Namely if there is any subdirectory that
+     * does not have READ_EXECUTE access, AccessControlException will be thrown.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetContentSummaryNonSuperUser() throws Exception {
+        final Path foo = new Path("/fooNoneSuper");
+        final Path bar = new Path(foo, "barNoneSuper");
+        final Path baz = new Path(bar, "bazNoneSuper");
+        // run as some random non-superuser, non-owner user.
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        // by default, permission is rwxr-xr-x, as long as READ and EXECUTE are set,
+        // content summary should accessible
+        FileStatus fileStatus;
+        fileStatus = dfs.getFileStatus(foo);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        fileStatus = dfs.getFileStatus(bar);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        // file has no EXECUTE, it is rw-r--r-- default
+        fileStatus = dfs.getFileStatus(baz);
+        assertEquals((short) 644, fileStatus.getPermission().toOctal());
+        // by default, can get content summary
+        ContentSummaryJVMInterface summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
 
-    dfs.setPermission(foo, new FsPermission((short)0));
-
-    summary = cluster.getNameNodeRpc().getContentSummary(
-        foo.toString());
-    verifySummary(summary, 2, 1, 10);
-
-    dfs.setPermission(bar, new FsPermission((short)0));
-
-    summary = cluster.getNameNodeRpc().getContentSummary(
-        foo.toString());
-    verifySummary(summary, 2, 1, 10);
-
-    dfs.setPermission(baz, new FsPermission((short)0));
-
-    summary = cluster.getNameNodeRpc().getContentSummary(
-        foo.toString());
-    verifySummary(summary, 2, 1, 10);
-  }
-
-  /**
-   * Test getContentSummary for non-super, non-owner. Such users are restricted
-   * by permission of subdirectories. Namely if there is any subdirectory that
-   * does not have READ_EXECUTE access, AccessControlException will be thrown.
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testGetContentSummaryNonSuperUser() throws Exception {
-    final Path foo = new Path("/fooNoneSuper");
-    final Path bar = new Path(foo, "barNoneSuper");
-    final Path baz = new Path(bar, "bazNoneSuper");
-    // run as some random non-superuser, non-owner user.
-    final UserGroupInformation userUgi  =
-        UserGroupInformation.createUserForTesting(
-            "randomUser", new String[]{"randomGroup"});
-    dfs.mkdirs(bar);
-    DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
-
-    // by default, permission is rwxr-xr-x, as long as READ and EXECUTE are set,
-    // content summary should accessible
-    FileStatus fileStatus;
-    fileStatus = dfs.getFileStatus(foo);
-    assertEquals((short)755, fileStatus.getPermission().toOctal());
-    fileStatus = dfs.getFileStatus(bar);
-    assertEquals((short)755, fileStatus.getPermission().toOctal());
-    // file has no EXECUTE, it is rw-r--r-- default
-    fileStatus = dfs.getFileStatus(baz);
-    assertEquals((short)644, fileStatus.getPermission().toOctal());
-
-    // by default, can get content summary
-    ContentSummaryJVMInterface summary =
-        userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
-          @Override
-          public ContentSummaryJVMInterface run() throws IOException {
-            return cluster.getNameNodeRpc().getContentSummary(
-                foo.toString());
-          }
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
         });
-    verifySummary(summary, 2, 1, 10);
+        verifySummary(summary, 2, 1, 10);
+        // set empty access on root dir, should disallow content summary
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
 
-    // set empty access on root dir, should disallow content summary
-    dfs.setPermission(foo, new FsPermission((short)0));
-    try {
-      userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
-        @Override
-        public ContentSummaryJVMInterface run() throws IOException {
-          return cluster.getNameNodeRpc().getContentSummary(
-              foo.toString());
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
         }
-      });
-      fail("Should've fail due to access control exception.");
-    } catch (AccessControlException e) {
-      assertTrue(e.getMessage().contains("Permission denied"));
+        // restore foo's permission to allow READ_EXECUTE
+        dfs.setPermission(foo, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        // set empty access on subdir, should disallow content summary from root dir
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // restore the permission of subdir to READ_EXECUTE. enable
+        // getContentSummary again for root
+        dfs.setPermission(bar, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // permission of files under the directory does not affect
+        // getContentSummary
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
     }
 
-    // restore foo's permission to allow READ_EXECUTE
-    dfs.setPermission(foo,
-        new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
-
-    // set empty access on subdir, should disallow content summary from root dir
-    dfs.setPermission(bar, new FsPermission((short)0));
-
-    try {
-      userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
-        @Override
-        public ContentSummaryJVMInterface run() throws IOException {
-          return cluster.getNameNodeRpc().getContentSummary(
-              foo.toString());
-        }
-      });
-      fail("Should've fail due to access control exception.");
-    } catch (AccessControlException e) {
-      assertTrue(e.getMessage().contains("Permission denied"));
+    private void verifySummary(ContentSummary summary, int dirCount, int fileCount, int length) {
+        assertEquals(dirCount, summary.getDirectoryCount());
+        assertEquals(fileCount, summary.getFileCount());
+        assertEquals(length, summary.getLength());
     }
 
-    // restore the permission of subdir to READ_EXECUTE. enable
-    // getContentSummary again for root
-    dfs.setPermission(bar,
-        new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+    private void verifySummary(ContentSummaryJVMInterface summary, int dirCount, int fileCount, int length) {
+        assertEquals(dirCount, summary.getDirectoryCount());
+        assertEquals(fileCount, summary.getFileCount());
+        assertEquals(length, summary.getLength());
+    }
 
-    summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
-      @Override
-      public ContentSummaryJVMInterface run() throws IOException {
-        return cluster.getNameNodeRpc().getContentSummary(
-            foo.toString());
-      }
-    });
-    verifySummary(summary, 2, 1, 10);
+    @Test
+    public void testGetContentSummarySuperUser_withUpgrade20() throws Exception {
+        final Path foo = new Path("/fooSuper");
+        final Path bar = new Path(foo, "barSuper");
+        final Path baz = new Path(bar, "bazSuper");
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        ContentSummaryJVMInterface summary;
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+    }
 
-    // permission of files under the directory does not affect
-    // getContentSummary
-    dfs.setPermission(baz, new FsPermission((short)0));
-    summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
-      @Override
-      public ContentSummaryJVMInterface run() throws IOException {
-        return cluster.getNameNodeRpc().getContentSummary(
-            foo.toString());
-      }
-    });
-    verifySummary(summary, 2, 1, 10);
-  }
+    @Test
+    public void testGetContentSummarySuperUser_withUpgrade40() throws Exception {
+        final Path foo = new Path("/fooSuper");
+        final Path bar = new Path(foo, "barSuper");
+        final Path baz = new Path(bar, "bazSuper");
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary;
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+    }
 
-  private void verifySummary(ContentSummary summary, int dirCount,
-      int fileCount, int length) {
-    assertEquals(dirCount, summary.getDirectoryCount());
-    assertEquals(fileCount, summary.getFileCount());
-    assertEquals(length, summary.getLength());
-  }
+    @Test
+    public void testGetContentSummarySuperUser_withUpgrade60() throws Exception {
+        final Path foo = new Path("/fooSuper");
+        final Path bar = new Path(foo, "barSuper");
+        final Path baz = new Path(bar, "bazSuper");
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary;
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+    }
 
-  private void verifySummary(ContentSummaryJVMInterface summary, int dirCount,
-                             int fileCount, int length) {
-    assertEquals(dirCount, summary.getDirectoryCount());
-    assertEquals(fileCount, summary.getFileCount());
-    assertEquals(length, summary.getLength());
-  }
+    @Test
+    public void testGetContentSummarySuperUser_withUpgrade80() throws Exception {
+        final Path foo = new Path("/fooSuper");
+        final Path bar = new Path(foo, "barSuper");
+        final Path baz = new Path(bar, "bazSuper");
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        ContentSummaryJVMInterface summary;
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = cluster.getNameNodeRpc().getContentSummary(foo.toString());
+        verifySummary(summary, 2, 1, 10);
+    }
 
+    @Test
+    public void testGetContentSummaryNonSuperUser_withUpgrade20() throws Exception {
+        final Path foo = new Path("/fooNoneSuper");
+        final Path bar = new Path(foo, "barNoneSuper");
+        final Path baz = new Path(bar, "bazNoneSuper");
+        // run as some random non-superuser, non-owner user.
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        // content summary should accessible
+        FileStatus fileStatus;
+        fileStatus = dfs.getFileStatus(foo);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        fileStatus = dfs.getFileStatus(bar);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // file has no EXECUTE, it is rw-r--r-- default
+        fileStatus = dfs.getFileStatus(baz);
+        assertEquals((short) 644, fileStatus.getPermission().toOctal());
+        // by default, can get content summary
+        ContentSummaryJVMInterface summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // set empty access on root dir, should disallow content summary
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // restore foo's permission to allow READ_EXECUTE
+        dfs.setPermission(foo, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        // set empty access on subdir, should disallow content summary from root dir
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // getContentSummary again for root
+        dfs.setPermission(bar, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // getContentSummary
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+    }
+
+    @Test
+    public void testGetContentSummaryNonSuperUser_withUpgrade40() throws Exception {
+        final Path foo = new Path("/fooNoneSuper");
+        final Path bar = new Path(foo, "barNoneSuper");
+        final Path baz = new Path(bar, "bazNoneSuper");
+        // run as some random non-superuser, non-owner user.
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        // content summary should accessible
+        FileStatus fileStatus;
+        fileStatus = dfs.getFileStatus(foo);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        fileStatus = dfs.getFileStatus(bar);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        // file has no EXECUTE, it is rw-r--r-- default
+        fileStatus = dfs.getFileStatus(baz);
+        assertEquals((short) 644, fileStatus.getPermission().toOctal());
+        // by default, can get content summary
+        ContentSummaryJVMInterface summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // set empty access on root dir, should disallow content summary
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // restore foo's permission to allow READ_EXECUTE
+        dfs.setPermission(foo, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        // set empty access on subdir, should disallow content summary from root dir
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // getContentSummary again for root
+        dfs.setPermission(bar, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // getContentSummary
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+    }
+
+    @Test
+    public void testGetContentSummaryNonSuperUser_withUpgrade60() throws Exception {
+        final Path foo = new Path("/fooNoneSuper");
+        final Path bar = new Path(foo, "barNoneSuper");
+        final Path baz = new Path(bar, "bazNoneSuper");
+        // run as some random non-superuser, non-owner user.
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        // content summary should accessible
+        FileStatus fileStatus;
+        fileStatus = dfs.getFileStatus(foo);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        fileStatus = dfs.getFileStatus(bar);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        // file has no EXECUTE, it is rw-r--r-- default
+        fileStatus = dfs.getFileStatus(baz);
+        assertEquals((short) 644, fileStatus.getPermission().toOctal());
+        // by default, can get content summary
+        ContentSummaryJVMInterface summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // set empty access on root dir, should disallow content summary
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // restore foo's permission to allow READ_EXECUTE
+        dfs.setPermission(foo, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        // set empty access on subdir, should disallow content summary from root dir
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // getContentSummary again for root
+        dfs.setPermission(bar, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // getContentSummary
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+    }
+
+    @Test
+    public void testGetContentSummaryNonSuperUser_withUpgrade80() throws Exception {
+        final Path foo = new Path("/fooNoneSuper");
+        final Path bar = new Path(foo, "barNoneSuper");
+        final Path baz = new Path(bar, "bazNoneSuper");
+        // run as some random non-superuser, non-owner user.
+        final UserGroupInformation userUgi = UserGroupInformation.createUserForTesting("randomUser", new String[] { "randomGroup" });
+        dfs.mkdirs(bar);
+        DFSTestUtil.createFile(dfs, baz, 10, REPLICATION, 0L);
+        // content summary should accessible
+        FileStatus fileStatus;
+        fileStatus = dfs.getFileStatus(foo);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        fileStatus = dfs.getFileStatus(bar);
+        assertEquals((short) 755, fileStatus.getPermission().toOctal());
+        // file has no EXECUTE, it is rw-r--r-- default
+        fileStatus = dfs.getFileStatus(baz);
+        assertEquals((short) 644, fileStatus.getPermission().toOctal());
+        // by default, can get content summary
+        ContentSummaryJVMInterface summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+        // set empty access on root dir, should disallow content summary
+        dfs.setPermission(foo, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // restore foo's permission to allow READ_EXECUTE
+        dfs.setPermission(foo, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        // set empty access on subdir, should disallow content summary from root dir
+        dfs.setPermission(bar, new FsPermission((short) 0));
+        try {
+            userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+                @Override
+                public ContentSummaryJVMInterface run() throws IOException {
+                    return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+                }
+            });
+            fail("Should've fail due to access control exception.");
+        } catch (AccessControlException e) {
+            assertTrue(e.getMessage().contains("Permission denied"));
+        }
+        // getContentSummary again for root
+        dfs.setPermission(bar, new FsPermission(READ_EXECUTE, READ_EXECUTE, READ_EXECUTE));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        verifySummary(summary, 2, 1, 10);
+        // getContentSummary
+        dfs.setPermission(baz, new FsPermission((short) 0));
+        summary = userUgi.doAs(new PrivilegedExceptionAction<ContentSummaryJVMInterface>() {
+
+            @Override
+            public ContentSummaryJVMInterface run() throws IOException {
+                return cluster.getNameNodeRpc().getContentSummary(foo.toString());
+            }
+        });
+        verifySummary(summary, 2, 1, 10);
+    }
 }

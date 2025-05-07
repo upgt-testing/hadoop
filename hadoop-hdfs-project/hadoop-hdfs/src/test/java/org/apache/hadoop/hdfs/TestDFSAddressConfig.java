@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*
  * Test the MiniDFSClusterInJVM functionality that allows "dfs.datanode.address",
  * "dfs.datanode.http.address", and "dfs.datanode.ipc.address" to be
@@ -29,10 +28,8 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.MiniDFSClusterInJVM.DataNodeProperties;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption;
@@ -40,77 +37,288 @@ import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
 import org.junit.Test;
 
-
 public class TestDFSAddressConfig {
 
-  @Test
-  public void testDFSAddressConfig() throws IOException {
-    Configuration conf = new HdfsConfiguration();
-
-    /*-------------------------------------------------------------------------
+    @Test
+    public void testDFSAddressConfig() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        /*-------------------------------------------------------------------------
      * By default, the DataNode socket address should be localhost (127.0.0.1).
      *------------------------------------------------------------------------*/
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    cluster.waitActive();
-
-    ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
-    DataNodeJVMInterface dn = dns.get(0);
-
-    String selfSocketAddr = dn.getXferAddress().toString();
-    System.out.println("DN Self Socket Addr == " + selfSocketAddr);
-    assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
-
-    /*-------------------------------------------------------------------------
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+        DataNodeJVMInterface dn = dns.get(0);
+        String selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
      * Shut down the datanodes, reconfigure, and bring them back up.
      * Even if told to use the configuration properties for dfs.datanode,
      * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
      * the dfs.datanode properties are not set.
      *------------------------------------------------------------------------*/
-    for (int i = 0; i < dns.size(); i++) {
-      DataNodeProperties dnp = cluster.stopDataNode(i);
-      assertNotNull("Should have been able to stop simulated datanode", dnp);
-    }
-
-    conf.unset(DFS_DATANODE_ADDRESS_KEY);
-    conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
-    conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
-
-    cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR,
-                           null, null, null, false, true);
-
-    dns = cluster.getDataNodes();
-    dn = dns.get(0);
-
-    selfSocketAddr = dn.getXferAddress().toString();
-    System.out.println("DN Self Socket Addr == " + selfSocketAddr);
-    // assert that default self socket address is 127.0.0.1
-    assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
-
-    /*-------------------------------------------------------------------------
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.unset(DFS_DATANODE_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 127.0.0.1
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
      * Shut down the datanodes, reconfigure, and bring them back up.
      * This time, modify the dfs.datanode properties and make sure that they
      * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
      *------------------------------------------------------------------------*/
-    for (int i = 0; i < dns.size(); i++) {
-      DataNodeProperties dnp = cluster.stopDataNode(i);
-      assertNotNull("Should have been able to stop simulated datanode", dnp);
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 0.0.0.0
+        assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
+        cluster.shutdown();
     }
 
-    conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
-    conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
-    conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+    @Test
+    public void testDFSAddressConfig_withUpgrade20() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        /*-------------------------------------------------------------------------
+     * By default, the DataNode socket address should be localhost (127.0.0.1).
+     *------------------------------------------------------------------------*/
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+        DataNodeJVMInterface dn = dns.get(0);
+        String selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * Even if told to use the configuration properties for dfs.datanode,
+     * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
+     * the dfs.datanode properties are not set.
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.unset(DFS_DATANODE_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 127.0.0.1
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * This time, modify the dfs.datanode properties and make sure that they
+     * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 0.0.0.0
+        assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
+        cluster.shutdown();
+    }
 
-    cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR,
-                           null, null, null, false, true);
+    @Test
+    public void testDFSAddressConfig_withUpgrade40() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        /*-------------------------------------------------------------------------
+     * By default, the DataNode socket address should be localhost (127.0.0.1).
+     *------------------------------------------------------------------------*/
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+        DataNodeJVMInterface dn = dns.get(0);
+        String selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * Even if told to use the configuration properties for dfs.datanode,
+     * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
+     * the dfs.datanode properties are not set.
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.unset(DFS_DATANODE_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 127.0.0.1
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * This time, modify the dfs.datanode properties and make sure that they
+     * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 0.0.0.0
+        assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
+        cluster.shutdown();
+    }
 
-    dns = cluster.getDataNodes();
-    dn = dns.get(0);
+    @Test
+    public void testDFSAddressConfig_withUpgrade60() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        /*-------------------------------------------------------------------------
+     * By default, the DataNode socket address should be localhost (127.0.0.1).
+     *------------------------------------------------------------------------*/
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+        DataNodeJVMInterface dn = dns.get(0);
+        String selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * Even if told to use the configuration properties for dfs.datanode,
+     * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
+     * the dfs.datanode properties are not set.
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.unset(DFS_DATANODE_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 127.0.0.1
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * This time, modify the dfs.datanode properties and make sure that they
+     * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 0.0.0.0
+        assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
+        cluster.shutdown();
+    }
 
-    selfSocketAddr = dn.getXferAddress().toString();
-    System.out.println("DN Self Socket Addr == " + selfSocketAddr);
-    // assert that default self socket address is 0.0.0.0
-    assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
-
-    cluster.shutdown();
-  }
+    @Test
+    public void testDFSAddressConfig_withUpgrade80() throws IOException {
+        Configuration conf = new HdfsConfiguration();
+        /*-------------------------------------------------------------------------
+     * By default, the DataNode socket address should be localhost (127.0.0.1).
+     *------------------------------------------------------------------------*/
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        ArrayList<DataNodeJVMInterface> dns = cluster.getDataNodes();
+        DataNodeJVMInterface dn = dns.get(0);
+        String selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * Even if told to use the configuration properties for dfs.datanode,
+     * MiniDFSClusterInJVM.startDataNodes() should use localhost as the default if
+     * the dfs.datanode properties are not set.
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.unset(DFS_DATANODE_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_HTTP_ADDRESS_KEY);
+        conf.unset(DFS_DATANODE_IPC_ADDRESS_KEY);
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 127.0.0.1
+        assertTrue(selfSocketAddr.contains("/127.0.0.1:"));
+        /*-------------------------------------------------------------------------
+     * Shut down the datanodes, reconfigure, and bring them back up.
+     * This time, modify the dfs.datanode properties and make sure that they
+     * are used to configure sockets by MiniDFSClusterInJVM.startDataNodes().
+     *------------------------------------------------------------------------*/
+        for (int i = 0; i < dns.size(); i++) {
+            DataNodeProperties dnp = cluster.stopDataNode(i);
+            assertNotNull("Should have been able to stop simulated datanode", dnp);
+        }
+        conf.set(DFS_DATANODE_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_HTTP_ADDRESS_KEY, "0.0.0.0:0");
+        conf.set(DFS_DATANODE_IPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster.startDataNodes(conf, 1, true, StartupOption.REGULAR, null, null, null, false, true);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dns = cluster.getDataNodes();
+        dn = dns.get(0);
+        selfSocketAddr = dn.getXferAddress().toString();
+        System.out.println("DN Self Socket Addr == " + selfSocketAddr);
+        // assert that default self socket address is 0.0.0.0
+        assertTrue(selfSocketAddr.contains("/0.0.0.0:"));
+        cluster.shutdown();
+    }
 }
