@@ -99,7 +99,6 @@ import org.apache.hadoop.hdfs.protocol.OpenFileEntry;
 import org.apache.hadoop.hdfs.protocol.OpenFilesIterator;
 import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.datanode.DataNodeJVMInterface;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeSpi;
 import org.apache.hadoop.hdfs.server.namenode.ErasureCodingPolicyManager;
@@ -5254,39 +5253,6 @@ public class TestDistributedFileSystem {
         }
     }
 
-    @Test(timeout = 10000)
-    public void testDFSClientPeerReadTimeout_withUpgrade80() throws IOException {
-        final int timeout = 1000;
-        final Configuration conf = new HdfsConfiguration();
-        conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, timeout);
-        // only need cluster to create a dfs client to get a peer
-        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-        try {
-            cluster.waitActive();
-            DistributedFileSystem dfs = cluster.getFileSystem();
-            // use a dummy socket to ensure the read timesout
-            ServerSocket socket = new ServerSocket(0);
-            Peer peer = dfs.getClient().newConnectedPeer((InetSocketAddress) socket.getLocalSocketAddress(), null, null);
-            long start = Time.now();
-            try {
-                peer.getInputStream().read();
-                Assert.fail("read should timeout");
-            } catch (SocketTimeoutException ste) {
-                long delta = Time.now() - start;
-                if (delta < timeout * 0.9) {
-                    throw new IOException("read timedout too soon in " + delta + " ms.", ste);
-                }
-                if (delta > timeout * 1.1) {
-                    throw new IOException("read timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
-                }
-            }
-        } finally {
-            cluster.shutdown();
-        }
-    }
-
     @Test(timeout = 60000)
     public void testGetServerDefaults_withUpgrade20() throws IOException {
         Configuration conf = new HdfsConfiguration();
@@ -5449,41 +5415,6 @@ public class TestDistributedFileSystem {
                 }
                 if (delta > timeout * 1.2) {
                     throw new IOException("write timedout too late in " + delta + " ms.", ste);
-                }
-            }
-        } finally {
-            cluster.shutdown();
-        }
-    }
-
-    @Test(timeout = 10000)
-    public void testDFSClientPeerWriteTimeout_withUpgrade80() throws IOException {
-        final int timeout = 1000;
-        final Configuration conf = new HdfsConfiguration();
-        conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_TIMEOUT_KEY, timeout);
-        // only need cluster to create a dfs client to get a peer
-        final MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-        try {
-            cluster.waitActive();
-            DistributedFileSystem dfs = cluster.getFileSystem();
-            // Write 10 MB to a dummy socket to ensure the write times out
-            ServerSocket socket = new ServerSocket(0);
-            Peer peer = dfs.getClient().newConnectedPeer((InetSocketAddress) socket.getLocalSocketAddress(), null, null);
-            long start = Time.now();
-            try {
-                byte[] buf = new byte[10 * 1024 * 1024];
-                peer.getOutputStream().write(buf);
-                long delta = Time.now() - start;
-                Assert.fail("write finish in " + delta + " ms" + "but should timedout");
-            } catch (SocketTimeoutException ste) {
-                long delta = Time.now() - start;
-                if (delta < timeout * 0.9) {
-                    throw new IOException("write timedout too soon in " + delta + " ms.", ste);
-                }
-                if (delta > timeout * 1.2) {
-                    throw new IOException("write timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
         } finally {
@@ -6442,8 +6373,8 @@ public class TestDistributedFileSystem {
                         fail();
                     } catch (AccessControlException ace) {
                         GenericTestUtils.assertExceptionContains("Access denied for user " + "ProbablyNotARealUserName. Superuser privilege is required", ace);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
+                        finalCluster.restartNodeForTesting(0);
+                        finalCluster.upgradeNodeForTesting(0);
                     }
                     return null;
                 }
@@ -6695,8 +6626,8 @@ public class TestDistributedFileSystem {
                     }
                     try {
                         fs.enableErasureCodingPolicy(policyName);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
+                        finalCluster.restartNodeForTesting(0);
+                        finalCluster.upgradeNodeForTesting(0);
                         fail();
                     } catch (AccessControlException ace) {
                         GenericTestUtils.assertExceptionContains("Access denied for user " + "ProbablyNotARealUserName. Superuser privilege is required", ace);

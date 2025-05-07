@@ -360,9 +360,9 @@ public class TestUpgradeDomainBlockPlacementPolicy {
                     locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
                 } catch (IOException ioe) {
                     return false;
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
                 for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
                     Set<DatanodeInfo> locs = new HashSet<>();
                     for (DatanodeInfo datanodeInfo : block.getLocations()) {

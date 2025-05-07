@@ -1998,6 +1998,8 @@ public class TestClientProtocolForPipelineRecovery {
             final DFSOutputStream out = (DFSOutputStream) fileSys.append(file).getWrappedStream();
             final AtomicBoolean running = new AtomicBoolean(true);
             final AtomicBoolean failed = new AtomicBoolean(false);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             Thread t = new Thread() {
 
                 public void run() {
@@ -2009,8 +2011,6 @@ public class TestClientProtocolForPipelineRecovery {
                             Thread.sleep(1000);
                         } catch (IOException | InterruptedException e) {
                             LOG.error("Exception during write", e);
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                             failed.set(true);
                             break;
                         }

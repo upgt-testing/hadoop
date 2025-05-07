@@ -1537,14 +1537,14 @@ public class TestEnhancedByteBufferAccess {
         results[1] = fsIn.read(null, BLOCK_SIZE, EnumSet.of(ReadOption.SKIP_CHECKSUMS));
         // The mmap should be of the first block of the file.
         final ExtendedBlock firstBlock = DFSTestUtil.getFirstBlock(fs, TEST_PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cache.accept(new CacheVisitor() {
 
             @Override
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(new ExtendedBlockId(firstBlock.getBlockId(), firstBlock.getBlockPoolId()));
                 Assert.assertNotNull(replica);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertTrue(replica.hasMmap());
                 // The replica should not yet be evictable, since we have it open.
                 Assert.assertNull(replica.getEvictableTimeNs());

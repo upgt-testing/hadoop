@@ -2604,14 +2604,14 @@ public class TestNameNodeMXBean {
             // delete ec files
             fs.delete(ecDirPath, true);
             verifyTotalBlocksMetrics(0L, 0L, namesystem.getTotalBlocks());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             if (fs != null) {
                 try {
                     fs.close();
                 } catch (Exception e) {
                     throw e;
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
             if (namesystem != null) {

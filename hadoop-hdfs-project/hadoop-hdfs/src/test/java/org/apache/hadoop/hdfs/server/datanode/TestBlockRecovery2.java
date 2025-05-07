@@ -613,11 +613,11 @@ public class TestBlockRecovery2 {
                     return dfs.isFileClosed(filePath);
                 } catch (IOException e) {
                     LOG.info("Something went wrong.", e);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
                 return false;
             }, 300, 300000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             // Wait for the block to be replicated
             //DFSTestUtil.waitForReplication(cluster, DFSTestUtil.getFirstBlock(
             //  dfs, filePath), 1, numReplicas, 0);

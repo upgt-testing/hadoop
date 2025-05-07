@@ -1051,15 +1051,13 @@ public class TestWebHDFSForHA {
             final NamenodeProtocolsJVMInterface rpcServer = namenode.getRpcServer();
             Whitebox.setInternalState(namenode, "rpcServer", null);
             new Thread() {
-
                 @Override
                 public void run() {
                     boolean result = false;
                     FileSystem fs = null;
                     try {
                         fs = FileSystem.get(WEBHDFS_URI, conf);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
+
                         final Path dir = new Path("/test");
                         result = fs.mkdirs(dir);
                     } catch (IOException e) {
@@ -1074,6 +1072,8 @@ public class TestWebHDFSForHA {
                 }
             }.start();
             Thread.sleep(1000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             Whitebox.setInternalState(namenode, "rpcServer", rpcServer);
             synchronized (this) {
                 while (!resultMap.containsKey("mkdirs")) {

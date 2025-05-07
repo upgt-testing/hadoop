@@ -344,6 +344,8 @@ public class TestSecureEncryptionZoneWithKMS {
             public Void run() throws IOException {
                 // Get a client handler within the proxy user context for createFile
                 try (DistributedFileSystem dfs = cluster.getFileSystem()) {
+                    cluster.restartNodeForTesting(0);
+                    cluster.upgradeNodeForTesting(0);
                     for (int i = 0; i < 3; i++) {
                         Path filePath = new Path(zonePath, "testData." + i + ".dat");
                         DFSTestUtil.createFile(dfs, filePath, 1024, (short) 3, 1L);
@@ -352,8 +354,6 @@ public class TestSecureEncryptionZoneWithKMS {
                 } catch (IOException e) {
                     throw new IOException(e);
                 }
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
         });
     }

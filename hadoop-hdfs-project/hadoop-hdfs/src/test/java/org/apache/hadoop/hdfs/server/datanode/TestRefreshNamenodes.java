@@ -305,13 +305,13 @@ public class TestRefreshNamenodes {
                 public void delayWhenOfferServiceHoldLock() {
                     try {
                         Thread.sleep(1000);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             });
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
             ConfigurationJVMInterface dnConf = dn.getConf();
             dnConf.set(DFSConfigKeys.DFS_NAMESERVICES, "ns1");

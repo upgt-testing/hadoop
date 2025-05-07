@@ -184,10 +184,10 @@ public class TestRead {
         ShortCircuitTestContext testContext = new ShortCircuitTestContext("testEOFWithBlockReaderLocal");
         try {
             final Configuration conf = testContext.newConfiguration();
-            cluster.restartNodeForTesting(0);
-            cluster.upgradeNodeForTesting(0);
             conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_CACHE_READAHEAD, BLOCK_SIZE);
             MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(true).build();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             testEOF(cluster, 1);
             testEOF(cluster, 14);
             testEOF(cluster, 10000);

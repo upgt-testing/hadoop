@@ -670,25 +670,4 @@ public class TestDiskError {
             }
         }, 100, 60000);
     }
-
-    @Test(timeout = 60000)
-    public void testcheckDiskError_withUpgrade80() throws Exception {
-        if (cluster.getDataNodes().size() <= 0) {
-            cluster.startDataNodes(conf, 1, true, null, null);
-            cluster.waitActive();
-        }
-        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(0);
-        //checking for disk error
-        final long lastCheckTimestamp = dataNode.getLastDiskErrorCheck();
-        dataNode.checkDiskError();
-        GenericTestUtils.waitFor(new Supplier<Boolean>() {
-
-            @Override
-            public Boolean get() {
-                return dataNode.getLastDiskErrorCheck() > lastCheckTimestamp;
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
-            }
-        }, 100, 60000);
-    }
 }

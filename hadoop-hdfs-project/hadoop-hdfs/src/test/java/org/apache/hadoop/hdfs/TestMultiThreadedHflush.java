@@ -332,8 +332,6 @@ public class TestMultiThreadedHflush {
                                     return;
                                 }
                             }
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                         } catch (Throwable t) {
                             thrown.set(t);
                         }
@@ -352,6 +350,8 @@ public class TestMultiThreadedHflush {
             for (Thread t : flushers) {
                 t.join();
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             // They should have all gotten the expected exception, not anything
             // else.
             if (thrown.get() != null) {

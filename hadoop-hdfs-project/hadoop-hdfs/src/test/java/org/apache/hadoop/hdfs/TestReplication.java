@@ -821,12 +821,12 @@ public class TestReplication {
             // Receiving datanode fails on checksum and reports it to namenode
             replFactor = 2;
             fs.setReplication(file1, replFactor);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             // Now get block details and check if the block is corrupt
             GenericTestUtils.waitFor(() -> {
                 try {
                     return dfsClient.getNamenode().getBlockLocations(file1.toString(), 0, Long.MAX_VALUE).get(0).isCorrupt();
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 } catch (IOException ie) {
                     return false;
                 }

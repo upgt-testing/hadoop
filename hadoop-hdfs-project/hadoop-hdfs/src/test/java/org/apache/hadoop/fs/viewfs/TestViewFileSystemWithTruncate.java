@@ -192,11 +192,11 @@ public class TestViewFileSystemWithTruncate {
                     } catch (IOException e) {
                         return false;
                     }
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }, 100, 60 * 1000);
         }
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // file length should be 10 after truncate
         assertEquals(newLength, fsView.getFileStatus(filePath).getLen());
     }
