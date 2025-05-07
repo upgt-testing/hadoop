@@ -256,10 +256,10 @@ public class TestLocalDFS {
         Configuration conf = new HdfsConfiguration();
         for (final String homeBase : homeBases) {
             conf.set(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY, homeBase);
-            cluster.restartNodeForTesting(0);
-            cluster.upgradeNodeForTesting(0);
             MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
             FileSystem fileSys = cluster.getFileSystem();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             try {
                 // test home directory
                 Path home = fileSys.makeQualified(new Path(homeBase + "/" + getUserName(fileSys)));

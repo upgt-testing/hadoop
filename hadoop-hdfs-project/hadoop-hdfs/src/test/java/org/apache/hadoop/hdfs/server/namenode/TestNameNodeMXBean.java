@@ -2351,10 +2351,10 @@ public class TestNameNodeMXBean {
             if (fs != null) {
                 try {
                     fs.close();
-                } catch (Exception e) {
-                    throw e;
                     cluster.restartNodeForTesting(0);
                     cluster.upgradeNodeForTesting(0);
+                } catch (Exception e) {
+                    throw e;
                 }
             }
             if (namesystem != null) {

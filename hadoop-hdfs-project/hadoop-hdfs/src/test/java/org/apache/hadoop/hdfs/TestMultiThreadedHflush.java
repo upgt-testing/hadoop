@@ -317,6 +317,8 @@ public class TestMultiThreadedHflush {
         final FSDataOutputStream stm = createFile(fs, p, 1);
         ArrayList<Thread> flushers = new ArrayList<Thread>();
         final AtomicReference<Throwable> thrown = new AtomicReference<Throwable>();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         try {
             for (int i = 0; i < 10; i++) {
                 Thread flusher = new Thread() {
@@ -332,8 +334,6 @@ public class TestMultiThreadedHflush {
                                     return;
                                 }
                             }
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                         } catch (Throwable t) {
                             thrown.set(t);
                         }

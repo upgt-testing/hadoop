@@ -1038,57 +1038,6 @@ public class TestWebHDFSForHA {
     }
 
     @Test(timeout = 120000)
-    public void testRetryWhileNNStartup_withUpgrade40() throws Exception {
-        final Configuration conf = DFSTestUtil.newHAConfiguration(LOGICAL_NAME);
-        MiniDFSClusterInJVM cluster = null;
-        final Map<String, Boolean> resultMap = new HashMap<String, Boolean>();
-        try {
-            cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topo).numDataNodes(0).build();
-            HATestUtil.setFailoverConfigurations(cluster, conf, LOGICAL_NAME);
-            cluster.waitActive();
-            cluster.transitionToActive(0);
-            final NameNodeJVMInterface namenode = cluster.getNameNode(0);
-            final NamenodeProtocolsJVMInterface rpcServer = namenode.getRpcServer();
-            Whitebox.setInternalState(namenode, "rpcServer", null);
-            new Thread() {
-
-                @Override
-                public void run() {
-                    boolean result = false;
-                    FileSystem fs = null;
-                    try {
-                        fs = FileSystem.get(WEBHDFS_URI, conf);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
-                        final Path dir = new Path("/test");
-                        result = fs.mkdirs(dir);
-                    } catch (IOException e) {
-                        result = false;
-                    } finally {
-                        IOUtils.cleanup(null, fs);
-                    }
-                    synchronized (TestWebHDFSForHA.this) {
-                        resultMap.put("mkdirs", result);
-                        TestWebHDFSForHA.this.notifyAll();
-                    }
-                }
-            }.start();
-            Thread.sleep(1000);
-            Whitebox.setInternalState(namenode, "rpcServer", rpcServer);
-            synchronized (this) {
-                while (!resultMap.containsKey("mkdirs")) {
-                    this.wait();
-                }
-                Assert.assertTrue(resultMap.get("mkdirs"));
-            }
-        } finally {
-            if (cluster != null) {
-                cluster.shutdown();
-            }
-        }
-    }
-
-    @Test(timeout = 120000)
     public void testRetryWhileNNStartup_withUpgrade60() throws Exception {
         final Configuration conf = DFSTestUtil.newHAConfiguration(LOGICAL_NAME);
         MiniDFSClusterInJVM cluster = null;

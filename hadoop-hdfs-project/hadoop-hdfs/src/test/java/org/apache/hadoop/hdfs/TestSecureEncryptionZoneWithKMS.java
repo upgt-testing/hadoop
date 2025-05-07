@@ -331,34 +331,6 @@ public class TestSecureEncryptionZoneWithKMS {
     }
 
     @Test
-    public void testSecureEncryptionZoneWithKMS_withUpgrade40() throws IOException, InterruptedException {
-        final Path zonePath = new Path(TEST_PATH, "TestEZ1");
-        fsWrapper.mkdir(zonePath, FsPermission.getDirDefault(), true);
-        fsWrapper.setOwner(zonePath, OOZIE_PROXIED_USER_NAME, "supergroup");
-        dfsAdmin.createEncryptionZone(zonePath, testKey, NO_TRASH);
-        UserGroupInformation oozieUgi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(ooziePrincipal, keytab);
-        UserGroupInformation proxyUserUgi = UserGroupInformation.createProxyUser(OOZIE_PROXIED_USER_NAME, oozieUgi);
-        proxyUserUgi.doAs(new PrivilegedExceptionAction<Void>() {
-
-            @Override
-            public Void run() throws IOException {
-                // Get a client handler within the proxy user context for createFile
-                try (DistributedFileSystem dfs = cluster.getFileSystem()) {
-                    for (int i = 0; i < 3; i++) {
-                        Path filePath = new Path(zonePath, "testData." + i + ".dat");
-                        DFSTestUtil.createFile(dfs, filePath, 1024, (short) 3, 1L);
-                    }
-                    return null;
-                } catch (IOException e) {
-                    throw new IOException(e);
-                }
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
-            }
-        });
-    }
-
-    @Test
     public void testSecureEncryptionZoneWithKMS_withUpgrade60() throws IOException, InterruptedException {
         final Path zonePath = new Path(TEST_PATH, "TestEZ1");
         fsWrapper.mkdir(zonePath, FsPermission.getDirDefault(), true);

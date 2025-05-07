@@ -5216,10 +5216,10 @@ public class TestDistributedFileSystem {
                 }
                 if (delta > timeout * 1.1) {
                     throw new IOException("read timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             cluster.shutdown();
         }
@@ -5420,10 +5420,10 @@ public class TestDistributedFileSystem {
                 }
                 if (delta > timeout * 1.2) {
                     throw new IOException("write timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             cluster.shutdown();
         }
@@ -6312,7 +6312,7 @@ public class TestDistributedFileSystem {
     }
 
     @Test
-    public void testRemoveErasureCodingPolicy_withUpgrade60() throws Exception {
+    public void testRemoveErasureCodingPolicy_withUpgrade80() throws Exception {
         Configuration conf = getTestConfiguration();
         MiniDFSClusterInJVM cluster = null;
         try {
@@ -6353,7 +6353,7 @@ public class TestDistributedFileSystem {
     }
 
     @Test
-    public void testRemoveErasureCodingPolicy_withUpgrade80() throws Exception {
+    public void testRemoveErasureCodingPolicy_withUpgrade60() throws Exception {
         Configuration conf = getTestConfiguration();
         MiniDFSClusterInJVM cluster = null;
         try {
@@ -6377,11 +6377,11 @@ public class TestDistributedFileSystem {
                     DistributedFileSystem fs = finalCluster.getFileSystem();
                     try {
                         fs.removeErasureCodingPolicy(policyName);
+                        finalCluster.restartNodeForTesting(0);
+                        finalCluster.upgradeNodeForTesting(0);
                         fail();
                     } catch (AccessControlException ace) {
                         GenericTestUtils.assertExceptionContains("Access denied for user " + "ProbablyNotARealUserName. Superuser privilege is required", ace);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                     }
                     return null;
                 }
@@ -6633,8 +6633,8 @@ public class TestDistributedFileSystem {
                     }
                     try {
                         fs.enableErasureCodingPolicy(policyName);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
+                        finalCluster.restartNodeForTesting(0);
+                        finalCluster.upgradeNodeForTesting(0);
                         fail();
                     } catch (AccessControlException ace) {
                         GenericTestUtils.assertExceptionContains("Access denied for user " + "ProbablyNotARealUserName. Superuser privilege is required", ace);

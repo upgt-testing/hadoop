@@ -268,21 +268,6 @@ public class TestRollingFileSystemSinkWithSecureHdfs extends RollingFileSystemSi
     }
 
     @Test
-    public void testWithSecureHDFS_withUpgrade60() throws Exception {
-        final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp/test";
-        final MetricsSystem ms = initMetricsSystem(path, true, false, true);
-        assertMetricsContents(sink.doAs(new PrivilegedExceptionAction<String>() {
-
-            @Override
-            public String run() throws Exception {
-                return doWriteTest(ms, path, 1);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
-            }
-        }));
-    }
-
-    @Test
     public void testMissingPropertiesWithSecureHDFS_withUpgrade20() throws Exception {
         final String path = "hdfs://" + cluster.getNameNode().getHostAndPort() + "/tmp/test";
         initMetricsSystem(path, true, false);

@@ -828,12 +828,12 @@ public class TestReplication {
             GenericTestUtils.waitFor(() -> {
                 try {
                     return dfsClient.getNamenode().getBlockLocations(file1.toString(), 0, Long.MAX_VALUE).get(0).isCorrupt();
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 } catch (IOException ie) {
                     return false;
                 }
             }, 1000, 15000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             replicaCount = dfsClient.getNamenode().getBlockLocations(file1.toString(), 0, Long.MAX_VALUE).get(0).getLocations().length;
             assertEquals("replication should not success", 1, replicaCount);
         } finally {
