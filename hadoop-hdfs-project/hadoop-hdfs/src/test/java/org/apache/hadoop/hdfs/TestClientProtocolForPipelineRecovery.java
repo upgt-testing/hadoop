@@ -1799,8 +1799,6 @@ public class TestClientProtocolForPipelineRecovery {
                             Thread.sleep(1000);
                         } catch (IOException | InterruptedException e) {
                             LOG.error("Exception during write", e);
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                             failed.set(true);
                             break;
                         }
@@ -1808,6 +1806,8 @@ public class TestClientProtocolForPipelineRecovery {
                     running.set(false);
                 }
             };
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             t.start();
             // Let write start
             Thread.sleep(1000);

@@ -325,10 +325,10 @@ public class TestSecureEncryptionZoneWithKMS {
                 } catch (IOException e) {
                     throw new IOException(e);
                 }
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
     }
 
     @Test

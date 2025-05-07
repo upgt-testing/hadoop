@@ -332,13 +332,13 @@ public class TestMultiThreadedHflush {
                                     return;
                                 }
                             }
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                         } catch (Throwable t) {
                             thrown.set(t);
                         }
                     }
                 };
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
                 flusher.start();
                 flushers.add(flusher);
             }

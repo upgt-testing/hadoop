@@ -667,9 +667,9 @@ public class TestDiskError {
             @Override
             public Boolean get() {
                 return dataNode.getLastDiskErrorCheck() > lastCheckTimestamp;
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
         }, 100, 60000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
     }
 }
