@@ -592,10 +592,10 @@ public class TestDatanodeRestart {
                 // timers have at-least semantics, so it should be at least 5 seconds.
                 if (elapsed < 5000 || elapsed > 10000) {
                     throw new IOException(elapsed + " milliseconds passed.", e);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             DataNodeFaultInjector.set(oldDnInjector);
             fileSys.open(file).read(0L, buffer, 0, 1);
         } finally {

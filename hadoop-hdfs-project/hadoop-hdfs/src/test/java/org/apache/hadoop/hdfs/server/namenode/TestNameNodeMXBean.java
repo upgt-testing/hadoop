@@ -2326,6 +2326,8 @@ public class TestNameNodeMXBean {
             verifyTotalBlocksMetrics(0L, 3L, namesystem.getTotalBlocks());
             // delete ec files
             fs.delete(ecDirPath, true);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             verifyTotalBlocksMetrics(0L, 0L, namesystem.getTotalBlocks());
         } finally {
             if (fs != null) {
@@ -2333,8 +2335,6 @@ public class TestNameNodeMXBean {
                     fs.close();
                 } catch (Exception e) {
                     throw e;
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
             if (namesystem != null) {

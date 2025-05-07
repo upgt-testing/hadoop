@@ -1058,8 +1058,6 @@ public class TestWebHDFSForHA {
                     FileSystem fs = null;
                     try {
                         fs = FileSystem.get(WEBHDFS_URI, conf);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                         final Path dir = new Path("/test");
                         result = fs.mkdirs(dir);
                     } catch (IOException e) {
@@ -1073,6 +1071,8 @@ public class TestWebHDFSForHA {
                     }
                 }
             }.start();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             Thread.sleep(1000);
             Whitebox.setInternalState(namenode, "rpcServer", rpcServer);
             synchronized (this) {

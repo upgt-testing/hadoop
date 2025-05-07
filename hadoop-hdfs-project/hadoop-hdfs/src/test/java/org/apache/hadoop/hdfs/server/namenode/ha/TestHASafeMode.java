@@ -2039,10 +2039,10 @@ public class TestHASafeMode {
             @Override
             public Boolean get() {
                 return cluster.getNamesystem(1).getNumLiveDataNodes() == 3;
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
         }, 1000, 10000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.triggerBlockReports();
         NameNodeAdapter.abortEditLogs(nn0);
         cluster.shutdownNameNode(0);
