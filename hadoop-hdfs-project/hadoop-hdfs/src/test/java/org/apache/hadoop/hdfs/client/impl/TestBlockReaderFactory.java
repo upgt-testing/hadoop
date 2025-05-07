@@ -778,8 +778,6 @@ public class TestBlockReaderFactory {
                 try {
                     byte[] contents = DFSTestUtil.readFileBuffer(dfs, new Path(TEST_FILE));
                     Assert.assertFalse(creationIsBlocked.get());
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                     byte[] expected = DFSTestUtil.calculateFileContentsFromSeed(SEED, TEST_FILE_LEN);
                     Assert.assertTrue(Arrays.equals(contents, expected));
                 } catch (Throwable e) {
@@ -788,6 +786,8 @@ public class TestBlockReaderFactory {
                 }
             }
         };
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         Thread[] threads = new Thread[NUM_THREADS];
         for (int i = 0; i < NUM_THREADS; i++) {
             threads[i] = new Thread(readerRunnable);

@@ -1211,8 +1211,6 @@ public class TestDataNodeMetrics {
                         DFSTestUtil.createFile(fs, new Path("/time.txt." + x.get()), LONG_FILE_LEN, (short) 1, Time.monotonicNow());
                         DFSTestUtil.readFile(fs, new Path("/time.txt." + x.get()));
                         fs.delete(new Path("/time.txt." + x.get()), true);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                     } catch (IOException ioe) {
                         LOG.error("Caught IOException while ingesting DN metrics", ioe);
                         return false;
@@ -1223,6 +1221,8 @@ public class TestDataNodeMetrics {
                     return endWriteValue > startWriteValue && endReadValue > startReadValue;
                 }
             }, 30, 60000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             if (cluster != null) {
                 cluster.shutdown();

@@ -276,10 +276,10 @@ public class TestRollingFileSystemSinkWithSecureHdfs extends RollingFileSystemSi
             @Override
             public String run() throws Exception {
                 return doWriteTest(ms, path, 1);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
         }));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
     }
 
     @Test

@@ -373,13 +373,13 @@ public class TestListOpenFiles {
                         } catch (Exception e) {
                             listOpenFilesError.set(true);
                             LOG.info("Error listing open files: ", e);
-                            haCluster.restartNodeForTesting(0);
-                            haCluster.upgradeNodeForTesting(0);
                             break;
                         }
                     }
                 }
             });
+            haCluster.restartNodeForTesting(0);
+            haCluster.upgradeNodeForTesting(0);
             clientThread.start();
             // Let client list open files for few
             // times before the NN failover.

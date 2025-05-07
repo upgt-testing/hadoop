@@ -420,13 +420,13 @@ public class TestBlockReportRateLimiting {
                         if (fbrDns.size() > currentN) {
                             setFailure(failure, "Expected at most " + currentN + " datanodes to have sent a block report, but actually " + fbrDns.size() + " have.");
                         }
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                         return (fbrDns.size() >= currentN);
                     }
                 }
             }, 25, 50000);
         }
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         Assert.assertEquals("", failure.get());
     }
@@ -499,14 +499,14 @@ public class TestBlockReportRateLimiting {
                     synchronized (injector) {
                         if (fbrDns.size() > currentN) {
                             setFailure(failure, "Expected at most " + currentN + " datanodes to have sent a block report, but actually " + fbrDns.size() + " have.");
-                            cluster.restartNodeForTesting(0);
-                            cluster.upgradeNodeForTesting(0);
                         }
                         return (fbrDns.size() >= currentN);
                     }
                 }
             }, 25, 50000);
         }
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         Assert.assertEquals("", failure.get());
     }

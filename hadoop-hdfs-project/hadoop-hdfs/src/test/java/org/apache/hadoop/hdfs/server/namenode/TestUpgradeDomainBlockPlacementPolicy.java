@@ -361,8 +361,6 @@ public class TestUpgradeDomainBlockPlacementPolicy {
                     locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
                 } catch (IOException ioe) {
                     return false;
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
                 for (LocatedBlock block : locatedBlocks.getLocatedBlocks()) {
                     Set<DatanodeInfo> locs = new HashSet<>();
@@ -380,6 +378,8 @@ public class TestUpgradeDomainBlockPlacementPolicy {
                 return true;
             }
         }, 1000, WAIT_TIMEOUT_MS);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // Verify block placement policy of each block.
         LocatedBlocks locatedBlocks = cluster.getFileSystem().getClient().getLocatedBlocks(path.toString(), 0, fileSize);
     }

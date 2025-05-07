@@ -923,14 +923,14 @@ public class TestShortCircuitCache {
                             done.setValue(info.get(datanode).full.isEmpty() && info.get(datanode).notFull.isEmpty());
                         }
                     });
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 } catch (IOException e) {
                     LOG.error("error running visitor", e);
                 }
                 return done.booleanValue();
             }
         }, 10, 60000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         sockDir.close();
     }
@@ -1044,11 +1044,11 @@ public class TestShortCircuitCache {
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
                 Assert.assertNotNull(replica);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertTrue(replica.getSlot().isValid());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // shared memory segment alive, and make it stale.
         cluster.getDataNodes().get(0).shutdown();
         cache.accept(new CacheVisitor() {
@@ -1097,12 +1097,12 @@ public class TestShortCircuitCache {
             @Override
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertNotNull(replica);
                 Assert.assertFalse(replica.getSlot().isValid());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         sockDir.close();
     }
@@ -1220,13 +1220,13 @@ public class TestShortCircuitCache {
             public void visit(HashMap<DatanodeInfo, PerDatanodeVisitorInfo> info) throws IOException {
                 Assert.assertTrue(info.get(datanode).full.isEmpty());
                 Assert.assertFalse(info.get(datanode).disabled);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertEquals(1, info.get(datanode).notFull.values().size());
                 DfsClientShm shm = info.get(datanode).notFull.values().iterator().next();
                 Assert.assertFalse(shm.isDisconnected());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // Remove the file whose blocks we just read.
         fs.delete(TEST_PATH, false);
         // Wait for the replica to be purged from the DFSClient's cache.
@@ -1315,8 +1315,6 @@ public class TestShortCircuitCache {
             public Boolean get() {
                 try {
                     done.setValue(true);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                     cache.getDfsClientShmManager().visit(new Visitor() {
 
                         @Override
@@ -1340,6 +1338,8 @@ public class TestShortCircuitCache {
                 return done.booleanValue();
             }
         }, 10, 60000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         sockDir.close();
     }
@@ -1411,14 +1411,14 @@ public class TestShortCircuitCache {
                             }
                         }
                     });
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 } catch (IOException e) {
                     LOG.error("error running visitor", e);
                 }
                 return done.booleanValue();
             }
         }, 10, 60000);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         sockDir.close();
     }

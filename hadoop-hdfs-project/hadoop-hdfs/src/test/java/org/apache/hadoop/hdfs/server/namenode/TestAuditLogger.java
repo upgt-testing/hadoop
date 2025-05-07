@@ -1050,13 +1050,13 @@ public class TestAuditLogger {
                 public void run() {
                     try {
                         fs.setTimes(p, time, time);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                     } catch (IOException e) {
                         fail("Unexpected exception found." + e);
                     }
                 }
             });
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             child.start();
             try {
                 child.join();
@@ -1206,8 +1206,6 @@ public class TestAuditLogger {
                         fs.setPermission(p, new FsPermission((short) 777));
                     } catch (IOException e) {
                         fail("Unexpected exception found." + e);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                     }
                 }
             });
@@ -1217,6 +1215,8 @@ public class TestAuditLogger {
             } catch (InterruptedException ignored) {
                 // Ignore
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             assertTrue(auditlog.getOutput().endsWith(String.format("callerContext=setPermission:L%n")));
             auditlog.clearOutput();
             // reuse the current context's signature

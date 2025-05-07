@@ -256,9 +256,9 @@ public class TestLocalDFS {
         Configuration conf = new HdfsConfiguration();
         for (final String homeBase : homeBases) {
             conf.set(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY, homeBase);
+            MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
             cluster.restartNodeForTesting(0);
             cluster.upgradeNodeForTesting(0);
-            MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
             FileSystem fileSys = cluster.getFileSystem();
             try {
                 // test home directory
