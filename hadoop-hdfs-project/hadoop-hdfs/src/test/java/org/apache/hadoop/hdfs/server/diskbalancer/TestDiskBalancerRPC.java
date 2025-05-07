@@ -14,7 +14,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package org.apache.hadoop.hdfs.server.diskbalancer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,11 +44,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
 import static org.apache.hadoop.hdfs.server.datanode.DiskBalancerWorkStatus.Result.NO_PLAN;
 import static org.apache.hadoop.hdfs.server.datanode.DiskBalancerWorkStatus.Result.PLAN_DONE;
 import static org.apache.hadoop.hdfs.server.datanode.DiskBalancerWorkStatus.Result.PLAN_UNDER_PROGRESS;
@@ -59,154 +56,152 @@ import static org.junit.Assert.assertEquals;
  * Test DiskBalancer RPC.
  */
 public class TestDiskBalancerRPC {
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
-  private static final String PLAN_FILE = "/system/current.plan.json";
-  private MiniDFSClusterInJVM cluster;
-  private Configuration conf;
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-  @Before
-  public void setUp() throws Exception {
-    conf = new HdfsConfiguration();
-    conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
-    cluster.waitActive();
-  }
+    private static final String PLAN_FILE = "/system/current.plan.json";
 
-  @After
-  public void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    private MiniDFSClusterInJVM cluster;
+
+    private Configuration conf;
+
+    @Before
+    public void setUp() throws Exception {
+        conf = new HdfsConfiguration();
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(2).build();
+        cluster.waitActive();
     }
-  }
 
-  @Test
-  public void testSubmitPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-    //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
-      //  plan.toJson(), false);
-  }
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
 
-  @Test
-  public void testSubmitPlanWithInvalidHash() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    char[] hashArray = planHash.toCharArray();
-    hashArray[0]++;
-    planHash = String.valueOf(hashArray);
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_HASH));
-    //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
-      //  plan.toJson(), false);
-  }
+    @Test
+    public void testSubmitPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
+        //  plan.toJson(), false);
+    }
 
-  @Test
-  public void testSubmitPlanWithInvalidVersion() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    planVersion++;
-    NodePlan plan = rpcTestHelper.getPlan();
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_VERSION));
-    //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
-      //  plan.toJson(), false);
-  }
+    @Test
+    public void testSubmitPlanWithInvalidHash() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        char[] hashArray = planHash.toCharArray();
+        hashArray[0]++;
+        planHash = String.valueOf(hashArray);
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_HASH));
+        //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
+        //  plan.toJson(), false);
+    }
 
-  @Test
-  public void testSubmitPlanWithInvalidPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN));
-    //dataNode.submitDiskBalancerPlan(planHash, planVersion, "", "",
-      //  false);
-  }
+    @Test
+    public void testSubmitPlanWithInvalidVersion() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        planVersion++;
+        NodePlan plan = rpcTestHelper.getPlan();
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN_VERSION));
+        //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
+        //  plan.toJson(), false);
+    }
 
-  @Test
-  public void testCancelPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-    //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
-      //  plan.toJson(), false);
-    //dataNode.cancelDiskBalancePlan(planHash);
-  }
+    @Test
+    public void testSubmitPlanWithInvalidPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.INVALID_PLAN));
+        //dataNode.submitDiskBalancerPlan(planHash, planVersion, "", "",
+        //  false);
+    }
 
-  @Test
-  public void testCancelNonExistentPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    char[] hashArray= planHash.toCharArray();
-    hashArray[0]++;
-    planHash = String.valueOf(hashArray);
-    NodePlan plan = rpcTestHelper.getPlan();
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
-    dataNode.cancelDiskBalancePlan(planHash);
-  }
+    @Test
+    public void testCancelPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        //dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
+        //  plan.toJson(), false);
+        //dataNode.cancelDiskBalancePlan(planHash);
+    }
 
-  @Test
-  public void testCancelEmptyPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = "";
-    NodePlan plan = rpcTestHelper.getPlan();
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
-    dataNode.cancelDiskBalancePlan(planHash);
-  }
+    @Test
+    public void testCancelNonExistentPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        char[] hashArray = planHash.toCharArray();
+        hashArray[0]++;
+        planHash = String.valueOf(hashArray);
+        NodePlan plan = rpcTestHelper.getPlan();
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
+        dataNode.cancelDiskBalancePlan(planHash);
+    }
 
-  @Test
-  public void testGetDiskBalancerVolumeMapping() throws Exception {
-    final int dnIndex = 0;
-    DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
-    String volumeNameJson = dataNode.getDiskBalancerSetting(
-        DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
-    Assert.assertNotNull(volumeNameJson);
-    ObjectMapper mapper = new ObjectMapper();
+    @Test
+    public void testCancelEmptyPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = "";
+        NodePlan plan = rpcTestHelper.getPlan();
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.NO_SUCH_PLAN));
+        dataNode.cancelDiskBalancePlan(planHash);
+    }
 
-    @SuppressWarnings("unchecked")
-    Map<String, String> volumemap =
-        mapper.readValue(volumeNameJson, HashMap.class);
+    @Test
+    public void testGetDiskBalancerVolumeMapping() throws Exception {
+        final int dnIndex = 0;
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        String volumeNameJson = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
+        Assert.assertNotNull(volumeNameJson);
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, String> volumemap = mapper.readValue(volumeNameJson, HashMap.class);
+        Assert.assertEquals(2, volumemap.size());
+    }
 
-    Assert.assertEquals(2, volumemap.size());
-  }
+    @Test
+    public void testGetDiskBalancerInvalidSetting() throws Exception {
+        final int dnIndex = 0;
+        final String invalidSetting = "invalidSetting";
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
+        dataNode.getDiskBalancerSetting(invalidSetting);
+    }
 
-  @Test
-  public void testGetDiskBalancerInvalidSetting() throws Exception {
-    final int dnIndex = 0;
-    final String invalidSetting = "invalidSetting";
-    DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
-    thrown.expect(DiskBalancerException.class);
-    thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
-    dataNode.getDiskBalancerSetting(invalidSetting);
-  }
-
-  @Test
-  public void testgetDiskBalancerBandwidth() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-
-    /*
+    @Test
+    public void testgetDiskBalancerBandwidth() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        /*
     dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
         plan.toJson(), false);
     String bandwidthString = dataNode.getDiskBalancerSetting(
@@ -214,119 +209,372 @@ public class TestDiskBalancerRPC {
     long value = Long.decode(bandwidthString);
     Assert.assertEquals(10L, value);
      */
-  }
+    }
 
-  @Test
-  public void testQueryPlan() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
-    String planHash = rpcTestHelper.getPlanHash();
-    int planVersion = rpcTestHelper.getPlanVersion();
-    NodePlan plan = rpcTestHelper.getPlan();
-
-    /*
+    @Test
+    public void testQueryPlan() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        String planHash = rpcTestHelper.getPlanHash();
+        int planVersion = rpcTestHelper.getPlanVersion();
+        NodePlan plan = rpcTestHelper.getPlan();
+        /*
     dataNode.submitDiskBalancerPlan(planHash, planVersion, PLAN_FILE,
         plan.toJson(), false);
     DiskBalancerWorkStatus status = dataNode.queryDiskBalancerPlan();
     Assert.assertTrue(status.getResult() == PLAN_UNDER_PROGRESS ||
         status.getResult() == PLAN_DONE);
      */
-  }
+    }
 
-  @Test
-  public void testQueryPlanWithoutSubmit() throws Exception {
-    RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
-    DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+    @Test
+    public void testQueryPlanWithoutSubmit() throws Exception {
+        RpcTestHelper rpcTestHelper = new RpcTestHelper().invoke();
+        DataNodeJVMInterface dataNode = rpcTestHelper.getDataNode();
+        //DiskBalancerWorkStatus status = dataNode.queryDiskBalancerPlan();
+        //Assert.assertTrue(status.getResult() == NO_PLAN);
+    }
 
-    //DiskBalancerWorkStatus status = dataNode.queryDiskBalancerPlan();
-    //Assert.assertTrue(status.getResult() == NO_PLAN);
-  }
-
-  @Test
-  public void testMoveBlockAcrossVolume() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    final int defaultBlockSize = 100;
-    conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
-    conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
-    String fileName = "/tmp.txt";
-    Path filePath = new Path(fileName);
-    final int numDatanodes = 1;
-    final int dnIndex = 0;
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(numDatanodes).build();
-    FsVolumeImpl source = null;
-    FsVolumeImpl dest = null;
-    try {
-      cluster.waitActive();
-      Random r = new Random();
-      FileSystem fs = cluster.getFileSystem(dnIndex);
-      DFSTestUtil.createFile(fs, filePath, 10 * 1024,
-          (short) 1, r.nextLong());
-      DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
-      FsVolumeReferencesJVMInterface refs =
-          dnNode.getFSDataset().getFsVolumeReferences();
-      try {
-        source = (FsVolumeImpl) refs.get(0);
-        dest = (FsVolumeImpl) refs.get(1);
-        /*
+    @Test
+    public void testMoveBlockAcrossVolume() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        final int defaultBlockSize = 100;
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
+        String fileName = "/tmp.txt";
+        Path filePath = new Path(fileName);
+        final int numDatanodes = 1;
+        final int dnIndex = 0;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
+        FsVolumeImpl source = null;
+        FsVolumeImpl dest = null;
+        try {
+            cluster.waitActive();
+            Random r = new Random();
+            FileSystem fs = cluster.getFileSystem(dnIndex);
+            DFSTestUtil.createFile(fs, filePath, 10 * 1024, (short) 1, r.nextLong());
+            DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
+            FsVolumeReferencesJVMInterface refs = dnNode.getFSDataset().getFsVolumeReferences();
+            try {
+                source = (FsVolumeImpl) refs.get(0);
+                dest = (FsVolumeImpl) refs.get(1);
+                /*
         DiskBalancerTestUtil.moveAllDataToDestVolume(dnNode.getFSDataset(),
             source, dest);
         assertEquals(0, DiskBalancerTestUtil.getBlockCount(source, false));
          */
-      } finally {
-        refs.close();
-      }
-    } finally {
-      cluster.shutdown();
-    }
-  }
-
-
-  private class RpcTestHelper {
-    private NodePlan plan;
-    private int planVersion;
-    private DataNodeJVMInterface dataNode;
-    private String planHash;
-
-    public NodePlan getPlan() {
-      return plan;
+            } finally {
+                refs.close();
+            }
+        } finally {
+            cluster.shutdown();
+        }
     }
 
-    public int getPlanVersion() {
-      return planVersion;
+    private class RpcTestHelper {
+
+        private NodePlan plan;
+
+        private int planVersion;
+
+        private DataNodeJVMInterface dataNode;
+
+        private String planHash;
+
+        public NodePlan getPlan() {
+            return plan;
+        }
+
+        public int getPlanVersion() {
+            return planVersion;
+        }
+
+        public DataNodeJVMInterface getDataNode() {
+            return dataNode;
+        }
+
+        public String getPlanHash() {
+            return planHash;
+        }
+
+        public RpcTestHelper invoke() throws Exception {
+            final int dnIndex = 0;
+            cluster.restartDataNode(dnIndex);
+            cluster.waitActive();
+            ClusterConnector nameNodeConnector = ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
+            DiskBalancerCluster diskBalancerCluster = new DiskBalancerCluster(nameNodeConnector);
+            diskBalancerCluster.readClusterInfo();
+            Assert.assertEquals(cluster.getDataNodes().size(), diskBalancerCluster.getNodes().size());
+            diskBalancerCluster.setNodesToProcess(diskBalancerCluster.getNodes());
+            dataNode = cluster.getDataNodes().get(dnIndex);
+            DiskBalancerDataNode node = diskBalancerCluster.getNodeByUUID(dataNode.getDatanodeUuid());
+            GreedyPlanner planner = new GreedyPlanner(10.0f, node);
+            plan = new NodePlan(node.getDataNodeName(), node.getDataNodePort());
+            planner.balanceVolumeSet(node, node.getVolumeSets().get("DISK"), plan);
+            planVersion = 1;
+            planHash = DigestUtils.shaHex(plan.toJson());
+            return this;
+        }
     }
 
-    public DataNodeJVMInterface getDataNode() {
-      return dataNode;
+    @Test
+    public void testGetDiskBalancerVolumeMapping_withUpgrade20() throws Exception {
+        final int dnIndex = 0;
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        String volumeNameJson = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertNotNull(volumeNameJson);
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, String> volumemap = mapper.readValue(volumeNameJson, HashMap.class);
+        Assert.assertEquals(2, volumemap.size());
     }
 
-    public String getPlanHash() {
-      return planHash;
+    @Test
+    public void testGetDiskBalancerVolumeMapping_withUpgrade40() throws Exception {
+        final int dnIndex = 0;
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        String volumeNameJson = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
+        Assert.assertNotNull(volumeNameJson);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, String> volumemap = mapper.readValue(volumeNameJson, HashMap.class);
+        Assert.assertEquals(2, volumemap.size());
     }
 
-    public RpcTestHelper invoke() throws Exception {
-      final int dnIndex = 0;
-      cluster.restartDataNode(dnIndex);
-      cluster.waitActive();
-      ClusterConnector nameNodeConnector =
-          ConnectorFactory.getCluster(cluster.getFileSystem(0).getUri(), conf);
-
-      DiskBalancerCluster diskBalancerCluster =
-          new DiskBalancerCluster(nameNodeConnector);
-      diskBalancerCluster.readClusterInfo();
-      Assert.assertEquals(cluster.getDataNodes().size(),
-          diskBalancerCluster.getNodes().size());
-      diskBalancerCluster.setNodesToProcess(diskBalancerCluster.getNodes());
-      dataNode = cluster.getDataNodes().get(dnIndex);
-      DiskBalancerDataNode node = diskBalancerCluster.getNodeByUUID(
-          dataNode.getDatanodeUuid());
-      GreedyPlanner planner = new GreedyPlanner(10.0f, node);
-      plan = new NodePlan(node.getDataNodeName(), node.getDataNodePort());
-      planner.balanceVolumeSet(node, node.getVolumeSets().get("DISK"), plan);
-      planVersion = 1;
-      planHash = DigestUtils.shaHex(plan.toJson());
-      return this;
+    @Test
+    public void testGetDiskBalancerVolumeMapping_withUpgrade60() throws Exception {
+        final int dnIndex = 0;
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        String volumeNameJson = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
+        Assert.assertNotNull(volumeNameJson);
+        ObjectMapper mapper = new ObjectMapper();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        @SuppressWarnings("unchecked")
+        Map<String, String> volumemap = mapper.readValue(volumeNameJson, HashMap.class);
+        Assert.assertEquals(2, volumemap.size());
     }
-  }
+
+    @Test
+    public void testGetDiskBalancerVolumeMapping_withUpgrade80() throws Exception {
+        final int dnIndex = 0;
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        String volumeNameJson = dataNode.getDiskBalancerSetting(DiskBalancerConstants.DISKBALANCER_VOLUME_NAME);
+        Assert.assertNotNull(volumeNameJson);
+        ObjectMapper mapper = new ObjectMapper();
+        @SuppressWarnings("unchecked")
+        Map<String, String> volumemap = mapper.readValue(volumeNameJson, HashMap.class);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals(2, volumemap.size());
+    }
+
+    @Test
+    public void testGetDiskBalancerInvalidSetting_withUpgrade20() throws Exception {
+        final int dnIndex = 0;
+        final String invalidSetting = "invalidSetting";
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
+        dataNode.getDiskBalancerSetting(invalidSetting);
+    }
+
+    @Test
+    public void testGetDiskBalancerInvalidSetting_withUpgrade40() throws Exception {
+        final int dnIndex = 0;
+        final String invalidSetting = "invalidSetting";
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        thrown.expect(DiskBalancerException.class);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
+        dataNode.getDiskBalancerSetting(invalidSetting);
+    }
+
+    @Test
+    public void testGetDiskBalancerInvalidSetting_withUpgrade60() throws Exception {
+        final int dnIndex = 0;
+        final String invalidSetting = "invalidSetting";
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dataNode.getDiskBalancerSetting(invalidSetting);
+    }
+
+    @Test
+    public void testGetDiskBalancerInvalidSetting_withUpgrade80() throws Exception {
+        final int dnIndex = 0;
+        final String invalidSetting = "invalidSetting";
+        DataNodeJVMInterface dataNode = cluster.getDataNodes().get(dnIndex);
+        thrown.expect(DiskBalancerException.class);
+        thrown.expect(new DiskBalancerResultVerifier(Result.UNKNOWN_KEY));
+        dataNode.getDiskBalancerSetting(invalidSetting);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testMoveBlockAcrossVolume_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        final int defaultBlockSize = 100;
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
+        String fileName = "/tmp.txt";
+        Path filePath = new Path(fileName);
+        final int numDatanodes = 1;
+        final int dnIndex = 0;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
+        FsVolumeImpl source = null;
+        FsVolumeImpl dest = null;
+        try {
+            cluster.waitActive();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Random r = new Random();
+            FileSystem fs = cluster.getFileSystem(dnIndex);
+            DFSTestUtil.createFile(fs, filePath, 10 * 1024, (short) 1, r.nextLong());
+            DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
+            FsVolumeReferencesJVMInterface refs = dnNode.getFSDataset().getFsVolumeReferences();
+            try {
+                source = (FsVolumeImpl) refs.get(0);
+                dest = (FsVolumeImpl) refs.get(1);
+                /*
+        DiskBalancerTestUtil.moveAllDataToDestVolume(dnNode.getFSDataset(),
+            source, dest);
+        assertEquals(0, DiskBalancerTestUtil.getBlockCount(source, false));
+         */
+            } finally {
+                refs.close();
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMoveBlockAcrossVolume_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        final int defaultBlockSize = 100;
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
+        String fileName = "/tmp.txt";
+        Path filePath = new Path(fileName);
+        final int numDatanodes = 1;
+        final int dnIndex = 0;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
+        FsVolumeImpl source = null;
+        FsVolumeImpl dest = null;
+        try {
+            cluster.waitActive();
+            Random r = new Random();
+            FileSystem fs = cluster.getFileSystem(dnIndex);
+            DFSTestUtil.createFile(fs, filePath, 10 * 1024, (short) 1, r.nextLong());
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
+            FsVolumeReferencesJVMInterface refs = dnNode.getFSDataset().getFsVolumeReferences();
+            try {
+                source = (FsVolumeImpl) refs.get(0);
+                dest = (FsVolumeImpl) refs.get(1);
+                /*
+        DiskBalancerTestUtil.moveAllDataToDestVolume(dnNode.getFSDataset(),
+            source, dest);
+        assertEquals(0, DiskBalancerTestUtil.getBlockCount(source, false));
+         */
+            } finally {
+                refs.close();
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMoveBlockAcrossVolume_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        final int defaultBlockSize = 100;
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
+        String fileName = "/tmp.txt";
+        Path filePath = new Path(fileName);
+        final int numDatanodes = 1;
+        final int dnIndex = 0;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
+        FsVolumeImpl source = null;
+        FsVolumeImpl dest = null;
+        try {
+            cluster.waitActive();
+            Random r = new Random();
+            FileSystem fs = cluster.getFileSystem(dnIndex);
+            DFSTestUtil.createFile(fs, filePath, 10 * 1024, (short) 1, r.nextLong());
+            DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
+            FsVolumeReferencesJVMInterface refs = dnNode.getFSDataset().getFsVolumeReferences();
+            try {
+                source = (FsVolumeImpl) refs.get(0);
+                /*
+        DiskBalancerTestUtil.moveAllDataToDestVolume(dnNode.getFSDataset(),
+            source, dest);
+        assertEquals(0, DiskBalancerTestUtil.getBlockCount(source, false));
+         */
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                dest = (FsVolumeImpl) refs.get(1);
+            } finally {
+                refs.close();
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testMoveBlockAcrossVolume_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        final int defaultBlockSize = 100;
+        conf.setBoolean(DFSConfigKeys.DFS_DISK_BALANCER_ENABLED, true);
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultBlockSize);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, defaultBlockSize);
+        String fileName = "/tmp.txt";
+        Path filePath = new Path(fileName);
+        final int numDatanodes = 1;
+        final int dnIndex = 0;
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(numDatanodes).build();
+        FsVolumeImpl source = null;
+        FsVolumeImpl dest = null;
+        try {
+            cluster.waitActive();
+            Random r = new Random();
+            FileSystem fs = cluster.getFileSystem(dnIndex);
+            DFSTestUtil.createFile(fs, filePath, 10 * 1024, (short) 1, r.nextLong());
+            DataNodeJVMInterface dnNode = cluster.getDataNodes().get(dnIndex);
+            FsVolumeReferencesJVMInterface refs = dnNode.getFSDataset().getFsVolumeReferences();
+            try {
+                source = (FsVolumeImpl) refs.get(0);
+                dest = (FsVolumeImpl) refs.get(1);
+                /*
+        DiskBalancerTestUtil.moveAllDataToDestVolume(dnNode.getFSDataset(),
+            source, dest);
+        assertEquals(0, DiskBalancerTestUtil.getBlockCount(source, false));
+         */
+            } finally {
+                refs.close();
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }
