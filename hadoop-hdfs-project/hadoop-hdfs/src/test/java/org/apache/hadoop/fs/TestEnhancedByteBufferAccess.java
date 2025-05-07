@@ -1545,13 +1545,13 @@ public class TestEnhancedByteBufferAccess {
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(new ExtendedBlockId(firstBlock.getBlockId(), firstBlock.getBlockPoolId()));
                 Assert.assertNotNull(replica);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertTrue(replica.hasMmap());
                 // The replica should not yet be evictable, since we have it open.
                 Assert.assertNull(replica.getEvictableTimeNs());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // Read more blocks.
         results[2] = fsIn.read(null, BLOCK_SIZE, EnumSet.of(ReadOption.SKIP_CHECKSUMS));
         results[3] = fsIn.read(null, BLOCK_SIZE, EnumSet.of(ReadOption.SKIP_CHECKSUMS));

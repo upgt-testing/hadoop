@@ -614,11 +614,11 @@ public class TestStandbyCheckpoints {
         for (int i = 0; i < 20; i++) {
             if (versionFile.exists()) {
                 break;
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
             }
             Thread.sleep(500);
         }
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // VERSION must have been created.
         assert versionFile.exists();
     }

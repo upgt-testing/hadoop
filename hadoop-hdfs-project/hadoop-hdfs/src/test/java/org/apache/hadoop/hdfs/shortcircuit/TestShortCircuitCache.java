@@ -801,11 +801,11 @@ public class TestShortCircuitCache {
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
                 Assert.assertNotNull(replica);
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertTrue(replica.getSlot().isValid());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         // shared memory segment alive, and make it stale.
         cluster.getDataNodes().get(0).shutdown();
         cache.accept(new CacheVisitor() {
@@ -854,12 +854,12 @@ public class TestShortCircuitCache {
             @Override
             public void visit(int numOutstandingMmaps, Map<ExtendedBlockId, ShortCircuitReplica> replicas, Map<ExtendedBlockId, InvalidToken> failedLoads, LinkedMap evictable, LinkedMap evictableMmapped) {
                 ShortCircuitReplica replica = replicas.get(ExtendedBlockId.fromExtendedBlock(block));
-                cluster.restartNodeForTesting(0);
-                cluster.upgradeNodeForTesting(0);
                 Assert.assertNotNull(replica);
                 Assert.assertFalse(replica.getSlot().isValid());
             }
         });
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
         cluster.shutdown();
         sockDir.close();
     }

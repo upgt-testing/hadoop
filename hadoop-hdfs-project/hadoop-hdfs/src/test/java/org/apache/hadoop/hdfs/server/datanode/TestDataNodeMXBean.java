@@ -491,12 +491,12 @@ public class TestDataNodeMXBean {
                         return getTotalNumBlocks(mbs, mxbeanName) == 4;
                     } catch (Exception e) {
                         e.printStackTrace();
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                         return false;
                     }
                 }
             }, 100, 30000);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             if (cluster != null) {
                 cluster.shutdown();

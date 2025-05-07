@@ -4176,10 +4176,10 @@ public class TestDistributedFileSystem {
                 }
                 if (delta > timeout * 1.1) {
                     throw new IOException("read timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             cluster.shutdown();
         }
@@ -4380,10 +4380,10 @@ public class TestDistributedFileSystem {
                 }
                 if (delta > timeout * 1.2) {
                     throw new IOException("write timedout too late in " + delta + " ms.", ste);
-                    cluster.restartNodeForTesting(0);
-                    cluster.upgradeNodeForTesting(0);
                 }
             }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
         } finally {
             cluster.shutdown();
         }

@@ -4605,8 +4605,6 @@ public class TestDFSShell {
                 public void run() {
                     try {
                         show("copy local " + f2 + " to remote " + dst);
-                        cluster.restartNodeForTesting(0);
-                        cluster.upgradeNodeForTesting(0);
                         dfs.copyFromLocalFile(false, false, new Path(f2.getPath()), dst);
                     } catch (IOException ioe) {
                         show("good " + StringUtils.stringifyException(ioe));
@@ -4616,6 +4614,8 @@ public class TestDFSShell {
                     assertTrue(false);
                 }
             };
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
             //use SecurityManager to pause the copying of f1 and begin copying f2
             SecurityManager sm = System.getSecurityManager();
             System.out.println("SecurityManager = " + sm);
