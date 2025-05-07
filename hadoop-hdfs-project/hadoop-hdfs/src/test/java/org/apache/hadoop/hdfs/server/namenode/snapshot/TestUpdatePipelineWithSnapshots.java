@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode.snapshot;
 
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,44 +36,37 @@ import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
 import org.junit.Test;
 
 public class TestUpdatePipelineWithSnapshots {
-  
-  // Regression test for HDFS-6647.
-  @Test
-  public void testUpdatePipelineAfterDelete() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    Path file = new Path("/test-file");    
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    
-    try {
-      FileSystem fs = cluster.getFileSystem();
-      NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
-      DFSOutputStream out = null;
-      try {
-        // Create a file and make sure a block is allocated for it.
-        out = (DFSOutputStream)(fs.create(file).
-            getWrappedStream()); 
-        out.write(1);
-        out.hflush();
-        
-        // Create a snapshot that includes the file.
-        SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs,
-            new Path("/"), "s1");
-        
-        // Grab the block info of this file for later use.
-        FSDataInputStream in = null;
-        ExtendedBlock oldBlock = null;
+
+    // Regression test for HDFS-6647.
+    @Test
+    public void testUpdatePipelineAfterDelete() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
         try {
-          in = fs.open(file);
-          oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
-        } finally {
-          IOUtils.closeStream(in);
-        }
-        
-        // Allocate a new block ID/gen stamp so we can simulate pipeline
-        // recovery.
-        String clientName = ((DistributedFileSystem)fs).getClient()
-            .getClientName();
-        /*
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+                /*
         LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
             oldBlock, clientName);
         ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
@@ -101,12 +93,271 @@ public class TestUpdatePipelineWithSnapshots {
         // Make sure the NN can restart with the edit logs as we have them now.
         cluster.restartNameNode(true);
          */
-      } finally {
-        IOUtils.closeStream(out);
-      }
-    } finally {
-      cluster.shutdown();
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 
+    @Test
+    public void testUpdatePipelineAfterDelete_withUpgrade20() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+                /*
+        LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
+            oldBlock, clientName);
+        ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
+            oldBlock.getBlockId(), oldBlock.getNumBytes(), 
+            newLocatedBlock.getBlock().getGenerationStamp());
+
+        // Delete the file from the present FS. It will still exist the
+        // previously-created snapshot. This will log an OP_DELETE for the
+        // file in question.
+        fs.delete(file, true);
+        
+        // Simulate a pipeline recovery, wherein a new block is allocated
+        // for the existing block, resulting in an OP_UPDATE_BLOCKS being
+        // logged for the file in question.
+        try {
+          namenode.updatePipeline(clientName, oldBlock, newBlock,
+              newLocatedBlock.getLocations(), newLocatedBlock.getStorageIDs());
+        } catch (IOException ioe) {
+          // normal
+          assertExceptionContains(
+              "does not exist or it is not under construction", ioe);
+        }
+        
+        // Make sure the NN can restart with the edit logs as we have them now.
+        cluster.restartNameNode(true);
+         */
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testUpdatePipelineAfterDelete_withUpgrade40() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                /*
+        LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
+            oldBlock, clientName);
+        ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
+            oldBlock.getBlockId(), oldBlock.getNumBytes(), 
+            newLocatedBlock.getBlock().getGenerationStamp());
+
+        // Delete the file from the present FS. It will still exist the
+        // previously-created snapshot. This will log an OP_DELETE for the
+        // file in question.
+        fs.delete(file, true);
+        
+        // Simulate a pipeline recovery, wherein a new block is allocated
+        // for the existing block, resulting in an OP_UPDATE_BLOCKS being
+        // logged for the file in question.
+        try {
+          namenode.updatePipeline(clientName, oldBlock, newBlock,
+              newLocatedBlock.getLocations(), newLocatedBlock.getStorageIDs());
+        } catch (IOException ioe) {
+          // normal
+          assertExceptionContains(
+              "does not exist or it is not under construction", ioe);
+        }
+        
+        // Make sure the NN can restart with the edit logs as we have them now.
+        cluster.restartNameNode(true);
+         */
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testUpdatePipelineAfterDelete_withUpgrade60() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    cluster.restartNodeForTesting(0);
+                    cluster.upgradeNodeForTesting(0);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+                /*
+        LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
+            oldBlock, clientName);
+        ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
+            oldBlock.getBlockId(), oldBlock.getNumBytes(), 
+            newLocatedBlock.getBlock().getGenerationStamp());
+
+        // Delete the file from the present FS. It will still exist the
+        // previously-created snapshot. This will log an OP_DELETE for the
+        // file in question.
+        fs.delete(file, true);
+        
+        // Simulate a pipeline recovery, wherein a new block is allocated
+        // for the existing block, resulting in an OP_UPDATE_BLOCKS being
+        // logged for the file in question.
+        try {
+          namenode.updatePipeline(clientName, oldBlock, newBlock,
+              newLocatedBlock.getLocations(), newLocatedBlock.getStorageIDs());
+        } catch (IOException ioe) {
+          // normal
+          assertExceptionContains(
+              "does not exist or it is not under construction", ioe);
+        }
+        
+        // Make sure the NN can restart with the edit logs as we have them now.
+        cluster.restartNameNode(true);
+         */
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testUpdatePipelineAfterDelete_withUpgrade80() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        Path file = new Path("/test-file");
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        try {
+            FileSystem fs = cluster.getFileSystem();
+            NamenodeProtocolsJVMInterface namenode = cluster.getNameNodeRpc();
+            DFSOutputStream out = null;
+            try {
+                // Create a file and make sure a block is allocated for it.
+                out = (DFSOutputStream) (fs.create(file).getWrappedStream());
+                out.write(1);
+                out.hflush();
+                // Create a snapshot that includes the file.
+                SnapshotTestHelper.createSnapshot((DistributedFileSystem) fs, new Path("/"), "s1");
+                // Grab the block info of this file for later use.
+                FSDataInputStream in = null;
+                ExtendedBlock oldBlock = null;
+                try {
+                    in = fs.open(file);
+                    oldBlock = DFSTestUtil.getAllBlocks(in).get(0).getBlock();
+                } finally {
+                    IOUtils.closeStream(in);
+                }
+                // Allocate a new block ID/gen stamp so we can simulate pipeline
+                // recovery.
+                String clientName = ((DistributedFileSystem) fs).getClient().getClientName();
+                /*
+        LocatedBlock newLocatedBlock = namenode.updateBlockForPipeline(
+            oldBlock, clientName);
+        ExtendedBlock newBlock = new ExtendedBlock(oldBlock.getBlockPoolId(),
+            oldBlock.getBlockId(), oldBlock.getNumBytes(), 
+            newLocatedBlock.getBlock().getGenerationStamp());
+
+        // Delete the file from the present FS. It will still exist the
+        // previously-created snapshot. This will log an OP_DELETE for the
+        // file in question.
+        fs.delete(file, true);
+        
+        // Simulate a pipeline recovery, wherein a new block is allocated
+        // for the existing block, resulting in an OP_UPDATE_BLOCKS being
+        // logged for the file in question.
+        try {
+          namenode.updatePipeline(clientName, oldBlock, newBlock,
+              newLocatedBlock.getLocations(), newLocatedBlock.getStorageIDs());
+        } catch (IOException ioe) {
+          // normal
+          assertExceptionContains(
+              "does not exist or it is not under construction", ioe);
+        }
+        
+        // Make sure the NN can restart with the edit logs as we have them now.
+        cluster.restartNameNode(true);
+         */
+                cluster.restartNodeForTesting(0);
+                cluster.upgradeNodeForTesting(0);
+            } finally {
+                IOUtils.closeStream(out);
+            }
+        } finally {
+            cluster.shutdown();
+        }
+    }
 }

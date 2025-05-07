@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.permission.PermissionStatus;
@@ -58,67 +56,62 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
 import com.google.common.base.Supplier;
 import org.mockito.Mockito;
 
 @RunWith(Parameterized.class)
 public class TestEditLogTailer {
-  static {
-    GenericTestUtils.setLogLevel(FSEditLog.LOG, Level.ALL);
-  }
 
-  @Parameters
-  public static Collection<Object[]> data() {
-    Collection<Object[]> params = new ArrayList<Object[]>();
-    params.add(new Object[]{ Boolean.FALSE });
-    params.add(new Object[]{ Boolean.TRUE });
-    return params;
-  }
+    static {
+        GenericTestUtils.setLogLevel(FSEditLog.LOG, Level.ALL);
+    }
 
-  private static boolean useAsyncEditLog;
-  public TestEditLogTailer(Boolean async) {
-    useAsyncEditLog = async;
-  }
+    @Parameters
+    public static Collection<Object[]> data() {
+        Collection<Object[]> params = new ArrayList<Object[]>();
+        params.add(new Object[] { Boolean.FALSE });
+        params.add(new Object[] { Boolean.TRUE });
+        return params;
+    }
 
-  private static final String DIR_PREFIX = "/dir";
-  private static final int DIRS_TO_MAKE = 20;
-  static final long SLEEP_TIME = 1000;
-  static final long NN_LAG_TIMEOUT = 10 * 1000;
-  
-  static {
-    GenericTestUtils.setLogLevel(FSImage.LOG, Level.ALL);
-    GenericTestUtils.setLogLevel(FSEditLog.LOG, Level.ALL);
-    GenericTestUtils.setLogLevel(EditLogTailer.LOG, Level.ALL);
-  }
+    private static boolean useAsyncEditLog;
 
-  private static Configuration getConf() {
-    Configuration conf = new HdfsConfiguration();
-    conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_EDITS_ASYNC_LOGGING,
-        useAsyncEditLog);
-    return conf;
-  }
+    public TestEditLogTailer(Boolean async) {
+        useAsyncEditLog = async;
+    }
 
-  @Test
-  public void testTailer() throws IOException, InterruptedException,
-      ServiceFailedException {
-    Configuration conf = getConf();
-    conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+    private static final String DIR_PREFIX = "/dir";
 
-    HAUtil.setAllowStandbyReads(conf, true);
-    
-    MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf)
-      .nnTopology(MiniDFSNNTopology.simpleHATopology())
-      .numDataNodes(0)
-      .build();
-    cluster.waitActive();
-    
-    cluster.transitionToActive(0);
-    
-    NameNodeJVMInterface nn1 = cluster.getNameNode(0);
-    NameNodeJVMInterface nn2 = cluster.getNameNode(1);
-    try {
-      /*
+    private static final int DIRS_TO_MAKE = 20;
+
+    static final long SLEEP_TIME = 1000;
+
+    static final long NN_LAG_TIMEOUT = 10 * 1000;
+
+    static {
+        GenericTestUtils.setLogLevel(FSImage.LOG, Level.ALL);
+        GenericTestUtils.setLogLevel(FSEditLog.LOG, Level.ALL);
+        GenericTestUtils.setLogLevel(EditLogTailer.LOG, Level.ALL);
+    }
+
+    private static Configuration getConf() {
+        Configuration conf = new HdfsConfiguration();
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_EDITS_ASYNC_LOGGING, useAsyncEditLog);
+        return conf;
+    }
+
+    @Test
+    public void testTailer() throws IOException, InterruptedException, ServiceFailedException {
+        Configuration conf = getConf();
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        HAUtil.setAllowStandbyReads(conf, true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+        NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+        NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+        try {
+            /*
       for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
         NameNodeAdapter.mkdirs(nn1, getDirPath(i),
             new PermissionStatus("test","test", new FsPermission((short)00755)),
@@ -145,85 +138,72 @@ public class TestEditLogTailer {
             getDirPath(i), false).isDir());
       }
        */
-    } finally {
-      cluster.shutdown();
+        } finally {
+            cluster.shutdown();
+        }
     }
-  }
 
-  @Test
-  public void testNN0TriggersLogRolls() throws Exception {
-    testStandbyTriggersLogRolls(0);
-  }
-  
-  @Test
-  public void testNN1TriggersLogRolls() throws Exception {
-    testStandbyTriggersLogRolls(1);
-  }
-
-  private static void testStandbyTriggersLogRolls(int activeIndex)
-      throws Exception {
-    Configuration conf = getConf();
-    // Roll every 1s
-    conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, 1);
-    conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
-
-    MiniDFSClusterInJVM cluster = null;
-    for (int i = 0; i < 5; i++) {
-      try {
-        // Have to specify IPC ports so the NNs can talk to each other.
-        int[] ports = ServerSocketUtil.getPorts(2);
-        MiniDFSNNTopology topology = new MiniDFSNNTopology()
-            .addNameservice(new MiniDFSNNTopology.NSConf("ns1")
-                .addNN(new MiniDFSNNTopology.NNConf("nn1")
-                    .setIpcPort(ports[0]))
-                .addNN(new MiniDFSNNTopology.NNConf("nn2")
-                    .setIpcPort(ports[1])));
-
-        cluster = new MiniDFSClusterInJVM.Builder(conf)
-          .nnTopology(topology)
-          .numDataNodes(0)
-          .build();
-        break;
-      } catch (BindException e) {
-        // retry if race on ports given by ServerSocketUtil#getPorts
-        continue;
-      }
+    @Test
+    public void testNN0TriggersLogRolls() throws Exception {
+        testStandbyTriggersLogRolls(0);
     }
-    if (cluster == null) {
-      fail("failed to start mini cluster.");
-    }
-    try {
-      cluster.transitionToActive(activeIndex);
-      waitForLogRollInSharedDir(cluster, 3);
-    } finally {
-      cluster.shutdown();
-    }
-  }
-  
-  private static String getDirPath(int suffix) {
-    return DIR_PREFIX + suffix;
-  }
-  
-  private static void waitForLogRollInSharedDir(MiniDFSClusterInJVM cluster,
-      long startTxId) throws Exception {
-    URI sharedUri = cluster.getSharedEditsDir(0, 1);
-    File sharedDir = new File(sharedUri.getPath(), "current");
-    final File expectedInProgressLog =
-        new File(sharedDir, NNStorage.getInProgressEditsFileName(startTxId));
-    final File expectedFinalizedLog = new File(sharedDir,
-        NNStorage.getFinalizedEditsFileName(startTxId, startTxId + 1));
-    // There is a chance that multiple rolling happens by multiple NameNodes
-    // And expected inprogress file would have also finalized. So look for the
-    // finalized edits file as well
-    GenericTestUtils.waitFor(new Supplier<Boolean>() {
-      @Override
-      public Boolean get() {
-        return expectedInProgressLog.exists() || expectedFinalizedLog.exists();
-      }
-    }, 100, 10000);
-  }
 
-  /*
+    @Test
+    public void testNN1TriggersLogRolls() throws Exception {
+        testStandbyTriggersLogRolls(1);
+    }
+
+    private static void testStandbyTriggersLogRolls(int activeIndex) throws Exception {
+        Configuration conf = getConf();
+        // Roll every 1s
+        conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, 1);
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        MiniDFSClusterInJVM cluster = null;
+        for (int i = 0; i < 5; i++) {
+            try {
+                // Have to specify IPC ports so the NNs can talk to each other.
+                int[] ports = ServerSocketUtil.getPorts(2);
+                MiniDFSNNTopology topology = new MiniDFSNNTopology().addNameservice(new MiniDFSNNTopology.NSConf("ns1").addNN(new MiniDFSNNTopology.NNConf("nn1").setIpcPort(ports[0])).addNN(new MiniDFSNNTopology.NNConf("nn2").setIpcPort(ports[1])));
+                cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(topology).numDataNodes(0).build();
+                break;
+            } catch (BindException e) {
+                // retry if race on ports given by ServerSocketUtil#getPorts
+                continue;
+            }
+        }
+        if (cluster == null) {
+            fail("failed to start mini cluster.");
+        }
+        try {
+            cluster.transitionToActive(activeIndex);
+            waitForLogRollInSharedDir(cluster, 3);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    private static String getDirPath(int suffix) {
+        return DIR_PREFIX + suffix;
+    }
+
+    private static void waitForLogRollInSharedDir(MiniDFSClusterInJVM cluster, long startTxId) throws Exception {
+        URI sharedUri = cluster.getSharedEditsDir(0, 1);
+        File sharedDir = new File(sharedUri.getPath(), "current");
+        final File expectedInProgressLog = new File(sharedDir, NNStorage.getInProgressEditsFileName(startTxId));
+        final File expectedFinalizedLog = new File(sharedDir, NNStorage.getFinalizedEditsFileName(startTxId, startTxId + 1));
+        // There is a chance that multiple rolling happens by multiple NameNodes
+        // And expected inprogress file would have also finalized. So look for the
+        // finalized edits file as well
+        GenericTestUtils.waitFor(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                return expectedInProgressLog.exists() || expectedFinalizedLog.exists();
+            }
+        }, 100, 10000);
+    }
+
+    /*
   @Test(timeout=20000)
   public void testRollEditTimeoutForActiveNN() throws IOException {
     Configuration conf = getConf();
@@ -264,4 +244,183 @@ public class TestEditLogTailer {
     }
   }
    */
+    @Test
+    public void testTailer_withUpgrade20() throws IOException, InterruptedException, ServiceFailedException {
+        Configuration conf = getConf();
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        HAUtil.setAllowStandbyReads(conf, true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+        NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+        try {
+            /*
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+      
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+       */
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testTailer_withUpgrade40() throws IOException, InterruptedException, ServiceFailedException {
+        Configuration conf = getConf();
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        HAUtil.setAllowStandbyReads(conf, true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+        NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+        NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        try {
+            /*
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+      
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+       */
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testTailer_withUpgrade60() throws IOException, InterruptedException, ServiceFailedException {
+        Configuration conf = getConf();
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        HAUtil.setAllowStandbyReads(conf, true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+        NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+        NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+        try {
+            /*
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+      
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+       */
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } finally {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testTailer_withUpgrade80() throws IOException, InterruptedException, ServiceFailedException {
+        Configuration conf = getConf();
+        conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);
+        HAUtil.setAllowStandbyReads(conf, true);
+        MiniDFSClusterInJVM cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(0).build();
+        cluster.waitActive();
+        cluster.transitionToActive(0);
+        NameNodeJVMInterface nn1 = cluster.getNameNode(0);
+        NameNodeJVMInterface nn2 = cluster.getNameNode(1);
+        try {
+            /*
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = 0; i < DIRS_TO_MAKE / 2; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+      
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        NameNodeAdapter.mkdirs(nn1, getDirPath(i),
+            new PermissionStatus("test","test", new FsPermission((short)00755)),
+            true);
+      }
+      
+      HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
+
+      for (int i = DIRS_TO_MAKE / 2; i < DIRS_TO_MAKE; i++) {
+        assertTrue(NameNodeAdapter.getFileInfo(nn2,
+            getDirPath(i), false).isDir());
+      }
+       */
+        } finally {
+            cluster.shutdown();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
 }

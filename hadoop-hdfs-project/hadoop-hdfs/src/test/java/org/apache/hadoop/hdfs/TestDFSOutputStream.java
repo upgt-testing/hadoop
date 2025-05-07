@@ -30,7 +30,6 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -60,7 +59,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
@@ -68,237 +66,183 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.internal.util.reflection.Whitebox;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_DEFAULT;
 import static org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.DFS_CLIENT_WRITE_PACKET_SIZE_KEY;
 
 public class TestDFSOutputStream {
-  static MiniDFSClusterInJVM cluster;
 
-  @BeforeClass
-  public static void setup() throws IOException {
-    Configuration conf = new Configuration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
-  }
+    static MiniDFSClusterInJVM cluster;
 
-  /**
-   * The close() method of DFSOutputStream should never throw the same exception
-   * twice. See HDFS-5335 for details.
-   */
-  @Test
-  public void testCloseTwice() throws IOException {
-    DistributedFileSystem fs = cluster.getFileSystem();
-    FSDataOutputStream os = fs.create(new Path("/test"));
-    DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os,
-        "wrappedStream");
-    DataStreamer streamer = (DataStreamer) Whitebox
-        .getInternalState(dos, "streamer");
-    @SuppressWarnings("unchecked")
-    LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox
-        .getInternalState(streamer, "lastException");
-    Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
-    Assert.assertNull(thrown);
-
-    dos.close();
-
-    IOException dummy = new IOException("dummy");
-    ex.set(dummy);
-    try {
-      dos.close();
-    } catch (IOException e) {
-      assertEquals(e, dummy);
+    @BeforeClass
+    public static void setup() throws IOException {
+        Configuration conf = new Configuration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(3).build();
     }
-    thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
-    Assert.assertNull(thrown);
-    dos.close();
-  }
 
-  /**
-   * The computePacketChunkSize() method of DFSOutputStream should set the actual
-   * packet size < 64kB. See HDFS-7308 for details.
-   */
-  @Test
-  public void testComputePacketChunkSize() throws Exception {
-    DistributedFileSystem fs = cluster.getFileSystem();
-    FSDataOutputStream os = fs.create(new Path("/test"));
-    DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os,
-        "wrappedStream");
-
-    final int packetSize = 64*1024;
-    final int bytesPerChecksum = 512;
-
-    Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize",
-        int.class, int.class);
-    method.setAccessible(true);
-    method.invoke(dos, packetSize, bytesPerChecksum);
-
-    Field field = dos.getClass().getDeclaredField("packetSize");
-    field.setAccessible(true);
-
-    Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
-    // If PKT_MAX_HEADER_LEN is 257, actual packet size come to over 64KB
-    // without a fix on HDFS-7308.
-    Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
-  }
-
-  /**
-   * This tests preventing overflows of package size and bodySize.
-   * <p>
-   * See also https://issues.apache.org/jira/browse/HDFS-11608.
-   * </p>
-   * @throws IOException
-   * @throws SecurityException
-   * @throws NoSuchFieldException
-   * @throws InvocationTargetException
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws NoSuchMethodException
-   */
-  @Test(timeout=60000)
-  public void testPreventOverflow() throws IOException, NoSuchFieldException,
-      SecurityException, IllegalAccessException, IllegalArgumentException,
-      InvocationTargetException, NoSuchMethodException {
-
-    final int defaultWritePacketSize = DFS_CLIENT_WRITE_PACKET_SIZE_DEFAULT;
-    int configuredWritePacketSize = defaultWritePacketSize;
-    int finalWritePacketSize = defaultWritePacketSize;
-
-    /* test default WritePacketSize, e.g. 64*1024 */
-    runAdjustChunkBoundary(configuredWritePacketSize, finalWritePacketSize);
-
-    /* test large WritePacketSize, e.g. 1G */
-    configuredWritePacketSize = 1000 * 1024 * 1024;
-    finalWritePacketSize = PacketReceiver.MAX_PACKET_SIZE;
-    runAdjustChunkBoundary(configuredWritePacketSize, finalWritePacketSize);
-  }
-
-  /**
-   * @configuredWritePacketSize the configured WritePacketSize.
-   * @finalWritePacketSize the final WritePacketSize picked by
-   *                       {@link DFSOutputStream#adjustChunkBoundary}
-   */
-  private void runAdjustChunkBoundary(
-      final int configuredWritePacketSize,
-      final int finalWritePacketSize) throws IOException, NoSuchFieldException,
-      SecurityException, IllegalAccessException, IllegalArgumentException,
-      InvocationTargetException, NoSuchMethodException {
-
-    final boolean appendChunk = false;
-    final long blockSize = 3221225500L;
-    final long bytesCurBlock = 1073741824L;
-    final int bytesPerChecksum = 512;
-    final int checksumSize = 4;
-    final int chunkSize = bytesPerChecksum + checksumSize;
-    final int packateMaxHeaderLength = 33;
-
-    MiniDFSClusterInJVM dfsCluster = null;
-    final File baseDir = new File(PathUtils.getTestDir(getClass()),
-        GenericTestUtils.getMethodName());
-
-    try {
-      final Configuration dfsConf = new Configuration();
-      dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR,
-          baseDir.getAbsolutePath());
-      dfsConf.setInt(DFS_CLIENT_WRITE_PACKET_SIZE_KEY,
-          configuredWritePacketSize);
-      dfsCluster = new MiniDFSClusterInJVM.Builder(dfsConf).numDataNodes(1).build();
-      dfsCluster.waitActive();
-
-      final FSDataOutputStream os = dfsCluster.getFileSystem()
-          .create(new Path(baseDir.getPath(), "testPreventOverflow"));
-      final DFSOutputStream dos = (DFSOutputStream) Whitebox
-          .getInternalState(os, "wrappedStream");
-
-      /* set appendChunk */
-      final Method setAppendChunkMethod = dos.getClass()
-          .getDeclaredMethod("setAppendChunk", boolean.class);
-      setAppendChunkMethod.setAccessible(true);
-      setAppendChunkMethod.invoke(dos, appendChunk);
-
-      /* set bytesCurBlock */
-      final Method setBytesCurBlockMethod = dos.getClass()
-          .getDeclaredMethod("setBytesCurBlock", long.class);
-      setBytesCurBlockMethod.setAccessible(true);
-      setBytesCurBlockMethod.invoke(dos, bytesCurBlock);
-
-      /* set blockSize */
-      final Field blockSizeField = dos.getClass().getDeclaredField("blockSize");
-      blockSizeField.setAccessible(true);
-      blockSizeField.setLong(dos, blockSize);
-
-      /* call adjustChunkBoundary */
-      final Method method = dos.getClass()
-          .getDeclaredMethod("adjustChunkBoundary");
-      method.setAccessible(true);
-      method.invoke(dos);
-
-      /* get and verify writePacketSize */
-      final Field writePacketSizeField = dos.getClass()
-          .getDeclaredField("writePacketSize");
-      writePacketSizeField.setAccessible(true);
-      Assert.assertEquals(writePacketSizeField.getInt(dos),
-          finalWritePacketSize);
-
-      /* get and verify chunksPerPacket */
-      final Field chunksPerPacketField = dos.getClass()
-          .getDeclaredField("chunksPerPacket");
-      chunksPerPacketField.setAccessible(true);
-      Assert.assertEquals(chunksPerPacketField.getInt(dos),
-          (finalWritePacketSize - packateMaxHeaderLength) / chunkSize);
-
-      /* get and verify packetSize */
-      final Field packetSizeField = dos.getClass()
-          .getDeclaredField("packetSize");
-      packetSizeField.setAccessible(true);
-      Assert.assertEquals(packetSizeField.getInt(dos),
-          chunksPerPacketField.getInt(dos) * chunkSize);
-    } finally {
-      if (dfsCluster != null) {
-        dfsCluster.shutdown();
-      }
+    /**
+     * The close() method of DFSOutputStream should never throw the same exception
+     * twice. See HDFS-5335 for details.
+     */
+    @Test
+    public void testCloseTwice() throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        DataStreamer streamer = (DataStreamer) Whitebox.getInternalState(dos, "streamer");
+        @SuppressWarnings("unchecked")
+        LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox.getInternalState(streamer, "lastException");
+        Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+        IOException dummy = new IOException("dummy");
+        ex.set(dummy);
+        try {
+            dos.close();
+        } catch (IOException e) {
+            assertEquals(e, dummy);
+        }
+        thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
     }
-  }
 
-  @Test
-  public void testCongestionBackoff() throws IOException {
-    DfsClientConf dfsClientConf = mock(DfsClientConf.class);
-    DFSClient client = mock(DFSClient.class);
-    when(client.getConf()).thenReturn(dfsClientConf);
-    when(client.getTracer()).thenReturn(FsTracer.get(new Configuration()));
-    client.clientRunning = true;
-    DataStreamer stream = new DataStreamer(
-        mock(HdfsFileStatus.class),
-        mock(ExtendedBlock.class),
-        client,
-        "foo", null, null, null, null, null, null);
+    /**
+     * The computePacketChunkSize() method of DFSOutputStream should set the actual
+     * packet size < 64kB. See HDFS-7308 for details.
+     */
+    @Test
+    public void testComputePacketChunkSize() throws Exception {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        final int packetSize = 64 * 1024;
+        final int bytesPerChecksum = 512;
+        Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
+        method.setAccessible(true);
+        method.invoke(dos, packetSize, bytesPerChecksum);
+        Field field = dos.getClass().getDeclaredField("packetSize");
+        field.setAccessible(true);
+        Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
+        // If PKT_MAX_HEADER_LEN is 257, actual packet size come to over 64KB
+        // without a fix on HDFS-7308.
+        Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
+    }
 
-    DataOutputStream blockStream = mock(DataOutputStream.class);
-    doThrow(new IOException()).when(blockStream).flush();
-    Whitebox.setInternalState(stream, "blockStream", blockStream);
-    Whitebox.setInternalState(stream, "stage",
-                              BlockConstructionStage.PIPELINE_CLOSE);
-    @SuppressWarnings("unchecked")
-    LinkedList<DFSPacket> dataQueue = (LinkedList<DFSPacket>)
-        Whitebox.getInternalState(stream, "dataQueue");
-    @SuppressWarnings("unchecked")
-    ArrayList<DatanodeInfo> congestedNodes = (ArrayList<DatanodeInfo>)
-        Whitebox.getInternalState(stream, "congestedNodes");
-    congestedNodes.add(mock(DatanodeInfo.class));
-    DFSPacket packet = mock(DFSPacket.class);
-    when(packet.getTraceParents()).thenReturn(new SpanId[] {});
-    dataQueue.add(packet);
-    stream.run();
-    Assert.assertTrue(congestedNodes.isEmpty());
-  }
+    /**
+     * This tests preventing overflows of package size and bodySize.
+     * <p>
+     * See also https://issues.apache.org/jira/browse/HDFS-11608.
+     * </p>
+     * @throws IOException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     */
+    @Test(timeout = 60000)
+    public void testPreventOverflow() throws IOException, NoSuchFieldException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        final int defaultWritePacketSize = DFS_CLIENT_WRITE_PACKET_SIZE_DEFAULT;
+        int configuredWritePacketSize = defaultWritePacketSize;
+        int finalWritePacketSize = defaultWritePacketSize;
+        /* test default WritePacketSize, e.g. 64*1024 */
+        runAdjustChunkBoundary(configuredWritePacketSize, finalWritePacketSize);
+        /* test large WritePacketSize, e.g. 1G */
+        configuredWritePacketSize = 1000 * 1024 * 1024;
+        finalWritePacketSize = PacketReceiver.MAX_PACKET_SIZE;
+        runAdjustChunkBoundary(configuredWritePacketSize, finalWritePacketSize);
+    }
 
-  /*
+    /**
+     * @configuredWritePacketSize the configured WritePacketSize.
+     * @finalWritePacketSize the final WritePacketSize picked by
+     *                       {@link DFSOutputStream#adjustChunkBoundary}
+     */
+    private void runAdjustChunkBoundary(final int configuredWritePacketSize, final int finalWritePacketSize) throws IOException, NoSuchFieldException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        final boolean appendChunk = false;
+        final long blockSize = 3221225500L;
+        final long bytesCurBlock = 1073741824L;
+        final int bytesPerChecksum = 512;
+        final int checksumSize = 4;
+        final int chunkSize = bytesPerChecksum + checksumSize;
+        final int packateMaxHeaderLength = 33;
+        MiniDFSClusterInJVM dfsCluster = null;
+        final File baseDir = new File(PathUtils.getTestDir(getClass()), GenericTestUtils.getMethodName());
+        try {
+            final Configuration dfsConf = new Configuration();
+            dfsConf.set(MiniDFSClusterInJVM.HDFS_MINIDFS_BASEDIR, baseDir.getAbsolutePath());
+            dfsConf.setInt(DFS_CLIENT_WRITE_PACKET_SIZE_KEY, configuredWritePacketSize);
+            dfsCluster = new MiniDFSClusterInJVM.Builder(dfsConf).numDataNodes(1).build();
+            dfsCluster.waitActive();
+            final FSDataOutputStream os = dfsCluster.getFileSystem().create(new Path(baseDir.getPath(), "testPreventOverflow"));
+            final DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+            /* set appendChunk */
+            final Method setAppendChunkMethod = dos.getClass().getDeclaredMethod("setAppendChunk", boolean.class);
+            setAppendChunkMethod.setAccessible(true);
+            setAppendChunkMethod.invoke(dos, appendChunk);
+            /* set bytesCurBlock */
+            final Method setBytesCurBlockMethod = dos.getClass().getDeclaredMethod("setBytesCurBlock", long.class);
+            setBytesCurBlockMethod.setAccessible(true);
+            setBytesCurBlockMethod.invoke(dos, bytesCurBlock);
+            /* set blockSize */
+            final Field blockSizeField = dos.getClass().getDeclaredField("blockSize");
+            blockSizeField.setAccessible(true);
+            blockSizeField.setLong(dos, blockSize);
+            /* call adjustChunkBoundary */
+            final Method method = dos.getClass().getDeclaredMethod("adjustChunkBoundary");
+            method.setAccessible(true);
+            method.invoke(dos);
+            /* get and verify writePacketSize */
+            final Field writePacketSizeField = dos.getClass().getDeclaredField("writePacketSize");
+            writePacketSizeField.setAccessible(true);
+            Assert.assertEquals(writePacketSizeField.getInt(dos), finalWritePacketSize);
+            /* get and verify chunksPerPacket */
+            final Field chunksPerPacketField = dos.getClass().getDeclaredField("chunksPerPacket");
+            chunksPerPacketField.setAccessible(true);
+            Assert.assertEquals(chunksPerPacketField.getInt(dos), (finalWritePacketSize - packateMaxHeaderLength) / chunkSize);
+            /* get and verify packetSize */
+            final Field packetSizeField = dos.getClass().getDeclaredField("packetSize");
+            packetSizeField.setAccessible(true);
+            Assert.assertEquals(packetSizeField.getInt(dos), chunksPerPacketField.getInt(dos) * chunkSize);
+        } finally {
+            if (dfsCluster != null) {
+                dfsCluster.shutdown();
+            }
+        }
+    }
+
+    @Test
+    public void testCongestionBackoff() throws IOException {
+        DfsClientConf dfsClientConf = mock(DfsClientConf.class);
+        DFSClient client = mock(DFSClient.class);
+        when(client.getConf()).thenReturn(dfsClientConf);
+        when(client.getTracer()).thenReturn(FsTracer.get(new Configuration()));
+        client.clientRunning = true;
+        DataStreamer stream = new DataStreamer(mock(HdfsFileStatus.class), mock(ExtendedBlock.class), client, "foo", null, null, null, null, null, null);
+        DataOutputStream blockStream = mock(DataOutputStream.class);
+        doThrow(new IOException()).when(blockStream).flush();
+        Whitebox.setInternalState(stream, "blockStream", blockStream);
+        Whitebox.setInternalState(stream, "stage", BlockConstructionStage.PIPELINE_CLOSE);
+        @SuppressWarnings("unchecked")
+        LinkedList<DFSPacket> dataQueue = (LinkedList<DFSPacket>) Whitebox.getInternalState(stream, "dataQueue");
+        @SuppressWarnings("unchecked")
+        ArrayList<DatanodeInfo> congestedNodes = (ArrayList<DatanodeInfo>) Whitebox.getInternalState(stream, "congestedNodes");
+        congestedNodes.add(mock(DatanodeInfo.class));
+        DFSPacket packet = mock(DFSPacket.class);
+        when(packet.getTraceParents()).thenReturn(new SpanId[] {});
+        dataQueue.add(packet);
+        stream.run();
+        Assert.assertTrue(congestedNodes.isEmpty());
+    }
+
+    /*
   @Test
   public void testNoLocalWriteFlag() throws IOException {
     DistributedFileSystem fs = cluster.getFileSystem();
@@ -341,43 +285,337 @@ public class TestDFSOutputStream {
   }
 
    */
-
-  @Test
-  public void testEndLeaseCall() throws Exception {
-    Configuration conf = new Configuration();
-    DFSClient client = new DFSClient(cluster.getNameNode(0)
-        .getNameNodeAddress(), conf);
-    DFSClient spyClient = Mockito.spy(client);
-    DFSOutputStream dfsOutputStream = spyClient.create("/file2",
-        FsPermission.getFileDefault(),
-        EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null , 1024, null);
-    DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
-    spyDFSOutputStream.closeThreads(anyBoolean());
-    verify(spyClient, times(1)).endFileLease(anyLong());
-  }
-
-  @Test
-  public void testStreamFlush() throws Exception {
-    FileSystem fs = cluster.getFileSystem();
-    FSDataOutputStream os = fs.create(new Path("/normal-file"));
-    // Verify output stream supports hsync() and hflush().
-    assertTrue("DFSOutputStream should support hflush()!",
-        os.hasCapability(StreamCapability.HFLUSH.getValue()));
-    assertTrue("DFSOutputStream should support hsync()!",
-        os.hasCapability(StreamCapability.HSYNC.getValue()));
-    byte[] bytes = new byte[1024];
-    InputStream is = new ByteArrayInputStream(bytes);
-    IOUtils.copyBytes(is, os, bytes.length);
-    os.hflush();
-    IOUtils.copyBytes(is, os, bytes.length);
-    os.hsync();
-    os.close();
-  }
-
-  @AfterClass
-  public static void tearDown() {
-    if (cluster != null) {
-      cluster.shutdown();
+    @Test
+    public void testEndLeaseCall() throws Exception {
+        Configuration conf = new Configuration();
+        DFSClient client = new DFSClient(cluster.getNameNode(0).getNameNodeAddress(), conf);
+        DFSClient spyClient = Mockito.spy(client);
+        DFSOutputStream dfsOutputStream = spyClient.create("/file2", FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null, 1024, null);
+        DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
+        spyDFSOutputStream.closeThreads(anyBoolean());
+        verify(spyClient, times(1)).endFileLease(anyLong());
     }
-  }
+
+    @Test
+    public void testStreamFlush() throws Exception {
+        FileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/normal-file"));
+        // Verify output stream supports hsync() and hflush().
+        assertTrue("DFSOutputStream should support hflush()!", os.hasCapability(StreamCapability.HFLUSH.getValue()));
+        assertTrue("DFSOutputStream should support hsync()!", os.hasCapability(StreamCapability.HSYNC.getValue()));
+        byte[] bytes = new byte[1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hflush();
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
+
+    @Test
+    public void testCloseTwice_withUpgrade20() throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        DataStreamer streamer = (DataStreamer) Whitebox.getInternalState(dos, "streamer");
+        @SuppressWarnings("unchecked")
+        LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox.getInternalState(streamer, "lastException");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+        IOException dummy = new IOException("dummy");
+        ex.set(dummy);
+        try {
+            dos.close();
+        } catch (IOException e) {
+            assertEquals(e, dummy);
+        }
+        thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+    }
+
+    @Test
+    public void testCloseTwice_withUpgrade40() throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        DataStreamer streamer = (DataStreamer) Whitebox.getInternalState(dos, "streamer");
+        @SuppressWarnings("unchecked")
+        LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox.getInternalState(streamer, "lastException");
+        Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        IOException dummy = new IOException("dummy");
+        ex.set(dummy);
+        try {
+            dos.close();
+        } catch (IOException e) {
+            assertEquals(e, dummy);
+        }
+        thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+    }
+
+    @Test
+    public void testCloseTwice_withUpgrade60() throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        DataStreamer streamer = (DataStreamer) Whitebox.getInternalState(dos, "streamer");
+        @SuppressWarnings("unchecked")
+        LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox.getInternalState(streamer, "lastException");
+        Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+        IOException dummy = new IOException("dummy");
+        ex.set(dummy);
+        try {
+            dos.close();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } catch (IOException e) {
+            assertEquals(e, dummy);
+        }
+        thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+    }
+
+    @Test
+    public void testCloseTwice_withUpgrade80() throws IOException {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        DataStreamer streamer = (DataStreamer) Whitebox.getInternalState(dos, "streamer");
+        @SuppressWarnings("unchecked")
+        LastExceptionInStreamer ex = (LastExceptionInStreamer) Whitebox.getInternalState(streamer, "lastException");
+        Throwable thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+        IOException dummy = new IOException("dummy");
+        ex.set(dummy);
+        try {
+            dos.close();
+        } catch (IOException e) {
+            assertEquals(e, dummy);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        thrown = (Throwable) Whitebox.getInternalState(ex, "thrown");
+        Assert.assertNull(thrown);
+        dos.close();
+    }
+
+    @Test
+    public void testComputePacketChunkSize_withUpgrade20() throws Exception {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        final int packetSize = 64 * 1024;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        final int bytesPerChecksum = 512;
+        Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
+        method.setAccessible(true);
+        method.invoke(dos, packetSize, bytesPerChecksum);
+        Field field = dos.getClass().getDeclaredField("packetSize");
+        field.setAccessible(true);
+        Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
+        // without a fix on HDFS-7308.
+        Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
+    }
+
+    @Test
+    public void testComputePacketChunkSize_withUpgrade40() throws Exception {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        final int packetSize = 64 * 1024;
+        final int bytesPerChecksum = 512;
+        Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        method.setAccessible(true);
+        method.invoke(dos, packetSize, bytesPerChecksum);
+        Field field = dos.getClass().getDeclaredField("packetSize");
+        field.setAccessible(true);
+        Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
+        // without a fix on HDFS-7308.
+        Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
+    }
+
+    @Test
+    public void testComputePacketChunkSize_withUpgrade60() throws Exception {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        final int packetSize = 64 * 1024;
+        final int bytesPerChecksum = 512;
+        Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
+        method.setAccessible(true);
+        method.invoke(dos, packetSize, bytesPerChecksum);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Field field = dos.getClass().getDeclaredField("packetSize");
+        field.setAccessible(true);
+        Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
+        // without a fix on HDFS-7308.
+        Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
+    }
+
+    @Test
+    public void testComputePacketChunkSize_withUpgrade80() throws Exception {
+        DistributedFileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/test"));
+        DFSOutputStream dos = (DFSOutputStream) Whitebox.getInternalState(os, "wrappedStream");
+        final int packetSize = 64 * 1024;
+        final int bytesPerChecksum = 512;
+        Method method = dos.getClass().getDeclaredMethod("computePacketChunkSize", int.class, int.class);
+        method.setAccessible(true);
+        method.invoke(dos, packetSize, bytesPerChecksum);
+        Field field = dos.getClass().getDeclaredField("packetSize");
+        field.setAccessible(true);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue((Integer) field.get(dos) + 33 < packetSize);
+        // without a fix on HDFS-7308.
+        Assert.assertTrue((Integer) field.get(dos) + 257 < packetSize);
+    }
+
+    @Test
+    public void testEndLeaseCall_withUpgrade20() throws Exception {
+        Configuration conf = new Configuration();
+        DFSClient client = new DFSClient(cluster.getNameNode(0).getNameNodeAddress(), conf);
+        DFSClient spyClient = Mockito.spy(client);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSOutputStream dfsOutputStream = spyClient.create("/file2", FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null, 1024, null);
+        DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
+        spyDFSOutputStream.closeThreads(anyBoolean());
+        verify(spyClient, times(1)).endFileLease(anyLong());
+    }
+
+    @Test
+    public void testEndLeaseCall_withUpgrade40() throws Exception {
+        Configuration conf = new Configuration();
+        DFSClient client = new DFSClient(cluster.getNameNode(0).getNameNodeAddress(), conf);
+        DFSClient spyClient = Mockito.spy(client);
+        DFSOutputStream dfsOutputStream = spyClient.create("/file2", FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null, 1024, null);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
+        spyDFSOutputStream.closeThreads(anyBoolean());
+        verify(spyClient, times(1)).endFileLease(anyLong());
+    }
+
+    @Test
+    public void testEndLeaseCall_withUpgrade60() throws Exception {
+        Configuration conf = new Configuration();
+        DFSClient client = new DFSClient(cluster.getNameNode(0).getNameNodeAddress(), conf);
+        DFSClient spyClient = Mockito.spy(client);
+        DFSOutputStream dfsOutputStream = spyClient.create("/file2", FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null, 1024, null);
+        DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        spyDFSOutputStream.closeThreads(anyBoolean());
+        verify(spyClient, times(1)).endFileLease(anyLong());
+    }
+
+    @Test
+    public void testEndLeaseCall_withUpgrade80() throws Exception {
+        Configuration conf = new Configuration();
+        DFSClient client = new DFSClient(cluster.getNameNode(0).getNameNodeAddress(), conf);
+        DFSClient spyClient = Mockito.spy(client);
+        DFSOutputStream dfsOutputStream = spyClient.create("/file2", FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), (short) 3, 1024, null, 1024, null);
+        DFSOutputStream spyDFSOutputStream = Mockito.spy(dfsOutputStream);
+        spyDFSOutputStream.closeThreads(anyBoolean());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        verify(spyClient, times(1)).endFileLease(anyLong());
+    }
+
+    @Test
+    public void testStreamFlush_withUpgrade20() throws Exception {
+        FileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/normal-file"));
+        // Verify output stream supports hsync() and hflush().
+        assertTrue("DFSOutputStream should support hflush()!", os.hasCapability(StreamCapability.HFLUSH.getValue()));
+        assertTrue("DFSOutputStream should support hsync()!", os.hasCapability(StreamCapability.HSYNC.getValue()));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        byte[] bytes = new byte[1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hflush();
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+    }
+
+    @Test
+    public void testStreamFlush_withUpgrade40() throws Exception {
+        FileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/normal-file"));
+        // Verify output stream supports hsync() and hflush().
+        assertTrue("DFSOutputStream should support hflush()!", os.hasCapability(StreamCapability.HFLUSH.getValue()));
+        assertTrue("DFSOutputStream should support hsync()!", os.hasCapability(StreamCapability.HSYNC.getValue()));
+        byte[] bytes = new byte[1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hflush();
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+    }
+
+    @Test
+    public void testStreamFlush_withUpgrade60() throws Exception {
+        FileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/normal-file"));
+        // Verify output stream supports hsync() and hflush().
+        assertTrue("DFSOutputStream should support hflush()!", os.hasCapability(StreamCapability.HFLUSH.getValue()));
+        assertTrue("DFSOutputStream should support hsync()!", os.hasCapability(StreamCapability.HSYNC.getValue()));
+        byte[] bytes = new byte[1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hflush();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+    }
+
+    @Test
+    public void testStreamFlush_withUpgrade80() throws Exception {
+        FileSystem fs = cluster.getFileSystem();
+        FSDataOutputStream os = fs.create(new Path("/normal-file"));
+        // Verify output stream supports hsync() and hflush().
+        assertTrue("DFSOutputStream should support hflush()!", os.hasCapability(StreamCapability.HFLUSH.getValue()));
+        assertTrue("DFSOutputStream should support hsync()!", os.hasCapability(StreamCapability.HSYNC.getValue()));
+        byte[] bytes = new byte[1024];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hflush();
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        os.close();
+    }
 }

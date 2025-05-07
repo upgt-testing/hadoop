@@ -18,9 +18,7 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -39,92 +37,260 @@ import org.junit.Test;
  * Test abandoning blocks, which clients do on pipeline creation failure.
  */
 public class TestAbandonBlock {
-  public static final Log LOG = LogFactory.getLog(TestAbandonBlock.class);
-  
-  private static final Configuration CONF = new HdfsConfiguration();
-  static final String FILE_NAME_PREFIX
-      = "/" + TestAbandonBlock.class.getSimpleName() + "_"; 
-  private MiniDFSClusterInJVM cluster;
-  private DistributedFileSystem fs;
 
-  @Before
-  public void setUp() throws Exception {
-    cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(2).build();
-    fs = cluster.getFileSystem();
-    cluster.waitActive();
-  }
+    public static final Log LOG = LogFactory.getLog(TestAbandonBlock.class);
 
-  @After
-  public void tearDown() throws Exception {
-    if (fs != null) {
-      fs.close();
-      fs = null;
-    }
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private static final Configuration CONF = new HdfsConfiguration();
 
-  @Test
-  /** Abandon a block while creating a file */
-  public void testAbandonBlock() throws IOException {
-    String src = FILE_NAME_PREFIX + "foo";
+    static final String FILE_NAME_PREFIX = "/" + TestAbandonBlock.class.getSimpleName() + "_";
 
-    // Start writing a file but do not close it
-    FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short)1, 512L);
-    for (int i = 0; i < 1024; i++) {
-      fout.write(123);
-    }
-    fout.hflush();
-    long fileId = ((DFSOutputStream)fout.getWrappedStream()).getFileId();
+    private MiniDFSClusterInJVM cluster;
 
-    // Now abandon the last block
-    DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
-    LocatedBlocks blocks =
-      dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
-    int orginalNumBlocks = blocks.locatedBlockCount();
-    LocatedBlock b = blocks.getLastLocatedBlock();
-    dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src,
-        dfsclient.clientName);
-    
-    // call abandonBlock again to make sure the operation is idempotent
-    dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src,
-        dfsclient.clientName);
+    private DistributedFileSystem fs;
 
-    // And close the file
-    fout.close();
-
-    // Close cluster and check the block has been abandoned after restart
-    cluster.restartNameNode();
-    blocks = dfsclient.getNamenode().getBlockLocations(src, 0,
-        Integer.MAX_VALUE);
-    Assert.assertEquals("Blocks " + b + " has not been abandoned.",
-        orginalNumBlocks, blocks.locatedBlockCount() + 1);
-  }
-
-  @Test
-  /** Make sure that the quota is decremented correctly when a block is abandoned */
-  public void testQuotaUpdatedWhenBlockAbandoned() throws IOException {
-    // Setting diskspace quota to 3MB
-    fs.setQuota(new Path("/"), HdfsConstants.QUOTA_DONT_SET, 3 * 1024 * 1024);
-
-    // Start writing a file with 2 replicas to ensure each datanode has one.
-    // Block Size is 1MB.
-    String src = FILE_NAME_PREFIX + "test_quota1";
-    FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short)2, 1024 * 1024);
-    for (int i = 0; i < 1024; i++) {
-      fout.writeByte(123);
+    @Before
+    public void setUp() throws Exception {
+        cluster = new MiniDFSClusterInJVM.Builder(CONF).numDataNodes(2).build();
+        fs = cluster.getFileSystem();
+        cluster.waitActive();
     }
 
-    // Shutdown one datanode, causing the block abandonment.
-    cluster.getDataNodes().get(0).shutdown();
-
-    // Close the file, new block will be allocated with 2MB pending size.
-    try {
-      fout.close();
-    } catch (QuotaExceededException e) {
-      fail("Unexpected quota exception when closing fout");
+    @After
+    public void tearDown() throws Exception {
+        if (fs != null) {
+            fs.close();
+            fs = null;
+        }
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-  }
+
+    @Test
+    public /**
+     * Abandon a block while creating a file
+     */
+    void testAbandonBlock() throws IOException {
+        String src = FILE_NAME_PREFIX + "foo";
+        // Start writing a file but do not close it
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 1, 512L);
+        for (int i = 0; i < 1024; i++) {
+            fout.write(123);
+        }
+        fout.hflush();
+        long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
+        // Now abandon the last block
+        DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        int orginalNumBlocks = blocks.locatedBlockCount();
+        LocatedBlock b = blocks.getLastLocatedBlock();
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // call abandonBlock again to make sure the operation is idempotent
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // And close the file
+        fout.close();
+        // Close cluster and check the block has been abandoned after restart
+        cluster.restartNameNode();
+        blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        Assert.assertEquals("Blocks " + b + " has not been abandoned.", orginalNumBlocks, blocks.locatedBlockCount() + 1);
+    }
+
+    @Test
+    public /**
+     * Make sure that the quota is decremented correctly when a block is abandoned
+     */
+    void testQuotaUpdatedWhenBlockAbandoned() throws IOException {
+        // Setting diskspace quota to 3MB
+        fs.setQuota(new Path("/"), HdfsConstants.QUOTA_DONT_SET, 3 * 1024 * 1024);
+        // Start writing a file with 2 replicas to ensure each datanode has one.
+        // Block Size is 1MB.
+        String src = FILE_NAME_PREFIX + "test_quota1";
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 2, 1024 * 1024);
+        for (int i = 0; i < 1024; i++) {
+            fout.writeByte(123);
+        }
+        // Shutdown one datanode, causing the block abandonment.
+        cluster.getDataNodes().get(0).shutdown();
+        // Close the file, new block will be allocated with 2MB pending size.
+        try {
+            fout.close();
+        } catch (QuotaExceededException e) {
+            fail("Unexpected quota exception when closing fout");
+        }
+    }
+
+    @Test
+    public /**
+     * Abandon a block while creating a file
+     */
+    void testAbandonBlock_withUpgrade20() throws IOException {
+        String src = FILE_NAME_PREFIX + "foo";
+        // Start writing a file but do not close it
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 1, 512L);
+        for (int i = 0; i < 1024; i++) {
+            fout.write(123);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        fout.hflush();
+        long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
+        // Now abandon the last block
+        DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        int orginalNumBlocks = blocks.locatedBlockCount();
+        LocatedBlock b = blocks.getLastLocatedBlock();
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // call abandonBlock again to make sure the operation is idempotent
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // And close the file
+        fout.close();
+        // Close cluster and check the block has been abandoned after restart
+        cluster.restartNameNode();
+        blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        Assert.assertEquals("Blocks " + b + " has not been abandoned.", orginalNumBlocks, blocks.locatedBlockCount() + 1);
+    }
+
+    @Test
+    public /**
+     * Abandon a block while creating a file
+     */
+    void testAbandonBlock_withUpgrade40() throws IOException {
+        String src = FILE_NAME_PREFIX + "foo";
+        // Start writing a file but do not close it
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 1, 512L);
+        for (int i = 0; i < 1024; i++) {
+            fout.write(123);
+        }
+        fout.hflush();
+        long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
+        // Now abandon the last block
+        DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        int orginalNumBlocks = blocks.locatedBlockCount();
+        LocatedBlock b = blocks.getLastLocatedBlock();
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // call abandonBlock again to make sure the operation is idempotent
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // And close the file
+        fout.close();
+        // Close cluster and check the block has been abandoned after restart
+        cluster.restartNameNode();
+        blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        Assert.assertEquals("Blocks " + b + " has not been abandoned.", orginalNumBlocks, blocks.locatedBlockCount() + 1);
+    }
+
+    @Test
+    public /**
+     * Abandon a block while creating a file
+     */
+    void testAbandonBlock_withUpgrade60() throws IOException {
+        String src = FILE_NAME_PREFIX + "foo";
+        // Start writing a file but do not close it
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 1, 512L);
+        for (int i = 0; i < 1024; i++) {
+            fout.write(123);
+        }
+        fout.hflush();
+        long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
+        // Now abandon the last block
+        DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        int orginalNumBlocks = blocks.locatedBlockCount();
+        LocatedBlock b = blocks.getLastLocatedBlock();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // call abandonBlock again to make sure the operation is idempotent
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // And close the file
+        fout.close();
+        // Close cluster and check the block has been abandoned after restart
+        cluster.restartNameNode();
+        blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        Assert.assertEquals("Blocks " + b + " has not been abandoned.", orginalNumBlocks, blocks.locatedBlockCount() + 1);
+    }
+
+    @Test
+    public /**
+     * Abandon a block while creating a file
+     */
+    void testAbandonBlock_withUpgrade80() throws IOException {
+        String src = FILE_NAME_PREFIX + "foo";
+        // Start writing a file but do not close it
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 1, 512L);
+        for (int i = 0; i < 1024; i++) {
+            fout.write(123);
+        }
+        fout.hflush();
+        long fileId = ((DFSOutputStream) fout.getWrappedStream()).getFileId();
+        // Now abandon the last block
+        DFSClient dfsclient = DFSClientAdapter.getDFSClient(fs);
+        LocatedBlocks blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        int orginalNumBlocks = blocks.locatedBlockCount();
+        LocatedBlock b = blocks.getLastLocatedBlock();
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // call abandonBlock again to make sure the operation is idempotent
+        dfsclient.getNamenode().abandonBlock(b.getBlock(), fileId, src, dfsclient.clientName);
+        // And close the file
+        fout.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Close cluster and check the block has been abandoned after restart
+        cluster.restartNameNode();
+        blocks = dfsclient.getNamenode().getBlockLocations(src, 0, Integer.MAX_VALUE);
+        Assert.assertEquals("Blocks " + b + " has not been abandoned.", orginalNumBlocks, blocks.locatedBlockCount() + 1);
+    }
+
+    @Test
+    public /**
+     * Make sure that the quota is decremented correctly when a block is abandoned
+     */
+    void testQuotaUpdatedWhenBlockAbandoned_withUpgrade20() throws IOException {
+        // Setting diskspace quota to 3MB
+        fs.setQuota(new Path("/"), HdfsConstants.QUOTA_DONT_SET, 3 * 1024 * 1024);
+        // Block Size is 1MB.
+        String src = FILE_NAME_PREFIX + "test_quota1";
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 2, 1024 * 1024);
+        for (int i = 0; i < 1024; i++) {
+            fout.writeByte(123);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // Shutdown one datanode, causing the block abandonment.
+        cluster.getDataNodes().get(0).shutdown();
+        // Close the file, new block will be allocated with 2MB pending size.
+        try {
+            fout.close();
+        } catch (QuotaExceededException e) {
+            fail("Unexpected quota exception when closing fout");
+        }
+    }
+
+    @Test
+    public /**
+     * Make sure that the quota is decremented correctly when a block is abandoned
+     */
+    void testQuotaUpdatedWhenBlockAbandoned_withUpgrade60() throws IOException {
+        // Setting diskspace quota to 3MB
+        fs.setQuota(new Path("/"), HdfsConstants.QUOTA_DONT_SET, 3 * 1024 * 1024);
+        // Block Size is 1MB.
+        String src = FILE_NAME_PREFIX + "test_quota1";
+        FSDataOutputStream fout = fs.create(new Path(src), true, 4096, (short) 2, 1024 * 1024);
+        for (int i = 0; i < 1024; i++) {
+            fout.writeByte(123);
+        }
+        // Shutdown one datanode, causing the block abandonment.
+        cluster.getDataNodes().get(0).shutdown();
+        // Close the file, new block will be allocated with 2MB pending size.
+        try {
+            fout.close();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } catch (QuotaExceededException e) {
+            fail("Unexpected quota exception when closing fout");
+        }
+    }
 }

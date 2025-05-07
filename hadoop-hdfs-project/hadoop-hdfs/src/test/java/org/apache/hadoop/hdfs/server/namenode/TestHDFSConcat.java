@@ -17,16 +17,13 @@
  */
 package org.apache.hadoop.hdfs.server.namenode;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocolsJVMInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,54 +49,56 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestHDFSConcat {
-  public static final Log LOG = LogFactory.getLog(TestHDFSConcat.class);
 
-  private static final short REPL_FACTOR = 2;
-  
-  private MiniDFSClusterInJVM cluster;
-  private NamenodeProtocolsJVMInterface nn;
-  private DistributedFileSystem dfs;
+    public static final Log LOG = LogFactory.getLog(TestHDFSConcat.class);
 
-  private static final long blockSize = 512;
+    private static final short REPL_FACTOR = 2;
 
-  
-  private static final Configuration conf;
+    private MiniDFSClusterInJVM cluster;
 
-  static {
-    conf = new Configuration();
-    conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
-  }
-  
-  @Before
-  public void startUpCluster() throws IOException {
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL_FACTOR).build();
-    assertNotNull("Failed Cluster Creation", cluster);
-    cluster.waitClusterUp();
-    dfs = cluster.getFileSystem();
-    assertNotNull("Failed to get FileSystem", dfs);
-    nn = cluster.getNameNodeRpc();
-    assertNotNull("Failed to get NameNode", nn);
-  }
+    private NamenodeProtocolsJVMInterface nn;
 
-  @After
-  public void shutDownCluster() throws IOException {
-    if(dfs != null) {
-      dfs.close();
-      dfs = null;
+    private DistributedFileSystem dfs;
+
+    private static final long blockSize = 512;
+
+    private static final Configuration conf;
+
+    static {
+        conf = new Configuration();
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     }
-    if(cluster != null) {
-      cluster.shutdownDataNodes();
-      cluster.shutdown();
-      cluster = null;
+
+    @Before
+    public void startUpCluster() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(REPL_FACTOR).build();
+        assertNotNull("Failed Cluster Creation", cluster);
+        cluster.waitClusterUp();
+        dfs = cluster.getFileSystem();
+        assertNotNull("Failed to get FileSystem", dfs);
+        nn = cluster.getNameNodeRpc();
+        assertNotNull("Failed to get NameNode", nn);
     }
-  }
-  
-  /**
-   * Concatenates 10 files into one
-   * Verifies the final size, deletion of the file, number of blocks
-   * @throws IOException
-   */
-  /*
+
+    @After
+    public void shutDownCluster() throws IOException {
+        if (dfs != null) {
+            dfs.close();
+            dfs = null;
+        }
+        if (cluster != null) {
+            cluster.shutdownDataNodes();
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    /**
+     * Concatenates 10 files into one
+     * Verifies the final size, deletion of the file, number of blocks
+     * @throws IOException
+     */
+    /*
   @Test
   public void testConcat() throws IOException, InterruptedException {
     final int numFiles = 10;
@@ -235,66 +234,56 @@ public class TestHDFSConcat {
     
   }
    */
-
-  /**
-   * Test that the concat operation is properly persisted in the
-   * edit log, and properly replayed on restart.
-   */
-  @Test
-  public void testConcatInEditLog() throws Exception {
-    final Path TEST_DIR = new Path("/testConcatInEditLog");
-    final long FILE_LEN = blockSize;
-    
-    // 1. Concat some files
-    Path[] srcFiles = new Path[3];
-    for (int i = 0; i < srcFiles.length; i++) {
-      Path path = new Path(TEST_DIR, "src-" + i);
-      DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
-      srcFiles[i] = path;
-    }    
-    Path targetFile = new Path(TEST_DIR, "target");
-    DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
-    
-    dfs.concat(targetFile, srcFiles);
-    
-    // 2. Verify the concat operation basically worked, and record
-    // file status.
-    assertTrue(dfs.exists(targetFile));
-    FileStatus origStatus = dfs.getFileStatus(targetFile);
-
-    // 3. Restart NN to force replay from edit log
-    cluster.restartNameNode(true);
-    
-    // 4. Verify concat operation was replayed correctly and file status
-    // did not change.
-    assertTrue(dfs.exists(targetFile));
-    assertFalse(dfs.exists(srcFiles[0]));
-
-    FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
-
-    assertEquals(origStatus.getModificationTime(),
-        statusAfterRestart.getModificationTime());
-  }
-
-  // compare content
-  private void checkFileContent(byte[] concat, byte[][] bytes ) {
-    int idx=0;
-    boolean mismatch = false;
-    
-    for(byte [] bb: bytes) {
-      for(byte b: bb) {
-        if(b != concat[idx++]) {
-          mismatch=true;
-          break;
+    /**
+     * Test that the concat operation is properly persisted in the
+     * edit log, and properly replayed on restart.
+     */
+    @Test
+    public void testConcatInEditLog() throws Exception {
+        final Path TEST_DIR = new Path("/testConcatInEditLog");
+        final long FILE_LEN = blockSize;
+        // 1. Concat some files
+        Path[] srcFiles = new Path[3];
+        for (int i = 0; i < srcFiles.length; i++) {
+            Path path = new Path(TEST_DIR, "src-" + i);
+            DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
+            srcFiles[i] = path;
         }
-      }
-      if(mismatch)
-        break;
+        Path targetFile = new Path(TEST_DIR, "target");
+        DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
+        dfs.concat(targetFile, srcFiles);
+        // 2. Verify the concat operation basically worked, and record
+        // file status.
+        assertTrue(dfs.exists(targetFile));
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
+        // 3. Restart NN to force replay from edit log
+        cluster.restartNameNode(true);
+        // 4. Verify concat operation was replayed correctly and file status
+        // did not change.
+        assertTrue(dfs.exists(targetFile));
+        assertFalse(dfs.exists(srcFiles[0]));
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
+        assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
     }
-    assertFalse("File content of concatenated file is different", mismatch);
-  }
 
-  /*
+    // compare content
+    private void checkFileContent(byte[] concat, byte[][] bytes) {
+        int idx = 0;
+        boolean mismatch = false;
+        for (byte[] bb : bytes) {
+            for (byte b : bb) {
+                if (b != concat[idx++]) {
+                    mismatch = true;
+                    break;
+                }
+            }
+            if (mismatch)
+                break;
+        }
+        assertFalse("File content of concatenated file is different", mismatch);
+    }
+
+    /*
   // test case when final block is not of a full length
   @Test
   public void testConcatNotCompleteBlock() throws IOException {
@@ -368,165 +357,259 @@ public class TestHDFSConcat {
     checkFileContent(byteFileConcat, new byte [] [] {byteFile1, byteFile2});
   }
    */
-
-  /**
-   * test illegal args cases
-   */
-  @Test
-  public void testIllegalArg() throws IOException {
-    long fileLen = blockSize*3;
-    
-    Path parentDir  = new Path ("/parentTrg");
-    assertTrue(dfs.mkdirs(parentDir));
-    Path trg = new Path(parentDir, "trg");
-    DFSTestUtil.createFile(dfs, trg, fileLen, REPL_FACTOR, 1);
-
-    // must be in the same dir
-    {
-      // create first file
-      Path dir1 = new Path ("/dir1");
-      assertTrue(dfs.mkdirs(dir1));
-      Path src = new Path(dir1, "src");
-      DFSTestUtil.createFile(dfs, src, fileLen, REPL_FACTOR, 1);
-      
-      try {
-        dfs.concat(trg, new Path [] {src});
-        fail("didn't fail for src and trg in different directories");
-      } catch (Exception e) {
-        // expected
-      }
-    }
-    // non existing file
-    try {
-      dfs.concat(trg, new Path [] {new Path("test1/a")}); // non existing file
-      fail("didn't fail with invalid arguments");
-    } catch (Exception e) {
-      //expected
-    }
-    // empty arg list
-    try {
-      dfs.concat(trg, new Path [] {}); // empty array
-      fail("didn't fail with invalid arguments");
-    } catch (Exception e) {
-      // exspected
-    }
-
-    // the source file's preferred block size cannot be greater than the target
-    {
-      final Path src1 = new Path(parentDir, "src1");
-      DFSTestUtil.createFile(dfs, src1, fileLen, REPL_FACTOR, 0L);
-      final Path src2 = new Path(parentDir, "src2");
-      // create a file whose preferred block size is greater than the target
-      DFSTestUtil.createFile(dfs, src2, 1024, fileLen,
-          dfs.getDefaultBlockSize(trg) * 2, REPL_FACTOR, 0L);
-      try {
-        dfs.concat(trg, new Path[] {src1, src2});
-        fail("didn't fail for src with greater preferred block size");
-      } catch (Exception e) {
-        GenericTestUtils.assertExceptionContains("preferred block size", e);
-      }
-    }
-  }
-
-  /**
-   * make sure we update the quota correctly after concat
-   */
-  @Test
-  public void testConcatWithQuotaDecrease() throws IOException {
-    final short srcRepl = 3; // note this is different with REPL_FACTOR
-    final int srcNum = 10;
-    final Path foo = new Path("/foo");
-    final Path[] srcs = new Path[srcNum];
-    final Path target = new Path(foo, "target");
-    DFSTestUtil.createFile(dfs, target, blockSize, REPL_FACTOR, 0L);
-
-    dfs.setQuota(foo, Long.MAX_VALUE - 1, Long.MAX_VALUE - 1);
-
-    for (int i = 0; i < srcNum; i++) {
-      srcs[i] = new Path(foo, "src" + i);
-      DFSTestUtil.createFile(dfs, srcs[i], blockSize * 2, srcRepl, 0L);
+    /**
+     * test illegal args cases
+     */
+    @Test
+    public void testIllegalArg() throws IOException {
+        long fileLen = blockSize * 3;
+        Path parentDir = new Path("/parentTrg");
+        assertTrue(dfs.mkdirs(parentDir));
+        Path trg = new Path(parentDir, "trg");
+        DFSTestUtil.createFile(dfs, trg, fileLen, REPL_FACTOR, 1);
+        // must be in the same dir
+        {
+            // create first file
+            Path dir1 = new Path("/dir1");
+            assertTrue(dfs.mkdirs(dir1));
+            Path src = new Path(dir1, "src");
+            DFSTestUtil.createFile(dfs, src, fileLen, REPL_FACTOR, 1);
+            try {
+                dfs.concat(trg, new Path[] { src });
+                fail("didn't fail for src and trg in different directories");
+            } catch (Exception e) {
+                // expected
+            }
+        }
+        // non existing file
+        try {
+            // non existing file
+            dfs.concat(trg, new Path[] { new Path("test1/a") });
+            fail("didn't fail with invalid arguments");
+        } catch (Exception e) {
+            //expected
+        }
+        // empty arg list
+        try {
+            // empty array
+            dfs.concat(trg, new Path[] {});
+            fail("didn't fail with invalid arguments");
+        } catch (Exception e) {
+            // exspected
+        }
+        // the source file's preferred block size cannot be greater than the target
+        {
+            final Path src1 = new Path(parentDir, "src1");
+            DFSTestUtil.createFile(dfs, src1, fileLen, REPL_FACTOR, 0L);
+            final Path src2 = new Path(parentDir, "src2");
+            // create a file whose preferred block size is greater than the target
+            DFSTestUtil.createFile(dfs, src2, 1024, fileLen, dfs.getDefaultBlockSize(trg) * 2, REPL_FACTOR, 0L);
+            try {
+                dfs.concat(trg, new Path[] { src1, src2 });
+                fail("didn't fail for src with greater preferred block size");
+            } catch (Exception e) {
+                GenericTestUtils.assertExceptionContains("preferred block size", e);
+            }
+        }
     }
 
-    ContentSummary summary = dfs.getContentSummary(foo);
-    Assert.assertEquals(11, summary.getFileCount());
-    Assert.assertEquals(blockSize * REPL_FACTOR +
-            blockSize * 2 * srcRepl * srcNum, summary.getSpaceConsumed());
-
-    dfs.concat(target, srcs);
-    summary = dfs.getContentSummary(foo);
-    Assert.assertEquals(1, summary.getFileCount());
-    Assert.assertEquals(
-        blockSize * REPL_FACTOR + blockSize * 2 * REPL_FACTOR * srcNum,
-        summary.getSpaceConsumed());
-  }
-
-  @Test
-  public void testConcatWithQuotaIncrease() throws IOException {
-    final short repl = 3;
-    final int srcNum = 10;
-    final Path foo = new Path("/foo");
-    final Path bar = new Path(foo, "bar");
-    final Path[] srcs = new Path[srcNum];
-    final Path target = new Path(bar, "target");
-    DFSTestUtil.createFile(dfs, target, blockSize, repl, 0L);
-
-    final long dsQuota = blockSize * repl + blockSize * srcNum * REPL_FACTOR;
-    dfs.setQuota(foo, Long.MAX_VALUE - 1, dsQuota);
-
-    for (int i = 0; i < srcNum; i++) {
-      srcs[i] = new Path(bar, "src" + i);
-      DFSTestUtil.createFile(dfs, srcs[i], blockSize, REPL_FACTOR, 0L);
+    /**
+     * make sure we update the quota correctly after concat
+     */
+    @Test
+    public void testConcatWithQuotaDecrease() throws IOException {
+        // note this is different with REPL_FACTOR
+        final short srcRepl = 3;
+        final int srcNum = 10;
+        final Path foo = new Path("/foo");
+        final Path[] srcs = new Path[srcNum];
+        final Path target = new Path(foo, "target");
+        DFSTestUtil.createFile(dfs, target, blockSize, REPL_FACTOR, 0L);
+        dfs.setQuota(foo, Long.MAX_VALUE - 1, Long.MAX_VALUE - 1);
+        for (int i = 0; i < srcNum; i++) {
+            srcs[i] = new Path(foo, "src" + i);
+            DFSTestUtil.createFile(dfs, srcs[i], blockSize * 2, srcRepl, 0L);
+        }
+        ContentSummary summary = dfs.getContentSummary(foo);
+        Assert.assertEquals(11, summary.getFileCount());
+        Assert.assertEquals(blockSize * REPL_FACTOR + blockSize * 2 * srcRepl * srcNum, summary.getSpaceConsumed());
+        dfs.concat(target, srcs);
+        summary = dfs.getContentSummary(foo);
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(blockSize * REPL_FACTOR + blockSize * 2 * REPL_FACTOR * srcNum, summary.getSpaceConsumed());
     }
 
-    ContentSummary summary = dfs.getContentSummary(bar);
-    Assert.assertEquals(11, summary.getFileCount());
-    Assert.assertEquals(dsQuota, summary.getSpaceConsumed());
-
-    try {
-      dfs.concat(target, srcs);
-      fail("QuotaExceededException expected");
-    } catch (RemoteException e) {
-      Assert.assertTrue(
-          e.unwrapRemoteException() instanceof QuotaExceededException);
+    @Test
+    public void testConcatWithQuotaIncrease() throws IOException {
+        final short repl = 3;
+        final int srcNum = 10;
+        final Path foo = new Path("/foo");
+        final Path bar = new Path(foo, "bar");
+        final Path[] srcs = new Path[srcNum];
+        final Path target = new Path(bar, "target");
+        DFSTestUtil.createFile(dfs, target, blockSize, repl, 0L);
+        final long dsQuota = blockSize * repl + blockSize * srcNum * REPL_FACTOR;
+        dfs.setQuota(foo, Long.MAX_VALUE - 1, dsQuota);
+        for (int i = 0; i < srcNum; i++) {
+            srcs[i] = new Path(bar, "src" + i);
+            DFSTestUtil.createFile(dfs, srcs[i], blockSize, REPL_FACTOR, 0L);
+        }
+        ContentSummary summary = dfs.getContentSummary(bar);
+        Assert.assertEquals(11, summary.getFileCount());
+        Assert.assertEquals(dsQuota, summary.getSpaceConsumed());
+        try {
+            dfs.concat(target, srcs);
+            fail("QuotaExceededException expected");
+        } catch (RemoteException e) {
+            Assert.assertTrue(e.unwrapRemoteException() instanceof QuotaExceededException);
+        }
+        dfs.setQuota(foo, Long.MAX_VALUE - 1, Long.MAX_VALUE - 1);
+        dfs.concat(target, srcs);
+        summary = dfs.getContentSummary(bar);
+        Assert.assertEquals(1, summary.getFileCount());
+        Assert.assertEquals(blockSize * repl * (srcNum + 1), summary.getSpaceConsumed());
     }
 
-    dfs.setQuota(foo, Long.MAX_VALUE - 1, Long.MAX_VALUE - 1);
-    dfs.concat(target, srcs);
-    summary = dfs.getContentSummary(bar);
-    Assert.assertEquals(1, summary.getFileCount());
-    Assert.assertEquals(blockSize * repl * (srcNum + 1),
-        summary.getSpaceConsumed());
-  }
-
-  @Test
-  public void testConcatRelativeTargetPath() throws IOException {
-    Path dir = new Path("/dir");
-    Path trg = new Path("trg");
-    Path src = new Path(dir, "src");
-    dfs.setWorkingDirectory(dir);
-    DFSTestUtil.createFile(dfs, trg, blockSize, REPL_FACTOR, 1);
-    DFSTestUtil.createFile(dfs, src, blockSize, REPL_FACTOR, 1);
-    dfs.concat(trg, new Path[]{src});
-    assertEquals(blockSize * 2, dfs.getFileStatus(trg).getLen());
-    assertFalse(dfs.exists(src));
-  }
-
-  @Test(timeout = 30000)
-  public void testConcatReservedRelativePaths() throws IOException {
-    String testPathDir = "/.reserved/raw/ezone";
-    Path dir = new Path(testPathDir);
-    dfs.mkdirs(dir);
-    Path trg = new Path(testPathDir, "trg");
-    Path src = new Path(testPathDir, "src");
-    DFSTestUtil.createFile(dfs, trg, blockSize, REPL_FACTOR, 1);
-    DFSTestUtil.createFile(dfs, src, blockSize, REPL_FACTOR, 1);
-    try {
-      dfs.concat(trg, new Path[] { src });
-      Assert.fail("Must throw Exception!");
-    } catch (IOException e) {
-      String errMsg = "Concat operation doesn't support "
-          + FSDirectory.DOT_RESERVED_STRING + " relative path : " + trg;
-      GenericTestUtils.assertExceptionContains(errMsg, e);
+    @Test
+    public void testConcatRelativeTargetPath() throws IOException {
+        Path dir = new Path("/dir");
+        Path trg = new Path("trg");
+        Path src = new Path(dir, "src");
+        dfs.setWorkingDirectory(dir);
+        DFSTestUtil.createFile(dfs, trg, blockSize, REPL_FACTOR, 1);
+        DFSTestUtil.createFile(dfs, src, blockSize, REPL_FACTOR, 1);
+        dfs.concat(trg, new Path[] { src });
+        assertEquals(blockSize * 2, dfs.getFileStatus(trg).getLen());
+        assertFalse(dfs.exists(src));
     }
-  }
+
+    @Test(timeout = 30000)
+    public void testConcatReservedRelativePaths() throws IOException {
+        String testPathDir = "/.reserved/raw/ezone";
+        Path dir = new Path(testPathDir);
+        dfs.mkdirs(dir);
+        Path trg = new Path(testPathDir, "trg");
+        Path src = new Path(testPathDir, "src");
+        DFSTestUtil.createFile(dfs, trg, blockSize, REPL_FACTOR, 1);
+        DFSTestUtil.createFile(dfs, src, blockSize, REPL_FACTOR, 1);
+        try {
+            dfs.concat(trg, new Path[] { src });
+            Assert.fail("Must throw Exception!");
+        } catch (IOException e) {
+            String errMsg = "Concat operation doesn't support " + FSDirectory.DOT_RESERVED_STRING + " relative path : " + trg;
+            GenericTestUtils.assertExceptionContains(errMsg, e);
+        }
+    }
+
+    @Test
+    public void testConcatInEditLog_withUpgrade20() throws Exception {
+        final Path TEST_DIR = new Path("/testConcatInEditLog");
+        final long FILE_LEN = blockSize;
+        // 1. Concat some files
+        Path[] srcFiles = new Path[3];
+        for (int i = 0; i < srcFiles.length; i++) {
+            Path path = new Path(TEST_DIR, "src-" + i);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
+            srcFiles[i] = path;
+        }
+        Path targetFile = new Path(TEST_DIR, "target");
+        DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
+        dfs.concat(targetFile, srcFiles);
+        // file status.
+        assertTrue(dfs.exists(targetFile));
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
+        // 3. Restart NN to force replay from edit log
+        cluster.restartNameNode(true);
+        // did not change.
+        assertTrue(dfs.exists(targetFile));
+        assertFalse(dfs.exists(srcFiles[0]));
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
+        assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
+    }
+
+    @Test
+    public void testConcatInEditLog_withUpgrade40() throws Exception {
+        final Path TEST_DIR = new Path("/testConcatInEditLog");
+        final long FILE_LEN = blockSize;
+        // 1. Concat some files
+        Path[] srcFiles = new Path[3];
+        for (int i = 0; i < srcFiles.length; i++) {
+            Path path = new Path(TEST_DIR, "src-" + i);
+            DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
+            srcFiles[i] = path;
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        Path targetFile = new Path(TEST_DIR, "target");
+        DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
+        dfs.concat(targetFile, srcFiles);
+        // file status.
+        assertTrue(dfs.exists(targetFile));
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
+        // 3. Restart NN to force replay from edit log
+        cluster.restartNameNode(true);
+        // did not change.
+        assertTrue(dfs.exists(targetFile));
+        assertFalse(dfs.exists(srcFiles[0]));
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
+        assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
+    }
+
+    @Test
+    public void testConcatInEditLog_withUpgrade60() throws Exception {
+        final Path TEST_DIR = new Path("/testConcatInEditLog");
+        final long FILE_LEN = blockSize;
+        // 1. Concat some files
+        Path[] srcFiles = new Path[3];
+        for (int i = 0; i < srcFiles.length; i++) {
+            Path path = new Path(TEST_DIR, "src-" + i);
+            DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
+            srcFiles[i] = path;
+        }
+        Path targetFile = new Path(TEST_DIR, "target");
+        DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
+        dfs.concat(targetFile, srcFiles);
+        // file status.
+        assertTrue(dfs.exists(targetFile));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
+        // 3. Restart NN to force replay from edit log
+        cluster.restartNameNode(true);
+        // did not change.
+        assertTrue(dfs.exists(targetFile));
+        assertFalse(dfs.exists(srcFiles[0]));
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
+        assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
+    }
+
+    @Test
+    public void testConcatInEditLog_withUpgrade80() throws Exception {
+        final Path TEST_DIR = new Path("/testConcatInEditLog");
+        final long FILE_LEN = blockSize;
+        // 1. Concat some files
+        Path[] srcFiles = new Path[3];
+        for (int i = 0; i < srcFiles.length; i++) {
+            Path path = new Path(TEST_DIR, "src-" + i);
+            DFSTestUtil.createFile(dfs, path, FILE_LEN, REPL_FACTOR, 1);
+            srcFiles[i] = path;
+        }
+        Path targetFile = new Path(TEST_DIR, "target");
+        DFSTestUtil.createFile(dfs, targetFile, FILE_LEN, REPL_FACTOR, 1);
+        dfs.concat(targetFile, srcFiles);
+        // file status.
+        assertTrue(dfs.exists(targetFile));
+        FileStatus origStatus = dfs.getFileStatus(targetFile);
+        // 3. Restart NN to force replay from edit log
+        cluster.restartNameNode(true);
+        // did not change.
+        assertTrue(dfs.exists(targetFile));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertFalse(dfs.exists(srcFiles[0]));
+        FileStatus statusAfterRestart = dfs.getFileStatus(targetFile);
+        assertEquals(origStatus.getModificationTime(), statusAfterRestart.getModificationTime());
+    }
 }

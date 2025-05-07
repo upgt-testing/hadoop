@@ -19,8 +19,6 @@ package org.apache.hadoop.hdfs.server.datanode;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-
 import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsVolumeReferencesJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.*;
 import org.apache.commons.logging.Log;
@@ -48,7 +46,6 @@ import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -59,85 +56,80 @@ import static org.junit.Assert.assertThat;
  * the same DataNode. Excess replicas on the same DN should be ignored by the NN.
  */
 public class TestBlockHasMultipleReplicasOnSameDN {
-  public static final Log LOG = LogFactory.getLog(TestBlockHasMultipleReplicasOnSameDN.class);
 
-  private static final short NUM_DATANODES = 2;
-  private static final int BLOCK_SIZE = 1024;
-  private static final long NUM_BLOCKS = 5;
-  private static final long seed = 0x1BADF00DL;
+    public static final Log LOG = LogFactory.getLog(TestBlockHasMultipleReplicasOnSameDN.class);
 
-  private Configuration conf;
-  private MiniDFSClusterInJVM cluster;
-  private DistributedFileSystem fs;
-  private DFSClient client;
-  private String bpid;
+    private static final short NUM_DATANODES = 2;
 
-  @Before
-  public void startUpCluster() throws IOException {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(NUM_DATANODES)
-        .build();
-    fs = cluster.getFileSystem();
-    client = fs.getClient();
-    bpid = cluster.getNamesystem().getBlockPoolId();
-  }
+    private static final int BLOCK_SIZE = 1024;
 
-  @After
-  public void shutDownCluster() throws IOException {
-    if (cluster != null) {
-      fs.close();
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private static final long NUM_BLOCKS = 5;
 
-  private String makeFileName(String prefix) {
-    return "/" + prefix + ".dat";
-  }
+    private static final long seed = 0x1BADF00DL;
 
-  /**
-   * Verify NameNode behavior when a given DN reports multiple replicas
-   * of a given block.
-   */
-  @Test
-  public void testBlockHasMultipleReplicasOnSameDN() throws IOException {
-    String filename = makeFileName(GenericTestUtils.getMethodName());
-    Path filePath = new Path(filename);
+    private Configuration conf;
 
-    // Write out a file with a few blocks.
-    DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS,
-                           BLOCK_SIZE, NUM_DATANODES, seed);
+    private MiniDFSClusterInJVM cluster;
 
-    // Get the block list for the file with the block locations.
-    LocatedBlocks locatedBlocks = client.getLocatedBlocks(
-        filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+    private DistributedFileSystem fs;
 
-    // Generate a fake block report from one of the DataNodes, such
-    // that it reports one copy of each block on either storage.
-    DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-    DatanodeRegistrationJVMInterface dnReg = dn.getDNRegistrationForBP(bpid);
-    StorageBlockReport reports[] =
-        new StorageBlockReport[cluster.getStoragesPerDatanode()];
+    private DFSClient client;
 
-    ArrayList<Replica> blocks = new ArrayList<Replica>();
+    private String bpid;
 
-    for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
-      Block localBlock = locatedBlock.getBlock().getLocalBlock();
-      blocks.add(new FinalizedReplica(localBlock, null, null));
+    @Before
+    public void startUpCluster() throws IOException {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(NUM_DATANODES).build();
+        fs = cluster.getFileSystem();
+        client = fs.getClient();
+        bpid = cluster.getNamesystem().getBlockPoolId();
     }
 
-    try (FsVolumeReferencesJVMInterface volumes =
-      dn.getFSDataset().getFsVolumeReferences()) {
-      BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
-      for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
-        DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
-        reports[i] = new StorageBlockReport(dns, bll);
-      }
+    @After
+    public void shutDownCluster() throws IOException {
+        if (cluster != null) {
+            fs.close();
+            cluster.shutdown();
+            cluster = null;
+        }
     }
 
-    // Should not assert!
-    /*
+    private String makeFileName(String prefix) {
+        return "/" + prefix + ".dat";
+    }
+
+    /**
+     * Verify NameNode behavior when a given DN reports multiple replicas
+     * of a given block.
+     */
+    @Test
+    public void testBlockHasMultipleReplicasOnSameDN() throws IOException {
+        String filename = makeFileName(GenericTestUtils.getMethodName());
+        Path filePath = new Path(filename);
+        // Write out a file with a few blocks.
+        DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
+        // Get the block list for the file with the block locations.
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        // Generate a fake block report from one of the DataNodes, such
+        // that it reports one copy of each block on either storage.
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        DatanodeRegistrationJVMInterface dnReg = dn.getDNRegistrationForBP(bpid);
+        StorageBlockReport[] reports = new StorageBlockReport[cluster.getStoragesPerDatanode()];
+        ArrayList<Replica> blocks = new ArrayList<Replica>();
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
+            Block localBlock = locatedBlock.getBlock().getLocalBlock();
+            blocks.add(new FinalizedReplica(localBlock, null, null));
+        }
+        try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
+            for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
+                DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
+                reports[i] = new StorageBlockReport(dns, bll);
+            }
+        }
+        // Should not assert!
+        /*
     cluster.getNameNodeRpc().blockReport(dnReg, bpid, reports,
         new BlockReportContext(1, 0, System.nanoTime(), 0L));
 
@@ -151,5 +143,89 @@ public class TestBlockHasMultipleReplicasOnSameDN {
       assertThat(locations[0].getDatanodeUuid(), not(locations[1].getDatanodeUuid()));
     }
      */
-  }
+    }
+
+    @Test
+    public void testBlockHasMultipleReplicasOnSameDN_withUpgrade20() throws IOException {
+        String filename = makeFileName(GenericTestUtils.getMethodName());
+        Path filePath = new Path(filename);
+        // Write out a file with a few blocks.
+        DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
+        // Get the block list for the file with the block locations.
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        // that it reports one copy of each block on either storage.
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DatanodeRegistrationJVMInterface dnReg = dn.getDNRegistrationForBP(bpid);
+        StorageBlockReport[] reports = new StorageBlockReport[cluster.getStoragesPerDatanode()];
+        ArrayList<Replica> blocks = new ArrayList<Replica>();
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
+            Block localBlock = locatedBlock.getBlock().getLocalBlock();
+            blocks.add(new FinalizedReplica(localBlock, null, null));
+        }
+        try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
+            for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
+                DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
+                reports[i] = new StorageBlockReport(dns, bll);
+            }
+        }
+    }
+
+    @Test
+    public void testBlockHasMultipleReplicasOnSameDN_withUpgrade60() throws IOException {
+        String filename = makeFileName(GenericTestUtils.getMethodName());
+        Path filePath = new Path(filename);
+        // Write out a file with a few blocks.
+        DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
+        // Get the block list for the file with the block locations.
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        // that it reports one copy of each block on either storage.
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        DatanodeRegistrationJVMInterface dnReg = dn.getDNRegistrationForBP(bpid);
+        StorageBlockReport[] reports = new StorageBlockReport[cluster.getStoragesPerDatanode()];
+        ArrayList<Replica> blocks = new ArrayList<Replica>();
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
+            Block localBlock = locatedBlock.getBlock().getLocalBlock();
+            blocks.add(new FinalizedReplica(localBlock, null, null));
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
+            for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
+                DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
+                reports[i] = new StorageBlockReport(dns, bll);
+            }
+        }
+    }
+
+    @Test
+    public void testBlockHasMultipleReplicasOnSameDN_withUpgrade80() throws IOException {
+        String filename = makeFileName(GenericTestUtils.getMethodName());
+        Path filePath = new Path(filename);
+        // Write out a file with a few blocks.
+        DFSTestUtil.createFile(fs, filePath, BLOCK_SIZE, BLOCK_SIZE * NUM_BLOCKS, BLOCK_SIZE, NUM_DATANODES, seed);
+        // Get the block list for the file with the block locations.
+        LocatedBlocks locatedBlocks = client.getLocatedBlocks(filePath.toString(), 0, BLOCK_SIZE * NUM_BLOCKS);
+        // that it reports one copy of each block on either storage.
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        DatanodeRegistrationJVMInterface dnReg = dn.getDNRegistrationForBP(bpid);
+        StorageBlockReport[] reports = new StorageBlockReport[cluster.getStoragesPerDatanode()];
+        ArrayList<Replica> blocks = new ArrayList<Replica>();
+        for (LocatedBlock locatedBlock : locatedBlocks.getLocatedBlocks()) {
+            Block localBlock = locatedBlock.getBlock().getLocalBlock();
+            blocks.add(new FinalizedReplica(localBlock, null, null));
+        }
+        try (FsVolumeReferencesJVMInterface volumes = dn.getFSDataset().getFsVolumeReferences()) {
+            BlockListAsLongs bll = BlockListAsLongs.encode(blocks);
+            for (int i = 0; i < cluster.getStoragesPerDatanode(); ++i) {
+                DatanodeStorage dns = new DatanodeStorage(volumes.get(i).getStorageID());
+                reports[i] = new StorageBlockReport(dns, bll);
+            }
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+    }
 }

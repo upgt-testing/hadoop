@@ -22,9 +22,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeys.HA_HM_RPC_TIMEOUT_KEY
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.HealthCheckFailedException;
@@ -41,45 +39,39 @@ import org.junit.Test;
 
 public class TestNNHealthCheck {
 
-  private MiniDFSClusterInJVM cluster;
-  private Configuration conf;
+    private MiniDFSClusterInJVM cluster;
 
-  @Before
-  public void setup() {
-    conf = new Configuration();
-  }
+    private Configuration conf;
 
-  @After
-  public void shutdown() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    @Before
+    public void setup() {
+        conf = new Configuration();
     }
-  }
 
-  @Test
-  public void testNNHealthCheck() throws IOException {
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .numDataNodes(0)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology())
-        .build();
-    doNNHealthCheckTest();
-  }
+    @After
+    public void shutdown() {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-  @Test
-  public void testNNHealthCheckWithLifelineAddress() throws IOException {
-    conf.set(DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY, "0.0.0.0:0");
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-          .numDataNodes(0)
-          .nnTopology(MiniDFSNNTopology.simpleHATopology())
-          .build();
-    doNNHealthCheckTest();
-  }
+    @Test
+    public void testNNHealthCheck() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        doNNHealthCheckTest();
+    }
 
-  private void doNNHealthCheckTest() throws IOException {
-    MockNameNodeResourceChecker mockResourceChecker =
-        new MockNameNodeResourceChecker(conf);
-    /*
+    @Test
+    public void testNNHealthCheckWithLifelineAddress() throws IOException {
+        conf.set(DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        doNNHealthCheckTest();
+    }
+
+    private void doNNHealthCheckTest() throws IOException {
+        MockNameNodeResourceChecker mockResourceChecker = new MockNameNodeResourceChecker(conf);
+        /*
     cluster.getNameNode(0).getNamesystem()
         .setNNResourceChecker(mockResourceChecker);
 
@@ -116,5 +108,22 @@ public class TestNNHealthCheck {
           re.unwrapRemoteException(HealthCheckFailedException.class));
     }
      */
-  }
+    }
+
+    @Test
+    public void testNNHealthCheck_withUpgrade20() throws IOException {
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        doNNHealthCheckTest();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testNNHealthCheckWithLifelineAddress_withUpgrade20() throws IOException {
+        conf.set(DFS_NAMENODE_LIFELINE_RPC_ADDRESS_KEY, "0.0.0.0:0");
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(0).nnTopology(MiniDFSNNTopology.simpleHATopology()).build();
+        doNNHealthCheckTest();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }
