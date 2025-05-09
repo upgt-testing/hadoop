@@ -800,6 +800,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   public Configuration(Configuration other) {
     this.resources = (ArrayList<Resource>) other.resources.clone();
     synchronized(other) {
+      this.setParameters.putAll(other.getSetParameters());
       if (other.properties != null) {
         this.properties = (Properties)other.properties.clone();
       }
