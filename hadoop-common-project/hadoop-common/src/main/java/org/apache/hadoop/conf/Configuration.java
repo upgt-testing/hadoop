@@ -783,6 +783,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   @SuppressWarnings("unchecked")
   public Configuration(Configuration other) {
     synchronized(other) {
+      this.setParameters.putAll(other.getSetParameters());
       // Make sure we clone a finalized state
       // Resources like input streams can be processed only once
       other.getProps();
