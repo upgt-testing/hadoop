@@ -8,8 +8,11 @@ import org.apache.hadoop.http.HttpServer2JVMInterface;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Set;
 
 public interface NameNodeJVMInterface {
+    Set<InetSocketAddress> getAuxiliaryNameNodeAddresses();
+    String getNNAuxiliaryRpcAddress();
     boolean isObserverState();
     ConfigurationJVMInterface getConf();
     String clz = "org.apache.hadoop.hdfs.server.namenode.NameNode";
@@ -63,7 +66,7 @@ public interface NameNodeJVMInterface {
     //org.apache.hadoop.ha.HAServiceProtocol.HAServiceState getServiceState();
     long getLastHATransitionTime();
     //boolean doRollback(Configuration arg0, boolean arg1) throws java.io.IOException;
-    //HttpServer2Interface getHttpServer();
+    HttpServer2JVMInterface getHttpServer();
     //org.apache.hadoop.hdfs.server.common.HdfsServerConstants.StartupOption parseArguments(java.lang.String[] arg0);
     //void startMetricsLogger(Configuration arg0);
     //java.lang.String reconfigureIPCBackoffEnabled(java.lang.String arg0);
