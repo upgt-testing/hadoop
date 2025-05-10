@@ -2204,6 +2204,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         }
         LOG.info("Upgrading the namenode at index " + nnIndex);
         NameNodeInfo info = getNN(nnIndex);
+        Configuration conf = nameNodes[nnIndex].conf;
         if (info == null || info.nameNode == null) {
             LOG.warn("Try to upgrade a non-started namenode at index " + nnIndex + ", skip it.");
             return;
@@ -2240,11 +2241,9 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         nameNodes[nnIndex] = new NameNodeInfo(nn, nnInstance, info.nameserviceId, info.nnId, startOpt,
                 conf);
         if (waitActive) {
-            if (numDataNodes > 0) {
-                waitNameNodeUp(nnIndex);
-            }
-            LOG.info("Upgrarded the namenode");
-            waitActive(nnIndex);
+            waitClusterUp();
+            LOG.info("Upgraded the namenode");
+            waitActive();
         }
 
         if (isSingleNN) {
