@@ -778,8 +778,10 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   @SuppressWarnings("unchecked")
   public Configuration(Configuration other) {
+
    this.resources = (ArrayList<Resource>) other.resources.clone();
    synchronized(other) {
+     this.setParameters.putAll(other.getSetParameters());       
      if (other.properties != null) {
        this.properties = (Properties)other.properties.clone();
      }
@@ -795,7 +797,6 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
          new ConcurrentHashMap<String, Boolean>());
      this.finalParameters.addAll(other.finalParameters);
    }
-
     synchronized(Configuration.class) {
       REGISTRY.put(this, null);
     }

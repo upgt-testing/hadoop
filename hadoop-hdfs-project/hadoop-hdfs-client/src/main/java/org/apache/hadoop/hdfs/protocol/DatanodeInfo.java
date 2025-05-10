@@ -60,7 +60,9 @@ public class DatanodeInfo extends DatanodeID implements Node, DatanodeInfoJVMInt
   public enum AdminStates {
     NORMAL("In Service"),
     DECOMMISSION_INPROGRESS("Decommission In Progress"),
-    DECOMMISSIONED("Decommissioned");
+    DECOMMISSIONED("Decommissioned"),
+    ENTERING_MAINTENANCE("Entering Maintenance"),
+    IN_MAINTENANCE("In Maintenance");
 
     final String value;
 
