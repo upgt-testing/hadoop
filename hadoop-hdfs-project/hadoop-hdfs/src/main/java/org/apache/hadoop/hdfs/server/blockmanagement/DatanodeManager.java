@@ -1303,6 +1303,13 @@ public class DatanodeManager implements DatanodeManagerJVMInterface {
     final boolean listDecommissioningNodes =
         type == DatanodeReportType.ALL ||
         type == DatanodeReportType.DECOMMISSIONING;
+    final boolean listEnteringMaintenanceNodes =
+            type == DatanodeReportType.ALL ||
+                    type == DatanodeReportType.ENTERING_MAINTENANCE;
+    final boolean listInMaintenanceNodes =
+            type == DatanodeReportType.ALL ||
+                    type == DatanodeReportType.IN_MAINTENANCE;
+
 
     ArrayList<DatanodeDescriptor> nodes;
     final HostSet foundNodes = new HostSet();
