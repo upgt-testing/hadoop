@@ -3,7 +3,6 @@ package org.apache.hadoop.hdfs.server.namenode;
 import edu.illinois.VersionClassLoader;
 import edu.illinois.VersionSelector;
 import edu.illinois.instance.Instance;
-import jdk.internal.org.jline.utils.Log;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.ConfigurationJVMInterface;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
