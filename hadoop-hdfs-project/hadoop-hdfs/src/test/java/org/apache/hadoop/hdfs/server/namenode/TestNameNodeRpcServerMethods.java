@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
@@ -37,62 +36,63 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 
 public class TestNameNodeRpcServerMethods {
-  private static NamenodeProtocolsJVMInterface nnRpc;
-  private static Configuration conf;
-  private static MiniDFSClusterInJVM cluster;
 
-  /** Start a cluster */
-  @Before
-  public void setup() throws Exception {
-    conf = new HdfsConfiguration();
-    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    cluster.waitActive();
-    nnRpc = cluster.getNameNode().getRpcServer();
-  }
+    private static NamenodeProtocolsJVMInterface nnRpc;
 
-  /**
-   * Cleanup after the test
-   *
-   * @throws IOException
-   * @throws UnresolvedLinkException
-   * @throws SafeModeException
-   * @throws AccessControlException
-   */
-  @After
-  public void cleanup() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private static Configuration conf;
 
-  @Test
-  public void testDeleteSnapshotWhenSnapshotNameIsEmpty() throws Exception {
-    String dir = "/testNamenodeRetryCache/testDelete";
-    try {
-      nnRpc.deleteSnapshot(dir, null);
-      Assert.fail("testdeleteSnapshot is not thrown expected exception ");
-    } catch (IOException e) {
-      // expected
-      GenericTestUtils.assertExceptionContains(
-          "The snapshot name is null or empty.", e);
-    }
-    try {
-      nnRpc.deleteSnapshot(dir, "");
-      Assert.fail("testdeleteSnapshot is not thrown expected exception");
-    } catch (IOException e) {
-      // expected
-      GenericTestUtils.assertExceptionContains(
-          "The snapshot name is null or empty.", e);
+    private static MiniDFSClusterInJVM cluster;
+
+    /**
+     * Start a cluster
+     */
+    @Before
+    public void setup() throws Exception {
+        conf = new HdfsConfiguration();
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        nnRpc = cluster.getNameNode().getRpcServer();
     }
 
-  }
+    /**
+     * Cleanup after the test
+     *
+     * @throws IOException
+     * @throws UnresolvedLinkException
+     * @throws SafeModeException
+     * @throws AccessControlException
+     */
+    @After
+    public void cleanup() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-  /*
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
+
+    /*
   @Test
   public void testGetDatanodeStorageReportWithNumBLocksNotZero() throws Exception {
     int buffSize = 1024;
@@ -117,4 +117,87 @@ public class TestNameNodeRpcServerMethods {
     assertEquals(1, numBlocks);
   }
    */
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty_withUpgrade20() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
+
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty_withUpgrade40() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
+
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty_withUpgrade60() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
+
+    @Test
+    public void testDeleteSnapshotWhenSnapshotNameIsEmpty_withUpgrade80() throws Exception {
+        String dir = "/testNamenodeRetryCache/testDelete";
+        try {
+            nnRpc.deleteSnapshot(dir, null);
+            Assert.fail("testdeleteSnapshot is not thrown expected exception ");
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+        try {
+            nnRpc.deleteSnapshot(dir, "");
+            Assert.fail("testdeleteSnapshot is not thrown expected exception");
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        } catch (IOException e) {
+            // expected
+            GenericTestUtils.assertExceptionContains("The snapshot name is null or empty.", e);
+        }
+    }
 }
