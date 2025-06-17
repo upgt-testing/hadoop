@@ -36,13 +36,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
-
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DU_INTERVAL_KEY;
 import static org.junit.Assert.assertEquals;
 
@@ -50,109 +48,95 @@ import static org.junit.Assert.assertEquals;
  * Unit test for ReplicaCachingGetSpaceUsed class.
  */
 public class TestReplicaCachingGetSpaceUsed {
-  private Configuration conf = null;
-  private MiniDFSClusterInJVM cluster;
-  private DistributedFileSystem fs;
-  private DataNodeJVMInterface dataNode;
 
-  @Before
-  public void setUp()
-      throws IOException, NoSuchMethodException, InterruptedException {
-    conf = new Configuration();
-    conf.setClass("fs.getspaceused.classname", ReplicaCachingGetSpaceUsed.class,
-        CachingGetSpaceUsed.class);
-    conf.setLong(FS_DU_INTERVAL_KEY, 1000);
-    conf.setLong("fs.getspaceused.jitterMillis", 0);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).build();
-    cluster.waitActive();
-    dataNode = cluster.getDataNodes().get(0);
+    private Configuration conf = null;
 
-    fs = cluster.getFileSystem();
-  }
+    private MiniDFSClusterInJVM cluster;
 
-  @After
-  public void tearDown() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
+    private DistributedFileSystem fs;
 
-  @Test
-  public void testReplicaCachingGetSpaceUsedByFINALIZEDReplica()
-      throws Exception {
-    FSDataOutputStream os = fs
-        .create(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"));
-    byte[] bytes = new byte[20480];
-    InputStream is = new ByteArrayInputStream(bytes);
-    IOUtils.copyBytes(is, os, bytes.length);
-    os.hsync();
-    os.close();
+    private DataNodeJVMInterface dataNode;
 
-    DFSInputStream dfsInputStream = fs.getClient()
-        .open("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica");
-    long blockLength = 0;
-    long metaLength = 0;
-    List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
-    for (LocatedBlock locatedBlock : locatedBlocks) {
-      ExtendedBlock extendedBlock = locatedBlock.getBlock();
-      blockLength += extendedBlock.getLocalBlock().getNumBytes();
-      //metaLength += dataNode.getFSDataset()
-        //  .getMetaDataInputStream(extendedBlock).getLength();
+    @Before
+    public void setUp() throws IOException, NoSuchMethodException, InterruptedException {
+        conf = new Configuration();
+        conf.setClass("fs.getspaceused.classname", ReplicaCachingGetSpaceUsed.class, CachingGetSpaceUsed.class);
+        conf.setLong(FS_DU_INTERVAL_KEY, 1000);
+        conf.setLong("fs.getspaceused.jitterMillis", 0);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).build();
+        cluster.waitActive();
+        dataNode = cluster.getDataNodes().get(0);
+        fs = cluster.getFileSystem();
     }
 
-    // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called after replica
-    // has been written to disk.
-    Thread.sleep(2000);
-    //assertEquals(blockLength + metaLength,
-      //  dataNode.getFSDataset().getDfsUsed());
-
-    fs.delete(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"),
-        true);
-  }
-
-  @Test
-  public void testReplicaCachingGetSpaceUsedByRBWReplica() throws Exception {
-    FSDataOutputStream os =
-        fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
-    byte[] bytes = new byte[20480];
-    InputStream is = new ByteArrayInputStream(bytes);
-    IOUtils.copyBytes(is, os, bytes.length);
-    os.hsync();
-
-    DFSInputStream dfsInputStream =
-        fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
-    long blockLength = 0;
-    long metaLength = 0;
-    List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
-    for (LocatedBlock locatedBlock : locatedBlocks) {
-      ExtendedBlock extendedBlock = locatedBlock.getBlock();
-      blockLength += extendedBlock.getLocalBlock().getNumBytes();
-      //metaLength += dataNode.getFSDataset()
-        //  .getMetaDataInputStream(extendedBlock).getLength();
+    @After
+    public void tearDown() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
 
-    // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called after replica
-    // has been written to disk.
-    Thread.sleep(2000);
-    //assertEquals(blockLength + metaLength,
-      //  dataNode.getFSDataset().getDfsUsed());
+    @Test
+    public void testReplicaCachingGetSpaceUsedByFINALIZEDReplica() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called after replica
+        // has been written to disk.
+        Thread.sleep(2000);
+        //assertEquals(blockLength + metaLength,
+        //  dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"), true);
+    }
 
-    os.close();
+    @Test
+    public void testReplicaCachingGetSpaceUsedByRBWReplica() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called after replica
+        // has been written to disk.
+        Thread.sleep(2000);
+        //assertEquals(blockLength + metaLength,
+        //  dataNode.getFSDataset().getDfsUsed());
+        os.close();
+        // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called, dfsspaceused is
+        // recalculated
+        Thread.sleep(2000);
+        // After close operation, the replica state will be transformed from RBW to
+        // finalized. But the space used of these replicas are all included and the
+        // dfsUsed value should be same.
+        assertEquals(blockLength + metaLength, dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
+    }
 
-    // Guarantee ReplicaCachingGetSpaceUsed#refresh() is called, dfsspaceused is
-    // recalculated
-    Thread.sleep(2000);
-    // After close operation, the replica state will be transformed from RBW to
-    // finalized. But the space used of these replicas are all included and the
-    // dfsUsed value should be same.
-    assertEquals(blockLength + metaLength,
-        dataNode.getFSDataset().getDfsUsed());
-
-    fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
-  }
-
-  /*
+    /*
   @Test(timeout = 15000)
   public void testFsDatasetImplDeepCopyReplica() {
     FsDatasetSpi<?> fsDataset = dataNode.getFSDataset();
@@ -175,32 +159,224 @@ public class TestReplicaCachingGetSpaceUsed {
     modifyThread.setShouldRun(false);
   }
    */
+    private class ModifyThread extends Thread {
 
-  private class ModifyThread extends Thread {
-    private boolean shouldRun = true;
+        private boolean shouldRun = true;
 
-    @Override
-    public void run() {
-      FSDataOutputStream os = null;
-      while (shouldRun) {
-        try {
-          int id = RandomUtils.nextInt();
-          os = fs.create(new Path("/testFsDatasetImplDeepCopyReplica/" + id));
-          byte[] bytes = new byte[2048];
-          InputStream is = new ByteArrayInputStream(bytes);
-          IOUtils.copyBytes(is, os, bytes.length);
-          os.hsync();
-          os.close();
-        } catch (IOException e) {}
-      }
+        @Override
+        public void run() {
+            FSDataOutputStream os = null;
+            while (shouldRun) {
+                try {
+                    int id = RandomUtils.nextInt();
+                    os = fs.create(new Path("/testFsDatasetImplDeepCopyReplica/" + id));
+                    byte[] bytes = new byte[2048];
+                    InputStream is = new ByteArrayInputStream(bytes);
+                    IOUtils.copyBytes(is, os, bytes.length);
+                    os.hsync();
+                    os.close();
+                } catch (IOException e) {
+                }
+            }
+            try {
+                fs.delete(new Path("/testFsDatasetImplDeepCopyReplica"), true);
+            } catch (IOException e) {
+            }
+        }
 
-      try {
-        fs.delete(new Path("/testFsDatasetImplDeepCopyReplica"), true);
-      } catch (IOException e) {}
+        private void setShouldRun(boolean shouldRun) {
+            this.shouldRun = shouldRun;
+        }
     }
 
-    private void setShouldRun(boolean shouldRun) {
-      this.shouldRun = shouldRun;
+    @Test
+    public void testReplicaCachingGetSpaceUsedByFINALIZEDReplica_withUpgrade20() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        os.close();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"), true);
     }
-  }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByFINALIZEDReplica_withUpgrade40() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica");
+        long blockLength = 0;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"), true);
+    }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByFINALIZEDReplica_withUpgrade80() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        os.close();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByFINALIZEDReplica"), true);
+    }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByRBWReplica_withUpgrade20() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        os.close();
+        // recalculated
+        Thread.sleep(2000);
+        // dfsUsed value should be same.
+        assertEquals(blockLength + metaLength, dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
+    }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByRBWReplica_withUpgrade40() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        os.close();
+        // recalculated
+        Thread.sleep(2000);
+        // dfsUsed value should be same.
+        assertEquals(blockLength + metaLength, dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
+    }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByRBWReplica_withUpgrade60() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+            cluster.restartNodeForTesting(0);
+            cluster.upgradeNodeForTesting(0);
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        os.close();
+        // recalculated
+        Thread.sleep(2000);
+        // dfsUsed value should be same.
+        assertEquals(blockLength + metaLength, dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
+    }
+
+    @Test
+    public void testReplicaCachingGetSpaceUsedByRBWReplica_withUpgrade80() throws Exception {
+        FSDataOutputStream os = fs.create(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"));
+        byte[] bytes = new byte[20480];
+        InputStream is = new ByteArrayInputStream(bytes);
+        IOUtils.copyBytes(is, os, bytes.length);
+        os.hsync();
+        DFSInputStream dfsInputStream = fs.getClient().open("/testReplicaCachingGetSpaceUsedByRBWReplica");
+        long blockLength = 0;
+        long metaLength = 0;
+        List<LocatedBlock> locatedBlocks = dfsInputStream.getAllBlocks();
+        for (LocatedBlock locatedBlock : locatedBlocks) {
+            ExtendedBlock extendedBlock = locatedBlock.getBlock();
+            blockLength += extendedBlock.getLocalBlock().getNumBytes();
+            //metaLength += dataNode.getFSDataset()
+            //  .getMetaDataInputStream(extendedBlock).getLength();
+        }
+        // has been written to disk.
+        Thread.sleep(2000);
+        os.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // recalculated
+        Thread.sleep(2000);
+        // dfsUsed value should be same.
+        assertEquals(blockLength + metaLength, dataNode.getFSDataset().getDfsUsed());
+        fs.delete(new Path("/testReplicaCachingGetSpaceUsedByRBWReplica"), true);
+    }
 }
