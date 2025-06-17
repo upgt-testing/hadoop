@@ -22,7 +22,6 @@ import static org.apache.hadoop.fs.permission.AclEntryScope.*;
 import static org.apache.hadoop.fs.permission.AclEntryType.*;
 import static org.apache.hadoop.fs.permission.FsAction.*;
 import static org.junit.Assert.*;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
@@ -36,7 +35,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
 
 /**
@@ -45,143 +43,405 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  * NameNode can still load ACLs from fsimage or edits.
  */
 public class TestAclConfigFlag {
-  private static final Path PATH = new Path("/path");
 
-  private MiniDFSClusterInJVM cluster;
-  private DistributedFileSystem fs;
+    private static final Path PATH = new Path("/path");
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+    private MiniDFSClusterInJVM cluster;
 
-  @After
-  public void shutdown() throws Exception {
-    IOUtils.cleanupWithLogger(null, fs);
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private DistributedFileSystem fs;
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @After
+    public void shutdown() throws Exception {
+        IOUtils.cleanupWithLogger(null, fs);
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
     }
-  }
 
-  @Test
-  public void testModifyAclEntries() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.modifyAclEntries(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-  }
-
-  @Test
-  public void testRemoveAclEntries() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.removeAclEntries(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-  }
-
-  @Test
-  public void testRemoveDefaultAcl() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.removeAclEntries(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-  }
-
-  @Test
-  public void testRemoveAcl() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.removeAcl(PATH);
-  }
-
-  @Test
-  public void testSetAcl() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.setAcl(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-  }
-
-  @Test
-  public void testGetAclStatus() throws Exception {
-    initCluster(true, false);
-    fs.mkdirs(PATH);
-    expectException();
-    fs.getAclStatus(PATH);
-  }
-
-  @Test
-  public void testEditLog() throws Exception {
-    // With ACLs enabled, set an ACL.
-    initCluster(true, true);
-    fs.mkdirs(PATH);
-    fs.setAcl(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-
-    // Restart with ACLs disabled.  Expect successful restart.
-    restart(false, false);
-  }
-
-  @Test
-  public void testFsImage() throws Exception {
-    // With ACLs enabled, set an ACL.
-    initCluster(true, true);
-    fs.mkdirs(PATH);
-    fs.setAcl(PATH, Lists.newArrayList(
-      aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
-
-    // Save a new checkpoint and restart with ACLs still enabled.
-    restart(true, true);
-
-    // Restart with ACLs disabled.  Expect successful restart.
-    restart(false, false);
-  }
-
-  /**
-   * We expect an AclException, and we want the exception text to state the
-   * configuration key that controls ACL support.
-   */
-  private void expectException() {
-    exception.expect(AclException.class);
-    exception.expectMessage(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY);
-  }
-
-  /**
-   * Initialize the cluster, wait for it to become active, and get FileSystem.
-   *
-   * @param format if true, format the NameNode and DataNodes before starting up
-   * @param aclsEnabled if true, ACL support is enabled
-   * @throws Exception if any step fails
-   */
-  private void initCluster(boolean format, boolean aclsEnabled)
-      throws Exception {
-    Configuration conf = new Configuration();
-    conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, aclsEnabled);
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(format)
-      .build();
-    cluster.waitActive();
-    fs = cluster.getFileSystem();
-  }
-
-  /**
-   * Restart the cluster, optionally saving a new checkpoint.
-   *
-   * @param checkpoint boolean true to save a new checkpoint
-   * @param aclsEnabled if true, ACL support is enabled
-   * @throws Exception if restart fails
-   */
-  private void restart(boolean checkpoint, boolean aclsEnabled)
-      throws Exception {
-    NameNodeJVMInterface nameNode = cluster.getNameNode();
-    if (checkpoint) {
-      NameNodeAdapter.enterSafeMode(nameNode, false);
-      NameNodeAdapter.saveNamespace(nameNode);
+    @Test
+    public void testModifyAclEntries() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.modifyAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
     }
-    shutdown();
-    initCluster(false, aclsEnabled);
-  }
+
+    @Test
+    public void testRemoveAclEntries() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveDefaultAcl() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveAcl() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAcl(PATH);
+    }
+
+    @Test
+    public void testSetAcl() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testGetAclStatus() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.getAclStatus(PATH);
+    }
+
+    @Test
+    public void testEditLog() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testFsImage() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Save a new checkpoint and restart with ACLs still enabled.
+        restart(true, true);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    /**
+     * We expect an AclException, and we want the exception text to state the
+     * configuration key that controls ACL support.
+     */
+    private void expectException() {
+        exception.expect(AclException.class);
+        exception.expectMessage(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY);
+    }
+
+    /**
+     * Initialize the cluster, wait for it to become active, and get FileSystem.
+     *
+     * @param format if true, format the NameNode and DataNodes before starting up
+     * @param aclsEnabled if true, ACL support is enabled
+     * @throws Exception if any step fails
+     */
+    private void initCluster(boolean format, boolean aclsEnabled) throws Exception {
+        Configuration conf = new Configuration();
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, aclsEnabled);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).format(format).build();
+        cluster.waitActive();
+        fs = cluster.getFileSystem();
+    }
+
+    /**
+     * Restart the cluster, optionally saving a new checkpoint.
+     *
+     * @param checkpoint boolean true to save a new checkpoint
+     * @param aclsEnabled if true, ACL support is enabled
+     * @throws Exception if restart fails
+     */
+    private void restart(boolean checkpoint, boolean aclsEnabled) throws Exception {
+        NameNodeJVMInterface nameNode = cluster.getNameNode();
+        if (checkpoint) {
+            NameNodeAdapter.enterSafeMode(nameNode, false);
+            NameNodeAdapter.saveNamespace(nameNode);
+        }
+        shutdown();
+        initCluster(false, aclsEnabled);
+    }
+
+    @Test
+    public void testModifyAclEntries_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.modifyAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testModifyAclEntries_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.modifyAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testModifyAclEntries_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.modifyAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRemoveAclEntries_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveAclEntries_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveAclEntries_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRemoveDefaultAcl_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveDefaultAcl_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testRemoveDefaultAcl_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAclEntries(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRemoveAcl_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.removeAcl(PATH);
+    }
+
+    @Test
+    public void testRemoveAcl_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.removeAcl(PATH);
+    }
+
+    @Test
+    public void testRemoveAcl_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.removeAcl(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testSetAcl_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testSetAcl_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+    }
+
+    @Test
+    public void testSetAcl_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testGetAclStatus_withUpgrade20() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        expectException();
+        fs.getAclStatus(PATH);
+    }
+
+    @Test
+    public void testGetAclStatus_withUpgrade40() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.getAclStatus(PATH);
+    }
+
+    @Test
+    public void testGetAclStatus_withUpgrade80() throws Exception {
+        initCluster(true, false);
+        fs.mkdirs(PATH);
+        expectException();
+        fs.getAclStatus(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testEditLog_withUpgrade20() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testEditLog_withUpgrade40() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testEditLog_withUpgrade80() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testFsImage_withUpgrade20() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Save a new checkpoint and restart with ACLs still enabled.
+        restart(true, true);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testFsImage_withUpgrade40() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Save a new checkpoint and restart with ACLs still enabled.
+        restart(true, true);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testFsImage_withUpgrade60() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Save a new checkpoint and restart with ACLs still enabled.
+        restart(true, true);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+    }
+
+    @Test
+    public void testFsImage_withUpgrade80() throws Exception {
+        // With ACLs enabled, set an ACL.
+        initCluster(true, true);
+        fs.mkdirs(PATH);
+        fs.setAcl(PATH, Lists.newArrayList(aclEntry(DEFAULT, USER, "foo", READ_WRITE)));
+        // Save a new checkpoint and restart with ACLs still enabled.
+        restart(true, true);
+        // Restart with ACLs disabled.  Expect successful restart.
+        restart(false, false);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }
