@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -42,76 +41,186 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestHttpsFileSystem {
-  private static final String BASEDIR =
-      GenericTestUtils.getTempPath(TestHttpsFileSystem.class.getSimpleName());
 
-  private static MiniDFSClusterInJVM cluster;
-  private static Configuration conf;
+    private static final String BASEDIR = GenericTestUtils.getTempPath(TestHttpsFileSystem.class.getSimpleName());
 
-  private static String keystoresDir;
-  private static String sslConfDir;
-  private static String nnAddr;
+    private static MiniDFSClusterInJVM cluster;
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    conf = new Configuration();
-    conf.setBoolean(HdfsClientConfigKeys.DFS_WEBHDFS_ENABLED_KEY, true);
-    conf.set(DFSConfigKeys.DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
-    conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
-    conf.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
+    private static Configuration conf;
 
-    File base = new File(BASEDIR);
-    FileUtil.fullyDelete(base);
-    base.mkdirs();
-    keystoresDir = new File(BASEDIR).getAbsolutePath();
-    sslConfDir = KeyStoreTestUtil.getClasspathDir(TestHttpsFileSystem.class);
+    private static String keystoresDir;
 
-    KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
-    conf.set(DFSConfigKeys.DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY,
-        KeyStoreTestUtil.getClientSSLConfigFileName());
-    conf.set(DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY,
-        KeyStoreTestUtil.getServerSSLConfigFileName());
+    private static String sslConfDir;
 
-    cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
-    cluster.waitActive();
-    OutputStream os = cluster.getFileSystem().create(new Path("/test"));
-    os.write(23);
-    os.close();
-    InetSocketAddress addr = cluster.getNameNode().getHttpsAddress();
-    nnAddr = NetUtils.getHostPortString(addr);
-    conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
-  }
+    private static String nnAddr;
 
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    @BeforeClass
+    public static void setUp() throws Exception {
+        conf = new Configuration();
+        conf.setBoolean(HdfsClientConfigKeys.DFS_WEBHDFS_ENABLED_KEY, true);
+        conf.set(DFSConfigKeys.DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
+        conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
+        conf.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
+        File base = new File(BASEDIR);
+        FileUtil.fullyDelete(base);
+        base.mkdirs();
+        keystoresDir = new File(BASEDIR).getAbsolutePath();
+        sslConfDir = KeyStoreTestUtil.getClasspathDir(TestHttpsFileSystem.class);
+        KeyStoreTestUtil.setupSSLConfig(keystoresDir, sslConfDir, conf, false);
+        conf.set(DFSConfigKeys.DFS_CLIENT_HTTPS_KEYSTORE_RESOURCE_KEY, KeyStoreTestUtil.getClientSSLConfigFileName());
+        conf.set(DFSConfigKeys.DFS_SERVER_HTTPS_KEYSTORE_RESOURCE_KEY, KeyStoreTestUtil.getServerSSLConfigFileName());
+        cluster = new MiniDFSClusterInJVM.Builder(conf).numDataNodes(1).build();
+        cluster.waitActive();
+        OutputStream os = cluster.getFileSystem().create(new Path("/test"));
+        os.write(23);
+        os.close();
+        InetSocketAddress addr = cluster.getNameNode().getHttpsAddress();
+        nnAddr = NetUtils.getHostPortString(addr);
+        conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
     }
-    FileUtil.fullyDelete(new File(BASEDIR));
-    KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
-  }
 
-  @Test
-  public void testHsftpFileSystem() throws Exception {
-    FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
-    Assert.assertTrue(fs.exists(new Path("/test")));
-    InputStream is = fs.open(new Path("/test"));
-    Assert.assertEquals(23, is.read());
-    is.close();
-    fs.close();
-  }
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+        FileUtil.fullyDelete(new File(BASEDIR));
+        KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
+    }
 
-  @Test
-  public void testSWebHdfsFileSystem() throws Exception {
-    FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
-    final Path f = new Path("/testswebhdfs");
-    FSDataOutputStream os = fs.create(f);
-    os.write(23);
-    os.close();
-    Assert.assertTrue(fs.exists(f));
-    InputStream is = fs.open(f);
-    Assert.assertEquals(23, is.read());
-    is.close();
-    fs.close();
-  }
+    @Test
+    public void testHsftpFileSystem() throws Exception {
+        FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
+        Assert.assertTrue(fs.exists(new Path("/test")));
+        InputStream is = fs.open(new Path("/test"));
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testSWebHdfsFileSystem() throws Exception {
+        FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+        final Path f = new Path("/testswebhdfs");
+        FSDataOutputStream os = fs.create(f);
+        os.write(23);
+        os.close();
+        Assert.assertTrue(fs.exists(f));
+        InputStream is = fs.open(f);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testHsftpFileSystem_withUpgrade20() throws Exception {
+        FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
+        Assert.assertTrue(fs.exists(new Path("/test")));
+        InputStream is = fs.open(new Path("/test"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testHsftpFileSystem_withUpgrade40() throws Exception {
+        FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
+        Assert.assertTrue(fs.exists(new Path("/test")));
+        InputStream is = fs.open(new Path("/test"));
+        Assert.assertEquals(23, is.read());
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testHsftpFileSystem_withUpgrade60() throws Exception {
+        FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
+        Assert.assertTrue(fs.exists(new Path("/test")));
+        InputStream is = fs.open(new Path("/test"));
+        Assert.assertEquals(23, is.read());
+        is.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.close();
+    }
+
+    @Test
+    public void testHsftpFileSystem_withUpgrade80() throws Exception {
+        FileSystem fs = FileSystem.get(new URI("hsftp://" + nnAddr), conf);
+        Assert.assertTrue(fs.exists(new Path("/test")));
+        InputStream is = fs.open(new Path("/test"));
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testSWebHdfsFileSystem_withUpgrade20() throws Exception {
+        FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+        final Path f = new Path("/testswebhdfs");
+        FSDataOutputStream os = fs.create(f);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        os.write(23);
+        os.close();
+        Assert.assertTrue(fs.exists(f));
+        InputStream is = fs.open(f);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testSWebHdfsFileSystem_withUpgrade40() throws Exception {
+        FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+        final Path f = new Path("/testswebhdfs");
+        FSDataOutputStream os = fs.create(f);
+        os.write(23);
+        os.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertTrue(fs.exists(f));
+        InputStream is = fs.open(f);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testSWebHdfsFileSystem_withUpgrade60() throws Exception {
+        FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+        final Path f = new Path("/testswebhdfs");
+        FSDataOutputStream os = fs.create(f);
+        os.write(23);
+        os.close();
+        Assert.assertTrue(fs.exists(f));
+        InputStream is = fs.open(f);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        fs.close();
+    }
+
+    @Test
+    public void testSWebHdfsFileSystem_withUpgrade80() throws Exception {
+        FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+        final Path f = new Path("/testswebhdfs");
+        FSDataOutputStream os = fs.create(f);
+        os.write(23);
+        os.close();
+        Assert.assertTrue(fs.exists(f));
+        InputStream is = fs.open(f);
+        Assert.assertEquals(23, is.read());
+        is.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        fs.close();
+    }
 }
