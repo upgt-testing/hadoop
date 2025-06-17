@@ -18,7 +18,6 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import java.io.IOException;
-
 import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
@@ -33,7 +32,6 @@ import org.apache.hadoop.ipc.metrics.RetryCacheMetricsJVMInterface;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_ENABLE_RETRY_CACHE_KEY;
 
@@ -44,72 +42,126 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_ENABLE_RETRY_CAC
  * Retry cache works based on tracking previously received request based on the
  * ClientId and CallId received in RPC requests and storing the response. The
  * response is replayed on retry when the same request is received again.
- *
  */
 public class TestNameNodeRetryCacheMetrics {
-  private MiniDFSClusterInJVM cluster;
-  private FSNamesystemJVMInterface namesystem;
-  private DistributedFileSystem filesystem;
-  private final int namenodeId = 0;
-  private Configuration conf;
-  private RetryCacheMetricsJVMInterface metrics;
 
-  private DFSClient client;
+    private MiniDFSClusterInJVM cluster;
 
-  /** Start a cluster */
-  @Before
-  public void setup() throws Exception {
-    conf = new HdfsConfiguration();
-    conf.setBoolean(DFS_NAMENODE_ENABLE_RETRY_CACHE_KEY, true);
-    conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY, 2);
-    cluster = new MiniDFSClusterInJVM.Builder(conf)
-        .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3)
-        .build();
-    cluster.waitActive();
-    cluster.transitionToActive(namenodeId);
-    HATestUtil.setFailoverConfigurations(cluster, conf);
-    filesystem = (DistributedFileSystem) HATestUtil.configureFailoverFs(cluster, conf);
-    namesystem = cluster.getNamesystem(namenodeId);
-    metrics = namesystem.getRetryCache().getMetricsForTests();
-  }
+    private FSNamesystemJVMInterface namesystem;
 
-  /**
-   * Cleanup after the test
-   * @throws IOException
-   **/
-  @After
-  public void cleanup() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+    private DistributedFileSystem filesystem;
+
+    private final int namenodeId = 0;
+
+    private Configuration conf;
+
+    private RetryCacheMetricsJVMInterface metrics;
+
+    private DFSClient client;
+
+    /**
+     * Start a cluster
+     */
+    @Before
+    public void setup() throws Exception {
+        conf = new HdfsConfiguration();
+        conf.setBoolean(DFS_NAMENODE_ENABLE_RETRY_CACHE_KEY, true);
+        conf.setInt(HdfsClientConfigKeys.DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY, 2);
+        cluster = new MiniDFSClusterInJVM.Builder(conf).nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(3).build();
+        cluster.waitActive();
+        cluster.transitionToActive(namenodeId);
+        HATestUtil.setFailoverConfigurations(cluster, conf);
+        filesystem = (DistributedFileSystem) HATestUtil.configureFailoverFs(cluster, conf);
+        namesystem = cluster.getNamesystem(namenodeId);
+        metrics = namesystem.getRetryCache().getMetricsForTests();
     }
-  }
 
-  @Test
-  public void testRetryCacheMetrics() throws IOException {
-    checkMetrics(0, 0, 0);
+    /**
+     * Cleanup after the test
+     * @throws IOException
+     */
+    @After
+    public void cleanup() throws IOException {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
 
-    // DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY is 2 ,
-    // so 2 requests are dropped at first.
-    // After that, 1 request will reach NameNode correctly.
-    trySaveNamespace();
-    checkMetrics(2, 0, 1);
+    @Test
+    public void testRetryCacheMetrics() throws IOException {
+        checkMetrics(0, 0, 0);
+        // DFS_CLIENT_TEST_DROP_NAMENODE_RESPONSE_NUM_KEY is 2 ,
+        // so 2 requests are dropped at first.
+        // After that, 1 request will reach NameNode correctly.
+        trySaveNamespace();
+        checkMetrics(2, 0, 1);
+        // RetryCache will be cleared after Namesystem#close()
+        namesystem.close();
+        checkMetrics(2, 1, 1);
+    }
 
-    // RetryCache will be cleared after Namesystem#close()
-    namesystem.close();
-    checkMetrics(2, 1, 1);
-  }
+    private void checkMetrics(long hit, long cleared, long updated) {
+        assertEquals("CacheHit", hit, metrics.getCacheHit());
+        assertEquals("CacheCleared", cleared, metrics.getCacheCleared());
+        assertEquals("CacheUpdated", updated, metrics.getCacheUpdated());
+    }
 
-  private void checkMetrics(long hit, long cleared, long updated) {
-    assertEquals("CacheHit", hit, metrics.getCacheHit());
-    assertEquals("CacheCleared", cleared, metrics.getCacheCleared());
-    assertEquals("CacheUpdated", updated, metrics.getCacheUpdated());
-  }
+    private void trySaveNamespace() throws IOException {
+        filesystem.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
+        filesystem.saveNamespace();
+        filesystem.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_LEAVE);
+    }
 
-  private void trySaveNamespace() throws IOException {
-    filesystem.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_ENTER);
-    filesystem.saveNamespace();
-    filesystem.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_LEAVE);
-  }
+    @Test
+    public void testRetryCacheMetrics_withUpgrade20() throws IOException {
+        checkMetrics(0, 0, 0);
+        // After that, 1 request will reach NameNode correctly.
+        trySaveNamespace();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        checkMetrics(2, 0, 1);
+        // RetryCache will be cleared after Namesystem#close()
+        namesystem.close();
+        checkMetrics(2, 1, 1);
+    }
 
+    @Test
+    public void testRetryCacheMetrics_withUpgrade40() throws IOException {
+        checkMetrics(0, 0, 0);
+        // After that, 1 request will reach NameNode correctly.
+        trySaveNamespace();
+        checkMetrics(2, 0, 1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        // RetryCache will be cleared after Namesystem#close()
+        namesystem.close();
+        checkMetrics(2, 1, 1);
+    }
+
+    @Test
+    public void testRetryCacheMetrics_withUpgrade60() throws IOException {
+        checkMetrics(0, 0, 0);
+        // After that, 1 request will reach NameNode correctly.
+        trySaveNamespace();
+        checkMetrics(2, 0, 1);
+        // RetryCache will be cleared after Namesystem#close()
+        namesystem.close();
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        checkMetrics(2, 1, 1);
+    }
+
+    @Test
+    public void testRetryCacheMetrics_withUpgrade80() throws IOException {
+        checkMetrics(0, 0, 0);
+        // After that, 1 request will reach NameNode correctly.
+        trySaveNamespace();
+        checkMetrics(2, 0, 1);
+        // RetryCache will be cleared after Namesystem#close()
+        namesystem.close();
+        checkMetrics(2, 1, 1);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }

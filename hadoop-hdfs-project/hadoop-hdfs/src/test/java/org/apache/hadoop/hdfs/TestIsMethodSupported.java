@@ -19,10 +19,8 @@ package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
-
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
 import org.apache.hadoop.hdfs.protocolPB.ClientDatanodeProtocolTranslatorPB;
 import org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolPB;
@@ -55,142 +53,264 @@ import org.junit.Test;
  * isMethodSupported method in ProtocolMetaInterface.
  */
 public class TestIsMethodSupported {
-  private static MiniDFSClusterInJVM cluster = null;
-  private static final HdfsConfiguration conf = new HdfsConfiguration();
-  private static InetSocketAddress nnAddress = null;
-  private static InetSocketAddress dnAddress = null;
-  
-  @BeforeClass
-  public static void setUp() throws Exception {
-    cluster = (new MiniDFSClusterInJVM.Builder(conf))
-        .numDataNodes(1).build();
-    nnAddress = cluster.getNameNode().getNameNodeAddress();
-    DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
-    dnAddress = new InetSocketAddress(dn.getDatanodeId().getIpAddr(),
-                                      dn.getIpcPort());
-  }
 
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    private static MiniDFSClusterInJVM cluster = null;
+
+    private static final HdfsConfiguration conf = new HdfsConfiguration();
+
+    private static InetSocketAddress nnAddress = null;
+
+    private static InetSocketAddress dnAddress = null;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        cluster = (new MiniDFSClusterInJVM.Builder(conf)).numDataNodes(1).build();
+        nnAddress = cluster.getNameNode().getNameNodeAddress();
+        DataNodeJVMInterface dn = cluster.getDataNodes().get(0);
+        dnAddress = new InetSocketAddress(dn.getDatanodeId().getIpAddr(), dn.getIpcPort());
     }
-  }
 
-  @Test
-  public void testNamenodeProtocol() throws IOException {
-    NamenodeProtocol np =
-        NameNodeProxies.createNonHAProxy(conf,
-            nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(),
-            true).getProxy();
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+        }
+    }
 
-    boolean exists = RpcClientUtil.isMethodSupported(np,
-        NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER,
-        RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+    @Test
+    public void testNamenodeProtocol() throws IOException {
+        NamenodeProtocol np = NameNodeProxies.createNonHAProxy(conf, nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        boolean exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+        assertTrue(exists);
+        exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
+        assertFalse(exists);
+    }
 
-    assertTrue(exists);
-    exists = RpcClientUtil.isMethodSupported(np,
-        NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER,
-        RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
-    assertFalse(exists);
-  }
+    @Test
+    public void testDatanodeProtocol() throws IOException {
+        DatanodeProtocolClientSideTranslatorPB translator = new DatanodeProtocolClientSideTranslatorPB(nnAddress, conf);
+        assertTrue(translator.isMethodSupported("sendHeartbeat"));
+    }
 
-  @Test
-  public void testDatanodeProtocol() throws IOException {
-    DatanodeProtocolClientSideTranslatorPB translator = 
-        new DatanodeProtocolClientSideTranslatorPB(nnAddress, conf);
-    assertTrue(translator.isMethodSupported("sendHeartbeat"));
-  }
-  
-  @Test
-  public void testClientDatanodeProtocol() throws IOException {
-    ClientDatanodeProtocolTranslatorPB translator = 
-        new ClientDatanodeProtocolTranslatorPB(nnAddress, 
-            UserGroupInformation.getCurrentUser(), conf,
-        NetUtils.getDefaultSocketFactory(conf));
-    //Namenode doesn't implement ClientDatanodeProtocol
-    assertFalse(translator.isMethodSupported("refreshNamenodes"));
-    
-    translator = new ClientDatanodeProtocolTranslatorPB(
-        dnAddress, UserGroupInformation.getCurrentUser(), conf,
-        NetUtils.getDefaultSocketFactory(conf));
-    assertTrue(translator.isMethodSupported("refreshNamenodes"));
-  }
+    @Test
+    public void testClientDatanodeProtocol() throws IOException {
+        ClientDatanodeProtocolTranslatorPB translator = new ClientDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        //Namenode doesn't implement ClientDatanodeProtocol
+        assertFalse(translator.isMethodSupported("refreshNamenodes"));
+        translator = new ClientDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        assertTrue(translator.isMethodSupported("refreshNamenodes"));
+    }
 
-  @Test
-  public void testClientNamenodeProtocol() throws IOException {
-    ClientProtocol cp =
-        NameNodeProxies.createNonHAProxy(
-            conf, nnAddress, ClientProtocol.class,
-            UserGroupInformation.getCurrentUser(), true).getProxy();
-    RpcClientUtil.isMethodSupported(cp,
-        ClientNamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER,
-        RPC.getProtocolVersion(ClientNamenodeProtocolPB.class), "mkdirs");
-  }
+    @Test
+    public void testClientNamenodeProtocol() throws IOException {
+        ClientProtocol cp = NameNodeProxies.createNonHAProxy(conf, nnAddress, ClientProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        RpcClientUtil.isMethodSupported(cp, ClientNamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(ClientNamenodeProtocolPB.class), "mkdirs");
+    }
 
-  @Test
-  public void tesJournalProtocol() throws IOException {
-    JournalProtocolTranslatorPB translator = (JournalProtocolTranslatorPB)
-        NameNodeProxies.createNonHAProxy(conf, nnAddress, JournalProtocol.class,
-            UserGroupInformation.getCurrentUser(), true).getProxy();
-    //Nameode doesn't implement JournalProtocol
-    assertFalse(translator.isMethodSupported("startLogSegment"));
-  }
-  
-  @Test
-  public void testInterDatanodeProtocol() throws IOException {
-    InterDatanodeProtocolTranslatorPB translator = 
-        new InterDatanodeProtocolTranslatorPB(
-            nnAddress, UserGroupInformation.getCurrentUser(), conf,
-            NetUtils.getDefaultSocketFactory(conf), 0);
-    //Not supported at namenode
-    assertFalse(translator.isMethodSupported("initReplicaRecovery"));
-    
-    translator = new InterDatanodeProtocolTranslatorPB(
-        dnAddress, UserGroupInformation.getCurrentUser(), conf,
-        NetUtils.getDefaultSocketFactory(conf), 0);
-    assertTrue(translator.isMethodSupported("initReplicaRecovery"));
-  }
-  
-  @Test
-  public void testGetUserMappingsProtocol() throws IOException {
-    GetUserMappingsProtocolClientSideTranslatorPB translator = 
-        (GetUserMappingsProtocolClientSideTranslatorPB)
-        NameNodeProxies.createNonHAProxy(conf, nnAddress,
-            GetUserMappingsProtocol.class, UserGroupInformation.getCurrentUser(),
-            true).getProxy();
-    assertTrue(translator.isMethodSupported("getGroupsForUser"));
-  }
-  
-  @Test
-  public void testRefreshAuthorizationPolicyProtocol() throws IOException {
-    RefreshAuthorizationPolicyProtocolClientSideTranslatorPB translator = 
-      (RefreshAuthorizationPolicyProtocolClientSideTranslatorPB)
-      NameNodeProxies.createNonHAProxy(conf, nnAddress,
-          RefreshAuthorizationPolicyProtocol.class,
-          UserGroupInformation.getCurrentUser(), true).getProxy();
-    assertTrue(translator.isMethodSupported("refreshServiceAcl"));
-  }
-  
-  @Test
-  public void testRefreshUserMappingsProtocol() throws IOException {
-    RefreshUserMappingsProtocolClientSideTranslatorPB translator =
-        (RefreshUserMappingsProtocolClientSideTranslatorPB)
-        NameNodeProxies.createNonHAProxy(conf, nnAddress,
-            RefreshUserMappingsProtocol.class,
-            UserGroupInformation.getCurrentUser(), true).getProxy();
-    assertTrue(
-        translator.isMethodSupported("refreshUserToGroupsMappings"));
-  }
+    @Test
+    public void tesJournalProtocol() throws IOException {
+        JournalProtocolTranslatorPB translator = (JournalProtocolTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, JournalProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        //Nameode doesn't implement JournalProtocol
+        assertFalse(translator.isMethodSupported("startLogSegment"));
+    }
 
-  @Test
-  public void testRefreshCallQueueProtocol() throws IOException {
-    RefreshCallQueueProtocolClientSideTranslatorPB translator =
-        (RefreshCallQueueProtocolClientSideTranslatorPB)
-        NameNodeProxies.createNonHAProxy(conf, nnAddress,
-            RefreshCallQueueProtocol.class,
-            UserGroupInformation.getCurrentUser(), true).getProxy();
-    assertTrue(
-        translator.isMethodSupported("refreshCallQueue"));
-  }
+    @Test
+    public void testInterDatanodeProtocol() throws IOException {
+        InterDatanodeProtocolTranslatorPB translator = new InterDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        //Not supported at namenode
+        assertFalse(translator.isMethodSupported("initReplicaRecovery"));
+        translator = new InterDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        assertTrue(translator.isMethodSupported("initReplicaRecovery"));
+    }
+
+    @Test
+    public void testGetUserMappingsProtocol() throws IOException {
+        GetUserMappingsProtocolClientSideTranslatorPB translator = (GetUserMappingsProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, GetUserMappingsProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("getGroupsForUser"));
+    }
+
+    @Test
+    public void testRefreshAuthorizationPolicyProtocol() throws IOException {
+        RefreshAuthorizationPolicyProtocolClientSideTranslatorPB translator = (RefreshAuthorizationPolicyProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshAuthorizationPolicyProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshServiceAcl"));
+    }
+
+    @Test
+    public void testRefreshUserMappingsProtocol() throws IOException {
+        RefreshUserMappingsProtocolClientSideTranslatorPB translator = (RefreshUserMappingsProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshUserMappingsProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshUserToGroupsMappings"));
+    }
+
+    @Test
+    public void testRefreshCallQueueProtocol() throws IOException {
+        RefreshCallQueueProtocolClientSideTranslatorPB translator = (RefreshCallQueueProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshCallQueueProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshCallQueue"));
+    }
+
+    @Test
+    public void testNamenodeProtocol_withUpgrade20() throws IOException {
+        NamenodeProtocol np = NameNodeProxies.createNonHAProxy(conf, nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        boolean exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertTrue(exists);
+        exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
+        assertFalse(exists);
+    }
+
+    @Test
+    public void testNamenodeProtocol_withUpgrade40() throws IOException {
+        NamenodeProtocol np = NameNodeProxies.createNonHAProxy(conf, nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        boolean exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+        assertTrue(exists);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
+        assertFalse(exists);
+    }
+
+    @Test
+    public void testNamenodeProtocol_withUpgrade60() throws IOException {
+        NamenodeProtocol np = NameNodeProxies.createNonHAProxy(conf, nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        boolean exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+        assertTrue(exists);
+        exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertFalse(exists);
+    }
+
+    @Test
+    public void testNamenodeProtocol_withUpgrade80() throws IOException {
+        NamenodeProtocol np = NameNodeProxies.createNonHAProxy(conf, nnAddress, NamenodeProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        boolean exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "rollEditLog");
+        assertTrue(exists);
+        exists = RpcClientUtil.isMethodSupported(np, NamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(NamenodeProtocolPB.class), "bogusMethod");
+        assertFalse(exists);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testDatanodeProtocol_withUpgrade20() throws IOException {
+        DatanodeProtocolClientSideTranslatorPB translator = new DatanodeProtocolClientSideTranslatorPB(nnAddress, conf);
+        assertTrue(translator.isMethodSupported("sendHeartbeat"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testClientDatanodeProtocol_withUpgrade20() throws IOException {
+        ClientDatanodeProtocolTranslatorPB translator = new ClientDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        //Namenode doesn't implement ClientDatanodeProtocol
+        assertFalse(translator.isMethodSupported("refreshNamenodes"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        translator = new ClientDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        assertTrue(translator.isMethodSupported("refreshNamenodes"));
+    }
+
+    @Test
+    public void testClientDatanodeProtocol_withUpgrade40() throws IOException {
+        ClientDatanodeProtocolTranslatorPB translator = new ClientDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        //Namenode doesn't implement ClientDatanodeProtocol
+        assertFalse(translator.isMethodSupported("refreshNamenodes"));
+        translator = new ClientDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertTrue(translator.isMethodSupported("refreshNamenodes"));
+    }
+
+    @Test
+    public void testClientDatanodeProtocol_withUpgrade80() throws IOException {
+        ClientDatanodeProtocolTranslatorPB translator = new ClientDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        //Namenode doesn't implement ClientDatanodeProtocol
+        assertFalse(translator.isMethodSupported("refreshNamenodes"));
+        translator = new ClientDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf));
+        assertTrue(translator.isMethodSupported("refreshNamenodes"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testClientNamenodeProtocol_withUpgrade20() throws IOException {
+        ClientProtocol cp = NameNodeProxies.createNonHAProxy(conf, nnAddress, ClientProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        RpcClientUtil.isMethodSupported(cp, ClientNamenodeProtocolPB.class, RPC.RpcKind.RPC_PROTOCOL_BUFFER, RPC.getProtocolVersion(ClientNamenodeProtocolPB.class), "mkdirs");
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void tesJournalProtocol_withUpgrade20() throws IOException {
+        JournalProtocolTranslatorPB translator = (JournalProtocolTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, JournalProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        //Nameode doesn't implement JournalProtocol
+        assertFalse(translator.isMethodSupported("startLogSegment"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testInterDatanodeProtocol_withUpgrade20() throws IOException {
+        InterDatanodeProtocolTranslatorPB translator = new InterDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        //Not supported at namenode
+        assertFalse(translator.isMethodSupported("initReplicaRecovery"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        translator = new InterDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        assertTrue(translator.isMethodSupported("initReplicaRecovery"));
+    }
+
+    @Test
+    public void testInterDatanodeProtocol_withUpgrade40() throws IOException {
+        InterDatanodeProtocolTranslatorPB translator = new InterDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        //Not supported at namenode
+        assertFalse(translator.isMethodSupported("initReplicaRecovery"));
+        translator = new InterDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+        assertTrue(translator.isMethodSupported("initReplicaRecovery"));
+    }
+
+    @Test
+    public void testInterDatanodeProtocol_withUpgrade80() throws IOException {
+        InterDatanodeProtocolTranslatorPB translator = new InterDatanodeProtocolTranslatorPB(nnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        //Not supported at namenode
+        assertFalse(translator.isMethodSupported("initReplicaRecovery"));
+        translator = new InterDatanodeProtocolTranslatorPB(dnAddress, UserGroupInformation.getCurrentUser(), conf, NetUtils.getDefaultSocketFactory(conf), 0);
+        assertTrue(translator.isMethodSupported("initReplicaRecovery"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testGetUserMappingsProtocol_withUpgrade20() throws IOException {
+        GetUserMappingsProtocolClientSideTranslatorPB translator = (GetUserMappingsProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, GetUserMappingsProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("getGroupsForUser"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRefreshAuthorizationPolicyProtocol_withUpgrade20() throws IOException {
+        RefreshAuthorizationPolicyProtocolClientSideTranslatorPB translator = (RefreshAuthorizationPolicyProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshAuthorizationPolicyProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshServiceAcl"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRefreshUserMappingsProtocol_withUpgrade20() throws IOException {
+        RefreshUserMappingsProtocolClientSideTranslatorPB translator = (RefreshUserMappingsProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshUserMappingsProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshUserToGroupsMappings"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
+
+    @Test
+    public void testRefreshCallQueueProtocol_withUpgrade20() throws IOException {
+        RefreshCallQueueProtocolClientSideTranslatorPB translator = (RefreshCallQueueProtocolClientSideTranslatorPB) NameNodeProxies.createNonHAProxy(conf, nnAddress, RefreshCallQueueProtocol.class, UserGroupInformation.getCurrentUser(), true).getProxy();
+        assertTrue(translator.isMethodSupported("refreshCallQueue"));
+        cluster.restartNodeForTesting(0);
+        cluster.upgradeNodeForTesting(0);
+    }
 }
