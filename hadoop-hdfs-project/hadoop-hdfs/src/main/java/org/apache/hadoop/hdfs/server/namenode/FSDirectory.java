@@ -268,11 +268,11 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
     assert namesystem.hasReadLock() : "Should hold namesystem read lock";
   }
 
-  void writeLock() {
+  public void writeLock() {
     assert namesystem.hasWriteLock() : "Should hold namesystem write lock";
   }
 
-  void writeUnlock() {
+  public void writeUnlock() {
     assert namesystem.hasWriteLock() : "Should hold namesystem write lock";
   }
 
@@ -584,7 +584,7 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
     return Joiner.on(",").skipNulls().join(protectedDirectories);
   }
 
-  BlockManager getBlockManager() {
+  public BlockManager getBlockManager() {
     return getFSNamesystem().getBlockManager();
   }
 
@@ -650,7 +650,7 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
     return contentSleepMicroSec;
   }
 
-  int getInodeXAttrsLimit() {
+  public int getInodeXAttrsLimit() {
     return inodeXAttrsLimit;
   }
 
@@ -678,12 +678,12 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
   }
 
   /** Enable quota verification */
-  void enableQuotaChecks() {
+  public void enableQuotaChecks() {
     skipQuotaCheck = false;
   }
 
   /** Disable quota verification */
-  void disableQuotaChecks() {
+  public void disableQuotaChecks() {
     skipQuotaCheck = true;
   }
 
@@ -870,7 +870,7 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
     }
   }
 
-  void updateCountForQuota() {
+  public void updateCountForQuota() {
     updateCountForQuota(quotaInitThreads);
   }
 
@@ -1579,7 +1579,7 @@ public class FSDirectory implements Closeable, FSDirectoryJVMInterface {
   }
   
   @VisibleForTesting
-  int getInodeMapSize() {
+  public int getInodeMapSize() {
     return inodeMap.size();
   }
 

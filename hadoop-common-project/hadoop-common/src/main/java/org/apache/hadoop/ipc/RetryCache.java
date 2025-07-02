@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * To look an implementation using this cache, see HDFS FSNamesystem class.
  */
 @InterfaceAudience.Private
-public class RetryCache {
+public class RetryCache implements RetryCacheJVMInterface {
   public static final Logger LOG = LoggerFactory.getLogger(RetryCache.class);
   private final RetryCacheMetrics retryCacheMetrics;
   private static final int MIN_CAPACITY = 16;

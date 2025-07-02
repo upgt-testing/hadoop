@@ -48,7 +48,7 @@ import static org.apache.hadoop.hdfs.server.common.HdfsServerConstants.XATTR_SNA
 
 /** Snapshot of a sub-tree in the namesystem. */
 @InterfaceAudience.Private
-public class Snapshot implements Comparable<byte[]> {
+public class Snapshot implements Comparable<byte[]>, SnapshotJVMInterface {
   /**
    * This id is used to indicate the current state (vs. snapshots)
    */

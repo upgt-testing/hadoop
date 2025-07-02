@@ -587,7 +587,7 @@ public class SnapshotManager implements SnapshotStatsMXBean, SnapshotManagerJVMI
     snapshotCounter = counter;
   }
 
-  List<INodeDirectory> getSnapshottableDirs() {
+  public List<INodeDirectory> getSnapshottableDirs() {
     return new ArrayList<>(snapshottables.values());
   }
 

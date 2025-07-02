@@ -75,7 +75,7 @@ import org.apache.hadoop.thirdparty.com.google.common.util.concurrent.ThreadFact
  * This class depends on the FSNamesystem lock for synchronization.
  */
 @InterfaceAudience.Private
-public class DatanodeAdminManager {
+public class DatanodeAdminManager implements DatanodeAdminManagerJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(DatanodeAdminManager.class);
   private final Namesystem namesystem;

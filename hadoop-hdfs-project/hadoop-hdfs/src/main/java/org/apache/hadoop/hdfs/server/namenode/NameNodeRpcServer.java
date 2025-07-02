@@ -274,6 +274,11 @@ public class NameNodeRpcServer implements NamenodeProtocols, NameNodeRpcServerJV
   // Users who can override the client info
   private final String[] ipProxyUsers;
 
+  @Override
+  public void renewLease(String clientName) throws IOException {
+    return;
+  }
+
   public NameNodeRpcServer(Configuration conf, NameNode nn)
       throws IOException {
     this.nn = nn;

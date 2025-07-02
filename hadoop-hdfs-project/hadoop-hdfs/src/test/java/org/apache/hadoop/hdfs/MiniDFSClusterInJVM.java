@@ -2680,7 +2680,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
 
     public void waitDatanodeConnectedToActive(DataNodeJVMInterface dn, int timeout)
             throws InterruptedException, TimeoutException {
-        GenericTestUtils.waitFor(() -> dn.isDatanodeFullyStarted(true),
+        GenericTestUtils.waitFor(() -> dn.isDatanodeFullyStarted(),
                 100, timeout, "Datanode is not connected to active namenode even after "
                         + timeout + " ms of waiting");
     }

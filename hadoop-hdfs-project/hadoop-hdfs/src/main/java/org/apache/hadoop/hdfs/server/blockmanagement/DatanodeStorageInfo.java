@@ -26,6 +26,7 @@ import org.apache.hadoop.hdfs.protocol.Block;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage;
 import org.apache.hadoop.hdfs.server.protocol.DatanodeStorage.State;
+import org.apache.hadoop.hdfs.server.protocol.DatanodeStorageJVMInterface;
 import org.apache.hadoop.hdfs.server.protocol.StorageReport;
 
 import org.apache.hadoop.classification.VisibleForTesting;
@@ -34,7 +35,7 @@ import org.apache.hadoop.classification.VisibleForTesting;
  * A Datanode has one or more storages. A storage in the Datanode is represented
  * by this class.
  */
-public class DatanodeStorageInfo {
+public class DatanodeStorageInfo implements DatanodeStorageInfoJVMInterface {
   public static final DatanodeStorageInfo[] EMPTY_ARRAY = {};
 
   public static DatanodeInfo[] toDatanodeInfos(
@@ -220,7 +221,7 @@ public class DatanodeStorageInfo {
     heartbeatedSinceFailover = value;
   }
 
-  boolean areBlocksOnFailedStorage() {
+  public boolean areBlocksOnFailedStorage() {
     return getState() == State.FAILED && numBlocks != 0;
   }
 

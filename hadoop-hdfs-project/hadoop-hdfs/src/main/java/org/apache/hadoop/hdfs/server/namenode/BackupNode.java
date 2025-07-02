@@ -249,8 +249,18 @@ public class BackupNode extends NameNode {
       DFSUtil.addInternalPBProtocol(conf, JournalProtocolPB.class, service,
           this.clientRpcServer);
     }
-    
-    /** 
+
+    @Override
+    public void renewLease(String clientName) throws IOException {
+      return; // no-op
+    }
+
+    @Override
+    public NamespaceInfo versionRequest() throws IOException {
+      return super.versionRequest();
+    }
+
+    /**
      * Verifies a journal request
      */
     private void verifyJournalRequest(JournalInfo journalInfo)

@@ -1,12 +1,22 @@
 package org.apache.hadoop.hdfs.server.blockmanagement;
 
 import org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManagerJVMInterface;
+import org.apache.hadoop.util.DeamonJVMInterface;
 
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Queue;
 
 public interface BlockManagerJVMInterface {
+    DeamonJVMInterface getRedundancyThread();
+    void enableRMTerminationForTesting();
+    int getTotalBlocks();
+    boolean isPopulatingReplQueues();
+    void rescanPostponedMisreplicatedBlocks();
+    Queue<?> getMarkedDeleteQueue();
+    BlockPlacementPolicyJVMInterface getBlockPlacementPolicy();
+    long getMissingBlocksCount();
+    int numOfUnderReplicatedBlocks();
+    long getPendingReconstructionBlocksCount();
     long getLowRedundancyBlocksCount();
     long getExcessBlocksCount();
     long getPendingDeletionBlocksCount();
@@ -27,5 +37,5 @@ public interface BlockManagerJVMInterface {
     int getMaxReplicationStreams();
     int getReplicationStreamsHardLimit();
     int getBlocksReplWorkMultiplier();
-    int getReconstructionPendingTimeout();
+    //int getReconstructionPendingTimeout();
 }

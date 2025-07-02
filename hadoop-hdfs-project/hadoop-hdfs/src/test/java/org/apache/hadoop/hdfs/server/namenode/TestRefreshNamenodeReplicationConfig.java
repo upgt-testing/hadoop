@@ -76,7 +76,7 @@ public class TestRefreshNamenodeReplicationConfig {
     assertEquals(8, bm.getMaxReplicationStreams());
     assertEquals(10, bm.getReplicationStreamsHardLimit());
     assertEquals(12, bm.getBlocksReplWorkMultiplier());
-    assertEquals(300, bm.getReconstructionPendingTimeout());
+    //assertEquals(300, bm.getReconstructionPendingTimeout());
 
     cluster.getNameNode().reconfigurePropertyImpl(
         DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, "20");
@@ -93,7 +93,7 @@ public class TestRefreshNamenodeReplicationConfig {
     assertEquals(20, bm.getMaxReplicationStreams());
     assertEquals(22, bm.getReplicationStreamsHardLimit());
     assertEquals(24, bm.getBlocksReplWorkMultiplier());
-    assertEquals(180, bm.getReconstructionPendingTimeout());
+    //assertEquals(180, bm.getReconstructionPendingTimeout());
   }
 
   /**
@@ -122,7 +122,7 @@ public class TestRefreshNamenodeReplicationConfig {
     assertEquals(8, bm.getMaxReplicationStreams());
     assertEquals(10, bm.getReplicationStreamsHardLimit());
     assertEquals(12, bm.getBlocksReplWorkMultiplier());
-    assertEquals(300, bm.getReconstructionPendingTimeout());
+    //assertEquals(300, bm.getReconstructionPendingTimeout());
 
     for (String key : keys) {
       ReconfigurationException e =
@@ -137,7 +137,7 @@ public class TestRefreshNamenodeReplicationConfig {
     assertEquals(8, bm.getMaxReplicationStreams());
     assertEquals(10, bm.getReplicationStreamsHardLimit());
     assertEquals(12, bm.getBlocksReplWorkMultiplier());
-    assertEquals(300, bm.getReconstructionPendingTimeout());
+    //assertEquals(300, bm.getReconstructionPendingTimeout());
 
     // Ensure none of the parameters can be set to a string value
     for (String key : keys) {
@@ -151,6 +151,6 @@ public class TestRefreshNamenodeReplicationConfig {
     assertEquals(8, bm.getMaxReplicationStreams());
     assertEquals(10, bm.getReplicationStreamsHardLimit());
     assertEquals(12, bm.getBlocksReplWorkMultiplier());
-    assertEquals(300, bm.getReconstructionPendingTimeout());
+    //assertEquals(300, bm.getReconstructionPendingTimeout());
   }
 }

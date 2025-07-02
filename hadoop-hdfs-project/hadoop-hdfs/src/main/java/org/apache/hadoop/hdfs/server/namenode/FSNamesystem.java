@@ -1198,7 +1198,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return true, if CallerContext is enabled, otherwise false, if it's
    *         disabled.
    */
-  boolean getCallerContextEnabled() {
+  public boolean getCallerContextEnabled() {
     for (AuditLogger logger : auditLoggers) {
       if (logger instanceof DefaultAuditLogger) {
         return ((DefaultAuditLogger) logger).getCallerContextEnabled();
@@ -1910,7 +1910,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Causes heartbeat and lease daemons to stop; waits briefly for
    * them to finish, but a short timeout returns control back to caller.
    */
-  void close() {
+  public void close() {
     fsRunning = false;
     try {
       stopCommonServices();
@@ -2187,7 +2187,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Get block locations within the specified range.
    * @see ClientProtocol#getBlockLocations(String, long, long)
    */
-  LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
+  public LocatedBlocks getBlockLocations(String clientMachine, String srcArg,
       long offset, long length) throws IOException {
     final String operationName = "open";
     checkOperation(OperationCategory.READ);
@@ -2447,7 +2447,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    *         false if file does not exist or is a directory
    * @throws  IOException
    */
-  boolean setReplication(final String src, final short replication)
+  public boolean setReplication(final String src, final short replication)
       throws IOException {
     final String operationName = "setReplication";
     boolean success = false;
@@ -2858,7 +2858,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    *         if the lease can be released and the file can be closed.
    * @throws IOException
    */
-  boolean recoverLease(String src, String holder, String clientMachine)
+  public boolean recoverLease(String src, String holder, String clientMachine)
       throws IOException {
     boolean skipSync = false;
     checkOperation(OperationCategory.WRITE);
@@ -6176,7 +6176,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * @return a list in which each entry describes a corrupt file/block
    * @throws IOException
    */
-  Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
+  public Collection<CorruptFileBlockInfo> listCorruptFileBlocks(String path,
   String[] cookieTab) throws IOException {
     final String operationName = "listCorruptFileBlocks";
     checkSuperuserPrivilege(operationName, path);
@@ -6519,7 +6519,7 @@ public class FSNamesystem implements Namesystem, FSNamesystemMBean,
    * Client invoked methods are invoked over RPC and will be in 
    * RPC call context even if the client exits.
    */
-  boolean isExternalInvocation() {
+  public boolean isExternalInvocation() {
     return Server.isRpcInvocation();
   }
 

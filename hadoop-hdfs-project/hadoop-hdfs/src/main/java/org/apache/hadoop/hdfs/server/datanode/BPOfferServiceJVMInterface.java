@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BPOfferServiceJVMInterface {
+    void stop();
     String getBlockPoolId();
     void triggerHeartbeatForTests() throws IOException;
     void triggerBlockReportForTests() throws IOException;

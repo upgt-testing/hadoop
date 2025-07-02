@@ -8,6 +8,13 @@ import org.apache.hadoop.hdfs.protocol.UnregisteredNodeException;
 import java.util.List;
 
 public interface DatanodeManagerJVMInterface {
+    DatanodeAdminManagerJVMInterface getDatanodeAdminManager();
+    SlowPeerTrackerJVMInterface getSlowPeerTracker();
+    int getMaxSlowpeerCollectNodes();
+    boolean getEnableAvoidSlowDataNodesForRead();
+    long getHeartbeatRecheckInterval();
+    long getHeartbeatInterval();
+    int getBlockInvalidateLimit();
     void setHeartbeatExpireInterval(long expireInterval);
     HeartbeatManagerJVMInterface getHeartbeatManager();
     DatanodeDescriptorJVMInterface getDatanode(DatanodeIDJVMInterface nodeID) throws UnregisteredNodeException;

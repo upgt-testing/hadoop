@@ -25,6 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface DataNodeJVMInterface {
+    int getBpOsCount();
+    ChangedVolumesJVMInterface parseChangedVolumes(String arg) throws IOException;
+    String getDiskBalancerStatus();
+    void cancelDiskBalancePlan(String bpid) throws IOException;
+    void checkDiskError() throws IOException;
+    long getLastDiskErrorCheck();
+    void setIBRDisabledForTest(boolean disabled);
+    long getBalancerBandwidth();
     RPCServerJVMInterface getRpcServer();
     DirectoryScannerJVMInterface getDirectoryScanner();
     void clearAllBlockSecretKeys();
@@ -34,7 +42,6 @@ public interface DataNodeJVMInterface {
             throws ReconfigurationException;
     DataXceiverServerJVMInterface getXferServer();
     DataStorageJVMInterface getStorage();
-    List<Map<String, String>> getBPServiceActorInfoMap();
     ConfigurationJVMInterface getConf();
     boolean isSecurityEnabled();
     String getClusterId();
@@ -49,7 +56,7 @@ public interface DataNodeJVMInterface {
     int getXmitsInProgress();
     String getBPServiceActorInfo();
     String getSlowDisks();
-    PipelineAck.ECN getECN();
+    //PipelineAck.ECN getECN();
     DataNodeMetricsJVMInterface getMetrics();
     DataNodeDiskMetricsJVMInterface getDiskMetrics();
     int getXferPort();
@@ -64,7 +71,6 @@ public interface DataNodeJVMInterface {
     void runDatanodeDaemon() throws IOException;
     InetSocketAddress getXferAddress();
     boolean isDatanodeFullyStarted();
-    boolean isDatanodeFullyStarted(boolean checkForRegistration);
     String getDisplayName();
     void shutdownDatanode(boolean forUpgrade) throws IOException;
     void shutdown();

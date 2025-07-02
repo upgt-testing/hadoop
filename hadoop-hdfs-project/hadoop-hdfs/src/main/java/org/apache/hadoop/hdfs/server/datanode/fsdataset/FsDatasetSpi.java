@@ -290,7 +290,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsD
   /**
    * @return the generation stamp stored with the block.
    */
-  Block getStoredBlock(String bpid, long blkid) throws IOException;
+  public Block getStoredBlock(String bpid, long blkid) throws IOException;
 
   /**
    * Returns an input stream at specified offset of the specified block.
@@ -418,7 +418,7 @@ public interface FsDatasetSpi<V extends FsVolumeSpi> extends FSDatasetMBean, FsD
    * @param bpid Block Pool Id
    * @return - a map of DatanodeStorage to block report for the volume.
    */
-  Map<DatanodeStorage, BlockListAsLongs> getBlockReports(String bpid);
+  public Map<DatanodeStorage, BlockListAsLongs> getBlockReports(String bpid);
 
   /**
    * Returns the cache report - the full list of cached block IDs of a

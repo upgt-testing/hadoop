@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public class SlowPeerTracker {
+public class SlowPeerTracker implements SlowPeerTrackerJVMInterface {
   public static final Logger LOG =
       LoggerFactory.getLogger(SlowPeerTracker.class);
 
