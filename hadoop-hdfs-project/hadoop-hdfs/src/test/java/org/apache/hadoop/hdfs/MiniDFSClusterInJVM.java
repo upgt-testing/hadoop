@@ -2433,6 +2433,34 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         finalizeNNUpgrade(activeNN);
     }
 
+    public synchronized void upgradePartialNameNodes(float percentage) throws IOException {
+        if (percentage < 0 || percentage > 1) {
+            throw new IllegalArgumentException("Percentage must be between 0 and 1");
+        }
+        int activeNN = prepareNNUpgrade();
+        // First, always upgrade the activeNN
+        upgradeNameNode(activeNN, false, true);
+
+        int totalNNs = namenodes.size();
+        int numToUpgrade = (int) Math.ceil(totalNNs * percentage);
+        LOG.info("[UPGT] Upgrading " + numToUpgrade + " out of " + totalNNs + " NNs at percentage: " + percentage);
+
+        // Ensure at least one NN is upgraded (activeNN already done)
+        if (numToUpgrade <= 1) {
+            numToUpgrade = 1;
+        }
+
+        // Upgrade additional NNs based on percentage, skipping activeNN
+        int upgraded = 1;
+        for (int i = 0; i < totalNNs && upgraded < numToUpgrade; i++) {
+            if (i == activeNN) continue;
+            upgradeNameNode(i, false, true);
+            upgraded++;
+        }
+        waitActive();
+        finalizeNNUpgrade(activeNN);
+    }
+
 
     /**
      * Upgrade a given NN at index nnIndex. This will do PREPARE and FINALIZE in single NN mode.
@@ -2893,21 +2921,48 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
     }
 
     public boolean upgradeNodeForTesting(int i) {
+        boolean isPartialUpgrade = false;
+        float percentageToUpgrade = 0.5f; // Default to 50% upgrade
         boolean upgradeDN = Boolean.getBoolean("upgt.datanode.upgrade");
         boolean upgradeNN = Boolean.getBoolean("upgt.namenode.upgrade");
-        LOG.info("Under upgrade mode: " + upgradeDN);
+        isPartialUpgrade = Boolean.getBoolean("upgt.upgrade.partial");
+        LOG.info("[UPGT] upgrade namenode mode: " + upgradeNN + ", is partial upgrade: " + isPartialUpgrade);
+        LOG.info("[UPGT] upgrade datanode mode: " + upgradeDN + ", is partial upgrade: " + isPartialUpgrade);
+        LOG.info("[UPGT-NODE-SIZE] Total Number of NameNodes: " + namenodes.size());
+        LOG.info("[UPGT-NODE-SIZE] Total Number of DataNodes: " + dataNodes.size());
         if (!upgradeDN && !upgradeNN) {
-            LOG.info("Skip upgrading Node " + i);
+            LOG.info("Skip upgrading Node!");
             return false;
         }
         try {
             if (upgradeNN) {
                 //upgradeNameNode(i, true);
-                upgradeAllNameNodes();
+                if (isPartialUpgrade) {
+                    upgradePartialNameNodes(percentageToUpgrade);
+                } else {
+                    upgradeAllNameNodes();
+                }
             }
             if (upgradeDN) {
+                if (isPartialUpgrade) {
+                    LOG.info("[UPGT] Partial upgrade datanodes, only upgrade 50% of the datanodes");
+                    // only upgrade the first 50% of the datanodes
+                    int numDataNodesToUpgrade = dataNodes.size() * percentageToUpgrade > 0 ? (int) (dataNodes.size() * percentageToUpgrade) : 0;
+                    if (!dataNodes.isEmpty() && numDataNodesToUpgrade == 0) {
+                        numDataNodesToUpgrade = 1;
+                    }
+                    LOG.info("[UPGT] Number of DataNodes to upgrade: " + numDataNodesToUpgrade);
+                    for (int j = 0; j < numDataNodesToUpgrade; j++) {
+                        if (!upgradeDataNode(i, true)) {
+                            return false;
+                        }
+                        LOG.info("Upgraded DataNode " + i);
+                    }
+                } else {
+                    // upgrade all datanodes
+                    upgradeAllDataNodes(true);
+                }
                 //upgradeDataNode(i, true);
-                upgradeAllDataNodes(true);
             }
             waitActive();
         } catch (IOException e) {
