@@ -2201,7 +2201,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         // First, always upgrade the activeNN
         upgradeNameNode(activeNN, false, true);
 
-        int totalNNs = namenodes.size();
+        int totalNNs = nameNodes.length;
         int numToUpgrade = (int) Math.ceil(totalNNs * percentage);
         LOG.info("[UPGT] Upgrading " + numToUpgrade + " out of " + totalNNs + " NNs at percentage: " + percentage);
 
@@ -2727,7 +2727,7 @@ public class MiniDFSClusterInJVM implements AutoCloseable {
         isPartialUpgrade = Boolean.getBoolean("upgt.upgrade.partial");
         LOG.info("[UPGT] upgrade namenode mode: " + upgradeNN + ", is partial upgrade: " + isPartialUpgrade);
         LOG.info("[UPGT] upgrade datanode mode: " + upgradeDN + ", is partial upgrade: " + isPartialUpgrade);
-        LOG.info("[UPGT-NODE-SIZE] Total Number of NameNodes: " + namenodes.size());
+        LOG.info("[UPGT-NODE-SIZE] Total Number of NameNodes: " + nameNodes.length);
         LOG.info("[UPGT-NODE-SIZE] Total Number of DataNodes: " + dataNodes.size());
         if (!upgradeDN && !upgradeNN) {
             LOG.info("Skip upgrading Node!");
