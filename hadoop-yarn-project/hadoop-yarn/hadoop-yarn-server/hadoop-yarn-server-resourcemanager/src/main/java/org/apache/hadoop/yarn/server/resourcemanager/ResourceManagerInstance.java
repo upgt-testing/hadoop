@@ -15,7 +15,11 @@ import java.util.stream.Collectors;
 public class ResourceManagerInstance extends Instance {
 
     public ResourceManagerInstance() {
-        super("3.3.5");
+        super(StartVersion != null ? StartVersion : "3.3.5");
+    }
+
+    public ResourceManagerInstance(String version) {
+        super(version);
     }
 
     /**

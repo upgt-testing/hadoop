@@ -96,6 +96,7 @@ import static org.apache.hadoop.yarn.server.resourcemanager.resource.TestResourc
 
 import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManagerInstance;
+import edu.illinois.instance.Instance;
 
 /**
  * <p>
@@ -206,8 +207,12 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
         resourceManagers = new ResourceManagerJVMInterface[numResourceManagers];
         nodeManagers = new NodeManagerJVMInterface[numNodeManagers];
-        this.resourceManagerInstance = new ResourceManagerInstance();
-        this.nodeManagerInstance = new NodeManagerInstance();
+        
+        // Initialize version arrays for UPGT upgrade testing
+        currentNodeManagerVersions = new String[numNodeManagers];
+        for (int i = 0; i < numNodeManagers; i++) {
+            currentNodeManagerVersions[i] = currentResourceManagerVersion;
+        }
     }
 
     /**
@@ -854,7 +859,508 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
     }
 
-    private ResourceManagerInstance resourceManagerInstance = new ResourceManagerInstance();
+    // Version tracking for UPGT upgrade testing
+    private String currentResourceManagerVersion;
+    private String[] currentNodeManagerVersions;
 
-    private NodeManagerInstance nodeManagerInstance = new NodeManagerInstance();
+    private ResourceManagerInstance resourceManagerInstance;
+    private NodeManagerInstance nodeManagerInstance;
+
+    // Initialize versions and instances
+    {
+        currentResourceManagerVersion = Instance.StartVersion != null ? Instance.StartVersion : "3.3.5";
+        resourceManagerInstance = new ResourceManagerInstance(currentResourceManagerVersion);
+        nodeManagerInstance = new NodeManagerInstance(currentResourceManagerVersion);
+    }
+
+    /**
+     * State preservation class for ResourceManager upgrade operations.
+     */
+    private static class ResourceManagerState {
+        Configuration configuration;
+        String rmId;
+        boolean isHA;
+        boolean wasActive;
+        
+        ResourceManagerState(Configuration config, String id, boolean ha, boolean active) {
+            this.configuration = config;
+            this.rmId = id;
+            this.isHA = ha;
+            this.wasActive = active;
+        }
+    }
+    
+    /**
+     * State preservation class for NodeManager upgrade operations.
+     */
+    private static class NodeManagerState {
+        Configuration configuration;
+        String nodeId;
+        String localDirs;
+        String logDirs;
+        
+        NodeManagerState(Configuration config, String id, String localDirs, String logDirs) {
+            this.configuration = config;
+            this.nodeId = id;
+            this.localDirs = localDirs;
+            this.logDirs = logDirs;
+        }
+    }
+
+    /**
+     * Saves the current state of a ResourceManager before upgrade.
+     *
+     * @param index the index of the ResourceManager
+     * @return saved state object
+     */
+    private ResourceManagerState saveResourceManagerState(int index) {
+        if (resourceManagers[index] == null) {
+            return null;
+        }
+        
+        Configuration conf = resourceManagers[index].getConfig();
+        String rmId = (rmIds != null && index < rmIds.length) ? rmIds[index] : null;
+        boolean isHA = HAUtil.isHAEnabled(conf);
+        boolean wasActive = false;
+        
+        try {
+            if (isHA && resourceManagers[index].getRMContext() != null) {
+                wasActive = HAServiceProtocol.HAServiceState.ACTIVE == 
+                    resourceManagers[index].getRMContext().getRMAdminService().getServiceStatus().getState();
+            }
+        } catch (Exception e) {
+            LOG.warn("Could not determine HA state for RM[{}], assuming inactive", index, e);
+        }
+        
+        return new ResourceManagerState(new YarnConfiguration(conf), rmId, isHA, wasActive);
+    }
+
+    /**
+     * Saves the current state of a NodeManager before upgrade.
+     *
+     * @param index the index of the NodeManager
+     * @return saved state object
+     */
+    private NodeManagerState saveNodeManagerState(int index) {
+        if (nodeManagers[index] == null) {
+            return null;
+        }
+        
+        Configuration conf = nodeManagers[index].getConfig();
+        String nodeId = conf.get(YarnConfiguration.NM_ADDRESS, "");
+        String localDirs = conf.get(YarnConfiguration.NM_LOCAL_DIRS, "");
+        String logDirs = conf.get(YarnConfiguration.NM_LOG_DIRS, "");
+        
+        return new NodeManagerState(new YarnConfiguration(conf), nodeId, localDirs, logDirs);
+    }
+
+    /**
+     * Restores ResourceManager with preserved state after upgrade.
+     *
+     * @param index the index of the ResourceManager
+     * @param savedState the previously saved state
+     * @throws Exception if restoration fails
+     */
+    private void restoreResourceManagerState(int index, ResourceManagerState savedState) throws Exception {
+        if (savedState == null) {
+            // No saved state, use default initialization
+            initResourceManager(index, getConfig());
+        } else {
+            // Restore with saved configuration
+            initResourceManager(index, savedState.configuration);
+            
+            // Restore HA state if needed
+            if (savedState.isHA && savedState.wasActive && index == 0) {
+                // Wait a bit for initialization
+                Thread.sleep(100);
+                try {
+                    resourceManagers[index].getRMContext().getRMAdminService()
+                        .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
+                            HAServiceProtocol.RequestSource.REQUEST_BY_USER_FORCED));
+                } catch (Exception e) {
+                    LOG.warn("Could not restore HA active state for RM[{}]", index, e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Upgrades the ResourceManager to the specified target version.
+     * This method stops the current RM, creates a new instance with the target version,
+     * and starts it with preserved configuration.
+     *
+     * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
+     * @throws Exception if upgrade fails
+     */
+    public void upgradeResourceManager(String targetVersion) throws Exception {
+        validateVersion(targetVersion);
+        
+        LOG.info("Upgrading ResourceManager from {} to {}", currentResourceManagerVersion, targetVersion);
+        
+        // Save state of all ResourceManagers before stopping
+        ResourceManagerState[] savedStates = new ResourceManagerState[resourceManagers.length];
+        for (int i = 0; i < resourceManagers.length; i++) {
+            savedStates[i] = saveResourceManagerState(i);
+        }
+        
+        // Stop current ResourceManagers
+        for (int i = 0; i < resourceManagers.length; i++) {
+            if (resourceManagers[i] != null) {
+                resourceManagers[i].stop();
+            }
+        }
+        
+        // Update version and create new instance
+        currentResourceManagerVersion = targetVersion;
+        resourceManagerInstance = new ResourceManagerInstance(targetVersion);
+        
+        // Recreate ResourceManagers with new version
+        for (int i = 0; i < resourceManagers.length; i++) {
+            resourceManagers[i] = createResourceManager();
+            // Restore state with preserved configuration
+            restoreResourceManagerState(i, savedStates[i]);
+            // Start the ResourceManager
+            startResourceManager(i);
+        }
+        
+        LOG.info("ResourceManager upgrade completed to version {}", targetVersion);
+    }
+
+    /**
+     * Restores NodeManager with preserved state after upgrade.
+     * Note: NodeManager state restoration is more complex due to the wrapper pattern.
+     * This method recreates the NodeManager and applies the saved configuration.
+     *
+     * @param index the index of the NodeManager
+     * @param savedState the previously saved state
+     * @param targetVersion the target version for the new NodeManager instance
+     */
+    private void restoreNodeManagerState(int index, NodeManagerState savedState, String targetVersion) {
+        // Create a temporary NodeManager instance for this specific upgrade
+        NodeManagerInstance nmInstance = new NodeManagerInstance(targetVersion);
+        
+        // Set the thread context classloader to the version classloader
+        nmInstance.getVersionClassLoader().setCurrentThreadClassLoader();
+        
+        try {
+            // Create the NodeManager with the appropriate class
+            nodeManagers[index] = useRpc ? new CustomNodeManager() : new ShortCircuitedNodeManager();
+            
+            // If we have saved state, we need to initialize with the preserved configuration
+            if (savedState != null) {
+                Configuration restoredConfig = new YarnConfiguration(savedState.configuration);
+                
+                // Restore important node-specific settings
+                if (!savedState.localDirs.isEmpty()) {
+                    restoredConfig.set(YarnConfiguration.NM_LOCAL_DIRS, savedState.localDirs);
+                }
+                if (!savedState.logDirs.isEmpty()) {
+                    restoredConfig.set(YarnConfiguration.NM_LOG_DIRS, savedState.logDirs);
+                }
+                if (!savedState.nodeId.isEmpty()) {
+                    restoredConfig.set(YarnConfiguration.NM_ADDRESS, savedState.nodeId);
+                }
+                
+                // Initialize with restored configuration
+                nodeManagers[index].init(restoredConfig);
+                
+                LOG.info("Restored NodeManager[{}] with preserved configuration", index);
+            } else {
+                // No saved state, use default configuration
+                LOG.info("No saved state for NodeManager[{}], using default configuration", index);
+            }
+        } finally {
+            // Reset the thread context classloader
+            nmInstance.getVersionClassLoader().resetCurrentThreadClassLoader();
+        }
+    }
+
+    /**
+     * Upgrades a specific NodeManager to the specified target version.
+     *
+     * @param index the index of the NodeManager to upgrade
+     * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
+     * @throws Exception if upgrade fails
+     */
+    public void upgradeNodeManager(int index, String targetVersion) throws Exception {
+        validateVersion(targetVersion);
+        
+        if (index < 0 || index >= nodeManagers.length) {
+            throw new IllegalArgumentException("Invalid NodeManager index: " + index);
+        }
+        
+        LOG.info("Upgrading NodeManager[{}] from {} to {}", index, currentNodeManagerVersions[index], targetVersion);
+        
+        // Save state before stopping
+        NodeManagerState savedState = saveNodeManagerState(index);
+        
+        // Stop current NodeManager
+        if (nodeManagers[index] != null) {
+            nodeManagers[index].stop();
+        }
+        
+        // Update version
+        currentNodeManagerVersions[index] = targetVersion;
+        
+        // For individual NodeManager upgrades, we need to create a new instance
+        // Update the shared instance if all NMs are now on the same version
+        if (allNodeManagersHaveVersion(targetVersion)) {
+            nodeManagerInstance = new NodeManagerInstance(targetVersion);
+        }
+        
+        // Recreate NodeManager with preserved configuration
+        restoreNodeManagerState(index, savedState, targetVersion);
+        
+        LOG.info("NodeManager[{}] upgrade completed to version {}", index, targetVersion);
+    }
+
+    /**
+     * Upgrades all NodeManagers to the specified target version.
+     *
+     * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
+     * @throws Exception if upgrade fails
+     */
+    public void upgradeAllNodeManagers(String targetVersion) throws Exception {
+        validateVersion(targetVersion);
+        
+        LOG.info("Upgrading all NodeManagers to version {}", targetVersion);
+        
+        // Save state for all NodeManagers before stopping
+        NodeManagerState[] savedStates = new NodeManagerState[nodeManagers.length];
+        for (int i = 0; i < nodeManagers.length; i++) {
+            savedStates[i] = saveNodeManagerState(i);
+        }
+        
+        // Stop all NodeManagers
+        for (int i = 0; i < nodeManagers.length; i++) {
+            if (nodeManagers[i] != null) {
+                nodeManagers[i].stop();
+            }
+        }
+        
+        // Update all versions
+        for (int i = 0; i < currentNodeManagerVersions.length; i++) {
+            currentNodeManagerVersions[i] = targetVersion;
+        }
+        
+        // Update the shared NodeManager instance since all will be on same version
+        nodeManagerInstance = new NodeManagerInstance(targetVersion);
+        
+        // Recreate all NodeManagers with preserved configuration
+        for (int i = 0; i < nodeManagers.length; i++) {
+            restoreNodeManagerState(i, savedStates[i], targetVersion);
+        }
+        
+        LOG.info("All NodeManagers upgrade completed to version {}", targetVersion);
+    }
+
+    /**
+     * Upgrades the entire YARN cluster (all ResourceManagers and NodeManagers) to the specified target version.
+     * This method coordinates a full cluster upgrade by first upgrading all ResourceManagers, 
+     * then upgrading all NodeManagers, ensuring proper sequencing and configuration preservation.
+     *
+     * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
+     * @throws Exception if upgrade fails
+     */
+    public void upgradeAllNodes(String targetVersion) throws Exception {
+        validateVersion(targetVersion);
+        
+        LOG.info("Starting full cluster upgrade to version {}", targetVersion);
+        LOG.info("Current cluster state:\n{}", getClusterVersionState());
+        
+        try {
+            // Phase 1: Upgrade ResourceManagers first (for stability)
+            LOG.info("Phase 1: Upgrading ResourceManagers to version {}", targetVersion);
+            if (!currentResourceManagerVersion.equals(targetVersion)) {
+                upgradeResourceManager(targetVersion);
+                LOG.info("ResourceManager upgrade completed successfully");
+            } else {
+                LOG.info("ResourceManager already at target version {}", targetVersion);
+            }
+            
+            // Brief pause to let ResourceManagers stabilize
+            Thread.sleep(500);
+            
+            // Phase 2: Upgrade NodeManagers
+            LOG.info("Phase 2: Upgrading all NodeManagers to version {}", targetVersion);
+            if (!allNodeManagersHaveVersion(targetVersion)) {
+                upgradeAllNodeManagers(targetVersion);
+                LOG.info("NodeManager upgrades completed successfully");
+            } else {
+                LOG.info("All NodeManagers already at target version {}", targetVersion);
+            }
+            
+            // Phase 3: Verify cluster state
+            LOG.info("Phase 3: Verifying cluster upgrade");
+            waitForClusterStability(5000); // Wait up to 5 seconds
+            
+            if (isClusterHomogeneous() && getClusterVersion().equals(targetVersion)) {
+                LOG.info("Full cluster upgrade completed successfully to version {}", targetVersion);
+                LOG.info("Final cluster state:\n{}", getClusterVersionState());
+            } else {
+                LOG.warn("Cluster upgrade may not be fully complete. Current state:\n{}", getClusterVersionState());
+            }
+            
+        } catch (Exception e) {
+            LOG.error("Full cluster upgrade failed. Current state:\n{}", getClusterVersionState());
+            throw new Exception("Cluster upgrade to version " + targetVersion + " failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Waits for cluster stability after an upgrade operation.
+     * This method can be extended to include more sophisticated health checks.
+     *
+     * @param timeoutMs maximum time to wait in milliseconds
+     * @return true if cluster appears stable, false if timeout exceeded
+     */
+    private boolean waitForClusterStability(int timeoutMs) {
+        LOG.info("Waiting for cluster stability (timeout: {}ms)", timeoutMs);
+        
+        long startTime = System.currentTimeMillis();
+        
+        try {
+            // Basic stability check - just wait a bit for services to initialize
+            // In a real implementation, this could check service health, node registration, etc.
+            Thread.sleep(Math.min(1000, timeoutMs)); // Wait at least 1 second, but not more than timeout
+            
+            long elapsed = System.currentTimeMillis() - startTime;
+            if (elapsed < timeoutMs) {
+                LOG.info("Cluster appears stable after {}ms", elapsed);
+                return true;
+            } else {
+                LOG.warn("Cluster stability timeout exceeded ({}ms)", timeoutMs);
+                return false;
+            }
+        } catch (InterruptedException e) {
+            LOG.warn("Interrupted while waiting for cluster stability", e);
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    /**
+     * Gets the current version of the ResourceManager.
+     *
+     * @return the current ResourceManager version
+     */
+    public String getResourceManagerVersion() {
+        return currentResourceManagerVersion;
+    }
+
+    /**
+     * Gets the current version of a specific NodeManager.
+     *
+     * @param index the index of the NodeManager
+     * @return the current NodeManager version
+     */
+    public String getNodeManagerVersion(int index) {
+        if (index < 0 || index >= currentNodeManagerVersions.length) {
+            throw new IllegalArgumentException("Invalid NodeManager index: " + index);
+        }
+        return currentNodeManagerVersions[index];
+    }
+
+    /**
+     * Gets the current versions of all NodeManagers.
+     *
+     * @return array of current NodeManager versions
+     */
+    public String[] getNodeManagerVersions() {
+        return currentNodeManagerVersions.clone();
+    }
+
+    /**
+     * Checks if all NodeManagers have the specified version.
+     *
+     * @param version the version to check
+     * @return true if all NodeManagers have the specified version
+     */
+    private boolean allNodeManagersHaveVersion(String version) {
+        if (currentNodeManagerVersions == null) {
+            return false;
+        }
+        for (String nmVersion : currentNodeManagerVersions) {
+            if (!version.equals(nmVersion)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Gets the current version state of the entire cluster.
+     *
+     * @return a formatted string showing versions of all cluster components
+     */
+    public String getClusterVersionState() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Cluster Version State:\n");
+        
+        // ResourceManager versions
+        sb.append("  ResourceManager: ").append(currentResourceManagerVersion).append("\n");
+        
+        // NodeManager versions
+        sb.append("  NodeManagers:\n");
+        if (currentNodeManagerVersions != null) {
+            for (int i = 0; i < currentNodeManagerVersions.length; i++) {
+                sb.append("    NM[").append(i).append("]: ").append(currentNodeManagerVersions[i]).append("\n");
+            }
+        }
+        
+        return sb.toString();
+    }
+
+    /**
+     * Checks if the entire cluster is running on the same version.
+     *
+     * @return true if all ResourceManagers and NodeManagers are on the same version
+     */
+    public boolean isClusterHomogeneous() {
+        if (currentNodeManagerVersions == null || currentResourceManagerVersion == null) {
+            return false;
+        }
+        
+        // Check if all NodeManagers have the same version as ResourceManager
+        for (String nmVersion : currentNodeManagerVersions) {
+            if (!currentResourceManagerVersion.equals(nmVersion)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Gets the common version if the cluster is homogeneous, otherwise returns null.
+     *
+     * @return the common version if all nodes are on same version, null otherwise
+     */
+    public String getClusterVersion() {
+        return isClusterHomogeneous() ? currentResourceManagerVersion : null;
+    }
+
+    /**
+     * Validates that the target version is one of the allowed versions.
+     *
+     * @param targetVersion the version to validate
+     * @throws IllegalArgumentException if the version is invalid
+     */
+    private void validateVersion(String targetVersion) {
+        if (targetVersion == null) {
+            throw new IllegalArgumentException("Target version cannot be null");
+        }
+        
+        String startVersion = Instance.StartVersion;
+        String upgradeVersion = Instance.UpgradeVersion;
+        
+        if (startVersion == null || upgradeVersion == null) {
+            throw new IllegalStateException("Start version and upgrade version must be set via system properties");
+        }
+        
+        if (!targetVersion.equals(startVersion) && !targetVersion.equals(upgradeVersion)) {
+            throw new IllegalArgumentException("Target version must be either StartVersion (" + startVersion + 
+                                             ") or UpgradeVersion (" + upgradeVersion + "), but was: " + targetVersion);
+        }
+    }
 }

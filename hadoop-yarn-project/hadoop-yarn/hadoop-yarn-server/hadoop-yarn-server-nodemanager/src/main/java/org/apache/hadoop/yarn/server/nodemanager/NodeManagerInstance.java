@@ -13,7 +13,11 @@ import java.lang.reflect.Constructor;
 public class NodeManagerInstance extends Instance {
 
     public NodeManagerInstance() {
-        super("3.3.5");
+        super(StartVersion != null ? StartVersion : "3.3.5");
+    }
+
+    public NodeManagerInstance(String version) {
+        super(version);
     }
 
     /**

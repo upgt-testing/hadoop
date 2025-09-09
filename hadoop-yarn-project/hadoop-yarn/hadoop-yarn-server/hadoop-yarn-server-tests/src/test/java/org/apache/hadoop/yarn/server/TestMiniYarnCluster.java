@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.yarn.server;
 
+import edu.illinois.instance.Instance;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.conf.HAUtil;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
@@ -107,6 +108,7 @@ public class TestMiniYarnCluster {
       //verify that the timeline service is started.
       Assert.assertNotNull("Timeline Service should have been started",
           cluster.getApplicationHistoryServer());
+      cluster.upgradeAllNodes(Instance.UpgradeVersion);
     }
   }
 
