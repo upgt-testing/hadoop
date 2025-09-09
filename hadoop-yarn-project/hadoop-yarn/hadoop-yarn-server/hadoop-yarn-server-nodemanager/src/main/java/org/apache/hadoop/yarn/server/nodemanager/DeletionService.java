@@ -48,7 +48,7 @@ import org.apache.hadoop.yarn.server.nodemanager.recovery.NMStateStoreService;
 
 import org.apache.hadoop.thirdparty.com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class DeletionService extends AbstractService {
+public class DeletionService extends AbstractService implements DeletionServiceJVMInterface {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(DeletionService.class);
@@ -209,5 +209,38 @@ public class DeletionService extends AbstractService {
   @Private
   public boolean isTerminated() {
     return getServiceState() == STATE.STOPPED && sched.isTerminated();
+  }
+  
+  public void delete_bridge(org.apache.hadoop.yarn.server.nodemanager.containermanager.deletion.task.DeletionTaskJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("delete", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("delete"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: delete");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

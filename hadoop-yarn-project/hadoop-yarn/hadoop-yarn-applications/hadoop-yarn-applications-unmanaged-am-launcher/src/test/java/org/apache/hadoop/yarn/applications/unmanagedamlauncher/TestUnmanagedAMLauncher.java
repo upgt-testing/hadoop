@@ -40,19 +40,25 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationAttemptState;
 import org.apache.hadoop.yarn.client.ClientRMProxy;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 
 public class TestUnmanagedAMLauncher {
   private static final Logger LOG = LoggerFactory
       .getLogger(TestUnmanagedAMLauncher.class);
 
-  protected static MiniYARNCluster yarnCluster = null;
+  protected static MiniYARNClusterInJVM yarnCluster = null;
   protected static Configuration conf = new YarnConfiguration();
 
   @BeforeClass
@@ -60,7 +66,7 @@ public class TestUnmanagedAMLauncher {
     LOG.info("Starting up YARN cluster");
     conf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
     if (yarnCluster == null) {
-      yarnCluster = new MiniYARNCluster(
+      yarnCluster = new MiniYARNClusterInJVM(
           TestUnmanagedAMLauncher.class.getSimpleName(), 1, 1, 1);
       yarnCluster.init(conf);
       yarnCluster.start();

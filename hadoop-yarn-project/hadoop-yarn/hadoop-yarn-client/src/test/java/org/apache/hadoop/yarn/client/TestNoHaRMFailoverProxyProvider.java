@@ -23,7 +23,7 @@ import org.apache.hadoop.yarn.api.records.NodeReport;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,6 +41,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationClientProtocolJVMInterface;
 
 /**
  * Unit tests for {@link DefaultNoHARMFailoverProxyProvider} and
@@ -76,8 +78,8 @@ public class TestNoHaRMFailoverProxyProvider {
    */
   @Test
   public void testRestartedRM() throws Exception {
-    MiniYARNCluster cluster =
-        new MiniYARNCluster("testRestartedRMNegative", NUMNODEMANAGERS, 1, 1);
+    MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testRestartedRMNegative", NUMNODEMANAGERS, 1, 1);
     YarnClient rmClient = YarnClient.createYarnClient();
     try {
       cluster.init(conf);
@@ -107,8 +109,8 @@ public class TestNoHaRMFailoverProxyProvider {
     conf.setClass(YarnConfiguration.CLIENT_FAILOVER_NO_HA_PROXY_PROVIDER,
         AutoRefreshNoHARMFailoverProxyProvider.class,
         RMFailoverProxyProvider.class);
-    MiniYARNCluster cluster =
-        new MiniYARNCluster("testRestartedRMNegative", NUMNODEMANAGERS, 1, 1);
+    MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testRestartedRMNegative", NUMNODEMANAGERS, 1, 1);
     YarnClient rmClient = null;
     try {
       cluster.init(conf);

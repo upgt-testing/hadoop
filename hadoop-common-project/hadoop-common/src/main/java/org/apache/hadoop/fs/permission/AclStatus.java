@@ -32,7 +32,7 @@ import org.apache.hadoop.thirdparty.com.google.common.collect.Lists;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class AclStatus {
+public class AclStatus implements AclStatusJVMInterface {
   private final String owner;
   private final String group;
   private final boolean stickyBit;
@@ -274,5 +274,72 @@ public class AclStatus {
     } else {
       return entry.getPermission();
     }
+  }
+  
+  public java.lang.Object getEffectivePermission_bridge(org.apache.hadoop.fs.permission.AclEntryJVMInterface arg0, org.apache.hadoop.fs.permission.FsPermissionJVMInterface arg1) throws java.lang.IllegalArgumentException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getEffectivePermission", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getEffectivePermission"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.lang.Object"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getEffectivePermission");
+          target.setAccessible(true);
+          java.lang.Object __result = (java.lang.Object) target.invoke(this, arg0, arg1);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public java.lang.Object getEffectivePermission_bridge(org.apache.hadoop.fs.permission.AclEntryJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getEffectivePermission", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getEffectivePermission"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.lang.Object"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getEffectivePermission");
+          target.setAccessible(true);
+          java.lang.Object __result = (java.lang.Object) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

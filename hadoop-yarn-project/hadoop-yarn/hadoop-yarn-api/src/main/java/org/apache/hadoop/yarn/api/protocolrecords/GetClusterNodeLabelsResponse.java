@@ -29,7 +29,7 @@ import org.apache.hadoop.yarn.util.Records;
 
 @Public
 @Evolving
-public abstract class GetClusterNodeLabelsResponse {
+public abstract class GetClusterNodeLabelsResponse implements GetClusterNodeLabelsResponseJVMInterface {
   /**
    * Creates a new instance.
    *

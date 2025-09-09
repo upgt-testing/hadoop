@@ -66,7 +66,7 @@ import static org.apache.hadoop.thirdparty.com.google.common.base.Preconditions.
 @InterfaceStability.Unstable
 public abstract class
     AbstractFSBuilderImpl<S, B extends FSBuilder<S, B>>
-    implements FSBuilder<S, B> {
+    implements FSBuilder<S, B>, AbstractFSBuilderImplJVMInterface<S, B> {
 
   public static final String UNKNOWN_MANDATORY_KEY = "Unknown mandatory key";
 
@@ -389,6 +389,31 @@ public abstract class
     mandatory.forEach((key) ->
         checkArgument(knownKeys.contains(key),
             UNKNOWN_MANDATORY_KEY + " %s\"%s\"", eText, key));
+  }
+  
+  public S build_bridge() throws java.lang.IllegalArgumentException, java.lang.UnsupportedOperationException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("build"))
+                      continue;
+                  if (m.getParameterCount() != 0)
+                      continue;
+                  if (m.getReturnType().getName().equals("S"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: build");
+          target.setAccessible(true);
+          S __result = (S) target.invoke(this);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 
 }

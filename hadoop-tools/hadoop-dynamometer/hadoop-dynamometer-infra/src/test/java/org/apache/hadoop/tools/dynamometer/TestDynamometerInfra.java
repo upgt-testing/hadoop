@@ -65,7 +65,7 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Container;
 import org.apache.hadoop.yarn.server.resourcemanager.nodelabels.RMNodeLabelsManager;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacitySchedulerConfiguration;
@@ -87,9 +87,20 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.apache.hadoop.fs.FSDataOutputStreamJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.fs.FileSystemJVMInterface;
+import org.apache.hadoop.yarn.api.records.NodeIdJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
+import org.apache.hadoop.fs.FileStatusJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
+import org.apache.hadoop.fs.FSDataInputStreamJVMInterface;
+import org.apache.hadoop.fs.permission.FsPermissionJVMInterface;
 
 /**
- * Start a Dynamometer cluster in a MiniYARNCluster. Ensure that the NameNode is
+ * Start a Dynamometer cluster in a MiniYARNClusterInJVM. Ensure that the NameNode is
  * able to start correctly, exit safemode, and run some commands. Subsequently
  * the workload job is launched and it is verified that it completes
  * successfully and is able to replay commands as expected.
@@ -137,7 +148,7 @@ public class TestDynamometerInfra {
   private static final String OUTPUT_PATH = "/tmp/trace_output_direct";
 
   private static MiniDFSCluster miniDFSCluster;
-  private static MiniYARNCluster miniYARNCluster;
+  private static MiniYARNClusterInJVM miniYARNCluster;
   private static YarnClient yarnClient;
   private static FileSystem fs;
   private static Configuration conf;
@@ -221,7 +232,7 @@ public class TestDynamometerInfra {
     conf.setClass(CapacitySchedulerConfiguration.RESOURCE_CALCULATOR_CLASS,
         DominantResourceCalculator.class, ResourceCalculator.class);
     conf.setBoolean(YarnConfiguration.NM_DISK_HEALTH_CHECK_ENABLE, false);
-    miniYARNCluster = new MiniYARNCluster(TestDynamometerInfra.class.getName(),
+    miniYARNCluster = new MiniYARNClusterInJVM(TestDynamometerInfra.class.getName(),
         1, MINICLUSTER_NUM_NMS, 1, 1);
     miniYARNCluster.init(conf);
     miniYARNCluster.start();

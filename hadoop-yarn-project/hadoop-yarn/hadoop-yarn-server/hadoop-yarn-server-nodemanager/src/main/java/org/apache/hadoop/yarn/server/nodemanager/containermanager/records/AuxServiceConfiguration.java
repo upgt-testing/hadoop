@@ -38,7 +38,7 @@ import java.util.Objects;
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuxServiceConfiguration {
+public class AuxServiceConfiguration implements AuxServiceConfigurationJVMInterface {
 
   private Map<String, String> properties = new HashMap<>();
   private List<AuxServiceFile> files = new ArrayList<>();

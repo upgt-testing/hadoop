@@ -66,7 +66,7 @@ import org.apache.hadoop.yarn.exceptions.ApplicationIdNotProvidedException;
 import org.apache.hadoop.yarn.exceptions.ApplicationNotFoundException;
 import org.apache.hadoop.yarn.exceptions.ContainerNotFoundException;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.MockRM;
 import org.apache.hadoop.yarn.server.resourcemanager.MockRMAppSubmissionData;
 import org.apache.hadoop.yarn.server.resourcemanager.MockRMAppSubmitter;
@@ -102,6 +102,40 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetContainersRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationRequestJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.SignalContainerRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.NodeIdJVMInterface;
+import org.apache.hadoop.yarn.server.resourcemanager.ResourceManagerJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationClientProtocolJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerReportJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesResponseJVMInterface;
 
 /**
  * This class is to test class {@link YarnClient).
@@ -317,7 +351,7 @@ public class TestYarnClient extends ParameterizedSchedulerTestBase {
 
   @Test (timeout = 30000)
   public void testSubmitIncorrectQueueToCapacityScheduler() throws IOException {
-    MiniYARNCluster cluster = new MiniYARNCluster("testMRAMTokens", 1, 1, 1);
+    MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testMRAMTokens", 1, 1, 1);
     YarnClient rmClient = null;
     try {
       YarnConfiguration conf = new YarnConfiguration();
@@ -1049,7 +1083,7 @@ public class TestYarnClient extends ParameterizedSchedulerTestBase {
 
   @Test(timeout = 30000)
   public void testAMMRTokens() throws Exception {
-    MiniYARNCluster cluster = new MiniYARNCluster("testMRAMTokens", 1, 1, 1);
+    MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testMRAMTokens", 1, 1, 1);
     YarnClient rmClient = null;
     try {
       cluster.init(getConf());

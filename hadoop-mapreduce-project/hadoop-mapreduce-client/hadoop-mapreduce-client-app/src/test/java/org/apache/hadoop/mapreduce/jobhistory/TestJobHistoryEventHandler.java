@@ -77,7 +77,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.event.AsyncDispatcher;
 import org.apache.hadoop.yarn.event.DrainDispatcher;
 import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.timeline.TimelineStore;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -90,6 +90,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.security.authorize.AccessControlListJVMInterface;
+import org.apache.hadoop.fs.FileSystemJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
 
 public class TestJobHistoryEventHandler {
 
@@ -575,14 +582,14 @@ public class TestJobHistoryEventHandler {
     Configuration conf = new YarnConfiguration();
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, true);
     long currentTime = System.currentTimeMillis();
-    try (MiniYARNCluster yarnCluster = new MiniYARNCluster(
+    try (MiniYARNClusterInJVM yarnCluster = new MiniYARNClusterInJVM(
         TestJobHistoryEventHandler.class.getSimpleName(), 1, 1, 1, 1)) {
       yarnCluster.init(conf);
       yarnCluster.start();
       Configuration confJHEH = new YarnConfiguration(conf);
       confJHEH.setBoolean(MRJobConfig.MAPREDUCE_JOB_EMIT_TIMELINE_DATA, true);
       confJHEH.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS,
-          MiniYARNCluster.getHostname() + ":" +
+          MiniYARNClusterInJVM.getHostname() + ":" +
           yarnCluster.getApplicationHistoryServer().getPort());
       JHEvenHandlerForTest jheh = new JHEvenHandlerForTest(t.mockAppContext, 0);
       jheh.init(confJHEH);

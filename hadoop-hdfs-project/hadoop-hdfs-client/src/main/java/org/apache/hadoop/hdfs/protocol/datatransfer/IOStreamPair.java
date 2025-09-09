@@ -29,7 +29,7 @@ import org.apache.hadoop.io.IOUtils;
  * A little struct class to wrap an InputStream and an OutputStream.
  */
 @InterfaceAudience.Private
-public class IOStreamPair implements Closeable {
+public class IOStreamPair implements Closeable, IOStreamPairJVMInterface {
   public final InputStream in;
   public final OutputStream out;
 

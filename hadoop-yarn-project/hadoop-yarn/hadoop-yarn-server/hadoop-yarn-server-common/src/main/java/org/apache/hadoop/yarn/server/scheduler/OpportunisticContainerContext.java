@@ -46,7 +46,7 @@ import static org.apache.hadoop.yarn.server.scheduler.OpportunisticContainerAllo
  * This encapsulates application specific information used by the
  * Opportunistic Container Allocator to allocate containers.
  */
-public class OpportunisticContainerContext {
+public class OpportunisticContainerContext implements OpportunisticContainerContextJVMInterface {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(OpportunisticContainerContext.class);
@@ -203,5 +203,108 @@ public class OpportunisticContainerContext {
   @VisibleForTesting
   public OpportunisticSchedulerMetrics getOppSchedulerMetrics() {
     return OpportunisticSchedulerMetrics.getMetrics();
+  }
+  
+  public void updateAllocationParams_bridge(org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg0, org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg1, org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg2, int arg3) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[4];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              __types[3] = int.class;
+              try {
+                  target = this.getClass().getMethod("updateAllocationParams", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateAllocationParams"))
+                      continue;
+                  if (m.getParameterCount() != 4)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateAllocationParams");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1, arg2, arg3);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setContainerIdGenerator_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setContainerIdGenerator", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setContainerIdGenerator"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setContainerIdGenerator");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void matchAllocationToOutstandingRequest_bridge(org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg0, java.util.List<org.apache.hadoop.yarn.server.scheduler.OpportunisticContainerAllocator.Allocation> arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("matchAllocationToOutstandingRequest", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("matchAllocationToOutstandingRequest"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: matchAllocationToOutstandingRequest");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

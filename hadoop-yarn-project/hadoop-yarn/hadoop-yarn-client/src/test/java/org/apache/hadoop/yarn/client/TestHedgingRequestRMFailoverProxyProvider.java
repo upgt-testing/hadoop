@@ -26,10 +26,11 @@ import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.ApplicationNotFoundException;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.HATestUtil;
 import org.junit.Assert;
 import org.junit.Test;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 
 public class TestHedgingRequestRMFailoverProxyProvider {
 
@@ -47,8 +48,8 @@ public class TestHedgingRequestRMFailoverProxyProvider {
     conf.setLong(YarnConfiguration.RESOURCEMANAGER_CONNECT_RETRY_INTERVAL_MS,
         2000);
 
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster("testHedgingRequestProxyProvider", 5, 0, 1, 1)) {
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testHedgingRequestProxyProvider", 5, 0, 1, 1)) {
 
       HATestUtil.setRpcAddressForRM("rm1", 10000, conf);
       HATestUtil.setRpcAddressForRM("rm2", 20000, conf);
@@ -104,7 +105,7 @@ public class TestHedgingRequestRMFailoverProxyProvider {
     }
   }
 
-  private void makeRMActive(final MiniYARNCluster cluster, final int index) {
+  private void makeRMActive(final MiniYARNClusterInJVM cluster, final int index) {
     Thread t = new Thread() {
       @Override public void run() {
         try {

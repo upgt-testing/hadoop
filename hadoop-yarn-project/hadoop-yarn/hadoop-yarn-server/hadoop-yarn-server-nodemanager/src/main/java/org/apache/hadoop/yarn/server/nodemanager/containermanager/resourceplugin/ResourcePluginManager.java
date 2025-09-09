@@ -54,7 +54,7 @@ import static org.apache.hadoop.yarn.api.records.ResourceInformation.GPU_URI;
 /**
  * Manages {@link ResourcePlugin} configured on this NodeManager.
  */
-public class ResourcePluginManager {
+public class ResourcePluginManager implements ResourcePluginManagerJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(ResourcePluginManager.class);
   private static final Set<String> SUPPORTED_RESOURCE_PLUGINS =
@@ -310,5 +310,106 @@ public class ResourcePluginManager {
    */
   public synchronized Map<String, ResourcePlugin> getNameToPlugins() {
     return configuredPlugins;
+  }
+  
+  public void setDeviceMappingManager_bridge(org.apache.hadoop.yarn.server.nodemanager.containermanager.resourceplugin.deviceframework.DeviceMappingManagerJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setDeviceMappingManager", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setDeviceMappingManager"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setDeviceMappingManager");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void initialize_bridge(java.lang.Object arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.lang.ClassNotFoundException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("initialize", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("initialize"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: initialize");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void initializePluggableDevicePlugins_bridge(java.lang.Object arg0, org.apache.hadoop.conf.ConfigurationJVMInterface arg1, java.util.Map<java.lang.String, org.apache.hadoop.yarn.server.nodemanager.containermanager.resourceplugin.ResourcePlugin> arg2) throws org.apache.hadoop.yarn.exceptions.YarnRuntimeException, java.lang.ClassNotFoundException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[3];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("initializePluggableDevicePlugins", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("initializePluggableDevicePlugins"))
+                      continue;
+                  if (m.getParameterCount() != 3)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: initializePluggableDevicePlugins");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1, arg2);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

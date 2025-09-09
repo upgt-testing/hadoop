@@ -27,7 +27,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
 @Public
 @Evolving
 public abstract class AbstractEvent<TYPE extends Enum<TYPE>> 
-    implements Event<TYPE> {
+    implements Event<TYPE>, AbstractEventJVMInterface<TYPE> {
 
   private final TYPE type;
   private final long timestamp;

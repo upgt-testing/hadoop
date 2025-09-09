@@ -108,7 +108,7 @@ import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTest
 import org.apache.hadoop.thirdparty.protobuf.BlockingService;
 
 public class AdminService extends CompositeService implements
-    HAServiceProtocol, ResourceManagerAdministrationProtocol {
+    HAServiceProtocol, ResourceManagerAdministrationProtocol, AdminServiceJVMInterface {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(AdminService.class);

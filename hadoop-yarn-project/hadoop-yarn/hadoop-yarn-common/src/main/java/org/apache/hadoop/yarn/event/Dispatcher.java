@@ -28,7 +28,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
  */
 @Public
 @Evolving
-public interface Dispatcher {
+public interface Dispatcher extends DispatcherJVMInterface {
 
   EventHandler<Event> getEventHandler();
 

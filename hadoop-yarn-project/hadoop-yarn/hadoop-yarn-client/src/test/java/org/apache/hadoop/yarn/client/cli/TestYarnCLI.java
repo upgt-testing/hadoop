@@ -84,7 +84,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.ApplicationAttemptNotFoundException;
 import org.apache.hadoop.yarn.exceptions.ApplicationNotFoundException;
 import org.apache.hadoop.yarn.exceptions.ContainerNotFoundException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.reservation.ReservationSystemTestUtil;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.ResourceScheduler;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler;
@@ -102,6 +102,22 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.hadoop.thirdparty.com.google.common.collect.ImmutableSet;
 import org.apache.hadoop.thirdparty.com.google.common.collect.Sets;
+import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceInformationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.NodeIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationResourceUsageReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceUtilizationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerReportJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.yarn.api.records.QueueInfoJVMInterface;
 
 public class TestYarnCLI {
   private static final Logger LOG = LoggerFactory.getLogger(TestYarnCLI.class);
@@ -1759,8 +1775,8 @@ public class TestYarnCLI {
     // Enable intra-queue preemption for the a1 queue
     conf.setBoolean(CapacitySchedulerConfiguration.PREFIX
         + "root.a.a1.intra-queue-preemption.disable_preemption", false);
-    MiniYARNCluster cluster =
-        new MiniYARNCluster("testGetQueueInfoOverrideIntraQueuePreemption",
+    MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testGetQueueInfoOverrideIntraQueuePreemption",
             2, 1, 1);
 
     YarnClient yarnClient = null;
@@ -1816,8 +1832,8 @@ public class TestYarnCLI {
         + "ProportionalCapacityPreemptionPolicy");
     conf.setBoolean(
         CapacitySchedulerConfiguration.INTRAQUEUE_PREEMPTION_ENABLED, true);
-    MiniYARNCluster cluster =
-        new MiniYARNCluster("testGetQueueInfoPreemptionEnabled", 2, 1, 1);
+    MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testGetQueueInfoPreemptionEnabled", 2, 1, 1);
 
     YarnClient yarnClient = null;
     try {
@@ -1860,8 +1876,8 @@ public class TestYarnCLI {
     conf.setBoolean(YarnConfiguration.RM_SCHEDULER_ENABLE_MONITORS, true);
     conf.setBoolean(PREFIX + "root.a.a1.disable_preemption", true);
 
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster("testReservationAPIs", 2, 1, 1);
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testReservationAPIs", 2, 1, 1);
          YarnClient yarnClient = YarnClient.createYarnClient()) {
       cluster.init(conf);
       cluster.start();

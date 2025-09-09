@@ -37,7 +37,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class UpdateApplicationTimeoutsResponse {
+public abstract class UpdateApplicationTimeoutsResponse implements UpdateApplicationTimeoutsResponseJVMInterface {
 
   public static UpdateApplicationTimeoutsResponse newInstance() {
     UpdateApplicationTimeoutsResponse response =

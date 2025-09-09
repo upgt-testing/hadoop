@@ -35,7 +35,7 @@ import org.apache.hadoop.fs.statistics.IOStatisticsSupport;
 @InterfaceStability.Stable
 public class FSDataOutputStream extends DataOutputStream
     implements Syncable, CanSetDropBehind, StreamCapabilities,
-      IOStatisticsSource, Abortable {
+      IOStatisticsSource, Abortable, FSDataOutputStreamJVMInterface {
   private final OutputStream wrappedStream;
 
   private static class PositionCache extends FilterOutputStream {

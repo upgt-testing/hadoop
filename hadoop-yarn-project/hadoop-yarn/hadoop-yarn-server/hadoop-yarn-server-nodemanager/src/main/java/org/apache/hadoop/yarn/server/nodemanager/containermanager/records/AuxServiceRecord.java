@@ -35,7 +35,7 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "name", "version", "description", "launch_time",
     "configuration" })
-public class AuxServiceRecord {
+public class AuxServiceRecord implements AuxServiceRecordJVMInterface {
 
   private String name = null;
   private String version = null;
@@ -171,5 +171,71 @@ public class AuxServiceRecord {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
+  }
+  
+  public void setConfiguration_bridge(org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceConfigurationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setConfiguration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setConfiguration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setConfiguration");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordJVMInterface configuration_bridge(org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceConfigurationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("configuration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("configuration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: configuration");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordJVMInterface __result = (org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

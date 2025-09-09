@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class GetAllResourceProfilesResponse {
+public abstract class GetAllResourceProfilesResponse implements GetAllResourceProfilesResponseJVMInterface {
 
   public static GetAllResourceProfilesResponse newInstance() {
     return Records.newRecord(GetAllResourceProfilesResponse.class);

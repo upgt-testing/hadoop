@@ -29,7 +29,7 @@ import java.util.Iterator;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public abstract class StorageStatistics {
+public abstract class StorageStatistics implements StorageStatisticsJVMInterface {
 
   /**
    * These are common statistic names.

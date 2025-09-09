@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class BaseContainerTokenSecretManager extends
-    SecretManager<ContainerTokenIdentifier> {
+    SecretManager<ContainerTokenIdentifier> implements BaseContainerTokenSecretManagerJVMInterface {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(BaseContainerTokenSecretManager.class);
@@ -124,5 +124,71 @@ public class BaseContainerTokenSecretManager extends
   @Override
   public ContainerTokenIdentifier createIdentifier() {
     return new ContainerTokenIdentifier();
+  }
+  
+  public byte[] createPassword_bridge(org.apache.hadoop.yarn.security.ContainerTokenIdentifierJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("createPassword", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("createPassword"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("byte[]"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: createPassword");
+          target.setAccessible(true);
+          byte[] __result = (byte[]) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public byte[] retrievePassword_bridge(org.apache.hadoop.yarn.security.ContainerTokenIdentifierJVMInterface arg0) throws org.apache.hadoop.security.token.SecretManager.InvalidToken {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("retrievePassword", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("retrievePassword"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("byte[]"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: retrievePassword");
+          target.setAccessible(true);
+          byte[] __result = (byte[]) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

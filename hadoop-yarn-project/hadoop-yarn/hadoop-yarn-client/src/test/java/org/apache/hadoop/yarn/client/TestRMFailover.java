@@ -46,7 +46,7 @@ import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.event.AsyncDispatcher;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.AdminService;
 import org.apache.hadoop.yarn.server.resourcemanager.HATestUtil;
 import org.apache.hadoop.yarn.server.resourcemanager.ResourceManager;
@@ -64,6 +64,10 @@ import org.junit.Test;
 import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.hadoop.yarn.server.resourcemanager.RMFatalEventJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.server.resourcemanager.ResourceManagerJVMInterface;
 
 public class TestRMFailover extends ClientBaseWithFixes {
   private static final Logger LOG =
@@ -78,7 +82,7 @@ public class TestRMFailover extends ClientBaseWithFixes {
   private static final int RM2_PORT_BASE = 20000;
 
   private Configuration conf;
-  private MiniYARNCluster cluster;
+  private MiniYARNClusterInJVM cluster;
   private ApplicationId fakeAppId;
 
   @Before
@@ -95,7 +99,7 @@ public class TestRMFailover extends ClientBaseWithFixes {
     conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
     conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
 
-    cluster = new MiniYARNCluster(TestRMFailover.class.getName(), 2, 1, 1, 1);
+    cluster = new MiniYARNClusterInJVM(TestRMFailover.class.getName(), 2, 1, 1, 1);
   }
 
   @After
@@ -278,7 +282,7 @@ public class TestRMFailover extends ClientBaseWithFixes {
   @Test
   public void testRMWebAppRedirect() throws YarnException,
       InterruptedException, IOException {
-    cluster = new MiniYARNCluster(TestRMFailover.class.getName(), 2, 0, 1, 1);
+    cluster = new MiniYARNClusterInJVM(TestRMFailover.class.getName(), 2, 0, 1, 1);
     conf.setBoolean(YarnConfiguration.AUTO_FAILOVER_ENABLED, false);
 
     cluster.init(conf);

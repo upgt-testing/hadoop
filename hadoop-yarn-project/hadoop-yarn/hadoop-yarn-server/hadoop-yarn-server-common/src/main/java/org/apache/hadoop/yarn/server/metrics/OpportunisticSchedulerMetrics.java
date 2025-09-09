@@ -39,7 +39,7 @@ import static org.apache.hadoop.metrics2.lib.Interns.info;
  */
 @InterfaceAudience.Private
 @Metrics(context="yarn")
-public class OpportunisticSchedulerMetrics {
+public class OpportunisticSchedulerMetrics implements OpportunisticSchedulerMetricsJVMInterface {
   // CHECKSTYLE:OFF:VisibilityModifier
   private static AtomicBoolean isInitialized = new AtomicBoolean(false);
 

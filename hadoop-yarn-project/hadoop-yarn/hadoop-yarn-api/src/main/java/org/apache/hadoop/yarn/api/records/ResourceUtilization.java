@@ -34,7 +34,7 @@ import java.util.Map;
 @Public
 @Unstable
 public abstract class ResourceUtilization implements
-    Comparable<ResourceUtilization> {
+    Comparable<ResourceUtilization>, ResourceUtilizationJVMInterface {
 
   private Map<String, Float> customResources
       = new HashMap<>();

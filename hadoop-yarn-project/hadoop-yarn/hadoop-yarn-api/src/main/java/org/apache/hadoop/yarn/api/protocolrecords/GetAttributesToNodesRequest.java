@@ -38,7 +38,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Evolving
-public abstract class GetAttributesToNodesRequest {
+public abstract class GetAttributesToNodesRequest implements GetAttributesToNodesRequestJVMInterface {
 
   public static GetAttributesToNodesRequest newInstance() {
     return Records.newRecord(GetAttributesToNodesRequest.class);

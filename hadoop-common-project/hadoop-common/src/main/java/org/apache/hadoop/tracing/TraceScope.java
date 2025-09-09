@@ -19,7 +19,7 @@ package org.apache.hadoop.tracing;
 
 import java.io.Closeable;
 
-public class TraceScope implements Closeable {
+public class TraceScope implements Closeable, TraceScopeJVMInterface {
   Span span;
 
   public TraceScope(Span span) {

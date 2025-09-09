@@ -27,7 +27,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class GetResourceProfileRequest {
+public abstract class GetResourceProfileRequest implements GetResourceProfileRequestJVMInterface {
 
   public static GetResourceProfileRequest newInstance(String profile) {
     GetResourceProfileRequest request =

@@ -31,7 +31,7 @@ import static org.apache.hadoop.thirdparty.com.google.common.base.Preconditions.
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class MetricsTag implements MetricsInfo {
+public class MetricsTag implements MetricsInfo, MetricsTagJVMInterface {
   private final MetricsInfo info;
   private final String value;
 

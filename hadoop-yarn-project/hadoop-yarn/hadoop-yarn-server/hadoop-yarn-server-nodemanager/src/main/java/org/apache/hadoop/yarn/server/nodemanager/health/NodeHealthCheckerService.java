@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * @see TimedHealthReporterService
  */
 public class NodeHealthCheckerService extends CompositeService
-    implements HealthReporter {
+    implements HealthReporter, NodeHealthCheckerServiceJVMInterface {
 
   public static final Logger LOG =
       LoggerFactory.getLogger(NodeHealthCheckerService.class);

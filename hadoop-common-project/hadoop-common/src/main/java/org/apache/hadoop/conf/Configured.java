@@ -24,7 +24,7 @@ import org.apache.hadoop.classification.InterfaceStability;
 /** Base class for things that may be configured with a {@link Configuration}. */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class Configured implements Configurable {
+public class Configured implements Configurable, ConfiguredJVMInterface {
 
   private Configuration conf;
 
@@ -50,6 +50,39 @@ public class Configured implements Configurable {
   @Override
   public Configuration getConf() {
     return conf;
+  }
+  
+  public void setConf_bridge(org.apache.hadoop.conf.ConfigurationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setConf", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setConf"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setConf");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 
 }

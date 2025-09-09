@@ -21,7 +21,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Cont
 /**
  * Encapsulate the details needed to reap a container.
  */
-public final class ContainerReapContext {
+public final class ContainerReapContext implements ContainerReapContextJVMInterface {
 
   private final Container container;
   private final String user;

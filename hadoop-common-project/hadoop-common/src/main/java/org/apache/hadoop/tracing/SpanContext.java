@@ -23,7 +23,7 @@ import java.io.Closeable;
  * Wrapper class for SpanContext to avoid using OpenTracing/OpenTelemetry
  * SpanContext class directly for better separation.
  */
-public class SpanContext implements Closeable {
+public class SpanContext implements Closeable, SpanContextJVMInterface {
   public SpanContext() {
   }
 

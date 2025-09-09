@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class YarnClusterMetrics {
+public abstract class YarnClusterMetrics implements YarnClusterMetricsJVMInterface {
   
   @Private
   @Unstable

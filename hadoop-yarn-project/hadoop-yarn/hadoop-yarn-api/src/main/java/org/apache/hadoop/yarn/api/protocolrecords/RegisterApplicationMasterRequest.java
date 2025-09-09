@@ -43,7 +43,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class RegisterApplicationMasterRequest {
+public abstract class RegisterApplicationMasterRequest implements RegisterApplicationMasterRequestJVMInterface {
 
   /**
    * Create a new instance of <code>RegisterApplicationMasterRequest</code>.

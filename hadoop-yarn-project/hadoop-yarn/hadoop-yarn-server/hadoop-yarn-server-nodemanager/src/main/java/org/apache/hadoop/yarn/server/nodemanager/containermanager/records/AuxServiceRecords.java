@@ -30,7 +30,7 @@ import java.util.List;
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuxServiceRecords {
+public class AuxServiceRecords implements AuxServiceRecordsJVMInterface {
   private List<AuxServiceRecord> services = new ArrayList<>();
 
   public AuxServiceRecords serviceList(AuxServiceRecord... serviceList) {
@@ -42,5 +42,38 @@ public class AuxServiceRecords {
 
   public List<AuxServiceRecord> getServices() {
     return services;
+  }
+  
+  public org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordsJVMInterface serviceList_bridge(org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordJVMInterface[] arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("serviceList", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("serviceList"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordsJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: serviceList");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordsJVMInterface __result = (org.apache.hadoop.yarn.server.nodemanager.containermanager.records.AuxServiceRecordsJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

@@ -38,7 +38,7 @@ import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.reservation.ReservationSystemTestUtil;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.QueueMetrics;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler;
@@ -66,6 +66,19 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ReservationRequestsJVMInterface;
+import org.apache.hadoop.yarn.api.records.ReservationIdJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateRequestJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ReservationDefinitionJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationListRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationListResponseJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionResponseJVMInterface;
 
 
 /**
@@ -96,9 +109,9 @@ public class TestYarnClientWithReservation {
   }
 
 
-  private MiniYARNCluster setupMiniYARNCluster() throws Exception {
-    MiniYARNCluster cluster =
-        new MiniYARNCluster("testReservationAPIs", 2, 1, 1);
+  private MiniYARNClusterInJVM setupMiniYARNCluster() throws Exception {
+    MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM("testReservationAPIs", 2, 1, 1);
 
     cluster.init(getConfigurationForReservation());
     cluster.start();
@@ -154,7 +167,7 @@ public class TestYarnClientWithReservation {
     return conf;
   }
 
-  private YarnClient setupYarnClient(MiniYARNCluster cluster) {
+  private YarnClient setupYarnClient(MiniYARNClusterInJVM cluster) {
     final Configuration yarnConf = cluster.getConfig();
     YarnClient client = YarnClient.createYarnClient();
     client.init(yarnConf);
@@ -185,7 +198,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testCreateReservation() throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -224,7 +237,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testUpdateReservation() throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -281,7 +294,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testListReservationsByReservationId() throws Exception{
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -313,7 +326,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testListReservationsByTimeInterval() throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -368,7 +381,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testListReservationsByInvalidTimeInterval() throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -409,7 +422,7 @@ public class TestYarnClientWithReservation {
   @Test
   public void testListReservationsByTimeIntervalContainingNoReservations()
       throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();
@@ -479,7 +492,7 @@ public class TestYarnClientWithReservation {
 
   @Test
   public void testReservationDelete() throws Exception {
-    MiniYARNCluster cluster = setupMiniYARNCluster();
+    MiniYARNClusterInJVM cluster = setupMiniYARNCluster();
     YarnClient client = setupYarnClient(cluster);
     try {
       Clock clock = new UTCClock();

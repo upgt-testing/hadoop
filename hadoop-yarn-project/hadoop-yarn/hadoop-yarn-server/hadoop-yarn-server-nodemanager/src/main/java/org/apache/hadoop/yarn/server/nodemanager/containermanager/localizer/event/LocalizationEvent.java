@@ -24,7 +24,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.Reso
 /**
  * Events handled by {@link ResourceLocalizationService}
  */
-public class LocalizationEvent extends AbstractEvent<LocalizationEventType> {
+public class LocalizationEvent extends AbstractEvent<LocalizationEventType> implements LocalizationEventJVMInterface {
 
   public LocalizationEvent(LocalizationEventType event) {
     super(event, System.currentTimeMillis());
