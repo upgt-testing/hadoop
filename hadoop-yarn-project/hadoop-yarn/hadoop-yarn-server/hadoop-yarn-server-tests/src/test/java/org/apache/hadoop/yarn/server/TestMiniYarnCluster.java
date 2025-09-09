@@ -25,6 +25,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.HATestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import java.io.IOException;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 
 public class TestMiniYarnCluster {
 
@@ -42,8 +43,8 @@ public class TestMiniYarnCluster {
      */
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, false);
     enableAHS = false;
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster(TestMiniYarnCluster.class.getSimpleName(),
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM(TestMiniYarnCluster.class.getSimpleName(),
             numNodeManagers, numLocalDirs, numLogDirs, numLogDirs,
                 enableAHS)) {
 
@@ -61,14 +62,14 @@ public class TestMiniYarnCluster {
      */
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, true);
     enableAHS = false;
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster(TestMiniYarnCluster.class.getSimpleName(),
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM(TestMiniYarnCluster.class.getSimpleName(),
             numNodeManagers, numLocalDirs, numLogDirs, numLogDirs,
                 enableAHS)) {
       cluster.init(conf);
 
       // Verify that the timeline-service starts on ephemeral ports by default
-      String hostname = MiniYARNCluster.getHostname();
+      String hostname = MiniYARNClusterInJVM.getHostname();
       Assert.assertEquals(hostname + ":0",
         conf.get(YarnConfiguration.TIMELINE_SERVICE_ADDRESS));
 
@@ -90,8 +91,8 @@ public class TestMiniYarnCluster {
      */
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, false);
     enableAHS = true;
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster(TestMiniYarnCluster.class.getSimpleName(),
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM(TestMiniYarnCluster.class.getSimpleName(),
             numNodeManagers, numLocalDirs, numLogDirs, numLogDirs,
                 enableAHS)) {
       cluster.init(conf);
@@ -124,11 +125,11 @@ public class TestMiniYarnCluster {
     conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
     conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
 
-    try (MiniYARNCluster cluster =
-        new MiniYARNCluster(TestMiniYarnCluster.class.getName(),
+    try (MiniYARNClusterInJVM cluster =
+        new MiniYARNClusterInJVM(TestMiniYarnCluster.class.getName(),
             2, 0, 1, 1)) {
       cluster.init(conf);
-      Configuration conf1 = cluster.getResourceManager(0).getConfig(),
+      ConfigurationJVMInterface conf1 = cluster.getResourceManager(0).getConfig(),
           conf2 = cluster.getResourceManager(1).getConfig();
       Assert.assertFalse(conf1 == conf2);
       Assert.assertEquals("0.0.0.0:18032",
