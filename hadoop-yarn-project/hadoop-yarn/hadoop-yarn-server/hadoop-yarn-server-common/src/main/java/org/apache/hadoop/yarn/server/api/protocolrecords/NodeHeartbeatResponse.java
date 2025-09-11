@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.server.api.records.MasterKey;
 import org.apache.hadoop.yarn.server.api.records.NodeAction;
 
-public interface NodeHeartbeatResponse {
+public interface NodeHeartbeatResponse extends NodeHeartbeatResponseJVMInterface {
   int getResponseId();
   NodeAction getNodeAction();
 

@@ -65,7 +65,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @Private
 @Unstable
-public class SystemMetricsPublisher extends CompositeService {
+public class SystemMetricsPublisher extends CompositeService implements SystemMetricsPublisherJVMInterface {
 
   private static final Log LOG = LogFactory
       .getLog(SystemMetricsPublisher.class);

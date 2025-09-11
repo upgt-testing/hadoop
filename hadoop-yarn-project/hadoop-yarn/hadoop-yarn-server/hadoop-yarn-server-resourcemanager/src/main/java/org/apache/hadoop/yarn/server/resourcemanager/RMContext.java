@@ -49,7 +49,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.security.RMDelegationTokenS
 /**
  * Context of the ResourceManager.
  */
-public interface RMContext {
+public interface RMContext extends RMContextJVMInterface {
 
   Dispatcher getDispatcher();
 

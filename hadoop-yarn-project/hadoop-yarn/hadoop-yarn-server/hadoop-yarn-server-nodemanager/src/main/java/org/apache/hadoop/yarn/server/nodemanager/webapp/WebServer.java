@@ -38,7 +38,7 @@ import org.apache.hadoop.yarn.webapp.util.WebAppUtils;
 
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class WebServer extends AbstractService {
+public class WebServer extends AbstractService implements WebServerJVMInterface {
 
   private static final Log LOG = LogFactory.getLog(WebServer.class);
 

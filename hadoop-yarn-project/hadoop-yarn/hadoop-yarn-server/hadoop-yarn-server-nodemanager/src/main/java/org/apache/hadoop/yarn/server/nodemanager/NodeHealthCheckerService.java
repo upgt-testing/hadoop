@@ -27,7 +27,7 @@ import org.apache.hadoop.util.NodeHealthScriptRunner;
  * reporting back to the service for which the health checker has been asked to
  * report.
  */
-public class NodeHealthCheckerService extends CompositeService {
+public class NodeHealthCheckerService extends CompositeService implements NodeHealthCheckerServiceJVMInterface {
 
   private NodeHealthScriptRunner nodeHealthScriptRunner;
   private LocalDirsHandlerService dirsHandler;

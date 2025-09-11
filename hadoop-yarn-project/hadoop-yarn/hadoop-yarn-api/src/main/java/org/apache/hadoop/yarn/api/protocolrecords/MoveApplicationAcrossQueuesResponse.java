@@ -37,7 +37,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class MoveApplicationAcrossQueuesResponse {
+public abstract class MoveApplicationAcrossQueuesResponse implements MoveApplicationAcrossQueuesResponseJVMInterface {
   @Private
   @Unstable
   public static MoveApplicationAcrossQueuesResponse newInstance() {

@@ -51,7 +51,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class Resource implements Comparable<Resource> {
+public abstract class Resource implements Comparable<Resource>, ResourceJVMInterface {
 
   @Public
   @Stable

@@ -37,7 +37,7 @@ import org.apache.hadoop.yarn.security.NMTokenIdentifier;
 import org.apache.hadoop.yarn.server.api.records.MasterKey;
 
 public class BaseNMTokenSecretManager extends
-    SecretManager<NMTokenIdentifier> {
+    SecretManager<NMTokenIdentifier> implements BaseNMTokenSecretManagerJVMInterface {
 
   private static Log LOG = LogFactory
       .getLog(BaseNMTokenSecretManager.class);
@@ -147,5 +147,73 @@ public class BaseNMTokenSecretManager extends
           NMTokenIdentifier.KIND.toString(), password, SecurityUtil
             .buildTokenService(addr).toString());
     return nmToken;
+  }
+  
+  public org.apache.hadoop.yarn.api.records.TokenJVMInterface createNMToken_bridge(org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface arg0, org.apache.hadoop.yarn.api.records.NodeIdJVMInterface arg1, java.lang.String arg2) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[3];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("createNMToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("createNMToken"))
+                      continue;
+                  if (m.getParameterCount() != 3)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.records.TokenJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: createNMToken");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.records.TokenJVMInterface __result = (org.apache.hadoop.yarn.api.records.TokenJVMInterface) target.invoke(this, arg0, arg1, arg2);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public byte[] retrievePassword_bridge(org.apache.hadoop.yarn.security.NMTokenIdentifierJVMInterface arg0) throws org.apache.hadoop.security.token.SecretManager.InvalidToken {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("retrievePassword", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("retrievePassword"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("byte[]"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: retrievePassword");
+          target.setAccessible(true);
+          byte[] __result = (byte[]) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class ReservationUpdateResponse {
+public abstract class ReservationUpdateResponse implements ReservationUpdateResponseJVMInterface {
 
   @Private
   @Unstable

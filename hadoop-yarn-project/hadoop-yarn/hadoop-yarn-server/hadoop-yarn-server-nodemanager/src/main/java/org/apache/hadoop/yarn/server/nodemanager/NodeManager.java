@@ -77,7 +77,7 @@ import org.apache.hadoop.yarn.server.security.ApplicationACLsManager;
 import com.google.common.annotations.VisibleForTesting;
 
 public class NodeManager extends CompositeService 
-    implements EventHandler<NodeManagerEvent> {
+    implements EventHandler<NodeManagerEvent>, NodeManagerJVMInterface {
 
   /**
    * Priority of the NodeManager shutdown hook.
@@ -688,5 +688,38 @@ public class NodeManager extends CompositeService
   @Private
   public NodeStatusUpdater getNodeStatusUpdater() {
     return nodeStatusUpdater;
+  }
+  
+  public void handle_bridge(org.apache.hadoop.yarn.server.nodemanager.NodeManagerEventJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("handle", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("handle"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: handle");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

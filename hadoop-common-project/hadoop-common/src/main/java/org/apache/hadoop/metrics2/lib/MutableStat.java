@@ -33,7 +33,7 @@ import static org.apache.hadoop.metrics2.lib.Interns.*;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class MutableStat extends MutableMetric {
+public class MutableStat extends MutableMetric implements MutableStatJVMInterface {
   private final MetricsInfo numInfo;
   private final MetricsInfo avgInfo;
   private final MetricsInfo stdevInfo;
@@ -162,5 +162,39 @@ public class MutableStat extends MutableMetric {
   @Override
   public String toString() {
     return lastStat().toString();
+  }
+  
+  public void snapshot_bridge(org.apache.hadoop.metrics2.MetricsRecordBuilderJVMInterface arg0, boolean arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = boolean.class;
+              try {
+                  target = this.getClass().getMethod("snapshot", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("snapshot"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: snapshot");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

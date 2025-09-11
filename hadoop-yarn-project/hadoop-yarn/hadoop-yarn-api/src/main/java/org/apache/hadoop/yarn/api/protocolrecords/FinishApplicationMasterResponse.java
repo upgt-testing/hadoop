@@ -44,7 +44,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class FinishApplicationMasterResponse {
+public abstract class FinishApplicationMasterResponse implements FinishApplicationMasterResponseJVMInterface {
 
   @Private
   @Unstable

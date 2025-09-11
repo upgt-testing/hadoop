@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.apache.hadoop.yarn.util.Records;
 
-public abstract class GetLabelsToNodesRequest {
+public abstract class GetLabelsToNodesRequest implements GetLabelsToNodesRequestJVMInterface {
 
   public static GetLabelsToNodesRequest newInstance() {
     return Records.newRecord(GetLabelsToNodesRequest.class);

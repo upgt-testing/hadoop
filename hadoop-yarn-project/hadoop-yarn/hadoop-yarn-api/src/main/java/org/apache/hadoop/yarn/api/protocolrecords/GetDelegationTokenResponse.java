@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetDelegationTokenResponse {
+public abstract class GetDelegationTokenResponse implements GetDelegationTokenResponseJVMInterface {
 
   @Private
   @Unstable
@@ -58,4 +58,37 @@ public abstract class GetDelegationTokenResponse {
   @Private
   @Unstable
   public abstract void setRMDelegationToken(Token rmDTToken);
+  
+  public void setRMDelegationToken_bridge(org.apache.hadoop.yarn.api.records.TokenJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setRMDelegationToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setRMDelegationToken"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setRMDelegationToken");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 }

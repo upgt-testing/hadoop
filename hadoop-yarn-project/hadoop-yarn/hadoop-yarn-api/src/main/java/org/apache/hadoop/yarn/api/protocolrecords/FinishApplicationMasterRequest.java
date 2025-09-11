@@ -42,7 +42,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class FinishApplicationMasterRequest {
+public abstract class FinishApplicationMasterRequest implements FinishApplicationMasterRequestJVMInterface {
 
   @Public
   @Stable
@@ -119,5 +119,38 @@ public abstract class FinishApplicationMasterRequest {
   @Public
   @Stable
   public abstract void setTrackingUrl(String url);
+  
+  public void setFinalApplicationStatus_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setFinalApplicationStatus", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setFinalApplicationStatus"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setFinalApplicationStatus");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 
 }

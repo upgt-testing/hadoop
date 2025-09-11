@@ -32,7 +32,7 @@ import org.apache.hadoop.metrics2.lib.MutableRatesWithAggregation;
  */
 @InterfaceAudience.Private
 @Metrics(about="Per method RPC metrics", context="rpcdetailed")
-public class RpcDetailedMetrics {
+public class RpcDetailedMetrics implements RpcDetailedMetricsJVMInterface {
 
   @Metric MutableRatesWithAggregation rates;
 

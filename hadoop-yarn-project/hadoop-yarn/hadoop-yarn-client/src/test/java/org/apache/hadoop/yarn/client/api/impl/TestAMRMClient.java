@@ -83,7 +83,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.ipc.YarnRPC;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptState;
 import org.apache.hadoop.yarn.server.resourcemanager.security.AMRMTokenSecretManager;
@@ -100,10 +100,28 @@ import org.mockito.stubbing.Answer;
 import org.mortbay.log.Log;
 
 import com.google.common.base.Supplier;
+import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
+import org.apache.hadoop.io.TextJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
+import org.apache.hadoop.yarn.api.records.TokenJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.security.CredentialsJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 
 public class TestAMRMClient {
   static Configuration conf = null;
-  static MiniYARNCluster yarnCluster = null;
+  static MiniYARNClusterInJVM yarnCluster = null;
   static YarnClient yarnClient = null;
   static List<NodeReport> nodeReports = null;
   static ApplicationAttemptId attemptId = null;
@@ -138,7 +156,7 @@ public class TestAMRMClient {
 
   private static void createClientAndCluster(Configuration conf)
       throws Exception {
-    yarnCluster = new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
+    yarnCluster = new MiniYARNClusterInJVM(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
 
@@ -667,14 +685,14 @@ public class TestAMRMClient {
   @Test (timeout=60000)
   public void testAMRMClientWithSaslEncryption() throws Exception {
     conf.set(CommonConfigurationKeysPublic.HADOOP_RPC_PROTECTION, "privacy");
-    // we have to create a new instance of MiniYARNCluster to avoid SASL qop
+    // we have to create a new instance of MiniYARNClusterInJVM to avoid SASL qop
     // mismatches between client and server
     tearDown();
     createClientAndCluster(conf);
     startApp();
     registerAndAllocate();
 
-    // recreate the original MiniYARNCluster and YarnClient for other tests
+    // recreate the original MiniYARNClusterInJVM and YarnClient for other tests
     conf.unset(CommonConfigurationKeysPublic.HADOOP_RPC_PROTECTION);
     tearDown();
     createClientAndCluster(conf);

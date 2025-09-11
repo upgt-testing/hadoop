@@ -38,7 +38,7 @@ import org.apache.hadoop.metrics2.lib.MutableRate;
  */
 @InterfaceAudience.Private
 @Metrics(about="Aggregate RPC metrics", context="rpc")
-public class RpcMetrics {
+public class RpcMetrics implements RpcMetricsJVMInterface {
 
   static final Log LOG = LogFactory.getLog(RpcMetrics.class);
   final Server server;

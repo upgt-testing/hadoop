@@ -45,7 +45,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class KillApplicationResponse {
+public abstract class KillApplicationResponse implements KillApplicationResponseJVMInterface {
   @Private
   @Unstable
   public static KillApplicationResponse newInstance(boolean isKillCompleted) {

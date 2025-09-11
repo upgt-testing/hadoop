@@ -41,7 +41,7 @@ import com.google.common.net.InetAddresses;
  * host addresses.
  */
 
-public class MachineList {
+public class MachineList implements MachineListJVMInterface {
   
   public static final Log LOG = LogFactory.getLog(MachineList.class);
   public static final String WILDCARD_VALUE = "*";

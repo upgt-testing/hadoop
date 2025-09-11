@@ -52,7 +52,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class ContainerLaunchContext {
+public abstract class ContainerLaunchContext implements ContainerLaunchContextJVMInterface {
 
   @Public
   @Stable

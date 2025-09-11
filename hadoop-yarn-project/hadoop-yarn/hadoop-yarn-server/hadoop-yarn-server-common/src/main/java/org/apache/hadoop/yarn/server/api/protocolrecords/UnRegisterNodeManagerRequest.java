@@ -24,7 +24,7 @@ import org.apache.hadoop.yarn.util.Records;
 /**
  * Node Manager's unregister request.
  */
-public abstract class UnRegisterNodeManagerRequest {
+public abstract class UnRegisterNodeManagerRequest implements UnRegisterNodeManagerRequestJVMInterface {
   public static UnRegisterNodeManagerRequest newInstance(NodeId nodeId) {
     UnRegisterNodeManagerRequest nodeHeartbeatRequest = Records
         .newRecord(UnRegisterNodeManagerRequest.class);
@@ -35,4 +35,37 @@ public abstract class UnRegisterNodeManagerRequest {
   public abstract NodeId getNodeId();
 
   public abstract void setNodeId(NodeId nodeId);
+  
+  public void setNodeId_bridge(org.apache.hadoop.yarn.api.records.NodeIdJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setNodeId", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setNodeId"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setNodeId");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 }
