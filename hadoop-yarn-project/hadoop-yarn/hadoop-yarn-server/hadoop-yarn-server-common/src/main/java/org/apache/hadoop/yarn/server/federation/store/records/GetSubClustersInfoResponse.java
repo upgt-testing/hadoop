@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class GetSubClustersInfoResponse {
+public abstract class GetSubClustersInfoResponse implements GetSubClustersInfoResponseJVMInterface {
 
   @Public
   @Unstable

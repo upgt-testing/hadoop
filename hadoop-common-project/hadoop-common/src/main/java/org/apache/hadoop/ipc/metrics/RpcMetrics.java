@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Private
 @Metrics(about="Aggregate RPC metrics", context="rpc")
-public class RpcMetrics {
+public class RpcMetrics implements RpcMetricsJVMInterface {
 
   static final Logger LOG = LoggerFactory.getLogger(RpcMetrics.class);
   final Server server;

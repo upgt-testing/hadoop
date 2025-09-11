@@ -34,7 +34,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetNewApplicationRequest {
+public abstract class GetNewApplicationRequest implements GetNewApplicationRequestJVMInterface {
   @Public
   @Stable
   public static GetNewApplicationRequest newInstance() {

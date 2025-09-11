@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
 @Public
 @Unstable
 public abstract class ResourceUtilization implements
-    Comparable<ResourceUtilization> {
+    Comparable<ResourceUtilization>, ResourceUtilizationJVMInterface {
 
   @Public
   @Unstable

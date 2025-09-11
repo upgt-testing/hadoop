@@ -38,9 +38,14 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 
 import org.junit.Test;
+import org.apache.hadoop.fs.FSDataOutputStreamJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
+import org.apache.hadoop.io.TextJVMInterface;
+import org.apache.hadoop.fs.FSDataInputStreamJVMInterface;
 
 /**
  * Tests that S3A is usable through a YARN application.
@@ -49,7 +54,7 @@ public class ITestS3AMiniYarnCluster extends AbstractS3ATestBase {
 
   private final Configuration conf = new YarnConfiguration();
   private S3AFileSystem fs;
-  private MiniYARNCluster yarnCluster;
+  private MiniYARNClusterInJVM yarnCluster;
   private Path rootPath;
 
   @Override
@@ -61,7 +66,7 @@ public class ITestS3AMiniYarnCluster extends AbstractS3ATestBase {
     fs.setWorkingDirectory(workingDir);
     fs.mkdirs(new Path(rootPath, "input/"));
 
-    yarnCluster = new MiniYARNCluster("MiniClusterWordCount", // testName
+    yarnCluster = new MiniYARNClusterInJVM("MiniClusterWordCount", // testName
             1, // number of node managers
             1, // number of local log dirs per node manager
             1); // number of hdfs dirs per node manager

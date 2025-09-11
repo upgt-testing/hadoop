@@ -22,7 +22,7 @@ import org.apache.hadoop.yarn.api.records.ContainerId;
 import org.apache.hadoop.yarn.event.AbstractEvent;
 
 
-public class ContainerEvent extends AbstractEvent<ContainerEventType> {
+public class ContainerEvent extends AbstractEvent<ContainerEventType> implements ContainerEventJVMInterface {
 
   private final ContainerId containerID;
 

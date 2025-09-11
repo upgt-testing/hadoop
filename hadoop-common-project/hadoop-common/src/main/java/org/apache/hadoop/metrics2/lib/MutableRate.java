@@ -26,7 +26,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class MutableRate extends MutableStat {
+public class MutableRate extends MutableStat implements MutableRateJVMInterface {
 
   MutableRate(String name, String description, boolean extended) {
     super(name, description, "Ops", "Time", extended);

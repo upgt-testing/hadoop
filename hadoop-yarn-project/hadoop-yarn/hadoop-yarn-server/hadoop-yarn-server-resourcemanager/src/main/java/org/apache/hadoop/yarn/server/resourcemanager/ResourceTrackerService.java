@@ -93,7 +93,7 @@ import org.apache.hadoop.yarn.util.YarnVersionInfo;
 import com.google.common.annotations.VisibleForTesting;
 
 public class ResourceTrackerService extends AbstractService implements
-    ResourceTracker {
+    ResourceTracker, ResourceTrackerServiceJVMInterface {
 
   private static final Log LOG = LogFactory.getLog(ResourceTrackerService.class);
 
@@ -828,5 +828,170 @@ public class ResourceTrackerService extends AbstractService implements
   @VisibleForTesting
   public Server getServer() {
     return this.server;
+  }
+  
+  public void loadDynamicResourceConfiguration_bridge(org.apache.hadoop.conf.ConfigurationJVMInterface arg0) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("loadDynamicResourceConfiguration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("loadDynamicResourceConfiguration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: loadDynamicResourceConfiguration");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public java.lang.Object nodeHeartbeat_bridge(org.apache.hadoop.yarn.server.api.protocolrecords.NodeHeartbeatRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("nodeHeartbeat", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("nodeHeartbeat"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.lang.Object"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: nodeHeartbeat");
+          target.setAccessible(true);
+          java.lang.Object __result = (java.lang.Object) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.api.protocolrecords.UnRegisterNodeManagerResponseJVMInterface unRegisterNodeManager_bridge(org.apache.hadoop.yarn.server.api.protocolrecords.UnRegisterNodeManagerRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("unRegisterNodeManager", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("unRegisterNodeManager"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.api.protocolrecords.UnRegisterNodeManagerResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: unRegisterNodeManager");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.api.protocolrecords.UnRegisterNodeManagerResponseJVMInterface __result = (org.apache.hadoop.yarn.server.api.protocolrecords.UnRegisterNodeManagerResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void updateDynamicResourceConfiguration_bridge(org.apache.hadoop.yarn.server.resourcemanager.resource.DynamicResourceConfigurationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("updateDynamicResourceConfiguration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateDynamicResourceConfiguration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateDynamicResourceConfiguration");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public java.lang.Object registerNodeManager_bridge(org.apache.hadoop.yarn.server.api.protocolrecords.RegisterNodeManagerRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerNodeManager", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerNodeManager"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.lang.Object"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerNodeManager");
+          target.setAccessible(true);
+          java.lang.Object __result = (java.lang.Object) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

@@ -60,7 +60,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class AllocateRequest {
+public abstract class AllocateRequest implements AllocateRequestJVMInterface {
 
   @Public
   @Stable
@@ -366,5 +366,38 @@ public abstract class AllocateRequest {
     public AllocateRequest build() {
       return allocateRequest;
     }
+  }
+  
+  public void setResourceBlacklistRequest_bridge(org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setResourceBlacklistRequest", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setResourceBlacklistRequest"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setResourceBlacklistRequest");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

@@ -36,7 +36,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetClusterNodesRequest {
+public abstract class GetClusterNodesRequest implements GetClusterNodesRequestJVMInterface {
   @Public
   @Stable 
   public static GetClusterNodesRequest newInstance(EnumSet<NodeState> states) {

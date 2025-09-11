@@ -28,7 +28,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class CancelDelegationTokenResponse {
+public abstract class CancelDelegationTokenResponse implements CancelDelegationTokenResponseJVMInterface {
   @Private
   @Unstable
   public static CancelDelegationTokenResponse newInstance() {

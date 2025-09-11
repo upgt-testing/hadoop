@@ -39,7 +39,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class SubClusterRegisterRequest {
+public abstract class SubClusterRegisterRequest implements SubClusterRegisterRequestJVMInterface {
 
   @Private
   @Unstable
@@ -70,5 +70,38 @@ public abstract class SubClusterRegisterRequest {
   @Public
   @Unstable
   public abstract void setSubClusterInfo(SubClusterInfo subClusterInfo);
+  
+  public void setSubClusterInfo_bridge(org.apache.hadoop.yarn.server.federation.store.records.SubClusterInfoJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setSubClusterInfo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setSubClusterInfo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setSubClusterInfo");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 
 }

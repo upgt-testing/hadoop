@@ -30,7 +30,7 @@ import org.apache.hadoop.util.StringInterner;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class BlockLocation {
+public class BlockLocation implements BlockLocationJVMInterface {
   private String[] hosts; // Datanode hostnames
   private String[] cachedHosts; // Datanode hostnames with a cached replica
   private String[] names; // Datanode IP:xferPort for accessing the block

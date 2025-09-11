@@ -27,7 +27,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public abstract class BinaryComparable implements Comparable<BinaryComparable> {
+public abstract class BinaryComparable implements Comparable<BinaryComparable>, BinaryComparableJVMInterface {
 
   /**
    * Return n st bytes 0..n-1 from {#getBytes()} are valid.
@@ -79,6 +79,39 @@ public abstract class BinaryComparable implements Comparable<BinaryComparable> {
   @Override
   public int hashCode() {
     return WritableComparator.hashBytes(getBytes(), getLength());
+  }
+  
+  public int compareTo_bridge(org.apache.hadoop.io.BinaryComparableJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("compareTo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("compareTo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("int"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: compareTo");
+          target.setAccessible(true);
+          int __result = (int) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 
 }

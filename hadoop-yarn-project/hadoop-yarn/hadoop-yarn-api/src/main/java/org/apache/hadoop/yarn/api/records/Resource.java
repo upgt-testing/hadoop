@@ -50,7 +50,7 @@ import org.apache.hadoop.yarn.api.ApplicationMasterProtocol;
  */
 @Public
 @Stable
-public abstract class Resource implements Comparable<Resource> {
+public abstract class Resource implements Comparable<Resource>, ResourceJVMInterface {
 
   private static class SimpleResource extends Resource {
     private long memory;
@@ -219,5 +219,38 @@ public abstract class Resource implements Comparable<Resource> {
       return Integer.MAX_VALUE;
     }
     return Long.valueOf(value).intValue();
+  }
+  
+  public int compareTo_bridge(org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("compareTo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("compareTo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("int"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: compareTo");
+          target.setAccessible(true);
+          int __result = (int) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

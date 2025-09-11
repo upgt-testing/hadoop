@@ -42,7 +42,7 @@ import com.sun.jersey.api.json.JSONMarshaller;
  * capabilities as represented by {@link ClusterMetricsInfo} of the sub cluster.
  *
  */
-public class FederationStateStoreHeartbeat implements Runnable {
+public class FederationStateStoreHeartbeat implements Runnable, FederationStateStoreHeartbeatJVMInterface {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(FederationStateStoreHeartbeat.class);

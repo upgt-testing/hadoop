@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsRequest;
 import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponse;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.federation.failover.FederationProxyProviderUtil;
 import org.apache.hadoop.yarn.server.federation.failover.FederationRMFailoverProxyProvider;
 import org.apache.hadoop.yarn.server.federation.store.FederationStateStore;
@@ -56,6 +56,18 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.apache.hadoop.yarn.server.federation.store.records.SubClusterIdJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.yarn.server.federation.store.records.SubClusterInfoJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterRequestJVMInterface;
+import org.apache.hadoop.yarn.server.resourcemanager.ResourceManagerJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationClientProtocolJVMInterface;
+import org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoRequestJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsRequestJVMInterface;
+import org.apache.hadoop.yarn.server.federation.store.FederationStateStoreJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 
 /**
  * Unit tests for FederationRMFailoverProxyProvider.
@@ -101,7 +113,7 @@ public class TestFederationRMFailoverProxyProvider {
 
   private void testProxyProvider(boolean facadeFlushCache) throws Exception {
     final SubClusterId subClusterId = SubClusterId.newInstance("SC-1");
-    final MiniYARNCluster cluster = new MiniYARNCluster(
+    final MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM(
         "testFederationRMFailoverProxyProvider", 3, 0, 1, 1);
 
     conf.setBoolean(YarnConfiguration.FEDERATION_FLUSH_CACHE_FOR_RM_ADDR,
@@ -208,7 +220,7 @@ public class TestFederationRMFailoverProxyProvider {
   }
 
   private void makeRMActive(final SubClusterId subClusterId,
-      final MiniYARNCluster cluster, final int index) {
+      final MiniYARNClusterInJVM cluster, final int index) {
     try {
       System.out.println("Transition rm" + (index + 1) + " to active");
       String dummyAddress = "host:" + index;
