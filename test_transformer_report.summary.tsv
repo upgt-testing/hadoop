@@ -1,0 +1,9 @@
+metric	count
+totalTestFiles	3158
+transformableTests	26
+clusterTransformations	107
+typeTransformations	317
+skippedTests	3132
+errorTests	0
+transformed	26
+skipped	3132

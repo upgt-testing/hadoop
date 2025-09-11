@@ -23,7 +23,7 @@ import org.apache.hadoop.yarn.util.Records;
 /**
  * Node Manager's unregister response.
  */
-public abstract class UnRegisterNodeManagerResponse {
+public abstract class UnRegisterNodeManagerResponse implements UnRegisterNodeManagerResponseJVMInterface {
   public static UnRegisterNodeManagerResponse newInstance() {
     return Records.newRecord(UnRegisterNodeManagerResponse.class);
   }

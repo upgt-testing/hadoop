@@ -108,7 +108,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.BlockingService;
 
 public class AdminService extends CompositeService implements
-    HAServiceProtocol, ResourceManagerAdministrationProtocol {
+    HAServiceProtocol, ResourceManagerAdministrationProtocol, AdminServiceJVMInterface {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(AdminService.class);

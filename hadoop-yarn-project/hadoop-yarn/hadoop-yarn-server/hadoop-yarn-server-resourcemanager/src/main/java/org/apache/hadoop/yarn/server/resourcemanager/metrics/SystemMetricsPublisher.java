@@ -28,7 +28,7 @@ import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 /**
  * Interface used to publish app/container events to timelineservice.
  */
-public interface SystemMetricsPublisher {
+public interface SystemMetricsPublisher extends SystemMetricsPublisherJVMInterface {
 
   void appCreated(RMApp app, long createdTime);
 

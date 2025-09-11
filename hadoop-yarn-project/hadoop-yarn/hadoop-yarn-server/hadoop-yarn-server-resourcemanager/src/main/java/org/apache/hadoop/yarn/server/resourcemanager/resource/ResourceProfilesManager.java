@@ -30,7 +30,7 @@ import java.util.Map;
  * Interface for the resource profiles manager. Provides an interface to get
  * the list of available profiles and some helper functions.
  */
-public interface ResourceProfilesManager {
+public interface ResourceProfilesManager extends ResourceProfilesManagerJVMInterface {
 
   /**
    * Method to handle all initialization steps for ResourceProfilesManager.

@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * detected, the thread logs a message.
  */
 @InterfaceAudience.Private
-public class JvmPauseMonitor extends AbstractService {
+public class JvmPauseMonitor extends AbstractService implements JvmPauseMonitorJVMInterface {
   private static final Logger LOG = LoggerFactory.getLogger(
       JvmPauseMonitor.class);
 

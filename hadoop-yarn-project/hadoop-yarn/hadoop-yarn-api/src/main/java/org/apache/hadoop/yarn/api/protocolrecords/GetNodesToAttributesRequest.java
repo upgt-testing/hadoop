@@ -36,7 +36,7 @@ import java.util.Set;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public abstract class GetNodesToAttributesRequest {
+public abstract class GetNodesToAttributesRequest implements GetNodesToAttributesRequestJVMInterface {
 
   public static GetNodesToAttributesRequest newInstance(Set<String> hostNames) {
     GetNodesToAttributesRequest request =

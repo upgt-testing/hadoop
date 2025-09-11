@@ -28,7 +28,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class ReservationListRequest {
+public abstract class ReservationListRequest implements ReservationListRequestJVMInterface {
 
   /**
    * The {@link ReservationListRequest} will use the reservationId to search for

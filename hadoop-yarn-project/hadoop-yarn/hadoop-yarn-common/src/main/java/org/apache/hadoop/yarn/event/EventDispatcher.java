@@ -37,7 +37,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @param <T> Type of Event
  */
 public class EventDispatcher<T extends Event> extends
-    AbstractService implements EventHandler<T> {
+    AbstractService implements EventHandler<T>, EventDispatcherJVMInterface<T> {
 
   private final EventHandler<T> handler;
   private final BlockingQueue<T> eventQueue =

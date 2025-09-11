@@ -59,7 +59,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.timelineservice.RMTimelineC
 /**
  * Context of the ResourceManager.
  */
-public interface RMContext extends ApplicationMasterServiceContext {
+public interface RMContext extends ApplicationMasterServiceContext, RMContextJVMInterface {
 
   Dispatcher getDispatcher();
 

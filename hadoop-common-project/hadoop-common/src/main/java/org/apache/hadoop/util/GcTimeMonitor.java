@@ -30,7 +30,7 @@ import java.util.List;
  * hook which will be called whenever this percentage exceeds the specified
  * threshold.
  */
-public class GcTimeMonitor extends Thread {
+public class GcTimeMonitor extends Thread implements GcTimeMonitorJVMInterface {
 
   private final long maxGcTimePercentage;
   private final long observationWindowMs, sleepIntervalMs;

@@ -208,7 +208,7 @@ import org.apache.hadoop.yarn.util.timeline.TimelineUtils;
  * interfaces to the resource manager from the client.
  */
 public class ClientRMService extends AbstractService implements
-    ApplicationClientProtocol {
+    ApplicationClientProtocol, ClientRMServiceJVMInterface {
   private static final ArrayList<ApplicationReport> EMPTY_APPS_REPORT = new ArrayList<ApplicationReport>();
 
   private static final Logger LOG =
@@ -1976,5 +1976,1160 @@ public class ClientRMService extends AbstractService implements
   @VisibleForTesting
   public void setDisplayPerUserApps(boolean displayPerUserApps) {
     this.filterAppsByUser = displayPerUserApps;
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeLabelsResponseJVMInterface getClusterNodeLabels_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeLabelsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getClusterNodeLabels", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getClusterNodeLabels"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeLabelsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getClusterNodeLabels");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeLabelsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeLabelsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionResponseJVMInterface submitReservation_bridge(org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("submitReservation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("submitReservation"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: submitReservation");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.ReservationSubmissionResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationPriorityResponseJVMInterface updateApplicationPriority_bridge(org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationPriorityRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("updateApplicationPriority", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateApplicationPriority"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationPriorityResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateApplicationPriority");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationPriorityResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationPriorityResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesResponseJVMInterface getLabelsToNodes_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getLabelsToNodes", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getLabelsToNodes"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getLabelsToNodes");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetLabelsToNodesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetAttributesToNodesResponseJVMInterface getAttributesToNodes_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetAttributesToNodesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getAttributesToNodes", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getAttributesToNodes"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetAttributesToNodesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getAttributesToNodes");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetAttributesToNodesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetAttributesToNodesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.SignalContainerResponseJVMInterface signalToContainer_bridge(org.apache.hadoop.yarn.api.protocolrecords.SignalContainerRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("signalToContainer", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("signalToContainer"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.SignalContainerResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: signalToContainer");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.SignalContainerResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.SignalContainerResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface getApplicationReport_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplicationReport", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplicationReport"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplicationReport");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.ReservationListResponseJVMInterface listReservations_bridge(org.apache.hadoop.yarn.api.protocolrecords.ReservationListRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("listReservations", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("listReservations"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.ReservationListResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: listReservations");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.ReservationListResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.ReservationListResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceProfilesResponseJVMInterface getResourceProfiles_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceProfilesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getResourceProfiles", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getResourceProfiles"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceProfilesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getResourceProfiles");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceProfilesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceProfilesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoResponseJVMInterface getQueueUserAcls_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getQueueUserAcls", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getQueueUserAcls"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getQueueUserAcls");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponseJVMInterface getClusterNodes_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getClusterNodes", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getClusterNodes"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getClusterNodes");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoResponseJVMInterface getQueueInfo_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getQueueInfo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getQueueInfo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getQueueInfo");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceTypeInfoResponseJVMInterface getResourceTypeInfo_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceTypeInfoRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getResourceTypeInfo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getResourceTypeInfo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceTypeInfoResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getResourceTypeInfo");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceTypeInfoResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetAllResourceTypeInfoResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeAttributesResponseJVMInterface getClusterNodeAttributes_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeAttributesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getClusterNodeAttributes", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getClusterNodeAttributes"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeAttributesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getClusterNodeAttributes");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeAttributesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodeAttributesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface getApplicationAttemptReport_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplicationAttemptReport", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplicationAttemptReport"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplicationAttemptReport");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface getContainers_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetContainersRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getContainers", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getContainers"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getContainers");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenResponseJVMInterface renewDelegationToken_bridge(org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("renewDelegationToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("renewDelegationToken"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: renewDelegationToken");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsResponseJVMInterface getNodeToLabels_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getNodeToLabels", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getNodeToLabels"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getNodeToLabels");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetNodesToLabelsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface getClusterMetrics_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getClusterMetrics", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getClusterMetrics"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getClusterMetrics");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesResponseJVMInterface moveApplicationAcrossQueues_bridge(org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("moveApplicationAcrossQueues", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("moveApplicationAcrossQueues"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: moveApplicationAcrossQueues");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponseJVMInterface getNewApplication_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getNewApplication", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getNewApplication"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getNewApplication");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponseJVMInterface submitApplication_bridge(org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("submitApplication", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("submitApplication"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: submitApplication");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetNodesToAttributesResponseJVMInterface getNodesToAttributes_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetNodesToAttributesRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getNodesToAttributes", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getNodesToAttributes"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetNodesToAttributesResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getNodesToAttributes");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetNodesToAttributesResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetNodesToAttributesResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface getApplications_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplications", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplications"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplications");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetNewReservationResponseJVMInterface getNewReservation_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetNewReservationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getNewReservation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getNewReservation"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetNewReservationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getNewReservation");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetNewReservationResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetNewReservationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.FailApplicationAttemptResponseJVMInterface failApplicationAttempt_bridge(org.apache.hadoop.yarn.api.protocolrecords.FailApplicationAttemptRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("failApplicationAttempt", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("failApplicationAttempt"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.FailApplicationAttemptResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: failApplicationAttempt");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.FailApplicationAttemptResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.FailApplicationAttemptResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenResponseJVMInterface getDelegationToken_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getDelegationToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getDelegationToken"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getDelegationToken");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetResourceProfileResponseJVMInterface getResourceProfile_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetResourceProfileRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getResourceProfile", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getResourceProfile"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetResourceProfileResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getResourceProfile");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetResourceProfileResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetResourceProfileResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface forceKillApplication_bridge(org.apache.hadoop.yarn.api.protocolrecords.KillApplicationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("forceKillApplication", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("forceKillApplication"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: forceKillApplication");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteResponseJVMInterface deleteReservation_bridge(org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("deleteReservation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("deleteReservation"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: deleteReservation");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.ReservationDeleteResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateResponseJVMInterface updateReservation_bridge(org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("updateReservation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateReservation"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateReservation");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.ReservationUpdateResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenResponseJVMInterface cancelDelegationToken_bridge(org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("cancelDelegationToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("cancelDelegationToken"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: cancelDelegationToken");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsResponseJVMInterface updateApplicationTimeouts_bridge(org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("updateApplicationTimeouts", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateApplicationTimeouts"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateApplicationTimeouts");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.UpdateApplicationTimeoutsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface getApplicationAttempts_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplicationAttempts", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplicationAttempts"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplicationAttempts");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface getContainerReport_bridge(org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getContainerReport", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getContainerReport"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getContainerReport");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

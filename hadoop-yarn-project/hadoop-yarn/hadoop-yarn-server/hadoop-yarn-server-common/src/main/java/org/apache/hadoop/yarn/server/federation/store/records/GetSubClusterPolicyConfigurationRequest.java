@@ -29,7 +29,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class GetSubClusterPolicyConfigurationRequest {
+public abstract class GetSubClusterPolicyConfigurationRequest implements GetSubClusterPolicyConfigurationRequestJVMInterface {
 
   @Private
   @Unstable

@@ -33,7 +33,7 @@ import org.apache.hadoop.yarn.api.records.LogAggregationStatus;
 import org.apache.hadoop.yarn.api.records.Priority;
 import org.apache.hadoop.yarn.api.records.Resource;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.resourcemanager.RMContext;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMApp;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppImpl;
@@ -43,6 +43,17 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
+import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
+import org.apache.hadoop.fs.FSDataOutputStreamJVMInterface;
+import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.fs.FileSystemJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
+import org.apache.hadoop.yarn.server.resourcemanager.RMContextJVMInterface;
+import org.apache.hadoop.fs.permission.FsPermissionJVMInterface;
 
 public class TestHadoopArchiveLogs {
 
@@ -169,8 +180,8 @@ public class TestHadoopArchiveLogs {
 
   @Test(timeout = 30000)
   public void testFilterAppsByAggregatedStatus() throws Exception {
-    try (MiniYARNCluster yarnCluster =
-        new MiniYARNCluster(TestHadoopArchiveLogs.class.getSimpleName(),
+    try (MiniYARNClusterInJVM yarnCluster =
+        new MiniYARNClusterInJVM(TestHadoopArchiveLogs.class.getSimpleName(),
             1, 1, 1, 1)) {
       Configuration conf = new Configuration();
       conf.setBoolean(YarnConfiguration.LOG_AGGREGATION_ENABLED, true);

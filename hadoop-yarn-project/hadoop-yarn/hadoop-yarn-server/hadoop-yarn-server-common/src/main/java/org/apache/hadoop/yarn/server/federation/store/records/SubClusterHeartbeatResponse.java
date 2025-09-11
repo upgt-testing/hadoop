@@ -32,7 +32,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class SubClusterHeartbeatResponse {
+public abstract class SubClusterHeartbeatResponse implements SubClusterHeartbeatResponseJVMInterface {
 
   @Private
   @Unstable

@@ -29,7 +29,7 @@ import java.util.List;
  */
 public abstract class MultiStateTransitionListener
     <OPERAND, EVENT, STATE extends Enum<STATE>> implements
-    StateTransitionListener<OPERAND, EVENT, STATE> {
+    StateTransitionListener<OPERAND, EVENT, STATE>, MultiStateTransitionListenerJVMInterface<OPERAND, EVENT, STATE> {
 
   private final List<StateTransitionListener<OPERAND, EVENT, STATE>> listeners =
       new ArrayList<>();
@@ -57,5 +57,38 @@ public abstract class MultiStateTransitionListener
     for (StateTransitionListener<OPERAND, EVENT, STATE> listener : listeners) {
       listener.postTransition(op, beforeState, afterState, processedEvent);
     }
+  }
+  
+  public void addListener_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("addListener", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("addListener"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: addListener");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

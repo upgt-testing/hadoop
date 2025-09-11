@@ -42,7 +42,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class GetContainersResponse {
+public abstract class GetContainersResponse implements GetContainersResponseJVMInterface {
 
   @Public
   @Unstable

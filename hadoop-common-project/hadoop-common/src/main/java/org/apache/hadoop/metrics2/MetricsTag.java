@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class MetricsTag implements MetricsInfo {
+public class MetricsTag implements MetricsInfo, MetricsTagJVMInterface {
   private final MetricsInfo info;
   private final String value;
 

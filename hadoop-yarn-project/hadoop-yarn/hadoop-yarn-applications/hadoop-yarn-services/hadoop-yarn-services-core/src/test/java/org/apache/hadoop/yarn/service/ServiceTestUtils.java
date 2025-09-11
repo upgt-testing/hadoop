@@ -35,7 +35,7 @@ import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.service.api.records.Component;
 import org.apache.hadoop.yarn.service.api.records.Container;
 import org.apache.hadoop.yarn.service.api.records.ContainerState;
@@ -77,13 +77,16 @@ import static org.apache.hadoop.yarn.service.conf.YarnServiceConf.YARN_SERVICE_B
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.apache.hadoop.fs.FileSystemJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
 
 public class ServiceTestUtils {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ServiceTestUtils.class);
 
-  private MiniYARNCluster yarnCluster = null;
+  private MiniYARNClusterInJVM yarnCluster = null;
   private MiniDFSCluster hdfsCluster = null;
   private TestingCluster zkCluster;
   private CuratorService curatorService;
@@ -186,7 +189,7 @@ public class ServiceTestUtils {
     return fs;
   }
 
-  protected MiniYARNCluster getYarnCluster() {
+  protected MiniYARNClusterInJVM getYarnCluster() {
     return yarnCluster;
   }
 
@@ -246,7 +249,7 @@ public class ServiceTestUtils {
 
     if (yarnCluster == null) {
       yarnCluster =
-          new MiniYARNCluster(this.getClass().getSimpleName(), 1,
+          new MiniYARNClusterInJVM(this.getClass().getSimpleName(), 1,
               numNodeManager, 1, 1);
       yarnCluster.init(conf);
       yarnCluster.start();

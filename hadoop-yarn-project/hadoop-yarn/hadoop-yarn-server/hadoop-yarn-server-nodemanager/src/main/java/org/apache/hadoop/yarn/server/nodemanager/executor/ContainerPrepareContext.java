@@ -34,7 +34,7 @@ import java.util.Map;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class ContainerPrepareContext {
+public final class ContainerPrepareContext implements ContainerPrepareContextJVMInterface {
   private final Container container;
   private final Map<Path, List<String>> localizedResources;
   private final String user;

@@ -33,7 +33,7 @@ import java.net.InetSocketAddress;
 
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class LocalizerStartContext {
+public final class LocalizerStartContext implements LocalizerStartContextJVMInterface {
   private final Path nmPrivateContainerTokens;
   private final InetSocketAddress nmAddr;
   private final String user;

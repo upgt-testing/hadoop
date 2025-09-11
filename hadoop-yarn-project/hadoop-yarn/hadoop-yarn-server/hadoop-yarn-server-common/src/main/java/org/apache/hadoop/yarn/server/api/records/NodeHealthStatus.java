@@ -43,7 +43,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class NodeHealthStatus {
+public abstract class NodeHealthStatus implements NodeHealthStatusJVMInterface {
 
   @Private
   public static NodeHealthStatus newInstance(boolean isNodeHealthy,

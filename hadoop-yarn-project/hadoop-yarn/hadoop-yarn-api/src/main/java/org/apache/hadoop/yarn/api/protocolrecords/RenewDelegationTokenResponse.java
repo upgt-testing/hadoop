@@ -27,7 +27,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class RenewDelegationTokenResponse {
+public abstract class RenewDelegationTokenResponse implements RenewDelegationTokenResponseJVMInterface {
 
   @Private
   @Unstable
