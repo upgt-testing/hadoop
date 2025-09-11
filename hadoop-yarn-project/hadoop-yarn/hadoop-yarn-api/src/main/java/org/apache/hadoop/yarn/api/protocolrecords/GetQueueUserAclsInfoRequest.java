@@ -33,7 +33,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetQueueUserAclsInfoRequest {
+public abstract class GetQueueUserAclsInfoRequest implements GetQueueUserAclsInfoRequestJVMInterface {
   @Public
   @Stable
   public static GetQueueUserAclsInfoRequest newInstance() {

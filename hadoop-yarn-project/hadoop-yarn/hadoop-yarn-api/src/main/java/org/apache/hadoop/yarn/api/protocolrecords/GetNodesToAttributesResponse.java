@@ -38,7 +38,7 @@ import java.util.Set;
  */
 @Public
 @Evolving
-public abstract class GetNodesToAttributesResponse {
+public abstract class GetNodesToAttributesResponse implements GetNodesToAttributesResponseJVMInterface {
 
   public static GetNodesToAttributesResponse newInstance(
       Map<String, Set<NodeAttribute>> map) {

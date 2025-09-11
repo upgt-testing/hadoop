@@ -75,7 +75,7 @@ import org.apache.hadoop.thirdparty.com.google.common.annotations.VisibleForTest
  * participating in the federation membership.
  */
 public class FederationStateStoreService extends AbstractService
-    implements FederationStateStore {
+    implements FederationStateStore, FederationStateStoreServiceJVMInterface {
 
   public static final Logger LOG =
       LoggerFactory.getLogger(FederationStateStoreService.class);
@@ -300,5 +300,434 @@ public class FederationStateStoreService extends AbstractService
   public DeleteApplicationHomeSubClusterResponse deleteApplicationHomeSubCluster(
       DeleteApplicationHomeSubClusterRequest request) throws YarnException {
     return stateStoreClient.deleteApplicationHomeSubCluster(request);
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterInfoResponseJVMInterface getSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterInfoRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterInfoResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterInfoResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterInfoResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPoliciesConfigurationsResponseJVMInterface getPoliciesConfigurations_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPoliciesConfigurationsRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getPoliciesConfigurations", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getPoliciesConfigurations"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPoliciesConfigurationsResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getPoliciesConfigurations");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPoliciesConfigurationsResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPoliciesConfigurationsResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoResponseJVMInterface getSubClusters_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getSubClusters", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getSubClusters"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getSubClusters");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetSubClustersInfoResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterResponseJVMInterface registerSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.SubClusterRegisterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetApplicationHomeSubClusterResponseJVMInterface getApplicationHomeSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetApplicationHomeSubClusterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplicationHomeSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplicationHomeSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetApplicationHomeSubClusterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplicationHomeSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetApplicationHomeSubClusterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetApplicationHomeSubClusterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.DeleteApplicationHomeSubClusterResponseJVMInterface deleteApplicationHomeSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.DeleteApplicationHomeSubClusterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("deleteApplicationHomeSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("deleteApplicationHomeSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.DeleteApplicationHomeSubClusterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: deleteApplicationHomeSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.DeleteApplicationHomeSubClusterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.DeleteApplicationHomeSubClusterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.SubClusterDeregisterResponseJVMInterface deregisterSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.SubClusterDeregisterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("deregisterSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("deregisterSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.SubClusterDeregisterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: deregisterSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.SubClusterDeregisterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.SubClusterDeregisterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetApplicationsHomeSubClusterResponseJVMInterface getApplicationsHomeSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetApplicationsHomeSubClusterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getApplicationsHomeSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getApplicationsHomeSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetApplicationsHomeSubClusterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getApplicationsHomeSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetApplicationsHomeSubClusterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetApplicationsHomeSubClusterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.SetSubClusterPolicyConfigurationResponseJVMInterface setPolicyConfiguration_bridge(org.apache.hadoop.yarn.server.federation.store.records.SetSubClusterPolicyConfigurationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setPolicyConfiguration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setPolicyConfiguration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.SetSubClusterPolicyConfigurationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setPolicyConfiguration");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.SetSubClusterPolicyConfigurationResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.SetSubClusterPolicyConfigurationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPolicyConfigurationResponseJVMInterface getPolicyConfiguration_bridge(org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPolicyConfigurationRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getPolicyConfiguration", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getPolicyConfiguration"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPolicyConfigurationResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getPolicyConfiguration");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPolicyConfigurationResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.GetSubClusterPolicyConfigurationResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.UpdateApplicationHomeSubClusterResponseJVMInterface updateApplicationHomeSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.UpdateApplicationHomeSubClusterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("updateApplicationHomeSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateApplicationHomeSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.UpdateApplicationHomeSubClusterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateApplicationHomeSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.UpdateApplicationHomeSubClusterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.UpdateApplicationHomeSubClusterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.AddApplicationHomeSubClusterResponseJVMInterface addApplicationHomeSubCluster_bridge(org.apache.hadoop.yarn.server.federation.store.records.AddApplicationHomeSubClusterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("addApplicationHomeSubCluster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("addApplicationHomeSubCluster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.AddApplicationHomeSubClusterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: addApplicationHomeSubCluster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.AddApplicationHomeSubClusterResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.AddApplicationHomeSubClusterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.server.federation.store.records.SubClusterHeartbeatResponseJVMInterface subClusterHeartbeat_bridge(org.apache.hadoop.yarn.server.federation.store.records.SubClusterHeartbeatRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("subClusterHeartbeat", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("subClusterHeartbeat"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.server.federation.store.records.SubClusterHeartbeatResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: subClusterHeartbeat");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.server.federation.store.records.SubClusterHeartbeatResponseJVMInterface __result = (org.apache.hadoop.yarn.server.federation.store.records.SubClusterHeartbeatResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

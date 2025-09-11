@@ -34,7 +34,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Evolving
-public abstract class GetClusterNodeAttributesRequest {
+public abstract class GetClusterNodeAttributesRequest implements GetClusterNodeAttributesRequestJVMInterface {
 
   /**
    * Create new instance of GetClusterNodeAttributesRequest.

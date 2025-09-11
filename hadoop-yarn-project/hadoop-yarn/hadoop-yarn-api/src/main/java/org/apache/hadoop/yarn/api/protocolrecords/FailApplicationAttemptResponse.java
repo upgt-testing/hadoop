@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class FailApplicationAttemptResponse {
+public abstract class FailApplicationAttemptResponse implements FailApplicationAttemptResponseJVMInterface {
   @Private
   @Unstable
   public static FailApplicationAttemptResponse newInstance() {

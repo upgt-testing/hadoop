@@ -40,7 +40,7 @@ import java.util.List;
  */
 @Public
 @Unstable
-public abstract class ReservationListResponse {
+public abstract class ReservationListResponse implements ReservationListResponseJVMInterface {
 
   @Private
   @Unstable

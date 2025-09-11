@@ -37,7 +37,7 @@ import org.apache.hadoop.util.StringUtils;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class AclEntry {
+public class AclEntry implements AclEntryJVMInterface {
   private final AclEntryType type;
   private final String name;
   private final FsAction permission;

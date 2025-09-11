@@ -27,7 +27,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class GetAllResourceTypeInfoRequest {
+public abstract class GetAllResourceTypeInfoRequest implements GetAllResourceTypeInfoRequestJVMInterface {
 
   public static GetAllResourceTypeInfoRequest newInstance() {
     return Records.newRecord(GetAllResourceTypeInfoRequest.class);

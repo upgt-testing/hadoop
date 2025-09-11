@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * log aggregation status periodically.
  *
  */
-public class NMLogAggregationStatusTracker extends CompositeService {
+public class NMLogAggregationStatusTracker extends CompositeService implements NMLogAggregationStatusTrackerJVMInterface {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(NMLogAggregationStatusTracker.class);
@@ -266,5 +266,42 @@ public class NMLogAggregationStatusTracker extends CompositeService {
     public void setDiagnosis(String diagnosis) {
       this.diagnosis = diagnosis;
     }
+  }
+  
+  public void updateLogAggregationStatus_bridge(org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface arg0, java.lang.Object arg1, long arg2, java.lang.String arg3, boolean arg4) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[5];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = long.class;
+              __types[3] = (arg3 != null ? arg3.getClass() : Object.class);
+              __types[4] = boolean.class;
+              try {
+                  target = this.getClass().getMethod("updateLogAggregationStatus", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("updateLogAggregationStatus"))
+                      continue;
+                  if (m.getParameterCount() != 5)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: updateLogAggregationStatus");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1, arg2, arg3, arg4);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

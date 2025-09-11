@@ -24,7 +24,7 @@ import org.apache.hadoop.yarn.util.Records;
 
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class QueueStatistics {
+public abstract class QueueStatistics implements QueueStatisticsJVMInterface {
 
   @InterfaceAudience.Private
   @InterfaceStability.Unstable

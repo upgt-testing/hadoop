@@ -38,7 +38,7 @@ import java.nio.ByteBuffer;
  */
 @Private
 @Unstable
-public abstract class SubClusterPolicyConfiguration {
+public abstract class SubClusterPolicyConfiguration implements SubClusterPolicyConfigurationJVMInterface {
 
 
   @Private

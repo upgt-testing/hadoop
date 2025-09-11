@@ -41,7 +41,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetClusterNodesResponse {
+public abstract class GetClusterNodesResponse implements GetClusterNodesResponseJVMInterface {
 
   @Private
   @Unstable

@@ -42,7 +42,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @param <T> Type of Event
  */
 public class EventDispatcher<T extends Event> extends
-    AbstractService implements EventHandler<T> {
+    AbstractService implements EventHandler<T>, EventDispatcherJVMInterface<T> {
 
   private final EventHandler<T> handler;
   private final BlockingQueue<T> eventQueue =
@@ -160,6 +160,39 @@ public class EventDispatcher<T extends Event> extends
 
   public void setMetrics(EventTypeMetrics metrics) {
     this.metrics = metrics;
+  }
+  
+  public void setMetrics_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setMetrics", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setMetrics"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setMetrics");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 
 }

@@ -50,7 +50,7 @@ import org.apache.hadoop.thirdparty.com.google.common.base.Preconditions;
  * Helper class that provides utility methods specific to ZK operations.
  */
 @InterfaceAudience.Private
-public final class ZKCuratorManager {
+public final class ZKCuratorManager implements ZKCuratorManagerJVMInterface {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ZKCuratorManager.class);
@@ -502,5 +502,43 @@ public final class ZKCuratorManager {
       javax.security.auth.login.Configuration.setConfiguration(jconf);
       zkClientConfig.setProperty(ZKClientConfig.LOGIN_CONTEXT_NAME_KEY, JAAS_CLIENT_ENTRY);
     }
+  }
+  
+  public void safeCreate_bridge(java.lang.String arg0, byte[] arg1, java.util.List<org.apache.zookeeper.data.ACL> arg2, java.lang.Object arg3, java.util.List<org.apache.zookeeper.data.ACL> arg4, java.lang.String arg5) throws java.lang.Exception {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[6];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              __types[3] = (arg3 != null ? arg3.getClass() : Object.class);
+              __types[4] = (arg4 != null ? arg4.getClass() : Object.class);
+              __types[5] = (arg5 != null ? arg5.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("safeCreate", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("safeCreate"))
+                      continue;
+                  if (m.getParameterCount() != 6)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: safeCreate");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1, arg2, arg3, arg4, arg5);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

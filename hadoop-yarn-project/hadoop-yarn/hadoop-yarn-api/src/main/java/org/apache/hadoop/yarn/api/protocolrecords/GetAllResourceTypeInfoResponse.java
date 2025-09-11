@@ -30,7 +30,7 @@ import java.util.List;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Unstable
-public abstract class GetAllResourceTypeInfoResponse {
+public abstract class GetAllResourceTypeInfoResponse implements GetAllResourceTypeInfoResponseJVMInterface {
 
   public static GetAllResourceTypeInfoResponse newInstance() {
     return Records.newRecord(GetAllResourceTypeInfoResponse.class);

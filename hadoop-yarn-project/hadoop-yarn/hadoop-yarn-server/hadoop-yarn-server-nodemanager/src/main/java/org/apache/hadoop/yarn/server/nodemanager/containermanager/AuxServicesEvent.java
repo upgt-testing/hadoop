@@ -26,7 +26,7 @@ import org.apache.hadoop.yarn.event.AbstractEvent;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container
     .Container;
 
-public class AuxServicesEvent extends AbstractEvent<AuxServicesEventType> {
+public class AuxServicesEvent extends AbstractEvent<AuxServicesEventType> implements AuxServicesEventJVMInterface {
 
   private final String user;
   private final String serviceId;

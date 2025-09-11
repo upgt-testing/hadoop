@@ -59,7 +59,7 @@ import org.apache.hadoop.util.StringInterner;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class BlockLocation implements Serializable {
+public class BlockLocation implements Serializable, BlockLocationJVMInterface {
   private static final long serialVersionUID = 0x22986f6d;
 
   private String[] hosts; // Datanode hostnames

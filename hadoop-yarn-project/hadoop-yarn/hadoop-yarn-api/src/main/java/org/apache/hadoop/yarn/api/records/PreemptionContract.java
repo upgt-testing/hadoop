@@ -36,7 +36,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Evolving
-public abstract class PreemptionContract {
+public abstract class PreemptionContract implements PreemptionContractJVMInterface {
 
   @Private
   @Unstable

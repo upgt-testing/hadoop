@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class SubmitApplicationResponse {
+public abstract class SubmitApplicationResponse implements SubmitApplicationResponseJVMInterface {
   @Private
   @Unstable
   public static SubmitApplicationResponse newInstance() {

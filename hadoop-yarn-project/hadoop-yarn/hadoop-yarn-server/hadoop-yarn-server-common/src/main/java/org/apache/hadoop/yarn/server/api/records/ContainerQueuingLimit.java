@@ -24,7 +24,7 @@ import org.apache.hadoop.yarn.util.Records;
  * Used to hold max wait time / queue length information to be
  * passed back to the NodeManager.
  */
-public abstract class ContainerQueuingLimit {
+public abstract class ContainerQueuingLimit implements ContainerQueuingLimitJVMInterface {
 
   public static ContainerQueuingLimit newInstance() {
     ContainerQueuingLimit containerQueuingLimit =

@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class SubClusterRegisterResponse {
+public abstract class SubClusterRegisterResponse implements SubClusterRegisterResponseJVMInterface {
 
   @Private
   @Unstable

@@ -52,7 +52,7 @@ import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.nodemanager.ContainerStateTransitionListener;
 import org.apache.hadoop.yarn.server.nodemanager.Context;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.ContainerEvent;
@@ -82,10 +82,29 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
+import org.apache.hadoop.yarn.api.records.NMTokenJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
+import org.apache.hadoop.yarn.server.nodemanager.ContainerStateTransitionListenerJVMInterface;
+import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.ContainerEventJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
+import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
+import org.apache.hadoop.yarn.server.nodemanager.ContextJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
+import org.apache.hadoop.security.CredentialsJVMInterface;
 
 public class TestNMClient {
   Configuration conf = null;
-  MiniYARNCluster yarnCluster = null;
+  MiniYARNClusterInJVM yarnCluster = null;
   YarnClientImpl yarnClient = null;
   AMRMClientImpl<ContainerRequest> rmClient = null;
   NMClientImpl nmClient = null;
@@ -166,7 +185,7 @@ public class TestNMClient {
     conf.set(YarnConfiguration.NM_CONTAINER_STATE_TRANSITION_LISTENERS,
         DebugSumContainerStateListener.class.getName());
     yarnCluster =
-        new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
+        new MiniYARNClusterInJVM(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
     assertNotNull(yarnCluster);

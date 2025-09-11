@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Cont
 
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class ContainerExecContext {
+public final class ContainerExecContext implements ContainerExecContextJVMInterface {
   private final String user;
   private final String appId;
   private final Container container;

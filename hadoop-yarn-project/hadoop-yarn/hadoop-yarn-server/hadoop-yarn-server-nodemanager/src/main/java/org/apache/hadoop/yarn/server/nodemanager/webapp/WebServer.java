@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WebServer extends AbstractService {
+public class WebServer extends AbstractService implements WebServerJVMInterface {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(WebServer.class);
