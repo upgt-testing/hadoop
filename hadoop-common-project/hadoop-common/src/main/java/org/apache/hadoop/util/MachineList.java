@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * host addresses.
  */
 
-public class MachineList {
+public class MachineList implements MachineListJVMInterface {
   
   public static final Logger LOG = LoggerFactory.getLogger(MachineList.class);
   public static final String WILDCARD_VALUE = "*";

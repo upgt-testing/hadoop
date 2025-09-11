@@ -60,7 +60,7 @@ import java.util.Set;
  */
 @Public
 @Unstable
-public abstract class ContainerRetryContext {
+public abstract class ContainerRetryContext implements ContainerRetryContextJVMInterface {
   public static final int RETRY_FOREVER = -1;
   public static final int RETRY_INVALID = -1000;
   public static final ContainerRetryContext NEVER_RETRY_CONTEXT =
@@ -100,4 +100,37 @@ public abstract class ContainerRetryContext {
   public abstract long getFailuresValidityInterval();
   public abstract void setFailuresValidityInterval(
       long failuresValidityInterval);
+  
+  public void setRetryPolicy_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setRetryPolicy", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setRetryPolicy"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setRetryPolicy");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 }

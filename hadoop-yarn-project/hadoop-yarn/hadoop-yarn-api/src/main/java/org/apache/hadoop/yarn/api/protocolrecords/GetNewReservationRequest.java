@@ -30,7 +30,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class GetNewReservationRequest {
+public abstract class GetNewReservationRequest implements GetNewReservationRequestJVMInterface {
   @Public
   @Unstable
   public static GetNewReservationRequest newInstance() {

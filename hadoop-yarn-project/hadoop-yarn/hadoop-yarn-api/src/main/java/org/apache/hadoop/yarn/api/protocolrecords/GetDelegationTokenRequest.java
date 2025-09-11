@@ -29,7 +29,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetDelegationTokenRequest {
+public abstract class GetDelegationTokenRequest implements GetDelegationTokenRequestJVMInterface {
 
   @Public
   @Stable

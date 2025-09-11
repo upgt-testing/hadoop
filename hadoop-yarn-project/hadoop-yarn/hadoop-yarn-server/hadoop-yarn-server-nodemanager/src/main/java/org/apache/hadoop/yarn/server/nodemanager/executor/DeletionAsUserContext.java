@@ -34,7 +34,7 @@ import java.util.List;
 
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class DeletionAsUserContext {
+public final class DeletionAsUserContext implements DeletionAsUserContextJVMInterface {
   private final String user;
   private final Path subDir;
   private final List<Path> basedirs;

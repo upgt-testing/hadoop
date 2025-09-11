@@ -26,7 +26,7 @@ import org.apache.hadoop.service.Service;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public interface EmbeddedElector extends Service{
+public interface EmbeddedElector extends Service,EmbeddedElectorJVMInterface {
   /**
    * Leave and rejoin leader election.
    */

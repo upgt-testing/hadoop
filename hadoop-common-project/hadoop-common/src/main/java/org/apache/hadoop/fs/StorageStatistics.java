@@ -26,7 +26,7 @@ import java.util.Iterator;
  * instance.
  */
 @InterfaceAudience.Public
-public abstract class StorageStatistics {
+public abstract class StorageStatistics implements StorageStatisticsJVMInterface {
 
   /**
    * These are common statistic names.

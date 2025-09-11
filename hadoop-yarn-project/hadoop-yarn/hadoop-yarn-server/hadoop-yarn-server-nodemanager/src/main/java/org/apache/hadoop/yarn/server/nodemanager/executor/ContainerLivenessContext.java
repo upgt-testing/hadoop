@@ -30,7 +30,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Cont
 
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class ContainerLivenessContext {
+public final class ContainerLivenessContext implements ContainerLivenessContextJVMInterface {
   private final Container container;
   private final String user;
   private final String pid;

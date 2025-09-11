@@ -98,7 +98,7 @@ import org.apache.hadoop.yarn.util.Records;
 
 @Evolving
 @Public
-public abstract class LogAggregationContext {
+public abstract class LogAggregationContext implements LogAggregationContextJVMInterface {
 
   @Public
   @Unstable

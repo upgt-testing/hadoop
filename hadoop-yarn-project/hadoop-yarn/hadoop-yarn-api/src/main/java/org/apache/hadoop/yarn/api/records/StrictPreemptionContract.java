@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Evolving
-public abstract class StrictPreemptionContract {
+public abstract class StrictPreemptionContract implements StrictPreemptionContractJVMInterface {
 
   @Private
   @Unstable

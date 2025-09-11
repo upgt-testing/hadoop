@@ -30,7 +30,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class DeleteApplicationHomeSubClusterResponse {
+public abstract class DeleteApplicationHomeSubClusterResponse implements DeleteApplicationHomeSubClusterResponseJVMInterface {
 
   @Private
   @Unstable
