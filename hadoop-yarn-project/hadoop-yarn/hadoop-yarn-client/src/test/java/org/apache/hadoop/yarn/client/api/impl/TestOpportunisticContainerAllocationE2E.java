@@ -54,7 +54,7 @@ import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptState;
 
@@ -84,24 +84,6 @@ import java.util.TreeSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
-import org.apache.hadoop.yarn.api.records.ExecutionTypeRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.NMTokenJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.TokenJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.security.UserGroupInformationJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.service.ServiceJVMInterface;
 
 /**
  * Class that tests the allocation of OPPORTUNISTIC containers through the
@@ -109,7 +91,7 @@ import org.apache.hadoop.service.ServiceJVMInterface;
  */
 public class TestOpportunisticContainerAllocationE2E {
   private static Configuration conf = null;
-  private static MiniYARNClusterInJVM yarnCluster = null;
+  private static MiniYARNCluster yarnCluster = null;
   private static YarnClient yarnClient = null;
   private static List<NodeReport> nodeReports = null;
   private static int nodeCount = 3;
@@ -153,7 +135,7 @@ public class TestOpportunisticContainerAllocationE2E {
         YarnConfiguration.NM_OPPORTUNISTIC_CONTAINERS_MAX_QUEUE_LENGTH, 10);
     conf.setLong(YarnConfiguration.NM_LOG_RETAIN_SECONDS, 1);
     yarnCluster =
-        new MiniYARNClusterInJVM(TestAMRMClient.class.getName(), nodeCount, 1, 1);
+        new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
 

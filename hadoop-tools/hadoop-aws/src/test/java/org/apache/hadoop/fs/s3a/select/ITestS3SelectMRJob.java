@@ -45,14 +45,11 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.DurationInfo;
 import org.apache.hadoop.util.functional.FutureIO;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 
 import static org.apache.hadoop.fs.s3a.commit.CommitConstants.FS_S3A_COMMITTER_NAME;
 import static org.apache.hadoop.fs.s3a.commit.CommitConstants.FS_S3A_COMMITTER_STAGING_UNIQUE_FILENAMES;
 import static org.apache.hadoop.fs.s3a.select.SelectConstants.*;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.fs.PathJVMInterface;
-import org.apache.hadoop.io.TextJVMInterface;
 
 /**
  * Run an MR job with a select query.
@@ -88,7 +85,7 @@ public class ITestS3SelectMRJob extends AbstractS3SelectTest {
 
   private S3AFileSystem fs;
 
-  private MiniYARNClusterInJVM yarnCluster;
+  private MiniYARNCluster yarnCluster;
 
   private Path rootPath;
 
@@ -108,7 +105,7 @@ public class ITestS3SelectMRJob extends AbstractS3SelectTest {
     fs.setWorkingDirectory(workingDir);
     fs.mkdirs(new Path(rootPath, "input/"));
 
-    yarnCluster = new MiniYARNClusterInJVM("ITestS3SelectMRJob", // testName
+    yarnCluster = new MiniYARNCluster("ITestS3SelectMRJob", // testName
         1, // number of node managers
         1, // number of local log dirs per node manager
         1); // number of hdfs dirs per node manager

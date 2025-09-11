@@ -67,23 +67,13 @@ import org.apache.hadoop.yarn.api.records.timeline.TimelineEntities;
 import org.apache.hadoop.yarn.api.records.timeline.TimelineEntity;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
 import org.apache.hadoop.yarn.server.resourcemanager.RMContext;
 import org.apache.hadoop.yarn.server.resourcemanager.ResourceManager;
 import org.apache.hadoop.yarn.server.timeline.NameValuePair;
 import org.apache.hadoop.yarn.util.LinuxResourceCalculatorPlugin;
 import org.apache.hadoop.yarn.util.ProcfsBasedProcessTree;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptReportJVMInterface;
-import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerReportJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.ResourceManagerJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.fs.PathJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.RMContextJVMInterface;
 
 /**
  * Base class for testing DistributedShell features.
@@ -112,7 +102,7 @@ public abstract class DistributedShellBaseTest {
       ""
   };
   private static MiniDFSCluster hdfsCluster = null;
-  private static MiniYARNClusterInJVM yarnCluster = null;
+  private static MiniYARNCluster yarnCluster = null;
   private static String yarnSiteBackupPath = null;
   private static String yarnSitePath = null;
   @Rule
@@ -486,7 +476,7 @@ public abstract class DistributedShellBaseTest {
       return;
     }
     yarnCluster =
-        new MiniYARNClusterInJVM(getClass().getSimpleName(), 1, numNodeManagers,
+        new MiniYARNCluster(getClass().getSimpleName(), 1, numNodeManagers,
             1, 1);
     yarnCluster.init(yarnConfig);
     yarnCluster.start();
@@ -494,7 +484,7 @@ public abstract class DistributedShellBaseTest {
     waitForNMsToRegister();
     conf.set(
         YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS,
-        MiniYARNClusterInJVM.getHostname() + ":"
+        MiniYARNCluster.getHostname() + ":"
             + yarnCluster.getApplicationHistoryServer().getPort());
     Configuration yarnClusterConfig = yarnCluster.getConfig();
     yarnClusterConfig.set(YarnConfiguration.YARN_APPLICATION_CLASSPATH,
@@ -563,7 +553,7 @@ public abstract class DistributedShellBaseTest {
     return yarnCluster.getNodeManager(index);
   }
 
-  protected MiniYARNClusterInJVM getYarnCluster() {
+  protected MiniYARNCluster getYarnCluster() {
     return yarnCluster;
   }
 
