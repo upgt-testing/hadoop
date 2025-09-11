@@ -38,7 +38,7 @@ import static org.apache.hadoop.yarn.api.records.ResourceInformation.GPU_URI;
 /**
  * Manages {@link ResourcePlugin} configured on this NodeManager.
  */
-public class ResourcePluginManager {
+public class ResourcePluginManager implements ResourcePluginManagerJVMInterface {
   private static final Logger LOG =
       LoggerFactory.getLogger(ResourcePluginManager.class);
   private static final Set<String> SUPPORTED_RESOURCE_PLUGINS = ImmutableSet.of(
@@ -102,5 +102,38 @@ public class ResourcePluginManager {
    */
   public synchronized Map<String, ResourcePlugin> getNameToPlugins() {
     return configuredPlugins;
+  }
+  
+  public void initialize_bridge(java.lang.Object arg0) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("initialize", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("initialize"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: initialize");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

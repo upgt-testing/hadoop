@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class Credentials implements Writable {
+public class Credentials implements Writable, CredentialsJVMInterface {
   private static final Logger LOG = LoggerFactory.getLogger(Credentials.class);
 
   private  Map<Text, byte[]> secretKeysMap = new HashMap<Text, byte[]>();
@@ -332,5 +332,338 @@ public class Credentials implements Writable {
         addToken(key, token.getValue());
       }
     }
+  }
+  
+  public void addSecretKey_bridge(org.apache.hadoop.io.TextJVMInterface arg0, byte[] arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("addSecretKey", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("addSecretKey"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: addSecretKey");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void addToken_bridge(org.apache.hadoop.io.TextJVMInterface arg0, org.apache.hadoop.security.token.TokenJVMInterface arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("addToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("addToken"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: addToken");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void removeSecretKey_bridge(org.apache.hadoop.io.TextJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("removeSecretKey", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("removeSecretKey"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: removeSecretKey");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void writeTokenStorageFile_bridge(org.apache.hadoop.fs.PathJVMInterface arg0, org.apache.hadoop.conf.ConfigurationJVMInterface arg1) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("writeTokenStorageFile", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("writeTokenStorageFile"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: writeTokenStorageFile");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void readFields_bridge(java.lang.Object arg0) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("readFields", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("readFields"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: readFields");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.security.token.TokenJVMInterface getToken_bridge(org.apache.hadoop.io.TextJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getToken", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getToken"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.security.token.TokenJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getToken");
+          target.setAccessible(true);
+          org.apache.hadoop.security.token.TokenJVMInterface __result = (org.apache.hadoop.security.token.TokenJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void mergeAll_bridge(org.apache.hadoop.security.CredentialsJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("mergeAll", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("mergeAll"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: mergeAll");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void write_bridge(java.lang.Object arg0) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("write", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("write"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: write");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public byte[] getSecretKey_bridge(org.apache.hadoop.io.TextJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getSecretKey", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getSecretKey"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("byte[]"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getSecretKey");
+          target.setAccessible(true);
+          byte[] __result = (byte[]) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void addAll_bridge(org.apache.hadoop.security.CredentialsJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("addAll", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("addAll"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: addAll");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

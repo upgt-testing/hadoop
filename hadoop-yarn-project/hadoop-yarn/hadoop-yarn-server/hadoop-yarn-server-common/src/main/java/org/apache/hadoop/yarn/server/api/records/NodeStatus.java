@@ -39,7 +39,7 @@ import org.apache.hadoop.yarn.util.Records;
  *   <li>Container status.</li>
  * </ul>
  */
-public abstract class NodeStatus {
+public abstract class NodeStatus implements NodeStatusJVMInterface {
 
   /**
    * Create a new {@code NodeStatus}.
@@ -132,4 +132,169 @@ public abstract class NodeStatus {
   @Unstable
   public abstract void setOpportunisticContainersStatus(
       OpportunisticContainersStatus opportunisticContainersStatus);
+  
+  public void setContainersUtilization_bridge(org.apache.hadoop.yarn.api.records.ResourceUtilizationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setContainersUtilization", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setContainersUtilization"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setContainersUtilization");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setNodeHealthStatus_bridge(org.apache.hadoop.yarn.server.api.records.NodeHealthStatusJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setNodeHealthStatus", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setNodeHealthStatus"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setNodeHealthStatus");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setNodeUtilization_bridge(org.apache.hadoop.yarn.api.records.ResourceUtilizationJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setNodeUtilization", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setNodeUtilization"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setNodeUtilization");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setNodeId_bridge(org.apache.hadoop.yarn.api.records.NodeIdJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setNodeId", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setNodeId"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setNodeId");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setOpportunisticContainersStatus_bridge(org.apache.hadoop.yarn.server.api.records.OpportunisticContainersStatusJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setOpportunisticContainersStatus", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setOpportunisticContainersStatus"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setOpportunisticContainersStatus");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
 }

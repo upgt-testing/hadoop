@@ -35,7 +35,7 @@ import java.util.Map;
 
 @InterfaceAudience.Private
 @InterfaceStability.Unstable
-public final class ContainerStartContext {
+public final class ContainerStartContext implements ContainerStartContextJVMInterface {
   private final Container container;
   private final Map<Path, List<String>> localizedResources;
   private final Path nmPrivateContainerScriptPath;

@@ -49,7 +49,7 @@ import org.apache.hadoop.yarn.server.nodemanager.metrics.NodeManagerMetrics;
  * directories of a node. This specifically manages nodemanager-local-dirs and
  * nodemanager-log-dirs by periodically checking their health.
  */
-public class LocalDirsHandlerService extends AbstractService {
+public class LocalDirsHandlerService extends AbstractService implements LocalDirsHandlerServiceJVMInterface {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(LocalDirsHandlerService.class);
@@ -681,5 +681,137 @@ public class LocalDirsHandlerService extends AbstractService {
     }
     sb.append(" ] ");
     return sb.toString();
+  }
+  
+  public void deregisterLogDirsChangeListener_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("deregisterLogDirsChangeListener", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("deregisterLogDirsChangeListener"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: deregisterLogDirsChangeListener");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void registerLocalDirsChangeListener_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerLocalDirsChangeListener", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerLocalDirsChangeListener"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerLocalDirsChangeListener");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void deregisterLocalDirsChangeListener_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("deregisterLocalDirsChangeListener", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("deregisterLocalDirsChangeListener"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: deregisterLocalDirsChangeListener");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void registerLogDirsChangeListener_bridge(java.lang.Object arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerLogDirsChangeListener", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerLogDirsChangeListener"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerLogDirsChangeListener");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

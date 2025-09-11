@@ -31,7 +31,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.LimitedPrivate({"HDFS", "MapReduce"})
 @InterfaceStability.Evolving
-public class Service {
+public class Service implements ServiceJVMInterface {
   private String key;
   private Class<?> protocol;
   

@@ -35,7 +35,7 @@ import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.Capacity
 
 import java.util.List;
 
-public class QueueACLsManager {
+public class QueueACLsManager implements QueueACLsManagerJVMInterface {
 
   private static final Log LOG = LogFactory.getLog(QueueACLsManager.class);
 
@@ -79,5 +79,42 @@ public class QueueACLsManager {
     } else {
       return scheduler.checkAccess(callerUGI, acl, app.getQueue());
     }
+  }
+  
+  public boolean checkAccess_bridge(org.apache.hadoop.security.UserGroupInformationJVMInterface arg0, java.lang.Object arg1, java.lang.Object arg2, java.lang.String arg3, java.util.List<java.lang.String> arg4) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[5];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              __types[3] = (arg3 != null ? arg3.getClass() : Object.class);
+              __types[4] = (arg4 != null ? arg4.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("checkAccess", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("checkAccess"))
+                      continue;
+                  if (m.getParameterCount() != 5)
+                      continue;
+                  if (m.getReturnType().getName().equals("boolean"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: checkAccess");
+          target.setAccessible(true);
+          boolean __result = (boolean) target.invoke(this, arg0, arg1, arg2, arg3, arg4);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

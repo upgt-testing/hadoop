@@ -42,7 +42,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Unstable
-public abstract class GetApplicationAttemptsResponse {
+public abstract class GetApplicationAttemptsResponse implements GetApplicationAttemptsResponseJVMInterface {
 
   @Public
   @Unstable

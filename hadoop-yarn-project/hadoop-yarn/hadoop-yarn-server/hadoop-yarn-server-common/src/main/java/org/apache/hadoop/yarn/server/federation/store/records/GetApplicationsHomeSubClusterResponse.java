@@ -39,7 +39,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class GetApplicationsHomeSubClusterResponse {
+public abstract class GetApplicationsHomeSubClusterResponse implements GetApplicationsHomeSubClusterResponseJVMInterface {
 
   @Private
   @Unstable

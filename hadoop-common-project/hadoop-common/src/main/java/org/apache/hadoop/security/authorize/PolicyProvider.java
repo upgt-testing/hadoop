@@ -29,7 +29,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.LimitedPrivate({"HDFS", "MapReduce"})
 @InterfaceStability.Evolving
-public abstract class PolicyProvider {
+public abstract class PolicyProvider implements PolicyProviderJVMInterface {
 
   /**
    * Configuration key for the {@link PolicyProvider} implementation.

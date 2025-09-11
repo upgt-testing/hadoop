@@ -78,7 +78,7 @@ import com.google.common.annotations.VisibleForTesting;
 @SuppressWarnings("unchecked")
 @Private
 public class ApplicationMasterService extends AbstractService implements
-    ApplicationMasterProtocol {
+    ApplicationMasterProtocol, ApplicationMasterServiceJVMInterface {
   private static final Log LOG = LogFactory.getLog(ApplicationMasterService.class);
 
   private final AMLivelinessMonitor amLivelinessMonitor;
@@ -478,5 +478,237 @@ public class ApplicationMasterService extends AbstractService implements
   @VisibleForTesting
   public Server getServer() {
     return this.server;
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface allocate_bridge(org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("allocate", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("allocate"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: allocate");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void registerAppAttempt_bridge(org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerAppAttempt", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerAppAttempt"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerAppAttempt");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public boolean hasApplicationMasterRegistered_bridge(org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("hasApplicationMasterRegistered", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("hasApplicationMasterRegistered"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("boolean"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: hasApplicationMasterRegistered");
+          target.setAccessible(true);
+          boolean __result = (boolean) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface registerApplicationMaster_bridge(org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("registerApplicationMaster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("registerApplicationMaster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: registerApplicationMaster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void unregisterAttempt_bridge(org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("unregisterAttempt", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("unregisterAttempt"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: unregisterAttempt");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void refreshServiceAcls_bridge(org.apache.hadoop.conf.ConfigurationJVMInterface arg0, org.apache.hadoop.security.authorize.PolicyProviderJVMInterface arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("refreshServiceAcls", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("refreshServiceAcls"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: refreshServiceAcls");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface finishApplicationMaster_bridge(org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequestJVMInterface arg0) throws org.apache.hadoop.yarn.exceptions.YarnException, java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("finishApplicationMaster", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("finishApplicationMaster"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: finishApplicationMaster");
+          target.setAccessible(true);
+          org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface __result = (org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

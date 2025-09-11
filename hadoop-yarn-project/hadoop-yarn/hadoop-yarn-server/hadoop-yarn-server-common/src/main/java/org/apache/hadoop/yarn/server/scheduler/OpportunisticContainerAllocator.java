@@ -62,7 +62,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * ResourceManager. It tries to distribute the containers as evenly as possible.
  * </p>
  */
-public class OpportunisticContainerAllocator {
+public class OpportunisticContainerAllocator implements OpportunisticContainerAllocatorJVMInterface {
 
   private static final int NODE_LOCAL_LOOP = 0;
   private static final int RACK_LOCAL_LOOP = 1;
@@ -616,5 +616,43 @@ public class OpportunisticContainerAllocator {
       }
     }
     return partitionedRequests;
+  }
+  
+  public java.util.List allocateContainers_bridge(org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface arg0, java.util.List<org.apache.hadoop.yarn.api.records.ResourceRequest> arg1, org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface arg2, org.apache.hadoop.yarn.server.scheduler.OpportunisticContainerContextJVMInterface arg3, long arg4, java.lang.String arg5) throws org.apache.hadoop.yarn.exceptions.YarnException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[6];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              __types[3] = (arg3 != null ? arg3.getClass() : Object.class);
+              __types[4] = long.class;
+              __types[5] = (arg5 != null ? arg5.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("allocateContainers", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("allocateContainers"))
+                      continue;
+                  if (m.getParameterCount() != 6)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.util.List"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: allocateContainers");
+          target.setAccessible(true);
+          java.util.List __result = (java.util.List) target.invoke(this, arg0, arg1, arg2, arg3, arg4, arg5);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

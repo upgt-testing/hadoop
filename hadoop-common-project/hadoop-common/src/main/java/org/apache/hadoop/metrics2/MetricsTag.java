@@ -29,7 +29,7 @@ import org.apache.hadoop.classification.InterfaceStability;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public class MetricsTag implements MetricsInfo {
+public class MetricsTag implements MetricsInfo, MetricsTagJVMInterface {
   private final MetricsInfo info;
   private final String value;
 

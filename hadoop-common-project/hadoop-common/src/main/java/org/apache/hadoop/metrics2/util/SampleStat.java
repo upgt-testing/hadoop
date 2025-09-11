@@ -24,7 +24,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
  * Helper to compute running sample stats
  */
 @InterfaceAudience.Private
-public class SampleStat {
+public class SampleStat implements SampleStatJVMInterface {
   private final MinMax minmax = new MinMax();
   private long numSamples = 0;
   private double a0, a1, s0, s1, total;
@@ -195,5 +195,38 @@ public class SampleStat {
       min = other.min();
       max = other.max();
     }
+  }
+  
+  public void copyTo_bridge(org.apache.hadoop.metrics2.util.SampleStatJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("copyTo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("copyTo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: copyTo");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

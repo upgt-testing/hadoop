@@ -61,7 +61,7 @@ import org.apache.hadoop.yarn.util.resource.ResourceUtils;
  */
 @Public
 @Stable
-public abstract class Resource implements Comparable<Resource> {
+public abstract class Resource implements Comparable<Resource>, ResourceJVMInterface {
 
   protected ResourceInformation[] resources = null;
 
@@ -547,5 +547,106 @@ public abstract class Resource implements Comparable<Resource> {
     ri.setMinimumAllocation(0);
     ri.setMaximumAllocation(Long.MAX_VALUE);
     return ri;
+  }
+  
+  public int compareTo_bridge(org.apache.hadoop.yarn.api.records.ResourceJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("compareTo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("compareTo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("int"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: compareTo");
+          target.setAccessible(true);
+          int __result = (int) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setResourceInformation_bridge(int arg0, org.apache.hadoop.yarn.api.records.ResourceInformationJVMInterface arg1) throws org.apache.hadoop.yarn.exceptions.ResourceNotFoundException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = int.class;
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setResourceInformation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setResourceInformation"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setResourceInformation");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public void setResourceInformation_bridge(java.lang.String arg0, org.apache.hadoop.yarn.api.records.ResourceInformationJVMInterface arg1) throws org.apache.hadoop.yarn.exceptions.ResourceNotFoundException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("setResourceInformation", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("setResourceInformation"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: setResourceInformation");
+          target.setAccessible(true);
+          target.invoke(this, arg0, arg1);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

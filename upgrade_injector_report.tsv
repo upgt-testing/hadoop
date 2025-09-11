@@ -1,0 +1,7 @@
+metric	value
+totalTestFiles	26
+processedTestFiles	26
+skippedTestFiles	0
+totalTestMethods	144
+injectedTestMethods	35
+upgradeMethods_MiniYARNClusterInJVM	9

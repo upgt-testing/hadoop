@@ -29,7 +29,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
 @SuppressWarnings("rawtypes")
 @Public
 @Evolving
-public interface Dispatcher {
+public interface Dispatcher extends DispatcherJVMInterface {
 
   // Configuration to make sure dispatcher crashes but doesn't do system-exit in
   // case of errors. By default, it should be false, so that tests are not

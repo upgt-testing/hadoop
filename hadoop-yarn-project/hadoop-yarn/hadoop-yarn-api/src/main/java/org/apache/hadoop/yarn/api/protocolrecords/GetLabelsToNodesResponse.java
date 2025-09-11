@@ -27,7 +27,7 @@ import org.apache.hadoop.yarn.api.records.NodeId;
 import org.apache.hadoop.yarn.api.records.NodeLabel;
 import org.apache.hadoop.yarn.util.Records;
 
-public abstract class GetLabelsToNodesResponse {
+public abstract class GetLabelsToNodesResponse implements GetLabelsToNodesResponseJVMInterface {
   public static GetLabelsToNodesResponse newInstance(
       Map<String, Set<NodeId>> map) {
 	GetLabelsToNodesResponse response =

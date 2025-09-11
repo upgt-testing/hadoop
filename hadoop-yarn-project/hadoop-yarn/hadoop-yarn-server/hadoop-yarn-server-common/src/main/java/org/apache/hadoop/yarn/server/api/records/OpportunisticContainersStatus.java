@@ -29,7 +29,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Private
 @Unstable
-public abstract class OpportunisticContainersStatus {
+public abstract class OpportunisticContainersStatus implements OpportunisticContainersStatusJVMInterface {
   public static OpportunisticContainersStatus newInstance() {
     return Records.newRecord(OpportunisticContainersStatus.class);
   }

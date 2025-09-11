@@ -32,7 +32,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class Token {
+public abstract class Token implements TokenJVMInterface {
 
   @Private
   @Unstable

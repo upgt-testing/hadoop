@@ -39,7 +39,7 @@ import org.apache.hadoop.ipc.StandbyException;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Evolving
-public abstract class SecretManager<T extends TokenIdentifier> {
+public abstract class SecretManager<T extends TokenIdentifier> implements SecretManagerJVMInterface<T> {
   /**
    * The token was invalid and the message explains why.
    */
