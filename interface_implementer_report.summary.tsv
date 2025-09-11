@@ -1,0 +1,6 @@
+metric	count
+totalInterfacesProcessed	266
+skippedNoConcreteClass	29
+implemented	225
+forcedImplementation	4
+noClassFound	8

@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @LimitedPrivate({"YARN", "MapReduce"})
 @Unstable
-public abstract class Version {
+public abstract class Version implements VersionJVMInterface {
 
   public static Version newInstance(int majorVersion, int minorVersion) {
     Version version = Records.newRecord(Version.class);
@@ -80,5 +80,38 @@ public abstract class Version {
     } else {
       return false;
     }
+  }
+  
+  public boolean isCompatibleTo_bridge(org.apache.hadoop.yarn.server.records.VersionJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("isCompatibleTo", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("isCompatibleTo"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("boolean"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: isCompatibleTo");
+          target.setAccessible(true);
+          boolean __result = (boolean) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

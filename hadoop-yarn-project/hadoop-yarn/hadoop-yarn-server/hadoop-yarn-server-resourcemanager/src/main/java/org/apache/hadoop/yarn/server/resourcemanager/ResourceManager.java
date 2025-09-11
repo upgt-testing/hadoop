@@ -134,7 +134,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  */
 @SuppressWarnings("unchecked")
-public class ResourceManager extends CompositeService implements Recoverable {
+public class ResourceManager extends CompositeService implements Recoverable, ResourceManagerJVMInterface {
 
   /**
    * Priority of the ResourceManager shutdown hook.
@@ -1548,5 +1548,71 @@ public class ResourceManager extends CompositeService implements Recoverable {
 
   protected RMAppLifetimeMonitor createRMAppLifetimeMonitor() {
     return new RMAppLifetimeMonitor(this.rmContext);
+  }
+  
+  public void recover_bridge(java.lang.Object arg0) throws java.lang.Exception {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("recover", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("recover"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("void"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: recover");
+          target.setAccessible(true);
+          target.invoke(this, arg0);
+          return;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.util.curator.ZKCuratorManagerJVMInterface createAndStartZKManager_bridge(org.apache.hadoop.conf.ConfigurationJVMInterface arg0) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("createAndStartZKManager", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("createAndStartZKManager"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.util.curator.ZKCuratorManagerJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: createAndStartZKManager");
+          target.setAccessible(true);
+          org.apache.hadoop.util.curator.ZKCuratorManagerJVMInterface __result = (org.apache.hadoop.util.curator.ZKCuratorManagerJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

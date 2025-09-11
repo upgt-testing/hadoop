@@ -40,7 +40,7 @@ import org.apache.hadoop.conf.Configuration;
 @Stringable
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class Path implements Comparable, Serializable, ObjectInputValidation {
+public class Path implements Comparable, Serializable, ObjectInputValidation, PathJVMInterface {
 
   /**
    * The directory separator, a slash.
@@ -582,5 +582,105 @@ public class Path implements Comparable, Serializable, ObjectInputValidation {
       throw new InvalidObjectException("No URI in deserialized Path");
     }
 
+  }
+  
+  public org.apache.hadoop.fs.PathJVMInterface makeQualified_bridge(java.net.URI arg0, org.apache.hadoop.fs.PathJVMInterface arg1) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = (arg1 != null ? arg1.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("makeQualified", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("makeQualified"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.fs.PathJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: makeQualified");
+          target.setAccessible(true);
+          org.apache.hadoop.fs.PathJVMInterface __result = (org.apache.hadoop.fs.PathJVMInterface) target.invoke(this, arg0, arg1);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.fs.FileSystemJVMInterface getFileSystem_bridge(org.apache.hadoop.conf.ConfigurationJVMInterface arg0) throws java.io.IOException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("getFileSystem", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("getFileSystem"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.fs.FileSystemJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: getFileSystem");
+          target.setAccessible(true);
+          org.apache.hadoop.fs.FileSystemJVMInterface __result = (org.apache.hadoop.fs.FileSystemJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public org.apache.hadoop.fs.PathJVMInterface makeQualified_bridge(org.apache.hadoop.fs.FileSystemJVMInterface arg0) {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[1];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("makeQualified", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("makeQualified"))
+                      continue;
+                  if (m.getParameterCount() != 1)
+                      continue;
+                  if (m.getReturnType().getName().equals("org.apache.hadoop.fs.PathJVMInterface"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: makeQualified");
+          target.setAccessible(true);
+          org.apache.hadoop.fs.PathJVMInterface __result = (org.apache.hadoop.fs.PathJVMInterface) target.invoke(this, arg0);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

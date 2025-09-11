@@ -30,7 +30,7 @@ import org.apache.hadoop.classification.InterfaceStability;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class FSDataOutputStream extends DataOutputStream
-    implements Syncable, CanSetDropBehind, StreamCapabilities {
+    implements Syncable, CanSetDropBehind, StreamCapabilities, FSDataOutputStreamJVMInterface {
   private final OutputStream wrappedStream;
 
   private static class PositionCache extends FilterOutputStream {

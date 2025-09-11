@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 @InterfaceAudience.Private
 @Metrics(about="Per method RPC metrics", context="rpcdetailed")
-public class RpcDetailedMetrics {
+public class RpcDetailedMetrics implements RpcDetailedMetricsJVMInterface {
 
   @Metric MutableRatesWithAggregation rates;
   @Metric MutableRatesWithAggregation deferredRpcRates;

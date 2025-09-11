@@ -34,7 +34,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class ResourceBlacklistRequest {
+public abstract class ResourceBlacklistRequest implements ResourceBlacklistRequestJVMInterface {
 
   @Public
   @Stable

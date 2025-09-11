@@ -50,7 +50,7 @@ import org.apache.hadoop.yarn.api.records.timeline.TimelineEntity;
 import org.apache.hadoop.yarn.api.records.timelineservice.TimelineEvent;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.timeline.TimelineStore;
 import org.apache.hadoop.yarn.server.timelineservice.collector.PerNodeTimelineCollectorsAuxService;
 import org.apache.hadoop.yarn.server.timelineservice.storage.FileSystemTimelineReaderImpl;
@@ -61,6 +61,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
+import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
+import org.apache.hadoop.fs.FileSystemJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
+import org.apache.hadoop.fs.PathJVMInterface;
 
 public class TestMRTimelineEventHandling {
 
@@ -126,7 +132,7 @@ public class TestMRTimelineEventHandling {
       cluster.init(conf);
       cluster.start();
       conf.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS,
-          MiniYARNCluster.getHostname() + ":"
+          MiniYARNClusterInJVM.getHostname() + ":"
           + cluster.getApplicationHistoryServer().getPort());
       TimelineStore ts = cluster.getApplicationHistoryServer()
               .getTimelineStore();
@@ -486,7 +492,7 @@ public class TestMRTimelineEventHandling {
       cluster.init(conf);
       cluster.start();
       conf.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS,
-          MiniYARNCluster.getHostname() + ":"
+          MiniYARNClusterInJVM.getHostname() + ":"
               + cluster.getApplicationHistoryServer().getPort());
       TimelineStore ts = cluster.getApplicationHistoryServer()
           .getTimelineStore();
@@ -525,7 +531,7 @@ public class TestMRTimelineEventHandling {
       cluster.init(conf);
       cluster.start();
       conf.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS,
-          MiniYARNCluster.getHostname() + ":"
+          MiniYARNClusterInJVM.getHostname() + ":"
               + cluster.getApplicationHistoryServer().getPort());
       TimelineStore ts = cluster.getApplicationHistoryServer()
           .getTimelineStore();

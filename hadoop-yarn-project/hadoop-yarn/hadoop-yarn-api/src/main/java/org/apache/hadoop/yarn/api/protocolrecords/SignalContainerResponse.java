@@ -32,5 +32,5 @@ import org.apache.hadoop.yarn.api.ApplicationClientProtocol;
  */
 @Public
 @Evolving
-public abstract class SignalContainerResponse {
+public abstract class SignalContainerResponse implements SignalContainerResponseJVMInterface {
 }

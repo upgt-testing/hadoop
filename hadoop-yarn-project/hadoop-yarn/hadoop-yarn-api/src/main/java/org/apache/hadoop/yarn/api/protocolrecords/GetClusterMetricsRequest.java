@@ -33,7 +33,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetClusterMetricsRequest {
+public abstract class GetClusterMetricsRequest implements GetClusterMetricsRequestJVMInterface {
   @Public
   @Stable
   public static GetClusterMetricsRequest newInstance() {

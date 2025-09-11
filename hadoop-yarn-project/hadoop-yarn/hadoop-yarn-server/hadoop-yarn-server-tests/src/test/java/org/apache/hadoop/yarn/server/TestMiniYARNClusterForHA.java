@@ -29,9 +29,10 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.junit.Before;
 import org.junit.Test;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
 
 public class TestMiniYARNClusterForHA {
-  MiniYARNCluster cluster;
+  MiniYARNClusterInJVM cluster;
 
   @Before
   public void setup() throws IOException, InterruptedException {
@@ -39,7 +40,7 @@ public class TestMiniYARNClusterForHA {
     conf.setBoolean(YarnConfiguration.AUTO_FAILOVER_ENABLED, false);
     conf.set(YarnConfiguration.RM_WEBAPP_ADDRESS, "localhost:0");
 
-    cluster = new MiniYARNCluster(TestMiniYARNClusterForHA.class.getName(),
+    cluster = new MiniYARNClusterInJVM(TestMiniYARNClusterForHA.class.getName(),
         2, 1, 1, 1);
     cluster.init(conf);
     cluster.start();

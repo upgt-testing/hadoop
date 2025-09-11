@@ -43,7 +43,7 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebServer extends AbstractService {
+public class WebServer extends AbstractService implements WebServerJVMInterface {
 
   private static final Logger LOG =
        LoggerFactory.getLogger(WebServer.class);

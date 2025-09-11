@@ -26,7 +26,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
 import org.apache.hadoop.yarn.api.records.NodeId;
 import org.apache.hadoop.yarn.util.Records;
 
-public abstract class GetNodesToLabelsResponse {
+public abstract class GetNodesToLabelsResponse implements GetNodesToLabelsResponseJVMInterface {
   public static GetNodesToLabelsResponse newInstance(
       Map<NodeId, Set<String>> map) {
     GetNodesToLabelsResponse response =

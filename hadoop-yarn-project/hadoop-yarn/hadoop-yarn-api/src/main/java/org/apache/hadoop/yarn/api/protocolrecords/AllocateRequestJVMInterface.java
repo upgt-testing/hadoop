@@ -1,0 +1,28 @@
+package org.apache.hadoop.yarn.api.protocolrecords;
+
+public interface AllocateRequestJVMInterface {
+
+    org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface getResourceBlacklistRequest();
+
+    int getResponseId();
+
+    java.util.List getUpdateRequests();
+
+    void setUpdateRequests(java.util.List<org.apache.hadoop.yarn.api.records.UpdateContainerRequest> arg0);
+
+    void setProgress(float arg0);
+
+    void setReleaseList(java.util.List<org.apache.hadoop.yarn.api.records.ContainerId> arg0);
+
+    void setResourceBlacklistRequest_bridge(org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface arg0);
+
+    void setAskList(java.util.List<org.apache.hadoop.yarn.api.records.ResourceRequest> arg0);
+
+    void setResponseId(int arg0);
+
+    java.util.List getAskList();
+
+    java.util.List getReleaseList();
+
+    float getProgress();
+}

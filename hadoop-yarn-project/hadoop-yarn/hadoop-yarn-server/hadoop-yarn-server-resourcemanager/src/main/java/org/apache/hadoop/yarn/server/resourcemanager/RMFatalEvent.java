@@ -23,7 +23,7 @@ import org.apache.hadoop.yarn.event.AbstractEvent;
 /**
  * Event that indicates a non-recoverable error for the resource manager.
  */
-public class RMFatalEvent extends AbstractEvent<RMFatalEventType> {
+public class RMFatalEvent extends AbstractEvent<RMFatalEventType> implements RMFatalEventJVMInterface {
   private final Exception cause;
   private final String message;
 

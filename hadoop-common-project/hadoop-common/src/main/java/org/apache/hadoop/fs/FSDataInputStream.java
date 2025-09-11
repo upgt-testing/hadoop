@@ -38,7 +38,7 @@ import org.apache.hadoop.util.IdentityHashStore;
 public class FSDataInputStream extends DataInputStream
     implements Seekable, PositionedReadable, 
       ByteBufferReadable, HasFileDescriptor, CanSetDropBehind, CanSetReadahead,
-      HasEnhancedByteBufferAccess, CanUnbuffer, StreamCapabilities {
+      HasEnhancedByteBufferAccess, CanUnbuffer, StreamCapabilities, FSDataInputStreamJVMInterface {
   /**
    * Map ByteBuffers that we have handed out to readers to ByteBufferPool 
    * objects
@@ -245,5 +245,74 @@ public class FSDataInputStream extends DataInputStream
   @Override
   public String toString() {
     return super.toString() + ": " + in;
+  }
+  
+  public java.nio.ByteBuffer read_bridge(java.lang.Object arg0, int arg1, java.util.EnumSet<org.apache.hadoop.fs.ReadOption> arg2) throws java.io.IOException, java.lang.UnsupportedOperationException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[3];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = int.class;
+              __types[2] = (arg2 != null ? arg2.getClass() : Object.class);
+              try {
+                  target = this.getClass().getMethod("read", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("read"))
+                      continue;
+                  if (m.getParameterCount() != 3)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.nio.ByteBuffer"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: read");
+          target.setAccessible(true);
+          java.nio.ByteBuffer __result = (java.nio.ByteBuffer) target.invoke(this, arg0, arg1, arg2);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
+  }
+  
+  public java.nio.ByteBuffer read_bridge(java.lang.Object arg0, int arg1) throws java.io.IOException, java.lang.UnsupportedOperationException {
+      try {
+          java.lang.reflect.Method target = null;
+          {
+              Class<?>[] __types = new Class<?>[2];
+              __types[0] = (arg0 != null ? arg0.getClass() : Object.class);
+              __types[1] = int.class;
+              try {
+                  target = this.getClass().getMethod("read", __types);
+              } catch (NoSuchMethodException e) {
+              }
+          }
+          if (target == null) {
+              for (java.lang.reflect.Method m : this.getClass().getDeclaredMethods()) {
+                  if (!m.getName().equals("read"))
+                      continue;
+                  if (m.getParameterCount() != 2)
+                      continue;
+                  if (m.getReturnType().getName().equals("java.nio.ByteBuffer"))
+                      continue;
+                  target = m;
+                  break;
+              }
+          }
+          if (target == null)
+              throw new RuntimeException("No matching target method found: read");
+          target.setAccessible(true);
+          java.nio.ByteBuffer __result = (java.nio.ByteBuffer) target.invoke(this, arg0, arg1);
+          return __result;
+      } catch (Throwable e) {
+          throw new RuntimeException(e);
+      }
   }
 }

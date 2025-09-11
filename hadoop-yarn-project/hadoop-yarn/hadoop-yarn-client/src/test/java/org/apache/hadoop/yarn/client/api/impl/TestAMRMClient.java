@@ -69,7 +69,7 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.ipc.YarnRPC;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.server.MiniYARNCluster;
+import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
 import org.apache.hadoop.yarn.server.resourcemanager.RMContext;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
@@ -91,6 +91,16 @@ import org.junit.runners.Parameterized;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.eclipse.jetty.util.log.Log;
+import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
+import org.apache.hadoop.security.UserGroupInformationJVMInterface;
+import org.apache.hadoop.conf.ConfigurationJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
+import org.apache.hadoop.io.TextJVMInterface;
+import org.apache.hadoop.security.CredentialsJVMInterface;
+import org.apache.hadoop.yarn.server.resourcemanager.RMContextJVMInterface;
+import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
+import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
 
 
 /**
@@ -101,7 +111,7 @@ public class TestAMRMClient {
   private String schedulerName = null;
   private boolean autoUpdate = false;
   private Configuration conf = null;
-  private MiniYARNCluster yarnCluster = null;
+  private MiniYARNClusterInJVM yarnCluster = null;
   private YarnClient yarnClient = null;
   private List<NodeReport> nodeReports = null;
   private ApplicationAttemptId attemptId = null;
@@ -158,7 +168,7 @@ public class TestAMRMClient {
         YarnConfiguration.OPPORTUNISTIC_CONTAINER_ALLOCATION_ENABLED, true);
     conf.setInt(
         YarnConfiguration.NM_OPPORTUNISTIC_CONTAINERS_MAX_QUEUE_LENGTH, 10);
-    yarnCluster = new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
+    yarnCluster = new MiniYARNClusterInJVM(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
 
@@ -889,7 +899,7 @@ public class TestAMRMClient {
 
   @Test (timeout=60000)
   public void testAMRMClientWithSaslEncryption() throws Exception {
-    // we have to create a new instance of MiniYARNCluster to avoid SASL qop
+    // we have to create a new instance of MiniYARNClusterInJVM to avoid SASL qop
     // mismatches between client and server
     teardown();
     conf = new YarnConfiguration();

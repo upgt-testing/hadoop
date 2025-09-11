@@ -31,7 +31,7 @@ import org.apache.hadoop.yarn.util.Records;
  */
 @Public
 @Stable
-public abstract class GetQueueInfoRequest {
+public abstract class GetQueueInfoRequest implements GetQueueInfoRequestJVMInterface {
 
   @Public
   @Stable

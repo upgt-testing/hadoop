@@ -20,7 +20,7 @@ package org.apache.hadoop.yarn.api.protocolrecords;
 
 import org.apache.hadoop.yarn.util.Records;
 
-public abstract class GetNodesToLabelsRequest {
+public abstract class GetNodesToLabelsRequest implements GetNodesToLabelsRequestJVMInterface {
   public static GetNodesToLabelsRequest newInstance() {
     return Records.newRecord(GetNodesToLabelsRequest.class);
   }
