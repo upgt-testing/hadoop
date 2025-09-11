@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -97,6 +99,7 @@ import static org.apache.hadoop.yarn.server.resourcemanager.resource.TestResourc
 import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManagerInstance;
 import edu.illinois.instance.Instance;
+import edu.illinois.instance.UpgradeMode;
 
 /**
  * <p>
@@ -155,12 +158,12 @@ public class MiniYARNClusterInJVM extends CompositeService {
     private boolean enableAHS;
 
     /**
-     * @param testName name of the test
+     * @param testName            name of the test
      * @param numResourceManagers the number of resource managers in the cluster
-     * @param numNodeManagers the number of node managers in the cluster
-     * @param numLocalDirs the number of nm-local-dirs per nodemanager
-     * @param numLogDirs the number of nm-log-dirs per nodemanager
-     * @param enableAHS enable ApplicationHistoryServer or not
+     * @param numNodeManagers     the number of node managers in the cluster
+     * @param numLocalDirs        the number of nm-local-dirs per nodemanager
+     * @param numLogDirs          the number of nm-log-dirs per nodemanager
+     * @param enableAHS           enable ApplicationHistoryServer or not
      */
     @Deprecated
     public MiniYARNClusterInJVM(String testName, int numResourceManagers, int numNodeManagers, int numLocalDirs, int numLogDirs, boolean enableAHS) {
@@ -207,7 +210,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
         resourceManagers = new ResourceManagerJVMInterface[numResourceManagers];
         nodeManagers = new NodeManagerJVMInterface[numNodeManagers];
-        
+
         // Initialize version arrays for UPGT upgrade testing
         currentNodeManagerVersions = new String[numNodeManagers];
         for (int i = 0; i < numNodeManagers; i++) {
@@ -216,11 +219,11 @@ public class MiniYARNClusterInJVM extends CompositeService {
     }
 
     /**
-     * @param testName name of the test
+     * @param testName            name of the test
      * @param numResourceManagers the number of resource managers in the cluster
-     * @param numNodeManagers the number of node managers in the cluster
-     * @param numLocalDirs the number of nm-local-dirs per nodemanager
-     * @param numLogDirs the number of nm-log-dirs per nodemanager
+     * @param numNodeManagers     the number of node managers in the cluster
+     * @param numLocalDirs        the number of nm-local-dirs per nodemanager
+     * @param numLogDirs          the number of nm-log-dirs per nodemanager
      */
     @SuppressWarnings("deprecation")
     public MiniYARNClusterInJVM(String testName, int numResourceManagers, int numNodeManagers, int numLocalDirs, int numLogDirs) {
@@ -228,10 +231,10 @@ public class MiniYARNClusterInJVM extends CompositeService {
     }
 
     /**
-     * @param testName name of the test
+     * @param testName        name of the test
      * @param numNodeManagers the number of node managers in the cluster
-     * @param numLocalDirs the number of nm-local-dirs per nodemanager
-     * @param numLogDirs the number of nm-log-dirs per nodemanager
+     * @param numLocalDirs    the number of nm-local-dirs per nodemanager
+     * @param numLogDirs      the number of nm-log-dirs per nodemanager
      */
     public MiniYARNClusterInJVM(String testName, int numNodeManagers, int numLocalDirs, int numLogDirs) {
         this(testName, 1, numNodeManagers, numLocalDirs, numLogDirs);
@@ -533,6 +536,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
         /**
          * Create local/log directories
+         *
          * @param dirType type of directories i.e. local dirs or log dirs
          * @param numDirs number of directories
          * @return the created directories as a comma delimited String
@@ -578,6 +582,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
         /**
          * Hook to allow modification/replacement of NodeStatus
+         *
          * @param currentStatus Current status.
          * @return New node status.
          */
@@ -681,9 +686,9 @@ public class MiniYARNClusterInJVM extends CompositeService {
      * @param timeout Time to wait (sleeps in 10 ms intervals) in milliseconds.
      * @return true if all NodeManagers connect to the (Active)
      * ResourceManager, false otherwise.
-     * @throws YarnException if there is no active RM
+     * @throws YarnException        if there is no active RM
      * @throws InterruptedException if any thread has interrupted
-     * the current thread
+     *                              the current thread
      */
     public boolean waitForNodeManagersToConnect(long timeout) throws YarnException, InterruptedException {
         GetClusterMetricsRequest req = GetClusterMetricsRequest.newInstance();
@@ -859,12 +864,12 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
     }
 
+    private ResourceManagerInstance resourceManagerInstance;
+    private NodeManagerInstance nodeManagerInstance;
+
     // Version tracking for UPGT upgrade testing
     private String currentResourceManagerVersion;
     private String[] currentNodeManagerVersions;
-
-    private ResourceManagerInstance resourceManagerInstance;
-    private NodeManagerInstance nodeManagerInstance;
 
     // Initialize versions and instances
     {
@@ -881,7 +886,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
         String rmId;
         boolean isHA;
         boolean wasActive;
-        
+
         ResourceManagerState(Configuration config, String id, boolean ha, boolean active) {
             this.configuration = config;
             this.rmId = id;
@@ -889,7 +894,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
             this.wasActive = active;
         }
     }
-    
+
     /**
      * State preservation class for NodeManager upgrade operations.
      */
@@ -898,7 +903,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
         String nodeId;
         String localDirs;
         String logDirs;
-        
+
         NodeManagerState(Configuration config, String id, String localDirs, String logDirs) {
             this.configuration = config;
             this.nodeId = id;
@@ -917,21 +922,21 @@ public class MiniYARNClusterInJVM extends CompositeService {
         if (resourceManagers[index] == null) {
             return null;
         }
-        
+
         Configuration conf = resourceManagers[index].getConfig();
         String rmId = (rmIds != null && index < rmIds.length) ? rmIds[index] : null;
         boolean isHA = HAUtil.isHAEnabled(conf);
         boolean wasActive = false;
-        
+
         try {
             if (isHA && resourceManagers[index].getRMContext() != null) {
-                wasActive = HAServiceProtocol.HAServiceState.ACTIVE == 
-                    resourceManagers[index].getRMContext().getRMAdminService().getServiceStatus().getState();
+                wasActive = HAServiceProtocol.HAServiceState.ACTIVE ==
+                        resourceManagers[index].getRMContext().getRMAdminService().getServiceStatus().getState();
             }
         } catch (Exception e) {
             LOG.warn("Could not determine HA state for RM[{}], assuming inactive", index, e);
         }
-        
+
         return new ResourceManagerState(new YarnConfiguration(conf), rmId, isHA, wasActive);
     }
 
@@ -945,19 +950,19 @@ public class MiniYARNClusterInJVM extends CompositeService {
         if (nodeManagers[index] == null) {
             return null;
         }
-        
+
         Configuration conf = nodeManagers[index].getConfig();
         String nodeId = conf.get(YarnConfiguration.NM_ADDRESS, "");
         String localDirs = conf.get(YarnConfiguration.NM_LOCAL_DIRS, "");
         String logDirs = conf.get(YarnConfiguration.NM_LOG_DIRS, "");
-        
+
         return new NodeManagerState(new YarnConfiguration(conf), nodeId, localDirs, logDirs);
     }
 
     /**
      * Restores ResourceManager with preserved state after upgrade.
      *
-     * @param index the index of the ResourceManager
+     * @param index      the index of the ResourceManager
      * @param savedState the previously saved state
      * @throws Exception if restoration fails
      */
@@ -968,15 +973,15 @@ public class MiniYARNClusterInJVM extends CompositeService {
         } else {
             // Restore with saved configuration
             initResourceManager(index, savedState.configuration);
-            
+
             // Restore HA state if needed
             if (savedState.isHA && savedState.wasActive && index == 0) {
                 // Wait a bit for initialization
                 Thread.sleep(100);
                 try {
                     resourceManagers[index].getRMContext().getRMAdminService()
-                        .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
-                            HAServiceProtocol.RequestSource.REQUEST_BY_USER_FORCED));
+                            .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
+                                    HAServiceProtocol.RequestSource.REQUEST_BY_USER_FORCED));
                 } catch (Exception e) {
                     LOG.warn("Could not restore HA active state for RM[{}]", index, e);
                 }
@@ -994,26 +999,26 @@ public class MiniYARNClusterInJVM extends CompositeService {
      */
     public void upgradeResourceManager(String targetVersion) throws Exception {
         validateVersion(targetVersion);
-        
+
         LOG.info("Upgrading ResourceManager from {} to {}", currentResourceManagerVersion, targetVersion);
-        
+
         // Save state of all ResourceManagers before stopping
         ResourceManagerState[] savedStates = new ResourceManagerState[resourceManagers.length];
         for (int i = 0; i < resourceManagers.length; i++) {
             savedStates[i] = saveResourceManagerState(i);
         }
-        
+
         // Stop current ResourceManagers
         for (int i = 0; i < resourceManagers.length; i++) {
             if (resourceManagers[i] != null) {
                 resourceManagers[i].stop();
             }
         }
-        
+
         // Update version and create new instance
         currentResourceManagerVersion = targetVersion;
         resourceManagerInstance = new ResourceManagerInstance(targetVersion);
-        
+
         // Recreate ResourceManagers with new version
         for (int i = 0; i < resourceManagers.length; i++) {
             resourceManagers[i] = createResourceManager();
@@ -1022,7 +1027,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
             // Start the ResourceManager
             startResourceManager(i);
         }
-        
+
         LOG.info("ResourceManager upgrade completed to version {}", targetVersion);
     }
 
@@ -1031,25 +1036,25 @@ public class MiniYARNClusterInJVM extends CompositeService {
      * Note: NodeManager state restoration is more complex due to the wrapper pattern.
      * This method recreates the NodeManager and applies the saved configuration.
      *
-     * @param index the index of the NodeManager
-     * @param savedState the previously saved state
+     * @param index         the index of the NodeManager
+     * @param savedState    the previously saved state
      * @param targetVersion the target version for the new NodeManager instance
      */
     private void restoreNodeManagerState(int index, NodeManagerState savedState, String targetVersion) {
         // Create a temporary NodeManager instance for this specific upgrade
         NodeManagerInstance nmInstance = new NodeManagerInstance(targetVersion);
-        
+
         // Set the thread context classloader to the version classloader
         nmInstance.getVersionClassLoader().setCurrentThreadClassLoader();
-        
+
         try {
             // Create the NodeManager with the appropriate class
             nodeManagers[index] = useRpc ? new CustomNodeManager() : new ShortCircuitedNodeManager();
-            
+
             // If we have saved state, we need to initialize with the preserved configuration
             if (savedState != null) {
                 Configuration restoredConfig = new YarnConfiguration(savedState.configuration);
-                
+
                 // Restore important node-specific settings
                 if (!savedState.localDirs.isEmpty()) {
                     restoredConfig.set(YarnConfiguration.NM_LOCAL_DIRS, savedState.localDirs);
@@ -1060,10 +1065,10 @@ public class MiniYARNClusterInJVM extends CompositeService {
                 if (!savedState.nodeId.isEmpty()) {
                     restoredConfig.set(YarnConfiguration.NM_ADDRESS, savedState.nodeId);
                 }
-                
+
                 // Initialize with restored configuration
                 nodeManagers[index].init(restoredConfig);
-                
+
                 LOG.info("Restored NodeManager[{}] with preserved configuration", index);
             } else {
                 // No saved state, use default configuration
@@ -1078,39 +1083,39 @@ public class MiniYARNClusterInJVM extends CompositeService {
     /**
      * Upgrades a specific NodeManager to the specified target version.
      *
-     * @param index the index of the NodeManager to upgrade
+     * @param index         the index of the NodeManager to upgrade
      * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
      * @throws Exception if upgrade fails
      */
     public void upgradeNodeManager(int index, String targetVersion) throws Exception {
         validateVersion(targetVersion);
-        
+
         if (index < 0 || index >= nodeManagers.length) {
             throw new IllegalArgumentException("Invalid NodeManager index: " + index);
         }
-        
+
         LOG.info("Upgrading NodeManager[{}] from {} to {}", index, currentNodeManagerVersions[index], targetVersion);
-        
+
         // Save state before stopping
         NodeManagerState savedState = saveNodeManagerState(index);
-        
+
         // Stop current NodeManager
         if (nodeManagers[index] != null) {
             nodeManagers[index].stop();
         }
-        
+
         // Update version
         currentNodeManagerVersions[index] = targetVersion;
-        
+
         // For individual NodeManager upgrades, we need to create a new instance
         // Update the shared instance if all NMs are now on the same version
         if (allNodeManagersHaveVersion(targetVersion)) {
             nodeManagerInstance = new NodeManagerInstance(targetVersion);
         }
-        
+
         // Recreate NodeManager with preserved configuration
         restoreNodeManagerState(index, savedState, targetVersion);
-        
+
         LOG.info("NodeManager[{}] upgrade completed to version {}", index, targetVersion);
     }
 
@@ -1122,41 +1127,156 @@ public class MiniYARNClusterInJVM extends CompositeService {
      */
     public void upgradeAllNodeManagers(String targetVersion) throws Exception {
         validateVersion(targetVersion);
-        
+
         LOG.info("Upgrading all NodeManagers to version {}", targetVersion);
-        
+
         // Save state for all NodeManagers before stopping
         NodeManagerState[] savedStates = new NodeManagerState[nodeManagers.length];
         for (int i = 0; i < nodeManagers.length; i++) {
             savedStates[i] = saveNodeManagerState(i);
         }
-        
+
         // Stop all NodeManagers
         for (int i = 0; i < nodeManagers.length; i++) {
             if (nodeManagers[i] != null) {
                 nodeManagers[i].stop();
             }
         }
-        
+
         // Update all versions
         for (int i = 0; i < currentNodeManagerVersions.length; i++) {
             currentNodeManagerVersions[i] = targetVersion;
         }
-        
+
         // Update the shared NodeManager instance since all will be on same version
         nodeManagerInstance = new NodeManagerInstance(targetVersion);
-        
+
         // Recreate all NodeManagers with preserved configuration
         for (int i = 0; i < nodeManagers.length; i++) {
             restoreNodeManagerState(i, savedStates[i], targetVersion);
         }
-        
+
         LOG.info("All NodeManagers upgrade completed to version {}", targetVersion);
     }
 
     /**
+     * Upgrades 50% of the NodeManagers to the specified target version while keeping ResourceManagers upgraded.
+     * This method performs a partial cluster upgrade by upgrading all ResourceManagers (for stability)
+     * and then upgrading approximately 50% of the NodeManagers to the target version.
+     *
+     * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
+     * @throws Exception if upgrade fails
+     */
+    private void upgradePartialNodes(String targetVersion) throws Exception {
+        validateVersion(targetVersion);
+
+        LOG.info("Starting partial cluster upgrade (50% of nodes) to version {}", targetVersion);
+        LOG.info("Current cluster state:\n{}", getClusterVersionState());
+
+        try {
+            // Phase 1: Always upgrade ResourceManagers for stability
+            LOG.info("Phase 1: Upgrading ResourceManagers to version {}", targetVersion);
+            if (!currentResourceManagerVersion.equals(targetVersion)) {
+                upgradeResourceManager(targetVersion);
+                LOG.info("ResourceManager upgrade completed successfully");
+            } else {
+                LOG.info("ResourceManager already at target version {}", targetVersion);
+            }
+
+            // Brief pause to let ResourceManagers stabilize
+            Thread.sleep(500);
+
+            // Phase 2: Upgrade 50% of NodeManagers
+            LOG.info("Phase 2: Upgrading 50% of NodeManagers to version {}", targetVersion);
+            int[] nodesToUpgrade = selectNodesForPartialUpgrade(nodeManagers.length);
+
+            int upgradedCount = 0;
+            for (int index : nodesToUpgrade) {
+                if (!currentNodeManagerVersions[index].equals(targetVersion)) {
+                    upgradeNodeManager(index, targetVersion);
+                    upgradedCount++;
+                }
+            }
+
+            LOG.info("Partial upgrade completed: {} of {} NodeManagers upgraded",
+                    upgradedCount, nodeManagers.length);
+
+            // Phase 3: Verify mixed-version cluster state
+            LOG.info("Phase 3: Verifying partial cluster upgrade");
+            waitForClusterStability(5000); // Wait up to 5 seconds
+
+            LOG.info("Partial cluster upgrade completed. Final state:\n{}",
+                    getClusterVersionState());
+
+        } catch (Exception e) {
+            LOG.error("Partial cluster upgrade failed. Current state:\n{}",
+                    getClusterVersionState());
+            throw new Exception("Partial cluster upgrade to version " + targetVersion +
+                    " failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Selects which NodeManagers should be upgraded in a partial upgrade scenario.
+     * This method deterministically selects the first 50% of NodeManagers for upgrade,
+     * ensuring consistent behavior across test runs.
+     *
+     * @param totalNodes the total number of NodeManagers in the cluster
+     * @return array of indices representing NodeManagers to upgrade
+     */
+    private int[] selectNodesForPartialUpgrade(int totalNodes) {
+        // Calculate number of nodes to upgrade (at least 1)
+        int nodesToUpgrade = Math.max(1, totalNodes / 2);
+        int[] indices = new int[nodesToUpgrade];
+
+        // Use deterministic selection: upgrade first half of nodes
+        // This ensures consistent behavior and easier debugging
+        for (int i = 0; i < nodesToUpgrade; i++) {
+            indices[i] = i;
+        }
+
+        LOG.info("Selected {} of {} nodes for partial upgrade: {}",
+                nodesToUpgrade, totalNodes, java.util.Arrays.toString(indices));
+
+        return indices;
+    }
+
+    /**
+     * Upgrades the YARN cluster based on the configured upgrade mode.
+     * This method checks Instance.getUpgradeMode() to determine whether to perform:
+     * - FULL: All ResourceManagers and NodeManagers upgraded
+     * - PARTIAL: All ResourceManagers and 50% of NodeManagers upgraded
+     * - NONE: No upgrade performed
+     */
+    public void upgradeAllNodes() {
+        try {
+            UpgradeMode mode = Instance.getUpgradeMode();
+            String targetVersion = Instance.UpgradeVersion;
+
+            switch (mode) {
+                case FULL:
+                    LOG.info("Performing FULL cluster upgrade to version {}", targetVersion);
+                    upgradeAllNodes(targetVersion);
+                    break;
+                case PARTIAL:
+                    LOG.info("Performing PARTIAL (50%) cluster upgrade to version {}", targetVersion);
+                    upgradePartialNodes(targetVersion);
+                    break;
+                case NONE:
+                    LOG.info("No upgrade requested (mode = NONE)");
+                    break;
+                default:
+                    LOG.warn("Unknown upgrade mode: {}, defaulting to FULL", mode);
+                    upgradeAllNodes(targetVersion);
+            }
+        } catch (Exception e) {
+            LOG.error("Cluster upgrade failed: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
      * Upgrades the entire YARN cluster (all ResourceManagers and NodeManagers) to the specified target version.
-     * This method coordinates a full cluster upgrade by first upgrading all ResourceManagers, 
+     * This method coordinates a full cluster upgrade by first upgrading all ResourceManagers,
      * then upgrading all NodeManagers, ensuring proper sequencing and configuration preservation.
      *
      * @param targetVersion the version to upgrade to (must be StartVersion or UpgradeVersion)
@@ -1164,10 +1284,10 @@ public class MiniYARNClusterInJVM extends CompositeService {
      */
     public void upgradeAllNodes(String targetVersion) throws Exception {
         validateVersion(targetVersion);
-        
+
         LOG.info("Starting full cluster upgrade to version {}", targetVersion);
         LOG.info("Current cluster state:\n{}", getClusterVersionState());
-        
+
         try {
             // Phase 1: Upgrade ResourceManagers first (for stability)
             LOG.info("Phase 1: Upgrading ResourceManagers to version {}", targetVersion);
@@ -1177,10 +1297,10 @@ public class MiniYARNClusterInJVM extends CompositeService {
             } else {
                 LOG.info("ResourceManager already at target version {}", targetVersion);
             }
-            
+
             // Brief pause to let ResourceManagers stabilize
             Thread.sleep(500);
-            
+
             // Phase 2: Upgrade NodeManagers
             LOG.info("Phase 2: Upgrading all NodeManagers to version {}", targetVersion);
             if (!allNodeManagersHaveVersion(targetVersion)) {
@@ -1189,18 +1309,18 @@ public class MiniYARNClusterInJVM extends CompositeService {
             } else {
                 LOG.info("All NodeManagers already at target version {}", targetVersion);
             }
-            
+
             // Phase 3: Verify cluster state
             LOG.info("Phase 3: Verifying cluster upgrade");
             waitForClusterStability(5000); // Wait up to 5 seconds
-            
+
             if (isClusterHomogeneous() && getClusterVersion().equals(targetVersion)) {
                 LOG.info("Full cluster upgrade completed successfully to version {}", targetVersion);
                 LOG.info("Final cluster state:\n{}", getClusterVersionState());
             } else {
                 LOG.warn("Cluster upgrade may not be fully complete. Current state:\n{}", getClusterVersionState());
             }
-            
+
         } catch (Exception e) {
             LOG.error("Full cluster upgrade failed. Current state:\n{}", getClusterVersionState());
             throw new Exception("Cluster upgrade to version " + targetVersion + " failed: " + e.getMessage(), e);
@@ -1216,14 +1336,14 @@ public class MiniYARNClusterInJVM extends CompositeService {
      */
     private boolean waitForClusterStability(int timeoutMs) {
         LOG.info("Waiting for cluster stability (timeout: {}ms)", timeoutMs);
-        
+
         long startTime = System.currentTimeMillis();
-        
+
         try {
             // Basic stability check - just wait a bit for services to initialize
             // In a real implementation, this could check service health, node registration, etc.
             Thread.sleep(Math.min(1000, timeoutMs)); // Wait at least 1 second, but not more than timeout
-            
+
             long elapsed = System.currentTimeMillis() - startTime;
             if (elapsed < timeoutMs) {
                 LOG.info("Cluster appears stable after {}ms", elapsed);
@@ -1296,10 +1416,10 @@ public class MiniYARNClusterInJVM extends CompositeService {
     public String getClusterVersionState() {
         StringBuilder sb = new StringBuilder();
         sb.append("Cluster Version State:\n");
-        
+
         // ResourceManager versions
         sb.append("  ResourceManager: ").append(currentResourceManagerVersion).append("\n");
-        
+
         // NodeManager versions
         sb.append("  NodeManagers:\n");
         if (currentNodeManagerVersions != null) {
@@ -1307,7 +1427,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
                 sb.append("    NM[").append(i).append("]: ").append(currentNodeManagerVersions[i]).append("\n");
             }
         }
-        
+
         return sb.toString();
     }
 
@@ -1320,14 +1440,14 @@ public class MiniYARNClusterInJVM extends CompositeService {
         if (currentNodeManagerVersions == null || currentResourceManagerVersion == null) {
             return false;
         }
-        
+
         // Check if all NodeManagers have the same version as ResourceManager
         for (String nmVersion : currentNodeManagerVersions) {
             if (!currentResourceManagerVersion.equals(nmVersion)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -1341,6 +1461,80 @@ public class MiniYARNClusterInJVM extends CompositeService {
     }
 
     /**
+     * Checks if the cluster is in a mixed-version state (partial upgrade).
+     * A cluster is considered partially upgraded if different NodeManagers
+     * are running different versions.
+     *
+     * @return true if the cluster has NodeManagers running different versions
+     */
+    public boolean isPartiallyUpgraded() {
+        if (currentNodeManagerVersions == null) {
+            return false;
+        }
+
+        Set<String> versions = new HashSet<>();
+        for (String version : currentNodeManagerVersions) {
+            versions.add(version);
+        }
+
+        return versions.size() > 1;
+    }
+
+    /**
+     * Gets upgrade statistics showing how many NodeManagers are on each version.
+     * This provides visibility into the current state of a mixed-version cluster.
+     *
+     * @return map of version strings to count of NodeManagers on that version
+     */
+    public Map<String, Integer> getUpgradeStatistics() {
+        Map<String, Integer> stats = new HashMap<>();
+
+        if (currentNodeManagerVersions != null) {
+            for (String version : currentNodeManagerVersions) {
+                stats.put(version, stats.getOrDefault(version, 0) + 1);
+            }
+        }
+
+        return stats;
+    }
+
+    /**
+     * Gets a detailed upgrade status report for the entire cluster.
+     * This includes ResourceManager version, NodeManager version distribution,
+     * and whether the cluster is homogeneous or mixed-version.
+     *
+     * @return detailed string describing the cluster's upgrade status
+     */
+    public String getUpgradeStatusReport() {
+        StringBuilder report = new StringBuilder();
+        report.append("=== Cluster Upgrade Status Report ===\n");
+
+        // ResourceManager status
+        report.append("ResourceManager Version: ").append(currentResourceManagerVersion).append("\n");
+
+        // NodeManager statistics
+        Map<String, Integer> stats = getUpgradeStatistics();
+        report.append("NodeManager Version Distribution:\n");
+        for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+            report.append("  ").append(entry.getKey()).append(": ")
+                    .append(entry.getValue()).append(" nodes\n");
+        }
+
+        // Cluster status summary
+        report.append("Cluster Status: ");
+        if (isClusterHomogeneous()) {
+            report.append("HOMOGENEOUS (all nodes on same version)\n");
+        } else if (isPartiallyUpgraded()) {
+            report.append("MIXED-VERSION (partial upgrade in progress)\n");
+        } else {
+            report.append("UNKNOWN\n");
+        }
+
+        report.append("======================================");
+        return report.toString();
+    }
+
+    /**
      * Validates that the target version is one of the allowed versions.
      *
      * @param targetVersion the version to validate
@@ -1350,17 +1544,17 @@ public class MiniYARNClusterInJVM extends CompositeService {
         if (targetVersion == null) {
             throw new IllegalArgumentException("Target version cannot be null");
         }
-        
+
         String startVersion = Instance.StartVersion;
         String upgradeVersion = Instance.UpgradeVersion;
-        
+
         if (startVersion == null || upgradeVersion == null) {
             throw new IllegalStateException("Start version and upgrade version must be set via system properties");
         }
-        
+
         if (!targetVersion.equals(startVersion) && !targetVersion.equals(upgradeVersion)) {
-            throw new IllegalArgumentException("Target version must be either StartVersion (" + startVersion + 
-                                             ") or UpgradeVersion (" + upgradeVersion + "), but was: " + targetVersion);
+            throw new IllegalArgumentException("Target version must be either StartVersion (" + startVersion +
+                    ") or UpgradeVersion (" + upgradeVersion + "), but was: " + targetVersion);
         }
     }
 }
