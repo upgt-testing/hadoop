@@ -37,7 +37,7 @@ import org.apache.hadoop.yarn.client.ClientRMProxy;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptState;
 import org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler;
@@ -55,17 +55,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.security.UserGroupInformationJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.service.ServiceJVMInterface;
 
 /**
  * Base class for testing AMRMClient.
@@ -73,7 +62,7 @@ import org.apache.hadoop.service.ServiceJVMInterface;
 public class BaseAMRMClientTest {
 
   protected Configuration conf = null;
-  protected MiniYARNClusterInJVM yarnCluster = null;
+  protected MiniYARNCluster yarnCluster = null;
   protected YarnClient yarnClient = null;
   protected List<NodeReport> nodeReports = null;
   protected ApplicationAttemptId attemptId = null;
@@ -120,7 +109,7 @@ public class BaseAMRMClientTest {
         YarnConfiguration.OPPORTUNISTIC_CONTAINER_ALLOCATION_ENABLED, true);
     conf.setInt(
         YarnConfiguration.NM_OPPORTUNISTIC_CONTAINERS_MAX_QUEUE_LENGTH, 10);
-    yarnCluster = new MiniYARNClusterInJVM(
+    yarnCluster = new MiniYARNCluster(
         TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
