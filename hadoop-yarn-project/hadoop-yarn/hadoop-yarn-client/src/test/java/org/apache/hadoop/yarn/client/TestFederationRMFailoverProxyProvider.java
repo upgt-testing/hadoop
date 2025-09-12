@@ -127,7 +127,7 @@ public class TestFederationRMFailoverProxyProvider {
             System.out.println("Transition rm" + (index + 1) + " to active");
             String dummyAddress = "host:" + index;
             cluster.getResourceManager(index).getRMContext().getRMAdminService().transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(HAServiceProtocol.RequestSource.REQUEST_BY_USER));
-            ResourceManager rm = cluster.getResourceManager(index);
+            ResourceManagerJVMInterface rm = cluster.getResourceManager(index);
             InetSocketAddress amRMAddress = rm.getApplicationMasterService().getBindAddress();
             InetSocketAddress clientRMAddress = rm.getClientRMService().getBindAddress();
             SubClusterRegisterRequest request = SubClusterRegisterRequest.newInstance(SubClusterInfo.newInstance(subClusterId, amRMAddress.getAddress().getHostAddress() + ":" + amRMAddress.getPort(), clientRMAddress.getAddress().getHostAddress() + ":" + clientRMAddress.getPort(), dummyAddress, dummyAddress, SubClusterState.SC_NEW, 1, dummyCapability));

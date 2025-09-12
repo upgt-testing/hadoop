@@ -105,7 +105,7 @@ import org.apache.hadoop.yarn.api.records.YarnClusterMetrics;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.api.protocolrecords.NodeHeartbeatRequest;
 import org.apache.hadoop.yarn.server.api.protocolrecords.NodeHeartbeatResponse;
 import org.apache.hadoop.yarn.server.api.protocolrecords.RegisterNodeManagerRequest;
@@ -128,73 +128,6 @@ import org.apache.hadoop.yarn.server.security.ApplicationACLsManager;
 import org.apache.hadoop.yarn.util.Records;
 import org.junit.After;
 import org.junit.Before;
-import org.apache.hadoop.yarn.server.resourcemanager.security.QueueACLsManagerJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptReportResponseJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.AdminServiceJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetContainersRequestJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.RMContextJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.ResourceTrackerServiceJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.ApplicationMasterServiceJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.YarnClusterMetricsJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.NMTokenJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.ResourceManagerJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.CollectorInfoJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportRequestJVMInterface;
-import org.apache.hadoop.yarn.server.api.protocolrecords.RegisterNodeManagerResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerReportJVMInterface;
-import org.apache.hadoop.yarn.server.api.protocolrecords.NodeHeartbeatResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetClusterMetricsResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoResponseJVMInterface;
-import org.apache.hadoop.yarn.server.security.ApplicationACLsManagerJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationReportResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationsRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetApplicationAttemptsResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetQueueInfoRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetContainerReportRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.server.api.protocolrecords.RegisterNodeManagerRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.QueueInfoJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetDelegationTokenResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.NodeIdJVMInterface;
-import org.apache.hadoop.yarn.server.api.protocolrecords.NodeHeartbeatRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.KillApplicationResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetNewApplicationResponseJVMInterface;
-import org.apache.hadoop.yarn.server.resourcemanager.ClientRMServiceJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.TokenJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RenewDelegationTokenRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetContainersResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.MoveApplicationAcrossQueuesResponseJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.CancelDelegationTokenRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.GetQueueUserAclsInfoRequestJVMInterface;
 
 
 /**
@@ -362,7 +295,7 @@ public abstract class ProtocolHATestBase extends ClientBaseWithFixes {
     return cluster.getResourceManager(cluster.getActiveRMIndex());
   }
 
-  public class MiniYARNClusterForHATesting extends MiniYARNClusterInJVM {
+  public class MiniYARNClusterForHATesting extends MiniYARNCluster {
 
     private boolean overrideClientRMService;
     private boolean overrideRTS;
