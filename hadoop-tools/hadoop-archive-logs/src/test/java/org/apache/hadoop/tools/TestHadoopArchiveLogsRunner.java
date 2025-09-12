@@ -31,7 +31,7 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,13 +47,6 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import org.apache.hadoop.fs.FSDataOutputStreamJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.fs.FileSystemJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.fs.PathJVMInterface;
-import org.apache.hadoop.fs.FileStatusJVMInterface;
-import org.apache.hadoop.fs.permission.FsPermissionJVMInterface;
 
 public class TestHadoopArchiveLogsRunner {
 
@@ -67,7 +60,7 @@ public class TestHadoopArchiveLogsRunner {
 
   private Configuration conf;
   private MiniDFSCluster dfsCluster;
-  private MiniYARNClusterInJVM yarnCluster;
+  private MiniYARNCluster yarnCluster;
   private FileSystem fs;
   private ApplicationId app1;
   private Path app1Path;
@@ -80,7 +73,7 @@ public class TestHadoopArchiveLogsRunner {
 
   @Before
   public void setup() throws Exception {
-    yarnCluster = new MiniYARNClusterInJVM(
+    yarnCluster = new MiniYARNCluster(
         TestHadoopArchiveLogsRunner.class.getSimpleName(), 1, 2, 1, 1);
     conf = new YarnConfiguration();
     conf.setBoolean(YarnConfiguration.LOG_AGGREGATION_ENABLED, true);
