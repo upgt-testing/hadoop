@@ -64,7 +64,7 @@ import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.amrmproxy.AMRMProxyTokenSecretManager;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManagerImpl;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMApp;
@@ -75,27 +75,6 @@ import org.apache.hadoop.yarn.server.utils.BuilderUtils;
 import org.apache.hadoop.yarn.util.Records;
 import org.junit.Assert;
 import org.junit.Test;
-import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.TokenJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.security.UserGroupInformationJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 
 public class TestAMRMProxy {
 
@@ -109,7 +88,7 @@ public class TestAMRMProxy {
   public void testAMRMProxyE2E() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testAMRMProxyE2E",
+    try (MiniYARNCluster cluster = new MiniYARNCluster("testAMRMProxyE2E",
         1, 1, 1);
             YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
@@ -192,8 +171,8 @@ public class TestAMRMProxy {
   public void testE2ETokenRenewal() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster =
-        new MiniYARNClusterInJVM("testE2ETokenRenewal", 1, 1, 1);
+    try (MiniYARNCluster cluster =
+        new MiniYARNCluster("testE2ETokenRenewal", 1, 1, 1);
            YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
       conf.setBoolean(YarnConfiguration.AMRM_PROXY_ENABLED, true);
@@ -264,7 +243,7 @@ public class TestAMRMProxy {
   public void testE2ETokenSwap() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testE2ETokenSwap",
+    try (MiniYARNCluster cluster = new MiniYARNCluster("testE2ETokenSwap",
         1, 1, 1);
             YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
@@ -294,7 +273,7 @@ public class TestAMRMProxy {
   }
 
   private ApplicationMasterProtocol createAMRMProtocol(YarnClient rmClient,
-      ApplicationId appId, MiniYARNClusterInJVM cluster,
+      ApplicationId appId, MiniYARNCluster cluster,
       final Configuration yarnConf)
           throws IOException, InterruptedException, YarnException {
 
@@ -364,7 +343,7 @@ public class TestAMRMProxy {
   }
 
   private ApplicationId createApp(YarnClient yarnClient,
-      MiniYARNClusterInJVM yarnCluster) throws Exception {
+      MiniYARNCluster yarnCluster) throws Exception {
 
     ApplicationSubmissionContext appContext =
         yarnClient.createApplication().getApplicationSubmissionContext();

@@ -8,4 +8,5 @@ import java.io.IOException;
 public interface AdminServiceJVMInterface {
     HAServiceStatus getServiceStatus() throws IOException;
     void transitionToActive(HAServiceProtocol.StateChangeRequestInfo reqInfo) throws IOException;
+    void transitionToStandby(HAServiceProtocol.StateChangeRequestInfo reqInfo) throws IOException;
 }

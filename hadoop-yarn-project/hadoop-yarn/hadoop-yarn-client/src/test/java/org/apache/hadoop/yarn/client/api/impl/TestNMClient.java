@@ -62,30 +62,17 @@ import org.apache.hadoop.yarn.client.api.NMTokenCache;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptState;
 import org.apache.hadoop.yarn.util.Records;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.security.UserGroupInformationJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.security.CredentialsJVMInterface;
 
 public class TestNMClient {
   Configuration conf = null;
-  MiniYARNClusterInJVM yarnCluster = null;
+  MiniYARNCluster yarnCluster = null;
   YarnClientImpl yarnClient = null;
   AMRMClientImpl<ContainerRequest> rmClient = null;
   NMClientImpl nmClient = null;
@@ -99,7 +86,7 @@ public class TestNMClient {
     // start minicluster
     conf = new YarnConfiguration();
     yarnCluster =
-        new MiniYARNClusterInJVM(TestAMRMClient.class.getName(), nodeCount, 1, 1);
+        new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
     yarnCluster.start();
     assertNotNull(yarnCluster);
