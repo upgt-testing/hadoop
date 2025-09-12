@@ -41,23 +41,11 @@ import org.apache.hadoop.yarn.api.records.ResourceRequest;
 import org.apache.hadoop.yarn.api.records.Token;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMApp;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppState;
 import org.junit.Assert;
 import org.junit.Test;
-import org.apache.hadoop.yarn.api.records.TokenJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.RegisterApplicationMasterRequestJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.FinishApplicationMasterResponseJVMInterface;
-import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateResponseJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
 
 /**
  * End-to-End test cases for the AMRMProxy Service.
@@ -74,7 +62,7 @@ public class TestAMRMProxy extends BaseAMRMProxyE2ETest {
   public void testAMRMProxyE2E() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testAMRMProxyE2E",
+    try (MiniYARNCluster cluster = new MiniYARNCluster("testAMRMProxyE2E",
         1, 1, 1);
             YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
@@ -158,8 +146,8 @@ public class TestAMRMProxy extends BaseAMRMProxyE2ETest {
   public void testAMRMProxyTokenRenewal() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster =
-        new MiniYARNClusterInJVM("testE2ETokenRenewal", 1, 1, 1);
+    try (MiniYARNCluster cluster =
+        new MiniYARNCluster("testE2ETokenRenewal", 1, 1, 1);
            YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
       conf.setBoolean(YarnConfiguration.AMRM_PROXY_ENABLED, true);
@@ -232,7 +220,7 @@ public class TestAMRMProxy extends BaseAMRMProxyE2ETest {
   public void testE2ETokenSwap() throws Exception {
     ApplicationMasterProtocol client;
 
-    try (MiniYARNClusterInJVM cluster = new MiniYARNClusterInJVM("testE2ETokenSwap",
+    try (MiniYARNCluster cluster = new MiniYARNCluster("testE2ETokenSwap",
         1, 1, 1);
             YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();

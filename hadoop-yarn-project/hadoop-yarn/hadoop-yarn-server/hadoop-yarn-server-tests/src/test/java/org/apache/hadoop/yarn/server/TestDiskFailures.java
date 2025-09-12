@@ -29,7 +29,7 @@ import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.hadoop.yarn.api.records.NodeState;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.LocalDirsHandlerService;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
 import org.apache.hadoop.yarn.server.resourcemanager.rmnode.RMNode;
@@ -45,10 +45,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.junit.Assert;
-import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.server.nodemanager.LocalDirsHandlerServiceJVMInterface;
-import org.apache.hadoop.fs.PathJVMInterface;
 
 /**
  * Verify if NodeManager's in-memory good local dirs list and good log dirs list
@@ -70,8 +66,8 @@ public class TestDiskFailures {
   private static final int numLocalDirs = 4;
   private static final int numLogDirs = 4;
 
-  private static MiniYARNClusterInJVM yarnCluster;
-  LocalDirsHandlerServiceJVMInterface dirsHandler;
+  private static MiniYARNCluster yarnCluster;
+  LocalDirsHandlerService dirsHandler;
 
   @BeforeClass
   public static void setup() throws AccessControlException,
@@ -164,12 +160,12 @@ public class TestDiskFailures {
       localFSDirBase.mkdirs();
     }
     LOG.info("Starting up YARN cluster");
-    yarnCluster = new MiniYARNClusterInJVM(TestDiskFailures.class.getName(),
+    yarnCluster = new MiniYARNCluster(TestDiskFailures.class.getName(),
         1, numLocalDirs, numLogDirs);
     yarnCluster.init(conf);
     yarnCluster.start();
 
-    NodeManagerJVMInterface nm = yarnCluster.getNodeManager(0);
+    NodeManager nm = yarnCluster.getNodeManager(0);
     LOG.info("Configured nm-" + dirType + "-dirs="
              + nm.getConfig().get(dirsProperty));
     dirsHandler = nm.getNodeHealthChecker().getDiskHandler();
@@ -245,7 +241,6 @@ public class TestDiskFailures {
 
     Assert.assertEquals("Node's health in terms of disks is wrong",
                         isHealthy, dirsHandler.areDisksHealthy());
-    /*
     for (int i = 0; i < 10; i++) {
       Iterator<RMNode> iter = yarnCluster.getResourceManager().getRMContext()
                               .getRMNodes().values().iterator();
@@ -265,7 +260,6 @@ public class TestDiskFailures {
                             .getRMNodes().values().iterator();
     Assert.assertEquals("RM is not updated with the health status of a node",
         isHealthy, iter.next().getState() != NodeState.UNHEALTHY);
-     */
   }
 
   /**

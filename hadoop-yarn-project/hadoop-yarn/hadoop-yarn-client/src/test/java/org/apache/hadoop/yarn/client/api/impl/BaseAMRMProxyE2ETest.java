@@ -43,7 +43,7 @@ import org.apache.hadoop.yarn.client.api.AMRMClient;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.security.AMRMTokenIdentifier;
-import org.apache.hadoop.yarn.server.MiniYARNClusterInJVM;
+import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.amrmproxy.AMRMProxyTokenSecretManager;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManagerImpl;
 import org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttempt;
@@ -59,21 +59,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.hadoop.yarn.api.records.PriorityJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationAttemptIdJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.SubmitApplicationRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceBlacklistRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerIdJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationSubmissionContextJVMInterface;
-import org.apache.hadoop.yarn.api.records.ContainerLaunchContextJVMInterface;
-import org.apache.hadoop.yarn.api.protocolrecords.AllocateRequestJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationIdJVMInterface;
-import org.apache.hadoop.security.UserGroupInformationJVMInterface;
-import org.apache.hadoop.conf.ConfigurationJVMInterface;
-import org.apache.hadoop.yarn.api.records.ApplicationReportJVMInterface;
-import org.apache.hadoop.yarn.api.records.ResourceJVMInterface;
-import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 
 /**
  * Base test case to be used for Testing frameworks that use AMRMProxy.
@@ -81,7 +66,7 @@ import org.apache.hadoop.yarn.api.ApplicationMasterProtocolJVMInterface;
 public abstract class BaseAMRMProxyE2ETest {
 
   protected ApplicationMasterProtocol createAMRMProtocol(YarnClient rmClient,
-      ApplicationId appId, MiniYARNClusterInJVM cluster,
+      ApplicationId appId, MiniYARNCluster cluster,
       final Configuration yarnConf)
       throws IOException, InterruptedException, YarnException {
 
@@ -151,7 +136,7 @@ public abstract class BaseAMRMProxyE2ETest {
   }
 
   protected ApplicationAttemptId createApp(YarnClient yarnClient,
-      MiniYARNClusterInJVM yarnCluster, Configuration conf) throws Exception {
+      MiniYARNCluster yarnCluster, Configuration conf) throws Exception {
 
     ApplicationSubmissionContext appContext =
         yarnClient.createApplication().getApplicationSubmissionContext();
