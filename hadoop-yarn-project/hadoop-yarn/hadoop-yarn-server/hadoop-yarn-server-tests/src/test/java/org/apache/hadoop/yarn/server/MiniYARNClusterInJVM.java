@@ -312,7 +312,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
     private synchronized void initResourceManager(int index, Configuration conf) {
         Configuration newConf = resourceManagers.length > 1 ? new YarnConfiguration(conf) : conf;
-        resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
+        newConf.setClassLoader(resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader());
 
         if (HAUtil.isHAEnabled(newConf)) {
             newConf.set(YarnConfiguration.RM_HA_ID, rmIds[index]);
@@ -516,6 +516,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
         protected synchronized void serviceInit(Configuration conf) throws Exception {
             Configuration config = new YarnConfiguration(conf);
             // create nm-local-dirs and configure them for the nodemanager
+            config.setClassLoader(Thread.currentThread().getContextClassLoader());
             String localDirsString = prepareDirs("local", numLocalDirs);
             config.set(YarnConfiguration.NM_LOCAL_DIRS, localDirsString);
             // create nm-log-dirs and configure them for the nodemanager
