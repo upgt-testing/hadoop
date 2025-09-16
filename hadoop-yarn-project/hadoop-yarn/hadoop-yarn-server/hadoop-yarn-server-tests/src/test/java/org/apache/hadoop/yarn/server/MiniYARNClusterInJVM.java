@@ -19,10 +19,7 @@ package org.apache.hadoop.yarn.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.StringUtils;
@@ -60,13 +57,8 @@ import org.apache.hadoop.yarn.server.api.records.NodeStatus;
 import org.apache.hadoop.yarn.server.applicationhistoryservice.ApplicationHistoryServer;
 import org.apache.hadoop.yarn.server.applicationhistoryservice.ApplicationHistoryStore;
 import org.apache.hadoop.yarn.server.applicationhistoryservice.MemoryApplicationHistoryStore;
-import org.apache.hadoop.yarn.server.nodemanager.ContainerExecutor;
-import org.apache.hadoop.yarn.server.nodemanager.Context;
-import org.apache.hadoop.yarn.server.nodemanager.DeletionService;
-import org.apache.hadoop.yarn.server.nodemanager.LocalDirsHandlerService;
+import org.apache.hadoop.yarn.server.nodemanager.*;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
-import org.apache.hadoop.yarn.server.nodemanager.NodeStatusUpdater;
-import org.apache.hadoop.yarn.server.nodemanager.NodeStatusUpdaterImpl;
 import org.apache.hadoop.yarn.server.nodemanager.amrmproxy.AMRMProxyService;
 import org.apache.hadoop.yarn.server.nodemanager.amrmproxy.DefaultRequestInterceptor;
 import org.apache.hadoop.yarn.server.nodemanager.amrmproxy.RequestInterceptor;
@@ -94,10 +86,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.apache.hadoop.yarn.server.resourcemanager.resource.TestResourceProfiles.TEST_CONF_RESET_RESOURCE_TYPES;
 
-import org.apache.hadoop.yarn.server.nodemanager.NodeManagerJVMInterface;
-import org.apache.hadoop.yarn.server.nodemanager.NodeManagerInstance;
-import java.util.HashMap;
-import java.util.HashSet;
 import edu.illinois.instance.Instance;
 import edu.illinois.instance.UpgradeMode;
 
@@ -323,7 +311,8 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
     private synchronized void initResourceManager(int index, Configuration conf) {
         Configuration newConf = resourceManagers.length > 1 ? new YarnConfiguration(conf) : conf;
-        resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
+        newConf.setClassLoader(resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader());
+        //resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
         if (HAUtil.isHAEnabled(newConf)) {
             newConf.set(YarnConfiguration.RM_HA_ID, rmIds[index]);
         }
@@ -510,6 +499,8 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
         protected synchronized void serviceInit(Configuration conf) throws Exception {
             Configuration config = new YarnConfiguration(conf);
+            //config.setClassLoader(nodeManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader());
+            config.setClassLoader(Thread.currentThread().getContextClassLoader());
             // create nm-local-dirs and configure them for the nodemanager
             String localDirsString = prepareDirs("local", numLocalDirs);
             config.set(YarnConfiguration.NM_LOCAL_DIRS, localDirsString);
@@ -878,7 +869,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
     }
 
     // Upgrade methods appended from MiniYARNClusterUpgradeMethods.java
-private String currentResourceManagerVersion;
+    private String currentResourceManagerVersion;
     private String[] currentNodeManagerVersions;
 
     // Initialize versions and instances
