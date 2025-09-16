@@ -168,9 +168,12 @@ public class RMProxy<T> {
           YarnConfiguration.DEFAULT_CLIENT_FAILOVER_PROXY_PROVIDER, e);
     }
 
+    ClassLoader prevClzLoader = conf.getClassLoader();
+    conf.setClassLoader(Thread.currentThread().getContextClassLoader());
     RMFailoverProxyProvider<T> provider = ReflectionUtils.newInstance(
         conf.getClass(YarnConfiguration.CLIENT_FAILOVER_PROXY_PROVIDER,
             defaultProviderClass, RMFailoverProxyProvider.class), conf);
+    conf.setClassLoader(prevClzLoader);
     provider.init(conf, (RMProxy<T>) this, protocol);
     return provider;
   }
