@@ -335,7 +335,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
             }
         });
         resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
-
+        newConf.setClassLoader(Thread.currentThread().getContextClassLoader());
     }
 
     private synchronized void startResourceManager(final int index) {
