@@ -172,7 +172,7 @@
         </dependency>
         <dependency>
             <groupId>edu.illinois</groupId>
-            <artifactId>upgt-core</artifactId>
+            <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
