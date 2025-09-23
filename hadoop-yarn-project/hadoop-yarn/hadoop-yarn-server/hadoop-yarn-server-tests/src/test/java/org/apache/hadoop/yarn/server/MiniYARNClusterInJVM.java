@@ -26,6 +26,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import edu.illinois.core.instance.UpgradableInstance;
+import edu.illinois.core.instance.UpgradeMode;
+import edu.illinois.core.instance.UpgradeModeController;
+import edu.illinois.core.runtime.UpgtException;
+import edu.illinois.core.spi.NodeLoaderFactory;
+import edu.illinois.core.upgrade.UpgradePlan;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
@@ -99,8 +106,6 @@ import org.apache.hadoop.yarn.server.nodemanager.NodeManagerInstance;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import edu.illinois.instance.Instance;
-import edu.illinois.instance.UpgradeMode;
 
 /**
  * <p>
@@ -250,6 +255,9 @@ public class MiniYARNClusterInJVM extends CompositeService {
             conf.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS, hostname + ":" + ServerSocketUtil.getPort(9188, 10));
         }
         useRpc = conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_USE_RPC);
+        if (!useRpc) {
+            throw new UpgtException("MiniYARNClusterInJVM does not support version upgrade testing with direct communication w/o RPC");
+        }
         failoverTimeout = conf.getInt(YarnConfiguration.RM_ZK_TIMEOUT_MS, YarnConfiguration.DEFAULT_RM_ZK_TIMEOUT_MS);
         if (conf.getBoolean(TEST_CONF_RESET_RESOURCE_TYPES, true)) {
             ResourceUtils.resetResourceTypes(conf);
@@ -318,11 +326,13 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
     private synchronized void initResourceManager(int index, Configuration conf) {
         Configuration newConf = resourceManagers.length > 1 ? new YarnConfiguration(conf) : conf;
-        newConf.setClassLoader(resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader());
+        newConf.setClassLoader(resourceManagerInstance.enter());
+        //resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
         if (HAUtil.isHAEnabled(newConf)) {
             newConf.set(YarnConfiguration.RM_HA_ID, rmIds[index]);
         }
         resourceManagers[index].init(newConf);
+        /*
         resourceManagers[index].getRMContext().getDispatcher().register(RMAppAttemptEventType.class, new EventHandler<RMAppAttemptEvent>() {
 
             public void handle(RMAppAttemptEvent event) {
@@ -333,15 +343,16 @@ public class MiniYARNClusterInJVM extends CompositeService {
                 }
             }
         });
-        resourceManagerInstance.getVersionClassLoader().resetCurrentThreadClassLoader();
+         */
+        resourceManagerInstance.exit();
         newConf.setClassLoader(Thread.currentThread().getContextClassLoader());
     }
 
     private synchronized void startResourceManager(final int index) {
-        resourceManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader();
+        resourceManagers[index].getConfig().setClassLoader(resourceManagerInstance.enter());
         try {
             resourceManagers[index].start();
-            if (resourceManagers[index].getServiceState() != STATE.STARTED) {
+            if (resourceManagers[index].getServiceState() != Enum.valueOf((Class<Enum>) resourceManagers[index].getClass().getClassLoader().loadClass("org.apache.hadoop.service.Service$STATE"), "STARTED")) {
                 // RM could have failed.
                 throw new IOException("ResourceManager failed to start. Final state is " + resourceManagers[index].getServiceState());
             }
@@ -351,7 +362,8 @@ public class MiniYARNClusterInJVM extends CompositeService {
         Configuration conf = resourceManagers[index].getConfig();
         LOG.info("MiniYARN ResourceManager address: " + conf.get(YarnConfiguration.RM_ADDRESS));
         LOG.info("MiniYARN ResourceManager web address: " + WebAppUtils.getRMWebAppURLWithoutScheme(conf));
-        resourceManagerInstance.getVersionClassLoader().resetCurrentThreadClassLoader();
+        resourceManagerInstance.exit();
+        //resourceManagers[index].getConfig().setClassLoader(resourceManagerInstance.exit());
     }
 
     @InterfaceAudience.Private
@@ -476,6 +488,9 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
 
         private void waitForAppMastersToFinish(long timeoutMillis) throws InterruptedException {
+            // Sleep timeoutMillis millis to wait for app masters to finish
+            Thread.sleep(timeoutMillis);
+            /*
             long started = System.currentTimeMillis();
             synchronized (appMasters) {
                 while (!appMasters.isEmpty() && System.currentTimeMillis() - started < timeoutMillis) {
@@ -485,6 +500,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
             if (!appMasters.isEmpty()) {
                 LOG.warn("Stopping RM while some app masters are still alive");
             }
+             */
         }
 
         @Override
@@ -518,6 +534,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
         protected synchronized void serviceInit(Configuration conf) throws Exception {
             Configuration config = new YarnConfiguration(conf);
+            //config.setClassLoader(nodeManagerInstance.getVersionClassLoader().setCurrentThreadClassLoader());
             config.setClassLoader(Thread.currentThread().getContextClassLoader());
             // create nm-local-dirs and configure them for the nodemanager
             String localDirsString = prepareDirs("local", numLocalDirs);
@@ -561,12 +578,15 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
 
         protected synchronized void serviceStart() throws Exception {
+            //nodeManagers[index].getConfig().setClassLoader(resourceManagerInstance.enter());
             nodeManagers[index].start();
             if (nodeManagers[index].getServiceState() != STATE.STARTED) {
                 // NM could have failed.
                 throw new IOException("NodeManager " + index + " failed to start");
             }
             super.serviceStart();
+            //resourceManagerInstance.exit();
+            //nodeManagers[index].getConfig().setClassLoader(Thread.currentThread().getContextClassLoader());
         }
 
         @Override
@@ -695,6 +715,7 @@ public class MiniYARNClusterInJVM extends CompositeService {
      * the current thread
      */
     public boolean waitForNodeManagersToConnect(long timeout) throws YarnException, InterruptedException {
+        /*
         GetClusterMetricsRequest req = GetClusterMetricsRequest.newInstance();
         for (int i = 0; i < timeout / 10; i++) {
             ResourceManagerJVMInterface rm = getResourceManager();
@@ -706,6 +727,8 @@ public class MiniYARNClusterInJVM extends CompositeService {
             }
             Thread.sleep(10);
         }
+         */
+        Thread.sleep(timeout);
         LOG.info("Node Managers did not connect within 5000ms");
         return false;
     }
@@ -852,34 +875,39 @@ public class MiniYARNClusterInJVM extends CompositeService {
         }
     }
 
-    private ResourceManagerInstance resourceManagerInstance;
 
-    private NodeManagerInstance nodeManagerInstance;
+    private final UpgradePlan plan = UpgradePlan.fromSystemPropertyVersions();
+    private final NodeLoaderFactory factory = NodeLoaderFactory.createForPlan(plan);
+
+    private ResourceManagerInstance resourceManagerInstance;
+    //private NodeManagerInstance nodeManagerInstance;
+
+    // Initialize versions and instances
+    {
+        resourceManagerInstance = factory.createInstance("ResourceManager", plan, UpgradePlan.START_VERSION, ResourceManagerInstance::new);
+        //nodeManagerInstance = factory.createInstance("NodeManager", plan, UpgradePlan.START_VERSION, NodeManagerInstance::new);
+    }
 
     ResourceManagerInstance getOrCreateResourceManagerInstance() {
         if (this.resourceManagerInstance == null) {
-            this.resourceManagerInstance = new ResourceManagerInstance(edu.illinois.instance.Instance.StartVersion);
+            this.resourceManagerInstance = factory.createInstance("ResourceManager", plan, UpgradePlan.START_VERSION, ResourceManagerInstance::new);
         }
         return this.resourceManagerInstance;
     }
 
+    /*
     NodeManagerInstance getOrCreateNodeManagerInstance() {
         if (this.nodeManagerInstance == null) {
-            this.nodeManagerInstance = new NodeManagerInstance(edu.illinois.instance.Instance.StartVersion);
+            this.nodeManagerInstance = factory.createInstance("NodeManager", plan, UpgradePlan.START_VERSION, NodeManagerInstance::new);
         }
         return this.nodeManagerInstance;
     }
+     */
 
     // Upgrade methods appended from MiniYARNClusterUpgradeMethods.java
-private String currentResourceManagerVersion;
+    private String currentResourceManagerVersion;
     private String[] currentNodeManagerVersions;
 
-    // Initialize versions and instances
-    {
-        currentResourceManagerVersion = Instance.StartVersion != null ? Instance.StartVersion : "3.3.5";
-        resourceManagerInstance = new ResourceManagerInstance(currentResourceManagerVersion);
-        nodeManagerInstance = new NodeManagerInstance(currentResourceManagerVersion);
-    }
 
     /**
      * State preservation class for ResourceManager upgrade operations.
@@ -1020,7 +1048,7 @@ private String currentResourceManagerVersion;
         
         // Update version and create new instance
         currentResourceManagerVersion = targetVersion;
-        resourceManagerInstance = new ResourceManagerInstance(targetVersion);
+        resourceManagerInstance = factory.createInstance("ResourceManager", plan, targetVersion, ResourceManagerInstance::new);
         
         // Recreate ResourceManagers with new version
         for (int i = 0; i < resourceManagers.length; i++) {
@@ -1045,10 +1073,10 @@ private String currentResourceManagerVersion;
      */
     private void restoreNodeManagerState(int index, NodeManagerState savedState, String targetVersion) {
         // Create a temporary NodeManager instance for this specific upgrade
-        NodeManagerInstance nmInstance = new NodeManagerInstance(targetVersion);
+        //NodeManagerInstance nmInstance = factory.createInstance("NodeManager", plan, targetVersion, NodeManagerInstance::new);
         
         // Set the thread context classloader to the version classloader
-        nmInstance.getVersionClassLoader().setCurrentThreadClassLoader();
+        //nmInstance.enter();
         
         try {
             // Create the NodeManager with the appropriate class
@@ -1079,7 +1107,7 @@ private String currentResourceManagerVersion;
             }
         } finally {
             // Reset the thread context classloader
-            nmInstance.getVersionClassLoader().resetCurrentThreadClassLoader();
+            //nmInstance.exit();
         }
     }
 
@@ -1112,10 +1140,12 @@ private String currentResourceManagerVersion;
         
         // For individual NodeManager upgrades, we need to create a new instance
         // Update the shared instance if all NMs are now on the same version
+        /*
         if (allNodeManagersHaveVersion(targetVersion)) {
-            nodeManagerInstance = new NodeManagerInstance(targetVersion);
+            nodeManagerInstance = factory.createInstance("NodeManager", plan, targetVersion, NodeManagerInstance::new);
         }
-        
+         */
+
         // Recreate NodeManager with preserved configuration
         restoreNodeManagerState(index, savedState, targetVersion);
         
@@ -1152,7 +1182,7 @@ private String currentResourceManagerVersion;
         }
         
         // Update the shared NodeManager instance since all will be on same version
-        nodeManagerInstance = new NodeManagerInstance(targetVersion);
+        //nodeManagerInstance = factory.createInstance("NodeManager", plan, targetVersion, NodeManagerInstance::new);
         
         // Recreate all NodeManagers with preserved configuration
         for (int i = 0; i < nodeManagers.length; i++) {
@@ -1253,8 +1283,8 @@ private String currentResourceManagerVersion;
      */
     public void upgradeAllNodes() {
         try {
-            UpgradeMode mode = Instance.getUpgradeMode();
-            String targetVersion = Instance.UpgradeVersion;
+            UpgradeMode mode = UpgradeModeController.currentMode();
+            String targetVersion = UpgradePlan.UPGRADE_VERSION;
             
             switch (mode) {
                 case FULL:
@@ -1292,26 +1322,20 @@ private String currentResourceManagerVersion;
         LOG.info("Current cluster state:\n{}", getClusterVersionState());
         
         try {
-            // Phase 1: Upgrade ResourceManagers first (for stability)
-            LOG.info("Phase 1: Upgrading ResourceManagers to version {}", targetVersion);
-            if (!currentResourceManagerVersion.equals(targetVersion)) {
-                upgradeResourceManager(targetVersion);
-                LOG.info("ResourceManager upgrade completed successfully");
-            } else {
-                LOG.info("ResourceManager already at target version {}", targetVersion);
-            }
+
+
+            upgradeResourceManager(targetVersion);
+            LOG.info("ResourceManager upgrade completed successfully");
+
             
             // Brief pause to let ResourceManagers stabilize
             Thread.sleep(500);
             
             // Phase 2: Upgrade NodeManagers
             LOG.info("Phase 2: Upgrading all NodeManagers to version {}", targetVersion);
-            if (!allNodeManagersHaveVersion(targetVersion)) {
-                upgradeAllNodeManagers(targetVersion);
-                LOG.info("NodeManager upgrades completed successfully");
-            } else {
-                LOG.info("All NodeManagers already at target version {}", targetVersion);
-            }
+
+            upgradeAllNodeManagers(targetVersion);
+
             
             // Phase 3: Verify cluster state
             LOG.info("Phase 3: Verifying cluster upgrade");
@@ -1548,8 +1572,8 @@ private String currentResourceManagerVersion;
             throw new IllegalArgumentException("Target version cannot be null");
         }
         
-        String startVersion = Instance.StartVersion;
-        String upgradeVersion = Instance.UpgradeVersion;
+        String startVersion = UpgradePlan.START_VERSION;
+        String upgradeVersion = UpgradePlan.UPGRADE_VERSION;
         
         if (startVersion == null || upgradeVersion == null) {
             throw new IllegalStateException("Start version and upgrade version must be set via system properties");
