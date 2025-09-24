@@ -239,11 +239,17 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
     @Override
     public void serviceInit(Configuration conf) throws Exception {
-        useFixedPorts = conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_FIXED_PORTS);
-        useRpc = conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_USE_RPC);
+        useFixedPorts = true;
+        /*
+        conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_FIXED_PORTS);
+        */
+        useRpc = true;
+        /*
+        conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_USE_RPC);
         if (!useRpc) {
             throw new UpgtException("MiniYARNClusterInJVM does not support version upgrade testing with direct communication w/o RPC");
         }
+         */
         failoverTimeout = conf.getInt(YarnConfiguration.RM_ZK_TIMEOUT_MS, YarnConfiguration.DEFAULT_RM_ZK_TIMEOUT_MS);
         if (useRpc && !useFixedPorts) {
             throw new YarnRuntimeException("Invalid configuration!" + " Minicluster can use rpc only when configured to use fixed ports");
