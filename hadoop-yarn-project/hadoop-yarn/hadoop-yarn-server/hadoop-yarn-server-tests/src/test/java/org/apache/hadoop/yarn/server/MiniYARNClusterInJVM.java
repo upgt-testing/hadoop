@@ -241,16 +241,22 @@ public class MiniYARNClusterInJVM extends CompositeService {
 
     @Override
     public void serviceInit(Configuration conf) throws Exception {
-        useFixedPorts = conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_FIXED_PORTS);
+        useFixedPorts = true;
+        /*
+        conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_FIXED_PORTS);
         if (!useFixedPorts) {
             String hostname = MiniYARNClusterInJVM.getHostname();
             conf.set(YarnConfiguration.TIMELINE_SERVICE_ADDRESS, hostname + ":0");
             conf.set(YarnConfiguration.TIMELINE_SERVICE_WEBAPP_ADDRESS, hostname + ":" + ServerSocketUtil.getPort(9188, 10));
         }
-        useRpc = conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_USE_RPC);
+         */
+        useRpc = true;
+        /*
+        conf.getBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, YarnConfiguration.DEFAULT_YARN_MINICLUSTER_USE_RPC);
         if (!useRpc) {
             throw new UpgtException("MiniYARNClusterInJVM does not support version upgrade testing with direct communication w/o RPC");
         }
+         */
         failoverTimeout = conf.getInt(YarnConfiguration.RM_ZK_TIMEOUT_MS, YarnConfiguration.DEFAULT_RM_ZK_TIMEOUT_MS);
         if (conf.getBoolean(TEST_CONF_RESET_RESOURCE_TYPES, true)) {
             ResourceUtils.resetResourceTypes(conf);
