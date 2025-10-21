@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Helper utility for testing Hadoop version upgrades and mixed-version clusters.
@@ -46,6 +47,7 @@ public class UpgradeTestHelper {
   private static final Random RANDOM = new Random();
   private static final int DEFAULT_FILE_SIZE = 1024 * 1024; // 1MB
   private static final String TEST_DIR = "/upgrade-test";
+  private static final AtomicInteger FILE_BATCH_COUNTER = new AtomicInteger(0);
 
   /**
    * Performs a rolling upgrade of all DataNodes in the cluster.
@@ -186,9 +188,13 @@ public class UpgradeTestHelper {
       LOG.info("Created test directory: {}", testDirPath);
     }
 
+    // Get unique batch ID to avoid filename conflicts across multiple calls
+    int batchId = FILE_BATCH_COUNTER.getAndIncrement();
+
     // Create test files
     for (int i = 0; i < numFiles; i++) {
-      Path filePath = new Path(testDirPath, "testfile-" + i + ".dat");
+      // Include batch ID in filename to ensure uniqueness
+      Path filePath = new Path(testDirPath, "testfile-batch" + batchId + "-" + i + ".dat");
 
       // Write random data
       byte[] data = new byte[fileSize];
@@ -202,7 +208,7 @@ public class UpgradeTestHelper {
       LOG.debug("Created test file: {} ({} bytes)", filePath, fileSize);
     }
 
-    LOG.info("Created {} test files in {}", numFiles, testDirPath);
+    LOG.info("Created {} test files in {} (batch {})", numFiles, testDirPath, batchId);
     return testFiles;
   }
 

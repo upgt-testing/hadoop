@@ -70,17 +70,10 @@ public class TestMixedVersionCluster {
     // Check if HADOOP_HOME is set (check both env var and system property)
     // Try HADOOP_3_3_5_HOME as fallback since it's more reliably passed via system properties
     hadoopHome = getEnvOrProperty("HADOOP_HOME");
-
-    // Reject invalid paths (like build target directories) and use fallback
-    if (hadoopHome != null && (hadoopHome.contains("/target") || hadoopHome.contains("\\target"))) {
-      LOG.warn("HADOOP_HOME points to invalid build directory ({}), using HADOOP_3_3_5_HOME instead", hadoopHome);
-      hadoopHome = null;
-    }
-
     if (hadoopHome == null || hadoopHome.isEmpty()) {
       hadoopHome = getEnvOrProperty("HADOOP_3_3_5_HOME");
       if (hadoopHome != null && !hadoopHome.isEmpty()) {
-        LOG.info("Using HADOOP_3_3_5_HOME: {}", hadoopHome);
+        LOG.info("Using HADOOP_3_3_5_HOME as fallback: {}", hadoopHome);
       }
     }
 
