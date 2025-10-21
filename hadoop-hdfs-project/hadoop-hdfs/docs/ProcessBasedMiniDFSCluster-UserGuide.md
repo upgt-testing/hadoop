@@ -1,0 +1,592 @@
+# ProcessBasedMiniDFSCluster User Guide
+
+## Overview
+
+`ProcessBasedMiniDFSCluster` is a testing framework for Apache Hadoop HDFS that runs NameNodes and DataNodes in separate JVM processes. This enables testing scenarios that are impossible with the traditional in-process `MiniDFSCluster`, including:
+
+- **Mixed-version clusters**: Run different Hadoop versions on different nodes
+- **Version upgrades**: Test rolling upgrade scenarios
+- **Process isolation**: True multi-process behavior for realistic testing
+- **Compatibility testing**: Verify cross-version compatibility
+
+## Table of Contents
+
+1. [Prerequisites](#prerequisites)
+2. [Quick Start](#quick-start)
+3. [Basic Usage](#basic-usage)
+4. [Advanced Scenarios](#advanced-scenarios)
+5. [Configuration Options](#configuration-options)
+6. [Troubleshooting](#troubleshooting)
+7. [Best Practices](#best-practices)
+
+## Prerequisites
+
+### Required Software
+
+1. **JDK 8 or higher**
+   ```bash
+   java -version
+   # Should output: java version "1.8.0" or higher
+   ```
+
+2. **Maven 3.3+** (for building)
+   ```bash
+   mvn -version
+   ```
+
+3. **Hadoop Distributions**
+   - At least one built Hadoop distribution
+   - For mixed-version testing: multiple Hadoop distributions
+
+### Setting Up Hadoop Distributions
+
+You need complete Hadoop distributions (with all JARs and dependencies) for each version you want to test:
+
+```bash
+# Download and extract Hadoop distributions
+wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz
+tar xzf hadoop-3.3.1.tar.gz -C /opt/
+
+wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz
+tar xzf hadoop-3.3.5.tar.gz -C /opt/
+
+# Set environment variables (optional but recommended)
+export HADOOP_3_3_1_HOME=/opt/hadoop-3.3.1
+export HADOOP_3_3_5_HOME=/opt/hadoop-3.3.5
+```
+
+### System Requirements
+
+- **Memory**: At least 4GB RAM (2GB for cluster + 2GB for tests)
+- **Disk**: 1GB free space for temporary files
+- **Ports**: Range 50000-59999 should be available (configurable)
+
+## Quick Start
+
+### 5-Minute Example
+
+Here's a complete example to get you started:
+
+```java
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+
+public class QuickStartExample {
+    public static void main(String[] args) throws Exception {
+        // 1. Create configuration
+        Configuration conf = new HdfsConfiguration();
+        conf.set("dfs.replication", "3");
+
+        // 2. Build cluster
+        ProcessBasedMiniDFSCluster cluster =
+            new ProcessBasedMiniDFSCluster.Builder(conf)
+                .numDataNodes(3)
+                .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+                .format(true)
+                .build();
+
+        // 3. Wait for cluster to be ready
+        cluster.waitClusterUp();
+
+        // 4. Use the cluster
+        FileSystem fs = cluster.getFileSystem();
+        Path testFile = new Path("/test.txt");
+
+        // Write data
+        fs.createNewFile(testFile);
+        System.out.println("Created file: " + testFile);
+
+        // 5. Cleanup
+        cluster.shutdown();
+        System.out.println("Cluster shut down successfully");
+    }
+}
+```
+
+Run this example:
+```bash
+mvn compile exec:java -Dexec.mainClass="QuickStartExample"
+```
+
+## Basic Usage
+
+### Creating a Simple Cluster
+
+The most basic cluster setup with all nodes running the same Hadoop version:
+
+```java
+Configuration conf = new HdfsConfiguration();
+conf.set("dfs.replication", "2");
+
+ProcessBasedMiniDFSCluster cluster =
+    new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(3)
+        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+        .format(true)
+        .build();
+
+cluster.waitClusterUp();
+```
+
+### Cluster Lifecycle
+
+#### Starting the Cluster
+
+The cluster starts automatically when you call `build()`. To wait for full readiness:
+
+```java
+cluster.waitClusterUp();  // Blocks until cluster is healthy
+```
+
+#### Accessing the FileSystem
+
+```java
+FileSystem fs = cluster.getFileSystem();
+
+// Use standard Hadoop FileSystem API
+Path file = new Path("/data/test.txt");
+FSDataOutputStream out = fs.create(file);
+out.writeUTF("Hello HDFS!");
+out.close();
+
+// Read data
+FSDataInputStream in = fs.open(file);
+String data = in.readUTF();
+in.close();
+
+System.out.println("Read: " + data);
+```
+
+#### Shutting Down
+
+Always shut down the cluster to clean up resources:
+
+```java
+cluster.shutdown();  // Graceful shutdown, keeps data directories
+
+// Or, delete all data:
+cluster.shutdown(true);  // Delete temporary directories
+```
+
+### Using in JUnit Tests
+
+Recommended pattern for JUnit tests:
+
+```java
+public class MyHDFSTest {
+    private ProcessBasedMiniDFSCluster cluster;
+    private FileSystem fs;
+
+    @Before
+    public void setUp() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        conf.set("dfs.replication", "2");
+
+        cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+            .numDataNodes(3)
+            .allNodesHadoopDistribution(System.getenv("HADOOP_HOME"))
+            .format(true)
+            .build();
+
+        cluster.waitClusterUp();
+        fs = cluster.getFileSystem();
+    }
+
+    @After
+    public void tearDown() {
+        if (cluster != null) {
+            cluster.shutdown(true);  // Clean up after each test
+        }
+    }
+
+    @Test
+    public void testFileOperations() throws Exception {
+        Path testFile = new Path("/test.txt");
+        assertTrue(fs.createNewFile(testFile));
+        assertTrue(fs.exists(testFile));
+    }
+}
+```
+
+## Advanced Scenarios
+
+### Mixed-Version Clusters
+
+Run different Hadoop versions on different nodes:
+
+```java
+ProcessBasedMiniDFSCluster cluster =
+    new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(3)
+        .nameNodeHadoopDistribution("/opt/hadoop-3.3.1")
+        .dataNodeHadoopDistribution(0, "/opt/hadoop-3.3.1")
+        .dataNodeHadoopDistribution(1, "/opt/hadoop-3.3.5")
+        .dataNodeHadoopDistribution(2, "/opt/hadoop-3.3.6")
+        .format(true)
+        .build();
+```
+
+**Use Cases:**
+- Testing forward/backward compatibility
+- Simulating upgrade scenarios
+- Testing protocol compatibility
+
+### Rolling Upgrades
+
+Simulate a production rolling upgrade:
+
+```java
+import org.apache.hadoop.hdfs.server.process.upgrade.UpgradeTestHelper;
+
+// Start with old version
+ProcessBasedMiniDFSCluster cluster =
+    new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(3)
+        .allNodesHadoopDistribution("/opt/hadoop-3.3.1")
+        .format(true)
+        .build();
+
+cluster.waitClusterUp();
+FileSystem fs = cluster.getFileSystem();
+
+// Write test data
+List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
+
+// Perform rolling upgrade
+String targetVersion = "/opt/hadoop-3.3.5";
+UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, targetVersion, testFiles);
+
+// Verify data after upgrade
+UpgradeTestHelper.verifyTestData(fs, testFiles);
+
+System.out.println("Rolling upgrade successful!");
+cluster.shutdown();
+```
+
+### Node Restart Testing
+
+Test cluster behavior when nodes restart:
+
+```java
+// Restart a specific DataNode
+cluster.restartDataNode(0);
+cluster.waitClusterUp();
+
+// Restart with version change
+cluster.shutdownDataNode(1);
+cluster.changeDataNodeVersion(1, "/opt/hadoop-3.3.6");
+cluster.startDataNode(1);
+cluster.waitClusterUp();
+
+// Restart NameNode
+cluster.restartNameNode(0);
+cluster.waitClusterUp();
+```
+
+### Custom Configuration Per Node
+
+```java
+Configuration baseConf = new HdfsConfiguration();
+baseConf.set("dfs.replication", "3");
+
+// Build cluster with custom configuration
+ProcessBasedMiniDFSCluster cluster =
+    new ProcessBasedMiniDFSCluster.Builder(baseConf)
+        .numDataNodes(3)
+        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+        .format(true)
+        .build();
+```
+
+## Configuration Options
+
+### Builder Methods
+
+| Method | Description | Example |
+|--------|-------------|---------|
+| `numDataNodes(int)` | Number of DataNodes | `.numDataNodes(3)` |
+| `allNodesHadoopDistribution(String)` | Set same version for all nodes | `.allNodesHadoopDistribution("/opt/hadoop-3.3.5")` |
+| `nameNodeHadoopDistribution(String)` | Set NameNode version | `.nameNodeHadoopDistribution("/opt/hadoop-3.3.1")` |
+| `dataNodeHadoopDistribution(int, String)` | Set specific DataNode version | `.dataNodeHadoopDistribution(0, "/opt/hadoop-3.3.5")` |
+| `format(boolean)` | Format HDFS on startup | `.format(true)` |
+
+### Configuration Properties
+
+Common HDFS configuration properties:
+
+```java
+Configuration conf = new HdfsConfiguration();
+
+// Replication factor
+conf.set("dfs.replication", "3");
+
+// Block size (128MB)
+conf.set("dfs.blocksize", "134217728");
+
+// DataNode handler threads
+conf.set("dfs.datanode.handler.count", "10");
+
+// Enable permissions
+conf.set("dfs.permissions.enabled", "false");
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. "HADOOP_HOME not set" or "Cannot find Hadoop distribution"
+
+**Problem**: The specified Hadoop distribution path doesn't exist.
+
+**Solution**:
+```bash
+# Verify the path exists
+ls -la /opt/hadoop-3.3.5
+
+# Set environment variable
+export HADOOP_HOME=/opt/hadoop-3.3.5
+
+# Or use absolute path in code
+.allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+```
+
+#### 2. "Port already in use" or "Address already bound"
+
+**Problem**: Required ports are already in use.
+
+**Solution**:
+```bash
+# Check what's using ports in range 50000-59999
+lsof -i :50000-59999
+
+# Kill stuck processes
+pkill -f "ProcessLauncher"
+
+# Or change port range (in future versions)
+```
+
+#### 3. "Cluster did not come up" or Timeout
+
+**Problem**: Nodes failed to start or become healthy.
+
+**Solution**:
+```bash
+# Check logs in temporary directory
+ls -la /tmp/process-minicluster-*/*/logs/
+
+# View NameNode logs
+tail -100 /tmp/process-minicluster-*/nn0/logs/*
+
+# View DataNode logs
+tail -100 /tmp/process-minicluster-*/dn0/logs/*
+
+# Common causes:
+# - Insufficient memory
+# - Port conflicts
+# - Incorrect Hadoop distribution
+# - Java version mismatch
+```
+
+#### 4. "Version compatibility" errors
+
+**Problem**: Incompatible Hadoop versions used together.
+
+**Solution**:
+```java
+// Check compatibility before building cluster
+VersionConfigAdapter v1 = new VersionConfigAdapter("3.3.1");
+VersionConfigAdapter v2 = new VersionConfigAdapter("3.3.5");
+
+if (v1.isCompatibleWith(v2)) {
+    System.out.println("Versions are compatible");
+} else {
+    System.out.println("Versions are NOT compatible");
+}
+
+// Generally compatible:
+// - Same major version (e.g., 3.x with 3.x)
+// - Adjacent minor versions in 2.x (e.g., 2.9 with 2.10)
+
+// NOT compatible:
+// - Different major versions (e.g., 2.x with 3.x)
+```
+
+#### 5. "Out of Memory" errors
+
+**Problem**: Not enough heap for multiple JVM processes.
+
+**Solution**:
+```bash
+# Increase test JVM memory
+export MAVEN_OPTS="-Xmx4g"
+
+# Or in surefire configuration
+mvn test -DargLine="-Xmx4g"
+
+# Reduce number of DataNodes for testing
+.numDataNodes(2)  // Instead of 3 or more
+```
+
+### Debug Mode
+
+Enable debug logging:
+
+```java
+// In your test
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
+Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+root.setLevel(Level.DEBUG);
+```
+
+Or via log4j.properties:
+```properties
+log4j.logger.org.apache.hadoop.hdfs.server.process=DEBUG
+```
+
+## Best Practices
+
+### 1. Always Clean Up
+
+```java
+try {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(3)
+        .allNodesHadoopDistribution(hadoopHome)
+        .build();
+
+    // Your test code
+
+} finally {
+    if (cluster != null) {
+        cluster.shutdown(true);  // Always cleanup
+    }
+}
+```
+
+### 2. Use Environment Variables for Paths
+
+```java
+// Don't hardcode paths
+String hadoopHome = System.getenv("HADOOP_HOME");
+if (hadoopHome == null) {
+    throw new RuntimeException("HADOOP_HOME must be set");
+}
+```
+
+### 3. Test Data Verification
+
+```java
+import org.apache.hadoop.hdfs.server.process.upgrade.UpgradeTestHelper;
+
+// Write test data
+List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
+
+// ... perform operations ...
+
+// Verify data integrity
+UpgradeTestHelper.verifyTestData(fs, testFiles);
+
+// Cleanup
+UpgradeTestHelper.cleanupTestData(fs, testFiles);
+```
+
+### 4. Wait for Cluster Stability
+
+```java
+// After any node operation
+cluster.restartDataNode(0);
+cluster.waitClusterUp();  // Wait before proceeding
+
+// For custom checks
+UpgradeTestHelper.waitForClusterStable(cluster, 30000);  // 30 second timeout
+```
+
+### 5. Use Appropriate Replication
+
+```java
+// For 3 DataNodes, use replication <= 3
+conf.set("dfs.replication", "2");  // or "3"
+
+// Don't use:
+conf.set("dfs.replication", "5");  // Only 3 DNs available!
+```
+
+## Example: Complete Integration Test
+
+```java
+@Test
+public void testCompleteWorkflow() throws Exception {
+    Configuration conf = new HdfsConfiguration();
+    conf.set("dfs.replication", "3");
+
+    ProcessBasedMiniDFSCluster cluster = null;
+    try {
+        // 1. Build cluster
+        cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+            .numDataNodes(3)
+            .allNodesHadoopDistribution(System.getenv("HADOOP_HOME"))
+            .format(true)
+            .build();
+
+        cluster.waitClusterUp();
+        FileSystem fs = cluster.getFileSystem();
+
+        // 2. Write data
+        Path testDir = new Path("/test");
+        fs.mkdirs(testDir);
+
+        for (int i = 0; i < 10; i++) {
+            Path file = new Path(testDir, "file-" + i + ".txt");
+            FSDataOutputStream out = fs.create(file);
+            out.writeUTF("Test data " + i);
+            out.close();
+        }
+
+        // 3. Verify data
+        FileStatus[] files = fs.listStatus(testDir);
+        assertEquals(10, files.length);
+
+        // 4. Test node restart
+        cluster.restartDataNode(0);
+        cluster.waitClusterUp();
+
+        // 5. Verify data still accessible
+        files = fs.listStatus(testDir);
+        assertEquals(10, files.length);
+
+        // 6. Read specific file
+        Path file0 = new Path(testDir, "file-0.txt");
+        FSDataInputStream in = fs.open(file0);
+        String data = in.readUTF();
+        in.close();
+        assertEquals("Test data 0", data);
+
+        // 7. Cleanup
+        fs.delete(testDir, true);
+
+    } finally {
+        if (cluster != null) {
+            cluster.shutdown(true);
+        }
+    }
+}
+```
+
+## Additional Resources
+
+- [Developer Guide](ProcessBasedMiniDFSCluster-DeveloperGuide.md) - For extending the framework
+- [Version Upgrade Testing Guide](VersionUpgradeTestingGuide.md) - Detailed upgrade testing scenarios
+- [CLAUDE.md](../../CLAUDE.md) - Project-specific development guidelines
+
+## Support
+
+For issues and questions:
+- Check the troubleshooting section above
+- Review test examples in `src/test/java/org/apache/hadoop/hdfs/server/process/`
+- File issues in the project's issue tracker
