@@ -52,14 +52,26 @@ public class TestRollingUpgrade {
   private String sourceVersion;
   private String targetVersion;
 
+  /**
+   * Helper to get a variable from either environment or system property.
+   * Checks environment variable first, then falls back to system property.
+   */
+  private String getEnvOrProperty(String name) {
+    String value = System.getenv(name);
+    if (value == null || value.isEmpty()) {
+      value = System.getProperty(name);
+    }
+    return value;
+  }
+
   @Before
   public void setUp() {
     conf = new HdfsConfiguration();
     conf.set("dfs.replication", "3");
 
-    // Check for required Hadoop versions
-    sourceVersion = System.getenv("HADOOP_3_3_1_HOME");
-    targetVersion = System.getenv("HADOOP_3_3_5_HOME");
+    // Check for required Hadoop versions (check both env var and system property)
+    sourceVersion = getEnvOrProperty("HADOOP_3_3_1_HOME");
+    targetVersion = getEnvOrProperty("HADOOP_3_3_5_HOME");
 
     if (sourceVersion == null || sourceVersion.isEmpty()) {
       LOG.warn("HADOOP_3_3_1_HOME not set, skipping rolling upgrade tests");
@@ -433,9 +445,9 @@ public class TestRollingUpgrade {
    */
   @Test
   public void testMultipleSuccessiveUpgrades() throws Exception {
-    String version331 = System.getenv("HADOOP_3_3_1_HOME");
-    String version335 = System.getenv("HADOOP_3_3_5_HOME");
-    String version336 = System.getenv("HADOOP_3_3_6_HOME");
+    String version331 = getEnvOrProperty("HADOOP_3_3_1_HOME");
+    String version335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String version336 = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_1_HOME must be set", version331);
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", version335);

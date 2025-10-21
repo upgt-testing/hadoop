@@ -61,14 +61,26 @@ public class TestHadoop335To336Upgrade {
   private String hadoop335Home;
   private String hadoop336Home;
 
+  /**
+   * Helper to get a variable from either environment or system property.
+   * Checks environment variable first, then falls back to system property.
+   */
+  private String getEnvOrProperty(String name) {
+    String value = System.getenv(name);
+    if (value == null || value.isEmpty()) {
+      value = System.getProperty(name);
+    }
+    return value;
+  }
+
   @Before
   public void setUp() {
     conf = new HdfsConfiguration();
     conf.set("dfs.replication", "3");
 
-    // Check for required Hadoop versions
-    hadoop335Home = System.getenv("HADOOP_3_3_5_HOME");
-    hadoop336Home = System.getenv("HADOOP_3_3_6_HOME");
+    // Check for required Hadoop versions (check both env var and system property)
+    hadoop335Home = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    hadoop336Home = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     if (hadoop335Home == null || hadoop335Home.isEmpty()) {
       LOG.warn("HADOOP_3_3_5_HOME not set, skipping tests");

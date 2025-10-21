@@ -231,9 +231,9 @@ if [ -n "$TEST_CLASS" ]; then
     log_info "Running test class: $TEST_PATTERN"
   fi
 else
-  # Run all upgrade tests
-  TEST_PATTERN="org.apache.hadoop.hdfs.server.process.upgrade.*"
-  log_info "Running all upgrade tests in upgrade package"
+  # Run all upgrade tests (Maven Surefire requires explicit class names)
+  TEST_PATTERN="TestRollingUpgrade,TestMixedVersionCluster,TestHadoop335To336Upgrade"
+  log_info "Running all upgrade tests: TestRollingUpgrade, TestMixedVersionCluster, TestHadoop335To336Upgrade"
 fi
 
 # Create test output directory
@@ -245,11 +245,16 @@ log_info "Starting test execution (this may take 10-30 minutes)..."
 echo ""
 
 # Run tests with environment variables
+# Note: Maven Surefire runs in a separate JVM, so we pass env vars as system properties
+# The test code checks both environment variables and system properties
 set +e  # Don't exit on test failures
 mvn test \
   -pl "$TEST_MODULE" \
   -Dtest="$TEST_PATTERN" \
   -Dmaven.javadoc.skip=true \
+  -DHADOOP_HOME="$HADOOP_HOME" \
+  -DHADOOP_3_3_5_HOME="$HADOOP_3_3_5_HOME" \
+  -DHADOOP_3_3_6_HOME="$HADOOP_3_3_6_HOME" \
   2>&1 | tee "$TEST_OUTPUT_DIR/test-execution.log"
 
 TEST_EXIT_CODE=${PIPESTATUS[0]}

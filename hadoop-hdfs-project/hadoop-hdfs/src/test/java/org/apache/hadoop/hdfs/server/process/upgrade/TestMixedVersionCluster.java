@@ -50,13 +50,25 @@ public class TestMixedVersionCluster {
   private Configuration conf;
   private String hadoopHome;
 
+  /**
+   * Helper to get a variable from either environment or system property.
+   * Checks environment variable first, then falls back to system property.
+   */
+  private String getEnvOrProperty(String name) {
+    String value = System.getenv(name);
+    if (value == null || value.isEmpty()) {
+      value = System.getProperty(name);
+    }
+    return value;
+  }
+
   @Before
   public void setUp() {
     conf = new HdfsConfiguration();
     conf.set("dfs.replication", "2");
 
-    // Check if HADOOP_HOME is set
-    hadoopHome = System.getenv("HADOOP_HOME");
+    // Check if HADOOP_HOME is set (check both env var and system property)
+    hadoopHome = getEnvOrProperty("HADOOP_HOME");
     if (hadoopHome == null || hadoopHome.isEmpty()) {
       LOG.warn("HADOOP_HOME not set, skipping integration tests");
     }
@@ -112,9 +124,9 @@ public class TestMixedVersionCluster {
   @Test
   public void testMixedPatchVersions() throws Exception {
     // This test requires multiple Hadoop distributions
-    String hadoop331 = System.getenv("HADOOP_3_3_1_HOME");
-    String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop336 = System.getenv("HADOOP_3_3_6_HOME");
+    String hadoop331 = getEnvOrProperty("HADOOP_3_3_1_HOME");
+    String hadoop335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String hadoop336 = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_1_HOME must be set", hadoop331);
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
@@ -164,9 +176,9 @@ public class TestMixedVersionCluster {
    */
   @Test
   public void testMixedMinorVersionsHadoop3x() throws Exception {
-    String hadoop333 = System.getenv("HADOOP_3_3_3_HOME");
-    String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop340 = System.getenv("HADOOP_3_4_0_HOME");
+    String hadoop333 = getEnvOrProperty("HADOOP_3_3_3_HOME");
+    String hadoop335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String hadoop340 = getEnvOrProperty("HADOOP_3_4_0_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
 
@@ -226,8 +238,8 @@ public class TestMixedVersionCluster {
    */
   @Test
   public void testDataNodeRestartWithVersionChange() throws Exception {
-    String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop336 = System.getenv("HADOOP_3_3_6_HOME");
+    String hadoop335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String hadoop336 = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
     Assume.assumeNotNull("HADOOP_3_3_6_HOME must be set", hadoop336);
@@ -274,8 +286,8 @@ public class TestMixedVersionCluster {
   @Test
   public void testAllDataNodesDifferentVersions() throws Exception {
     String hadoop331 = System.getenv("HADOOP_3_3_1_HOME");
-    String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop336 = System.getenv("HADOOP_3_3_6_HOME");
+    String hadoop335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String hadoop336 = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
 
@@ -326,8 +338,8 @@ public class TestMixedVersionCluster {
    */
   @Test
   public void testIncompatibleVersionDetection() throws Exception {
-    String hadoop2 = System.getenv("HADOOP_2_10_HOME");
-    String hadoop3 = System.getenv("HADOOP_3_3_5_HOME");
+    String hadoop2 = getEnvOrProperty("HADOOP_2_10_HOME");
+    String hadoop3 = getEnvOrProperty("HADOOP_3_3_5_HOME");
 
     // Skip if we don't have both major versions
     Assume.assumeNotNull("HADOOP_2_10_HOME must be set", hadoop2);
@@ -390,8 +402,8 @@ public class TestMixedVersionCluster {
    */
   @Test
   public void testMixedVersionClusterStability() throws Exception {
-    String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop336 = System.getenv("HADOOP_3_3_6_HOME");
+    String hadoop335 = getEnvOrProperty("HADOOP_3_3_5_HOME");
+    String hadoop336 = getEnvOrProperty("HADOOP_3_3_6_HOME");
 
     Assume.assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
 
