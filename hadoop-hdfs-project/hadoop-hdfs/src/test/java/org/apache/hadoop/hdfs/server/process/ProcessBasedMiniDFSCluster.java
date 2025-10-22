@@ -98,11 +98,15 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     // Process managers
     private final List<NameNodeProcessManager> nameNodeManagers;
     private final List<DataNodeProcessManager> dataNodeManagers;
+    private final List<JournalNodeProcessManager> journalNodeManagers;
 
     // Configuration generators
     private final ProcessConfigurationGenerator configGenerator;
     private final PortAllocator portAllocator;
     private final DirectoryManager directoryManager;
+
+    // Port pre-allocation for all nodes
+    private final PortAllocation portAllocation;
 
     // Cluster state
     private boolean isStarted = false;
@@ -119,6 +123,11 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         this.numNameNodes = builder.numNameNodes;
         this.numDataNodes = builder.numDataNodes;
         this.format = builder.format;
+
+        // Initialize HA configuration
+        this.haEnabled = builder.haEnabled;
+        this.numJournalNodes = builder.numJournalNodes;
+        this.nameservice = builder.nameservice;
 
         // Initialize storage configuration
         this.storagesPerDatanode = builder.storagesPerDatanode;
@@ -153,13 +162,18 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         this.versionRegistry = new HadoopVersionRegistry();
         this.nameNodeManagers = new ArrayList<>();
         this.dataNodeManagers = new ArrayList<>();
+        this.journalNodeManagers = new ArrayList<>();
 
         // Initialize utilities
         this.portAllocator = new PortAllocator(builder.portRangeStart, builder.portRangeEnd);
 
+        // Pre-allocate all ports for all nodes before creating any configurations
+        // This ensures all configurations can be generated with complete port information
+        this.portAllocation = preAllocateAllPorts();
+
         // Create base directory
         File baseDir = builder.baseDir != null ? builder.baseDir : createDefaultBaseDir();
-        this.directoryManager = new DirectoryManager(baseDir, true);  // cleanup on exit
+        this.directoryManager = new DirectoryManager(baseDir, false);  // TEMP: Disable cleanup for debugging
         this.configGenerator = new ProcessConfigurationGenerator(baseConfiguration, portAllocator);
 
         // Register Hadoop distributions
@@ -169,10 +183,30 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         buildCluster();
     }
 
+    // HA configuration
+    private final boolean haEnabled;
+    private final int numJournalNodes;
+    private final String nameservice;
+
     /**
      * Register Hadoop distributions from builder configuration.
      */
     private void registerHadoopDistributions(Builder builder) throws IOException {
+        // Register JournalNode distributions (if HA enabled)
+        if (builder.haEnabled) {
+            for (int i = 0; i < builder.numJournalNodes; i++) {
+                String hadoopHome = builder.journalNodeHadoopHomes.getOrDefault(i, builder.defaultHadoopHome);
+                if (hadoopHome == null) {
+                    throw new IllegalArgumentException(
+                        "No Hadoop distribution specified for JournalNode " + i);
+                }
+                String versionKey = "jn-" + i;
+                if (!versionRegistry.isRegistered(versionKey)) {
+                    versionRegistry.register(versionKey, hadoopHome);
+                }
+            }
+        }
+
         // Register NameNode distributions
         for (int i = 0; i < numNameNodes; i++) {
             String hadoopHome = builder.nameNodeHadoopHomes.getOrDefault(i, builder.defaultHadoopHome);
@@ -204,46 +238,139 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      * Build the cluster structure (but don't start processes yet).
      */
     private void buildCluster() throws IOException {
-        LOG.info("Building ProcessBasedMiniDFSCluster with {} NameNodes and {} DataNodes",
-            numNameNodes, numDataNodes);
-
-        // Create NameNode managers
-        for (int i = 0; i < numNameNodes; i++) {
-            DirectoryManager.NodeDirectory nnNodeDir = directoryManager.createNameNodeDirectory(i);
-            ProcessConfigurationGenerator.NodeConfiguration nnNodeConf =
-                configGenerator.generateNameNodeConfig(i, nnNodeDir);
-            HadoopDistribution distribution = versionRegistry.get("nn-" + i);
-
-            NameNodeProcessManager nnManager = new NameNodeProcessManager(
-                nnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
-                nnNodeDir.getNodeBaseDir(), i);
-            nameNodeManagers.add(nnManager);
+        if (haEnabled) {
+            LOG.info("Building HA ProcessBasedMiniDFSCluster with {} JournalNodes, {} NameNodes and {} DataNodes",
+                numJournalNodes, numNameNodes, numDataNodes);
+        } else {
+            LOG.info("Building ProcessBasedMiniDFSCluster with {} NameNodes and {} DataNodes",
+                numNameNodes, numDataNodes);
         }
 
-        // Get NameNode addresses for DataNode configuration
-        List<InetSocketAddress> nnAddresses = new ArrayList<>();
-        for (NameNodeProcessManager nnManager : nameNodeManagers) {
-            nnAddresses.add(nnManager.getRpcAddress());
+        // Create JournalNode managers (if HA enabled) - MUST be before NameNodes
+        if (haEnabled) {
+            for (int i = 0; i < numJournalNodes; i++) {
+                DirectoryManager.NodeDirectory jnNodeDir = directoryManager.createJournalNodeDirectory(i);
+                ProcessConfigurationGenerator.NodeConfiguration jnNodeConf =
+                    configGenerator.generateJournalNodeConfig(i, jnNodeDir);
+                HadoopDistribution distribution = versionRegistry.get("jn-" + i);
+
+                JournalNodeProcessManager jnManager = new JournalNodeProcessManager(
+                    jnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
+                    jnNodeDir.getNodeBaseDir(), i);
+                journalNodeManagers.add(jnManager);
+            }
+        }
+
+        // Create NameNode managers
+        if (haEnabled) {
+            // HA mode: use pre-allocated ports for all NameNodes
+            // Pre-populate address maps with ALL NameNode addresses from pre-allocated ports
+            // This allows each configuration to be generated with complete information
+            Map<String, String> nnRpcAddresses = new HashMap<>();
+            Map<String, String> nnHttpAddresses = new HashMap<>();
+            Map<String, String> nnServiceRpcAddresses = new HashMap<>();
+
+            for (int i = 0; i < numNameNodes; i++) {
+                String nnId = "nn" + (i + 1);  // nn1, nn2, ...
+                PortAllocation.NodePorts ports = portAllocation.nameNodePorts.get(nnId);
+                nnRpcAddresses.put(nnId, "localhost:" + ports.rpcPort);
+                nnHttpAddresses.put(nnId, "localhost:" + ports.httpPort);
+                nnServiceRpcAddresses.put(nnId, "localhost:" + ports.serviceRpcPort);
+                LOG.info("Pre-populated addresses for {}: RPC={}, HTTP={}, ServiceRPC={}",
+                    nnId, ports.rpcPort, ports.httpPort, ports.serviceRpcPort);
+            }
+
+            // Build NameNode ID list (nn1, nn2, etc.)
+            StringBuilder nnIdsBuilder = new StringBuilder();
+            for (int i = 0; i < numNameNodes; i++) {
+                if (i > 0) nnIdsBuilder.append(",");
+                nnIdsBuilder.append("nn").append(i + 1); // nn1, nn2, ...
+            }
+            String nameNodeIds = nnIdsBuilder.toString();
+
+            // Get JournalNode quorum URI
+            String journalNodeQuorumUri = getJournalNodeQuorumUri();
+
+            // Create each NameNode with HA configuration using pre-allocated ports
+            // Now each NN config will have complete information about ALL NNs
+            for (int i = 0; i < numNameNodes; i++) {
+                String nnId = "nn" + (i + 1); // nn1, nn2, ...
+                PortAllocation.NodePorts ports = portAllocation.nameNodePorts.get(nnId);
+
+                DirectoryManager.NodeDirectory nnNodeDir = directoryManager.createNameNodeDirectory(i);
+                ProcessConfigurationGenerator.NodeConfiguration nnNodeConf =
+                    configGenerator.generateHANameNodeConfig(
+                        i, nnId, nnNodeDir, nameservice, nameNodeIds,
+                        journalNodeQuorumUri, ports.rpcPort, ports.httpPort, ports.serviceRpcPort,
+                        nnRpcAddresses, nnHttpAddresses, nnServiceRpcAddresses);
+                HadoopDistribution distribution = versionRegistry.get("nn-" + i);
+
+                NameNodeProcessManager nnManager = new NameNodeProcessManager(
+                    nnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
+                    nnNodeDir.getNodeBaseDir(), i);
+                nameNodeManagers.add(nnManager);
+            }
+
+            // No need for second pass anymore! All configurations have complete information
+        } else {
+            // Standalone mode: use standalone configuration generation
+            for (int i = 0; i < numNameNodes; i++) {
+                DirectoryManager.NodeDirectory nnNodeDir = directoryManager.createNameNodeDirectory(i);
+                ProcessConfigurationGenerator.NodeConfiguration nnNodeConf =
+                    configGenerator.generateNameNodeConfig(i, nnNodeDir);
+                HadoopDistribution distribution = versionRegistry.get("nn-" + i);
+
+                NameNodeProcessManager nnManager = new NameNodeProcessManager(
+                    nnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
+                    nnNodeDir.getNodeBaseDir(), i);
+                nameNodeManagers.add(nnManager);
+            }
         }
 
         // Create DataNode managers
-        for (int i = 0; i < numDataNodes; i++) {
-            // Get storage types for this DataNode
-            StorageType[] dnStorageTypes = (storageTypes != null) ? storageTypes[i] : null;
+        if (haEnabled) {
+            // HA mode: use HA configuration generation
+            for (int i = 0; i < numDataNodes; i++) {
+                // Get storage types for this DataNode
+                StorageType[] dnStorageTypes = (storageTypes != null) ? storageTypes[i] : null;
 
-            // Get rack for this DataNode
-            String rack = (racks != null && i < racks.length) ? racks[i] : null;
+                DirectoryManager.NodeDirectory dnNodeDir =
+                    directoryManager.createDataNodeDirectory(i, storagesPerDatanode, dnStorageTypes);
+                ProcessConfigurationGenerator.NodeConfiguration dnNodeConf =
+                    configGenerator.generateHADataNodeConfig(i, dnNodeDir, nameservice, dnStorageTypes);
+                HadoopDistribution distribution = versionRegistry.get("dn-" + i);
 
-            DirectoryManager.NodeDirectory dnNodeDir =
-                directoryManager.createDataNodeDirectory(i, storagesPerDatanode, dnStorageTypes);
-            ProcessConfigurationGenerator.NodeConfiguration dnNodeConf =
-                configGenerator.generateDataNodeConfig(i, dnNodeDir, nnAddresses, dnStorageTypes, rack, racks);
-            HadoopDistribution distribution = versionRegistry.get("dn-" + i);
+                DataNodeProcessManager dnManager = new DataNodeProcessManager(
+                    dnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
+                    dnNodeDir.getNodeBaseDir(), i);
+                dataNodeManagers.add(dnManager);
+            }
+        } else {
+            // Standalone mode: use standalone configuration generation
+            // Get NameNode addresses for DataNode configuration
+            List<InetSocketAddress> nnAddresses = new ArrayList<>();
+            for (NameNodeProcessManager nnManager : nameNodeManagers) {
+                nnAddresses.add(nnManager.getRpcAddress());
+            }
 
-            DataNodeProcessManager dnManager = new DataNodeProcessManager(
-                dnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
-                dnNodeDir.getNodeBaseDir(), i);
-            dataNodeManagers.add(dnManager);
+            for (int i = 0; i < numDataNodes; i++) {
+                // Get storage types for this DataNode
+                StorageType[] dnStorageTypes = (storageTypes != null) ? storageTypes[i] : null;
+
+                // Get rack for this DataNode
+                String rack = (racks != null && i < racks.length) ? racks[i] : null;
+
+                DirectoryManager.NodeDirectory dnNodeDir =
+                    directoryManager.createDataNodeDirectory(i, storagesPerDatanode, dnStorageTypes);
+                ProcessConfigurationGenerator.NodeConfiguration dnNodeConf =
+                    configGenerator.generateDataNodeConfig(i, dnNodeDir, nnAddresses, dnStorageTypes, rack, racks);
+                HadoopDistribution distribution = versionRegistry.get("dn-" + i);
+
+                DataNodeProcessManager dnManager = new DataNodeProcessManager(
+                    dnNodeConf.getConfig(), distribution.getHadoopHome().getAbsolutePath(),
+                    dnNodeDir.getNodeBaseDir(), i);
+                dataNodeManagers.add(dnManager);
+            }
         }
 
         LOG.info("Cluster structure built successfully");
@@ -260,22 +387,100 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         LOG.info("Starting ProcessBasedMiniDFSCluster...");
 
         try {
-            // Format NameNodes if requested
-            if (format) {
+            // Start JournalNodes first (if HA enabled) - BEFORE NameNodes
+            if (haEnabled) {
+                // Clean JournalNode directories if formatting
+                if (format) {
+                    LOG.info("Cleaning JournalNode directories before formatting");
+                    for (int i = 0; i < journalNodeManagers.size(); i++) {
+                        JournalNodeProcessManager jn = journalNodeManagers.get(i);
+                        String editsDir = jn.getConfiguration().get(
+                            org.apache.hadoop.hdfs.DFSConfigKeys.DFS_JOURNALNODE_EDITS_DIR_KEY);
+                        if (editsDir != null) {
+                            java.io.File editsDirFile = new java.io.File(editsDir);
+                            if (editsDirFile.exists()) {
+                                LOG.info("Cleaning JournalNode {} edits directory: {}", i, editsDir);
+                                try {
+                                    deleteRecursively(editsDirFile);
+                                    if (!editsDirFile.mkdirs()) {
+                                        LOG.warn("Failed to recreate JournalNode {} edits directory", i);
+                                    }
+                                } catch (Exception e) {
+                                    LOG.warn("Failed to clean JournalNode {} edits directory: {}",
+                                        i, e.getMessage());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (int i = 0; i < journalNodeManagers.size(); i++) {
+                    JournalNodeProcessManager jn = journalNodeManagers.get(i);
+                    LOG.info("Starting JournalNode {}", i);
+                    jn.start();
+                    LOG.info("JournalNode {} started and ready", i);
+                }
+                LOG.info("All {} JournalNodes started successfully", journalNodeManagers.size());
+            }
+
+            // HA initialization sequence
+            if (haEnabled && format) {
+                // Step 1: Format only the first NameNode (will become active)
+                NameNodeProcessManager nn0 = nameNodeManagers.get(0);
+                LOG.info("Formatting first NameNode (nn0) for HA cluster");
+                nn0.format();
+
+                // Step 2: Initialize shared edits directory (before starting NN)
+                LOG.info("Initializing shared edits directory");
+                nn0.initializeSharedEdits();
+
+                // Step 3: Start first NameNode
+                LOG.info("Starting first NameNode (nn0)");
+                nn0.start();
+                LOG.info("NameNode 0 started and ready");
+
+                // Step 4: Transition first NameNode to active state
+                LOG.info("Transitioning NameNode 0 to active state");
+                nn0.transitionToActive();
+                LOG.info("NameNode 0 transitioned to active");
+
+                // Step 5: Bootstrap and start standby NameNodes
+                for (int i = 1; i < nameNodeManagers.size(); i++) {
+                    NameNodeProcessManager nn = nameNodeManagers.get(i);
+                    LOG.info("Bootstrapping standby NameNode {}", i);
+                    nn.bootstrapStandby();
+
+                    LOG.info("Starting standby NameNode {}", i);
+                    nn.start();
+                    LOG.info("NameNode {} started and ready", i);
+                }
+
+                LOG.info("HA NameNode initialization sequence completed successfully");
+
+            } else if (format) {
+                // Standalone mode: format all NameNodes
                 for (int i = 0; i < nameNodeManagers.size(); i++) {
                     NameNodeProcessManager nn = nameNodeManagers.get(i);
                     LOG.info("Formatting NameNode {}", i);
                     nn.format();
                 }
-            }
 
-            // Start NameNodes first
-            for (int i = 0; i < nameNodeManagers.size(); i++) {
-                NameNodeProcessManager nn = nameNodeManagers.get(i);
-                LOG.info("Starting NameNode {}", i);
-                nn.start();
-                // Note: waitForProcessReady is called internally by start()
-                LOG.info("NameNode {} started and ready", i);
+                // Start NameNodes
+                for (int i = 0; i < nameNodeManagers.size(); i++) {
+                    NameNodeProcessManager nn = nameNodeManagers.get(i);
+                    LOG.info("Starting NameNode {}", i);
+                    nn.start();
+                    LOG.info("NameNode {} started and ready", i);
+                }
+
+            } else {
+                // No formatting: just start NameNodes
+                for (int i = 0; i < nameNodeManagers.size(); i++) {
+                    NameNodeProcessManager nn = nameNodeManagers.get(i);
+                    LOG.info("Starting NameNode {} (no format)", i);
+                    nn.start();
+                    LOG.info("NameNode {} started and ready", i);
+                }
             }
 
             // Then start DataNodes
@@ -385,34 +590,99 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
     /**
      * Get the FileSystem instance for this cluster.
+     * For HA clusters, returns an HA-aware FileSystem configured with the nameservice.
      */
     public DistributedFileSystem getFileSystem() throws IOException {
         if (fileSystem == null) {
-            Configuration conf = new Configuration(baseConfiguration);
-            conf.set("fs.defaultFS", getURI().toString());
-            fileSystem = (DistributedFileSystem) FileSystem.get(conf);
+            fileSystem = createFileSystem();
         }
         return fileSystem;
     }
 
     /**
      * Get a new FileSystem instance (not cached).
+     * For HA clusters, returns an HA-aware FileSystem configured with the nameservice.
      */
     public DistributedFileSystem getNewFileSystemInstance() throws IOException {
-        Configuration conf = new Configuration(baseConfiguration);
-        conf.set("fs.defaultFS", getURI().toString());
+        Configuration conf = createFileSystemConfiguration();
         return (DistributedFileSystem) FileSystem.newInstance(conf);
     }
 
     /**
-     * Get the URI for the cluster.
+     * Creates a FileSystem instance with appropriate configuration.
+     *
+     * @return DistributedFileSystem instance
+     * @throws IOException if FileSystem creation fails
      */
-    public URI getURI() {
-        return getURI(0);
+    private DistributedFileSystem createFileSystem() throws IOException {
+        Configuration conf = createFileSystemConfiguration();
+        return (DistributedFileSystem) FileSystem.get(conf);
     }
 
     /**
-     * Get the URI for a specific NameNode.
+     * Creates a Configuration for FileSystem client with HA support.
+     *
+     * @return Configuration object
+     * @throws IOException if configuration creation fails
+     */
+    private Configuration createFileSystemConfiguration() throws IOException {
+        Configuration conf = new Configuration(baseConfiguration);
+
+        if (haEnabled) {
+            // HA mode: configure for nameservice
+            conf.set("fs.defaultFS", "hdfs://" + nameservice);
+
+            // Copy HA configuration from first NameNode
+            Configuration nnConf = nameNodeManagers.get(0).getConfiguration();
+
+            // Copy nameservice configuration
+            conf.set(DFSConfigKeys.DFS_NAMESERVICES, nameservice);
+            String haNameNodesKey = DFSConfigKeys.DFS_HA_NAMENODES_KEY_PREFIX + "." + nameservice;
+            conf.set(haNameNodesKey, nnConf.get(haNameNodesKey));
+
+            // Copy NameNode addresses
+            for (int i = 0; i < nameNodeManagers.size(); i++) {
+                String nnId = "nn" + (i + 1);
+                String rpcKey = DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY + "." + nameservice + "." + nnId;
+                String httpKey = DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY + "." + nameservice + "." + nnId;
+
+                conf.set(rpcKey, nnConf.get(rpcKey));
+                conf.set(httpKey, nnConf.get(httpKey));
+            }
+
+            // Copy failover proxy provider
+            String failoverProviderKey = DFSConfigKeys.DFS_CLIENT_FAILOVER_PROXY_PROVIDER_KEY_PREFIX +
+                "." + nameservice;
+            conf.set(failoverProviderKey, nnConf.get(failoverProviderKey));
+
+            LOG.info("Created HA-aware FileSystem configuration for nameservice: {}", nameservice);
+        } else {
+            // Standalone mode: use specific NameNode address
+            conf.set("fs.defaultFS", getURI().toString());
+        }
+
+        return conf;
+    }
+
+    /**
+     * Get the URI for the cluster.
+     * For HA clusters, returns hdfs://nameservice
+     * For standalone clusters, returns hdfs://host:port
+     */
+    public URI getURI() {
+        if (haEnabled) {
+            try {
+                return new URI("hdfs://" + nameservice);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create HA URI", e);
+            }
+        } else {
+            return getURI(0);
+        }
+    }
+
+    /**
+     * Get the URI for a specific NameNode (direct connection, bypasses HA).
      */
     public URI getURI(int nnIndex) {
         if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
@@ -456,6 +726,265 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      */
     public int getNumDataNodes() {
         return numDataNodes;
+    }
+
+    /**
+     * Check if a NameNode is alive (process is running).
+     *
+     * @param nnIndex the NameNode index
+     * @return true if the NameNode process is alive
+     */
+    public boolean isNameNodeAlive(int nnIndex) {
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+        return nameNodeManagers.get(nnIndex).isAlive();
+    }
+
+    /**
+     * Check if a DataNode is alive (process is running).
+     *
+     * @param dnIndex the DataNode index
+     * @return true if the DataNode process is alive
+     */
+    public boolean isDataNodeAlive(int dnIndex) {
+        if (dnIndex < 0 || dnIndex >= dataNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid DataNode index: " + dnIndex);
+        }
+        return dataNodeManagers.get(dnIndex).isAlive();
+    }
+
+    /**
+     * Get whether HA is enabled for this cluster.
+     *
+     * @return true if HA is enabled
+     */
+    public boolean isHAEnabled() {
+        return haEnabled;
+    }
+
+    /**
+     * Get the number of JournalNodes in this cluster.
+     * Only meaningful if HA is enabled.
+     *
+     * @return number of JournalNodes (0 if HA not enabled)
+     */
+    public int getNumJournalNodes() {
+        return haEnabled ? numJournalNodes : 0;
+    }
+
+    /**
+     * Get the nameservice ID for this HA cluster.
+     * Only meaningful if HA is enabled.
+     *
+     * @return nameservice ID, or null if HA not enabled
+     */
+    public String getNameservice() {
+        return haEnabled ? nameservice : null;
+    }
+
+    /**
+     * Get the QJournal URI for the JournalNode quorum.
+     * Format: qjournal://host1:port1;host2:port2;host3:port3/nameservice
+     *
+     * Only meaningful if HA is enabled.
+     *
+     * @return QJournal URI string
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public String getJournalNodeQuorumUri() {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+
+        if (journalNodeManagers.isEmpty()) {
+            throw new IllegalStateException("No JournalNodes have been created yet");
+        }
+
+        StringBuilder uriBuilder = new StringBuilder("qjournal://");
+        for (int i = 0; i < journalNodeManagers.size(); i++) {
+            if (i > 0) {
+                uriBuilder.append(";");
+            }
+            JournalNodeProcessManager jn = journalNodeManagers.get(i);
+            uriBuilder.append(jn.getJournalNodeUri());
+        }
+        uriBuilder.append("/").append(nameservice);
+
+        return uriBuilder.toString();
+    }
+
+    /**
+     * Transitions a NameNode to active state.
+     *
+     * @param nnIndex the NameNode index to transition
+     * @throws IOException if transition fails
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public void transitionToActive(int nnIndex) throws IOException {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+
+        String nnId = "nn" + (nnIndex + 1); // nn1, nn2, ...
+        LOG.info("Transitioning NameNode {} ({}) to active", nnIndex, nnId);
+
+        HAAdminCommandRunner haAdmin = createHAAdminRunner();
+        haAdmin.transitionToActive(nameservice, nnId);
+
+        LOG.info("NameNode {} successfully transitioned to active", nnIndex);
+    }
+
+    /**
+     * Transitions a NameNode to standby state.
+     *
+     * @param nnIndex the NameNode index to transition
+     * @throws IOException if transition fails
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public void transitionToStandby(int nnIndex) throws IOException {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+
+        String nnId = "nn" + (nnIndex + 1); // nn1, nn2, ...
+        LOG.info("Transitioning NameNode {} ({}) to standby", nnIndex, nnId);
+
+        HAAdminCommandRunner haAdmin = createHAAdminRunner();
+        haAdmin.transitionToStandby(nameservice, nnId);
+
+        LOG.info("NameNode {} successfully transitioned to standby", nnIndex);
+    }
+
+    /**
+     * Gets the service state of a NameNode.
+     *
+     * @param nnIndex the NameNode index to query
+     * @return the service state ("active", "standby", or other)
+     * @throws IOException if query fails
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public String getServiceState(int nnIndex) throws IOException {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+
+        String nnId = "nn" + (nnIndex + 1); // nn1, nn2, ...
+        HAAdminCommandRunner haAdmin = createHAAdminRunner();
+        return haAdmin.getServiceState(nameservice, nnId);
+    }
+
+    /**
+     * Checks the health of a NameNode.
+     *
+     * @param nnIndex the NameNode index to check
+     * @return true if healthy, false otherwise
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public boolean checkHealth(int nnIndex) {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+
+        String nnId = "nn" + (nnIndex + 1); // nn1, nn2, ...
+        try {
+            HAAdminCommandRunner haAdmin = createHAAdminRunner();
+            return haAdmin.checkHealth(nameservice, nnId);
+        } catch (IOException e) {
+            LOG.warn("Failed to check health for NameNode {}: {}", nnIndex, e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Gets the index of the active NameNode.
+     *
+     * @return the index of the active NameNode, or -1 if none is active
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public int getActiveNameNodeIndex() {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+
+        for (int i = 0; i < nameNodeManagers.size(); i++) {
+            try {
+                String state = getServiceState(i);
+                if ("active".equals(state)) {
+                    return i;
+                }
+            } catch (IOException e) {
+                LOG.debug("Could not get state for NameNode {}: {}", i, e.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Performs a manual failover from one NameNode to another.
+     * Transitions the current active to standby, then the target to active.
+     *
+     * @param targetNnIndex the index of the NameNode to make active
+     * @throws IOException if failover fails
+     * @throws IllegalStateException if HA is not enabled
+     */
+    public void failover(int targetNnIndex) throws IOException {
+        if (!haEnabled) {
+            throw new IllegalStateException("HA is not enabled for this cluster");
+        }
+
+        LOG.info("Performing manual failover to NameNode {}", targetNnIndex);
+
+        // Find current active NameNode
+        int currentActive = getActiveNameNodeIndex();
+        if (currentActive == -1) {
+            LOG.warn("No active NameNode found, just transitioning {} to active", targetNnIndex);
+            transitionToActive(targetNnIndex);
+            return;
+        }
+
+        if (currentActive == targetNnIndex) {
+            LOG.info("NameNode {} is already active", targetNnIndex);
+            return;
+        }
+
+        // Transition current active to standby
+        LOG.info("Transitioning current active NameNode {} to standby", currentActive);
+        transitionToStandby(currentActive);
+
+        // Transition target to active
+        LOG.info("Transitioning NameNode {} to active", targetNnIndex);
+        transitionToActive(targetNnIndex);
+
+        LOG.info("Failover completed: NameNode {} is now active", targetNnIndex);
+    }
+
+    /**
+     * Creates an HAAdminCommandRunner for executing HA admin commands.
+     *
+     * @return HAAdminCommandRunner instance
+     * @throws IOException if creation fails
+     */
+    private HAAdminCommandRunner createHAAdminRunner() throws IOException {
+        // Use the first NameNode's configuration and work directory
+        NameNodeProcessManager nn0 = nameNodeManagers.get(0);
+        HadoopDistribution distribution = versionRegistry.get("nn-0");
+        return new HAAdminCommandRunner(
+            distribution.getHadoopHome().getAbsolutePath(),
+            nn0.getConfiguration(),
+            nn0.getWorkDirectory());
     }
 
     /**
@@ -761,6 +1290,26 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     }
 
     /**
+     * Delete a directory and all its contents recursively.
+     *
+     * @param file the file or directory to delete
+     * @throws IOException if deletion fails
+     */
+    private static void deleteRecursively(java.io.File file) throws IOException {
+        if (file.isDirectory()) {
+            java.io.File[] files = file.listFiles();
+            if (files != null) {
+                for (java.io.File child : files) {
+                    deleteRecursively(child);
+                }
+            }
+        }
+        if (!file.delete()) {
+            throw new IOException("Failed to delete: " + file.getAbsolutePath());
+        }
+    }
+
+    /**
      * Get the default Hadoop home for new DataNodes.
      * Uses the distribution from the last existing DataNode.
      */
@@ -857,6 +1406,18 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
                 nameNodeManagers.get(i).stop();
             } catch (Exception e) {
                 LOG.warn("Error stopping NameNode " + i, e);
+            }
+        }
+
+        // Stop all JournalNodes (if HA enabled) - AFTER NameNodes
+        if (haEnabled) {
+            for (int i = 0; i < journalNodeManagers.size(); i++) {
+                try {
+                    LOG.info("Stopping JournalNode {}", i);
+                    journalNodeManagers.get(i).stop();
+                } catch (Exception e) {
+                    LOG.warn("Error stopping JournalNode " + i, e);
+                }
             }
         }
 
@@ -964,6 +1525,85 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     }
 
     // ========================================================================
+    // PORT PRE-ALLOCATION
+    // ========================================================================
+
+    /**
+     * Holds pre-allocated ports for all nodes in the cluster.
+     * This ensures all configuration files have complete port information.
+     */
+    private static class PortAllocation {
+        // Map of NameNode ID (nn1, nn2, etc.) to its ports
+        final Map<String, NodePorts> nameNodePorts = new HashMap<>();
+        // Map of JournalNode index to its ports
+        final Map<Integer, NodePorts> journalNodePorts = new HashMap<>();
+        // Map of DataNode index to its ports
+        final Map<Integer, NodePorts> dataNodePorts = new HashMap<>();
+
+        static class NodePorts {
+            final int rpcPort;
+            final int httpPort;
+            final int serviceRpcPort;  // -1 if not applicable
+
+            NodePorts(int rpcPort, int httpPort, int serviceRpcPort) {
+                this.rpcPort = rpcPort;
+                this.httpPort = httpPort;
+                this.serviceRpcPort = serviceRpcPort;
+            }
+
+            NodePorts(int rpcPort, int httpPort) {
+                this(rpcPort, httpPort, -1);
+            }
+        }
+    }
+
+    /**
+     * Pre-allocates all ports for all nodes before creating any configurations.
+     * This ensures deterministic port allocation and allows all configurations
+     * to be generated with complete information.
+     *
+     * @return PortAllocation containing all pre-allocated ports
+     * @throws IOException if port allocation fails
+     */
+    private PortAllocation preAllocateAllPorts() throws IOException {
+        PortAllocation allocation = new PortAllocation();
+
+        LOG.info("Pre-allocating ports for {} JournalNodes, {} NameNodes, {} DataNodes",
+            numJournalNodes, numNameNodes, numDataNodes);
+
+        // 1. Allocate ports for JournalNodes first
+        for (int i = 0; i < numJournalNodes; i++) {
+            int rpcPort = portAllocator.allocatePort();
+            int httpPort = portAllocator.allocatePort();
+            allocation.journalNodePorts.put(i, new PortAllocation.NodePorts(rpcPort, httpPort));
+            LOG.debug("JournalNode {}: rpc={}, http={}", i, rpcPort, httpPort);
+        }
+
+        // 2. Allocate ports for NameNodes
+        for (int i = 0; i < numNameNodes; i++) {
+            String nnId = "nn" + (i + 1);  // nn1, nn2, ...
+            int rpcPort = portAllocator.allocatePort();
+            int httpPort = portAllocator.allocatePort();
+            int serviceRpcPort = portAllocator.allocatePort();
+            allocation.nameNodePorts.put(nnId, new PortAllocation.NodePorts(rpcPort, httpPort, serviceRpcPort));
+            LOG.info("NameNode {} ({}): rpc={}, http={}, serviceRpc={}", i, nnId, rpcPort, httpPort, serviceRpcPort);
+        }
+
+        // 3. Allocate ports for DataNodes
+        for (int i = 0; i < numDataNodes; i++) {
+            int rpcPort = portAllocator.allocatePort();
+            int httpPort = portAllocator.allocatePort();
+            allocation.dataNodePorts.put(i, new PortAllocation.NodePorts(rpcPort, httpPort));
+            LOG.debug("DataNode {}: rpc={}, http={}", i, rpcPort, httpPort);
+        }
+
+        LOG.info("Port pre-allocation complete. Total ports allocated: {}",
+            (numJournalNodes * 2) + (numNameNodes * 3) + (numDataNodes * 2));
+
+        return allocation;
+    }
+
+    // ========================================================================
     // BUILDER CLASS
     // ========================================================================
 
@@ -986,6 +1626,12 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         private String defaultHadoopHome = null;
         private Map<Integer, String> nameNodeHadoopHomes = new HashMap<>();
         private Map<Integer, String> dataNodeHadoopHomes = new HashMap<>();
+        private Map<Integer, String> journalNodeHadoopHomes = new HashMap<>();
+
+        // HA configuration
+        private boolean haEnabled = false;
+        private int numJournalNodes = 3;  // Default: 3 for quorum
+        private String nameservice = "hdfs-ha";
 
         // Storage configuration
         private StorageType[][] storageTypes = null;        // 2D: [dnIndex][storageIndex]
@@ -1080,6 +1726,76 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
          */
         public Builder dataNodeHadoopDistribution(int dnIndex, String hadoopHome) {
             this.dataNodeHadoopHomes.put(dnIndex, hadoopHome);
+            return this;
+        }
+
+        /**
+         * Enable HA (High Availability) mode.
+         * When enabled, the cluster will start JournalNodes and configure NameNodes for HA.
+         *
+         * @return this Builder
+         */
+        public Builder enableHA() {
+            this.haEnabled = true;
+            return this;
+        }
+
+        /**
+         * Set the number of JournalNodes (default: 3).
+         * Only used when HA is enabled.
+         *
+         * @param num number of JournalNodes (must be odd for quorum, minimum 3)
+         * @return this Builder
+         */
+        public Builder numJournalNodes(int num) {
+            if (num < 3 || num % 2 == 0) {
+                throw new IllegalArgumentException(
+                    "Number of JournalNodes must be odd and at least 3 (for quorum). Got: " + num);
+            }
+            this.numJournalNodes = num;
+            return this;
+        }
+
+        /**
+         * Set the nameservice ID for HA configuration (default: "hdfs-ha").
+         * Only used when HA is enabled.
+         *
+         * @param nameservice nameservice ID
+         * @return this Builder
+         */
+        public Builder nameservice(String nameservice) {
+            if (nameservice == null || nameservice.trim().isEmpty()) {
+                throw new IllegalArgumentException("Nameservice cannot be null or empty");
+            }
+            this.nameservice = nameservice;
+            return this;
+        }
+
+        /**
+         * Set the Hadoop distribution for a specific JournalNode.
+         * Only used when HA is enabled.
+         *
+         * @param jnIndex JournalNode index
+         * @param hadoopHome path to Hadoop distribution
+         * @return this Builder
+         */
+        public Builder journalNodeHadoopDistribution(int jnIndex, String hadoopHome) {
+            this.journalNodeHadoopHomes.put(jnIndex, hadoopHome);
+            return this;
+        }
+
+        /**
+         * Set the same Hadoop distribution for all JournalNodes.
+         * Only used when HA is enabled.
+         *
+         * @param hadoopHome path to Hadoop distribution
+         * @return this Builder
+         */
+        public Builder allJournalNodesHadoopDistribution(String hadoopHome) {
+            // Will be applied to all JournalNodes during build
+            for (int i = 0; i < numJournalNodes; i++) {
+                this.journalNodeHadoopHomes.put(i, hadoopHome);
+            }
             return this;
         }
 

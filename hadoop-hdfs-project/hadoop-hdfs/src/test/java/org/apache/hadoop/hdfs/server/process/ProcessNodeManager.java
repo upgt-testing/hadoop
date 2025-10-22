@@ -276,7 +276,7 @@ public abstract class ProcessNodeManager {
     LOG.debug("Set HADOOP_HOME={}", hadoopHome);
 
     // 3. HADOOP_CONF_DIR - Configuration directory
-    File confDir = new File(workDir, "etc/hadoop");
+    File confDir = new File(workDir, "conf");
     env.put("HADOOP_CONF_DIR", confDir.getAbsolutePath());
     LOG.debug("Set HADOOP_CONF_DIR={}", confDir.getAbsolutePath());
 

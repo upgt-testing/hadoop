@@ -80,9 +80,9 @@ public class ProcessConfigurationGenerator {
   }
 
   /**
-   * Generates configuration for a NameNode.
+   * Generates configuration for a NameNode (standalone mode).
    *
-   * @param nnIndex the NameNode index (0 for single NN, 0-N for HA)
+   * @param nnIndex the NameNode index (0 for single NN)
    * @param nodeDir the node directory structure
    * @return NodeConfiguration containing the generated config and allocated ports
    * @throws IOException if port allocation or config generation fails
@@ -130,6 +130,126 @@ public class ProcessConfigurationGenerator {
 
     LOG.info("Generated NameNode configuration for nn{}: rpc={}, http={}, serviceRpc={}",
         nnIndex, rpcPort, httpPort, serviceRpcPort);
+
+    return new NodeConfiguration(config, allocatedPorts);
+  }
+
+  /**
+   * Generates configuration for a NameNode in HA mode.
+   *
+   * @param nnIndex the NameNode index (0 to numNameNodes-1)
+   * @param nnId the NameNode ID within the nameservice (e.g., "nn1", "nn2")
+   * @param nodeDir the node directory structure
+   * @param nameservice the nameservice ID for this HA cluster
+   * @param nameNodeIds comma-separated list of all NameNode IDs (e.g., "nn1,nn2")
+   * @param journalNodeQuorumUri the QJournal URI for shared edits
+   * @param rpcPort pre-allocated RPC port for this NameNode
+   * @param httpPort pre-allocated HTTP port for this NameNode
+   * @param serviceRpcPort pre-allocated service RPC port for this NameNode
+   * @param nameNodeRpcAddresses pre-populated map of NameNode ID to RPC address for ALL NNs
+   * @param nameNodeHttpAddresses pre-populated map of NameNode ID to HTTP address for ALL NNs
+   * @param nameNodeServiceRpcAddresses pre-populated map of NameNode ID to service RPC address for ALL NNs
+   * @return NodeConfiguration containing the generated config and allocated ports
+   * @throws IOException if config generation fails
+   */
+  public NodeConfiguration generateHANameNodeConfig(
+      int nnIndex,
+      String nnId,
+      DirectoryManager.NodeDirectory nodeDir,
+      String nameservice,
+      String nameNodeIds,
+      String journalNodeQuorumUri,
+      int rpcPort,
+      int httpPort,
+      int serviceRpcPort,
+      Map<String, String> nameNodeRpcAddresses,
+      Map<String, String> nameNodeHttpAddresses,
+      Map<String, String> nameNodeServiceRpcAddresses) throws IOException {
+
+    Configuration config = new Configuration(baseConfig);
+
+    // Use pre-allocated ports (passed as parameters)
+    // No need to allocate here anymore!
+
+    Map<String, Integer> allocatedPorts = new HashMap<>();
+    allocatedPorts.put("rpc", rpcPort);
+    allocatedPorts.put("http", httpPort);
+    allocatedPorts.put("serviceRpc", serviceRpcPort);
+
+    String nnHost = "localhost";
+
+    // 1. Configure nameservice
+    config.set(DFSConfigKeys.DFS_NAMESERVICES, nameservice);
+    config.set(DFSConfigKeys.DFS_HA_NAMENODES_KEY_PREFIX + "." + nameservice, nameNodeIds);
+
+    // 1a. Configure this NameNode's identity (required for HA)
+    config.set(DFSConfigKeys.DFS_NAMESERVICE_ID, nameservice);
+    config.set(DFSConfigKeys.DFS_HA_NAMENODE_ID_KEY, nnId);
+
+    // 2. Configure this NameNode's addresses
+    String rpcAddressKey = DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY + "." + nameservice + "." + nnId;
+    String httpAddressKey = DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY + "." + nameservice + "." + nnId;
+    String serviceRpcAddressKey = DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY + "." + nameservice + "." + nnId;
+
+    config.set(rpcAddressKey, nnHost + ":" + rpcPort);
+    config.set(httpAddressKey, nnHost + ":" + httpPort);
+    config.set(serviceRpcAddressKey, nnHost + ":" + serviceRpcPort);
+
+    // Also set the standalone keys for backward compatibility with NameNodeProcessManager
+    config.set(DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY, nnHost + ":" + rpcPort);
+    config.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY, nnHost + ":" + httpPort);
+    config.set(DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY, nnHost + ":" + serviceRpcPort);
+
+    // Configure addresses for all NameNodes in the cluster (from pre-populated maps)
+    for (Map.Entry<String, String> entry : nameNodeRpcAddresses.entrySet()) {
+      String otherNnId = entry.getKey();
+      String otherRpcAddress = entry.getValue();
+      String otherRpcKey = DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY + "." + nameservice + "." + otherNnId;
+      config.set(otherRpcKey, otherRpcAddress);
+    }
+    for (Map.Entry<String, String> entry : nameNodeHttpAddresses.entrySet()) {
+      String otherNnId = entry.getKey();
+      String otherHttpAddress = entry.getValue();
+      String otherHttpKey = DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY + "." + nameservice + "." + otherNnId;
+      config.set(otherHttpKey, otherHttpAddress);
+    }
+    for (Map.Entry<String, String> entry : nameNodeServiceRpcAddresses.entrySet()) {
+      String otherNnId = entry.getKey();
+      String otherServiceRpcAddress = entry.getValue();
+      String otherServiceRpcKey = DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY + "." + nameservice + "." + otherNnId;
+      config.set(otherServiceRpcKey, otherServiceRpcAddress);
+    }
+
+    // 3. Configure shared edits directory (QJournal)
+    String sharedEditsKey = DFSConfigKeys.DFS_NAMENODE_SHARED_EDITS_DIR_KEY + "." + nameservice;
+    config.set(sharedEditsKey, journalNodeQuorumUri);
+
+    // 4. Configure failover proxy provider
+    String failoverProviderKey = DFSConfigKeys.DFS_CLIENT_FAILOVER_PROXY_PROVIDER_KEY_PREFIX + "." + nameservice;
+    config.set(failoverProviderKey,
+        "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
+
+    // 5. Set default filesystem to nameservice
+    config.set("fs.defaultFS", "hdfs://" + nameservice);
+
+    // 6. Configure NameNode directories
+    config.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
+        new File(nodeDir.getDataDir(), "name").toURI().toString());
+    config.set(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_DIR_KEY,
+        new File(nodeDir.getDataDir(), "namesecondary").toURI().toString());
+
+    // 7. Enable HA-specific settings
+    config.setBoolean(DFSConfigKeys.DFS_HA_AUTO_FAILOVER_ENABLED_KEY, false); // Manual failover for testing
+    config.setBoolean(DFSConfigKeys.DFS_HA_TAILEDITS_INPROGRESS_KEY, true); // Enable tailing in-progress edits
+
+    // 8. Set common HDFS properties
+    setCommonHdfsProperties(config);
+
+    // 9. Write configuration files
+    writeConfigurationFiles(config, nodeDir.getConfDir());
+
+    LOG.info("Generated HA NameNode configuration for nn{} ({}): rpc={}, http={}, serviceRpc={}, nameservice={}",
+        nnIndex, nnId, rpcPort, httpPort, serviceRpcPort, nameservice);
 
     return new NodeConfiguration(config, allocatedPorts);
   }
@@ -302,6 +422,124 @@ public class ProcessConfigurationGenerator {
   }
 
   /**
+   * Generates configuration for a DataNode in HA mode.
+   *
+   * @param dnIndex the DataNode index (0 to numDataNodes-1)
+   * @param nodeDir the node directory structure
+   * @param nameservice the nameservice ID for this HA cluster
+   * @param storageTypes array of storage types for each storage location (can be null)
+   * @return NodeConfiguration containing the generated config and allocated ports
+   * @throws IOException if port allocation or config generation fails
+   */
+  public NodeConfiguration generateHADataNodeConfig(
+      int dnIndex,
+      DirectoryManager.NodeDirectory nodeDir,
+      String nameservice,
+      StorageType[] storageTypes) throws IOException {
+
+    Configuration config = new Configuration(baseConfig);
+
+    // Allocate ports for DataNode
+    int dataPort = portAllocator.allocatePort();
+    int ipcPort = portAllocator.allocatePort();
+    int httpPort = portAllocator.allocatePort();
+
+    Map<String, Integer> allocatedPorts = new HashMap<>();
+    allocatedPorts.put("data", dataPort);
+    allocatedPorts.put("ipc", ipcPort);
+    allocatedPorts.put("http", httpPort);
+
+    // Set DataNode-specific properties
+    String dnHost = "localhost";
+    config.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY,
+        dnHost + ":" + dataPort);
+    config.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY,
+        dnHost + ":" + ipcPort);
+    config.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY,
+        dnHost + ":" + httpPort);
+
+    // Build comma-separated list of data directories with storage type prefixes
+    StringBuilder dataDirBuilder = new StringBuilder();
+    List<File> storageDirs = nodeDir.getDataStorageDirs();
+    StorageType[] types = nodeDir.getStorageTypes();
+
+    for (int i = 0; i < storageDirs.size(); i++) {
+      if (i > 0) {
+        dataDirBuilder.append(",");
+      }
+
+      StorageType type = (types != null && i < types.length)
+          ? types[i]
+          : StorageType.DEFAULT;
+
+      // Format: [DISK]file:///path,[SSD]file:///path2
+      dataDirBuilder.append("[").append(type.toString()).append("]")
+          .append(storageDirs.get(i).toURI().toString());
+    }
+
+    config.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, dataDirBuilder.toString());
+
+    // Set default filesystem to nameservice (HA mode)
+    config.set("fs.defaultFS", "hdfs://" + nameservice);
+
+    // Set common HDFS properties for mini cluster
+    setCommonHdfsProperties(config);
+
+    // Write configuration files
+    writeConfigurationFiles(config, nodeDir.getConfDir());
+
+    LOG.info("Generated HA DataNode configuration for dn{} with {} storage locations: data={}, ipc={}, http={}, nameservice={}",
+        dnIndex, storageDirs.size(), dataPort, ipcPort, httpPort, nameservice);
+
+    return new NodeConfiguration(config, allocatedPorts);
+  }
+
+  /**
+   * Generates configuration for a JournalNode.
+   *
+   * @param jnIndex the JournalNode index (0 to numJournalNodes-1)
+   * @param nodeDir the node directory structure
+   * @return NodeConfiguration containing the generated config and allocated ports
+   * @throws IOException if port allocation or config generation fails
+   */
+  public NodeConfiguration generateJournalNodeConfig(
+      int jnIndex, DirectoryManager.NodeDirectory nodeDir) throws IOException {
+
+    Configuration config = new Configuration(baseConfig);
+
+    // Allocate ports for JournalNode
+    int rpcPort = portAllocator.allocatePort();
+    int httpPort = portAllocator.allocatePort();
+
+    Map<String, Integer> allocatedPorts = new HashMap<>();
+    allocatedPorts.put("rpc", rpcPort);
+    allocatedPorts.put("http", httpPort);
+
+    // Set JournalNode-specific properties
+    String jnHost = "localhost";
+    config.set(DFSConfigKeys.DFS_JOURNALNODE_RPC_ADDRESS_KEY,
+        jnHost + ":" + rpcPort);
+    config.set(DFSConfigKeys.DFS_JOURNALNODE_HTTP_ADDRESS_KEY,
+        jnHost + ":" + httpPort);
+
+    // Set edits directory - use subdirectory under data dir
+    File editsDir = new File(nodeDir.getDataDir(), "edits");
+    config.set(DFSConfigKeys.DFS_JOURNALNODE_EDITS_DIR_KEY,
+        editsDir.getAbsolutePath());
+
+    // Set common HDFS properties
+    setCommonHdfsProperties(config);
+
+    // Write configuration files
+    writeConfigurationFiles(config, nodeDir.getConfDir());
+
+    LOG.info("Generated JournalNode configuration for jn{}: rpc={}, http={}, edits={}",
+        jnIndex, rpcPort, httpPort, editsDir);
+
+    return new NodeConfiguration(config, allocatedPorts);
+  }
+
+  /**
    * Sets common HDFS properties suitable for a mini cluster.
    *
    * @param config the configuration to update
@@ -346,7 +584,7 @@ public class ProcessConfigurationGenerator {
    * @param confDir the directory to write configuration files to
    * @throws IOException if writing fails
    */
-  private void writeConfigurationFiles(Configuration config, File confDir)
+  public void writeConfigurationFiles(Configuration config, File confDir)
       throws IOException {
 
     if (!confDir.exists() && !confDir.mkdirs()) {

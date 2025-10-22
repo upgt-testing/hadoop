@@ -127,6 +127,18 @@ public class DirectoryManager {
   }
 
   /**
+   * Creates a directory structure for a JournalNode.
+   *
+   * @param nodeIndex the index of the JournalNode (0 to numJournalNodes-1)
+   * @return NodeDirectory object containing the created directories
+   * @throws IOException if unable to create directories
+   */
+  public NodeDirectory createJournalNodeDirectory(int nodeIndex) throws IOException {
+    String nodeDirName = "jn" + nodeIndex;
+    return createNodeDirectory(nodeDirName);
+  }
+
+  /**
    * Creates a directory structure for a DataNode (backward compatibility).
    *
    * @param nodeIndex the index of the DataNode (0 to numDataNodes-1)
