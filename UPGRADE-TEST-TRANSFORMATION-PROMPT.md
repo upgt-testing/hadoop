@@ -3,14 +3,15 @@
 ## Table of Contents
 1. [Introduction & Philosophy](#introduction--philosophy)
 2. [Prerequisites & Setup](#prerequisites--setup)
-3. [Core Transformation Rules](#core-transformation-rules)
-4. [Comprehensive API Mapping Tables](#comprehensive-api-mapping-tables)
-5. [Step-by-Step Transformation Process](#step-by-step-transformation-process)
-6. [Common Transformation Patterns](#common-transformation-patterns)
-7. [When to Comment Out Logic](#when-to-comment-out-logic)
-8. [Testing Checklist](#testing-checklist)
-9. [Best Practices](#best-practices)
-10. [Quick Reference Decision Tree](#quick-reference-decision-tree)
+3. [Test Organization and Naming Convention](#test-organization-and-naming-convention)
+4. [Core Transformation Rules](#core-transformation-rules)
+5. [Comprehensive API Mapping Tables](#comprehensive-api-mapping-tables)
+6. [Step-by-Step Transformation Process](#step-by-step-transformation-process)
+7. [Common Transformation Patterns](#common-transformation-patterns)
+8. [When to Comment Out Logic](#when-to-comment-out-logic)
+9. [Testing Checklist](#testing-checklist)
+10. [Best Practices](#best-practices)
+11. [Quick Reference Decision Tree](#quick-reference-decision-tree)
 
 ---
 
@@ -90,6 +91,100 @@ mvn test -Dtest=YourTransformedTest -pl hadoop-hdfs-project/hadoop-hdfs
 # Or use the automated script
 ./run-upgrade-test.sh --test-class YourTransformedTest
 ```
+
+---
+
+## Test Organization and Naming Convention
+
+### File Location Strategy
+**Place transformed tests in the SAME directory as the original tests**, using a naming suffix to distinguish them.
+
+This approach provides:
+- ✅ Side-by-side comparison of original and transformed tests
+- ✅ Tests alphabetically adjacent in file listings
+- ✅ Clear visual distinction via suffix
+- ✅ Original package structure preserved
+- ✅ Both versions can coexist long-term
+
+### Naming Convention: `_ProcessBased` Suffix
+
+```
+Original Test:     TestRollingUpgrade.java
+Transformed Test:  TestRollingUpgrade_ProcessBased.java
+
+Location:          Same directory, same package
+```
+
+### Directory Structure Examples
+
+```
+hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/
+├── TestRollingUpgrade.java                      [ORIGINAL - MiniDFSCluster]
+├── TestRollingUpgrade_ProcessBased.java         [TRANSFORMED - ProcessBased]
+├── TestRollingUpgradeRollback.java              [ORIGINAL - MiniDFSCluster]
+├── TestRollingUpgradeRollback_ProcessBased.java [TRANSFORMED - ProcessBased]
+└── server/
+    └── namenode/
+        └── ha/
+            ├── TestHAAppend.java                [ORIGINAL - MiniDFSCluster]
+            └── TestHAAppend_ProcessBased.java   [TRANSFORMED - ProcessBased]
+```
+
+### Package and Class Declaration
+
+The transformed test uses the **same package** as the original:
+
+```java
+// Original: TestRollingUpgrade.java
+package org.apache.hadoop.hdfs;
+
+public class TestRollingUpgrade {
+  // ... MiniDFSCluster tests
+}
+```
+
+```java
+// Transformed: TestRollingUpgrade_ProcessBased.java
+package org.apache.hadoop.hdfs;  // Same package!
+
+/**
+ * ProcessBasedMiniDFSCluster version of {@link TestRollingUpgrade}.
+ *
+ * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * process-based testing and multi-version upgrade scenarios.
+ *
+ * @see TestRollingUpgrade Original test using MiniDFSCluster
+ */
+public class TestRollingUpgrade_ProcessBased {
+  // ... ProcessBasedMiniDFSCluster tests
+}
+```
+
+### Test Execution Patterns
+
+```bash
+# Run original test only
+mvn test -Dtest=TestRollingUpgrade
+
+# Run transformed test only
+mvn test -Dtest=TestRollingUpgrade_ProcessBased
+
+# Run ALL ProcessBased tests across the codebase
+mvn test -Dtest="*_ProcessBased"
+
+# Run both versions for comparison
+mvn test -Dtest=TestRollingUpgrade,TestRollingUpgrade_ProcessBased
+```
+
+### Special Case: Example Tests
+
+Tests that serve as **examples or demonstrations** (not real transformations) may be placed in dedicated directories:
+
+```
+org.apache.hadoop.hdfs.server.process.upgrade.TestTransformationExample
+```
+
+This is acceptable for tutorial/documentation purposes, but **production test transformations** should follow the `_ProcessBased` suffix convention in the same directory.
 
 ---
 
@@ -288,6 +383,51 @@ Add comments only for:
 ---
 
 ## Step-by-Step Transformation Process
+
+### Step 0: Create Transformed Test File
+
+**Goal**: Set up the new test file with proper naming and location.
+
+1. **Locate the original test:**
+   ```bash
+   # Example: Original test
+   hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestRollingUpgrade.java
+   ```
+
+2. **Create new file with `_ProcessBased` suffix in the SAME directory:**
+   ```bash
+   # New transformed test (same directory!)
+   hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestRollingUpgrade_ProcessBased.java
+   ```
+
+3. **Copy original test content to new file:**
+   ```bash
+   cp TestRollingUpgrade.java TestRollingUpgrade_ProcessBased.java
+   ```
+
+4. **Update class name and add Javadoc:**
+   ```java
+   package org.apache.hadoop.hdfs;  // Same package as original!
+
+   /**
+    * ProcessBasedMiniDFSCluster version of {@link TestRollingUpgrade}.
+    *
+    * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+    * process-based testing and multi-version upgrade scenarios.
+    *
+    * @see TestRollingUpgrade Original test using MiniDFSCluster
+    */
+   public class TestRollingUpgrade_ProcessBased {  // Note: _ProcessBased suffix
+     // ... test methods
+   }
+   ```
+
+5. **Checklist before proceeding:**
+   - [ ] New file created in same directory as original
+   - [ ] Class name has `_ProcessBased` suffix
+   - [ ] Package declaration is identical to original
+   - [ ] Javadoc references original test with `@see` tag
+   - [ ] File compiles (even if tests fail)
 
 ### Step 1: Analyze Test Dependencies
 
@@ -721,6 +861,13 @@ boolean inSafe = dfs.setSafeMode(SafeModeAction.SAFEMODE_GET);
 ## Testing Checklist
 
 ### Before Running Test
+
+- [ ] **File organization correct**
+  - Transformed test in same directory as original
+  - File name has `_ProcessBased` suffix (e.g., `TestRollingUpgrade_ProcessBased.java`)
+  - Package declaration identical to original
+  - Class name matches file name with `_ProcessBased` suffix
+  - Javadoc includes `@see` reference to original test
 
 - [ ] **Environment variables set**
   ```bash
