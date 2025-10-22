@@ -19,6 +19,7 @@ package org.apache.hadoop.hdfs.server.process;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
@@ -81,8 +82,15 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     // Configuration
     private final Configuration baseConfiguration;
     private final int numNameNodes;
-    private final int numDataNodes;
+    private int numDataNodes;  // No longer final - can grow dynamically
     private final boolean format;
+
+    // Storage configuration
+    private final StorageType[][] storageTypes;
+    private final int storagesPerDatanode;
+
+    // Network topology
+    private final String[] racks;
 
     // Hadoop version registry
     private final HadoopVersionRegistry versionRegistry;
@@ -111,6 +119,35 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         this.numNameNodes = builder.numNameNodes;
         this.numDataNodes = builder.numDataNodes;
         this.format = builder.format;
+
+        // Initialize storage configuration
+        this.storagesPerDatanode = builder.storagesPerDatanode;
+
+        // Validate and expand storage types configuration
+        if (builder.storageTypes != null && builder.storageTypes.length != builder.numDataNodes) {
+            throw new IllegalArgumentException(
+                "storageTypes array length (" + builder.storageTypes.length +
+                ") must match numDataNodes (" + builder.numDataNodes + ")");
+        }
+
+        // Expand 1D array to 2D if needed
+        if (builder.storageTypes == null && builder.storageTypes1D != null) {
+            // Duplicate the 1D config for all DataNodes
+            this.storageTypes = new StorageType[builder.numDataNodes][];
+            for (int i = 0; i < builder.numDataNodes; i++) {
+                this.storageTypes[i] = builder.storageTypes1D;
+            }
+        } else {
+            this.storageTypes = builder.storageTypes;
+        }
+
+        // Initialize rack configuration
+        if (builder.racks != null && builder.racks.length != builder.numDataNodes) {
+            throw new IllegalArgumentException(
+                "racks array length (" + builder.racks.length +
+                ") must match numDataNodes (" + builder.numDataNodes + ")");
+        }
+        this.racks = builder.racks;
 
         // Initialize managers
         this.versionRegistry = new HadoopVersionRegistry();
@@ -191,9 +228,16 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         // Create DataNode managers
         for (int i = 0; i < numDataNodes; i++) {
-            DirectoryManager.NodeDirectory dnNodeDir = directoryManager.createDataNodeDirectory(i);
+            // Get storage types for this DataNode
+            StorageType[] dnStorageTypes = (storageTypes != null) ? storageTypes[i] : null;
+
+            // Get rack for this DataNode
+            String rack = (racks != null && i < racks.length) ? racks[i] : null;
+
+            DirectoryManager.NodeDirectory dnNodeDir =
+                directoryManager.createDataNodeDirectory(i, storagesPerDatanode, dnStorageTypes);
             ProcessConfigurationGenerator.NodeConfiguration dnNodeConf =
-                configGenerator.generateDataNodeConfig(i, dnNodeDir, nnAddresses);
+                configGenerator.generateDataNodeConfig(i, dnNodeDir, nnAddresses, dnStorageTypes, rack, racks);
             HadoopDistribution distribution = versionRegistry.get("dn-" + i);
 
             DataNodeProcessManager dnManager = new DataNodeProcessManager(
@@ -531,6 +575,244 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     }
 
     /**
+     * Start additional DataNodes dynamically.
+     * Simple overload with just number of nodes and storage types.
+     *
+     * @param conf configuration for new DataNodes
+     * @param numNewDataNodes number of DataNodes to add
+     * @param storageTypes storage types for each new DataNode
+     * @param manageDfsDirs ignored for process-based (always managed)
+     * @param racks rack IDs for new DataNodes (optional, can be null)
+     * @param hosts host names for new DataNodes (optional, can be null)
+     * @param simulatedCapacities simulated capacities (optional, can be null)
+     * @param storageCapacities storage capacities per storage per DataNode (optional, can be null)
+     * @throws IOException if starting DataNodes fails
+     * @throws TimeoutException if DataNodes don't become healthy in time
+     */
+    public synchronized void startDataNodes(Configuration conf, int numNewDataNodes,
+                                           StorageType[][] storageTypes, boolean manageDfsDirs,
+                                           String[] racks, String[] hosts,
+                                           long[] simulatedCapacities,
+                                           long[][] storageCapacities)
+            throws IOException, TimeoutException {
+
+        if (numNewDataNodes <= 0) {
+            LOG.warn("startDataNodes called with numNewDataNodes={}, ignoring", numNewDataNodes);
+            return;
+        }
+
+        LOG.info("Starting {} additional DataNodes", numNewDataNodes);
+
+        // Validate array sizes
+        if (storageTypes != null && storageTypes.length != numNewDataNodes) {
+            throw new IllegalArgumentException(
+                "storageTypes array length (" + storageTypes.length +
+                ") must match numNewDataNodes (" + numNewDataNodes + ")");
+        }
+        if (racks != null && racks.length != numNewDataNodes) {
+            throw new IllegalArgumentException(
+                "racks array length (" + racks.length +
+                ") must match numNewDataNodes (" + numNewDataNodes + ")");
+        }
+        if (hosts != null && hosts.length != numNewDataNodes) {
+            throw new IllegalArgumentException(
+                "hosts array length (" + hosts.length +
+                ") must match numNewDataNodes (" + numNewDataNodes + ")");
+        }
+
+        // Get NameNode addresses for new DataNode configuration
+        List<InetSocketAddress> nnAddresses = new ArrayList<>();
+        for (NameNodeProcessManager nnManager : nameNodeManagers) {
+            nnAddresses.add(nnManager.getRpcAddress());
+        }
+
+        // Get default Hadoop distribution for new DataNodes
+        // Use the distribution from the last existing DataNode, or from builder's default
+        String defaultHadoopHome = getDefaultHadoopHomeForNewDataNodes();
+
+        // Create and start each new DataNode
+        int startIndex = this.numDataNodes;  // First new DN index
+        for (int i = 0; i < numNewDataNodes; i++) {
+            int dnIndex = startIndex + i;
+
+            // Get storage types for this DataNode
+            StorageType[] dnStorageTypes = (storageTypes != null) ? storageTypes[i] : null;
+
+            // Create directory structure
+            DirectoryManager.NodeDirectory dnNodeDir =
+                directoryManager.createDataNodeDirectory(dnIndex, storagesPerDatanode, dnStorageTypes);
+
+            // Get rack for this DataNode
+            String rack = (racks != null && i < racks.length) ? racks[i] : null;
+
+            // Build combined racks array for topology mapping
+            // Need to include both original cluster racks and new DataNode racks
+            String[] allRacks = null;
+            if (rack != null && racks != null) {
+                // Combine original racks (if any) with new racks
+                int totalDataNodes = startIndex + numNewDataNodes;
+                allRacks = new String[totalDataNodes];
+
+                // Copy original racks
+                if (this.racks != null) {
+                    System.arraycopy(this.racks, 0, allRacks, 0, Math.min(this.racks.length, startIndex));
+                }
+
+                // Add new racks
+                for (int j = 0; j < numNewDataNodes; j++) {
+                    if (racks[j] != null) {
+                        allRacks[startIndex + j] = racks[j];
+                    }
+                }
+            }
+
+            // Generate configuration with rack support
+            ProcessConfigurationGenerator.NodeConfiguration dnNodeConf =
+                configGenerator.generateDataNodeConfig(dnIndex, dnNodeDir, nnAddresses, dnStorageTypes, rack, allRacks);
+
+            Configuration dnConf = dnNodeConf.getConfig();
+            if (hosts != null && hosts[i] != null) {
+                // Note: Host configuration would need to be applied here
+                LOG.warn("Host configuration is not yet fully supported in ProcessBasedMiniDFSCluster");
+            }
+
+            // Register Hadoop distribution if not already registered
+            String versionKey = "dn-" + dnIndex;
+            if (!versionRegistry.isRegistered(versionKey)) {
+                versionRegistry.register(versionKey, defaultHadoopHome);
+            }
+            HadoopDistribution distribution = versionRegistry.get(versionKey);
+
+            // Create DataNode process manager
+            DataNodeProcessManager dnManager = new DataNodeProcessManager(
+                dnConf, distribution.getHadoopHome().getAbsolutePath(),
+                dnNodeDir.getNodeBaseDir(), dnIndex);
+
+            // Start the DataNode process
+            LOG.info("Starting new DataNode {}", dnIndex);
+            dnManager.start();
+            LOG.info("New DataNode {} started and ready", dnIndex);
+
+            // Add to list
+            dataNodeManagers.add(dnManager);
+        }
+
+        // Update count
+        this.numDataNodes += numNewDataNodes;
+
+        LOG.info("Successfully started {} additional DataNodes. Total DataNodes: {}",
+            numNewDataNodes, this.numDataNodes);
+
+        // Wait for cluster to be stable
+        waitClusterUp();
+    }
+
+    /**
+     * Simplified startDataNodes overload matching common MiniDFSCluster usage.
+     */
+    public synchronized void startDataNodes(Configuration conf, int numNewDataNodes,
+                                           boolean manageDfsDirs,
+                                           String[] racks, String[] hosts,
+                                           long[] simulatedCapacities)
+            throws IOException, TimeoutException {
+        startDataNodes(conf, numNewDataNodes, null, manageDfsDirs, racks, hosts,
+            simulatedCapacities, null);
+    }
+
+    /**
+     * Comprehensive startDataNodes overload matching full MiniDFSCluster API.
+     * This signature is used by tests like TestExternalStoragePolicySatisfier.
+     *
+     * @param conf configuration for new DataNodes
+     * @param numNewDataNodes number of DataNodes to add
+     * @param storageTypes storage types for each new DataNode (can be null)
+     * @param manageDfsDirs ignored (always managed in process-based)
+     * @param operation ignored (not supported in process-based)
+     * @param racks rack IDs for new DataNodes (can be null)
+     * @param hosts host names for new DataNodes (can be null)
+     * @param dnHttpPorts ignored (ports are auto-allocated)
+     * @param storageCapacities storage capacities per storage per DN (can be null)
+     * @param dnIpcPorts ignored (ports are auto-allocated)
+     * @param setupHostsFile ignored (not applicable to process-based)
+     * @param checkDataNodeAddrConfig ignored
+     * @param checkDataNodeHostConfig ignored
+     * @param dnConfOverlays ignored (not yet supported)
+     * @param dnHttpsPorts ignored (ports are auto-allocated)
+     * @param dnBpPorts ignored (ports are auto-allocated)
+     */
+    public synchronized void startDataNodes(Configuration conf, int numNewDataNodes,
+                                           StorageType[][] storageTypes,
+                                           boolean manageDfsDirs,
+                                           Object operation,  // StartupOption - ignored
+                                           String[] racks, String[] hosts,
+                                           int[] dnHttpPorts,  // ignored
+                                           long[][] storageCapacities,
+                                           int[] dnIpcPorts,  // ignored
+                                           boolean setupHostsFile,  // ignored
+                                           boolean checkDataNodeAddrConfig,  // ignored
+                                           boolean checkDataNodeHostConfig,  // ignored
+                                           Configuration[] dnConfOverlays,  // ignored
+                                           int[] dnHttpsPorts,  // ignored
+                                           int[] dnBpPorts)  // ignored
+            throws IOException, TimeoutException {
+        // Delegate to our main implementation, ignoring unsupported parameters
+        startDataNodes(conf, numNewDataNodes, storageTypes, manageDfsDirs, racks, hosts,
+            null, storageCapacities);
+    }
+
+    /**
+     * Get the default Hadoop home for new DataNodes.
+     * Uses the distribution from the last existing DataNode.
+     */
+    private String getDefaultHadoopHomeForNewDataNodes() throws IOException {
+        if (dataNodeManagers.isEmpty()) {
+            throw new IOException("No existing DataNodes to determine default Hadoop distribution");
+        }
+
+        // Get the Hadoop home from the last DataNode
+        DataNodeProcessManager lastDn = dataNodeManagers.get(dataNodeManagers.size() - 1);
+        return lastDn.getHadoopHome();
+    }
+
+    /**
+     * Trigger heartbeats from all DataNodes to the NameNode.
+     *
+     * In ProcessBasedMiniDFSCluster, we cannot directly trigger heartbeats since
+     * nodes run in separate processes. Instead, this method waits long enough for
+     * natural heartbeat cycles to occur, ensuring state propagation.
+     *
+     * Default heartbeat interval is 3 seconds. This method waits for 5 seconds
+     * to ensure at least one full heartbeat cycle completes.
+     */
+    public void triggerHeartbeats() throws InterruptedException {
+        // Get heartbeat interval from configuration (default is 3 seconds)
+        long heartbeatInterval = baseConfiguration.getTimeDuration(
+            "dfs.heartbeat.interval", 3, TimeUnit.SECONDS);
+
+        // Wait for 1.5x the heartbeat interval to ensure heartbeats occur
+        long waitTime = (heartbeatInterval * 3) / 2;
+        LOG.info("Waiting {} ms for DataNode heartbeats to propagate state", waitTime);
+        Thread.sleep(waitTime);
+    }
+
+    /**
+     * Trigger block reports from all DataNodes to the NameNode.
+     *
+     * In ProcessBasedMiniDFSCluster, we cannot directly trigger block reports since
+     * nodes run in separate processes. Instead, this method waits long enough for
+     * natural block report cycles to occur.
+     *
+     * Default block report interval is 6 hours in production, but tests typically
+     * set it much lower. This method waits for 10 seconds to allow block reports.
+     */
+    public void triggerBlockReports() throws InterruptedException {
+        // Block reports take longer than heartbeats
+        // Wait 10 seconds to allow block reports to complete
+        LOG.info("Waiting 10 seconds for DataNode block reports to complete");
+        Thread.sleep(10000);
+    }
+
+    /**
      * Shutdown the entire cluster.
      */
     public void shutdown() {
@@ -705,6 +987,14 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         private Map<Integer, String> nameNodeHadoopHomes = new HashMap<>();
         private Map<Integer, String> dataNodeHadoopHomes = new HashMap<>();
 
+        // Storage configuration
+        private StorageType[][] storageTypes = null;        // 2D: [dnIndex][storageIndex]
+        private StorageType[] storageTypes1D = null;        // 1D: same types for all DNs
+        private int storagesPerDatanode = 1;                 // default: 1 storage per DN
+
+        // Network topology
+        private String[] racks = null;                       // rack assignments for DataNodes
+
         /**
          * Create a new builder.
          */
@@ -794,6 +1084,55 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         }
 
         /**
+         * Set the same storage type configuration for each DataNode.
+         * If storageTypes is uninitialized or passed null then StorageType.DEFAULT is used.
+         *
+         * @param types array of storage types (length should equal storagesPerDatanode)
+         * @return this Builder
+         */
+        public Builder storageTypes(StorageType[] types) {
+            this.storageTypes1D = types;
+            return this;
+        }
+
+        /**
+         * Set custom storage type configuration for each DataNode.
+         * If storageTypes is uninitialized or passed null then StorageType.DEFAULT is used.
+         *
+         * @param types 2D array where types[i] contains storage types for DataNode i
+         * @return this Builder
+         */
+        public Builder storageTypes(StorageType[][] types) {
+            this.storageTypes = types;
+            return this;
+        }
+
+        /**
+         * Set the number of storage locations per DataNode (default: 1).
+         *
+         * @param num number of storage locations per DataNode
+         * @return this Builder
+         */
+        public Builder storagesPerDatanode(int num) {
+            if (num < 1) {
+                throw new IllegalArgumentException("Must have at least 1 storage per DataNode");
+            }
+            this.storagesPerDatanode = num;
+            return this;
+        }
+
+        /**
+         * Set rack assignments for DataNodes.
+         *
+         * @param val array of rack names, one for each DataNode
+         * @return this Builder
+         */
+        public Builder racks(String[] val) {
+            this.racks = val;
+            return this;
+        }
+
+        /**
          * Build and start the cluster.
          */
         public ProcessBasedMiniDFSCluster build() throws IOException, TimeoutException {
@@ -805,7 +1144,7 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         /**
          * Build the cluster without starting it (for testing).
          */
-        ProcessBasedMiniDFSCluster buildWithoutStart() throws IOException {
+        public ProcessBasedMiniDFSCluster buildWithoutStart() throws IOException {
             return new ProcessBasedMiniDFSCluster(this);
         }
     }

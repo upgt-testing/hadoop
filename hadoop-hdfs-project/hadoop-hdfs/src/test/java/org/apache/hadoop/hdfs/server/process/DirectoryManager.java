@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hdfs.server.process;
 
+import org.apache.hadoop.fs.StorageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,25 +127,53 @@ public class DirectoryManager {
   }
 
   /**
-   * Creates a directory structure for a DataNode.
+   * Creates a directory structure for a DataNode (backward compatibility).
    *
    * @param nodeIndex the index of the DataNode (0 to numDataNodes-1)
    * @return NodeDirectory object containing the created directories
    * @throws IOException if unable to create directories
    */
   public NodeDirectory createDataNodeDirectory(int nodeIndex) throws IOException {
-    String nodeDirName = DATANODE_DIR_PREFIX + nodeIndex;
-    return createNodeDirectory(nodeDirName);
+    return createDataNodeDirectory(nodeIndex, 1, null);
   }
 
   /**
-   * Creates a complete directory structure for a node.
+   * Creates a directory structure for a DataNode with storage type configuration.
+   *
+   * @param nodeIndex the index of the DataNode (0 to numDataNodes-1)
+   * @param storagesPerDatanode number of storage locations for this DataNode
+   * @param storageTypes array of storage types for each storage location
+   * @return NodeDirectory object containing the created directories
+   * @throws IOException if unable to create directories
+   */
+  public NodeDirectory createDataNodeDirectory(int nodeIndex, int storagesPerDatanode,
+                                                 StorageType[] storageTypes) throws IOException {
+    String nodeDirName = DATANODE_DIR_PREFIX + nodeIndex;
+    return createNodeDirectory(nodeDirName, storagesPerDatanode, storageTypes);
+  }
+
+  /**
+   * Creates a complete directory structure for a node (backward compatibility).
    *
    * @param nodeDirName the name of the node directory (e.g., "nn0", "dn0")
    * @return NodeDirectory object containing the created directories
    * @throws IOException if unable to create directories
    */
   private NodeDirectory createNodeDirectory(String nodeDirName) throws IOException {
+    return createNodeDirectory(nodeDirName, 1, null);
+  }
+
+  /**
+   * Creates a complete directory structure for a node with storage type configuration.
+   *
+   * @param nodeDirName the name of the node directory (e.g., "nn0", "dn0")
+   * @param storagesPerDatanode number of storage locations (only applies to DataNodes)
+   * @param storageTypes array of storage types for each storage location
+   * @return NodeDirectory object containing the created directories
+   * @throws IOException if unable to create directories
+   */
+  private NodeDirectory createNodeDirectory(String nodeDirName, int storagesPerDatanode,
+                                             StorageType[] storageTypes) throws IOException {
     File nodeDir = new File(clusterBaseDir, nodeDirName);
 
     // Create main node directory
@@ -154,26 +183,45 @@ public class DirectoryManager {
 
     // Create subdirectories
     File confDir = new File(nodeDir, "conf");
-    File dataDir = new File(nodeDir, "data");
     File logsDir = new File(nodeDir, "logs");
 
     if (!confDir.exists() && !confDir.mkdirs()) {
       throw new IOException("Failed to create conf directory: " + confDir);
     }
+    if (!logsDir.exists() && !logsDir.mkdirs()) {
+      throw new IOException("Failed to create logs directory: " + logsDir);
+    }
+
+    // Create multiple data storage directories for DataNodes
+    File dataDir = new File(nodeDir, "data");
     if (!dataDir.exists() && !dataDir.mkdirs()) {
       throw new IOException("Failed to create data directory: " + dataDir);
     }
-    if (!logsDir.exists() && !logsDir.mkdirs()) {
-      throw new IOException("Failed to create logs directory: " + logsDir);
+
+    List<File> dataStorageDirs = new ArrayList<>();
+    for (int i = 0; i < storagesPerDatanode; i++) {
+      StorageType type = (storageTypes != null && i < storageTypes.length)
+          ? storageTypes[i]
+          : StorageType.DEFAULT;
+
+      // Create directory named by storage type: data-DISK-0, data-SSD-1, etc.
+      String dirName = "data-" + type.toString() + "-" + i;
+      File storageDir = new File(dataDir, dirName);
+      if (!storageDir.mkdirs()) {
+        throw new IOException("Failed to create storage directory: " + storageDir);
+      }
+      dataStorageDirs.add(storageDir);
     }
 
     File pidFile = new File(nodeDir, "pid");
 
     nodeDirs.add(nodeDir);
 
-    LOG.info("Created node directory structure at: {}", nodeDir);
+    LOG.info("Created node directory structure at: {} with {} storage locations",
+        nodeDir, storagesPerDatanode);
 
-    return new NodeDirectory(nodeDir, confDir, dataDir, logsDir, pidFile);
+    return new NodeDirectory(nodeDir, confDir, dataDir, dataStorageDirs,
+        storageTypes, logsDir, pidFile);
   }
 
   /**
@@ -270,15 +318,34 @@ public class DirectoryManager {
   public static class NodeDirectory {
     private final File nodeBaseDir;
     private final File confDir;
-    private final File dataDir;
+    private final File dataDir;  // Base data directory
+    private final List<File> dataStorageDirs;  // Multiple storage directories
+    private final StorageType[] storageTypes;
     private final File logsDir;
     private final File pidFile;
 
+    // Backward compatibility constructor
     public NodeDirectory(File nodeBaseDir, File confDir, File dataDir,
                          File logsDir, File pidFile) {
       this.nodeBaseDir = nodeBaseDir;
       this.confDir = confDir;
       this.dataDir = dataDir;
+      this.dataStorageDirs = new ArrayList<>();
+      this.dataStorageDirs.add(dataDir);  // Single storage location
+      this.storageTypes = null;
+      this.logsDir = logsDir;
+      this.pidFile = pidFile;
+    }
+
+    // New constructor with storage types
+    public NodeDirectory(File nodeBaseDir, File confDir, File dataDir,
+                         List<File> dataStorageDirs, StorageType[] storageTypes,
+                         File logsDir, File pidFile) {
+      this.nodeBaseDir = nodeBaseDir;
+      this.confDir = confDir;
+      this.dataDir = dataDir;
+      this.dataStorageDirs = new ArrayList<>(dataStorageDirs);
+      this.storageTypes = storageTypes;
       this.logsDir = logsDir;
       this.pidFile = pidFile;
     }
@@ -293,6 +360,14 @@ public class DirectoryManager {
 
     public File getDataDir() {
       return dataDir;
+    }
+
+    public List<File> getDataStorageDirs() {
+      return new ArrayList<>(dataStorageDirs);
+    }
+
+    public StorageType[] getStorageTypes() {
+      return storageTypes;
     }
 
     public File getLogsDir() {

@@ -19,6 +19,7 @@ package org.apache.hadoop.hdfs.server.process;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +135,7 @@ public class ProcessConfigurationGenerator {
   }
 
   /**
-   * Generates configuration for a DataNode.
+   * Generates configuration for a DataNode (backward compatibility).
    *
    * @param dnIndex the DataNode index (0 to numDataNodes-1)
    * @param nodeDir the node directory structure
@@ -146,6 +147,24 @@ public class ProcessConfigurationGenerator {
       int dnIndex,
       DirectoryManager.NodeDirectory nodeDir,
       List<InetSocketAddress> nameNodeAddresses) throws IOException {
+    return generateDataNodeConfig(dnIndex, nodeDir, nameNodeAddresses, null);
+  }
+
+  /**
+   * Generates configuration for a DataNode with storage type configuration.
+   *
+   * @param dnIndex the DataNode index (0 to numDataNodes-1)
+   * @param nodeDir the node directory structure
+   * @param nameNodeAddresses list of NameNode RPC addresses to connect to
+   * @param storageTypes array of storage types for each storage location
+   * @return NodeConfiguration containing the generated config and allocated ports
+   * @throws IOException if port allocation or config generation fails
+   */
+  public NodeConfiguration generateDataNodeConfig(
+      int dnIndex,
+      DirectoryManager.NodeDirectory nodeDir,
+      List<InetSocketAddress> nameNodeAddresses,
+      StorageType[] storageTypes) throws IOException {
 
     if (nameNodeAddresses == null || nameNodeAddresses.isEmpty()) {
       throw new IllegalArgumentException(
@@ -173,9 +192,26 @@ public class ProcessConfigurationGenerator {
     config.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY,
         dnHost + ":" + httpPort);
 
-    // Set data directory
-    config.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY,
-        new File(nodeDir.getDataDir(), "data").toURI().toString());
+    // Build comma-separated list of data directories with storage type prefixes
+    StringBuilder dataDirBuilder = new StringBuilder();
+    List<File> storageDirs = nodeDir.getDataStorageDirs();
+    StorageType[] types = nodeDir.getStorageTypes();
+
+    for (int i = 0; i < storageDirs.size(); i++) {
+      if (i > 0) {
+        dataDirBuilder.append(",");
+      }
+
+      StorageType type = (types != null && i < types.length)
+          ? types[i]
+          : StorageType.DEFAULT;
+
+      // Format: [DISK]file:///path,[SSD]file:///path2
+      dataDirBuilder.append("[").append(type.toString()).append("]")
+          .append(storageDirs.get(i).toURI().toString());
+    }
+
+    config.set(DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY, dataDirBuilder.toString());
 
     // Set NameNode address(es)
     if (nameNodeAddresses.size() == 1) {
@@ -199,10 +235,70 @@ public class ProcessConfigurationGenerator {
     // Write configuration files
     writeConfigurationFiles(config, nodeDir.getConfDir());
 
-    LOG.info("Generated DataNode configuration for dn{}: data={}, ipc={}, http={}",
-        dnIndex, dataPort, ipcPort, httpPort);
+    LOG.info("Generated DataNode configuration for dn{} with {} storage locations: data={}, ipc={}, http={}",
+        dnIndex, storageDirs.size(), dataPort, ipcPort, httpPort);
 
     return new NodeConfiguration(config, allocatedPorts);
+  }
+
+  /**
+   * Generates configuration for a DataNode with storage type and rack configuration.
+   *
+   * @param dnIndex the DataNode index (0 to numDataNodes-1)
+   * @param nodeDir the node directory structure
+   * @param nameNodeAddresses list of NameNode RPC addresses to connect to
+   * @param storageTypes array of storage types for each storage location
+   * @param rack the rack assignment for this DataNode (can be null)
+   * @param allRacks all rack assignments for rack topology mapping (can be null)
+   * @return NodeConfiguration containing the generated config and allocated ports
+   * @throws IOException if port allocation or config generation fails
+   */
+  public NodeConfiguration generateDataNodeConfig(
+      int dnIndex,
+      DirectoryManager.NodeDirectory nodeDir,
+      List<InetSocketAddress> nameNodeAddresses,
+      StorageType[] storageTypes,
+      String rack,
+      String[] allRacks) throws IOException {
+
+    // First generate the basic config
+    NodeConfiguration baseConfig = generateDataNodeConfig(dnIndex, nodeDir, nameNodeAddresses, storageTypes);
+    Configuration config = baseConfig.getConfig();
+
+    // Configure rack topology if racks are specified
+    if (rack != null && allRacks != null) {
+      // Use StaticMapping for rack awareness
+      config.setClass("net.topology.node.switch.mapping.impl",
+          org.apache.hadoop.net.StaticMapping.class,
+          org.apache.hadoop.net.DNSToSwitchMapping.class);
+
+      // Build the node-to-rack mapping string
+      // Format: hostname1=rack1,hostname2=rack2,...
+      StringBuilder mappingBuilder = new StringBuilder();
+      for (int i = 0; i < allRacks.length; i++) {
+        if (i > 0) {
+          mappingBuilder.append(",");
+        }
+        // Use localhost:port as the hostname identifier
+        String nodeId = "127.0.0.1:" + (50000 + i);  // Simple node identifier
+        mappingBuilder.append(nodeId).append("=").append(allRacks[i]);
+      }
+
+      config.set("hadoop.configured.node.mapping", mappingBuilder.toString());
+
+      // Also configure the hostname for this specific DataNode
+      String dnHost = "127.0.0.1";
+      config.set(DFSConfigKeys.DFS_DATANODE_HOST_NAME_KEY, dnHost);
+
+      LOG.info("Configured DataNode dn{} with rack: {}", dnIndex, rack);
+    }
+
+    // Re-write configuration files with rack settings
+    if (rack != null) {
+      writeConfigurationFiles(config, nodeDir.getConfDir());
+    }
+
+    return new NodeConfiguration(config, baseConfig.getAllocatedPorts());
   }
 
   /**

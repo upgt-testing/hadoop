@@ -286,6 +286,56 @@ cluster.restartNameNode(0);
 cluster.waitClusterUp();
 ```
 
+### Dynamic DataNode Addition
+
+Add DataNodes to a running cluster (new in this version):
+
+```java
+Configuration conf = new HdfsConfiguration();
+conf.set("dfs.replication", "2");
+
+// Start with 2 DataNodes
+ProcessBasedMiniDFSCluster cluster =
+    new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+        .format(true)
+        .build();
+
+cluster.waitClusterUp();
+FileSystem fs = cluster.getFileSystem();
+
+// Write initial data
+Path testFile = new Path("/test-data.txt");
+fs.createNewFile(testFile);
+
+// Dynamically add 3 more DataNodes
+cluster.startDataNodes(conf, 3, true, null, null, null);
+
+// Cluster now has 5 DataNodes total
+System.out.println("Total DataNodes: " + cluster.getNumDataNodes());  // Prints: 5
+
+// Data remains accessible
+assertTrue(fs.exists(testFile));
+```
+
+**With custom storage types:**
+
+```java
+// Add 2 DataNodes with heterogeneous storage
+StorageType[][] newStorageTypes = new StorageType[2][];
+newStorageTypes[0] = new StorageType[]{StorageType.SSD, StorageType.DISK};
+newStorageTypes[1] = new StorageType[]{StorageType.DISK, StorageType.ARCHIVE};
+
+cluster.startDataNodes(conf, 2, newStorageTypes, true, null, null, null, null);
+```
+
+**Use cases for dynamic DataNode addition:**
+- Testing cluster expansion scenarios
+- Simulating dynamic scaling
+- Testing rebalancing after node addition
+- Testing storage policy behavior with new nodes
+
 ### Custom Configuration Per Node
 
 ```java
@@ -307,11 +357,26 @@ ProcessBasedMiniDFSCluster cluster =
 
 | Method | Description | Example |
 |--------|-------------|---------|
-| `numDataNodes(int)` | Number of DataNodes | `.numDataNodes(3)` |
+| `numDataNodes(int)` | Number of DataNodes (initial) | `.numDataNodes(3)` |
 | `allNodesHadoopDistribution(String)` | Set same version for all nodes | `.allNodesHadoopDistribution("/opt/hadoop-3.3.5")` |
 | `nameNodeHadoopDistribution(String)` | Set NameNode version | `.nameNodeHadoopDistribution("/opt/hadoop-3.3.1")` |
 | `dataNodeHadoopDistribution(int, String)` | Set specific DataNode version | `.dataNodeHadoopDistribution(0, "/opt/hadoop-3.3.5")` |
 | `format(boolean)` | Format HDFS on startup | `.format(true)` |
+| `storageTypes(StorageType[][])` | Set storage types per DataNode | `.storageTypes(types)` |
+| `storagesPerDatanode(int)` | Number of storage locations per DN | `.storagesPerDatanode(2)` |
+
+### Cluster Management Methods
+
+| Method | Description | Example |
+|--------|-------------|---------|
+| `startDataNodes(conf, num, manageDfsDirs, racks, hosts, capacities)` | Add DataNodes dynamically | `cluster.startDataNodes(conf, 3, true, null, null, null)` |
+| `startDataNodes(conf, num, storageTypes, ...)` | Add DataNodes with storage types | `cluster.startDataNodes(conf, 2, types, true, ...)` |
+| `restartDataNode(int)` | Restart a specific DataNode | `cluster.restartDataNode(0)` |
+| `shutdownDataNode(int)` | Shutdown a specific DataNode | `cluster.shutdownDataNode(1)` |
+| `changeDataNodeVersion(int, String)` | Change DataNode version | `cluster.changeDataNodeVersion(0, hadoopHome)` |
+| `getNumDataNodes()` | Get current DataNode count | `int count = cluster.getNumDataNodes()` |
+| `triggerHeartbeats()` | Wait for DataNode heartbeats | `cluster.triggerHeartbeats()` |
+| `triggerBlockReports()` | Wait for DataNode block reports | `cluster.triggerBlockReports()` |
 
 ### Configuration Properties
 
