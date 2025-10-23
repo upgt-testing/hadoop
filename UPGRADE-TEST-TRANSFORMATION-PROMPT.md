@@ -8,10 +8,11 @@
 5. [Comprehensive API Mapping Tables](#comprehensive-api-mapping-tables)
 6. [Step-by-Step Transformation Process](#step-by-step-transformation-process)
 7. [Common Transformation Patterns](#common-transformation-patterns)
-8. [When to Comment Out Logic](#when-to-comment-out-logic)
-9. [Testing Checklist](#testing-checklist)
-10. [Best Practices](#best-practices)
-11. [Quick Reference Decision Tree](#quick-reference-decision-tree)
+8. [Inserting Cluster Upgrade Method Calls](#inserting-cluster-upgrade-method-calls)
+9. [When to Comment Out Logic](#when-to-comment-out-logic)
+10. [Testing Checklist](#testing-checklist)
+11. [Best Practices](#best-practices)
+12. [Quick Reference Decision Tree](#quick-reference-decision-tree)
 
 ---
 
@@ -776,6 +777,319 @@ long fileCount = summary.getFileCount();
 long dirCount = summary.getDirectoryCount();
 long totalBytes = summary.getLength();
 ```
+
+---
+
+## Inserting Cluster Upgrade Method Calls
+
+### Overview
+
+When transforming tests to support rolling upgrades, you need to insert `cluster.upgrade()` method calls at appropriate points in the test. This section explains how to identify upgrade points and handle the critical pattern of **closing streams before upgrade and reopening them afterward**.
+
+### Why Stream Management is Critical
+
+During a rolling upgrade, HDFS nodes (DataNodes and NameNodes) are restarted with new software versions. This restart **breaks the write pipeline** - the active connection between the client and the DataNode that's handling write operations.
+
+**Key principle**: Any `FSDataOutputStream` (or similar stream) that spans an upgrade point must be:
+1. **Closed** before calling `cluster.upgrade()`
+2. **Reopened** (typically in append mode) after `cluster.upgrade()` completes
+
+### Identifying Upgrade Points
+
+An upgrade point is a logical location in your test where you want to simulate a rolling upgrade. Common upgrade points include:
+
+1. **Mid-write operations** - Testing that data written before upgrade is accessible after upgrade
+2. **Between distinct test phases** - After setup operations but before verification
+3. **After creating test data** - Testing upgrade with existing data
+4. **During long-running operations** - Testing upgrade resilience
+
+### Step-by-Step: Inserting Upgrade Calls
+
+#### Step 1: Identify the Upgrade Point
+
+Look for a logical point in the test where upgrade makes sense:
+
+```java
+// BEFORE: Original test without upgrade
+Path file = new Path("/test/file.txt");
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);      // Write first part
+out.hflush();
+out.write(data, 100, 100);    // Write second part  <-- Potential upgrade point
+out.hflush();
+out.close();
+```
+
+#### Step 2: Close Streams Before Upgrade
+
+If a stream is open at the upgrade point, close it first:
+
+```java
+// AFTER: With upgrade point inserted
+Path file = new Path("/test/file.txt");
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);      // Write first part
+out.hflush();
+
+// === ROLLING UPGRADE POINT ===
+// CRITICAL: Close the stream before upgrade since the DataNode will be restarted
+// and the write pipeline will be broken
+out.close();
+System.out.println("Closed stream before rolling upgrade");
+```
+
+#### Step 3: Call cluster.upgrade()
+
+```java
+// Perform rolling upgrade
+cluster.upgrade();  // Executes full rolling upgrade procedure
+System.out.println("Rolling upgrade completed successfully");
+```
+
+**Note**: The `cluster.upgrade()` method:
+- Automatically follows the official HDFS rolling upgrade procedure
+- Enters safe mode, prepares upgrade, upgrades nodes, stabilizes cluster, and finalizes
+- **Automatically waits 5 seconds** after cluster stabilization for blocks to be reported
+- This automatic waiting ensures existing files can be reopened for append
+
+#### Step 4: Reopen Streams After Upgrade
+
+If you need to continue writing to the file, reopen it in append mode:
+
+```java
+// Reopen the file in append mode after upgrade
+out = fs.append(file);
+System.out.println("Reopened file in append mode after upgrade");
+
+// Continue writing
+out.write(data, 100, 100);    // Write second part
+out.hflush();
+out.close();
+```
+
+### Complete Example: TestFileAppend_ProcessBased
+
+Here's the complete pattern from `TestFileAppend_ProcessBased.java`:
+
+```java
+@Test
+public void testSimpleFlush() throws Exception {
+    Configuration conf = new HdfsConfiguration();
+    fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
+
+    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(1)
+        .format(true)
+        .build();
+    DistributedFileSystem fs = cluster.getFileSystem();
+
+    try {
+        cluster.waitClusterUp();
+
+        // Create file and write first part
+        Path file1 = new Path("/simpleFlush.dat");
+        FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
+        System.out.println("Created file simpleFlush.dat");
+
+        int mid = AppendTestUtil.FILE_SIZE / 2;
+        stm.write(fileContents, 0, mid);
+        stm.hflush();
+        System.out.println("Wrote and Flushed first part of file.");
+
+        // === ROLLING UPGRADE POINT ===
+        // STEP 1: Close the stream before upgrade
+        stm.close();
+        System.out.println("Closed stream before rolling upgrade");
+
+        // STEP 2: Perform rolling upgrade
+        cluster.upgrade();  // Automatic wait for blocks included!
+        System.out.println("Rolling upgrade completed successfully");
+
+        // STEP 3: Reopen in append mode
+        stm = fs.append(file1);
+        System.out.println("Reopened file in append mode after upgrade");
+
+        // Continue writing after upgrade
+        stm.write(fileContents, mid, AppendTestUtil.FILE_SIZE - mid);
+        System.out.println("Written second part of file");
+        stm.hflush();
+        stm.hflush();
+        System.out.println("Wrote and Flushed second part of file.");
+
+        // Verify that full blocks are sane
+        checkFile(fs, file1, 1);
+
+        stm.close();
+        System.out.println("Closed file.");
+
+        // Verify that entire file is good
+        AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
+            fileContents, "Read 2");
+
+    } finally {
+        fs.close();
+        cluster.shutdown();
+    }
+}
+```
+
+### Automatic Block Replication Waiting
+
+The `cluster.upgrade()` method includes an **automatic 5-second grace period** after cluster stabilization. This ensures:
+
+- DataNodes have time to report their blocks to the NameNode
+- Existing files can be immediately reopened for append operations
+- Tests don't need manual waiting logic for block replication
+
+**You do NOT need to add manual waiting code** like this:
+
+```java
+// ❌ NOT NEEDED - cluster.upgrade() handles this automatically!
+Thread.sleep(5000);
+GenericTestUtils.waitFor(() -> checkBlocksReplicated(), 1000, 30000);
+```
+
+The automatic waiting is built into `cluster.upgrade()` at `/Users/allenwang/xlab/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/server/process/ProcessBasedMiniDFSCluster.java:1630-1641`.
+
+### Pattern Variations
+
+#### Variation 1: Read-only operations (no stream management needed)
+
+If your test only reads data, no stream management is required:
+
+```java
+// Create test files
+fs.create(new Path("/file1")).close();
+fs.create(new Path("/file2")).close();
+
+// Upgrade - no stream management needed
+cluster.upgrade();
+
+// Verify files still readable
+assertTrue(fs.exists(new Path("/file1")));
+assertTrue(fs.exists(new Path("/file2")));
+```
+
+#### Variation 2: Multiple streams
+
+If multiple streams are open, close all of them:
+
+```java
+FSDataOutputStream out1 = fs.create(new Path("/file1"));
+FSDataOutputStream out2 = fs.create(new Path("/file2"));
+
+// Write to both
+out1.write(data1);
+out2.write(data2);
+out1.hflush();
+out2.hflush();
+
+// Close all streams before upgrade
+out1.close();
+out2.close();
+System.out.println("Closed all streams before upgrade");
+
+// Perform upgrade
+cluster.upgrade();
+
+// Reopen as needed
+out1 = fs.append(new Path("/file1"));
+out2 = fs.append(new Path("/file2"));
+```
+
+#### Variation 3: Input streams
+
+Input streams (readers) should also be closed and reopened:
+
+```java
+FSDataInputStream in = fs.open(new Path("/file"));
+byte[] buffer = new byte[1000];
+in.read(buffer);
+
+// Close input stream before upgrade
+in.close();
+System.out.println("Closed input stream before upgrade");
+
+// Perform upgrade
+cluster.upgrade();
+
+// Reopen at same position
+in = fs.open(new Path("/file"));
+in.seek(1000);  // Resume reading from where we left off
+```
+
+### Common Mistakes to Avoid
+
+#### ❌ Mistake 1: Not closing streams before upgrade
+
+```java
+// WRONG - Stream remains open during upgrade
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);
+cluster.upgrade();  // Pipeline will break!
+out.write(data, 100, 100);  // This will fail!
+```
+
+#### ❌ Mistake 2: Forgetting to reopen for continued writes
+
+```java
+// WRONG - Stream closed but not reopened
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);
+out.close();
+cluster.upgrade();
+// Missing: out = fs.append(file);
+out.write(data, 100, 100);  // NullPointerException or wrong stream!
+```
+
+#### ❌ Mistake 3: Using create() instead of append() after upgrade
+
+```java
+// WRONG - create() will overwrite existing data
+out.close();
+cluster.upgrade();
+out = fs.create(file);  // WRONG - overwrites the file!
+out.write(data, 100, 100);
+```
+
+#### ✅ Correct Pattern
+
+```java
+// CORRECT - Close, upgrade, reopen in append mode
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);
+out.hflush();
+out.close();
+
+cluster.upgrade();
+
+out = fs.append(file);  // CORRECT - append mode preserves existing data
+out.write(data, 100, 100);
+out.close();
+```
+
+### Testing Your Upgrade Point
+
+After inserting the upgrade call, verify:
+
+1. **Data before upgrade is preserved** - Read and verify data written before upgrade
+2. **Data after upgrade is correct** - Read and verify data written after upgrade
+3. **Combined data is valid** - Verify the complete file has all data in correct order
+4. **No exceptions during upgrade** - Upgrade completes without errors
+5. **Cluster is healthy after upgrade** - All nodes are operational
+
+### Summary Checklist
+
+When inserting `cluster.upgrade()` calls:
+
+- [ ] Identify logical upgrade point in test
+- [ ] Close all open `FSDataOutputStream` instances before `cluster.upgrade()`
+- [ ] Close all open `FSDataInputStream` instances before `cluster.upgrade()`
+- [ ] Call `cluster.upgrade()` (automatic block replication wait included)
+- [ ] Reopen streams in **append mode** (not create mode) if continuing to write
+- [ ] Add informative `System.out.println()` messages for debugging
+- [ ] Verify data integrity before and after upgrade
+- [ ] Test passes with upgrade point inserted
 
 ---
 
