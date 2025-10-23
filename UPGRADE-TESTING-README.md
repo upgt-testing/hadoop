@@ -518,6 +518,34 @@ tail -f /tmp/process-minicluster-*/nn0/logs/*.log
 tail -f /tmp/process-minicluster-*/dn0/logs/*.log
 ```
 
+### Preserving Cluster Data for Debugging
+
+By default, the cluster directory is cleaned up after tests complete. To preserve the cluster directory for debugging:
+
+```bash
+# Run tests with no cleanup
+mvn test \
+  -pl hadoop-hdfs-project/hadoop-hdfs \
+  -Dtest=TestHadoop335To336Upgrade \
+  -Dhadoop.start.home=/tmp/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/tmp/hadoop-test-distributions/hadoop-3.3.6 \
+  -Dmini.dfs.no.cleanup=true
+```
+
+With `-Dmini.dfs.no.cleanup=true`, the cluster directory in `/tmp/process-minicluster-*` will be preserved after the test completes, allowing you to:
+
+- Inspect HDFS data directories
+- Review complete log files
+- Examine configuration files used during the test
+- Debug process startup issues
+
+**Important:** Remember to manually clean up preserved directories when done:
+
+```bash
+# Clean up all preserved cluster directories
+rm -rf /tmp/process-minicluster-*
+```
+
 ## Advanced Usage
 
 ### Custom Test Data Sizes
