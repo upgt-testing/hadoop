@@ -54,39 +54,42 @@ When encountering server-side operations, try these approaches in order:
 
 ## Prerequisites & Setup
 
-### Environment Variables
-ProcessBasedMiniDFSCluster requires Hadoop distribution paths:
+### System Properties (Automatic!)
+ProcessBasedMiniDFSCluster now **automatically** reads Hadoop distributions from system properties:
 
 ```bash
-# For single-version testing
-export HADOOP_HOME=/path/to/hadoop-3.3.5
-
-# For multi-version upgrade testing
-export HADOOP_3_3_5_HOME=/path/to/hadoop-3.3.5
-export HADOOP_3_3_6_HOME=/path/to/hadoop-3.3.6
-
-# Verify environment
-echo $HADOOP_HOME
-echo $HADOOP_3_3_5_HOME
+# No manual setup needed! Just pass system properties to Maven:
+mvn test -Dtest=YourTransformedTest \
+  -Dhadoop.start.home=/path/to/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/path/to/hadoop-3.3.6 \
+  -pl hadoop-hdfs-project/hadoop-hdfs
 ```
+
+**Backward compatibility:** Environment variables (`HADOOP_HOME`, `HADOOP_UPGRADE_HOME`) still work as fallback.
 
 ### Test Configuration
 ```java
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
 
-@Before
-public void setUp() {
-    // Check environment variables in test setup
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set", hadoopHome);
+// No @Before setup needed! System properties are read automatically!
+
+@Test
+public void testSomething() {
+    // Just build - automatic!
+    ProcessBasedMiniDFSCluster cluster =
+        new ProcessBasedMiniDFSCluster.Builder(conf)
+            .numDataNodes(3)
+            .build();  // Automatically reads hadoop.start.home and hadoop.upgrade.home!
 }
 ```
 
 ### Running Transformed Tests
 ```bash
-# Run with environment variable
-export HADOOP_HOME=/opt/hadoop-3.3.5
-mvn test -Dtest=YourTransformedTest -pl hadoop-hdfs-project/hadoop-hdfs
+# Run with system properties (recommended)
+mvn test -Dtest=YourTransformedTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6 \
+  -pl hadoop-hdfs-project/hadoop-hdfs
 
 # Or use the automated script
 ./run-upgrade-test.sh --test-class YourTransformedTest
@@ -225,7 +228,7 @@ Add comments only for:
 | MiniDFSCluster Method | ProcessBasedMiniDFSCluster | Status | Notes |
 |----------------------|---------------------------|--------|-------|
 | **Cluster Creation** |
-| `new Builder(conf).build()` | `new Builder(conf).allNodesHadoopDistribution(hadoopHome).build()` | ✓ | Must specify Hadoop distribution |
+| `new Builder(conf).build()` | `new Builder(conf).build()` | ✓ | Automatically reads hadoop.start.home and hadoop.upgrade.home from system properties |
 | **FileSystem Access** |
 | `getFileSystem()` | `getFileSystem()` | ✓ | Same API |
 | `getFileSystem(int nn)` | `getFileSystem()` | ✓ | For multi-NN, use NN-specific config |
@@ -477,38 +480,44 @@ MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf)
     .build();
 cluster.waitActive();
 
-// AFTER (ProcessBasedMiniDFSCluster)
+// AFTER (ProcessBasedMiniDFSCluster) - AUTOMATIC!
 Configuration conf = new HdfsConfiguration();
-String hadoopHome = System.getenv("HADOOP_HOME");
-assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
+// No environment variable checks needed! Automatic!
 
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
-        .build();
+        .build();  // Automatically reads hadoop.start.home and hadoop.upgrade.home!
 cluster.waitClusterUp();
+```
+
+**Note:** System properties are passed via Maven:
+```bash
+mvn test -Dtest=MyTest \
+  -Dhadoop.start.home=/path/to/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/path/to/hadoop-3.3.6
 ```
 
 #### Multi-Version Cluster (for upgrade tests)
 
 ```java
-// For testing 3.3.5 → 3.3.6 upgrade
-String hadoop335 = System.getenv("HADOOP_3_3_5_HOME");
-String hadoop336 = System.getenv("HADOOP_3_3_6_HOME");
-assumeNotNull("HADOOP_3_3_5_HOME must be set", hadoop335);
-assumeNotNull("HADOOP_3_3_6_HOME must be set", hadoop336);
+// All ProcessBased tests support upgrades automatically!
+// Just build the cluster - it reads system properties automatically
 
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .nameNodeHadoopDistribution(hadoop335)      // NN on 3.3.5
-        .dataNodeHadoopDistribution(0, hadoop335)   // DN0 on 3.3.5
-        .dataNodeHadoopDistribution(1, hadoop335)   // DN1 on 3.3.5
-        .dataNodeHadoopDistribution(2, hadoop335)   // DN2 on 3.3.5
         .format(true)
-        .build();
+        .build();  // Starts with hadoop.start.home
+
+// Later, perform rolling upgrade to hadoop.upgrade.home
+String upgradeHome = cluster.getUpgradeDistributionPath();
+for (int i = 0; i < 3; i++) {
+    cluster.shutdownDataNode(i);
+    cluster.changeDataNodeVersion(i, upgradeHome);
+    cluster.startDataNode(i);
+}
 ```
 
 ### Step 4: Transform Operations Using Mapping Tables
@@ -618,8 +627,7 @@ public void testSomething() throws Exception {
     try (ProcessBasedMiniDFSCluster cluster =
             new ProcessBasedMiniDFSCluster.Builder(conf)
                 .numDataNodes(3)
-                .allNodesHadoopDistribution(hadoopHome)
-                .build()) {
+                .build()) {  // Automatic - reads system properties!
         // Test logic here
     }
 }
@@ -869,13 +877,15 @@ boolean inSafe = dfs.setSafeMode(SafeModeAction.SAFEMODE_GET);
   - Class name matches file name with `_ProcessBased` suffix
   - Javadoc includes `@see` reference to original test
 
-- [ ] **Environment variables set**
+- [ ] **System properties ready** (No manual setup needed!)
   ```bash
-  export HADOOP_HOME=/path/to/hadoop-3.3.5
-  # OR for upgrade tests:
-  export HADOOP_3_3_5_HOME=/path/to/hadoop-3.3.5
-  export HADOOP_3_3_6_HOME=/path/to/hadoop-3.3.6
+  # System properties will be passed when running tests:
+  mvn test -Dtest=MyTest \
+    -Dhadoop.start.home=/path/to/hadoop-3.3.5 \
+    -Dhadoop.upgrade.home=/path/to/hadoop-3.3.6
   ```
+
+  Note: Environment variables (`HADOOP_HOME`, `HADOOP_UPGRADE_HOME`) still work as fallback.
 
 - [ ] **Test compiles without errors**
   ```bash
@@ -919,12 +929,17 @@ boolean inSafe = dfs.setSafeMode(SafeModeAction.SAFEMODE_GET);
 ### Validation Commands
 
 ```bash
-# Run single test
-export HADOOP_HOME=/opt/hadoop-3.3.5
-mvn test -Dtest=YourTransformedTest -pl hadoop-hdfs-project/hadoop-hdfs
+# Run single test with system properties
+mvn test -Dtest=YourTransformedTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6 \
+  -pl hadoop-hdfs-project/hadoop-hdfs
 
 # Run with debug output
-mvn test -Dtest=YourTransformedTest -pl hadoop-hdfs-project/hadoop-hdfs -X
+mvn test -Dtest=YourTransformedTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6 \
+  -pl hadoop-hdfs-project/hadoop-hdfs -X
 
 # Check for orphaned processes after test
 ps aux | grep -E "(NameNode|DataNode|ProcessLauncher)"
@@ -945,10 +960,12 @@ pkill -f "ProcessLauncher"
 
 3. **Preserve test intent** - Even if implementation changes, maintain what the test is verifying
 
-4. **Use assumeNotNull() for environment checks**
+4. **System properties are automatic** - No manual environment checks needed!
    ```java
-   String hadoopHome = System.getenv("HADOOP_HOME");
-   assumeNotNull("HADOOP_HOME must be set", hadoopHome);
+   // Simply build the cluster - system properties handled automatically!
+   ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+       .numDataNodes(3)
+       .build();  // Reads hadoop.start.home and hadoop.upgrade.home automatically
    ```
 
 5. **Keep transformations minimal** - Change only what's necessary
@@ -971,7 +988,7 @@ pkill -f "ProcessLauncher"
 
 5. **Don't mix MiniDFSCluster and ProcessBasedMiniDFSCluster** in same test
 
-6. **Don't assume environment variables are set** - Always use `assumeNotNull()`
+6. **Don't manually check environment variables** - System properties are handled automatically!
 
 ### Performance Considerations
 

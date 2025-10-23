@@ -66,7 +66,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
         // Start with 2 DataNodes
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -106,7 +105,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
         // Start with 2 DataNodes with default storage
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -144,7 +142,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
         // Start with 1 DataNode
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -182,7 +179,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -206,7 +202,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -245,7 +240,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -272,7 +266,6 @@ public class TestProcessBasedMiniDFSCluster_DynamicNodes {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 

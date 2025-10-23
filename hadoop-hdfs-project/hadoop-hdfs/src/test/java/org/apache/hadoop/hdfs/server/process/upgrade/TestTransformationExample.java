@@ -101,7 +101,6 @@ public class TestTransformationExample {
     try (ProcessBasedMiniDFSCluster cluster =
             new ProcessBasedMiniDFSCluster.Builder(conf)
                 .numDataNodes(1)  // TRANSFORMATION: Changed from 0 to 1 (min requirement)
-                .allNodesHadoopDistribution(hadoopHome)  // TRANSFORMATION: Added distribution path
                 .format(true)
                 .build()) {
       cluster.waitClusterUp();  // TRANSFORMATION: Changed from waitActive()
@@ -207,7 +206,6 @@ public class TestTransformationExample {
       // Note: Changed numDataNodes from 0 to 1 - ProcessBasedMiniDFSCluster requires at least 1 DN
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(1)  // TRANSFORMATION: Changed from 0 to 1 (min requirement)
-          .allNodesHadoopDistribution(hadoopHome)  // TRANSFORMATION: Added distribution path
           .format(true)
           .build();
       cluster.waitClusterUp();  // TRANSFORMATION: Changed from waitActive()

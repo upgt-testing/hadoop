@@ -78,7 +78,6 @@ public class TestViewFsDefaultValue_ProcessBased {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(CONF)
         .numDataNodes(DFS_REPLICATION_DEFAULT + 1)
-        .allNodesHadoopDistribution(System.getenv("HADOOP_HOME"))
         .format(true)
         .build();
     cluster.waitClusterUp();

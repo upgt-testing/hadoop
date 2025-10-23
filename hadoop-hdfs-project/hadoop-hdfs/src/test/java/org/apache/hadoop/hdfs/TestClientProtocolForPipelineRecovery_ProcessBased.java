@@ -66,7 +66,6 @@ public class TestClientProtocolForPipelineRecovery_ProcessBased {
       int numDataNodes = 3;
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(numDataNodes)
-          .allNodesHadoopDistribution(hadoopHome)
           .format(true)
           .build();
       cluster.waitClusterUp();

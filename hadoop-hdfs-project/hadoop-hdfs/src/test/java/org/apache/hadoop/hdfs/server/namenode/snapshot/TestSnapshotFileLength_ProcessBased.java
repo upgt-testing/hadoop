@@ -77,7 +77,6 @@ public class TestSnapshotFileLength_ProcessBased {
     try {
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(REPLICATION)
-          .allNodesHadoopDistribution(hadoopHome)
           .format(true)
           .build();
       cluster.waitClusterUp();

@@ -112,7 +112,6 @@ public class TestMixedVersionCluster {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
 
@@ -263,7 +262,6 @@ public class TestMixedVersionCluster {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop335)
         .format(true)
         .build();
 
@@ -385,7 +383,6 @@ public class TestMixedVersionCluster {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(2)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
 

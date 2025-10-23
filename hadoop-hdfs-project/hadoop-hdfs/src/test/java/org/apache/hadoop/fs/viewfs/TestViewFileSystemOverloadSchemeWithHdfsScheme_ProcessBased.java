@@ -70,7 +70,6 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
     baseConf = new Configuration();
     cluster = new ProcessBasedMiniDFSCluster.Builder(baseConf)
         .numDataNodes(2)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
     cluster.waitClusterUp();

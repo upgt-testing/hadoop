@@ -124,7 +124,6 @@ public class TestHadoop335To336Upgrade {
     LOG.info("Starting cluster with Hadoop 3.3.5");
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop335Home)
         .format(true)
         .build();
 
@@ -193,7 +192,6 @@ public class TestHadoop335To336Upgrade {
     LOG.info("Starting cluster with Hadoop 3.3.6");
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop336Home)
         .format(true)
         .build();
 
@@ -317,7 +315,6 @@ public class TestHadoop335To336Upgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop335Home)
         .format(true)
         .build();
 
@@ -447,7 +444,6 @@ public class TestHadoop335To336Upgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop335Home)
         .format(true)
         .build();
 
@@ -512,7 +508,6 @@ public class TestHadoop335To336Upgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(4)
-        .allNodesHadoopDistribution(hadoop335Home)
         .format(true)
         .build();
 

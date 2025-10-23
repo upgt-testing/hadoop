@@ -73,7 +73,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
         .numDataNodes(3)
         .storageTypes(types)
         .storagesPerDatanode(2)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -100,7 +99,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
         .storageTypes(types)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -115,7 +113,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
   public void testDefaultStorageTypes() throws Exception {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(2)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -136,7 +133,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)  // 3 DataNodes
         .storageTypes(types)  // But only 2 entries in array
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
   }
@@ -156,7 +152,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
         .numDataNodes(2)
         .storageTypes(types)
         .storagesPerDatanode(3)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -179,7 +174,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
         .numDataNodes(1)
         .storageTypes(types)
         .storagesPerDatanode(4)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -193,7 +187,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
   public void testBackwardCompatibility() throws Exception {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
 
@@ -208,7 +201,6 @@ public class TestProcessBasedMiniDFSCluster_StorageTypes {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(2)
         .storagesPerDatanode(0)  // Invalid: must be >= 1
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .buildWithoutStart();
   }

@@ -81,9 +81,10 @@ org.apache.hadoop.hdfs.server.process/
 // Building
 public static class Builder {
     public Builder numDataNodes(int num)
-    public Builder allNodesHadoopDistribution(String path)
-    public Builder dataNodeHadoopDistribution(int index, String path)
-    public ProcessBasedMiniDFSCluster build()
+    public Builder fromSystemProperties()  // Reads hadoop.start.home and hadoop.upgrade.home
+    public Builder nameNodeHadoopDistribution(String path)  // For mixed-version only
+    public Builder dataNodeHadoopDistribution(int index, String path)  // For mixed-version only
+    public ProcessBasedMiniDFSCluster build()  // Automatically calls fromSystemProperties() if needed
 }
 
 // Lifecycle
@@ -102,19 +103,25 @@ public void changeDataNodeVersion(int dnIndex, String hadoopHome)
 public FileSystem getFileSystem()
 public URI getURI()
 public int getNumDataNodes()
+public String getUpgradeDistributionPath()  // Get upgrade version path
 ```
 
 **Design Pattern**: Builder + Facade
 ```java
-// Builder handles configuration
+// Builder handles configuration - automatically reads system properties!
 Builder builder = new Builder(conf)
-    .numDataNodes(3)
-    .allNodesHadoopDistribution(hadoopHome);
+    .numDataNodes(3);
+    // No need to set distribution - automatic!
 
 // Facade provides simple interface
 ProcessBasedMiniDFSCluster cluster = builder.build();
 FileSystem fs = cluster.getFileSystem();
+
+// For upgrade tests, access upgrade version:
+String upgradeHome = cluster.getUpgradeDistributionPath();
 ```
+
+**Note**: Distributions are **automatically read** from system properties (`hadoop.start.home` and `hadoop.upgrade.home`) when calling `.build()`. Explicit distribution methods are only needed for mixed-version testing.
 
 ### 2. ProcessNodeManager (Base Class)
 
@@ -508,10 +515,9 @@ public void testFeatureName() throws Exception {
 public void testIntegrationScenario() throws Exception {
     ProcessBasedMiniDFSCluster cluster = null;
     try {
-        // 1. Build cluster
+        // 1. Build cluster (automatically reads hadoop.start.home from system properties)
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(3)
-            .allNodesHadoopDistribution(hadoopHome)
             .build();
 
         cluster.waitClusterUp();
@@ -530,6 +536,11 @@ public void testIntegrationScenario() throws Exception {
         }
     }
 }
+```
+
+Run the test with:
+```bash
+mvn test -Dtest=MyIntegrationTest -Dhadoop.start.home=/opt/hadoop-3.3.5
 ```
 
 ### Test Naming Conventions

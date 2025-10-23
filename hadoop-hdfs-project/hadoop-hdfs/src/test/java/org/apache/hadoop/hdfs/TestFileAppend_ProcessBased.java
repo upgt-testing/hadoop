@@ -97,7 +97,6 @@ public class TestFileAppend_ProcessBased {
 
     ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
     DistributedFileSystem fs = cluster.getFileSystem();
@@ -159,7 +158,6 @@ public class TestFileAppend_ProcessBased {
 
     ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
     DistributedFileSystem fs = cluster.getFileSystem();

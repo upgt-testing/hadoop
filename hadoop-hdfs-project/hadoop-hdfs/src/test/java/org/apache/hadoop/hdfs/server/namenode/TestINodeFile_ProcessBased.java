@@ -58,7 +58,6 @@ public class TestINodeFile_ProcessBased {
     try {
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(1)
-          .allNodesHadoopDistribution(hadoopHome)
           .format(true)
           .build();
       cluster.waitClusterUp();

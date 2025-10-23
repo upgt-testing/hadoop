@@ -157,7 +157,6 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numberOfDatanodes)
-            .allNodesHadoopDistribution(hadoopHome)
             .storagesPerDatanode(storagesPerDn)
             .storageTypes(storageTypes)
             .format(true)

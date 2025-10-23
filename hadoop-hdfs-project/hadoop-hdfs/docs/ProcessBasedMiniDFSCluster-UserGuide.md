@@ -49,10 +49,24 @@ tar xzf hadoop-3.3.1.tar.gz -C /opt/
 
 wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz
 tar xzf hadoop-3.3.5.tar.gz -C /opt/
+```
 
-# Set environment variables (optional but recommended)
-export HADOOP_3_3_1_HOME=/opt/hadoop-3.3.1
-export HADOOP_3_3_5_HOME=/opt/hadoop-3.3.5
+**System Properties (Recommended)**:
+Pass Hadoop distribution paths via Maven system properties:
+
+```bash
+# For tests
+mvn test -Dtest=MyTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+```
+
+**Environment Variables (Fallback)**:
+Alternatively, use environment variables (still supported):
+
+```bash
+export HADOOP_HOME=/opt/hadoop-3.3.5
+export HADOOP_UPGRADE_HOME=/opt/hadoop-3.3.6
 ```
 
 ### System Requirements
@@ -80,11 +94,10 @@ public class QuickStartExample {
         Configuration conf = new HdfsConfiguration();
         conf.set("dfs.replication", "3");
 
-        // 2. Build cluster
+        // 2. Build cluster (automatically reads hadoop.start.home from system properties)
         ProcessBasedMiniDFSCluster cluster =
             new ProcessBasedMiniDFSCluster.Builder(conf)
                 .numDataNodes(3)
-                .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
                 .format(true)
                 .build();
 
@@ -108,7 +121,9 @@ public class QuickStartExample {
 
 Run this example:
 ```bash
-mvn compile exec:java -Dexec.mainClass="QuickStartExample"
+# Pass Hadoop distribution via system properties
+mvn compile exec:java -Dexec.mainClass="QuickStartExample" \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5
 ```
 
 ## Basic Usage
@@ -121,14 +136,19 @@ The most basic cluster setup with all nodes running the same Hadoop version:
 Configuration conf = new HdfsConfiguration();
 conf.set("dfs.replication", "2");
 
+// Automatically reads hadoop.start.home from system properties
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
         .format(true)
         .build();
 
 cluster.waitClusterUp();
+```
+
+**Note**: Pass the Hadoop distribution via Maven system properties:
+```bash
+mvn test -Dtest=MyTest -Dhadoop.start.home=/opt/hadoop-3.3.5
 ```
 
 ### Cluster Lifecycle
@@ -185,9 +205,9 @@ public class MyHDFSTest {
         Configuration conf = new HdfsConfiguration();
         conf.set("dfs.replication", "2");
 
+        // Automatically reads hadoop.start.home from system properties
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(3)
-            .allNodesHadoopDistribution(System.getenv("HADOOP_HOME"))
             .format(true)
             .build();
 
@@ -209,6 +229,11 @@ public class MyHDFSTest {
         assertTrue(fs.exists(testFile));
     }
 }
+```
+
+Run the test with:
+```bash
+mvn test -Dtest=MyHDFSTest -Dhadoop.start.home=/opt/hadoop-3.3.5
 ```
 
 ## Advanced Scenarios
@@ -241,11 +266,10 @@ Simulate a production rolling upgrade:
 ```java
 import org.apache.hadoop.hdfs.server.process.upgrade.UpgradeTestHelper;
 
-// Start with old version
+// Start with start version (automatically reads hadoop.start.home)
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution("/opt/hadoop-3.3.1")
         .format(true)
         .build();
 
@@ -255,8 +279,8 @@ FileSystem fs = cluster.getFileSystem();
 // Write test data
 List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
 
-// Perform rolling upgrade
-String targetVersion = "/opt/hadoop-3.3.5";
+// Perform rolling upgrade to upgrade version (automatically uses hadoop.upgrade.home)
+String targetVersion = cluster.getUpgradeDistributionPath();
 UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, targetVersion, testFiles);
 
 // Verify data after upgrade
@@ -264,6 +288,13 @@ UpgradeTestHelper.verifyTestData(fs, testFiles);
 
 System.out.println("Rolling upgrade successful!");
 cluster.shutdown();
+```
+
+Run the test with:
+```bash
+mvn test -Dtest=MyUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
 ```
 
 ### Node Restart Testing
@@ -294,11 +325,10 @@ Add DataNodes to a running cluster (new in this version):
 Configuration conf = new HdfsConfiguration();
 conf.set("dfs.replication", "2");
 
-// Start with 2 DataNodes
+// Start with 2 DataNodes (automatically reads hadoop.start.home)
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(2)
-        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
         .format(true)
         .build();
 
@@ -342,11 +372,10 @@ cluster.startDataNodes(conf, 2, newStorageTypes, true, null, null, null, null);
 Configuration baseConf = new HdfsConfiguration();
 baseConf.set("dfs.replication", "3");
 
-// Build cluster with custom configuration
+// Build cluster with custom configuration (automatically reads hadoop.start.home)
 ProcessBasedMiniDFSCluster cluster =
     new ProcessBasedMiniDFSCluster.Builder(baseConf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution("/opt/hadoop-3.3.5")
         .format(true)
         .build();
 ```
@@ -358,12 +387,13 @@ ProcessBasedMiniDFSCluster cluster =
 | Method | Description | Example |
 |--------|-------------|---------|
 | `numDataNodes(int)` | Number of DataNodes (initial) | `.numDataNodes(3)` |
-| `allNodesHadoopDistribution(String)` | Set same version for all nodes | `.allNodesHadoopDistribution("/opt/hadoop-3.3.5")` |
-| `nameNodeHadoopDistribution(String)` | Set NameNode version | `.nameNodeHadoopDistribution("/opt/hadoop-3.3.1")` |
-| `dataNodeHadoopDistribution(int, String)` | Set specific DataNode version | `.dataNodeHadoopDistribution(0, "/opt/hadoop-3.3.5")` |
 | `format(boolean)` | Format HDFS on startup | `.format(true)` |
 | `storageTypes(StorageType[][])` | Set storage types per DataNode | `.storageTypes(types)` |
 | `storagesPerDatanode(int)` | Number of storage locations per DN | `.storagesPerDatanode(2)` |
+| `nameNodeHadoopDistribution(String)` | Set NameNode version (for mixed-version) | `.nameNodeHadoopDistribution("/opt/hadoop-3.3.1")` |
+| `dataNodeHadoopDistribution(int, String)` | Set specific DataNode version (for mixed-version) | `.dataNodeHadoopDistribution(0, "/opt/hadoop-3.3.5")` |
+
+**Note**: For uniform-version clusters, distributions are **automatically read** from system properties (`hadoop.start.home` and `hadoop.upgrade.home`). Explicit distribution methods are only needed for mixed-version testing.
 
 ### Cluster Management Methods
 
@@ -402,20 +432,26 @@ conf.set("dfs.permissions.enabled", "false");
 
 ### Common Issues
 
-#### 1. "HADOOP_HOME not set" or "Cannot find Hadoop distribution"
+#### 1. "Cannot find Hadoop distribution" or "Start version not found"
 
-**Problem**: The specified Hadoop distribution path doesn't exist.
+**Problem**: The Hadoop distribution system property is not set or path doesn't exist.
 
 **Solution**:
 ```bash
 # Verify the path exists
 ls -la /opt/hadoop-3.3.5
 
-# Set environment variable
-export HADOOP_HOME=/opt/hadoop-3.3.5
+# Pass system property via Maven
+mvn test -Dtest=MyTest -Dhadoop.start.home=/opt/hadoop-3.3.5
 
-# Or use absolute path in code
-.allNodesHadoopDistribution("/opt/hadoop-3.3.5")
+# For upgrade tests, also set:
+mvn test -Dtest=MyTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+
+# Or use environment variables (fallback):
+export HADOOP_HOME=/opt/hadoop-3.3.5
+export HADOOP_UPGRADE_HOME=/opt/hadoop-3.3.6
 ```
 
 #### 2. "Port already in use" or "Address already bound"
@@ -522,8 +558,7 @@ log4j.logger.org.apache.hadoop.hdfs.server.process=DEBUG
 try {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoopHome)
-        .build();
+        .build();  // Automatic - reads system properties!
 
     // Your test code
 
@@ -534,15 +569,20 @@ try {
 }
 ```
 
-### 2. Use Environment Variables for Paths
+### 2. Use System Properties for Distribution Paths
 
-```java
-// Don't hardcode paths
-String hadoopHome = System.getenv("HADOOP_HOME");
-if (hadoopHome == null) {
-    throw new RuntimeException("HADOOP_HOME must be set");
-}
+```bash
+# Pass distributions via Maven system properties (recommended)
+mvn test -Dtest=MyTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+
+# Or use environment variables (fallback)
+export HADOOP_HOME=/opt/hadoop-3.3.5
+export HADOOP_UPGRADE_HOME=/opt/hadoop-3.3.6
 ```
+
+No code changes needed - distributions are automatically read!
 
 ### 3. Test Data Verification
 
@@ -592,10 +632,9 @@ public void testCompleteWorkflow() throws Exception {
 
     ProcessBasedMiniDFSCluster cluster = null;
     try {
-        // 1. Build cluster
+        // 1. Build cluster (automatically reads hadoop.start.home)
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(3)
-            .allNodesHadoopDistribution(System.getenv("HADOOP_HOME"))
             .format(true)
             .build();
 
@@ -641,6 +680,11 @@ public void testCompleteWorkflow() throws Exception {
         }
     }
 }
+```
+
+Run the test with:
+```bash
+mvn test -Dtest=MyTest -Dhadoop.start.home=/opt/hadoop-3.3.5
 ```
 
 ## Additional Resources

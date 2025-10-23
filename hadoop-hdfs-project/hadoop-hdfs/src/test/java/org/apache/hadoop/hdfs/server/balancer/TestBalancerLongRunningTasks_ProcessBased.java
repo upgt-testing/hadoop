@@ -121,7 +121,6 @@ public class TestBalancerLongRunningTasks_ProcessBased {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(2)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
     cluster.waitClusterUp();

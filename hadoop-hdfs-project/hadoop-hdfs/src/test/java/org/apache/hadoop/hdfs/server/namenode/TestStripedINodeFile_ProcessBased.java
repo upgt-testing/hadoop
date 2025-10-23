@@ -110,7 +110,6 @@ public class TestStripedINodeFile_ProcessBased {
                 { StorageType.DISK, StorageType.SSD },
                 { StorageType.DISK, StorageType.SSD },
                 { StorageType.DISK, StorageType.SSD } })
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
 

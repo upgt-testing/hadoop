@@ -140,7 +140,6 @@ public class TestDFSAdmin_ProcessBased {
     try(ProcessBasedMiniDFSCluster miniCluster =
             new ProcessBasedMiniDFSCluster.Builder(dfsConf)
                 .numDataNodes(numDataNodes)
-                .allNodesHadoopDistribution(hadoopHome)
                 .format(true)
                 .build()) {
       miniCluster.waitClusterUp();

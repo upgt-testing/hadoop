@@ -58,7 +58,6 @@ public class TestFileAppendRestart_ProcessBased {
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(4)
           // Note: ProcessBasedMiniDFSCluster doesn't support rack configuration
-          .allNodesHadoopDistribution(hadoopHome)
           .format(true)
           .build();
       cluster.waitClusterUp();

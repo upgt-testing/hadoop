@@ -84,7 +84,6 @@ public class TestPread_ProcessBased {
 
     ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
     DistributedFileSystem fileSys = cluster.getFileSystem();

@@ -96,7 +96,6 @@ public class TestDistributedFileSystem_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 
@@ -227,7 +226,6 @@ public class TestDistributedFileSystem_ProcessBased {
 
     ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
-            .allNodesHadoopDistribution(hadoopHome)
             .format(true)
             .build();
 

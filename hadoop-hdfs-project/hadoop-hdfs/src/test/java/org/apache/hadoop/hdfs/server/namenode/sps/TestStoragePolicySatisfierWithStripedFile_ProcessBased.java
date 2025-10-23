@@ -123,7 +123,6 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numOfDatanodes)
-            .allNodesHadoopDistribution(hadoopHome)
             .storagesPerDatanode(storagesPerDatanode)
             .storageTypes(new StorageType[][] {
                 {StorageType.DISK, StorageType.DISK},
@@ -228,7 +227,6 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numOfDatanodes)
-            .allNodesHadoopDistribution(hadoopHome)
             .storagesPerDatanode(storagesPerDatanode)
             .storageTypes(new StorageType[][] {
                 {StorageType.DISK, StorageType.DISK},
@@ -337,7 +335,6 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numOfDatanodes)
-            .allNodesHadoopDistribution(hadoopHome)
             .storagesPerDatanode(storagesPerDatanode)
             .storageTypes(new StorageType[][] {
                 {StorageType.DISK, StorageType.ARCHIVE},
@@ -426,7 +423,6 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster =
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numOfDatanodes)
-            .allNodesHadoopDistribution(hadoopHome)
             .storagesPerDatanode(storagesPerDatanode)
             .storageTypes(new StorageType[][] {
                 {StorageType.DISK, StorageType.DISK},

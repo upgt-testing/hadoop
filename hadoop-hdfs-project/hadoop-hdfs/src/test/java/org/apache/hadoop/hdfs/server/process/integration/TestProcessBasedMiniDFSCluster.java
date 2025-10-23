@@ -102,7 +102,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -123,7 +122,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(3)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -138,7 +136,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -158,7 +155,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -191,7 +187,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(2)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -224,7 +219,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -261,7 +255,6 @@ public class TestProcessBasedMiniDFSCluster {
         File clusterDir = new File(testDir, "cluster1");
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(clusterDir)
             .format(true)
             .build();
@@ -284,7 +277,6 @@ public class TestProcessBasedMiniDFSCluster {
         File dir1 = new File(testDir, "cluster1");
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(dir1)
             .format(true)
             .build();
@@ -301,7 +293,6 @@ public class TestProcessBasedMiniDFSCluster {
         File dir2 = new File(testDir, "cluster2");
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(dir2)
             .format(true)
             .build();
@@ -326,7 +317,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -343,7 +333,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -360,7 +349,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -377,7 +365,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -391,7 +378,6 @@ public class TestProcessBasedMiniDFSCluster {
         // Should fail - numDataNodes must be at least 1
         new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(0)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .build();
     }
 
@@ -409,7 +395,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -426,7 +411,6 @@ public class TestProcessBasedMiniDFSCluster {
         // Use try-with-resources
         try (ProcessBasedMiniDFSCluster autoCluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build()) {
@@ -448,7 +432,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -465,7 +448,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .format(true)
             .build();
@@ -480,7 +462,6 @@ public class TestProcessBasedMiniDFSCluster {
 
         cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(1)
-            .allNodesHadoopDistribution(HADOOP_HOME)
             .baseDir(testDir)
             .portRange(55000, 55999)
             .format(true)

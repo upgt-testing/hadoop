@@ -30,11 +30,24 @@ wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar
 tar xzf hadoop-3.3.1.tar.gz -C /opt/
 tar xzf hadoop-3.3.5.tar.gz -C /opt/
 tar xzf hadoop-3.3.6.tar.gz -C /opt/
+```
 
-# Set environment variables
-export HADOOP_3_3_1_HOME=/opt/hadoop-3.3.1
-export HADOOP_3_3_5_HOME=/opt/hadoop-3.3.5
-export HADOOP_3_3_6_HOME=/opt/hadoop-3.3.6
+**System Properties (Recommended)**:
+Pass distributions via Maven system properties:
+
+```bash
+# Basic upgrade test
+mvn test -Dtest=MyUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
+```
+
+**Environment Variables (Fallback)**:
+Alternatively, use environment variables:
+
+```bash
+export HADOOP_HOME=/opt/hadoop-3.3.1
+export HADOOP_UPGRADE_HOME=/opt/hadoop-3.3.5
 ```
 
 ### Test Environment Setup
@@ -54,11 +67,9 @@ public class UpgradeTestBase {
         conf = new HdfsConfiguration();
         conf.set("dfs.replication", "3");
 
-        // Verify environment variables
-        assertNotNull("HADOOP_3_3_1_HOME must be set",
-            System.getenv("HADOOP_3_3_1_HOME"));
-        assertNotNull("HADOOP_3_3_5_HOME must be set",
-            System.getenv("HADOOP_3_3_5_HOME"));
+        // No manual environment checks needed!
+        // Distributions are automatically read from system properties
+        // (hadoop.start.home and hadoop.upgrade.home)
     }
 
     @After
@@ -68,6 +79,13 @@ public class UpgradeTestBase {
         }
     }
 }
+```
+
+Run tests with:
+```bash
+mvn test -Dtest=MyUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
 ```
 
 ## Testing Strategies
@@ -87,13 +105,9 @@ public class UpgradeTestBase {
 ```java
 @Test
 public void testRollingUpgrade() throws Exception {
-    String sourceVersion = System.getenv("HADOOP_3_3_1_HOME");
-    String targetVersion = System.getenv("HADOOP_3_3_5_HOME");
-
-    // 1. Start with old version
+    // 1. Start with start version (automatically read from hadoop.start.home)
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -104,9 +118,12 @@ public void testRollingUpgrade() throws Exception {
     List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
     LOG.info("Created {} test files", testFiles.size());
 
-    // 3. Perform rolling upgrade
+    // 3. Get upgrade version (automatically from hadoop.upgrade.home)
+    String targetVersion = cluster.getUpgradeDistributionPath();
+
+    // 4. Perform rolling upgrade
     for (int i = 0; i < 3; i++) {
-        LOG.info("Upgrading DataNode {} from {} to {}", i, sourceVersion, targetVersion);
+        LOG.info("Upgrading DataNode {} to target version", i);
 
         // Shutdown DataNode
         cluster.shutdownDataNode(i);
@@ -125,13 +142,20 @@ public void testRollingUpgrade() throws Exception {
         LOG.info("DataNode {} upgraded successfully", i);
     }
 
-    // 4. Verify final state
+    // 5. Verify final state
     UpgradeTestHelper.assertCanReadWriteData(fs);
     LOG.info("Rolling upgrade completed successfully");
 
     // Cleanup
     UpgradeTestHelper.cleanupTestData(fs, testFiles);
 }
+```
+
+Run with:
+```bash
+mvn test -Dtest=MyRollingUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
 ```
 
 ### 2. Compatibility Testing
@@ -148,9 +172,10 @@ public void testRollingUpgrade() throws Exception {
 ```java
 @Test
 public void testMixedVersionCompatibility() throws Exception {
-    String version331 = System.getenv("HADOOP_3_3_1_HOME");
-    String version335 = System.getenv("HADOOP_3_3_5_HOME");
-    String version336 = System.getenv("HADOOP_3_3_6_HOME");
+    // For mixed-version testing, we need to explicitly specify distributions
+    String version331 = "/opt/hadoop-3.3.1";
+    String version335 = "/opt/hadoop-3.3.5";
+    String version336 = "/opt/hadoop-3.3.6";
 
     // Build mixed-version cluster
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
@@ -181,6 +206,8 @@ public void testMixedVersionCompatibility() throws Exception {
 }
 ```
 
+**Note**: Mixed-version testing requires **explicit** distribution paths. System properties are only used for uniform-version clusters.
+
 ### 3. Downgrade Testing
 
 **Purpose**: Verify that rollback to previous version works.
@@ -196,13 +223,13 @@ public void testMixedVersionCompatibility() throws Exception {
 ```java
 @Test
 public void testRollingDowngrade() throws Exception {
-    String newerVersion = System.getenv("HADOOP_3_3_5_HOME");
-    String olderVersion = System.getenv("HADOOP_3_3_1_HOME");
+    // For downgrade, swap: start with newer, "upgrade" to older
+    // hadoop.start.home = newer version
+    // hadoop.upgrade.home = older version
 
-    // Start with newer version
+    // Start with newer version (from hadoop.start.home)
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(newerVersion)
         .format(true)
         .build();
 
@@ -212,7 +239,8 @@ public void testRollingDowngrade() throws Exception {
     // Write test data
     List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
 
-    // Perform rolling downgrade
+    // Perform rolling downgrade (to hadoop.upgrade.home = older version)
+    String olderVersion = cluster.getUpgradeDistributionPath();
     UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, olderVersion, testFiles);
 
     // Verify data integrity
@@ -220,6 +248,14 @@ public void testRollingDowngrade() throws Exception {
 
     UpgradeTestHelper.cleanupTestData(fs, testFiles);
 }
+```
+
+Run with:
+```bash
+# For downgrade, swap the versions
+mvn test -Dtest=MyDowngradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.1
 ```
 
 ### 4. Stress Testing During Upgrade
@@ -236,12 +272,9 @@ public void testRollingDowngrade() throws Exception {
 ```java
 @Test
 public void testUpgradeUnderLoad() throws Exception {
-    String sourceVersion = System.getenv("HADOOP_3_3_1_HOME");
-    String targetVersion = System.getenv("HADOOP_3_3_5_HOME");
-
+    // Start with hadoop.start.home version
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -271,6 +304,9 @@ public void testUpgradeUnderLoad() throws Exception {
     writer.start();
 
     try {
+        // Get upgrade version (from hadoop.upgrade.home)
+        String targetVersion = cluster.getUpgradeDistributionPath();
+
         // Perform upgrade while writes continue
         for (int i = 0; i < 3; i++) {
             cluster.shutdownDataNode(i);
@@ -291,6 +327,13 @@ public void testUpgradeUnderLoad() throws Exception {
 }
 ```
 
+Run with:
+```bash
+mvn test -Dtest=MyStressTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
+```
+
 ## Common Upgrade Scenarios
 
 ### Scenario 1: Patch Version Upgrade (3.3.1 → 3.3.5)
@@ -300,29 +343,29 @@ public void testUpgradeUnderLoad() throws Exception {
 ```java
 @Test
 public void testPatchVersionUpgrade() throws Exception {
-    performBasicUpgrade("3.3.1", "3.3.5");
-}
-
-private void performBasicUpgrade(String from, String to) throws Exception {
-    String fromHome = System.getenv("HADOOP_" +
-        from.replace(".", "_") + "_HOME");
-    String toHome = System.getenv("HADOOP_" +
-        to.replace(".", "_") + "_HOME");
-
+    // Start with hadoop.start.home (3.3.1)
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(fromHome)
         .format(true)
         .build();
 
     cluster.waitClusterUp();
     FileSystem fs = cluster.getFileSystem();
 
+    // Upgrade to hadoop.upgrade.home (3.3.5)
     List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
-    UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, toHome, testFiles);
+    String upgradeHome = cluster.getUpgradeDistributionPath();
+    UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, upgradeHome, testFiles);
     UpgradeTestHelper.verifyTestData(fs, testFiles);
     UpgradeTestHelper.cleanupTestData(fs, testFiles);
 }
+```
+
+Run with:
+```bash
+mvn test -Dtest=MyPatchUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
 ```
 
 ### Scenario 2: Minor Version Upgrade (3.3.x → 3.4.x)
@@ -332,32 +375,35 @@ private void performBasicUpgrade(String from, String to) throws Exception {
 ```java
 @Test
 public void testMinorVersionUpgrade() throws Exception {
-    String hadoop33 = System.getenv("HADOOP_3_3_5_HOME");
-    String hadoop34 = System.getenv("HADOOP_3_4_0_HOME");
-
-    Assume.assumeNotNull("HADOOP_3_4_0_HOME must be set", hadoop34);
-
     // Verify compatibility first
     VersionConfigAdapter v33 = new VersionConfigAdapter("3.3.5");
     VersionConfigAdapter v34 = new VersionConfigAdapter("3.4.0");
     assertTrue("Versions should be compatible",
         v33.isCompatibleWith(v34));
 
-    // Perform upgrade
+    // Perform upgrade (start with hadoop.start.home = 3.3.5)
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(hadoop33)
         .format(true)
         .build();
 
     cluster.waitClusterUp();
     FileSystem fs = cluster.getFileSystem();
 
+    // Upgrade to hadoop.upgrade.home = 3.4.0
     List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
-    UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, hadoop34, testFiles);
+    String upgradeHome = cluster.getUpgradeDistributionPath();
+    UpgradeTestHelper.performRollingDataNodeUpgrade(cluster, upgradeHome, testFiles);
     UpgradeTestHelper.verifyTestData(fs, testFiles);
     UpgradeTestHelper.cleanupTestData(fs, testFiles);
 }
+```
+
+Run with:
+```bash
+mvn test -Dtest=MyMinorVersionUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.4.0
 ```
 
 ### Scenario 3: Partial Upgrade
@@ -367,12 +413,9 @@ public void testMinorVersionUpgrade() throws Exception {
 ```java
 @Test
 public void testPartialUpgrade() throws Exception {
-    String sourceVersion = System.getenv("HADOOP_3_3_1_HOME");
-    String targetVersion = System.getenv("HADOOP_3_3_5_HOME");
-
+    // Start with hadoop.start.home version
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(4)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -380,6 +423,9 @@ public void testPartialUpgrade() throws Exception {
     FileSystem fs = cluster.getFileSystem();
 
     List<Path> testFiles = UpgradeTestHelper.writeTestData(fs, 10);
+
+    // Get upgrade version from hadoop.upgrade.home
+    String targetVersion = cluster.getUpgradeDistributionPath();
 
     // Upgrade only 2 out of 4 DataNodes
     for (int i = 0; i < 2; i++) {
@@ -401,16 +447,26 @@ public void testPartialUpgrade() throws Exception {
 }
 ```
 
+Run with:
+```bash
+mvn test -Dtest=MyPartialUpgradeTest \
+  -Dhadoop.start.home=/opt/hadoop-3.3.1 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.5
+```
+
 ### Scenario 4: Multiple Successive Upgrades
 
 **Purpose**: Test upgrading through multiple versions.
 
+**Note**: This scenario requires more than 2 versions, so explicit paths must be used (system properties only support start and upgrade versions).
+
 ```java
 @Test
 public void testMultipleUpgrades() throws Exception {
-    String v331 = System.getenv("HADOOP_3_3_1_HOME");
-    String v333 = System.getenv("HADOOP_3_3_3_HOME");
-    String v335 = System.getenv("HADOOP_3_3_5_HOME");
+    // For multiple upgrades, use explicit paths
+    String v331 = "/opt/hadoop-3.3.1";
+    String v333 = "/opt/hadoop-3.3.3";
+    String v335 = "/opt/hadoop-3.3.5";
     String v336 = System.getenv("HADOOP_3_3_6_HOME");
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)

@@ -84,7 +84,6 @@ public class TestReplaceDatanodeOnFailure_ProcessBased {
     final ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .racks(racks)
         .numDataNodes(REPLICATION)
-        .allNodesHadoopDistribution(hadoopHome)
         .format(true)
         .build();
 

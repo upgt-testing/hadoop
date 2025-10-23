@@ -106,7 +106,6 @@ public class TestRollingUpgrade {
     // Start cluster with source version
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -149,7 +148,6 @@ public class TestRollingUpgrade {
     // Start cluster
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -202,7 +200,6 @@ public class TestRollingUpgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -258,7 +255,6 @@ public class TestRollingUpgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -302,7 +298,6 @@ public class TestRollingUpgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(4)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -350,7 +345,6 @@ public class TestRollingUpgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 
@@ -415,7 +409,6 @@ public class TestRollingUpgrade {
     // Start cluster with newer version
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(targetVersion)
         .format(true)
         .build();
 
@@ -461,7 +454,6 @@ public class TestRollingUpgrade {
     // Start with 3.3.1
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(version331)
         .format(true)
         .build();
 
@@ -504,7 +496,6 @@ public class TestRollingUpgrade {
 
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
-        .allNodesHadoopDistribution(sourceVersion)
         .format(true)
         .build();
 

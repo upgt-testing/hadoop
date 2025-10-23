@@ -2,6 +2,8 @@
 
 This guide provides complete instructions for testing Hadoop upgrades from version 3.3.5 to 3.3.6 using the ProcessBasedMiniDFSCluster framework.
 
+> **📝 Note:** Tests now use **system properties** (`-Dhadoop.start.home` and `-Dhadoop.upgrade.home`) instead of environment variables for easier execution via Maven. The cluster automatically reads these properties - no manual setup needed in test code!
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -110,8 +112,10 @@ which bc       # For calculations in analysis script
 
 No manual environment setup is required! The `run-upgrade-test.sh` script automatically:
 - Downloads required Hadoop distributions
-- Sets `HADOOP_3_3_5_HOME` and `HADOOP_3_3_6_HOME`
+- Passes `hadoop.start.home` and `hadoop.upgrade.home` system properties
 - Configures the test environment
+
+**Note:** Tests now use system properties instead of environment variables for easier execution.
 
 ## Scripts and Tools
 
@@ -235,20 +239,19 @@ wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar
 tar xzf hadoop-3.3.5.tar.gz
 tar xzf hadoop-3.3.6.tar.gz
 
-# 2. Set environment variables
-export HADOOP_3_3_5_HOME=/tmp/hadoop-test-distributions/hadoop-3.3.5
-export HADOOP_3_3_6_HOME=/tmp/hadoop-test-distributions/hadoop-3.3.6
-export HADOOP_HOME=$HADOOP_3_3_5_HOME
-
-# 3. Build Hadoop project
+# 2. Build Hadoop project
 cd /path/to/hadoop-transform
 mvn install -pl hadoop-hdfs-project/hadoop-hdfs -am -DskipTests
 
-# 4. Run tests
+# 3. Run tests with system properties
 mvn test \
   -pl hadoop-hdfs-project/hadoop-hdfs \
-  -Dtest=TestHadoop335To336Upgrade
+  -Dtest=TestHadoop335To336Upgrade \
+  -Dhadoop.start.home=/tmp/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/tmp/hadoop-test-distributions/hadoop-3.3.6
 ```
+
+**Note:** System properties are now preferred over environment variables. The cluster automatically reads `hadoop.start.home` and `hadoop.upgrade.home` from system properties.
 
 ## Test Scenarios
 
@@ -381,17 +384,20 @@ Output includes:
 Tests run: 0, Failures: 0, Errors: 0, Skipped: 24
 ```
 
-**Cause:** Environment variables not set
+**Cause:** System properties not passed or Hadoop distributions not found
 
 **Solution:**
 ```bash
-# Verify environment variables
-echo $HADOOP_3_3_5_HOME
-echo $HADOOP_3_3_6_HOME
+# Verify system properties are being passed
+mvn test -Dtest=TestHadoop335To336Upgrade \
+  -Dhadoop.start.home=/tmp/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/tmp/hadoop-test-distributions/hadoop-3.3.6
 
-# If empty, run with automatic download
+# Or run with automatic download
 ./run-upgrade-test.sh
 ```
+
+**Note:** Tests now use system properties (`-Dhadoop.start.home` and `-Dhadoop.upgrade.home`) instead of environment variables.
 
 #### 2. Download Failures
 
@@ -528,14 +534,18 @@ List<Path> files = UpgradeTestHelper.writeTestData(fs, 1000, 10 * 1024 * 1024); 
 
 ### Custom Hadoop Distributions
 
-Test with different Hadoop versions:
+Test with different Hadoop versions using system properties:
 
 ```bash
-# Set custom version paths
-export HADOOP_3_3_5_HOME=/opt/custom-hadoop-3.3.5
-export HADOOP_3_3_6_HOME=/opt/custom-hadoop-3.3.6
+# Run tests with custom distribution paths
+mvn test -pl hadoop-hdfs-project/hadoop-hdfs \
+  -Dtest=TestHadoop335To336Upgrade \
+  -Dhadoop.start.home=/opt/custom-hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/custom-hadoop-3.3.6
 
-# Run tests
+# Or with environment variables (fallback, but system properties preferred)
+export HADOOP_HOME=/opt/custom-hadoop-3.3.5
+export HADOOP_UPGRADE_HOME=/opt/custom-hadoop-3.3.6
 ./run-upgrade-test.sh --skip-download
 ```
 

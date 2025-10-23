@@ -53,7 +53,44 @@ import java.util.concurrent.TimeoutException;
  *   <li>Does NOT support direct object access to NameNode/DataNode instances</li>
  * </ul>
  *
- * <p><b>Example usage:</b>
+ * <p><b>Standard usage (system properties are automatic):</b>
+ * <pre>
+ * // Run with: mvn test -Dtest=MyTest \
+ * //              -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+ * //              -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+ * ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+ *     .numDataNodes(3)
+ *     .format(true)
+ *     .build();  // Automatically reads from system properties!
+ *
+ * try {
+ *     // Basic operations use start version
+ *     FileSystem fs = cluster.getFileSystem();
+ *     fs.mkdirs(new Path("/test"));
+ *
+ *     // Rolling upgrade: upgrade DataNodes one by one
+ *     String upgradeHome = cluster.getUpgradeDistributionPath();
+ *     for (int i = 0; i &lt; 3; i++) {
+ *         cluster.shutdownDataNode(i);
+ *         cluster.changeDataNodeVersion(i, upgradeHome);
+ *         cluster.startDataNode(i);
+ *     }
+ * } finally {
+ *     cluster.shutdown();
+ * }
+ * </pre>
+ *
+ * <p><b>Supported system properties:</b>
+ * <ul>
+ *   <li>{@code -Dhadoop.start.home=/path} - Start version Hadoop distribution (initial cluster version)</li>
+ *   <li>{@code -Dhadoop.upgrade.home=/path} - Upgrade version Hadoop distribution (target version for rolling upgrades)</li>
+ * </ul>
+ *
+ * <p><b>Backward compatibility:</b>
+ * Environment variables HADOOP_HOME (for start version) and HADOOP_UPGRADE_HOME (for upgrade version)
+ * are still supported as fallback, but system properties are preferred for easier test execution via Maven.</pre>
+ *
+ * <p><b>Manual distribution paths (for advanced scenarios):</b>
  * <pre>
  * ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
  *     .numDataNodes(3)
@@ -63,13 +100,6 @@ import java.util.concurrent.TimeoutException;
  *     .dataNodeHadoopDistribution(2, "/opt/hadoop-3.3.5")
  *     .format(true)
  *     .build();
- *
- * try {
- *     FileSystem fs = cluster.getFileSystem();
- *     // Use filesystem for testing...
- * } finally {
- *     cluster.shutdown();
- * }
  * </pre>
  */
 public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
@@ -94,6 +124,9 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
     // Hadoop version registry
     private final HadoopVersionRegistry versionRegistry;
+
+    // Upgrade version tracking (for rolling upgrade scenarios)
+    private final String upgradeDistributionPath;
 
     // Process managers
     private final List<NameNodeProcessManager> nameNodeManagers;
@@ -151,6 +184,7 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         // Initialize managers
         this.versionRegistry = new HadoopVersionRegistry();
+        this.upgradeDistributionPath = builder.upgradeHadoopHome;
         this.nameNodeManagers = new ArrayList<>();
         this.dataNodeManagers = new ArrayList<>();
 
@@ -761,6 +795,17 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     }
 
     /**
+     * Get the upgrade distribution path, if configured.
+     * This is used for rolling upgrade scenarios where tests need to upgrade nodes
+     * to a different Hadoop version.
+     *
+     * @return the upgrade distribution path, or null if not configured
+     */
+    public String getUpgradeDistributionPath() {
+        return upgradeDistributionPath;
+    }
+
+    /**
      * Get the default Hadoop home for new DataNodes.
      * Uses the distribution from the last existing DataNode.
      */
@@ -986,6 +1031,7 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         private String defaultHadoopHome = null;
         private Map<Integer, String> nameNodeHadoopHomes = new HashMap<>();
         private Map<Integer, String> dataNodeHadoopHomes = new HashMap<>();
+        private String upgradeHadoopHome = null;             // target version for rolling upgrades
 
         // Storage configuration
         private StorageType[][] storageTypes = null;        // 2D: [dnIndex][storageIndex]
@@ -1049,6 +1095,122 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
             }
             this.portRangeStart = start;
             this.portRangeEnd = end;
+            return this;
+        }
+
+        /**
+         * Detect all available Hadoop distributions from environment variables.
+         * Returns a sorted map of version strings to their paths, ordered by version.
+         *
+         * @return map of version to HADOOP_HOME path (may be empty)
+         */
+        private static Map<String, String> detectAvailableDistributions() {
+            Map<String, String> distributions = new HashMap<>();
+
+            // Check HADOOP_HOME
+            String hadoopHome = System.getenv("HADOOP_HOME");
+            if (hadoopHome != null && !hadoopHome.isEmpty()) {
+                distributions.put("default", hadoopHome);
+            }
+
+            // Check version-specific patterns (e.g., HADOOP_3_3_5_HOME)
+            for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+                String key = entry.getKey();
+                if (key.startsWith("HADOOP_") && key.endsWith("_HOME") &&
+                    !key.equals("HADOOP_HOME")) {
+                    String value = entry.getValue();
+                    if (value != null && !value.isEmpty()) {
+                        // Extract version: HADOOP_3_3_5_HOME -> 3.3.5
+                        String version = key.substring("HADOOP_".length(),
+                            key.length() - "_HOME".length()).replace("_", ".");
+                        distributions.put(version, value);
+                    }
+                }
+            }
+
+            return distributions;
+        }
+
+        /**
+         * Read start version Hadoop distribution path from system property.
+         * Tries in order:
+         * 1. System property: hadoop.start.home
+         * 2. Environment variable: HADOOP_HOME (fallback for backward compatibility)
+         *
+         * @return Hadoop home path for start version
+         * @throws IllegalStateException if no distribution found
+         */
+        private static String readStartVersionHome() {
+            // Try system property first (preferred)
+            String sysProp = System.getProperty("hadoop.start.home");
+            if (sysProp != null && !sysProp.isEmpty()) {
+                return sysProp;
+            }
+
+            // Try environment variable HADOOP_HOME (backward compatibility)
+            String hadoopHome = System.getenv("HADOOP_HOME");
+            if (hadoopHome != null && !hadoopHome.isEmpty()) {
+                return hadoopHome;
+            }
+
+            throw new IllegalStateException(
+                "Start version Hadoop distribution not found. " +
+                "Please pass system property: -Dhadoop.start.home=/path/to/hadoop-start-version, or " +
+                "set environment variable HADOOP_HOME (deprecated)");
+        }
+
+        /**
+         * Read upgrade version Hadoop distribution path from system property.
+         * Tries in order:
+         * 1. System property: hadoop.upgrade.home
+         * 2. Environment variable: HADOOP_UPGRADE_HOME (fallback)
+         *
+         * @return Hadoop home path for upgrade version
+         * @throws IllegalStateException if no distribution found
+         */
+        private static String readUpgradeVersionHome() {
+            // Try system property first (preferred)
+            String sysProp = System.getProperty("hadoop.upgrade.home");
+            if (sysProp != null && !sysProp.isEmpty()) {
+                return sysProp;
+            }
+
+            // Try environment variable (backward compatibility)
+            String hadoopHome = System.getenv("HADOOP_UPGRADE_HOME");
+            if (hadoopHome != null && !hadoopHome.isEmpty()) {
+                return hadoopHome;
+            }
+
+            throw new IllegalStateException(
+                "Upgrade version Hadoop distribution not found. " +
+                "Please pass system property: -Dhadoop.upgrade.home=/path/to/hadoop-upgrade-version, or " +
+                "set environment variable HADOOP_UPGRADE_HOME (deprecated)");
+        }
+
+        /**
+         * Read Hadoop distributions from system properties.
+         * ALL ProcessBased tests are designed to be upgrade-capable, so this method
+         * ALWAYS reads BOTH start and upgrade versions:
+         * - Start version: -Dhadoop.start.home (or HADOOP_HOME env var as fallback)
+         * - Upgrade version: -Dhadoop.upgrade.home (or HADOOP_UPGRADE_HOME env var as fallback)
+         *
+         * The start version is used to initially start all nodes.
+         * The upgrade version is available via cluster.getUpgradeDistributionPath()
+         * for use in rolling upgrade scenarios.
+         *
+         * Example usage:
+         * <pre>
+         * mvn test -Dtest=MyTest \
+         *     -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+         *     -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+         * </pre>
+         *
+         * @return this Builder
+         * @throws IllegalStateException if either distribution not found
+         */
+        public Builder fromSystemProperties() {
+            this.defaultHadoopHome = readStartVersionHome();
+            this.upgradeHadoopHome = readUpgradeVersionHome();
             return this;
         }
 
@@ -1134,8 +1296,15 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         /**
          * Build and start the cluster.
+         * If no Hadoop distributions have been explicitly set, automatically reads
+         * from system properties (hadoop.start.home and hadoop.upgrade.home).
          */
         public ProcessBasedMiniDFSCluster build() throws IOException, TimeoutException {
+            // Auto-configure from system properties if not explicitly set
+            if (defaultHadoopHome == null) {
+                fromSystemProperties();
+            }
+
             ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster(this);
             cluster.start();
             return cluster;
@@ -1143,8 +1312,15 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         /**
          * Build the cluster without starting it (for testing).
+         * If no Hadoop distributions have been explicitly set, automatically reads
+         * from system properties (hadoop.start.home and hadoop.upgrade.home).
          */
         public ProcessBasedMiniDFSCluster buildWithoutStart() throws IOException {
+            // Auto-configure from system properties if not explicitly set
+            if (defaultHadoopHome == null) {
+                fromSystemProperties();
+            }
+
             return new ProcessBasedMiniDFSCluster(this);
         }
     }
