@@ -2317,6 +2317,8 @@
             <MALLOC_ARENA_MAX>4</MALLOC_ARENA_MAX>
           </environmentVariables>
           <trimStackTrace>false</trimStackTrace>
+          <useFile>false</useFile>
+          <redirectTestOutputToFile>false</redirectTestOutputToFile>
           <systemPropertyVariables>
 
             <hadoop.log.dir>${project.build.directory}/log</hadoop.log.dir>
