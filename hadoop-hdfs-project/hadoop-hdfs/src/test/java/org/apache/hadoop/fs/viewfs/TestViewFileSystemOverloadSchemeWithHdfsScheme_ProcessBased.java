@@ -80,6 +80,9 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
    */
   @Before
   public void setUp() throws IOException {
+    // Reset FileSystem cache to make sure no FS instances are cached with DistributedFileSysten instance.
+    FileSystem.closeAll();
+    
     Configuration config = getNewConf();
     config.setInt(
         CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
