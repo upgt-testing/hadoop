@@ -248,7 +248,109 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         conf.setClass("net.topology.node.switch.mapping.impl",
             StaticMapping.class, DNSToSwitchMapping.class);
 
+        // Block report initial delay (default: 0 for tests)
+        // This matches MiniDFSCluster.startDataNodes()
+        if (conf.get(DFSConfigKeys.DFS_BLOCKREPORT_INITIAL_DELAY_KEY) == null) {
+            conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INITIAL_DELAY_KEY, 0);
+        }
+
+        // Disable min block size for tests (from hdfs-site.xml test resources)
+        // This allows tests to use tiny blocks
+        if (conf.get(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY) == null) {
+            conf.setLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 0);
+        }
+
+        // Simple authentication for tests (from hdfs-site.xml test resources)
+        // This turns security off by default for testing
+        if (conf.get("hadoop.security.authentication") == null) {
+            conf.set("hadoop.security.authentication", "simple");
+        }
+
+        // Adjust replication based on numDataNodes (matches MiniDFSCluster.initMiniDFSCluster())
+        // This prevents replication errors when cluster has fewer DNs than replication factor
+        if (numDataNodes > 0) {
+            int replication = conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
+            conf.setInt(DFSConfigKeys.DFS_REPLICATION_KEY, Math.min(replication, numDataNodes));
+
+            // Also adjust maintenance replication minimum
+            int maintenanceMinReplication = conf.getInt(
+                DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_KEY,
+                DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_DEFAULT);
+            if (maintenanceMinReplication ==
+                DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_DEFAULT) {
+                conf.setInt(DFSConfigKeys.DFS_NAMENODE_MAINTENANCE_REPLICATION_MIN_KEY,
+                    Math.min(maintenanceMinReplication, numDataNodes));
+            }
+        }
+
         LOG.info("Applied test-specific default configurations");
+    }
+
+    /**
+     * Validate that ProcessBasedMiniDFSCluster has the same test defaults as MiniDFSCluster.
+     * This is useful for debugging configuration issues and ensuring test compatibility.
+     *
+     * @return true if all critical test defaults are correctly configured
+     */
+    public boolean validateTestDefaults() {
+        Configuration conf = baseConfiguration;
+        boolean valid = true;
+
+        // Check redundancy considerload (should be false for tests)
+        if (conf.getBoolean(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY, true)) {
+            LOG.warn("Configuration mismatch: DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD should be false for tests");
+            valid = false;
+        }
+
+        // Check block report initial delay (should be 0 for tests)
+        long blockReportDelay = conf.getLong(DFSConfigKeys.DFS_BLOCKREPORT_INITIAL_DELAY_KEY, -1);
+        if (blockReportDelay != 0) {
+            LOG.warn("Configuration mismatch: DFS_BLOCKREPORT_INITIAL_DELAY should be 0 for tests, got: {}",
+                blockReportDelay);
+            valid = false;
+        }
+
+        // Check min block size (should be 0 for tests)
+        long minBlockSize = conf.getLong(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 1024*1024);
+        if (minBlockSize != 0) {
+            LOG.warn("Configuration mismatch: DFS_NAMENODE_MIN_BLOCK_SIZE should be 0 for tests, got: {}",
+                minBlockSize);
+            valid = false;
+        }
+
+        // Check authentication (should be simple for tests)
+        String auth = conf.get("hadoop.security.authentication", "kerberos");
+        if (!"simple".equals(auth)) {
+            LOG.warn("Configuration mismatch: hadoop.security.authentication should be 'simple' for tests, got: {}",
+                auth);
+            valid = false;
+        }
+
+        // Check network topology mapping
+        Class<?> mappingClass = conf.getClass("net.topology.node.switch.mapping.impl", null);
+        if (mappingClass != StaticMapping.class) {
+            LOG.warn("Configuration mismatch: net.topology.node.switch.mapping.impl should be StaticMapping for tests, got: {}",
+                mappingClass);
+            valid = false;
+        }
+
+        // Check replication is adjusted for cluster size
+        if (numDataNodes > 0) {
+            int replication = conf.getInt(DFSConfigKeys.DFS_REPLICATION_KEY, 3);
+            if (replication > numDataNodes) {
+                LOG.warn("Configuration mismatch: DFS_REPLICATION ({}) exceeds numDataNodes ({})",
+                    replication, numDataNodes);
+                valid = false;
+            }
+        }
+
+        if (valid) {
+            LOG.info("Test configuration validation passed - cluster configuration matches MiniDFSCluster defaults");
+        } else {
+            LOG.warn("Test configuration validation failed - cluster may behave differently than MiniDFSCluster");
+        }
+
+        return valid;
     }
 
     /**
@@ -1236,6 +1338,44 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
          */
         public Builder(Configuration conf) {
             this.conf = new Configuration(conf);
+            loadTestResources(this.conf);
+        }
+
+        /**
+         * Load configuration from test resources if available.
+         * This ensures ProcessBasedMiniDFSCluster has the same defaults as regular tests.
+         *
+         * Test resources are loaded from the classpath (e.g., src/test/resources/).
+         * This includes files like hdfs-site.xml and core-site.xml that contain
+         * test-specific configuration settings.
+         */
+        private void loadTestResources(Configuration conf) {
+            // Try to load hdfs-site.xml from test classpath
+            java.net.URL testResource = getClass().getClassLoader().getResource("hdfs-site.xml");
+            if (testResource != null) {
+                LOG.info("Loading test resource: hdfs-site.xml from {}", testResource);
+                conf.addResource("hdfs-site.xml");
+            } else {
+                LOG.debug("Test resource hdfs-site.xml not found on classpath");
+            }
+
+            // Also try core-site.xml
+            testResource = getClass().getClassLoader().getResource("core-site.xml");
+            if (testResource != null) {
+                LOG.info("Loading test resource: core-site.xml from {}", testResource);
+                conf.addResource("core-site.xml");
+            } else {
+                LOG.debug("Test resource core-site.xml not found on classpath");
+            }
+
+            // Try to load yarn-site.xml (may be needed for some tests)
+            testResource = getClass().getClassLoader().getResource("yarn-site.xml");
+            if (testResource != null) {
+                LOG.info("Loading test resource: yarn-site.xml from {}", testResource);
+                conf.addResource("yarn-site.xml");
+            } else {
+                LOG.debug("Test resource yarn-site.xml not found on classpath");
+            }
         }
 
         /**

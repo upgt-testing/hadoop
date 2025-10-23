@@ -258,6 +258,17 @@ get_all_test_methods() {
     echo "${all_methods[@]}"
 }
 
+# Function to cleanup stale DataNode and NameNode processes
+cleanup_processes() {
+    local pids=$(jps | grep -E 'DataNode|NameNode' | awk '{print $1}')
+    if [ -n "$pids" ]; then
+        print_info "Cleaning up stale DataNode/NameNode processes..."
+        echo "$pids" | xargs kill -9 2>/dev/null || true
+        sleep 2  # Give processes time to terminate
+        print_success "Cleanup complete"
+    fi
+}
+
 # Function to run tests method by method
 run_tests() {
     print_info "Discovering test methods..."
@@ -289,6 +300,9 @@ run_tests() {
 
         echo ""
         print_info "[${count}/${total_methods}] Running: ${short_class}#${method_name}"
+
+        # Cleanup any stale processes before running the test
+        cleanup_processes
 
         # Run Maven test for this specific method
         local maven_cmd="mvn test -pl hadoop-hdfs-project/hadoop-hdfs"
