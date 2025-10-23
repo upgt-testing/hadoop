@@ -1117,6 +1117,35 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
     }
 
     /**
+     * Change the Hadoop version for a specific NameNode.
+     * The NameNode must be shut down before calling this method.
+     *
+     * @param nnIndex index of the NameNode
+     * @param hadoopHome path to the new Hadoop distribution
+     * @throws IOException if the version change fails
+     */
+    public void changeNameNodeVersion(int nnIndex, String hadoopHome) throws IOException {
+        if (nnIndex < 0 || nnIndex >= nameNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid NameNode index: " + nnIndex);
+        }
+
+        LOG.info("Changing NameNode {} version to {}", nnIndex, hadoopHome);
+        NameNodeProcessManager oldNn = nameNodeManagers.get(nnIndex);
+
+        // Create new NameNodeProcessManager with new Hadoop version
+        NameNodeProcessManager newNn = new NameNodeProcessManager(
+            oldNn.getConfiguration(),
+            hadoopHome,
+            oldNn.getWorkDir(),
+            nnIndex);
+
+        // Replace in list
+        nameNodeManagers.set(nnIndex, newNn);
+
+        LOG.info("NameNode {} version changed to {}", nnIndex, hadoopHome);
+    }
+
+    /**
      * Get the upgrade distribution path, if configured.
      * This is used for rolling upgrade scenarios where tests need to upgrade nodes
      * to a different Hadoop version.
@@ -1125,6 +1154,692 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      */
     public String getUpgradeDistributionPath() {
         return upgradeDistributionPath;
+    }
+
+    // ========================================================================
+    // ROLLING UPGRADE SUPPORT (following official HDFS rolling upgrade procedure)
+    // ========================================================================
+
+    /**
+     * Enter safe mode.
+     * Executes: hdfs dfsadmin -safemode enter
+     *
+     * @throws IOException if entering safe mode fails
+     */
+    public void enterSafeMode() throws IOException {
+        LOG.info("Entering safe mode...");
+
+        // Get filesystem and create DFSAdmin
+        DistributedFileSystem fs = getFileSystem();
+        org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+            new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+        try {
+            // Capture System.out to get command output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -safemode enter
+                int exitCode = admin.run(new String[]{"-safemode", "enter"});
+
+                if (exitCode != 0) {
+                    String output = baos.toString();
+                    LOG.error("Failed to enter safe mode, exit code {}, output:\n{}", exitCode, output);
+                    throw new IOException("Failed to enter safe mode, exit code: " + exitCode);
+                }
+
+                LOG.info("Entered safe mode successfully");
+                LOG.debug("Safe mode output: {}", baos.toString());
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to enter safe mode", e);
+        }
+    }
+
+    /**
+     * Leave safe mode.
+     * Executes: hdfs dfsadmin -safemode leave
+     *
+     * @throws IOException if leaving safe mode fails
+     */
+    public void leaveSafeMode() throws IOException {
+        LOG.info("Leaving safe mode...");
+
+        // Get filesystem and create DFSAdmin
+        DistributedFileSystem fs = getFileSystem();
+        org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+            new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+        try {
+            // Capture System.out to get command output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -safemode leave
+                int exitCode = admin.run(new String[]{"-safemode", "leave"});
+
+                if (exitCode != 0) {
+                    String output = baos.toString();
+                    LOG.error("Failed to leave safe mode, exit code {}, output:\n{}", exitCode, output);
+                    throw new IOException("Failed to leave safe mode, exit code: " + exitCode);
+                }
+
+                LOG.info("Left safe mode successfully");
+                LOG.debug("Safe mode output: {}", baos.toString());
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to leave safe mode", e);
+        }
+    }
+
+    /**
+     * Prepare for rolling upgrade by creating rollback fsimage.
+     * Executes: hdfs dfsadmin -rollingUpgrade prepare
+     *
+     * This is Step 1 of the official HDFS rolling upgrade procedure.
+     *
+     * @throws IOException if preparation fails
+     */
+    public void prepareRollingUpgrade() throws IOException {
+        LOG.info("Preparing rolling upgrade...");
+
+        // Get filesystem and create DFSAdmin
+        DistributedFileSystem fs = getFileSystem();
+        org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+            new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+        try {
+            // Capture System.out to get command output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -rollingUpgrade prepare
+                int exitCode = admin.run(new String[]{"-rollingUpgrade", "prepare"});
+
+                if (exitCode != 0) {
+                    String output = baos.toString();
+                    LOG.error("Rolling upgrade prepare failed with exit code {}, output:\n{}", exitCode, output);
+                    throw new IOException("Failed to prepare rolling upgrade, exit code: " + exitCode);
+                }
+
+                LOG.info("Rolling upgrade preparation completed successfully");
+                LOG.debug("Preparation output: {}", baos.toString());
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to prepare rolling upgrade", e);
+        }
+    }
+
+    /**
+     * Query rolling upgrade status.
+     * Executes: hdfs dfsadmin -rollingUpgrade query
+     *
+     * @return true if ready to proceed, false if still preparing
+     * @throws IOException if query fails
+     */
+    public boolean queryRollingUpgrade() throws IOException {
+        // Get filesystem and create DFSAdmin
+        DistributedFileSystem fs = getFileSystem();
+        org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+            new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+        try {
+            // Capture System.out to check output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -rollingUpgrade query
+                admin.run(new String[]{"-rollingUpgrade", "query"});
+
+                String output = baos.toString();
+                LOG.debug("Rolling upgrade query output: {}", output);
+
+                // Check if ready to proceed
+                boolean ready = output.contains("Proceed with rolling upgrade");
+                return ready;
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to query rolling upgrade", e);
+        }
+    }
+
+    /**
+     * Wait for rolling upgrade to be ready.
+     * Polls queryRollingUpgrade() until ready or timeout.
+     *
+     * This is Step 2 of the official HDFS rolling upgrade procedure.
+     *
+     * @param timeoutMs timeout in milliseconds
+     * @throws IOException if query fails
+     * @throws TimeoutException if not ready within timeout
+     */
+    public void waitRollingUpgradeReady(long timeoutMs) throws IOException, TimeoutException {
+        LOG.info("Waiting for rolling upgrade to be ready (timeout: {} ms)...", timeoutMs);
+        long startTime = System.currentTimeMillis();
+
+        while (System.currentTimeMillis() - startTime < timeoutMs) {
+            if (queryRollingUpgrade()) {
+                LOG.info("Rolling upgrade is ready to proceed");
+                return;
+            }
+
+            try {
+                Thread.sleep(2000); // Poll every 2 seconds
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted while waiting for rolling upgrade", e);
+            }
+        }
+
+        throw new TimeoutException("Rolling upgrade did not become ready within " + timeoutMs + "ms");
+    }
+
+    /**
+     * Finalize rolling upgrade.
+     * Executes: hdfs dfsadmin -rollingUpgrade finalize
+     *
+     * This is the final step of the official HDFS rolling upgrade procedure.
+     *
+     * @throws IOException if finalization fails
+     */
+    public void finalizeRollingUpgrade() throws IOException {
+        LOG.info("Finalizing rolling upgrade...");
+
+        // Get filesystem and create DFSAdmin
+        DistributedFileSystem fs = getFileSystem();
+        org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+            new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+        try {
+            // Capture System.out to get command output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -rollingUpgrade finalize
+                int exitCode = admin.run(new String[]{"-rollingUpgrade", "finalize"});
+
+                if (exitCode != 0) {
+                    String output = baos.toString();
+                    LOG.error("Rolling upgrade finalize failed with exit code {}, output:\n{}", exitCode, output);
+                    throw new IOException("Failed to finalize rolling upgrade, exit code: " + exitCode);
+                }
+
+                LOG.info("Rolling upgrade finalized successfully");
+                LOG.debug("Finalize output: {}", baos.toString());
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to finalize rolling upgrade", e);
+        }
+    }
+
+    /**
+     * Gracefully shutdown DataNode using dfsadmin command.
+     * Executes: hdfs dfsadmin -shutdownDatanode <HOST:PORT> upgrade
+     *
+     * This is the recommended way to shutdown DataNodes during rolling upgrade.
+     *
+     * @param dnIndex DataNode index
+     * @throws IOException if shutdown fails
+     */
+    public void shutdownDataNodeGracefully(int dnIndex) throws IOException {
+        if (dnIndex < 0 || dnIndex >= dataNodeManagers.size()) {
+            throw new IllegalArgumentException("Invalid DataNode index: " + dnIndex);
+        }
+
+        DataNodeProcessManager dn = dataNodeManagers.get(dnIndex);
+        InetSocketAddress ipcAddress = dn.getRpcAddress();
+
+        LOG.info("Gracefully shutting down DataNode {} at {}:{}",
+            dnIndex, ipcAddress.getHostName(), ipcAddress.getPort());
+
+        try {
+            // IMPORTANT: Stop monitoring thread before shutdown to prevent
+            // "Process died unexpectedly" error when DataNode exits gracefully
+            dn.stopMonitoring();
+            LOG.debug("Stopped monitoring thread for DataNode {}", dnIndex);
+
+            // Get filesystem and create DFSAdmin
+            DistributedFileSystem fs = getFileSystem();
+            org.apache.hadoop.hdfs.tools.DFSAdmin admin =
+                new org.apache.hadoop.hdfs.tools.DFSAdmin(fs.getConf());
+
+            // Capture System.out to get command output
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            java.io.PrintStream ps = new java.io.PrintStream(baos);
+            java.io.PrintStream oldOut = System.out;
+            java.io.PrintStream oldErr = System.err;
+
+            try {
+                System.setOut(ps);
+                System.setErr(ps);
+
+                // Run: hdfs dfsadmin -shutdownDatanode <HOST:PORT> upgrade
+                int exitCode = admin.run(new String[]{
+                    "-shutdownDatanode",
+                    ipcAddress.getHostName() + ":" + ipcAddress.getPort(),
+                    "upgrade"
+                });
+
+                if (exitCode != 0) {
+                    LOG.warn("Graceful shutdown command returned {}, proceeding anyway", exitCode);
+                }
+
+                LOG.debug("DataNode shutdown output: {}", baos.toString());
+            } finally {
+                System.setOut(oldOut);
+                System.setErr(oldErr);
+            }
+
+            // Wait for DataNode to actually stop
+            waitForDataNodeShutdown(dnIndex, 30000);
+        } catch (Exception e) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to shutdown DataNode gracefully", e);
+        }
+    }
+
+    /**
+     * Wait for DataNode to shutdown.
+     *
+     * @param dnIndex DataNode index
+     * @param timeoutMs timeout in milliseconds
+     * @throws IOException if wait fails
+     */
+    private void waitForDataNodeShutdown(int dnIndex, long timeoutMs) throws IOException {
+        long startTime = System.currentTimeMillis();
+        DataNodeProcessManager dn = dataNodeManagers.get(dnIndex);
+
+        while (System.currentTimeMillis() - startTime < timeoutMs) {
+            if (!dn.isAlive()) {
+                LOG.info("DataNode {} has shut down", dnIndex);
+                return;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted waiting for DataNode shutdown", e);
+            }
+        }
+
+        LOG.warn("DataNode {} did not shut down gracefully within {} ms, forcing stop",
+            dnIndex, timeoutMs);
+        dn.stop();
+    }
+
+    /**
+     * Get array of all NameNode indices.
+     */
+    private int[] getAllNameNodeIndices() {
+        int[] indices = new int[numNameNodes];
+        for (int i = 0; i < numNameNodes; i++) {
+            indices[i] = i;
+        }
+        return indices;
+    }
+
+    /**
+     * Get array of all DataNode indices.
+     */
+    private int[] getAllDataNodeIndices() {
+        int[] indices = new int[numDataNodes];
+        for (int i = 0; i < numDataNodes; i++) {
+            indices[i] = i;
+        }
+        return indices;
+    }
+
+    /**
+     * Perform rolling upgrade following official HDFS rolling upgrade procedure.
+     *
+     * <p>This method implements the complete rolling upgrade sequence as documented at:
+     * https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsRollingUpgrade.html
+     *
+     * <p>The upgrade procedure consists of:</p>
+     * <ol>
+     *   <li>Prepare rolling upgrade (create rollback fsimage)</li>
+     *   <li>Wait for preparation to complete</li>
+     *   <li>Upgrade nodes according to the upgrade plan</li>
+     *   <li>Wait for cluster to stabilize</li>
+     *   <li>Finalize rolling upgrade</li>
+     * </ol>
+     *
+     * <p>The upgrade configuration (which nodes to upgrade, upgrade order) is read from:</p>
+     * <ul>
+     *   <li>System property: {@code -Dhadoop.upgrade.plan=<preset>}</li>
+     *   <li>System property: {@code -Dhadoop.upgrade.plan.file=/path/to/plan.properties}</li>
+     *   <li>Default: upgrade all nodes (NameNodes first, then DataNodes)</li>
+     * </ul>
+     *
+     * <p>The target version is taken from {@code -Dhadoop.upgrade.home} system property.</p>
+     *
+     * <p>Example usage:</p>
+     * <pre>
+     * // In test code:
+     * cluster.upgrade();
+     *
+     * // Command line:
+     * mvn test -Dtest=MyTest \
+     *   -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+     *   -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+     * </pre>
+     *
+     * @throws IOException if upgrade fails
+     * @throws TimeoutException if cluster doesn't stabilize
+     */
+    public void upgrade() throws IOException, TimeoutException {
+        LOG.info("=== Starting HDFS Rolling Upgrade ===");
+
+        // Get target version
+        String targetVersion = getUpgradeDistributionPath();
+        if (targetVersion == null || targetVersion.isEmpty()) {
+            throw new IllegalStateException(
+                "No upgrade version configured. Set -Dhadoop.upgrade.home=/path or " +
+                "HADOOP_UPGRADE_HOME environment variable.");
+        }
+
+        LOG.info("Target upgrade version: {}", targetVersion);
+
+        // Load upgrade plan
+        UpgradeConfig config = loadUpgradeConfig();
+        LOG.info("Upgrade plan loaded: {} steps", config.getSteps().size());
+
+        try {
+            // STEP 0: Enter safe mode (required for rolling upgrade preparation)
+            LOG.info("Step 0: Entering safe mode for rolling upgrade preparation");
+            enterSafeMode();
+
+            // STEP 1: Prepare rolling upgrade
+            LOG.info("Step 1/5: Preparing rolling upgrade");
+            prepareRollingUpgrade();
+
+            // STEP 2: Wait for preparation to complete
+            LOG.info("Step 2/5: Waiting for rolling upgrade to be ready");
+            waitRollingUpgradeReady(60000); // 60 second timeout
+
+            // STEP 3: Execute upgrade plan
+            LOG.info("Step 3/5: Executing upgrade plan");
+            executeUpgradePlan(config, targetVersion);
+
+            // STEP 4: Wait for cluster to stabilize
+            LOG.info("Step 4/5: Waiting for cluster to stabilize");
+            waitClusterUp();
+
+            // STEP 4.5: Wait for DataNodes to report blocks for existing files
+            // After a rolling upgrade, DataNodes need time to report their blocks
+            // back to the NameNode. This is necessary for append operations on
+            // existing files to succeed.
+            LOG.info("Waiting for blocks to be sufficiently replicated...");
+            LOG.info("(This ensures existing files can be reopened for append)");
+            try {
+                Thread.sleep(5000); // 5 second grace period for block reports
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted while waiting for block reports", e);
+            }
+
+            // STEP 5: Finalize rolling upgrade
+            LOG.info("Step 5/5: Finalizing rolling upgrade");
+            finalizeRollingUpgrade();
+
+            // STEP 6: Leave safe mode
+            LOG.info("Step 6: Leaving safe mode after rolling upgrade");
+            leaveSafeMode();
+
+            LOG.info("=== Rolling Upgrade Completed Successfully ===");
+
+        } catch (Exception e) {
+            LOG.error("Rolling upgrade failed: {}", e.getMessage(), e);
+            throw new IOException("Rolling upgrade failed", e);
+        }
+    }
+
+    /**
+     * Load upgrade configuration from system properties.
+     */
+    private UpgradeConfig loadUpgradeConfig() {
+        String planFile = System.getProperty("hadoop.upgrade.plan.file");
+        if (planFile != null) {
+            try {
+                return UpgradeConfig.fromFile(planFile);
+            } catch (IOException e) {
+                LOG.warn("Failed to load upgrade plan from file {}: {}",
+                    planFile, e.getMessage());
+                LOG.info("Falling back to default upgrade plan");
+            }
+        }
+
+        String preset = System.getProperty("hadoop.upgrade.plan", "all-nodes");
+        return UpgradeConfig.fromPreset(preset, this);
+    }
+
+    /**
+     * Execute the upgrade plan.
+     */
+    private void executeUpgradePlan(UpgradeConfig config, String targetVersion)
+        throws IOException, TimeoutException {
+
+        int stepNum = 0;
+        for (UpgradeConfig.UpgradeStep step : config.getSteps()) {
+            stepNum++;
+            LOG.info("Executing upgrade step {}/{}: {}",
+                stepNum, config.getSteps().size(), step.getDescription());
+
+            if (step.getNodeType() == UpgradeConfig.NodeType.NAMENODE) {
+                upgradeNameNodeStep(step, targetVersion);
+            } else {
+                upgradeDataNodeStep(step, targetVersion);
+            }
+
+            LOG.info("Completed upgrade step {}/{}", stepNum, config.getSteps().size());
+        }
+    }
+
+    /**
+     * Upgrade NameNodes according to step configuration.
+     */
+    private void upgradeNameNodeStep(UpgradeConfig.UpgradeStep step, String targetVersion)
+        throws IOException, TimeoutException {
+
+        int[] indices = step.getIndices();
+        if (indices == null) {
+            indices = getAllNameNodeIndices();
+        }
+
+        for (int nnIndex : indices) {
+            LOG.info("Upgrading NameNode {}", nnIndex);
+
+            // Shutdown
+            shutdownNameNode(nnIndex);
+
+            // Change version
+            changeNameNodeVersion(nnIndex, targetVersion);
+
+            // Start with -rollingUpgrade started option
+            NameNodeProcessManager nn = nameNodeManagers.get(nnIndex);
+            nn.startWithRollingUpgrade();
+
+            // Wait for cluster to stabilize
+            waitClusterUp();
+
+            LOG.info("Successfully upgraded NameNode {}", nnIndex);
+        }
+    }
+
+    /**
+     * Upgrade DataNodes according to step configuration.
+     */
+    private void upgradeDataNodeStep(UpgradeConfig.UpgradeStep step, String targetVersion)
+        throws IOException, TimeoutException {
+
+        int[] indices = step.getIndices();
+        if (indices == null) {
+            indices = getAllDataNodeIndices();
+        }
+
+        for (int dnIndex : indices) {
+            LOG.info("Upgrading DataNode {}", dnIndex);
+
+            // Graceful shutdown using dfsadmin
+            shutdownDataNodeGracefully(dnIndex);
+
+            // Change version
+            changeDataNodeVersion(dnIndex, targetVersion);
+
+            // Start DataNode
+            startDataNode(dnIndex);
+
+            // Wait for cluster to stabilize
+            waitClusterUp();
+
+            // IMPORTANT: Wait for DataNode to be writable (not excluded)
+            // After graceful shutdown for upgrade, DataNode may be in decommissioning
+            // or maintenance state. We need to wait for it to be fully available.
+            waitDataNodeWritable(dnIndex, 30000);
+
+            LOG.info("Successfully upgraded DataNode {}", dnIndex);
+        }
+    }
+
+    /**
+     * Wait for a DataNode to be writable (not excluded from writes).
+     *
+     * After a rolling upgrade, a DataNode may be in decommissioning or maintenance state.
+     * This method waits for the DataNode to be fully available for writes.
+     *
+     * @param dnIndex DataNode index
+     * @param timeoutMs timeout in milliseconds
+     * @throws IOException if DataNode doesn't become writable
+     */
+    private void waitDataNodeWritable(int dnIndex, long timeoutMs) throws IOException {
+        LOG.info("Waiting for DataNode {} to be writable (not excluded)", dnIndex);
+
+        long startTime = System.currentTimeMillis();
+        int attempts = 0;
+
+        while (System.currentTimeMillis() - startTime < timeoutMs) {
+            attempts++;
+            try {
+                DistributedFileSystem fs = getFileSystem();
+
+                // Get DataNode report to check state
+                DatanodeInfo[] liveNodes = fs.getClient().datanodeReport(
+                    org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType.LIVE);
+
+                DataNodeProcessManager targetDn = dataNodeManagers.get(dnIndex);
+                InetSocketAddress targetAddr = targetDn.getRpcAddress();
+
+                // Find our DataNode in the live nodes list
+                boolean found = false;
+                boolean writable = false;
+
+                for (DatanodeInfo dn : liveNodes) {
+                    // Match by IPC port
+                    if (dn.getIpcPort() == targetAddr.getPort()) {
+                        found = true;
+
+                        // Check if DataNode is in a state that excludes it from writes
+                        boolean isDecommissioning = dn.isDecommissionInProgress() || dn.isDecommissioned();
+                        boolean isInMaintenance = dn.isInMaintenance() || dn.isEnteringMaintenance();
+
+                        // Use a staleness interval of 30 seconds (30000 ms)
+                        long stalenessInterval = 30000;
+                        boolean isStale = dn.isStale(stalenessInterval);
+
+                        if (!isDecommissioning && !isInMaintenance && !isStale) {
+                            writable = true;
+                            LOG.info("DataNode {} is writable (attempt {}): decom={}, maint={}, stale={}",
+                                dnIndex, attempts, isDecommissioning, isInMaintenance, isStale);
+                        } else {
+                            LOG.info("DataNode {} not yet writable (attempt {}): decom={}, maint={}, stale={}",
+                                dnIndex, attempts, isDecommissioning, isInMaintenance, isStale);
+                        }
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    LOG.warn("DataNode {} not found in live nodes list (attempt {})", dnIndex, attempts);
+                } else if (writable) {
+                    LOG.info("DataNode {} is now writable after {} attempts ({} ms)",
+                        dnIndex, attempts, System.currentTimeMillis() - startTime);
+                    return;
+                }
+
+                // Wait before retry
+                Thread.sleep(1000);
+
+            } catch (Exception e) {
+                LOG.debug("Error checking DataNode {} writability (attempt {}): {}",
+                    dnIndex, attempts, e.getMessage());
+            }
+        }
+
+        throw new IOException(String.format(
+            "DataNode %d did not become writable within %d ms (%d attempts)",
+            dnIndex, timeoutMs, attempts));
     }
 
     /**

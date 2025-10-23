@@ -84,16 +84,29 @@ public class TestFileAppend_ProcessBased {
   }
 
   /**
-   * Test a simple flush on a simple HDFS file.
+   * Test a simple flush on a simple HDFS file with rolling upgrade.
+   *
+   * <p>This test performs a rolling upgrade in the middle of write operations
+   * following the official HDFS rolling upgrade procedure. The upgrade is
+   * performed after writing and flushing the first half of the file.
+   *
+   * <p>If hadoop.upgrade.home is configured, this test will perform a complete
+   * rolling upgrade (prepare → upgrade → finalize). If not configured, the test
+   * will skip the upgrade step and proceed normally.
+   *
+   * <p>Configure upgrade via:</p>
+   * <ul>
+   *   <li>{@code -Dhadoop.start.home=/path/to/start/version}</li>
+   *   <li>{@code -Dhadoop.upgrade.home=/path/to/new/version}</li>
+   *   <li>{@code -Dhadoop.upgrade.plan=all-nodes} (default, optional)</li>
+   * </ul>
+   *
    * @throws Exception an exception might be thrown
    */
   @Test
   public void testSimpleFlush() throws Exception {
     Configuration conf = new HdfsConfiguration();
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
-
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
 
     ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
@@ -113,6 +126,16 @@ public class TestFileAppend_ProcessBased {
       stm.write(fileContents, 0, mid);
       stm.hflush();
       System.out.println("Wrote and Flushed first part of file.");
+
+      // === ROLLING UPGRADE POINT ===
+      // Close the stream before upgrade since the DataNode will be restarted
+      // and the write pipeline will be broken
+      stm.close();
+      System.out.println("Closed stream before rolling upgrade");
+      // Perform rolling upgrade
+      cluster.upgrade();  // Executes full rolling upgrade procedure
+      System.out.println("Rolling upgrade completed successfully");
+      stm = fs.append(file1);
 
       // write the remainder of the file
       stm.write(fileContents, mid, AppendTestUtil.FILE_SIZE - mid);

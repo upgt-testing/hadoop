@@ -606,8 +606,9 @@ public abstract class ProcessNodeManager {
 
   /**
    * Stop the monitoring thread.
+   * Made public to allow external callers to stop monitoring before graceful shutdown.
    */
-  protected void stopMonitoring() {
+  public void stopMonitoring() {
     shouldMonitor = false;
     if (monitorThread != null && monitorThread.isAlive()) {
       monitorThread.interrupt();

@@ -30,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Manages a NameNode process running in a separate JVM.
@@ -332,6 +333,65 @@ public class NameNodeProcessManager extends ProcessNodeManager {
       Thread.currentThread().interrupt();
       throw new IOException("Interrupted while formatting NameNode", e);
     }
+  }
+
+  /**
+   * Start NameNode in rolling upgrade mode.
+   * This starts the NameNode with the "-rollingUpgrade started" option,
+   * which is required by the official HDFS rolling upgrade procedure.
+   *
+   * @throws IOException if start fails
+   * @throws TimeoutException if NameNode doesn't become healthy within timeout
+   */
+  public void startWithRollingUpgrade() throws IOException, TimeoutException {
+    LOG.info("Starting NameNode {} in rolling upgrade mode", nodeIndex);
+
+    if (isAlive()) {
+      throw new IllegalStateException(
+          "NameNode " + nodeIndex + " is already running. Stop it before starting with rolling upgrade.");
+    }
+
+    // Build classpath
+    List<String> classpath = buildClasspath();
+
+    // Build command with -rollingUpgrade started option
+    List<String> command = buildCommand(classpath);
+
+    // Add rolling upgrade arguments - THIS IS THE KEY DIFFERENCE
+    command.add("-rollingUpgrade");
+    command.add("started");
+
+    LOG.info("Starting NameNode {} with rolling upgrade option", nodeIndex);
+    LOG.debug("Command: {}", String.join(" ", command));
+
+    // Start the process (same logic as start() method)
+    ProcessBuilder pb = new ProcessBuilder(command);
+    pb.directory(workDir);
+    pb.redirectErrorStream(true);
+
+    // Set environment variables
+    java.util.Map<String, String> env = pb.environment();
+    setupProcessEnvironment(env);
+
+    // Redirect output to log file
+    File logFile = new File(workDir, "logs/" + getNodeType().toLowerCase() + ".log");
+    logFile.getParentFile().mkdirs();
+    pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
+
+    process = pb.start();
+    started = true;
+
+    // Write PID to file
+    writePid();
+
+    // Wait for process to be ready
+    waitForProcessReady(DEFAULT_TIMEOUT_MS);
+
+    // Start monitoring thread
+    startMonitoring();
+
+    LOG.info("NameNode {} started successfully in rolling upgrade mode (PID: {})",
+        nodeIndex, getPid());
   }
 
   /**
