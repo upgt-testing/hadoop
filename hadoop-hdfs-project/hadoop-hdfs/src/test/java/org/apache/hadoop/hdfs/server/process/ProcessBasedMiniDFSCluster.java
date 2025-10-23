@@ -1575,15 +1575,24 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      *
      * <p>The target version is taken from {@code -Dhadoop.upgrade.home} system property.</p>
      *
+     * <p><b>Skipping Upgrade:</b> To skip the upgrade completely (useful for testing baseline behavior),
+     * set the system property {@code -Dskip.upgrade=true}. When set, this method will return immediately
+     * without performing any upgrade operations.</p>
+     *
      * <p>Example usage:</p>
      * <pre>
      * // In test code:
      * cluster.upgrade();
      *
-     * // Command line:
+     * // Command line with upgrade:
      * mvn test -Dtest=MyTest \
      *   -Dhadoop.start.home=/opt/hadoop-3.3.5 \
      *   -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+     *
+     * // Command line without upgrade (baseline test):
+     * mvn test -Dtest=MyTest \
+     *   -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+     *   -Dskip.upgrade=true
      * </pre>
      *
      * @throws IOException if upgrade fails
@@ -1591,6 +1600,14 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      */
     public void upgrade() throws IOException, TimeoutException {
         LOG.info("=== Starting HDFS Rolling Upgrade ===");
+
+        // Check if upgrade should be skipped
+        boolean skipUpgrade = Boolean.parseBoolean(System.getProperty("skip.upgrade", "false"));
+        if (skipUpgrade) {
+            LOG.info("Skipping rolling upgrade (skip.upgrade=true)");
+            System.out.println("Skipping rolling upgrade (skip.upgrade system property is set)");
+            return;
+        }
 
         // Get target version
         String targetVersion = getUpgradeDistributionPath();
