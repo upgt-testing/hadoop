@@ -304,6 +304,13 @@ public class DirectoryManager {
    */
   private void registerShutdownHook() {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      // Check if cleanup is disabled for debugging
+      boolean noCleanup = Boolean.getBoolean("mini.dfs.no.cleanup");
+      if (noCleanup) {
+        LOG.info("Skipping shutdown hook cleanup due to mini.dfs.no.cleanup=true");
+        LOG.info("Cluster directory preserved at: {}", clusterBaseDir);
+        return;
+      }
       try {
         cleanup();
       } catch (IOException e) {

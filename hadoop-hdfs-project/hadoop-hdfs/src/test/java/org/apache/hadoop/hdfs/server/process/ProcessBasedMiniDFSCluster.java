@@ -18,13 +18,16 @@
 package org.apache.hadoop.hdfs.server.process;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.StorageType;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
+import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
+import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
 import org.apache.hadoop.ipc.RPC;
+import org.apache.hadoop.net.DNSToSwitchMapping;
+import org.apache.hadoop.net.StaticMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,6 +152,10 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      */
     private ProcessBasedMiniDFSCluster(Builder builder) throws IOException {
         this.baseConfiguration = new Configuration(builder.conf);
+
+        // Apply test-specific default configurations (matching MiniDFSCluster behavior)
+        applyTestDefaults(this.baseConfiguration);
+
         this.numNameNodes = builder.numNameNodes;
         this.numDataNodes = builder.numDataNodes;
         this.format = builder.format;
@@ -201,6 +208,47 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         // Build the cluster
         buildCluster();
+    }
+
+    /**
+     * Apply test-specific default configurations to match MiniDFSCluster behavior.
+     * This ensures ProcessBasedMiniDFSCluster has the same test defaults as MiniDFSCluster.
+     *
+     * @param conf the configuration to apply defaults to
+     */
+    private void applyTestDefaults(Configuration conf) {
+        // Block scanner volume join timeout (default: 30 seconds for tests)
+        // This matches MiniDFSCluster.Builder.initDefaultConfigurations()
+        long defaultScannerTimeout = conf.getLong(
+            DFSConfigKeys.DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY,
+            TimeUnit.SECONDS.toMillis(30));
+        conf.setLong(DFSConfigKeys.DFS_BLOCK_SCANNER_VOLUME_JOIN_TIMEOUT_MSEC_KEY,
+            defaultScannerTimeout);
+
+        // Do not consider load factor when selecting a datanode (default for tests)
+        // This matches MiniDFSCluster.Builder.initDefaultConfigurations()
+        conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_REDUNDANCY_CONSIDERLOAD_KEY, false);
+
+        // Safemode extension from testing key
+        // This matches MiniDFSCluster.initMiniDFSCluster()
+        int safemodeExtension = conf.getInt(
+            DFSConfigKeys.DFS_NAMENODE_SAFEMODE_EXTENSION_KEY + ".testing", 0);
+        conf.setInt(DFSConfigKeys.DFS_NAMENODE_SAFEMODE_EXTENSION_KEY, safemodeExtension);
+
+        // Decommission interval from testing key (default: 3 seconds for tests)
+        // This matches MiniDFSCluster.initMiniDFSCluster()
+        long decommissionInterval = conf.getTimeDuration(
+            DFSConfigKeys.DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY + ".testing",
+            3, TimeUnit.SECONDS);
+        conf.setTimeDuration(DFSConfigKeys.DFS_NAMENODE_DECOMMISSION_INTERVAL_KEY,
+            decommissionInterval, TimeUnit.SECONDS);
+
+        // Use StaticMapping for network topology (for rack awareness in tests)
+        // This matches MiniDFSCluster.initMiniDFSCluster()
+        conf.setClass("net.topology.node.switch.mapping.impl",
+            StaticMapping.class, DNSToSwitchMapping.class);
+
+        LOG.info("Applied test-specific default configurations");
     }
 
     /**
@@ -321,16 +369,25 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
                 LOG.info("DataNode {} started and ready", i);
             }
 
+            // Mark cluster as started before waiting for full readiness
+            // This allows isClusterUp() to proceed with health checks
+            isStarted = true;
+
             // Wait for cluster to be fully operational
             waitClusterUp();
 
-            isStarted = true;
             LOG.info("ProcessBasedMiniDFSCluster started successfully");
 
         } catch (Exception e) {
             LOG.error("Failed to start cluster, cleaning up", e);
             try {
-                shutdown(true);
+                // Check if cleanup is disabled for debugging
+                boolean noCleanup = Boolean.getBoolean("mini.dfs.no.cleanup");
+                if (noCleanup) {
+                    LOG.info("Skipping directory cleanup due to mini.dfs.no.cleanup=true");
+                    LOG.info("Cluster directory preserved at: {}", directoryManager.getClusterBaseDir());
+                }
+                shutdown(!noCleanup);
             } catch (Exception shutdownEx) {
                 LOG.warn("Error during cleanup after failed startup", shutdownEx);
             }
@@ -380,6 +437,28 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
             }
         }
 
+        // Wait for DataNodes to register and NameNode to leave safe mode
+        // This is critical - similar to MiniDFSCluster.waitClusterUp()
+        if (dataNodeManagers.size() > 0) {
+            int attempts = 0;
+            while (!isClusterUp()) {
+                long remaining = timeoutMs - (System.currentTimeMillis() - startTime);
+                if (remaining <= 0 || ++attempts > timeout) {
+                    throw new TimeoutException(
+                        "Timeout waiting for DataNodes to register and NameNode to leave safe mode. " +
+                        "NameNode may still be in safe mode or DataNodes have not reported yet.");
+                }
+
+                LOG.info("Waiting for DataNodes to register with NameNode (attempt {})...", attempts);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Interrupted while waiting for cluster", e);
+                }
+            }
+        }
+
         // Try to get FileSystem to verify connectivity
         try {
             FileSystem fs = getFileSystem();
@@ -392,27 +471,121 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
     /**
      * Check if the cluster is running.
+     * This checks not just that processes are alive, but that DataNodes have registered
+     * with the NameNode and the NameNode has left safe mode.
      */
     public boolean isClusterUp() {
+        LOG.info("isClusterUp() called - isStarted={}, isShutdown={}", isStarted, isShutdown);
         if (!isStarted || isShutdown) {
+            LOG.info("isClusterUp() returning false - cluster not started or is shutdown");
             return false;
         }
 
         try {
             // Check if all processes are alive
-            for (NameNodeProcessManager nn : nameNodeManagers) {
-                if (!nn.isAlive()) {
+            LOG.info("Checking if all {} NameNode(s) and {} DataNode(s) are alive...",
+                nameNodeManagers.size(), dataNodeManagers.size());
+            for (int i = 0; i < nameNodeManagers.size(); i++) {
+                NameNodeProcessManager nn = nameNodeManagers.get(i);
+                boolean alive = nn.isAlive();
+                LOG.info("NameNode {} is alive: {}", i, alive);
+                if (!alive) {
                     return false;
                 }
             }
-            for (DataNodeProcessManager dn : dataNodeManagers) {
-                if (!dn.isAlive()) {
+            for (int i = 0; i < dataNodeManagers.size(); i++) {
+                DataNodeProcessManager dn = dataNodeManagers.get(i);
+                boolean alive = dn.isAlive();
+                LOG.info("DataNode {} is alive: {}", i, alive);
+                if (!alive) {
                     return false;
                 }
             }
-            return true;
+
+            // Check that at least one NameNode is up (not in safe mode and has capacity)
+            // This is the critical check that ensures DataNodes have registered
+            LOG.info("All processes alive, now checking NameNode status...");
+            boolean anyNameNodeUp = false;
+            for (int i = 0; i < nameNodeManagers.size(); i++) {
+                LOG.info("Checking if NameNode {} is up...", i);
+                if (isNameNodeUp(i)) {
+                    LOG.info("NameNode {} is UP!", i);
+                    anyNameNodeUp = true;
+                    break;
+                } else {
+                    LOG.info("NameNode {} is NOT up yet", i);
+                }
+            }
+
+            LOG.info("isClusterUp() returning: {}", anyNameNodeUp);
+            return anyNameNodeUp;
         } catch (Exception e) {
+            LOG.info("isClusterUp() caught exception: {}", e.getMessage());
             LOG.warn("Error checking cluster status", e);
+            return false;
+        }
+    }
+
+    /**
+     * Check if a specific NameNode is fully operational.
+     * A NameNode is considered "up" when it's not in safe mode and has non-zero capacity,
+     * which indicates that DataNodes have successfully registered.
+     *
+     * @param nnIndex the NameNode index
+     * @return true if the NameNode is up and has registered DataNodes
+     */
+    public boolean isNameNodeUp(int nnIndex) {
+        try {
+            // For now, just check the primary NameNode (index 0)
+            // TODO: support multiple NameNodes properly
+            if (nnIndex >= nameNodeManagers.size()) {
+                LOG.info("NameNode {} check: FAILED - invalid index", nnIndex);
+                return false;
+            }
+
+            FileSystem fs = getFileSystem();
+            if (fs == null) {
+                LOG.info("NameNode {} check: FAILED - FileSystem is null", nnIndex);
+                return false;
+            }
+            if (!(fs instanceof DistributedFileSystem)) {
+                LOG.info("NameNode {} check: FAILED - FileSystem is not DistributedFileSystem, it's {}",
+                    nnIndex, fs.getClass().getName());
+                return false;
+            }
+
+            DistributedFileSystem dfs = (DistributedFileSystem) fs;
+
+            // 1) Not in safemode?
+            LOG.info("NameNode {} check: Checking safe mode...", nnIndex);
+            boolean inSafeMode = dfs.setSafeMode(HdfsConstants.SafeModeAction.SAFEMODE_GET);
+            if (inSafeMode) {
+                LOG.info("NameNode {} check: FAILED - still in safe mode", nnIndex);
+                return false;
+            }
+
+            // 2) Do we have ≥1 LIVE DataNode?
+            LOG.info("NameNode {} check: Checking for LIVE DataNodes...", nnIndex);
+            DatanodeInfo[] live = dfs.getClient().datanodeReport(HdfsConstants.DatanodeReportType.LIVE);
+
+            if (live == null || live.length < 1) {
+                LOG.info("NameNode {} check: FAILED - No LIVE DataNodes registered (count: {})",
+                    nnIndex, (live == null ? "null" : live.length));
+                return false;
+            }
+
+            LOG.info("NameNode {} check: Found {} LIVE DataNode(s), creating probe file...", nnIndex, live.length);
+            try (FSDataOutputStream out =
+                         fs.create(new Path("/.startup_probe"), (short)1)) {
+                out.hflush(); // forces pipeline open and first packet handshake
+            }
+            fs.delete(new Path("/.startup_probe"), false);
+            LOG.info("NameNode {} check: SUCCESS - cluster is fully operational", nnIndex);
+            return true;
+
+        } catch (Exception e) {
+            LOG.info("NameNode {} check: FAILED - Exception: {}", nnIndex, e.getMessage());
+            LOG.warn("Error checking NameNode {} status: {}", nnIndex, e.getMessage(), e);
             return false;
         }
     }
@@ -422,9 +595,24 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      */
     public DistributedFileSystem getFileSystem() throws IOException {
         if (fileSystem == null) {
+            URI uri = getURI();
+            LOG.info("Creating FileSystem with URI: {}", uri);
             Configuration conf = new Configuration(baseConfiguration);
-            conf.set("fs.defaultFS", getURI().toString());
-            fileSystem = (DistributedFileSystem) FileSystem.get(conf);
+            conf.set("fs.defaultFS", uri.toString());
+
+            try {
+                FileSystem fs = FileSystem.get(conf);
+                LOG.info("FileSystem.get() returned: {}", fs.getClass().getName());
+                fileSystem = (DistributedFileSystem) fs;
+                LOG.info("Successfully created DistributedFileSystem");
+            } catch (ClassCastException e) {
+                LOG.error("FileSystem is not DistributedFileSystem: {}",
+                    FileSystem.get(conf).getClass().getName(), e);
+                throw e;
+            } catch (IOException e) {
+                LOG.error("Failed to get FileSystem for URI {}: {}", uri, e.getMessage(), e);
+                throw e;
+            }
         }
         return fileSystem;
     }
@@ -455,7 +643,9 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         InetSocketAddress addr = nameNodeManagers.get(nnIndex).getRpcAddress();
         try {
-            return new URI("hdfs", null, addr.getHostName(), addr.getPort(), null, null, null);
+            // Always use 127.0.0.1 for local testing to avoid IPv4/IPv6 resolution issues
+            // On macOS, "localhost" may resolve to ::1 (IPv6) while server binds to IPv4
+            return new URI("hdfs", null, "127.0.0.1", addr.getPort(), null, null, null);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create URI", e);
         }

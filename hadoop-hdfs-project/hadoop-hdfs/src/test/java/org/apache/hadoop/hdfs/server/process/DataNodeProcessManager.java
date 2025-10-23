@@ -252,21 +252,17 @@ public class DataNodeProcessManager extends ProcessNodeManager {
 
   @Override
   protected boolean checkRpcHealth() throws IOException {
-    // For DataNode, we have multiple health check strategies:
-    // 1. Check if IPC port is listening (basic connectivity)
-    // 2. Check if registered with NameNode (requires NN access)
+    // For DataNode, we check if the IPC port is listening
+    // This is sufficient to know the process has started successfully
+    // Note: We don't check NameNode registration here because:
+    // 1. Registration happens asynchronously after startup
+    // 2. The cluster-level health check (waitClusterUp) verifies registration
 
-    // Strategy 1: Check if IPC port is listening
     if (!isPortListening(ipcAddress)) {
       throw new IOException("DataNode IPC port not listening: " + ipcAddress);
     }
 
-    // Strategy 2: If we have NameNode address, check registration
-    if (nameNodeRpcAddress != null) {
-      return checkRegistrationWithNameNode();
-    }
-
-    // If we can't check registration, port listening is good enough
+    LOG.debug("DataNode {} IPC port is listening at {}", nodeIndex, ipcAddress);
     return true;
   }
 
@@ -296,11 +292,13 @@ public class DataNodeProcessManager extends ProcessNodeManager {
     try {
       // Create NameNode proxy if not already created
       if (nameNodeProxy == null && nameNodeRpcAddress != null) {
+        LOG.debug("Creating NameNode proxy for DataNode {} health check", nodeIndex);
         nameNodeProxy = createNameNodeProxy();
       }
 
       if (nameNodeProxy == null) {
         // Can't check registration without NameNode proxy
+        LOG.debug("No NameNode proxy available for DataNode {} - skipping registration check", nodeIndex);
         return true;
       }
 
@@ -308,20 +306,25 @@ public class DataNodeProcessManager extends ProcessNodeManager {
       DatanodeInfo[] datanodes = nameNodeProxy.getDatanodeReport(
           org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType.LIVE);
 
+      LOG.debug("DataNode {} health check: NameNode reports {} live DataNodes", nodeIndex, datanodes.length);
+
       // Check if our DataNode is in the list
       // We match by IPC address since UUID might not be available yet
       for (DatanodeInfo dn : datanodes) {
+        LOG.debug("Checking DN {} against reported DN: ipcPort={}, xferPort={}, ipAddr={}, hostName={}",
+            nodeIndex, dn.getIpcPort(), dn.getXferPort(), dn.getIpAddr(), dn.getHostName());
         if (matchesDataNode(dn)) {
-          LOG.trace("DataNode {} found in NameNode's live list", nodeIndex);
+          LOG.info("DataNode {} found in NameNode's live list", nodeIndex);
           return true;
         }
       }
 
-      LOG.trace("DataNode {} not yet registered with NameNode", nodeIndex);
+      LOG.debug("DataNode {} not yet registered with NameNode (expected: ipcPort={}, xferPort={}, host={})",
+          nodeIndex, ipcAddress.getPort(), dataAddress.getPort(), ipcAddress.getHostString());
       throw new IOException("DataNode not registered with NameNode");
 
     } catch (IOException e) {
-      LOG.trace("Registration check failed for DataNode {}: {}",
+      LOG.debug("Registration check failed for DataNode {}: {}",
           nodeIndex, e.getMessage());
 
       // Close and recreate proxy on next attempt

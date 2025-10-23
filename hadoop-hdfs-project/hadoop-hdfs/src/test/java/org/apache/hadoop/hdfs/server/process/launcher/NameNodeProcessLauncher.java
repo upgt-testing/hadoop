@@ -18,6 +18,7 @@
 package org.apache.hadoop.hdfs.server.process.launcher;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +162,9 @@ public class NameNodeProcessLauncher {
           "Configuration directory does not exist: " + configDir);
     }
 
-    Configuration conf = new Configuration();
+    // Use HdfsConfiguration to automatically load hdfs-default.xml, hdfs-site.xml
+    // and other default resources (including test resources if on classpath)
+    Configuration conf = new HdfsConfiguration();
 
     // Load core-site.xml
     File coreSite = new File(confDir, "core-site.xml");
@@ -175,6 +178,20 @@ public class NameNodeProcessLauncher {
     if (hdfsSite.exists()) {
       LOG.info("Loading configuration from {}", hdfsSite);
       conf.addResource(hdfsSite.toURI().toString());
+    }
+
+    // Load any other XML files in conf directory (e.g., hadoop-policy.xml)
+    File[] xmlFiles = confDir.listFiles((dir, name) ->
+        name.endsWith(".xml") &&
+        !name.equals("core-site.xml") &&
+        !name.equals("hdfs-site.xml") &&
+        !name.equals("configuration.xsl"));
+
+    if (xmlFiles != null) {
+      for (File xmlFile : xmlFiles) {
+        LOG.info("Loading configuration from {}", xmlFile);
+        conf.addResource(xmlFile.toURI().toString());
+      }
     }
 
     return conf;

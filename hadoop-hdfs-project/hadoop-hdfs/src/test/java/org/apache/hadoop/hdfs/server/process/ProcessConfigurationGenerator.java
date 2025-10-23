@@ -21,14 +21,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
+import org.apache.hadoop.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,13 +106,24 @@ public class ProcessConfigurationGenerator {
     allocatedPorts.put("serviceRpc", serviceRpcPort);
 
     // Set NameNode-specific properties
-    String nnHost = "localhost";
-    config.set(DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY,
-        nnHost + ":" + rpcPort);
+    // Use 127.0.0.1 instead of "localhost" to avoid IPv4/IPv6 binding issues on macOS
+    String nnHost = "127.0.0.1";
+    String nnRpcAddress = nnHost + ":" + rpcPort;
+
+    // Set the default filesystem URI (critical for HDFS operations)
+    config.set("fs.defaultFS", "hdfs://" + nnRpcAddress);
+
+    config.set(DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY, nnRpcAddress);
     config.set(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY,
         nnHost + ":" + httpPort);
-    config.set(DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
-        nnHost + ":" + serviceRpcPort);
+
+    // Explicit bind hosts to avoid IPv4/IPv6 dual-stack issues
+    config.set(DFSConfigKeys.DFS_NAMENODE_RPC_BIND_HOST_KEY, "127.0.0.1");
+    config.set(DFSConfigKeys.DFS_NAMENODE_HTTP_BIND_HOST_KEY, "127.0.0.1");
+
+    // Note: Service RPC removed for simplicity - DNs will use regular RPC
+    // config.set(DFSConfigKeys.DFS_NAMENODE_SERVICE_RPC_ADDRESS_KEY,
+    //     nnHost + ":" + serviceRpcPort);
 
     // Set data directory
     config.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
@@ -184,13 +198,20 @@ public class ProcessConfigurationGenerator {
     allocatedPorts.put("http", httpPort);
 
     // Set DataNode-specific properties
-    String dnHost = "localhost";
+    // Use 127.0.0.1 instead of "localhost" to avoid IPv4/IPv6 binding issues on macOS
+    String dnHost = "127.0.0.1";
     config.set(DFSConfigKeys.DFS_DATANODE_ADDRESS_KEY,
         dnHost + ":" + dataPort);
     config.set(DFSConfigKeys.DFS_DATANODE_IPC_ADDRESS_KEY,
         dnHost + ":" + ipcPort);
     config.set(DFSConfigKeys.DFS_DATANODE_HTTP_ADDRESS_KEY,
         dnHost + ":" + httpPort);
+
+    // Set hostname explicitly to ensure DN reports correct address to NN
+    config.set(DFSConfigKeys.DFS_DATANODE_HOST_NAME_KEY, "127.0.0.1");
+
+    // Explicit bind hosts to avoid IPv4/IPv6 dual-stack issues
+    config.set("dfs.datanode.http.bind-host", "127.0.0.1");
 
     // Build comma-separated list of data directories with storage type prefixes
     StringBuilder dataDirBuilder = new StringBuilder();
@@ -217,14 +238,18 @@ public class ProcessConfigurationGenerator {
     if (nameNodeAddresses.size() == 1) {
       // Single NameNode
       InetSocketAddress nnAddr = nameNodeAddresses.get(0);
-      config.set("fs.defaultFS",
-          "hdfs://" + nnAddr.getHostName() + ":" + nnAddr.getPort());
+      // Always use 127.0.0.1 to match NN's bind address and avoid IPv4/IPv6 issues
+      String nnRpcAddress = "127.0.0.1:" + nnAddr.getPort();
+      config.set("fs.defaultFS", "hdfs://" + nnRpcAddress);
+      config.set(DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY, nnRpcAddress);
     } else {
       // Multiple NameNodes (HA setup)
       // For now, just use the first one; full HA support will be added later
       InetSocketAddress nnAddr = nameNodeAddresses.get(0);
-      config.set("fs.defaultFS",
-          "hdfs://" + nnAddr.getHostName() + ":" + nnAddr.getPort());
+      // Always use 127.0.0.1 to match NN's bind address and avoid IPv4/IPv6 issues
+      String nnRpcAddress = "127.0.0.1:" + nnAddr.getPort();
+      config.set("fs.defaultFS", "hdfs://" + nnRpcAddress);
+      config.set(DFSConfigKeys.DFS_NAMENODE_RPC_ADDRESS_KEY, nnRpcAddress);
       LOG.warn("Multiple NameNodes specified, but HA configuration not yet implemented. " +
           "Using first NameNode: {}", nnAddr);
     }
@@ -353,6 +378,10 @@ public class ProcessConfigurationGenerator {
       throw new IOException("Failed to create configuration directory: " + confDir);
     }
 
+    // Copy essential test resources first (these will be loaded before generated configs)
+    // TEMPORARILY DISABLED - may be causing process failures
+    // copyTestResources(confDir);
+
     // Write core-site.xml
     File coreSiteFile = new File(confDir, CORE_SITE_XML);
     writeConfigFile(config, coreSiteFile);
@@ -369,18 +398,78 @@ public class ProcessConfigurationGenerator {
   }
 
   /**
+   * Copy essential test resource configuration files to the node's conf directory.
+   * This ensures spawned processes have the same test resources as in-process tests.
+   *
+   * @param confDir the directory to copy test resources to
+   * @throws IOException if copying fails
+   */
+  private void copyTestResources(File confDir) throws IOException {
+    // Essential test resources to copy (if they exist on classpath)
+    String[] testResources = {
+        "hadoop-policy.xml",  // ACL configurations for all protocols
+        "fi-site.xml"         // Fault injection configuration
+    };
+
+    for (String resourceName : testResources) {
+      URL resourceUrl = getClass().getClassLoader().getResource(resourceName);
+      if (resourceUrl != null) {
+        File destFile = new File(confDir, resourceName);
+        try (InputStream in = resourceUrl.openStream();
+             OutputStream out = new FileOutputStream(destFile)) {
+          IOUtils.copyBytes(in, out, 4096, false);
+          LOG.info("Copied test resource {} to {}", resourceName, destFile);
+        } catch (IOException e) {
+          LOG.warn("Failed to copy test resource {}: {}", resourceName, e.getMessage());
+          // Don't fail - just log warning and continue
+        }
+      } else {
+        LOG.debug("Test resource {} not found on classpath, skipping", resourceName);
+      }
+    }
+  }
+
+  /**
    * Writes a Configuration object to an XML file.
+   * Only writes properties that were explicitly set (not defaults).
+   * This makes the configuration files much smaller and easier to debug.
    *
    * @param config the configuration to write
    * @param file the file to write to
    * @throws IOException if writing fails
    */
   private void writeConfigFile(Configuration config, File file) throws IOException {
+    // Create a new Configuration with only explicitly set properties
+    Configuration configToWrite = new Configuration(false); // false = don't load defaults
+
+    // Copy only properties that were explicitly set (not from default resources)
+    for (java.util.Map.Entry<String, String> entry : config) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+
+      // Check if this property was set programmatically or from a non-default resource
+      String[] sources = config.getPropertySources(key);
+      if (sources != null && sources.length > 0) {
+        // Skip properties from default resource files
+        boolean isFromDefaults = false;
+        for (String source : sources) {
+          if (source != null && (source.contains("-default.xml") || source.equals("Unknown"))) {
+            isFromDefaults = true;
+            break;
+          }
+        }
+
+        if (!isFromDefaults) {
+          configToWrite.set(key, value);
+        }
+      }
+    }
+
     try (OutputStream out = new FileOutputStream(file)) {
-      config.writeXml(out);
+      configToWrite.writeXml(out);
       out.flush();
     }
-    LOG.debug("Wrote configuration to: {}", file);
+    LOG.debug("Wrote {} configuration properties to: {}", configToWrite.size(), file);
   }
 
   /**
