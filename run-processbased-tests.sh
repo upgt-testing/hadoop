@@ -298,22 +298,36 @@ run_tests() {
 
         # Run the test and capture result
         local test_log="${RESULTS_DIR}/test-${count}-${short_class}-${method_name}.log"
-        if ${maven_cmd} > "$test_log" 2>&1; then
+        ${maven_cmd} > "$test_log" 2>&1
+
+        # Parse the test results from Maven output
+        # Look for line like: Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+        local result_line=$(grep "Tests run:" "$test_log" | tail -1)
+
+        local tests_run=$(echo "$result_line" | sed -n 's/.*Tests run: \([0-9]*\).*/\1/p')
+        local test_failures=$(echo "$result_line" | sed -n 's/.*Failures: \([0-9]*\).*/\1/p')
+        local test_errors=$(echo "$result_line" | sed -n 's/.*Errors: \([0-9]*\).*/\1/p')
+        local test_skipped=$(echo "$result_line" | sed -n 's/.*Skipped: \([0-9]*\).*/\1/p')
+
+        # Default to 0 if not found
+        tests_run=${tests_run:-0}
+        test_failures=${test_failures:-0}
+        test_errors=${test_errors:-0}
+        test_skipped=${test_skipped:-0}
+
+        # Determine test status based on Maven output
+        if [ "$test_failures" -gt 0 ]; then
+            print_error "FAILED: ${short_class}#${method_name} (Failures: ${test_failures})"
+            failed=$((failed + 1))
+        elif [ "$test_errors" -gt 0 ]; then
+            print_error "ERROR: ${short_class}#${method_name} (Errors: ${test_errors})"
+            errors=$((errors + 1))
+        elif [ "$test_skipped" -gt 0 ] || [ "$tests_run" -eq 0 ]; then
+            print_warning "SKIPPED: ${short_class}#${method_name}"
+            skipped=$((skipped + 1))
+        else
             print_success "PASSED: ${short_class}#${method_name}"
             passed=$((passed + 1))
-        else
-            # Check if it was a failure or error
-            if grep -q "Failures: 0" "$test_log" && grep -q "Errors: 0" "$test_log"; then
-                # Test was skipped
-                print_warning "SKIPPED: ${short_class}#${method_name}"
-                skipped=$((skipped + 1))
-            elif grep -q "Failures: [1-9]" "$test_log"; then
-                print_error "FAILED: ${short_class}#${method_name}"
-                failed=$((failed + 1))
-            else
-                print_error "ERROR: ${short_class}#${method_name}"
-                errors=$((errors + 1))
-            fi
         fi
 
         # Update progress
