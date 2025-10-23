@@ -151,7 +151,8 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
      * Private constructor - use Builder to create instances.
      */
     private ProcessBasedMiniDFSCluster(Builder builder) throws IOException {
-        this.baseConfiguration = new Configuration(builder.conf);
+        // Don't copy the configuration - use the same instance so updates are visible to caller
+        this.baseConfiguration = builder.conf;
 
         // Apply test-specific default configurations (matching MiniDFSCluster behavior)
         applyTestDefaults(this.baseConfiguration);
@@ -478,6 +479,12 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
             // Wait for cluster to be fully operational
             waitClusterUp();
 
+            // Update base configuration with the cluster's HDFS URI
+            // This ensures tests using configurations derived from baseConfiguration
+            // have the correct fs.defaultFS setting
+            baseConfiguration.set("fs.defaultFS", getURI().toString());
+            LOG.info("Set fs.defaultFS in baseConfiguration to: {}", getURI());
+
             LOG.info("ProcessBasedMiniDFSCluster started successfully");
 
         } catch (Exception e) {
@@ -726,6 +733,29 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
         Configuration conf = new Configuration(baseConfiguration);
         conf.set("fs.defaultFS", getURI().toString());
         return (DistributedFileSystem) FileSystem.newInstance(conf);
+    }
+
+    /**
+     * Get the configuration for the cluster.
+     * The returned configuration includes fs.defaultFS set to the cluster's HDFS URI.
+     * This matches the MiniDFSCluster API.
+     *
+     * @return the base configuration with fs.defaultFS set
+     */
+    public Configuration getConfiguration() {
+        return getConfiguration(0);
+    }
+
+    /**
+     * Get the configuration for a specific NameNode.
+     * For ProcessBasedMiniDFSCluster, this returns the base configuration
+     * since all nodes share the same configuration.
+     *
+     * @param nnIndex the NameNode index (currently unused but kept for API compatibility)
+     * @return the base configuration with fs.defaultFS set
+     */
+    public Configuration getConfiguration(int nnIndex) {
+        return baseConfiguration;
     }
 
     /**
@@ -1335,9 +1365,11 @@ public class ProcessBasedMiniDFSCluster implements AutoCloseable, Closeable {
 
         /**
          * Create a new builder.
+         * NOTE: The configuration is NOT copied - it will be modified when the cluster starts
+         * to set fs.defaultFS to the cluster's HDFS URI. This matches MiniDFSCluster behavior.
          */
         public Builder(Configuration conf) {
-            this.conf = new Configuration(conf);
+            this.conf = conf;
             loadTestResources(this.conf);
         }
 
