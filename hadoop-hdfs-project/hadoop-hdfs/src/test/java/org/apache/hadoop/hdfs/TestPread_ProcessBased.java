@@ -19,19 +19,25 @@ package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ChecksumException;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -39,23 +45,77 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestPread}.
+ * ProcessBasedMiniDFSCluster version of {@link TestPread} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * This class contains selective transformations of test methods from the
- * original TestPread class.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during hedged read operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestPread Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestPread_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestPread_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestPread_ProcessBased.class.getName());
 
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // File creation
+        UpgradeCheckpoints.AFTER_FILE_CREATE,
+
+        // Write operations
+        UpgradeCheckpoints.AFTER_WRITE,
+        UpgradeCheckpoints.AFTER_FLUSH,
+        "AFTER_OUTPUT_CLOSE",
+
+        // Read operations
+        "AFTER_INPUT_OPEN",
+        "BEFORE_READ"
+    );
+  }
+
+  /**
+   * Test hedged read from all DataNodes failed with parameterized upgrade checkpoints.
+   *
+   * <p>This test verifies that when all DataNodes fail to serve a read request,
+   * the hedged read mechanism correctly handles the failure. The test injects
+   * ChecksumException failures and verifies that the client exhausts all hedged
+   * read attempts.
+   *
+   * <p>With 8 checkpoints, this single test method generates 8 test executions,
+   * each testing upgrade at a different point in the read workflow.
+   *
+   * @throws Exception if test fails
+   */
   @Test(timeout=30000)
   public void testHedgedReadFromAllDNFailed() throws Exception {
-    Configuration conf = new Configuration();
     int numHedgedReadPoolThreads = 5;
     final int hedgedReadTimeoutMillis = 50;
 
@@ -79,32 +139,50 @@ public class TestPread_ProcessBased {
       }
     }).when(injector).fetchFromDatanodeException();
 
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(3)
         .format(true)
         .build();
-    DistributedFileSystem fileSys = cluster.getFileSystem();
-    DFSClient dfsClient = fileSys.getClient();
+    fs = cluster.getFileSystem();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    DFSClient dfsClient = ((DistributedFileSystem) fs).getClient();
     FSDataOutputStream output = null;
     DFSInputStream input = null;
     String filename = "/hedgedReadMaxOut.dat";
     DFSHedgedReadMetrics metrics = dfsClient.getHedgedReadMetrics();
     // Metrics instance is static, so we need to reset counts from prior tests.
     metrics.hedgedReadOps.reset();
-    try {
-      cluster.waitClusterUp();
 
+    try {
       Path file = new Path(filename);
-      output = fileSys.create(file, (short) 2);
+      output = fs.create(file, (short) 2);
+
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
       byte[] data = new byte[64 * 1024];
       output.write(data);
+
+      checkpoint(UpgradeCheckpoints.AFTER_WRITE);
+
       output.flush();
+
+      checkpoint(UpgradeCheckpoints.AFTER_FLUSH);
+
       output.close();
+      output = null;
+
+      checkpoint("AFTER_OUTPUT_CLOSE");
+
       byte[] buffer = new byte[64 * 1024];
       input = dfsClient.open(filename);
+
+      checkpoint("AFTER_INPUT_OPEN");
+
+      checkpoint("BEFORE_READ");
+
       input.read(0, buffer, 0, 1024);
       Assert.fail("Reading the block should have thrown BlockMissingException");
     } catch (BlockMissingException e) {
@@ -114,8 +192,7 @@ public class TestPread_ProcessBased {
       Mockito.reset(injector);
       IOUtils.cleanupWithLogger(LOG, input);
       IOUtils.cleanupWithLogger(LOG, output);
-      fileSys.close();
-      cluster.shutdown();
+      // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
     }
   }
 }

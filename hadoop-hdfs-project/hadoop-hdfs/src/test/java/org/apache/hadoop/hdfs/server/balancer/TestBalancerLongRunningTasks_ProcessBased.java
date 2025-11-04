@@ -18,59 +18,90 @@
 
 package org.apache.hadoop.hdfs.server.balancer;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DFSUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
-import org.junit.After;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeNotNull;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestBalancerLongRunningTasks}.
+ * ProcessBasedMiniDFSCluster version of {@link TestBalancerLongRunningTasks} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * Note: Only testTwoReplicaShouldNotInSameDN is transformed. Other tests in the
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during balancer long-running operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
+ *
+ * <p>Note: Only testTwoReplicaShouldNotInSameDN is transformed. Other tests in the
  * original class require fine-grained storage type configuration (SSD, RAM_DISK, DISK)
  * which is not supported by ProcessBasedMiniDFSCluster's builder API.
  *
  * @see TestBalancerLongRunningTasks Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestBalancerLongRunningTasks_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestBalancerLongRunningTasks_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
 
   private static final Logger LOG =
       LoggerFactory.getLogger(TestBalancerLongRunningTasks_ProcessBased.class);
 
-  private ProcessBasedMiniDFSCluster cluster;
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
 
-  @After
-  public void shutdown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // File operations
+        "AFTER_FILE_CREATION",
+        "AFTER_WAIT",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
   }
 
-  static {
-    initTestSetup();
-  }
-
+  @BeforeClass
   public static void initTestSetup() {
     // do not create id file since it occupies the disk space
     NameNodeConnector.setWrite2IdFile(false);
@@ -84,19 +115,17 @@ public class TestBalancerLongRunningTasks_ProcessBased {
    * Replica in (DN0,SSD) should not be moved to (DN1,SSD).
    * Otherwise DN1 has 2 replicas.
    *
-   * TRANSFORMATION NOTE: This test requires fine-grained storage type configuration
+   * <p>TRANSFORMATION NOTE: This test requires fine-grained storage type configuration
    * (.storageTypes(), .storageCapacities(), .storagesPerDatanode()) which is not
    * supported by ProcessBasedMiniDFSCluster. The test logic has been preserved but
    * storage type configuration is commented out. The test will use default storage
    * configuration instead.
+   *
+   * <p>With 5 checkpoints, this single test method generates 5 test executions,
+   * each testing upgrade at a different point in the balancer workflow.
    */
   @Test(timeout = 100000)
   public void testTwoReplicaShouldNotInSameDN() throws Exception {
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    final Configuration conf = new HdfsConfiguration();
-
     int blockSize = 5 * 1024 * 1024;
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
@@ -125,8 +154,10 @@ public class TestBalancerLongRunningTasks_ProcessBased {
         .build();
     cluster.waitClusterUp();
 
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     //set "/bar" directory with ONE_SSD storage policy.
-    DistributedFileSystem fs = cluster.getFileSystem();
+    fs = cluster.getFileSystem();
     Path barDir = new Path("/bar");
     fs.mkdirs(barDir, new FsPermission((short) 777));
 
@@ -142,9 +173,15 @@ public class TestBalancerLongRunningTasks_ProcessBased {
     DFSTestUtil.createFile(fs, fooFile, fileLen, (short) numOfDatanodes, new Random().nextLong());
     DFSTestUtil.waitReplication(fs, fooFile, (short) numOfDatanodes);
 
+    checkpoint("AFTER_FILE_CREATION");
+
     // TRANSFORMATION NOTE: triggerHeartbeats() not supported
     // Wait for heartbeats naturally
     Thread.sleep(5000);
+
+    checkpoint("AFTER_WAIT");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     BalancerParameters p = BalancerParameters.DEFAULT;
     Collection<URI> namenodes = DFSUtil.getInternalNsRpcUris(conf);
@@ -158,5 +195,6 @@ public class TestBalancerLongRunningTasks_ProcessBased {
     //
     // We keep the assertion but note that the test semantics have changed.
     assertEquals(ExitStatus.NO_MOVE_PROGRESS.getExitCode(), r);
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

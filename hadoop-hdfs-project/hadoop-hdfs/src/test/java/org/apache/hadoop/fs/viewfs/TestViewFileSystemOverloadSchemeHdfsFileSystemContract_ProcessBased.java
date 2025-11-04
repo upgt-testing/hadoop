@@ -19,80 +19,118 @@ package org.apache.hadoop.fs.viewfs;
 
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME;
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT;
-import static org.junit.Assume.assumeNotNull;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestViewFileSystemOverloadSchemeHdfsFileSystemContract}.
+ * ProcessBasedMiniDFSCluster version of {@link TestViewFileSystemOverloadSchemeHdfsFileSystemContract}
+ * with parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * Only testRenameRootDirForbidden is transformed.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during ViewFS operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestViewFileSystemOverloadSchemeHdfsFileSystemContract Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestViewFileSystemOverloadSchemeHdfsFileSystemContract_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // ViewFS configuration
+        "AFTER_VIEWFS_SETUP",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
 
   @Test(expected = AccessControlException.class, timeout = 60000)
   public void testRenameRootDirForbidden() throws Exception {
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    Configuration conf = new HdfsConfiguration();
     conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY, "062");
 
-    ProcessBasedMiniDFSCluster cluster = null;
-    try {
-      cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
-          .numDataNodes(2)
-          .format(true)
-          .build();
-      cluster.waitClusterUp();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
 
-      // Configure ViewFileSystemOverloadScheme
-      conf.set(String.format("fs.%s.impl", "hdfs"),
-          ViewFileSystemOverloadScheme.class.getName());
-      conf.set(String.format(
-          FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
-          "hdfs"),
-          DistributedFileSystem.class.getName());
-      conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
-          CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-      URI defaultFSURI =
-          URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
-      String defaultWorkingDirectory =
-          "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
+    // Configure ViewFileSystemOverloadScheme
+    conf.set(String.format("fs.%s.impl", "hdfs"),
+        ViewFileSystemOverloadScheme.class.getName());
+    conf.set(String.format(
+        FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
+        "hdfs"),
+        DistributedFileSystem.class.getName());
+    conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
+        CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
 
-      ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/user",
-          defaultFSURI);
-      ConfigUtil.addLink(conf, defaultFSURI.getAuthority(),
-          "/FileSystemContractBaseTest/",
-          new URI(defaultFSURI.toString() + "/FileSystemContractBaseTest/"));
+    URI defaultFSURI =
+        URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+    String defaultWorkingDirectory =
+        "/user/" + UserGroupInformation.getCurrentUser().getShortUserName();
 
-      FileSystem fs = FileSystem.get(conf);
+    ConfigUtil.addLink(conf, defaultFSURI.getAuthority(), "/user",
+        defaultFSURI);
+    ConfigUtil.addLink(conf, defaultFSURI.getAuthority(),
+        "/FileSystemContractBaseTest/",
+        new URI(defaultFSURI.toString() + "/FileSystemContractBaseTest/"));
 
-      // Test that renaming root directory is forbidden
-      // This should throw AccessControlException
-      fs.rename(new Path("/"), new Path("/testRenameRootDirForbidden"));
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
-    }
+    FileSystem viewFs = FileSystem.get(conf);
+
+    checkpoint("AFTER_VIEWFS_SETUP");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    // Test that renaming root directory is forbidden
+    // This should throw AccessControlException
+    viewFs.rename(new Path("/"), new Path("/testRenameRootDirForbidden"));
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

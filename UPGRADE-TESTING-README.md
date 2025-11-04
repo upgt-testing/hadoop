@@ -297,6 +297,239 @@ Version compatibility testing:
 - NameNode restart
 - Mixed-version cluster stability
 
+## Parameterized Upgrade Testing
+
+### Overview
+
+ProcessBased upgrade tests now use **JUnit parameterization** to run each test method multiple times with upgrades at different checkpoints. This provides comprehensive upgrade coverage while maintaining 100% reproducibility.
+
+### How It Works
+
+Instead of a single hardcoded upgrade point, each test defines multiple checkpoints and runs once for each checkpoint:
+
+```
+testSimpleFlush()
+├── Run 1: checkpoint=NO_UPGRADE (baseline)
+├── Run 2: checkpoint=AFTER_CLUSTER_START
+├── Run 3: checkpoint=AFTER_FILE_CREATE
+├── Run 4: checkpoint=AFTER_FIRST_WRITE
+├── Run 5: checkpoint=AFTER_FIRST_FLUSH
+... (13 total runs for this test)
+```
+
+**Result**: One test method → 13 separate test executions, each testing upgrade at a different point.
+
+### Test Execution Counts
+
+With parameterization, test execution counts have increased significantly:
+
+| Metric | Before Parameterization | After Parameterization |
+|--------|------------------------|------------------------|
+| Test classes | 19 | 19 |
+| Test methods | ~30 | ~30 |
+| Checkpoints per method | 1 (hardcoded) | 10-15 (parameterized) |
+| **Total test executions** | **~30** | **~360** |
+| **Upgrade scenarios tested** | **~30** | **~360** |
+
+**Execution time estimate**: ~6 hours for full suite (acceptable based on comprehensive coverage gained)
+
+### Running Parameterized Tests
+
+**Run all checkpoints for a test**:
+```bash
+./run-upgrade-test.sh --test-class TestFileAppend_ProcessBased
+```
+
+Expected output:
+```
+[INFO] Tests run: 26, Failures: 0, Errors: 0, Skipped: 0
+  - testSimpleFlush[upgrade-at=NO_UPGRADE]: PASSED
+  - testSimpleFlush[upgrade-at=AFTER_CLUSTER_START]: PASSED
+  - testSimpleFlush[upgrade-at=AFTER_FILE_CREATE]: PASSED
+  ... (13 total for testSimpleFlush)
+  - testComplexFlush[upgrade-at=NO_UPGRADE]: PASSED
+  ... (13 total for testComplexFlush)
+```
+
+**Run specific checkpoint only**:
+```bash
+mvn test -Dtest='TestFileAppend_ProcessBased#testSimpleFlush[upgrade-at=AFTER_CREATE]' \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6 \
+  -pl hadoop-hdfs-project/hadoop-hdfs
+```
+
+### Understanding Test Results
+
+**Test naming convention**:
+```
+TestClass.testMethod[upgrade-at=CHECKPOINT_NAME]
+```
+
+**Example failure**:
+```
+TestFileAppend_ProcessBased.testSimpleFlush[upgrade-at=AFTER_FIRST_WRITE]  FAILED
+```
+
+This tells you:
+- Which test class: `TestFileAppend_ProcessBased`
+- Which test method: `testSimpleFlush`
+- Which checkpoint failed: `AFTER_FIRST_WRITE`
+
+**Debugging a failure**:
+1. Identify the failing checkpoint from test name
+2. Run only that checkpoint to reproduce
+3. Check if upgrade at that point is inherently unsafe
+4. Determine if it's a real bug or expected limitation
+
+### Cleanup Between Executions
+
+**Critical**: Each checkpoint execution is completely isolated:
+
+1. **@Before** (ProcessBasedUpgradeTestBase):
+   - Kills any orphaned processes from previous runs
+   - Cleans old cluster directories
+   - Initializes fresh configuration
+
+2. **Test runs**:
+   - Creates new cluster
+   - Runs test logic
+   - Performs upgrade at specified checkpoint (or no upgrade for NO_UPGRADE)
+
+3. **@After** (ProcessBasedUpgradeTestBase):
+   - Closes FileSystem
+   - Shuts down cluster (deletes directories)
+   - Waits for processes to die
+   - Verifies no orphaned processes
+   - Force kills if verification fails
+
+**Cleanup guarantee**: No process or directory pollution between checkpoint executions.
+
+### Checkpoint Categories
+
+Tests use checkpoints from these categories:
+
+**1. Cluster Lifecycle**
+- `NO_UPGRADE` - baseline test without any upgrade
+- `AFTER_CLUSTER_START` - right after cluster initialization
+- `BEFORE_CLUSTER_SHUTDOWN` - just before cluster shutdown
+
+**2. File Operations**
+- `AFTER_FILE_CREATE` - after creating files/directories
+- `AFTER_FILE_DELETE` - after deletion operations
+- `AFTER_FILE_RENAME` - after rename operations
+
+**3. Write Operations**
+- `AFTER_FIRST_WRITE`, `AFTER_SECOND_WRITE` - after write operations
+- `AFTER_FIRST_FLUSH`, `AFTER_SECOND_FLUSH` - after flush operations
+- `AFTER_FIRST_CLOSE` - after closing stream
+
+**4. Stream Lifecycle**
+- `AFTER_APPEND_REOPEN` - after reopening file in append mode
+- `BEFORE_FINAL_CLOSE` - just before final close
+
+**5. Verification**
+- `BEFORE_VERIFICATION` - before data verification
+- `AFTER_VERIFICATION` - after verification complete
+
+**See**: `UpgradeCheckpoints.java` for full list of standard checkpoint names.
+
+### Best Practices for Parameterized Tests
+
+1. **Always include NO_UPGRADE**: First checkpoint should always be `NO_UPGRADE` to verify test works without upgrade
+
+2. **Fine-grained checkpoints**: Use 10-15 checkpoints per test for maximum coverage
+
+3. **Descriptive names**: Use `AFTER_BALANCER_RUN` not `CHECKPOINT_7`
+
+4. **Stream management**: Always close streams before checkpoints:
+   ```java
+   out.write(data);
+   out.close();              // Must close before checkpoint
+   checkpoint("AFTER_WRITE");
+   out = fs.append(file);    // Reopen if continuing
+   ```
+
+5. **Analyze patterns**: If multiple checkpoints fail, look for common patterns (e.g., all write-related checkpoints fail)
+
+### Test Architecture
+
+**Base Class**: All ProcessBased tests extend `ProcessBasedUpgradeTestBase`
+
+**Location**: `org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase`
+
+**Provides**:
+- Automatic cleanup via @Before/@After
+- `checkpoint(name)` method for upgrade injection
+- `shouldUpgrade(name)` helper method
+- Cleanup verification
+
+**Example test structure**:
+```java
+@RunWith(Parameterized.class)
+public class TestFileAppend_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      // ... 10+ checkpoints
+    );
+  }
+
+  @Test
+  public void testSimpleFlush() throws Exception {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    fs = cluster.getFileSystem();
+
+    // Insert checkpoints throughout
+    fs.create(file).close();
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    // No try-finally needed - @After handles cleanup!
+  }
+}
+```
+
+### Interpreting Aggregate Results
+
+When running the full test suite, results aggregate across all checkpoint executions:
+
+**Example output**:
+```
+Tests run: 360, Failures: 5, Errors: 0, Skipped: 2
+```
+
+Breaking this down:
+- **360 tests**: 19 test classes × ~2 methods each × ~12 checkpoints average
+- **5 failures**: 5 specific checkpoint scenarios failed
+- **2 skipped**: 2 checkpoint scenarios were skipped (e.g., missing environment setup)
+
+**Identifying patterns in failures**:
+```bash
+# Find all failures
+grep "FAILED" test-results-*/test-execution.log
+
+# Group by checkpoint
+grep "upgrade-at=" test-results-*/test-execution.log | \
+  grep "FAILED" | \
+  sed 's/.*upgrade-at=\\([^]]*\\).*/\\1/' | \
+  sort | uniq -c
+```
+
+Example pattern:
+```
+  3 AFTER_FIRST_WRITE
+  2 AFTER_BALANCER_RUN
+```
+
+This suggests: Write operations and balancer operations may have upgrade issues.
+
 ## Analyzing Results
 
 ### Test Output Structure

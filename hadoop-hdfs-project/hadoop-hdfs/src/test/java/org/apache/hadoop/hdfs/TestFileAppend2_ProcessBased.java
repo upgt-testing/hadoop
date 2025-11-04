@@ -20,34 +20,86 @@ package org.apache.hadoop.hdfs;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeNotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestFileAppend2}.
+ * ProcessBasedMiniDFSCluster version of {@link TestFileAppend2} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * This class contains selective transformations of test methods from the
- * original TestFileAppend2 class.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during file append operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestFileAppend2 Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestFileAppend2_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestFileAppend2_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // First write phase
+        UpgradeCheckpoints.AFTER_FILE_CREATE,
+        UpgradeCheckpoints.AFTER_FIRST_WRITE,
+        UpgradeCheckpoints.AFTER_FIRST_CLOSE,
+
+        // Second write phase
+        "AFTER_FIRST_APPEND_REOPEN",
+        UpgradeCheckpoints.AFTER_SECOND_WRITE,
+        "AFTER_SECOND_CLOSE",
+
+        // Third write phase
+        "AFTER_SECOND_APPEND_REOPEN",
+        "AFTER_THIRD_WRITE",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION,
+        UpgradeCheckpoints.AFTER_VERIFICATION
+    );
+  }
 
   private byte[] fileContents = null;
 
@@ -55,158 +107,173 @@ public class TestFileAppend2_ProcessBased {
    * Creates one file, writes a few bytes to it and then closed it.
    * Reopens the same file for appending, write all blocks and then close.
    * Verify that all data exists in file.
+   *
+   * <p>With 12 checkpoints, this single test method generates 12 test executions,
+   * each testing upgrade at a different point in the append workflow.
+   *
    * @throws Exception an exception might be thrown
    */
   @Test
   public void testSimpleAppend() throws Exception {
-    final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
 
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
         .format(true)
         .build();
-    FileSystem fs = cluster.getFileSystem();
-    try {
-      cluster.waitClusterUp();
+    fs = cluster.getFileSystem();
+    cluster.waitClusterUp();
 
-      { // test appending to a file.
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-        // create a new file.
-        Path file1 = new Path("/simpleAppend.dat");
-        FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
-        System.out.println("Created file simpleAppend.dat");
+    { // test appending to a file.
 
-        // write to file
-        int mid = 186;   // io.bytes.per.checksum bytes
-        System.out.println("Writing " + mid + " bytes to file " + file1);
-        stm.write(fileContents, 0, mid);
-        stm.close();
-        System.out.println("Wrote and Closed first part of file.");
+      // create a new file.
+      Path file1 = new Path("/simpleAppend.dat");
+      FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
+      System.out.println("Created file simpleAppend.dat");
 
-        // write to file
-        int mid2 = 607;   // io.bytes.per.checksum bytes
-        System.out.println("Writing " + mid + " bytes to file " + file1);
-        stm = fs.append(file1);
-        stm.write(fileContents, mid, mid2-mid);
-        stm.close();
-        System.out.println("Wrote and Closed second part of file.");
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
-        // write the remainder of the file
-        stm = fs.append(file1);
+      // write to file
+      int mid = 186;   // io.bytes.per.checksum bytes
+      System.out.println("Writing " + mid + " bytes to file " + file1);
+      stm.write(fileContents, 0, mid);
 
-        // ensure getPos is set to reflect existing size of the file
-        assertTrue(stm.getPos() > 0);
+      checkpoint(UpgradeCheckpoints.AFTER_FIRST_WRITE);
 
-        System.out.println("Writing " + (AppendTestUtil.FILE_SIZE - mid2) +
-            " bytes to file " + file1);
-        stm.write(fileContents, mid2, AppendTestUtil.FILE_SIZE - mid2);
-        System.out.println("Written second part of file");
-        stm.close();
-        System.out.println("Wrote and Closed second part of file.");
+      stm.close();
+      System.out.println("Wrote and Closed first part of file.");
 
-        // verify that entire file is good
-        AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
-            fileContents, "Read 2");
-      }
+      checkpoint(UpgradeCheckpoints.AFTER_FIRST_CLOSE);
 
-      { // test appending to an non-existing file.
-        FSDataOutputStream out = null;
-        try {
-          out = fs.append(new Path("/non-existing.dat"));
-          fail("Expected to have FileNotFoundException");
-        }
-        catch(java.io.FileNotFoundException fnfe) {
-          System.out.println("Good: got " + fnfe);
-          fnfe.printStackTrace(System.out);
-        }
-        finally {
-          IOUtils.closeStream(out);
-        }
-      }
+      // write to file
+      int mid2 = 607;   // io.bytes.per.checksum bytes
+      System.out.println("Writing " + mid + " bytes to file " + file1);
+      stm = fs.append(file1);
 
-      { // test append permission.
+      checkpoint("AFTER_FIRST_APPEND_REOPEN");
 
-        //set root to all writable
-        Path root = new Path("/");
-        fs.setPermission(root, new FsPermission((short)0777));
-        fs.close();
+      stm.write(fileContents, mid, mid2-mid);
 
-        // login as a different user
-        final UserGroupInformation superuser =
-          UserGroupInformation.getCurrentUser();
-        String username = "testappenduser";
-        String group = "testappendgroup";
-        assertFalse(superuser.getShortUserName().equals(username));
-        assertFalse(Arrays.asList(superuser.getGroupNames()).contains(group));
-        UserGroupInformation appenduser =
-          UserGroupInformation.createUserForTesting(username, new String[]{group});
+      checkpoint(UpgradeCheckpoints.AFTER_SECOND_WRITE);
 
-        fs = DFSTestUtil.getFileSystemAs(appenduser, conf);
+      stm.close();
+      System.out.println("Wrote and Closed second part of file.");
 
-        // create a file
-        Path dir = new Path(root, getClass().getSimpleName());
-        Path foo = new Path(dir, "foo.dat");
-        FSDataOutputStream out = null;
-        int offset = 0;
-        try {
-          out = fs.create(foo);
-          int len = 10 + AppendTestUtil.nextInt(100);
-          out.write(fileContents, offset, len);
-          offset += len;
-        }
-        finally {
-          IOUtils.closeStream(out);
-        }
+      checkpoint("AFTER_SECOND_CLOSE");
 
-        // change dir and foo to minimal permissions.
-        fs.setPermission(dir, new FsPermission((short)0100));
-        fs.setPermission(foo, new FsPermission((short)0200));
+      // write the remainder of the file
+      stm = fs.append(file1);
 
-        // try append, should success
-        out = null;
-        try {
-          out = fs.append(foo);
-          int len = 10 + AppendTestUtil.nextInt(100);
-          out.write(fileContents, offset, len);
-          offset += len;
-        }
-        finally {
-          IOUtils.closeStream(out);
-        }
+      checkpoint("AFTER_SECOND_APPEND_REOPEN");
 
-        // change dir and foo to all but no write on foo.
-        fs.setPermission(foo, new FsPermission((short)0577));
-        fs.setPermission(dir, new FsPermission((short)0777));
+      // ensure getPos is set to reflect existing size of the file
+      assertTrue(stm.getPos() > 0);
 
-        // try append, should fail
-        out = null;
-        try {
-          out = fs.append(foo);
-          fail("Expected to have AccessControlException");
-        }
-        catch(AccessControlException ace) {
-          System.out.println("Good: got " + ace);
-          ace.printStackTrace(System.out);
-        }
-        finally {
-          IOUtils.closeStream(out);
-        }
-      }
-    } catch (IOException e) {
-      System.out.println("Exception :" + e);
-      throw e;
-    } catch (Throwable e) {
-      System.out.println("Throwable :" + e);
-      e.printStackTrace();
-      throw new IOException("Throwable : " + e);
-    } finally {
-      fs.close();
-      cluster.shutdown();
+      System.out.println("Writing " + (AppendTestUtil.FILE_SIZE - mid2) +
+          " bytes to file " + file1);
+      stm.write(fileContents, mid2, AppendTestUtil.FILE_SIZE - mid2);
+
+      checkpoint("AFTER_THIRD_WRITE");
+
+      System.out.println("Written second part of file");
+      stm.close();
+      System.out.println("Wrote and Closed second part of file.");
+
+      checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+      // verify that entire file is good
+      AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
+          fileContents, "Read 2");
+
+      checkpoint(UpgradeCheckpoints.AFTER_VERIFICATION);
     }
+
+    { // test appending to an non-existing file.
+      FSDataOutputStream out = null;
+      try {
+        out = fs.append(new Path("/non-existing.dat"));
+        fail("Expected to have FileNotFoundException");
+      }
+      catch(java.io.FileNotFoundException fnfe) {
+        System.out.println("Good: got " + fnfe);
+        fnfe.printStackTrace(System.out);
+      }
+      finally {
+        IOUtils.closeStream(out);
+      }
+    }
+
+    { // test append permission.
+
+      //set root to all writable
+      Path root = new Path("/");
+      fs.setPermission(root, new FsPermission((short)0777));
+      fs.close();
+
+      // login as a different user
+      final UserGroupInformation superuser =
+        UserGroupInformation.getCurrentUser();
+      String username = "testappenduser";
+      String group = "testappendgroup";
+      assertFalse(superuser.getShortUserName().equals(username));
+      assertFalse(Arrays.asList(superuser.getGroupNames()).contains(group));
+      UserGroupInformation appenduser =
+        UserGroupInformation.createUserForTesting(username, new String[]{group});
+
+      fs = (DistributedFileSystem) DFSTestUtil.getFileSystemAs(appenduser, conf);
+
+      // create a file
+      Path dir = new Path(root, getClass().getSimpleName());
+      Path foo = new Path(dir, "foo.dat");
+      FSDataOutputStream out = null;
+      int offset = 0;
+      try {
+        out = fs.create(foo);
+        int len = 10 + AppendTestUtil.nextInt(100);
+        out.write(fileContents, offset, len);
+        offset += len;
+      }
+      finally {
+        IOUtils.closeStream(out);
+      }
+
+      // change dir and foo to minimal permissions.
+      fs.setPermission(dir, new FsPermission((short)0100));
+      fs.setPermission(foo, new FsPermission((short)0200));
+
+      // try append, should success
+      out = null;
+      try {
+        out = fs.append(foo);
+        int len = 10 + AppendTestUtil.nextInt(100);
+        out.write(fileContents, offset, len);
+        offset += len;
+      }
+      finally {
+        IOUtils.closeStream(out);
+      }
+
+      // change dir and foo to all but no write on foo.
+      fs.setPermission(foo, new FsPermission((short)0577));
+      fs.setPermission(dir, new FsPermission((short)0777));
+
+      // try append, should fail
+      out = null;
+      try {
+        out = fs.append(foo);
+        fail("Expected to have AccessControlException");
+      }
+      catch(AccessControlException ace) {
+        System.out.println("Good: got " + ace);
+        ace.printStackTrace(System.out);
+      }
+      finally {
+        IOUtils.closeStream(out);
+      }
+    }
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

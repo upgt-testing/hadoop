@@ -1093,6 +1093,453 @@ When inserting `cluster.upgrade()` calls:
 
 ---
 
+## Parameterized Upgrade Checkpoints
+
+### Overview
+
+**New Approach (Recommended)**: Instead of hardcoding a single upgrade point in each test, use JUnit parameterization to run each test multiple times with upgrades at different checkpoints. This provides comprehensive upgrade coverage with reproducible results.
+
+**Key Benefits**:
+- Single test → multiple upgrade scenarios automatically
+- 100% reproducible (deterministic checkpoint execution)
+- Comprehensive coverage (10+ checkpoints per test)
+- Guaranteed cleanup between executions
+- Easy to identify which checkpoint caused failure
+
+### Architecture
+
+```
+Test Method (testSimpleFlush)
+├── Execution 1: checkpoint=NO_UPGRADE
+│   ├── @Before: cleanup, init
+│   ├── Test runs (no upgrade)
+│   └── @After: cleanup verified
+│
+├── Execution 2: checkpoint=AFTER_CREATE
+│   ├── @Before: cleanup, init
+│   ├── Test runs, upgrades at AFTER_CREATE
+│   └── @After: cleanup verified
+│
+├── Execution 3: checkpoint=AFTER_WRITE
+│   ├── @Before: cleanup, init
+│   ├── Test runs, upgrades at AFTER_WRITE
+│   └── @After: cleanup verified
+│
+... (10+ more checkpoint executions)
+```
+
+### Base Class: ProcessBasedUpgradeTestBase
+
+All ProcessBased tests should extend `ProcessBasedUpgradeTestBase`, which provides:
+
+1. **@Before cleanup**: Kills orphaned processes, cleans old directories
+2. **@After cleanup**: Closes fs, shuts down cluster, verifies cleanup
+3. **checkpoint(name)**: Performs upgrade if name matches parameter
+4. **shouldUpgrade(name)**: Checks if upgrade should happen
+
+**Location**: `org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase`
+
+### Transformation Steps
+
+#### Step 1: Add Parameterization Framework
+
+```java
+// Add imports
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+import java.util.Arrays;
+import java.util.Collection;
+
+// Add annotation and extend base class
+@RunWith(Parameterized.class)
+public class TestFileAppend_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,           // Always include baseline
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      UpgradeCheckpoints.AFTER_FIRST_WRITE,
+      UpgradeCheckpoints.AFTER_FIRST_FLUSH,
+      // ... 10+ checkpoints per test
+    );
+  }
+}
+```
+
+#### Step 2: Remove try-finally Blocks
+
+**BEFORE** (manual cleanup):
+```java
+@Test
+public void testSomething() throws Exception {
+  Configuration conf = new HdfsConfiguration();
+  ProcessBasedMiniDFSCluster cluster = new Builder(conf).build();
+  DistributedFileSystem fs = cluster.getFileSystem();
+
+  try {
+    // test logic
+  } finally {
+    fs.close();
+    cluster.shutdown();
+  }
+}
+```
+
+**AFTER** (automatic cleanup via base class):
+```java
+@Test
+public void testSomething() throws Exception {
+  // Use conf, cluster, fs from base class
+  cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+  fs = cluster.getFileSystem();
+
+  // test logic with checkpoints
+  fs.create(file).close();
+  checkpoint(UpgradeCheckpoints.AFTER_CREATE);
+
+  // No try-finally needed - @After handles cleanup!
+}
+```
+
+#### Step 3: Replace Hardcoded cluster.upgrade() with checkpoint()
+
+**BEFORE** (hardcoded upgrade point):
+```java
+stm.write(data, 0, mid);
+stm.hflush();
+
+// === ROLLING UPGRADE POINT ===
+stm.close();
+cluster.upgrade();
+stm = fs.append(file);
+
+stm.write(data, mid, size - mid);
+```
+
+**AFTER** (parameterized checkpoints):
+```java
+stm.write(data, 0, mid);
+checkpoint(UpgradeCheckpoints.AFTER_FIRST_WRITE);
+
+stm.hflush();
+checkpoint(UpgradeCheckpoints.AFTER_FIRST_FLUSH);
+
+// Close before potential upgrade
+stm.close();
+checkpoint("AFTER_FIRST_CLOSE");
+
+// Reopen (always needed, regardless of upgrade)
+stm = fs.append(file);
+checkpoint(UpgradeCheckpoints.AFTER_APPEND_REOPEN);
+
+stm.write(data, mid, size - mid);
+checkpoint(UpgradeCheckpoints.AFTER_SECOND_WRITE);
+```
+
+### Checkpoint Naming Guidelines
+
+1. **Always include NO_UPGRADE first**: Ensures test passes without upgrade
+2. **Use UpgradeCheckpoints constants**: For common checkpoint names
+3. **Use custom strings**: For test-specific checkpoints
+4. **Be descriptive**: "AFTER_BALANCER_RUN" not "CHECKPOINT_7"
+5. **Fine-grained coverage**: 10-15 checkpoints per test method
+
+**Common checkpoint categories**:
+- Cluster lifecycle: `AFTER_CLUSTER_START`
+- File operations: `AFTER_FILE_CREATE`, `AFTER_FILE_DELETE`
+- Write operations: `AFTER_FIRST_WRITE`, `AFTER_SECOND_WRITE`
+- Flush operations: `AFTER_FIRST_FLUSH`, `AFTER_SECOND_FLUSH`
+- Stream lifecycle: `AFTER_FIRST_CLOSE`, `AFTER_APPEND_REOPEN`
+- Verification: `BEFORE_VERIFICATION`, `AFTER_VERIFICATION`
+
+### Stream Management with Checkpoints
+
+**Critical Rule**: Always close streams before checkpoints, reopen after if needed.
+
+**Pattern 1: Write → Upgrade → Continue Writing**
+```java
+FSDataOutputStream out = fs.create(file);
+out.write(data, 0, 100);
+checkpoint("AFTER_FIRST_WRITE");
+
+// Close before potential upgrade
+out.close();
+checkpoint("AFTER_FIRST_CLOSE");
+
+// Reopen if continuing to write
+out = fs.append(file);
+out.write(data, 100, 100);
+checkpoint("AFTER_SECOND_WRITE");
+
+out.close();
+```
+
+**Pattern 2: Read → Upgrade → Continue Reading**
+```java
+FSDataInputStream in = fs.open(file);
+byte[] buf1 = new byte[100];
+in.read(buf1);
+checkpoint("AFTER_FIRST_READ");
+
+// Close before potential upgrade
+long position = in.getPos();
+in.close();
+checkpoint("AFTER_READ_CLOSE");
+
+// Reopen and seek to continue
+in = fs.open(file);
+in.seek(position);
+byte[] buf2 = new byte[100];
+in.read(buf2);
+checkpoint("AFTER_SECOND_READ");
+
+in.close();
+```
+
+### Test Isolation and Cleanup
+
+**JUnit Parameterized Lifecycle** (per checkpoint execution):
+
+```
+1. Create new test instance
+2. @Before (ProcessBasedUpgradeTestBase.setupTest())
+   - Kill orphaned processes
+   - Clean old directories
+   - Initialize configuration
+3. @Test method runs
+   - Creates cluster
+   - Runs test logic
+   - Calls checkpoint() throughout
+4. @After (ProcessBasedUpgradeTestBase.tearDownTest())
+   - Close FileSystem
+   - Shutdown cluster (delete directories)
+   - Wait for processes to die
+   - Verify no orphaned processes
+   - Force kill if verification fails
+5. Destroy test instance
+
+(Repeat for next checkpoint)
+```
+
+**Cleanup Guarantee**: Each checkpoint execution is completely isolated with:
+- ✅ Pre-cleanup: Defensive process killing before test
+- ✅ Post-cleanup: Guaranteed shutdown in @After
+- ✅ Verification: Asserts no orphaned processes
+- ✅ Force cleanup: Kills orphans if verification fails
+- ✅ Directory cleanup: Deletes cluster directories
+
+### Complete Transformation Example
+
+**Original test**:
+```java
+public class TestFileAppend_ProcessBased {
+  @Test
+  public void testSimpleFlush() throws Exception {
+    Configuration conf = new HdfsConfiguration();
+    ProcessBasedMiniDFSCluster cluster = new Builder(conf).build();
+    DistributedFileSystem fs = cluster.getFileSystem();
+    try {
+      fs.create(file).write(data);
+      cluster.upgrade();  // Single hardcoded upgrade point
+      fs.append(file).write(moreData);
+    } finally {
+      fs.close();
+      cluster.shutdown();
+    }
+  }
+}
+```
+
+**Transformed with parameterization**:
+```java
+@RunWith(Parameterized.class)
+public class TestFileAppend_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      UpgradeCheckpoints.AFTER_FIRST_WRITE,
+      "AFTER_FIRST_CLOSE",
+      UpgradeCheckpoints.AFTER_APPEND_REOPEN,
+      UpgradeCheckpoints.AFTER_SECOND_WRITE
+    );
+  }
+
+  @Test
+  public void testSimpleFlush() throws Exception {
+    // Use conf from base class
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    fs = cluster.getFileSystem();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    FSDataOutputStream out = fs.create(file);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    out.write(data);
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_WRITE);
+
+    out.close();
+    checkpoint("AFTER_FIRST_CLOSE");
+
+    out = fs.append(file);
+    checkpoint(UpgradeCheckpoints.AFTER_APPEND_REOPEN);
+
+    out.write(moreData);
+    checkpoint(UpgradeCheckpoints.AFTER_SECOND_WRITE);
+
+    out.close();
+
+    // No try-finally - cleanup automatic!
+  }
+}
+```
+
+**Result**:
+- Before: 1 test execution, 1 upgrade point
+- After: 7 test executions, comprehensive upgrade coverage
+
+### Handling Test Failures
+
+When a test fails at a specific checkpoint:
+
+**Failure message shows checkpoint**:
+```
+testSimpleFlush[upgrade-at=AFTER_FIRST_WRITE]  FAILED
+```
+
+**Debugging strategy**:
+1. Identify which checkpoint caused failure
+2. Run just that checkpoint: `-Dtest=TestClass#testMethod[upgrade-at=AFTER_FIRST_WRITE]`
+3. Check if upgrade at that point is unsafe
+4. Decide: Fix code or mark checkpoint as unsafe
+
+**Options for unsafe checkpoints**:
+1. Remove from @Parameters list
+2. Add conditional skip in checkpoint() method
+3. Document as known limitation
+
+### Common Pitfalls
+
+❌ **Pitfall 1**: Forgetting to close stream before checkpoint
+```java
+// WRONG - stream open during upgrade
+out.write(data);
+checkpoint("AFTER_WRITE");  // Pipeline breaks if upgrade happens!
+out.write(moreData);        // This will fail
+```
+
+✅ **Correct**:
+```java
+out.write(data);
+out.close();
+checkpoint("AFTER_WRITE");
+out = fs.append(file);
+out.write(moreData);
+```
+
+❌ **Pitfall 2**: Not including NO_UPGRADE baseline
+```java
+// WRONG - no baseline test
+@Parameters
+public static Collection<String> checkpoints() {
+  return Arrays.asList(
+    "AFTER_CREATE",  // Missing NO_UPGRADE!
+    "AFTER_WRITE"
+  );
+}
+```
+
+✅ **Correct**:
+```java
+@Parameters
+public static Collection<String> checkpoints() {
+  return Arrays.asList(
+    UpgradeCheckpoints.NO_UPGRADE,  // Always first!
+    "AFTER_CREATE",
+    "AFTER_WRITE"
+  );
+}
+```
+
+❌ **Pitfall 3**: Reusing stream variable without closing
+```java
+// WRONG - overwrites stream reference without closing
+FSDataOutputStream out = fs.create(file);
+out.write(data);
+checkpoint("AFTER_WRITE");
+out = fs.append(file);  // Leaked previous stream!
+```
+
+✅ **Correct**:
+```java
+FSDataOutputStream out = fs.create(file);
+out.write(data);
+out.close();  // Explicit close
+checkpoint("AFTER_WRITE");
+out = fs.append(file);
+```
+
+### Testing Parameterized Tests
+
+**Run all checkpoints**:
+```bash
+mvn test -Dtest=TestFileAppend_ProcessBased \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+```
+
+**Run specific checkpoint**:
+```bash
+mvn test -Dtest='TestFileAppend_ProcessBased#testSimpleFlush[upgrade-at=AFTER_CREATE]' \
+  -Dhadoop.start.home=/opt/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/opt/hadoop-3.3.6
+```
+
+**Expected output** (for test with 13 checkpoints):
+```
+TestFileAppend_ProcessBased.testSimpleFlush[upgrade-at=NO_UPGRADE]  ✓
+TestFileAppend_ProcessBased.testSimpleFlush[upgrade-at=AFTER_CLUSTER_START]  ✓
+TestFileAppend_ProcessBased.testSimpleFlush[upgrade-at=AFTER_FILE_CREATE]  ✓
+... (10 more)
+```
+
+### Transformation Checklist
+
+When converting a test to use parameterized checkpoints:
+
+- [ ] Extend ProcessBasedUpgradeTestBase
+- [ ] Add @RunWith(Parameterized.class) annotation
+- [ ] Add @Parameter field for upgradeCheckpoint
+- [ ] Add @Parameters method with checkpoints list
+- [ ] Include NO_UPGRADE as first checkpoint
+- [ ] Remove all try-finally blocks around cluster/fs
+- [ ] Replace hardcoded cluster.upgrade() with checkpoint() calls
+- [ ] Insert 10+ checkpoint() calls throughout test
+- [ ] Close streams before each checkpoint
+- [ ] Reopen streams after checkpoints if needed
+- [ ] Verify test compiles
+- [ ] Run test and verify all checkpoints execute
+- [ ] Check cleanup verification passes
+
+---
+
 ## When to Comment Out Logic
 
 ### Only comment out operations that are:

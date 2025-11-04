@@ -17,13 +17,11 @@
  */
 package org.apache.hadoop.hdfs.server.namenode;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.StorageType;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.NameNodeProxies;
 import org.apache.hadoop.hdfs.StripedFileTestUtil;
 import org.apache.hadoop.hdfs.protocol.ClientProtocol;
@@ -32,56 +30,92 @@ import org.apache.hadoop.hdfs.protocol.HdfsConstants;
 import org.apache.hadoop.hdfs.protocol.LocatedBlock;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.Timeout;
-import org.junit.Assume;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
-
-import static org.junit.Assume.assumeNotNull;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
- * Process-based version of TestStripedINodeFile tests that require .storageTypes().
+ * ProcessBasedMiniDFSCluster version of TestStripedINodeFile with
+ * parameterized upgrade checkpoints.
  *
- * NOTE: Only contains the testUnsuitableStoragePoliciesWithECStripedMode test
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * process-based testing and multi-version upgrade scenarios.
+ *
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during striped file operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
+ *
+ * <p>NOTE: Only contains the testUnsuitableStoragePoliciesWithECStripedMode test
  * which was blocked waiting for .storageTypes() support in ProcessBasedMiniDFSCluster.
+ *
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestStripedINodeFile_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestStripedINodeFile_ProcessBased extends ProcessBasedUpgradeTestBase {
 
   // use hard coded policy - see HDFS-9816
   private static final ErasureCodingPolicy testECPolicy
       = StripedFileTestUtil.getDefaultECPolicy();
 
-  private String hadoopHome;
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
 
-  @Before
-  public void setUp() {
-    hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster tests", hadoopHome);
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
 
-    Configuration conf = new HdfsConfiguration();
-    try {
-      ErasureCodingPolicyManager.getInstance().init(conf);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to initialize ErasureCodingPolicyManager", e);
-    }
+        // File operations
+        "AFTER_FILE_CREATION",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
+
+  @BeforeClass
+  public static void init() throws IOException {
+    ErasureCodingPolicyManager.getInstance().init(new org.apache.hadoop.hdfs.HdfsConfiguration());
   }
 
   /**
    * Test unsuitable storage policies with EC striped mode.
-   * This test verifies that when an unsuitable storage policy (ONE_SSD) is set on an
+   *
+   * <p>This test verifies that when an unsuitable storage policy (ONE_SSD) is set on an
    * erasure-coded directory, blocks are still stored on DISK type storage.
+   *
+   * <p>With 4 checkpoints, this single test method generates 4 test executions,
+   * each testing upgrade at a different point in the striped file workflow.
    */
-  @Test
+  @Test(timeout = 300000)
   public void testUnsuitableStoragePoliciesWithECStripedMode()
       throws Exception {
-    final Configuration conf = new HdfsConfiguration();
     int defaultStripedBlockSize = testECPolicy.getCellSize() * 4;
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, defaultStripedBlockSize);
     conf.setLong(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1L);
@@ -96,7 +130,7 @@ public class TestStripedINodeFile_ProcessBased {
     // so we skip setting capacities. The test should still work as it's testing
     // storage type selection, not capacity.
 
-    final ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(numOfDatanodes)
         .storagesPerDatanode(storagesPerDatanode)
         .storageTypes(
@@ -113,40 +147,41 @@ public class TestStripedINodeFile_ProcessBased {
         .format(true)
         .build();
 
-    try {
-      cluster.waitClusterUp();
-      cluster.getFileSystem().enableErasureCodingPolicy(
-          StripedFileTestUtil.getDefaultECPolicy().getName());
+    cluster.waitClusterUp();
 
-      // set "/foo" directory with ONE_SSD storage policy.
-      ClientProtocol client = NameNodeProxies.createProxy(conf,
-          cluster.getFileSystem().getUri(), ClientProtocol.class).getProxy();
-      String fooDir = "/foo";
-      client.mkdirs(fooDir, new FsPermission((short) 777), true);
-      client.setStoragePolicy(fooDir, HdfsConstants.ONESSD_STORAGE_POLICY_NAME);
-      // set an EC policy on "/foo" directory
-      client.setErasureCodingPolicy(fooDir,
-          StripedFileTestUtil.getDefaultECPolicy().getName());
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-      // write file to fooDir
-      final String barFile = "/foo/bar";
-      long fileLen = 20 * defaultStripedBlockSize;
-      DFSTestUtil.createFile(cluster.getFileSystem(), new Path(barFile),
-          fileLen, (short) 3, 0);
+    cluster.getFileSystem().enableErasureCodingPolicy(
+        StripedFileTestUtil.getDefaultECPolicy().getName());
 
-      // verify storage types and locations
-      LocatedBlocks locatedBlocks = client.getBlockLocations(barFile, 0,
-          fileLen);
-      for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
-        for (StorageType type : lb.getStorageTypes()) {
-          Assert.assertEquals(StorageType.DISK, type);
-        }
-      }
+    // set "/foo" directory with ONE_SSD storage policy.
+    ClientProtocol client = NameNodeProxies.createProxy(conf,
+        cluster.getFileSystem().getUri(), ClientProtocol.class).getProxy();
+    String fooDir = "/foo";
+    client.mkdirs(fooDir, new FsPermission((short) 777), true);
+    client.setStoragePolicy(fooDir, HdfsConstants.ONESSD_STORAGE_POLICY_NAME);
+    // set an EC policy on "/foo" directory
+    client.setErasureCodingPolicy(fooDir,
+        StripedFileTestUtil.getDefaultECPolicy().getName());
 
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
+    // write file to fooDir
+    final String barFile = "/foo/bar";
+    long fileLen = 20 * defaultStripedBlockSize;
+    DFSTestUtil.createFile(cluster.getFileSystem(), new Path(barFile),
+        fileLen, (short) 3, 0);
+
+    checkpoint("AFTER_FILE_CREATION");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    // verify storage types and locations
+    LocatedBlocks locatedBlocks = client.getBlockLocations(barFile, 0,
+        fileLen);
+    for (LocatedBlock lb : locatedBlocks.getLocatedBlocks()) {
+      for (StorageType type : lb.getStorageTypes()) {
+        Assert.assertEquals(StorageType.DISK, type);
       }
     }
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

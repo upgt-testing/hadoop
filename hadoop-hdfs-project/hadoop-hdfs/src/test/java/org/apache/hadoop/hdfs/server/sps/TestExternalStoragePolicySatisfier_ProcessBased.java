@@ -274,6 +274,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
       // Change policy to ONE_SSD
       dfs.setStoragePolicy(new Path(subDir), ONE_SSD);
 
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before adding new DataNode with SSD storage
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       StorageType[][] newtypes =
           new StorageType[][]{{StorageType.SSD, StorageType.DISK}};
       startAdditionalDNs(config, 1, NUM_OF_DATANODES, newtypes,
@@ -330,6 +335,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
       // Change policy to ONE_SSD
       dfs.setStoragePolicy(new Path(FILE), ONE_SSD);
 
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       dfs.satisfyStoragePolicy(new Path(FILE));
       hdfsCluster.triggerHeartbeats();
       DFSTestUtil.waitExpectedStorageType(FILE, StorageType.SSD, 1, 30000, dfs);
@@ -374,6 +384,12 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
 
       // Change policy to WARM
       dfs.setStoragePolicy(new Path(FILE), "WARM");
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       dfs.satisfyStoragePolicy(new Path(FILE));
       hdfsCluster.triggerHeartbeats();
 
@@ -428,6 +444,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
 
       // 4. Change policy to HOT, so we can move the all block to DISK.
       dfs.setStoragePolicy(new Path(FILE), "HOT");
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       // 4. Satisfy the policy.
       dfs.satisfyStoragePolicy(new Path(FILE));
@@ -486,6 +507,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
         out.close();
       }
       hdfsCluster.triggerHeartbeats();
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       // Note: DataNodeTestUtils.setHeartbeatsDisabledForTests is not supported
       // in ProcessBasedMiniDFSCluster since DataNodes are in separate processes
@@ -565,6 +591,12 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
 
       // ONESSD is unsuitable storage policy on EC files
       client.setStoragePolicy(fooDir, HdfsConstants.ONESSD_STORAGE_POLICY_NAME);
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       dfs.satisfyStoragePolicy(new Path(testFile));
 
       // verify storage types and locations
@@ -648,6 +680,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
       hdfsCluster.restartDataNode(1);
       hdfsCluster.waitClusterUp();
 
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade after restarting DataNodes but before satisfying storage policy
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       fs.satisfyStoragePolicy(filePath);
       DFSTestUtil.waitExpectedStorageType(filePath.toString(),
           StorageType.ARCHIVE, 2, 30000, hdfsCluster.getFileSystem());
@@ -699,6 +736,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
       dfs.setStoragePolicy(new Path(FILE), COLD);
       dfs.satisfyStoragePolicy(new Path(FILE));
       dfs.delete(new Path(FILE), true);
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade after deleting file but before restarting external SPS
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       startExternalSps();
 
@@ -767,6 +809,11 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
               {StorageType.DISK, StorageType.SSD}};
       startAdditionalDNs(config, 2, NUM_OF_DATANODES, newtypes,
           STORAGES_PER_DATANODE, CAPACITY, hdfsCluster);
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade after adding new DataNodes but before replication change
+      hdfsCluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       // increase replication factor to 4 for the first 10 files and thus
       // initiate replica tasks

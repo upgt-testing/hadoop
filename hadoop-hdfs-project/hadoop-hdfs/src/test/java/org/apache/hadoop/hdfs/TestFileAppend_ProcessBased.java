@@ -18,29 +18,97 @@
 package org.apache.hadoop.hdfs;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestFileAppend}.
+ * ProcessBasedMiniDFSCluster version of {@link TestFileAppend} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * This class contains selective transformations of test methods from the
- * original TestFileAppend class.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during file append operations.
+ *
+ * <p>Each test execution tests ONE specific upgrade checkpoint:
+ * <ul>
+ *   <li>NO_UPGRADE - baseline test without any upgrade</li>
+ *   <li>AFTER_CLUSTER_START - upgrade right after cluster starts</li>
+ *   <li>AFTER_FILE_CREATE - upgrade after creating file</li>
+ *   <li>... and many more checkpoints throughout the test</li>
+ * </ul>
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestFileAppend Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestFileAppend_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestFileAppend_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * <p>Each checkpoint represents a point in the test where an upgrade
+   * might occur. The test runs once for each checkpoint.
+   *
+   * @return collection of checkpoint names
+   */
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // File operations
+        UpgradeCheckpoints.AFTER_FILE_CREATE,
+
+        // Write operations
+        UpgradeCheckpoints.AFTER_FIRST_WRITE,
+        UpgradeCheckpoints.AFTER_FIRST_FLUSH,
+        "AFTER_FIRST_CLOSE",
+
+        // After reopening in append mode
+        UpgradeCheckpoints.AFTER_APPEND_REOPEN,
+
+        // Second write sequence
+        UpgradeCheckpoints.AFTER_SECOND_WRITE,
+        "AFTER_SECOND_HFLUSH_1",
+        "AFTER_SECOND_HFLUSH_2",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION,
+        UpgradeCheckpoints.BEFORE_FINAL_CLOSE,
+        UpgradeCheckpoints.AFTER_VERIFICATION
+    );
+  }
 
   private static byte[] fileContents = null;
 
@@ -84,141 +152,189 @@ public class TestFileAppend_ProcessBased {
   }
 
   /**
-   * Test a simple flush on a simple HDFS file with rolling upgrade.
+   * Test a simple flush on a simple HDFS file with parameterized upgrade checkpoints.
    *
-   * <p>This test performs a rolling upgrade in the middle of write operations
-   * following the official HDFS rolling upgrade procedure. The upgrade is
-   * performed after writing and flushing the first half of the file.
+   * <p>This test performs file writes with flush operations and tests upgrades
+   * at various points in the workflow. The specific upgrade point is determined
+   * by the {@link #upgradeCheckpoint} parameter.
    *
-   * <p>If hadoop.upgrade.home is configured, this test will perform a complete
-   * rolling upgrade (prepare → upgrade → finalize). If not configured, the test
-   * will skip the upgrade step and proceed normally.
+   * <p>The test workflow:
+   * <ol>
+   *   <li>Create cluster and file</li>
+   *   <li>Write and flush first half of data</li>
+   *   <li>Close stream, potentially upgrade, reopen in append mode</li>
+   *   <li>Write and flush second half of data</li>
+   *   <li>Verify data integrity</li>
+   * </ol>
    *
-   * <p>Configure upgrade via:</p>
-   * <ul>
-   *   <li>{@code -Dhadoop.start.home=/path/to/start/version}</li>
-   *   <li>{@code -Dhadoop.upgrade.home=/path/to/new/version}</li>
-   *   <li>{@code -Dhadoop.upgrade.plan=all-nodes} (default, optional)</li>
-   * </ul>
+   * <p>With 13 checkpoints, this single test method generates 13 test executions,
+   * each testing upgrade at a different point in the workflow.
    *
-   * @throws Exception an exception might be thrown
+   * <p><b>Note:</b> Cluster and FileSystem cleanup is handled automatically by
+   * {@link ProcessBasedUpgradeTestBase} @After method. No try-finally block needed.
+   *
+   * @throws Exception if test fails
    */
   @Test
   public void testSimpleFlush() throws Exception {
-    Configuration conf = new HdfsConfiguration();
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
 
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    // Create cluster - uses conf from base class
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
         .format(true)
         .build();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    try {
-      cluster.waitClusterUp();
+    fs = cluster.getFileSystem();
+    cluster.waitClusterUp();
 
-      // create a new file.
-      Path file1 = new Path("/simpleFlush.dat");
-      FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
-      System.out.println("Created file simpleFlush.dat");
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-      // write to file
-      int mid = AppendTestUtil.FILE_SIZE /2;
-      stm.write(fileContents, 0, mid);
-      stm.hflush();
-      System.out.println("Wrote and Flushed first part of file.");
+    // Create file
+    Path file1 = new Path("/simpleFlush.dat");
+    FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
+    System.out.println("Created file simpleFlush.dat");
 
-      // === ROLLING UPGRADE POINT ===
-      // Close the stream before upgrade since the DataNode will be restarted
-      // and the write pipeline will be broken
-      stm.close();
-      System.out.println("Closed stream before rolling upgrade");
-      // Perform rolling upgrade
-      cluster.upgrade();  // Executes full rolling upgrade procedure
-      System.out.println("Rolling upgrade completed successfully");
-      stm = fs.append(file1);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
-      // write the remainder of the file
-      stm.write(fileContents, mid, AppendTestUtil.FILE_SIZE - mid);
-      System.out.println("Written second part of file");
-      stm.hflush();
-      stm.hflush();
-      System.out.println("Wrote and Flushed second part of file.");
+    // Write first half
+    int mid = AppendTestUtil.FILE_SIZE / 2;
+    stm.write(fileContents, 0, mid);
 
-      // verify that full blocks are sane
-      checkFile(fs, file1, 1);
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_WRITE);
 
-      stm.close();
-      System.out.println("Closed file.");
+    stm.hflush();
+    System.out.println("Wrote and Flushed first part of file.");
 
-      // verify that entire file is good
-      AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
-          fileContents, "Read 2");
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_FLUSH);
 
-    } catch (IOException e) {
-      System.out.println("Exception :" + e);
-      throw e;
-    } catch (Throwable e) {
-      System.out.println("Throwable :" + e);
-      e.printStackTrace();
-      throw new IOException("Throwable : " + e);
-    } finally {
-      fs.close();
-      cluster.shutdown();
-    }
+    // Close stream before potential upgrade
+    // IMPORTANT: Must close before checkpoint to handle pipeline break
+    stm.close();
+    System.out.println("Closed stream before potential upgrade");
+
+    checkpoint("AFTER_FIRST_CLOSE");
+
+    // Reopen in append mode (needed regardless of whether upgrade happened)
+    stm = fs.append(file1);
+    System.out.println("Reopened file in append mode");
+
+    checkpoint(UpgradeCheckpoints.AFTER_APPEND_REOPEN);
+
+    // Write second half
+    stm.write(fileContents, mid, AppendTestUtil.FILE_SIZE - mid);
+    System.out.println("Written second part of file");
+
+    checkpoint(UpgradeCheckpoints.AFTER_SECOND_WRITE);
+
+    stm.hflush();
+
+    checkpoint("AFTER_SECOND_HFLUSH_1");
+
+    stm.hflush();
+    System.out.println("Wrote and Flushed second part of file.");
+
+    checkpoint("AFTER_SECOND_HFLUSH_2");
+
+    // Verify blocks before final close
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    checkFile(fs, file1, 1);
+
+    checkpoint(UpgradeCheckpoints.BEFORE_FINAL_CLOSE);
+
+    stm.close();
+    System.out.println("Closed file.");
+
+    // Final verification
+    AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
+        fileContents, "Read 2");
+
+    checkpoint(UpgradeCheckpoints.AFTER_VERIFICATION);
+
+    // Cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 
   /**
-   * Test that file data can be flushed.
-   * @throws Exception an exception might be thrown
+   * Test that file data can be flushed with parameterized upgrade checkpoints.
+   *
+   * <p>This test performs many small writes with flushes and tests upgrades
+   * at various points. The specific upgrade point is determined by the
+   * {@link #upgradeCheckpoint} parameter.
+   *
+   * <p>The test workflow:
+   * <ol>
+   *   <li>Create cluster and file</li>
+   *   <li>Perform many small writes (29 bytes) with flush after each</li>
+   *   <li>Final flush and verification</li>
+   * </ol>
+   *
+   * <p><b>Note:</b> Cluster and FileSystem cleanup is handled automatically by
+   * {@link ProcessBasedUpgradeTestBase} @After method. No try-finally block needed.
+   *
+   * @throws Exception if test fails
    */
   @Test
   public void testComplexFlush() throws Exception {
-    Configuration conf = new HdfsConfiguration();
     fileContents = AppendTestUtil.initBuffer(AppendTestUtil.FILE_SIZE);
 
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    // Create cluster - uses conf from base class
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(1)
         .format(true)
         .build();
-    DistributedFileSystem fs = cluster.getFileSystem();
-    try {
-      cluster.waitClusterUp();
+    fs = cluster.getFileSystem();
+    cluster.waitClusterUp();
 
-      // create a new file.
-      Path file1 = new Path("/complexFlush.dat");
-      FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
-      System.out.println("Created file complexFlush.dat");
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-      int start = 0;
-      for (start = 0; (start + 29) < AppendTestUtil.FILE_SIZE; ) {
-        stm.write(fileContents, start, 29);
-        stm.hflush();
-        start += 29;
+    // Create file
+    Path file1 = new Path("/complexFlush.dat");
+    FSDataOutputStream stm = AppendTestUtil.createFile(fs, file1, 1);
+    System.out.println("Created file complexFlush.dat");
+
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    // Many small writes with flushes
+    int start = 0;
+    int writeCount = 0;
+    for (start = 0; (start + 29) < AppendTestUtil.FILE_SIZE; ) {
+      stm.write(fileContents, start, 29);
+      stm.hflush();
+      start += 29;
+      writeCount++;
+
+      // Insert checkpoints every 10 writes to avoid too many test executions
+      if (writeCount % 10 == 0) {
+        checkpoint("AFTER_WRITE_" + writeCount);
       }
-      stm.write(fileContents, start, AppendTestUtil.FILE_SIZE -start);
-      // need to make sure we completely write out all full blocks before
-      // the checkFile() call (see FSOutputSummer#flush)
-      stm.flush();
-      // verify that full blocks are sane
-      checkFile(fs, file1, 1);
-      stm.close();
-
-      // verify that entire file is good
-      AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
-          fileContents, "Read 2");
-    } catch (IOException e) {
-      System.out.println("Exception :" + e);
-      throw e;
-    } catch (Throwable e) {
-      System.out.println("Throwable :" + e);
-      e.printStackTrace();
-      throw new IOException("Throwable : " + e);
-    } finally {
-      fs.close();
-      cluster.shutdown();
     }
+
+    // Write remaining bytes
+    stm.write(fileContents, start, AppendTestUtil.FILE_SIZE - start);
+
+    checkpoint("AFTER_FINAL_WRITE");
+
+    // Final flush - need to make sure we completely write out all full blocks
+    // before the checkFile() call (see FSOutputSummer#flush)
+    stm.flush();
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    // Verify that full blocks are sane
+    checkFile(fs, file1, 1);
+
+    checkpoint(UpgradeCheckpoints.BEFORE_FINAL_CLOSE);
+
+    stm.close();
+
+    checkpoint(UpgradeCheckpoints.AFTER_FINAL_CLOSE);
+
+    // Verify that entire file is good
+    AppendTestUtil.checkFullFile(fs, file1, AppendTestUtil.FILE_SIZE,
+        fileContents, "Read 2");
+
+    checkpoint(UpgradeCheckpoints.AFTER_VERIFICATION);
+
+    // Cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

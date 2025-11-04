@@ -21,106 +21,99 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FsConstants;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.PathUtils;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME;
 import static org.apache.hadoop.fs.viewfs.Constants.CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT;
-import static org.junit.Assume.assumeNotNull;
 
 
 /**
  * Tests ViewFileSystemOverloadScheme with configured mount links.
- * ProcessBased version for upgrade testing.
+ * ProcessBased version with parameterized upgrade checkpoints.
+ *
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during ViewFS overload scheme operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
+ *
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final String TEST_STRING = "Hello ViewFSOverloadedScheme!";
   private static final String FS_IMPL_PATTERN_KEY = "fs.%s.impl";
   private static final String HDFS_SCHEME = "hdfs";
-  private Configuration conf = null;
-  private static ProcessBasedMiniDFSCluster cluster = null;
   private URI defaultFSURI;
   private File localTargetDir;
   private static final String TEST_ROOT_DIR = PathUtils
       .getTestDirName(TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased.class);
   private static final String HDFS_USER_FOLDER = "/HDFSUser";
   private static final String LOCAL_FOLDER = "/local";
-  private static Configuration baseConf;
-
-  @BeforeClass
-  public static void init() throws Exception {
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
-
-    baseConf = new Configuration();
-    cluster = new ProcessBasedMiniDFSCluster.Builder(baseConf)
-        .numDataNodes(2)
-        .format(true)
-        .build();
-    cluster.waitClusterUp();
-  }
 
   /**
-   * Sets up the configurations and starts the MiniDFSCluster.
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
    */
-  @Before
-  public void setUp() throws IOException {
-    // Reset FileSystem cache to make sure no FS instances are cached with DistributedFileSysten instance.
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // ViewFS setup
+        "AFTER_MOUNT_LINKS",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
+
+  private void setupViewFS() throws IOException {
+    // Reset FileSystem cache
     FileSystem.closeAll();
-    
-    Configuration config = getNewConf();
-    config.setInt(
-        CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
-    config.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
+
+    conf.setInt(CommonConfigurationKeysPublic.IPC_CLIENT_CONNECT_MAX_RETRIES_KEY, 1);
+    conf.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
         ViewFileSystemOverloadScheme.class.getName());
-    config.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
+    conf.setBoolean(CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME,
         CONFIG_VIEWFS_IGNORE_PORT_IN_MOUNT_TABLE_NAME_DEFAULT);
-    setConf(config);
+
     defaultFSURI =
-        URI.create(config.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
+        URI.create(conf.get(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY));
     localTargetDir = new File(TEST_ROOT_DIR, "/root/");
     localTargetDir.mkdirs();
     Assert.assertEquals(HDFS_SCHEME, defaultFSURI.getScheme()); // hdfs scheme.
-  }
-
-  @After
-  public void cleanUp() throws IOException {
-    if (cluster != null) {
-      FileSystem fs = new DistributedFileSystem();
-      fs.initialize(defaultFSURI, conf);
-      try {
-        FileStatus[] statuses = fs.listStatus(new Path("/"));
-        for (FileStatus st : statuses) {
-          Assert.assertTrue(fs.delete(st.getPath(), true));
-        }
-      } finally {
-        fs.close();
-      }
-      FileSystem.closeAll();
-    }
-  }
-
-  @AfterClass
-  public static void tearDown() throws IOException {
-    if (cluster != null) {
-      FileSystem.closeAll();
-      cluster.shutdown();
-    }
   }
 
   /**
@@ -146,12 +139,17 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
    */
   @Test(expected = IOException.class, timeout = 30000)
   public void testInvalidOverloadSchemeTargetFS() throws Exception {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    setupViewFS();
+
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
-    String mountTableIfSet = conf.get(Constants.CONFIG_VIEWFS_MOUNTTABLE_PATH);
-    conf = new Configuration();
-    if (mountTableIfSet != null) {
-      conf.set(Constants.CONFIG_VIEWFS_MOUNTTABLE_PATH, mountTableIfSet);
-    }
     addMountLinks(defaultFSURI.getHost(),
         new String[] {HDFS_USER_FOLDER, LOCAL_FOLDER,
             Constants.CONFIG_VIEWFS_LINK_FALLBACK },
@@ -159,18 +157,19 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
             localTargetDir.toURI().toString(),
             hdfsTargetPath.toUri().toString() },
         conf);
-    conf.set(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY,
-        defaultFSURI.toString());
-    conf.set(String.format(FS_IMPL_PATTERN_KEY, HDFS_SCHEME),
-        ViewFileSystemOverloadScheme.class.getName());
     conf.unset(String.format(
         FsConstants.FS_VIEWFS_OVERLOAD_SCHEME_TARGET_FS_IMPL_PATTERN,
         HDFS_SCHEME));
 
-    try (FileSystem fs = FileSystem.get(conf)) {
-      fs.createNewFile(new Path("/onRootWhenFallBack"));
+    checkpoint("AFTER_MOUNT_LINKS");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    try (FileSystem vfs = FileSystem.get(conf)) {
+      vfs.createNewFile(new Path("/onRootWhenFallBack"));
       Assert.fail("OverloadScheme target fs should be valid.");
     }
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 
   /**
@@ -184,6 +183,16 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
   @Test(timeout = 30000)
   public void testViewFsOverloadSchemeWithInnerCache()
       throws Exception {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    setupViewFS();
+
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     addMountLinks(defaultFSURI.getAuthority(),
         new String[] {HDFS_USER_FOLDER + 0, HDFS_USER_FOLDER + 1 },
@@ -191,10 +200,14 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
             hdfsTargetPath.toUri().toString() },
         conf);
 
+    checkpoint("AFTER_MOUNT_LINKS");
+
     // 1. Only 1 hdfs child file system should be there with cache.
     try (FileSystem vfs = FileSystem.get(conf)) {
       Assert.assertEquals(1, vfs.getChildFileSystems().length);
     }
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     // 2. Two hdfs file systems should be there if no cache.
     conf.setBoolean(Constants.CONFIG_VIEWFS_ENABLE_INNER_CACHE, false);
@@ -202,6 +215,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
       Assert.assertEquals(isFallBackExist(conf) ? 3 : 2,
           vfs.getChildFileSystems().length);
     }
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 
   // HDFS-15529: if any extended tests added fallback, then getChildFileSystems
@@ -219,9 +233,19 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
    * When InnerCache disabled, all matching ViewFileSystemOverloadScheme
    * initialized scheme file systems would not use FileSystem cache.
    */
-  @Test(timeout = 3000)
+  @Test(timeout = 30000)
   public void testViewFsOverloadSchemeWithNoInnerCacheAndHdfsTargets()
       throws Exception {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    setupViewFS();
+
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     addMountLinks(defaultFSURI.getAuthority(),
         new String[] {HDFS_USER_FOLDER + 0, HDFS_USER_FOLDER + 1 },
@@ -230,11 +254,17 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
         conf);
 
     conf.setBoolean(Constants.CONFIG_VIEWFS_ENABLE_INNER_CACHE, false);
+
+    checkpoint("AFTER_MOUNT_LINKS");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
     // Two hdfs file systems should be there if no cache.
     try (FileSystem vfs = FileSystem.get(conf)) {
       Assert.assertEquals(isFallBackExist(conf) ? 3 : 2,
           vfs.getChildFileSystems().length);
     }
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 
   /**
@@ -246,9 +276,19 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
    * initialized scheme file systems should continue to take advantage of
    * FileSystem cache.
    */
-  @Test(timeout = 3000)
+  @Test(timeout = 30000)
   public void testViewFsOverloadSchemeWithNoInnerCacheAndLocalSchemeTargets()
       throws Exception {
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(2)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    setupViewFS();
+
     final Path localTragetPath = new Path(localTargetDir.toURI());
     addMountLinks(defaultFSURI.getAuthority(),
         new String[] {LOCAL_FOLDER + 0, LOCAL_FOLDER + 1 },
@@ -259,30 +299,15 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_ProcessBased {
     // Only one local file system should be there if no InnerCache, but fs
     // cache should work.
     conf.setBoolean(Constants.CONFIG_VIEWFS_ENABLE_INNER_CACHE, false);
+
+    checkpoint("AFTER_MOUNT_LINKS");
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
     try (FileSystem vfs = FileSystem.get(conf)) {
       Assert.assertEquals(isFallBackExist(conf) ? 2 : 1,
           vfs.getChildFileSystems().length);
     }
-  }
-
-  /**
-   * @return configuration.
-   */
-  public Configuration getConf() {
-    return this.conf;
-  }
-
-  /**
-   * @return configuration.
-   */
-  public Configuration getNewConf() {
-    return new Configuration(baseConf);
-  }
-
-  /**
-   * sets configuration.
-   */
-  public void setConf(Configuration config) {
-    conf = config;
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

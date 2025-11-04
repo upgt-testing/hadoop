@@ -18,76 +18,120 @@
 package org.apache.hadoop.hdfs.server.namenode;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
 
-import org.apache.hadoop.conf.Configuration;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSClient;
 import org.apache.hadoop.hdfs.DFSUtilClient;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.HdfsFileStatus;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.IOUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestINodeFile}.
+ * ProcessBasedMiniDFSCluster version of {@link TestINodeFile} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * This class contains selective transformations of test methods from the
- * original TestINodeFile class.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during INode path operations.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestINodeFile Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestINodeFile_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestINodeFile_ProcessBased extends ProcessBasedUpgradeTestBase {
   public static final Logger LOG = LoggerFactory.getLogger(TestINodeFile_ProcessBased.class);
 
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // Directory operations
+        "AFTER_DIR_CREATION",
+
+        // Verification
+        UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
+
+  /**
+   * Test INode path resolution using dotdot (..) references.
+   *
+   * <p>With 4 checkpoints, this single test method generates 4 test executions,
+   * each testing upgrade at a different point in the INode path workflow.
+   */
   @Test
   public void testDotdotInodePath() throws Exception {
-    final Configuration conf = new Configuration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(1)
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
 
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-    ProcessBasedMiniDFSCluster cluster = null;
-    DFSClient client = null;
-    try {
-      cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
-          .numDataNodes(1)
-          .format(true)
-          .build();
-      cluster.waitClusterUp();
-      final DistributedFileSystem hdfs = cluster.getFileSystem();
+    final DistributedFileSystem hdfs = cluster.getFileSystem();
 
-      // TRANSFORMATION: Instead of accessing FSDirectory directly,
-      // use DFSClient API to get inode IDs from HdfsFileStatus
-      final Path dir = new Path("/dir");
-      hdfs.mkdirs(dir);
+    // TRANSFORMATION: Instead of accessing FSDirectory directly,
+    // use DFSClient API to get inode IDs from HdfsFileStatus
+    final Path dir = new Path("/dir");
+    hdfs.mkdirs(dir);
 
-      client = new DFSClient(DFSUtilClient.getNNAddress(conf), conf);
+    DFSClient client = new DFSClient(DFSUtilClient.getNNAddress(conf), conf);
 
-      // Get inode ID via client API (HdfsFileStatus has getFileId())
-      long dirId = client.getFileInfo(dir.toString()).getFileId();
-      long parentId = client.getFileInfo("/").getFileId();
+    // Get inode ID via client API (HdfsFileStatus has getFileId())
+    long dirId = client.getFileInfo(dir.toString()).getFileId();
+    long parentId = client.getFileInfo("/").getFileId();
 
-      String testPath = "/.reserved/.inodes/" + dirId + "/..";
-      HdfsFileStatus status = client.getFileInfo(testPath);
-      assertTrue(parentId == status.getFileId());
+    checkpoint("AFTER_DIR_CREATION");
 
-      // Test root's parent is still root
-      testPath = "/.reserved/.inodes/" + parentId + "/..";
-      status = client.getFileInfo(testPath);
-      assertTrue(parentId == status.getFileId());
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
-    } finally {
-      IOUtils.cleanupWithLogger(LOG, client);
-      if (cluster != null) {
-        cluster.shutdown();
-      }
-    }
+    String testPath = "/.reserved/.inodes/" + dirId + "/..";
+    HdfsFileStatus status = client.getFileInfo(testPath);
+    assertTrue(parentId == status.getFileId());
+
+    // Test root's parent is still root
+    testPath = "/.reserved/.inodes/" + parentId + "/..";
+    status = client.getFileInfo(testPath);
+    assertTrue(parentId == status.getFileId());
+
+    IOUtils.cleanupWithLogger(LOG, client);
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

@@ -18,69 +18,141 @@
 
 package org.apache.hadoop.hdfs;
 
-import static org.junit.Assume.assumeNotNull;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
-import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * ProcessBasedMiniDFSCluster version of {@link TestFileAppendRestart}.
+ * ProcessBasedMiniDFSCluster version of {@link TestFileAppendRestart} with
+ * parameterized upgrade checkpoints.
  *
- * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
+ * <p>Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
- * This class contains selective transformations of test methods from the
- * original TestFileAppendRestart class.
+ * <p>This test uses JUnit parameterization to run each test method multiple
+ * times with upgrades at different checkpoints, providing comprehensive
+ * coverage of upgrade scenarios during file append with pipeline recovery.
+ *
+ * <p>Cleanup between parameter executions is guaranteed by
+ * {@link ProcessBasedUpgradeTestBase} @Before and @After methods.
  *
  * @see TestFileAppendRestart Original test using MiniDFSCluster
+ * @see ProcessBasedUpgradeTestBase Base class with cleanup and checkpoint support
  */
-public class TestFileAppendRestart_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestFileAppendRestart_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  /**
+   * Define upgrade checkpoints for parameterized test execution.
+   *
+   * @return collection of checkpoint names
+   */
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        // Baseline - no upgrade
+        UpgradeCheckpoints.NO_UPGRADE,
+
+        // Cluster lifecycle
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+
+        // First write phase
+        UpgradeCheckpoints.AFTER_FILE_CREATE,
+        UpgradeCheckpoints.AFTER_FIRST_WRITE,
+        UpgradeCheckpoints.AFTER_FIRST_CLOSE,
+
+        // Pipeline recovery phase
+        UpgradeCheckpoints.AFTER_DATANODE_SHUTDOWN,
+        "AFTER_APPEND_REOPEN",
+        UpgradeCheckpoints.AFTER_SECOND_WRITE,
+        "AFTER_SECOND_CLOSE",
+
+        // Namenode restart and verification
+        UpgradeCheckpoints.AFTER_NAMENODE_RESTART,
+        UpgradeCheckpoints.BEFORE_VERIFICATION,
+        UpgradeCheckpoints.AFTER_VERIFICATION
+    );
+  }
+
   private static final int BLOCK_SIZE = 4096;
 
   /**
    * Test to append to the file, when one of datanode in the existing pipeline
    * is down.
+   *
+   * <p>With 12 checkpoints, this single test method generates 12 test executions,
+   * each testing upgrade at a different point in the pipeline recovery workflow.
+   *
+   * @throws Exception if test fails
    */
   @Test
   public void testAppendWithPipelineRecovery() throws Exception {
-    Configuration conf = new Configuration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(4)
+        // Note: ProcessBasedMiniDFSCluster doesn't support rack configuration
+        .format(true)
+        .build();
+    cluster.waitClusterUp();
 
-    String hadoopHome = System.getenv("HADOOP_HOME");
-    assumeNotNull("HADOOP_HOME must be set for ProcessBasedMiniDFSCluster", hadoopHome);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-    ProcessBasedMiniDFSCluster cluster = null;
-    FSDataOutputStream out = null;
-    try {
-      cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
-          .numDataNodes(4)
-          // Note: ProcessBasedMiniDFSCluster doesn't support rack configuration
-          .format(true)
-          .build();
-      cluster.waitClusterUp();
+    fs = cluster.getFileSystem();
+    Path path = new Path("/test1");
 
-      DistributedFileSystem fs = cluster.getFileSystem();
-      Path path = new Path("/test1");
+    FSDataOutputStream out = fs.create(path, true, BLOCK_SIZE, (short) 3, BLOCK_SIZE);
 
-      out = fs.create(path, true, BLOCK_SIZE, (short) 3, BLOCK_SIZE);
-      AppendTestUtil.write(out, 0, 1024);
-      out.close();
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
-      cluster.shutdownDataNode(3);
-      out = fs.append(path);
-      AppendTestUtil.write(out, 1024, 1024);
-      out.close();
+    AppendTestUtil.write(out, 0, 1024);
 
-      cluster.restartNameNode(0);
-      AppendTestUtil.check(fs, path, 2048);
-    } finally {
-      IOUtils.closeStream(out);
-      if (null != cluster) {
-        cluster.shutdown();
-      }
-    }
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_WRITE);
+
+    out.close();
+
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_CLOSE);
+
+    cluster.shutdownDataNode(3);
+
+    checkpoint(UpgradeCheckpoints.AFTER_DATANODE_SHUTDOWN);
+
+    out = fs.append(path);
+
+    checkpoint("AFTER_APPEND_REOPEN");
+
+    AppendTestUtil.write(out, 1024, 1024);
+
+    checkpoint(UpgradeCheckpoints.AFTER_SECOND_WRITE);
+
+    out.close();
+
+    checkpoint("AFTER_SECOND_CLOSE");
+
+    cluster.restartNameNode(0);
+
+    checkpoint(UpgradeCheckpoints.AFTER_NAMENODE_RESTART);
+
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
+
+    AppendTestUtil.check(fs, path, 2048);
+
+    checkpoint(UpgradeCheckpoints.AFTER_VERIFICATION);
+    // fs and cluster cleanup handled by @After in ProcessBasedUpgradeTestBase
   }
 }

@@ -174,6 +174,11 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
       StripedFileTestUtil.verifyLocatedStripedBlocks(locatedBlocks,
           dataBlocks + parityBlocks);
 
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before adding new DataNodes with ARCHIVE storage
+      cluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       // start 5 more datanodes
       int numOfNewDatanodes = 5;
       long[][] newCapacities = new long[numOfNewDatanodes][storagesPerDatanode];
@@ -278,6 +283,11 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
       StripedFileTestUtil.verifyLocatedStripedBlocks(locatedBlocks,
           dataBlocks + parityBlocks);
 
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before adding new DataNodes with ARCHIVE storage
+      cluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
+
       // start 2 more datanodes
       int numOfNewDatanodes = 2;
       long[][] newCapacities = new long[numOfNewDatanodes][storagesPerDatanode];
@@ -368,6 +378,11 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
 
       // Move file to ARCHIVE.
       fs.setStoragePolicy(barDir, "COLD");
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before simulating low redundancy
+      cluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       // Shutdown and restart DataNodes to simulate low redundancy scenario
       // Note: In ProcessBased cluster, we shutdown and restart DataNodes
@@ -471,6 +486,11 @@ public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
       }
       StripedFileTestUtil.verifyLocatedStripedBlocks(locatedBlocks,
           dataBlocks + parityBlocks);
+
+      // === ROLLING UPGRADE POINT ===
+      // Perform rolling upgrade before changing storage policy
+      cluster.upgrade();
+      System.out.println("Rolling upgrade completed successfully");
 
       // Move file to ARCHIVE. No datanodes available with ARCHIVE storage type.
       client.setStoragePolicy(barDir, "COLD");
