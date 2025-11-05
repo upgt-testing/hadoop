@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-04 (Completed TestFileContextSnapshot, TestDisallowModifyROSnapshot; Skipped TestReadStripedFileWithDecodingCorruptData, TestReadStripedFileWithDecodingDeletedData, TestReadStripedFileWithDNFailure)
+**Last Updated:** 2025-11-04 (Completed TestRandomOpsWithSnapshots; Skipped 4 Phase 3 tests: TestCorruptionWithFailover, TestErasureCodingCorruption, TestCorruptMetadataFile, TestRefreshNamenodeReplicationConfig)
 
 ---
 
@@ -9,10 +9,10 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 33 | 8.8% |
-| **Skipped (Incompatible)** | 17 | 4.6% |
+| **Completed Transformations** | 38 | 10.2% |
+| **Skipped (Incompatible)** | 25 | 6.7% |
 | **In Progress** | 0 | 0.0% |
-| **Not Started** | 323 | 86.6% |
+| **Not Started** | 310 | 83.1% |
 
 ### Progress by Priority
 
@@ -20,10 +20,10 @@
 |----------------|------:|----------:|--------:|------------:|------------:|----------:|
 | **CRITICAL (Upgrade)** | 5 | 0 | 5 | 0 | 0 | 0.0% (All Skipped) |
 | **HIGH (File Ops)** | 46 | 18 | 12 | 0 | 16 | 39.1% |
-| **HIGH (Data Integrity)** | 14 | 1 | 0 | 0 | 13 | 7.1% |
+| **HIGH (Data Integrity)** | 14 | 1 | 4 | 0 | 9 | 7.1% |
 | **MEDIUM (ViewFS)** | 40 | 3 | 0 | 0 | 37 | 7.5% |
 | **MEDIUM (Balancer)** | 15 | 3 | 0 | 0 | 12 | 20.0% |
-| **MEDIUM (Snapshot)** | 40 | 3 | 0 | 0 | 37 | 7.5% |
+| **MEDIUM (Snapshot)** | 40 | 8 | 4 | 0 | 28 | 20.0% |
 | **MEDIUM (Client/CLI)** | 80 | 2 | 0 | 0 | 78 | 2.5% |
 | **LOW (Other)** | 128 | 3 | 0 | 0 | 125 | 2.3% |
 
@@ -97,21 +97,21 @@ Tests focusing on file operations (create, read, write, append, delete, truncate
 ## Phase 3: HIGH Priority - Replication & Data Integrity
 
 **Target Completion:** Week 4
-**Progress:** 1/14 (7.1%)
+**Progress:** 1/14 completed, 4/14 skipped (7.1% completion rate)
 
 Tests ensuring data correctness and replication during upgrades.
 
 | Status | Test Class | Priority | Notes |
 |--------|------------|----------|-------|
-| 📋 | `org.apache.hadoop.hdfs.server.blockmanagement.TestCorruptionWithFailover` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.blockmanagement.TestErasureCodingCorruption` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.server.blockmanagement.TestCorruptionWithFailover` | HIGH | **SKIPPED**: Requires HA configuration with QJM and multiple NameNodes (line 53: `MiniDFSNNTopology.simpleHATopology()`). Also requires direct access to internal BlockManager via `cluster.getNamesystem().getBlockManager()` (line 78) and internal methods `getCorruptBlocks()` (line 74) and `markAllDatanodesStale()` (lines 68-69). ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
+| ❌ | `org.apache.hadoop.hdfs.server.blockmanagement.TestErasureCodingCorruption` | HIGH | **SKIPPED**: Requires HA configuration (line 53: `simpleHATopology()`) and HA failover operations (lines 81-82: `transitionToStandby()`, `transitionToActive()`). Also requires direct access to internal BlockManager (line 78: `getNamesystem().getBlockManager()`) and internal method `getCorruptECBlockGroups()` (line 88) with no client API equivalent. ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
+| ❌ | `org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile` | HIGH | **SKIPPED**: Requires direct access to DataNode's local filesystem to corrupt metadata files (line 81: `cluster.getBlockMetadataFile(0, block)`) and direct file manipulation (lines 89-98). Also requires internal BlockManager access (lines 109-110: `getNamesystem().getBlockManager().getCorruptBlocks()`). No client API exists for accessing or manipulating DataNode metadata files on disk. |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencingWithReplication` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.ha.TestPendingCorruptDnMessages` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.TestAddOverReplicatedStripedBlocks` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.TestListCorruptFileBlocks` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.TestRefreshNamenodeReplicationConfig` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.TestRefreshNamenodeReplicationConfig` | HIGH | **SKIPPED**: Requires direct access to internal BlockManager (line 57: `cluster.getNameNode().getNamesystem().getBlockManager()`) and internal BlockManager methods `getMaxReplicationStreams()`, `getReplicationStreamsHardLimit()`, `getBlocksReplWorkMultiplier()` (lines 72-74, 85-87, etc.) which have no client API equivalents. Test verifies internal replication configuration that can only be validated through direct BlockManager access. |
 | 📋 | `org.apache.hadoop.hdfs.TestCrcCorruption` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestFileCorruption` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithDecodingCorruptData` | HIGH | |
@@ -186,26 +186,26 @@ Tests for data balancing and movement operations.
 ## Phase 6: MEDIUM Priority - Snapshot Tests
 
 **Target Completion:** Week 8-9
-**Progress:** 3/40 (7.5%)
+**Progress:** 8/40 completed, 4/40 skipped (20.0% completion rate)
 
 Tests for HDFS snapshot functionality.
 
 | Status | Test Class | Priority | Notes |
 |--------|------------|----------|-------|
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestAclWithSnapshot` | MEDIUM | |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestAclWithSnapshot` | MEDIUM | **SKIPPED**: Requires extensive internal NameNode access: (1) FSAclBaseTest.getAclFeature(path, cluster) to get internal AclFeature objects and check reference counts; (2) AclStorage.getUniqueAclFeatures() to access internal NameNode storage; (3) cluster.getNameNode() + NameNodeAdapter.enterSafeMode/saveNamespace() for restart with checkpoint operations. The testDeDuplication test (60% of the code) heavily relies on internal AclFeature reference counting which has no client API equivalent. Most ACL operations are client-side, but internal verification makes this test unsuitable for ProcessBased transformation. |
 | ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestDisallowModifyROSnapshot` | MEDIUM | Completed - Tests that snapshot paths are read-only and modifications are properly disallowed. All operations use client-side APIs (FileSystem, DFSClient) to attempt modifications on snapshot paths and verify SnapshotAccessControlException is thrown. |
 | ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestFileContextSnapshot` | MEDIUM | Completed - Tests FileContext snapshot operations (create, delete, rename) with parameterized upgrade checkpoints. All operations use client-side APIs (FileContext, DistributedFileSystem) |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestNestedSnapshots` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestRandomOpsWithSnapshots` | MEDIUM | |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestNestedSnapshots` | MEDIUM | **SKIPPED**: Requires internal NameNode access to configure nested snapshot support: (1) cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true/false) for enabling/disabling nested snapshots - no client API equivalent; (2) testDisallowNestedSnapshottableDir requires cluster.getNamesystem().getFSDirectory(), fsdir.getINode(), and checks internal INode types (isWithSnapshot(), isSnapshottable()); (3) SnapshotTestHelper.dumpTree() requires cluster object. Core nested snapshot functionality depends on internal configuration not accessible via client APIs. |
+| ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestRandomOpsWithSnapshots` | MEDIUM | Completed - Comprehensive test of random FileSystem operations (create/delete/rename files/directories) mixed with snapshot operations (create/delete/rename snapshots), with NameNode restarts to verify fsimage loading. Transformed to use ProcessBasedMiniDFSCluster with parameterized upgrade checkpoints. Replaced cluster.restartNameNodes() with cluster.restartNameNode(0), cluster.getNameNode().isInSafeMode() with hdfs.setSafeMode(SafeModeAction.SAFEMODE_GET), and cluster.isDataNodeUp() with cluster.getNumDataNodes() > 0. Tests 250 files with random directory depths, performing random iterations of operations. |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapRootDescendantDiff` | MEDIUM | |
 | ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotFileLength` | MEDIUM | Completed |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotListing` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotMetrics` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotNameWithInvalidCharacters` | MEDIUM | |
+| ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotListing` | MEDIUM | Completed - Tests listing snapshots under snapshottable directories with parameterized upgrade checkpoints. All operations use client-side APIs (FileSystem operations: listStatus, allowSnapshot, createSnapshot, deleteSnapshot). Removed unused FSNamesystem field from original test. |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotMetrics` | MEDIUM | **SKIPPED**: Requires internal NameNode access to enable nested snapshot support: cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true) on line 82. The test verifies snapshot-related metrics (SnapshottableDirectories, AllowSnapshotOps, DisallowSnapshotOps) which rely on nested snapshot functionality. Same blocker as TestNestedSnapshots and TestSnapshottableDirListing. |
+| ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotNameWithInvalidCharacters` | MEDIUM | Completed - Tests that snapshot names with invalid characters (: and /) are properly rejected with RemoteException. All operations use client-side APIs (createFile, allowSnapshot, createSnapshot). Simple validation test with parameterized upgrade checkpoints. |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotStatsMXBean` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshottableDirListing` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestUpdatePipelineWithSnapshots` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot` | MEDIUM | |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshottableDirListing` | MEDIUM | **SKIPPED**: Requires internal NameNode access to enable nested snapshot support: cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true) on lines 79 and 177. This is necessary for both test methods (testListSnapshottableDir and testListWithDifferentUser) to work correctly. No client API equivalent exists for configuring nested snapshot support at runtime. Same blocker as TestNestedSnapshots. |
+| ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestUpdatePipelineWithSnapshots` | MEDIUM | Completed - Tests pipeline recovery after deleting a file that's in a snapshot (regression test for HDFS-6647). Transformed to use ProcessBasedMiniDFSCluster with parameterized upgrade checkpoints. Changed from cluster.getNameNodeRpc() (returns NamenodeProtocols) to dfs.getClient().getNamenode() (returns ClientProtocol). All RPC operations (updateBlockForPipeline, updatePipeline) are client-side calls. |
+| ✅ | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot` | MEDIUM | Completed - Tests interaction of XAttrs (extended attributes) with snapshots. Transformed to use ProcessBasedMiniDFSCluster with parameterized upgrade checkpoints. Replaced NameNodeAdapter.enterSafeMode/saveNamespace with client-side APIs (hdfs.setSafeMode, hdfs.saveNamespace). Includes tests for modifying/removing XAttrs, successive snapshots, read-only snapshot verification, and snapshot copying with XAttr preservation. |
 | 📋 | `org.apache.hadoop.hdfs.TestAppendSnapshotTruncate` | MEDIUM | |
 | 📋 | `org.apache.hadoop.hdfs.TestErasureCodingPolicyWithSnapshot` | MEDIUM | |
 | 📋 | `org.apache.hadoop.hdfs.TestSnapshotCommands` | MEDIUM | |
