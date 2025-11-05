@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-05 (Completed Test #9: TestResolveHdfsSymlink - 5 tests this session)
+**Last Updated:** 2025-11-05 (Completed Test #18: TestMiniJournalCluster - 14 tests this session)
 
 ---
 
@@ -9,10 +9,10 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 53 | 14.2% |
+| **Completed Transformations** | 62 | 16.6% |
 | **Skipped (Incompatible)** | 46 | 12.3% |
 | **In Progress** | 0 | 0.0% |
-| **Not Started** | 274 | 73.5% |
+| **Not Started** | 265 | 71.0% |
 
 ### Progress by Priority
 
@@ -25,7 +25,7 @@
 | **MEDIUM (Balancer)** | 15 | 3 | 4 | 0 | 8 | 20.0% |
 | **MEDIUM (Snapshot)** | 40 | 12 | 5 | 0 | 23 | 30.0% |
 | **MEDIUM (Client/CLI)** | 80 | 2 | 0 | 0 | 78 | 2.5% |
-| **LOW (Other)** | 128 | 11 | 1 | 0 | 116 | 8.6% |
+| **LOW (Other)** | 128 | 20 | 1 | 0 | 107 | 15.6% |
 
 ---
 
@@ -261,7 +261,7 @@ Tests for command-line tools and client operations.
 ## Phase 8: LOW Priority - Other Transformable Tests
 
 **Target Completion:** Week 12+
-**Progress:** 3/128 (2.3%)
+**Progress:** 20/128 (15.6%)
 
 Remaining transformable tests not in other categories.
 
@@ -280,15 +280,15 @@ Remaining transformable tests not in other categories.
 | ✅ | `org.apache.hadoop.fs.TestGlobPaths` | LOW | Transformed to ProcessBasedMiniDFSCluster. Comprehensive glob pattern test with 30+ test methods covering wildcards, curly brackets, character sets, ranges, symlinks, permissions, and edge cases. All tests use client-side FileSystem and FileContext APIs (mkdirs, createNewFile, globStatus). Compiled successfully. |
 | ✅ | `org.apache.hadoop.fs.TestHDFSFileContextMainOperations` | LOW | Transformed to ProcessBasedMiniDFSCluster. Extends FileContextMainOperationsBaseTest with tests for rename with quotas, truncate, and edit log replay. Includes restartCluster() method for testing cluster restart without formatting. All tests use client-side APIs (FileContext, DistributedFileSystem). Compiled successfully. |
 | ✅ | `org.apache.hadoop.fs.TestResolveHdfsSymlink` | LOW | Transformed to ProcessBasedMiniDFSCluster. Tests FileContext symlink resolution between HDFS and local filesystem, delegation token APIs, and error handling. 4 test methods using client-side FileContext and DFSClient APIs. Changed waitActive() to waitClusterUp(). Compiled successfully. |
-| 📋 | `org.apache.hadoop.fs.TestSWebHdfsFileContextMainOperations` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestSymlinkHdfs` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestSymlinkHdfsDisable` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestUnbuffer` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestUrlStreamHandler` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestWebHdfsFileContextMainOperations` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.crypto.TestHdfsCryptoStreams` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.qjournal.server.TestJournalNode` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.qjournal.TestMiniJournalCluster` | LOW | |
+| ✅ | `org.apache.hadoop.fs.TestSWebHdfsFileContextMainOperations` | LOW | Transformed to ProcessBasedMiniDFSCluster. Tests FileContext APIs on Secure WebHDFS (HTTPS). Extends TestWebHdfsFileContextMainOperations with SSL/HTTPS configuration. Wrapped cluster.build() and cluster.waitClusterUp() in try-catch to handle TimeoutException while maintaining parent class method signature (IOException, LoginException, URISyntaxException). All test methods inherited from parent. Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestSymlinkHdfs` | LOW | Transformed to ProcessBasedMiniDFSCluster. Abstract test class for symlink functionality in HDFS. Extends SymlinkBaseTest with 11 test methods testing symlinks across filesystems (HDFS/LocalFS), permissions, replication, quotas, and WebHDFS. Wrapped cluster.build() and cluster.waitClusterUp() in try-catch to handle TimeoutException. All operations use client-side APIs (wrapper.*, dfs.*, webhdfs.*). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestSymlinkHdfsDisable` | LOW | Transformed to ProcessBasedMiniDFSCluster. Single test method verifying that symlink resolution can be disabled via configuration (FS_CLIENT_RESOLVE_REMOTE_SYMLINKS_KEY=false). Wrapped cluster operations in try-catch for TimeoutException, added try-finally for proper cleanup. All operations use client-side APIs (FileContext, DistributedFileSystem). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestUnbuffer` | LOW | Transformed to ProcessBasedMiniDFSCluster. Tests unbuffer() functionality with 3 test methods: testUnbufferClosesSockets (verifies socket return to PeerCache), testOpenManyFilesViaTcp (opens 500 files with unbuffer), testUnbufferException (Mockito test, no cluster). Wrapped cluster operations in try-catch for TimeoutException. All operations use client-side APIs (PeerCache, unbuffer()). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestUrlStreamHandler` | LOW | Completed - Tests URL stream handler functionality for reading HDFS files via hdfs:// URLs. Transformed to use ProcessBasedMiniDFSCluster. Simple transformation: replaced MiniDFSCluster with ProcessBasedMiniDFSCluster, added cluster.waitClusterUp() and TimeoutException handling. Contains 5 test methods: testDfsUrls (uses cluster), testFileUrls (local FileSystem, no cluster), and 3 handler tests (no cluster). All operations use client-side APIs (URL.openStream(), FileSystem). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestWebHdfsFileContextMainOperations` | LOW | Completed - Tests FileContext APIs on WebHDFS. Transformed to use ProcessBasedMiniDFSCluster. Simple transformation: replaced MiniDFSCluster with ProcessBasedMiniDFSCluster and added TimeoutException to clusterSetupAtBeginning() signature. Original test already used cluster.waitClusterUp(). Extends FileContextMainOperationsBaseTest with many inherited test methods. Contains 2 local test methods: testUnsupportedSymlink (empty stub for future implementation) and testSetVerifyChecksum (tests checksum verification via FileContext API). All operations use client-side APIs (FileContext). Compiled successfully. |
+| ✅ | `org.apache.hadoop.hdfs.crypto.TestHdfsCryptoStreams` | LOW | Completed - Tests HDFS crypto streams (encrypted read/write). Transformed to use ProcessBasedMiniDFSCluster. Simple transformation: replaced MiniDFSCluster with ProcessBasedMiniDFSCluster. Original test already used dfsCluster.waitClusterUp(). Extends CryptoStreamsTestBase with all test methods inherited. Only defines setup/teardown methods that use client-side FileSystem APIs (mkdirs, create, open, delete). Tests crypto codec operations with CryptoFSDataOutputStream and CryptoFSDataInputStream. Compiled successfully. |
+| ✅ | `org.apache.hadoop.hdfs.qjournal.server.TestJournalNode` | LOW | Completed - Tests JournalNode component (for HA QJM). Note: This is a standalone JournalNode unit test that doesn't actually create a MiniDFSCluster. Transformed by replacing MiniDFSCluster.getBaseDirectory() utility calls with TEST_BUILD_DATA. The test creates a standalone JournalNode instance and tests journal operations, metrics, epoch transitions, segment info, recovery, HTTP endpoints, and federation configurations. Contains 28 test methods. All operations are internal to JournalNode (no cluster needed). Compiled successfully. |
+| ✅ | `org.apache.hadoop.hdfs.qjournal.TestMiniJournalCluster` | LOW | Completed - Tests MiniJournalCluster (test utility for QJM). Note: This is a standalone test that creates MiniJournalCluster (multiple JournalNodes) without creating a full HDFS cluster. Transformed by replacing MiniDFSCluster.getBaseDirectory() utility calls with TEST_BUILD_DATA. The test verifies journal cluster startup/shutdown, port configuration validation, and journal node configuration. Contains 2 test methods. All operations use MiniJournalCluster APIs (no HDFS cluster needed). Compiled successfully. |
 | 📋 | `org.apache.hadoop.hdfs.qjournal.TestNNWithQJM` | LOW | |
 | 📋 | `org.apache.hadoop.hdfs.qjournal.TestSecureNNWithQJM` | LOW | |
 | 📋 | `org.apache.hadoop.hdfs.security.TestDelegationTokenForProxyUser` | LOW | |
