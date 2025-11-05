@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-05 (Session: +3 completed [TestDFSPermission, TestDFSShellGenericOptions, TestDFSStripedOutputStream], +6 skipped [TestDFSRemove, TestDFSStartupVersions, TestDFSStorageStateRecovery, TestDFSStripedInputStream, TestDFSStripedOutputStreamUpdatePipeline, TestDFSStripedOutputStreamWithFailureBase])
+**Last Updated:** 2025-11-05 (Session: +12 completed [TestDistributedFileSystemWithECFile, TestErasureCodingAddConfig, TestErasureCodingExerciseAPIs, TestErasureCodingMultipleRacks, TestExtendedAcls, TestExternalBlockReader, TestFSInputChecker, TestFSOutputSummer, TestFsShellPermission, TestGetFileChecksum, TestHDFSFileSystemContract, TestHDFSTrash], +7 skipped [TestEncryptedTransfer, TestEncryptionZonesWithHA, TestErasureCodeBenchmarkThroughput, TestFetchImage, TestHAAuxiliaryPort, TestHFlush, TestInjectionForSimulatedStorage])
 
 ---
 
@@ -9,10 +9,10 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 80 | 21.4% |
-| **Skipped (Incompatible)** | 150 | 40.2% |
+| **Completed Transformations** | 91 | 24.4% |
+| **Skipped (Incompatible)** | 157 | 42.1% |
 | **In Progress** | 3 | 0.8% |
-| **Not Started** | 140 | 37.5% |
+| **Not Started** | 122 | 32.7% |
 
 ### Progress by Priority
 
@@ -25,7 +25,7 @@
 | **MEDIUM (Balancer)** | 15 | 3 | 4 | 0 | 8 | 20.0% |
 | **MEDIUM (Snapshot)** | 40 | 12 | 5 | 0 | 23 | 30.0% |
 | **MEDIUM (Client/CLI)** | 80 | 2 | 0 | 0 | 78 | 2.5% |
-| **LOW (Other)** | 128 | 36 | 89 | 2 | 1 | 28.1% |
+| **LOW (Other)** | 128 | 47 | 96 | 0 | -15 | 36.7% |
 
 ---
 
@@ -80,7 +80,7 @@ Tests focusing on file operations (create, read, write, append, delete, truncate
 ## Phase 8: LOW Priority - Other Transformable Tests
 
 **Target Completion:** Week 12+
-**Progress:** 31/128 (24.2%)
+**Progress:** 47/128 (36.7%)
 
 Remaining transformable tests not in other categories.
 
@@ -163,25 +163,25 @@ Remaining transformable tests not in other categories.
 | ❌ | `org.apache.hadoop.hdfs.TestDFSStripedOutputStreamUpdatePipeline` | LOW | **SKIPPED**: Tests striped output stream pipeline updates during DataNode failures (2 tests, 100 lines). CRITICAL BLOCKER: Uses `cluster.stopDataNode(0)`, `cluster.stopDataNode(1)`, `cluster.stopDataNode(2)` (lines 51-53) to simulate DataNode failures during write operations and verify pipeline update behavior. ProcessBasedMiniDFSCluster doesn't provide DataNode lifecycle control APIs needed for failure simulation. |
 | ❌ | `org.apache.hadoop.hdfs.TestDFSStripedOutputStreamWithFailureBase` | LOW | **SKIPPED**: Base/utility class (0 tests). Provides shared functionality for striped output stream failure tests. Not an actual test class. |
 | ✅ | `org.apache.hadoop.hdfs.TestDistributedFileSystem` | LOW | Completed |
-| 📋 | `org.apache.hadoop.hdfs.TestDistributedFileSystemWithECFile` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestEncryptedTransfer` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestEncryptionZonesWithHA` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestErasureCodeBenchmarkThroughput` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestErasureCodingAddConfig` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestErasureCodingExerciseAPIs` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestErasureCodingMultipleRacks` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestExtendedAcls` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestExternalBlockReader` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestFetchImage` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestFSInputChecker` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestFSOutputSummer` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestFsShellPermission` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestGetFileChecksum` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestHAAuxiliaryPort` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestHDFSFileSystemContract` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestHDFSTrash` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestHFlush` | LOW | |
-| 📋 | `org.apache.hadoop.hdfs.TestInjectionForSimulatedStorage` | LOW | |
+| ✅ | `org.apache.hadoop.hdfs.TestDistributedFileSystemWithECFile` | LOW | Completed - Tests block locations and listFiles for erasure-coded files with parameterized upgrade checkpoints. Transformed 4/5 test methods (testListECFilesSmallerThanOneCell, testListECFilesSmallerThanOneStripe, testListECFilesMoreThanOneBlockGroup, testStatistics). Skipped testReplayEditLogsForReplicatedFile which requires HA topology via MiniDFSNNTopology.simpleHATopology() - ProcessBasedMiniDFSCluster doesn't support HA. 100% client-side FileSystem APIs (listFiles, getFileBlockLocations, FileContext). 6 checkpoints per test method. |
+| ❌ | `org.apache.hadoop.hdfs.TestEncryptedTransfer` | LOW | **SKIPPED**: Tests encrypted data transfer using SASL encryption and block tokens (15 test methods, 548 lines). Already parameterized with @RunWith(Parameterized.class). CRITICAL BLOCKERS: (1) Lines 302-306, 340-345, 397-402: Direct access to `cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager()` for manipulating internal encryption key lifetimes via test-only methods (`setKeyUpdateIntervalForTesting`, `setTokenLifetime`, `clearAllKeysForTesting`); (2) Lines 351-363, 408-420: `cluster.getDataNodes()` to access internal DataNode state via `dn.getBlockPoolTokenSecretManager().get(encryptionKey.blockPoolId).hasKey(encryptionKey.keyId)` for verifying encryption key expiration; (3) Lines 423-426: Internal DFSOutputStream access via cast and `getPipeline()` method; (4) Lines 515-517: Direct DataNode object access via `cluster.getDataNode(port)` and `dn.shutdown()`. 5 out of 15 test methods (33%) require these internal accesses. Tests internal security infrastructure (block token secret manager, encryption key lifecycle) with no client API equivalents. ProcessBasedMiniDFSCluster runs nodes in separate processes making internal state access impossible. |
+| ❌ | `org.apache.hadoop.hdfs.TestEncryptionZonesWithHA` | LOW | **SKIPPED**: Tests encryption zones with HA failover. Requires HA topology via `MiniDFSNNTopology.simpleHATopology()` (line 72) which creates multiple NameNodes with shared state and failover capability. Uses HA-specific methods: `cluster.transitionToActive(0)` (line 76), `cluster.getNameNode(0/1)` (lines 81-82), `HATestUtil.configureFailoverFs()` (line 78), encryption key creation on multiple NameNodes (lines 79-80), and direct NameNode access `cluster.getNameNode(0).getNamesystem().getProvider()` (line 86). ProcessBasedMiniDFSCluster is designed for single-NameNode, multi-DataNode scenarios and does not support HA (High Availability) topology. |
+| ❌ | `org.apache.hadoop.hdfs.TestErasureCodeBenchmarkThroughput` | LOW | **SKIPPED**: Performance benchmark test for ErasureCodeBenchmarkThroughput tool (3 test methods, 124 lines). Tests write/read/gen/clean operations for replicated and erasure-coded files via ToolRunner. While technically transformable (all client-side FileSystem APIs, no direct cluster access), this test should be skipped because it's a **performance benchmarking test**, not a functional correctness test. Tests measure throughput of EC operations and validate benchmarking tool runs successfully - no assertions about HDFS functional behavior, data persistence, or upgrade correctness. Performance characteristics may differ between versions, but this test doesn't validate upgrade functionality. Following precedent of TestNNThroughputBenchmark (tracker line 120). Not upgrade-relevant - tests performance measurement infrastructure, not HDFS operations. |
+| ✅ | `org.apache.hadoop.hdfs.TestErasureCodingAddConfig` | LOW | Completed - Tests user-defined EC policy addition configuration (2 test methods, 79 lines). 100% client-side DistributedFileSystem API (addErasureCodingPolicies). Tests that adding custom EC policies succeeds when config enabled and fails when disabled. Transformed with parameterized upgrade checkpoints (NO_UPGRADE, AFTER_CLUSTER_START, AFTER_POLICY_CREATE, BEFORE_VERIFICATION). No direct cluster access. Perfect for upgrade testing - validates EC policy configuration behavior across versions. |
+| ✅ | `org.apache.hadoop.hdfs.TestErasureCodingExerciseAPIs` | LOW | Completed - Tests EC-enabled cluster APIs (access, quota, cache, EC policies, ACL, xattr, snapshots, symlinks, file ops, encryption zones, storage policies, append/truncate errors) with parameterized upgrade checkpoints. Replaced DFSTestUtil.createKey() with direct JavaKeyStoreProvider.Factory().createProvider() for encryption key creation. 13 test methods, 100% client-side APIs, 4 checkpoints per test. |
+| ✅ | `org.apache.hadoop.hdfs.TestErasureCodingMultipleRacks` | LOW | Completed - Tests EC block placement with skewed racks (3 test methods). Replaced DFSTestUtil.setupCluster() with inline rack array setup and ProcessBasedMiniDFSCluster.Builder().racks(). Replaced DFSTestUtil.waitForReplication() (requires internal cluster access) with client-side waitForReplication() using dfs.getFileBlockLocations(). Tests verify block placement across racks with various skewed configurations. 4 checkpoints per test. |
+| ✅ | `org.apache.hadoop.hdfs.TestExtendedAcls` | LOW | Completed - Tests HDFS ACL behavior (5 test methods). Converted from static @BeforeClass/@AfterClass setup to per-test cluster setup for parameterization. Tests default ACL inheritance, access ACL restrictions, gradual restriction changes. 100% client-side FileSystem ACL APIs (setAcl, getAclStatus, modifyAclEntries, removeAcl, access). 4 checkpoints per test. |
+| ✅ | `org.apache.hadoop.hdfs.TestExternalBlockReader` | LOW | Completed - Tests external block reader with custom SyntheticReplicaAccessor (2 test methods). 100% client-side operations. Removed .hosts() method not available in ProcessBasedMiniDFSCluster. 5 checkpoints per test. |
+| ❌ | `org.apache.hadoop.hdfs.TestFetchImage` | LOW | **SKIPPED**: Tests hdfs dfsadmin -fetchImage in HA cluster (1 test, 182 lines). Requires HA topology via `MiniDFSNNTopology.simpleHATopology()` (line 79) which creates multiple NameNodes with failover. Uses `cluster.getNameNode(0/1)` (lines 82-83), `cluster.transitionToActive()` (lines 100, 109), `HATestUtil.waitForStandbyToCatchUp()` (line 108), and `HATestUtil.configureFailoverFs()` (line 84). Requires direct filesystem access to NameNode storage directories via `cluster.getNameDirs(0)` (line 167) to find and verify FSImage files. Test validates HA failover behavior by fetching images from both active and standby NameNodes. ProcessBasedMiniDFSCluster is designed for single-NameNode scenarios and does not support HA topology. |
+| ✅ | `org.apache.hadoop.hdfs.TestFSInputChecker` | LOW | Completed - Tests FSInputChecker read/seek/skip operations with checksum verification (1 test method). Tests both HDFS and LocalFileSystem. 100% client-side operations for HDFS portion. 6 checkpoints covering cluster start, DFS tests, and verification. LocalFS file corruption tests preserved as-is (don't use cluster). |
+| ✅ | `org.apache.hadoop.hdfs.TestFSOutputSummer` | LOW | Completed - Tests FSOutputSummer write operations with different checksum types (CRC32, CRC32C, NULL) and write patterns (2 test methods). 100% client-side operations (create, write, read, getFileChecksum). 6 checkpoints covering cluster start, write patterns, and verification. Tests all-at-once, chunk-by-chunk, and variable-sized writes. |
+| ✅ | `org.apache.hadoop.hdfs.TestFsShellPermission` | LOW | Completed - Tests FsShell permission checking for delete operations with different users and permissions (1 test method, 8 test scenarios). 100% client-side operations (FsShell commands, mkdirs, setPermission, setOwner, exists). Uses UserGroupInformation.doAs() for user context switching. 5 checkpoints covering cluster start, file setup, delete tests, and verification. |
+| ✅ | `org.apache.hadoop.hdfs.TestGetFileChecksum` | LOW | ProcessBased version tests file checksums with append operations and files under construction. Compiled successfully first try. |
+| ❌ | `org.apache.hadoop.hdfs.TestHAAuxiliaryPort` | LOW | **SKIPPED**: Tests HA auxiliary RPC ports with multiple NameNodes (1 test, 113 lines). Requires HA topology via `MiniDFSNNTopology` with 2 NameNodes (lines 51-54). Uses HA operations: `cluster.transitionToActive(0/1)` (lines 60, 96), `cluster.getNameNode(0/1)` (lines 63-64), `cluster.shutdownNameNode(0)` (line 95). Requires internal access to NameNode RPC servers via `nn.getRpcServer()` and casts to `NameNodeRpcServer` to access auxiliary addresses (lines 67-70, 74-77). Test validates that auxiliary RPC ports work correctly and are accessible after HA failover. ProcessBasedMiniDFSCluster is designed for single-NameNode scenarios and does not support HA topology. |
+| ✅ | `org.apache.hadoop.hdfs.TestHDFSFileSystemContract` | LOW | Completed - Tests HDFS FileSystem contract compliance with append functionality (1 explicit test). Extends ProcessBasedUpgradeTestBase instead of FileSystemContractBaseTest due to Java single inheritance. Fixed protected field access by using umask value directly ("000"). 4 checkpoints covering cluster start, append test, and verification. Note: Only explicit test methods transformed; inherited contract tests from parent class not included. |
+| ✅ | `org.apache.hadoop.hdfs.TestHDFSTrash` | LOW | Completed - Tests HDFS trash functionality including trash shell operations, non-default filesystem handling, trash permissions, empty directory moves, and user-specific trash deletion (5 tests combined into 1 method). 100% client-side operations (FileSystem, Trash, DFSTestUtil, UserGroupInformation). 8 checkpoints covering cluster start, setup, and each test section. Combined all tests into single method to maintain shared setup with users and permissions. Compiled successfully first try. |
+| ❌ | `org.apache.hadoop.hdfs.TestHFlush` | LOW | **SKIPPED**: Tests internal hflush/hsync stream behavior with SyncFlags (14 tests, 507 lines). Requires casting FSDataOutputStream to internal DFSOutputStream via `getWrappedStream()` to call internal `hsync(EnumSet<SyncFlag>)` method (lines 117, 145, 154, 164, 332, 334). Uses direct DFSClient access `fileSystem.dfs.getLocatedBlocks()` to verify block boundaries during hsync operations (line 344). Tests internal stream semantics (UPDATE_LENGTH, END_BLOCK flags) not available through public FileSystem APIs. The doTheJob() helper method (lines 301-370) is used by 11 tests and requires both internal stream access and DFSClient access. Tests specifically validate internal DFSOutputStream implementation details including pipeline behavior and block management, which are not accessible via client APIs. |
+| ❌ | `org.apache.hadoop.hdfs.TestInjectionForSimulatedStorage` | LOW | **SKIPPED**: Tests block injection and replication with simulated storage (1 test, 186 lines). Requires `cluster.injectBlocks(0, uniqueBlocks, null)` to directly inject blocks into DataNode (line 171) - internal testing method not available via client APIs. Uses `cluster.getNamesystem().getBlockPoolId()` for direct NameNode FSNamesystem access (line 132). Requires `cluster.getAllBlockReports(bpid)` to retrieve internal block reports from all DataNodes (line 140). Uses `SimulatedFSDataset.setFactory(conf)` for test-only simulated storage implementation (lines 128, 152). Test validates internal replication behavior: creates file, shuts down cluster, restarts with simulated storage, injects blocks into one DataNode, and verifies NameNode triggers replication. Requires internal cluster state manipulation not available through FileSystem/DFSClient client APIs. |
 | 📋 | `org.apache.hadoop.hdfs.TestIsMethodSupported` | LOW | |
 | 📋 | `org.apache.hadoop.hdfs.TestLargeBlock` | LOW | |
 | 📋 | `org.apache.hadoop.hdfs.TestLease` | LOW | |
