@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-04 (Completed TestRandomOpsWithSnapshots; Skipped 4 Phase 3 tests: TestCorruptionWithFailover, TestErasureCodingCorruption, TestCorruptMetadataFile, TestRefreshNamenodeReplicationConfig)
+**Last Updated:** 2025-11-04 (Completed TestReplaceDatanodeFailureReplication; Skipped 8 total Phase 3 tests - all require HA config or internal block manipulation)
 
 ---
 
@@ -9,10 +9,10 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 38 | 10.2% |
-| **Skipped (Incompatible)** | 25 | 6.7% |
+| **Completed Transformations** | 39 | 10.5% |
+| **Skipped (Incompatible)** | 33 | 8.8% |
 | **In Progress** | 0 | 0.0% |
-| **Not Started** | 310 | 83.1% |
+| **Not Started** | 301 | 80.7% |
 
 ### Progress by Priority
 
@@ -20,7 +20,7 @@
 |----------------|------:|----------:|--------:|------------:|------------:|----------:|
 | **CRITICAL (Upgrade)** | 5 | 0 | 5 | 0 | 0 | 0.0% (All Skipped) |
 | **HIGH (File Ops)** | 46 | 18 | 12 | 0 | 16 | 39.1% |
-| **HIGH (Data Integrity)** | 14 | 1 | 4 | 0 | 9 | 7.1% |
+| **HIGH (Data Integrity)** | 14 | 2 | 12 | 0 | 0 | 14.3% |
 | **MEDIUM (ViewFS)** | 40 | 3 | 0 | 0 | 37 | 7.5% |
 | **MEDIUM (Balancer)** | 15 | 3 | 0 | 0 | 12 | 20.0% |
 | **MEDIUM (Snapshot)** | 40 | 8 | 4 | 0 | 28 | 20.0% |
@@ -97,7 +97,7 @@ Tests focusing on file operations (create, read, write, append, delete, truncate
 ## Phase 3: HIGH Priority - Replication & Data Integrity
 
 **Target Completion:** Week 4
-**Progress:** 1/14 completed, 4/14 skipped (7.1% completion rate)
+**Progress:** 2/14 completed, 12/14 skipped (14.3% completion rate - Phase Complete!)
 
 Tests ensuring data correctness and replication during upgrades.
 
@@ -106,16 +106,16 @@ Tests ensuring data correctness and replication during upgrades.
 | ❌ | `org.apache.hadoop.hdfs.server.blockmanagement.TestCorruptionWithFailover` | HIGH | **SKIPPED**: Requires HA configuration with QJM and multiple NameNodes (line 53: `MiniDFSNNTopology.simpleHATopology()`). Also requires direct access to internal BlockManager via `cluster.getNamesystem().getBlockManager()` (line 78) and internal methods `getCorruptBlocks()` (line 74) and `markAllDatanodesStale()` (lines 68-69). ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
 | ❌ | `org.apache.hadoop.hdfs.server.blockmanagement.TestErasureCodingCorruption` | HIGH | **SKIPPED**: Requires HA configuration (line 53: `simpleHATopology()`) and HA failover operations (lines 81-82: `transitionToStandby()`, `transitionToActive()`). Also requires direct access to internal BlockManager (line 78: `getNamesystem().getBlockManager()`) and internal method `getCorruptECBlockGroups()` (line 88) with no client API equivalent. ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
 | ❌ | `org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile` | HIGH | **SKIPPED**: Requires direct access to DataNode's local filesystem to corrupt metadata files (line 81: `cluster.getBlockMetadataFile(0, block)`) and direct file manipulation (lines 89-98). Also requires internal BlockManager access (lines 109-110: `getNamesystem().getBlockManager().getCorruptBlocks()`). No client API exists for accessing or manipulating DataNode metadata files on disk. |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencingWithReplication` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.ha.TestPendingCorruptDnMessages` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.TestAddOverReplicatedStripedBlocks` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.TestListCorruptFileBlocks` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencingWithReplication` | HIGH | **SKIPPED**: Requires HA configuration with 3 NameNodes (`harness.setNumberOfNameNodes(3)`) and uses `HAStressTestHarness` which requires QJM/shared edits. Tests HA failover scenarios during replication (`harness.addFailoverThread`, `cluster.transitionToActive`). ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.ha.TestPendingCorruptDnMessages` | HIGH | **SKIPPED**: Requires HA configuration (`MiniDFSNNTopology.simpleHATopology()` line 59) with 2 NameNodes and HA failover operations (`transitionToActive`, `transitionToStandby`). Also requires internal BlockManager access (`getNamesystem().getBlockManager().getPendingDataNodeMessageCount()` lines 94-96) with no client API equivalent. ProcessBasedMiniDFSCluster only supports single-NameNode clusters. |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.TestAddOverReplicatedStripedBlocks` | HIGH | **SKIPPED**: Requires extensive internal access: `SimulatedFSDataset.setFactory(conf)` to inject custom dataset (line 79), `cluster.injectBlocks()` to directly manipulate DataNode storage (lines 112, 118-122), `cluster.triggerBlockReports()` and `triggerHeartbeats()` not available in ProcessBased, `cluster.getDataNodes()` for direct DN access (line 159), `getNamesystem().getBlockManager()` for internal state (line 204), and `getNamesystem().writeLock()/writeUnlock()` for NameNode locking (lines 207-213). No client API equivalents exist for block injection and internal state manipulation. |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.TestListCorruptFileBlocks` | HIGH | **SKIPPED**: Requires direct filesystem access to DataNode storage directories to corrupt blocks: `cluster.getInstanceStorageDir()` and `MiniDFSCluster.getFinalizedDir()` (lines 102-105, 184-186, 302-303, 415-416, 495-496, 585-586), `getAllBlockFiles()/getAllBlockMetadataFiles()` (lines 105, 188, 304, 417, 498), direct file manipulation with RandomAccessFile and delete() to corrupt blocks on disk (lines 109-115, 192-198, 310-317, 423-430, 502-506, 591-597), and `DataNodeTestUtils.runDirectoryScanner()` for internal DN operations (line 512). While `dfs.listCorruptFileBlocks()` is a client API, the test requires direct manipulation of block files on disk which is not accessible in ProcessBasedMiniDFSCluster. |
+| ❌ | `org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks` | HIGH | **SKIPPED**: Requires internal access to corrupt blocks and verify replication state: `cluster.getNamesystem()` for direct FSNamesystem access (lines 64, 119, 170, 224), `namesystem.getBlockManager().countNodes()` to count corrupt replicas via internal BlockManager methods (lines 264-266), `cluster.getMaterializedReplica().truncateData()` to directly manipulate blocks on disk (line 276), `DataNodeTestUtils.runDirectoryScanner()` for internal DataNode operation (line 279), and `cluster.getStorageDir()/MiniDFSCluster.getFinalizedDir()` for direct filesystem access to DataNode storage (lines 285-286). No client API exists to corrupt blocks or query internal replication statistics. |
 | ❌ | `org.apache.hadoop.hdfs.server.namenode.TestRefreshNamenodeReplicationConfig` | HIGH | **SKIPPED**: Requires direct access to internal BlockManager (line 57: `cluster.getNameNode().getNamesystem().getBlockManager()`) and internal BlockManager methods `getMaxReplicationStreams()`, `getReplicationStreamsHardLimit()`, `getBlocksReplWorkMultiplier()` (lines 72-74, 85-87, etc.) which have no client API equivalents. Test verifies internal replication configuration that can only be validated through direct BlockManager access. |
-| 📋 | `org.apache.hadoop.hdfs.TestCrcCorruption` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestFileCorruption` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithDecodingCorruptData` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestReplaceDatanodeFailureReplication` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.TestCrcCorruption` | HIGH | **SKIPPED**: Requires direct manipulation of DataNode storage to corrupt blocks. Uses `cluster.getDataNodes().get(dnIdx)` for direct DN access (line 173), `dn.getFSDataset().getFinalizedBlocks(bpid)` for internal dataset access (lines 175-176), and `cluster.deleteMeta()`, `cluster.truncateMeta()`, `cluster.corruptMeta()` to directly manipulate meta files on DataNode storage (lines 184, 189, 191). Also uses `cluster.corruptBlockOnDataNodes()` to corrupt block files (line 289). No client API exists to corrupt meta files or block files on DataNode storage. |
+| ❌ | `org.apache.hadoop.hdfs.TestFileCorruption` | HIGH | **SKIPPED**: (Already skipped in Phase 2) All 5 test methods require deep internal access: `dn.getFSDataset()` for block manipulation, `cluster.getFsDatasetTestUtils()` for deleting block files, `cluster.getNamesystem()` with writeLock()/writeUnlock() for NameNode locking, `getBlockManager().findAndMarkBlockAsCorrupt()` for manual corruption marking, `cluster.triggerBlockReports()` not available in ProcessBased, and internal BlockManager metrics (getBlocksTotal, getLowRedundancyBlocksCount). Tests simulate block corruption and disk failures by directly manipulating internal storage state, with no client API equivalents. |
+| ❌ | `org.apache.hadoop.hdfs.TestReadStripedFileWithDecodingCorruptData` | HIGH | **SKIPPED**: (Already skipped in Phase 2) Uses `ReadStripedFileWithDecodingHelper.testReadWithBlockCorrupted()` which requires `cluster.getDataNodes()` for direct DataNode access (line 101, 169) and `cluster.corruptBlockOnDataNodes()` or `cluster.corruptBlockOnDataNodesByDeletingBlockFile()` (lines 254, 258) for internal block manipulation. These methods directly manipulate DataNode internal storage to simulate corruption, which is not accessible in ProcessBasedMiniDFSCluster. Tests online recovery of striped files with corrupt blocks by internally manipulating block files. |
+| ✅ | `org.apache.hadoop.hdfs.TestReplaceDatanodeFailureReplication` | HIGH | Completed - Tests pipeline replacement behavior when DataNodes fail during write operations. Transformed to use ProcessBasedMiniDFSCluster with parameterized upgrade checkpoints. Replaced `cluster.waitFirstBRCompleted()` with Thread.sleep(). All tests use client-side APIs (`out.getCurrentBlockReplication()`, file operations). Includes 5 test methods testing various datanode failure scenarios during pipeline writes. |
 | ✅ | `org.apache.hadoop.hdfs.TestReplaceDatanodeOnFailure` | HIGH | Completed |
 
 ---
