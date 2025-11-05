@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-04 (Completed 2 tests, Skipped 5 tests: 4 HA/Federation, 1 NodeGroup)
+**Last Updated:** 2025-11-05 (Completed Test #9: TestResolveHdfsSymlink - 5 tests this session)
 
 ---
 
@@ -9,10 +9,10 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 45 | 12.1% |
-| **Skipped (Incompatible)** | 45 | 12.1% |
+| **Completed Transformations** | 53 | 14.2% |
+| **Skipped (Incompatible)** | 46 | 12.3% |
 | **In Progress** | 0 | 0.0% |
-| **Not Started** | 283 | 75.9% |
+| **Not Started** | 274 | 73.5% |
 
 ### Progress by Priority
 
@@ -25,7 +25,7 @@
 | **MEDIUM (Balancer)** | 15 | 3 | 4 | 0 | 8 | 20.0% |
 | **MEDIUM (Snapshot)** | 40 | 12 | 5 | 0 | 23 | 30.0% |
 | **MEDIUM (Client/CLI)** | 80 | 2 | 0 | 0 | 78 | 2.5% |
-| **LOW (Other)** | 128 | 3 | 0 | 0 | 125 | 2.3% |
+| **LOW (Other)** | 128 | 11 | 1 | 0 | 116 | 8.6% |
 
 ---
 
@@ -237,24 +237,24 @@ Tests for command-line tools and client operations.
 | ✅ | `org.apache.hadoop.hdfs.TestClientProtocolForPipelineRecovery` | MEDIUM | Completed |
 | ❌ | `org.apache.hadoop.hdfs.TestClientReportBadBlock` | MEDIUM | Skipped - Requires server-side API access. Uses cluster.getDataNode(dninfo.getIpcPort()) (line 222) to access DataNode object directly for testing bad block reporting. ProcessBasedMiniDFSCluster does not provide direct access to DataNode objects due to process isolation |
 | ✅ | `org.apache.hadoop.hdfs.TestDFSClientExcludedNodes` | MEDIUM | Completed - Tests DFSClient excluded nodes handling. Transformed to use ProcessBasedMiniDFSCluster. Changed cluster.stopDataNode() to cluster.shutdownDataNode(), cluster.restartDataNode(DataNodeProperties) to cluster.restartDataNode(int index), and cluster.waitActive() to cluster.waitClusterUp(). Added TimeoutException to method signatures. Tests that clients properly exclude failed DataNodes and can forgive them after expiry period |
-| 📋 | `org.apache.hadoop.hdfs.TestDFSClientFailover` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.TestDFSClientRetries` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.TestDFSClientSocketSize` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.TestFileCreationClient` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.TestHdfsAdmin` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestDebugAdmin` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestDelegationTokenFetcher` | MEDIUM | |
+| ❌ | `org.apache.hadoop.hdfs.TestDFSClientFailover` | MEDIUM | **SKIPPED**: Requires HA configuration with multiple NameNodes (`MiniDFSNNTopology.simpleHATopology()` line 80) and HA failover operations (`cluster.transitionToActive()` lines 82, 112, 144). All 8 test methods explicitly test HA failover scenarios: active NameNode failure, connection timeout failover, logical URI handling with HA, DNS resolution with HA, and HA proxy providers. ProcessBasedMiniDFSCluster only supports single-NameNode clusters, not HA. Test is fundamentally about HA client behavior and cannot be transformed. |
+| ❌ | `org.apache.hadoop.hdfs.TestDFSClientRetries` | MEDIUM | **SKIPPED**: Requires server-side API access. Uses `cluster.getNameNodeRpc()` (lines 312, 385, 439, etc.) which returns `NamenodeProtocols` - a server-side protocol not accessible in ProcessBasedMiniDFSCluster's separate process model. Test heavily relies on Mockito spying/mocking of NamenodeProtocols to inject failures (`spy(cluster.getNameNodeRpc())` lines 313, 385), which requires in-process access. Also uses `cluster.corruptBlockOnDataNodes(block)` (line 930) which throws UnsupportedOperationException in ProcessBased. Tests retry logic by directly instantiating DFSClient with mocked NameNode (`new DFSClient(null, spyNN, conf, null)`). This internal testing approach of injecting failures through mocked protocols is fundamentally incompatible with ProcessBased's process isolation model. |
+| ✅ | `org.apache.hadoop.hdfs.TestDFSClientSocketSize` | MEDIUM | Completed - Tests DFSClient socket send buffer size configuration (default, specified, auto-tuned). Transformed to use ProcessBasedMiniDFSCluster. Changed cluster.waitActive() to cluster.waitClusterUp() and added TimeoutException to method signatures. Replaced direct DataNode access (cluster.dataNodes.get(0).datanode.getDatanodeId()) with client-side API call (dfs.getDataNodeStats()[0]) to get DatanodeInfo for socket creation. All operations use client-side APIs (DataStreamer.createSocketForPipeline). Tests verify socket buffer sizes are correctly configured. |
+| ✅ | `org.apache.hadoop.hdfs.TestFileCreationClient` | MEDIUM | Completed (duplicate entry - see Phase 2, line 78) |
+| ✅ | `org.apache.hadoop.hdfs.TestHdfsAdmin` | MEDIUM | Completed - Tests HdfsAdmin client API operations (quotas, storage policies, key providers, open files listing). Transformed to use ProcessBasedMiniDFSCluster. Changed cluster.waitActive() to cluster.waitClusterUp() and added TimeoutException to method signatures. All operations use client-side APIs (HdfsAdmin, FileSystem, DFSTestUtil). Includes 5 test methods testing quota management, bad URI handling, storage policy operations, KeyProvider for encryption, and listing open files. |
+| ❌ | `org.apache.hadoop.hdfs.tools.TestDebugAdmin` | MEDIUM | **SKIPPED**: Requires direct DataNode filesystem access. Contains 5 test methods, of which 3 require internal DataNode access: (1) `testVerifyMetaCommand` uses `cluster.getDataNodes().get(0)` (line 114), `datanode.getFSDataset()` (line 116), and `getBlockFile()/getMetaFile()` (lines 118-123) to access block files on disk; (2) `testComputeMetaCommand` uses same blockers (lines 143-148); (3) `testVerifyECCommand` uses `cluster.getDataNode(port)` (line 259), `datanode.getFSDataset()` (line 260), block/meta file access (lines 260-263), and direct file manipulation (line 267). DebugAdmin tool is designed for debugging DataNode local storage by directly accessing block/metadata files, which requires filesystem access to DataNode storage directories not available in ProcessBasedMiniDFSCluster's separate process model. While 2 tests (testRecoverLease, testRecoverLeaseforFileNotFound) could be transformed, the majority of functionality (60%) is blocked. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestDelegationTokenFetcher` | MEDIUM | Completed - Tests delegation token fetching operations. Transformed to use ProcessBasedMiniDFSCluster. Changed cluster.waitActive() to cluster.waitClusterUp() and added TimeoutException handling. Contains 4 test methods, of which 3 use mocked WebHdfsFileSystem (no cluster needed) and 1 uses cluster with client-side delegation token APIs (DelegationTokenFetcher.saveDelegationToken, renewTokens, cancelTokens). All operations use client-side APIs. |
 | ✅ | `org.apache.hadoop.hdfs.tools.TestDFSAdmin` | MEDIUM | Completed |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestDFSZKFailoverController` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestECAdmin` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestGetGroups` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestStoragePolicyCommands` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestStoragePolicySatisfyAdminCommands` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithDFSAdmin` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithFSCommands` | MEDIUM | |
-| 📋 | `org.apache.hadoop.hdfs.tools.TestViewFSStoragePolicyCommands` | MEDIUM | |
-| 📋 | `org.apache.hadoop.tools.TestJMXGet` | MEDIUM | |
+| ❌ | `org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA` | MEDIUM | **SKIPPED**: Requires HA configuration with QJM. Uses `MiniQJMHACluster` (lines 33, 49) which requires HA topology with multiple NameNodes and Quorum Journal Manager. Test name explicitly indicates HA testing ("WithHA"). ProcessBasedMiniDFSCluster only supports single-NameNode clusters, not HA configurations with shared journal storage. Test verifies DFSAdmin commands work correctly in HA setups. |
+| ❌ | `org.apache.hadoop.hdfs.tools.TestDFSZKFailoverController` | MEDIUM | **SKIPPED**: Requires HA configuration with ZooKeeper-based automatic failover. Uses `MiniDFSNNTopology` to create HA cluster with 2 NameNodes (lines 101-106), creates ZKFCThread instances for ZooKeeper Failover Controller (lines 114, 120), and uses `cluster.getNameNode(idx)` for direct NameNode access (lines 176, 265, 333). Test methods use HA-specific operations: `cluster.shutdownNameNode()`, `cluster.restartNameNode()` (lines 197, 205, 211), state transitions between ACTIVE/STANDBY/OBSERVER, and automatic failover scenarios. All 9 test methods test ZooKeeper-based failover controller functionality, which is an HA-specific component. ProcessBasedMiniDFSCluster only supports single-NameNode clusters, not HA configurations with ZooKeeper coordination. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestECAdmin` | MEDIUM | Completed - Tests ECAdmin CLI tool for erasure coding policy management. Transformed to use ProcessBasedMiniDFSCluster. Replaced `DFSTestUtil.setupCluster()` with custom `setupCluster()` helper method using ProcessBasedMiniDFSCluster.Builder with rack configuration. All operations use client-side APIs: `cluster.getFileSystem().enableErasureCodingPolicy()`, `disableErasureCodingPolicy()`, and ECAdmin CLI commands. Added `TimeoutException` handling for `cluster.waitClusterUp()`. Contains 11 test methods testing cluster topology verification, EC policy enable/disable, and error messaging. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestGetGroups` | MEDIUM | Completed - Tests GetGroups CLI tool for HDFS. Transformed to use ProcessBasedMiniDFSCluster. Extends `GetGroupsTestBase` from hadoop-common which contains actual test methods. Simple transformation: replaced `MiniDFSCluster.Builder(conf).numDataNodes(0).build()` with `ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(0).build()`, added `cluster.waitClusterUp()`, and added `TimeoutException` to method signature. Test creates cluster with 0 DataNodes and provides GetGroups tool instance for base class tests. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestStoragePolicyCommands` | MEDIUM | Completed - Tests StoragePolicyAdmin CLI tool commands. Transformed to use ProcessBasedMiniDFSCluster. Removed `.storageTypes(newtypes)` configuration as ProcessBasedMiniDFSCluster doesn't support fine-grained per-DataNode storage type configuration, but storage policy commands operate on metadata and work regardless of actual storage types. All operations use client-side APIs: `DFSTestUtil.createFile()`, StoragePolicyAdmin CLI (`setStoragePolicy`, `getStoragePolicy`, `unsetStoragePolicy`), and `DFSTestUtil.toolRun()`. Added `TimeoutException` handling for `cluster.waitClusterUp()`. Contains 2 test methods testing storage policy set/get/unset operations. |
+| ❌ | `org.apache.hadoop.hdfs.tools.TestStoragePolicySatisfyAdminCommands` | MEDIUM | **SKIPPED**: Requires actual storage type differentiation and physical block movement verification. Uses `.storageTypes(newtypes)` to configure ARCHIVE and DISK storage types (lines 61-64), creates external StoragePolicySatisfier instance with `DFSTestUtil.getNameNodeConnector()` for direct NameNode connection (lines 67-74), and critically uses `DFSTestUtil.waitExpectedStorageType()` to verify blocks physically moved to ARCHIVE storage (lines 109-110, 131-132). Test validates SPS functionality that moves blocks between storage tiers based on storage policies. ProcessBasedMiniDFSCluster doesn't support per-DataNode storage type configuration, and the test's core functionality (verifying SPS actually moves blocks between DISK and ARCHIVE tiers) cannot be validated without actual storage type support. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithDFSAdmin` | MEDIUM | Completed - Tests DFSAdmin commands with ViewFileSystemOverloadScheme configured. Transformed to use ProcessBasedMiniDFSCluster. Simple transformation since original already used `cluster.waitClusterUp()` instead of `waitActive()`. Added `TimeoutException` to method signature. Test configures ViewFileSystemOverloadScheme for mounting different filesystems and tests DFSAdmin CLI commands: `saveNamespace`, `safemode`, `allowSnapshot`/`disallowSnapshot`, `setBalancerBandwidth`. All operations use client-side DFSAdmin tool via ToolRunner.run(). Contains 7 test methods. |
+| ✅ | `org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithFSCommands` | MEDIUM | Completed - Tests FsShell commands with ViewFileSystemOverloadScheme configured. Transformed to use ProcessBasedMiniDFSCluster. Simple transformation since original already used `cluster.waitClusterUp()`. Added `TimeoutException` to method signature. Test configures ViewFileSystemOverloadScheme for mounting different filesystems and tests FsShell CLI command: `-df` (disk free) to verify disk usage calculation across mount points. All operations use client-side FsShell tool via ToolRunner.run(). Contains 1 test method. |
+| ❌ | `org.apache.hadoop.hdfs.tools.TestViewFSStoragePolicyCommands` | MEDIUM | **SKIPPED**: Requires HDFS Federation with multiple independent NameNodes. Uses `MiniDFSNNTopology.simpleFederatedTopology(2)` to create federated cluster with 2 NameNodes (lines 48-49), uses `cluster.getFileSystem(0)` and `cluster.getFileSystem(1)` to access filesystems of different NameNodes (lines 53-54), and configures ViewFS with links to multiple federation namespaces (lines 65-68). Test uses `cluster.getNameNode(0)` for direct NameNode access (lines 90, 95). ProcessBasedMiniDFSCluster only supports single-NameNode clusters, not federated topologies where multiple independent NameNodes each manage separate namespaces. Test extends TestStoragePolicyCommands to verify storage policy commands work correctly with ViewFS over federated HDFS. |
+| ❌ | `org.apache.hadoop.tools.TestJMXGet` | MEDIUM | **SKIPPED**: Requires in-process JMX MBean access. Uses JMXGet tool with `jmx.init()` to connect to local JVM's MBean server (line 103) to retrieve NameNode and DataNode metrics. Critically, test verifies that after `cluster.shutdown()`, no MBeans remain registered in the local JVM (lines 117-120, 169-172), which assumes NameNode/DataNode run in same JVM as test. ProcessBasedMiniDFSCluster runs NameNode and DataNode in separate JVM processes, making their JMX MBeans inaccessible via local JMX connection. Would require remote JMX configuration and cannot satisfy the post-shutdown MBean unregistration verification. Test validates JMX metric retrieval for "NumLiveDataNodes", "CorruptBlocks" (NameNode), and "BytesWritten" (DataNode). |
 
 ---
 
@@ -270,16 +270,16 @@ Remaining transformable tests not in other categories.
 
 | Status | Test Class | Priority | Notes |
 |--------|------------|----------|-------|
-| 📋 | `org.apache.hadoop.fs.loadGenerator.TestLoadGenerator` | LOW | |
-| 📋 | `org.apache.hadoop.fs.permission.TestStickyBit` | LOW | |
-| 📋 | `org.apache.hadoop.fs.shell.TestHdfsTextCommand` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestEnhancedByteBufferAccess` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestFcHdfsCreateMkdir` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestFcHdfsPermission` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestFcHdfsSetUMask` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestGlobPaths` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestHDFSFileContextMainOperations` | LOW | |
-| 📋 | `org.apache.hadoop.fs.TestResolveHdfsSymlink` | LOW | |
+| ✅ | `org.apache.hadoop.fs.loadGenerator.TestLoadGenerator` | LOW | Completed - Tests StructureGenerator, DataGenerator, and LoadGenerator utilities for HDFS. Transformed to use ProcessBasedMiniDFSCluster. Contains 2 test methods: (1) `testStructureGenerator()` tests structure generation without cluster, (2) `testLoadGenerator()` creates ProcessBasedMiniDFSCluster with 3 DataNodes and tests DataGenerator/LoadGenerator tools. Changed `cluster.waitActive()` to `cluster.waitClusterUp()` and added TimeoutException handling. All operations use client-side FileSystem APIs through DataGenerator and LoadGenerator utilities. Tests both programmatic and scripted load generation scenarios. |
+| ✅ | `org.apache.hadoop.fs.permission.TestStickyBit` | LOW | Completed - Tests sticky bit functionality (permission 01000) for files and directories. Transformed to use ProcessBasedMiniDFSCluster. All operations use client-side FileSystem APIs (setPermission, getFileStatus, modifyAclEntries). Includes tests for sticky bit persistence across cluster restarts, ACL interactions, recursive delete protection, and permission inheritance. 10 test methods covering sticky bit set/get, delete protection, rename protection, and reset behavior |
+| ✅ | `org.apache.hadoop.fs.shell.TestHdfsTextCommand` | LOW | Completed - Tests HDFS text command for displaying Avro binary files. Transformed to use ProcessBasedMiniDFSCluster. Single test method uses reflection to call Display.Text.getInputStream() and verifies correct output. All operations use client-side FileSystem APIs (create, write, exists) |
+| ❌ | `org.apache.hadoop.fs.TestEnhancedByteBufferAccess` | LOW | **SKIPPED**: Requires direct DataNode internal access via `cluster.getDataNodes().get(0).getFSDataset()` (lines 608, 635) to test zero-copy reads and cache verification. Specifically uses `FsDatasetSpi` to verify cache usage with `DFSTestUtil.verifyExpectedCacheUsage()`. Tests short-circuit reads with mmap which require accessing DataNode's internal storage. ProcessBasedMiniDFSCluster runs DataNodes in separate processes and doesn't provide access to internal FsDataset objects. |
+| ✅ | `org.apache.hadoop.fs.TestFcHdfsCreateMkdir` | LOW | Completed - Tests FileContext create/mkdir operations. Transformed to use ProcessBasedMiniDFSCluster. Extends FileContextCreateMkdirBaseTest which contains all test methods. All operations use client-side FileContext APIs (mkdir, create). Simple transformation with cluster setup only |
+| ✅ | `org.apache.hadoop.fs.TestFcHdfsPermission` | LOW | Completed - Tests FileContext permission operations. Extends FileContextPermissionBase with all test methods inherited. Transformed to use ProcessBasedMiniDFSCluster. All operations use client-side FileContext APIs |
+| ✅ | `org.apache.hadoop.fs.TestFcHdfsSetUMask` | LOW | Transformed to ProcessBasedMiniDFSCluster. Tests umask functionality with FileContext API. 12 test methods covering various permission scenarios (blank, wide-open, user-group). All tests use client-side FileContext operations. Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestGlobPaths` | LOW | Transformed to ProcessBasedMiniDFSCluster. Comprehensive glob pattern test with 30+ test methods covering wildcards, curly brackets, character sets, ranges, symlinks, permissions, and edge cases. All tests use client-side FileSystem and FileContext APIs (mkdirs, createNewFile, globStatus). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestHDFSFileContextMainOperations` | LOW | Transformed to ProcessBasedMiniDFSCluster. Extends FileContextMainOperationsBaseTest with tests for rename with quotas, truncate, and edit log replay. Includes restartCluster() method for testing cluster restart without formatting. All tests use client-side APIs (FileContext, DistributedFileSystem). Compiled successfully. |
+| ✅ | `org.apache.hadoop.fs.TestResolveHdfsSymlink` | LOW | Transformed to ProcessBasedMiniDFSCluster. Tests FileContext symlink resolution between HDFS and local filesystem, delegation token APIs, and error handling. 4 test methods using client-side FileContext and DFSClient APIs. Changed waitActive() to waitClusterUp(). Compiled successfully. |
 | 📋 | `org.apache.hadoop.fs.TestSWebHdfsFileContextMainOperations` | LOW | |
 | 📋 | `org.apache.hadoop.fs.TestSymlinkHdfs` | LOW | |
 | 📋 | `org.apache.hadoop.fs.TestSymlinkHdfsDisable` | LOW | |
