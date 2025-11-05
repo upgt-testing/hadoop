@@ -1,6 +1,6 @@
 # Test Transformation Progress Tracker
 
-**Last Updated:** 2025-11-04 (Completed TestFileAppend3 and TestFileCreationClient transformations)
+**Last Updated:** 2025-11-04 (Completed TestFileLengthOnClusterRestart and TestFileConcurrentReader transformations; Skipped TestFileCreationEmpty and TestReadWhileWriting)
 
 ---
 
@@ -9,17 +9,17 @@
 | Metric | Count | Percentage |
 |--------|------:|----------:|
 | **Total Transformable Tests** | 373 | 100.0% |
-| **Completed Transformations** | 23 | 6.2% |
-| **Skipped (Incompatible)** | 7 | 1.9% |
+| **Completed Transformations** | 27 | 7.2% |
+| **Skipped (Incompatible)** | 10 | 2.7% |
 | **In Progress** | 0 | 0.0% |
-| **Not Started** | 343 | 92.0% |
+| **Not Started** | 336 | 90.1% |
 
 ### Progress by Priority
 
 | Priority Level | Total | Completed | Skipped | In Progress | Not Started | % Complete |
 |----------------|------:|----------:|--------:|------------:|------------:|----------:|
 | **CRITICAL (Upgrade)** | 5 | 0 | 5 | 0 | 0 | 0.0% (All Skipped) |
-| **HIGH (File Ops)** | 46 | 10 | 2 | 0 | 34 | 21.7% |
+| **HIGH (File Ops)** | 46 | 14 | 5 | 0 | 27 | 30.4% |
 | **HIGH (Data Integrity)** | 14 | 1 | 0 | 0 | 13 | 7.1% |
 | **MEDIUM (ViewFS)** | 40 | 3 | 0 | 0 | 37 | 7.5% |
 | **MEDIUM (Balancer)** | 15 | 3 | 0 | 0 | 12 | 20.0% |
@@ -67,26 +67,26 @@ Tests focusing on file operations (create, read, write, append, delete, truncate
 |--------|------------|----------|-------|
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.snapshot.TestFileContextSnapshot` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.server.namenode.TestFileLimit` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestAppendDifferentChecksum` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestAppendSnapshotTruncate` | HIGH | |
+| ✅ | `org.apache.hadoop.hdfs.TestAppendDifferentChecksum` | HIGH | Completed - Tests appending with different checksum algorithms (CRC32/CRC32C) with parameterized upgrade checkpoints |
+| ✅ | `org.apache.hadoop.hdfs.TestAppendSnapshotTruncate` | HIGH | Completed - Tests random mix of append, snapshot, and truncate operations with multi-threaded workers. Checkpoints limited to worker pause points due to concurrent nature |
 | ✅ | `org.apache.hadoop.hdfs.TestFileAppend` | HIGH | Completed |
 | ✅ | `org.apache.hadoop.hdfs.TestFileAppend2` | HIGH | Completed |
 | ✅ | `org.apache.hadoop.hdfs.TestFileAppend3` | HIGH | Completed - Transformed client-side tests (TC1, TC2, TC5, TC12, AppendToPartialChunk, SmallAppendRace). Skipped TC7 and TC11 (require DataNode internal access) |
 | ❌ | `org.apache.hadoop.hdfs.TestFileAppend4` | HIGH | **SKIPPED**: All 4 tests require internal NameNode/DataNode access: cluster.setLeasePeriod() for lease manipulation, cluster.getDataNodes() for DN access, cluster.getNamesystem().getFSDirectory() and INodeFile access for internal NameNode state. Tests focus on internal lease recovery mechanisms not accessible via client APIs. |
-| 📋 | `org.apache.hadoop.hdfs.TestFileChecksum` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestFileConcurrentReader` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.TestFileChecksum` | HIGH | **SKIPPED**: 33 test methods heavily rely on `cluster.setDataNodeDead()` (used to forcibly mark DataNode as dead in NameNode internal state via NameNodeAdapter.getDatanode() and DFSTestUtil.setDatanodeDead()). Also uses direct DataNode object access via cluster.getDataNodes(). These internal NameNode/DataNode state manipulations have no client API equivalents in ProcessBasedMiniDFSCluster. Tests simulate DataNode failures and checksum verification with missing blocks. |
+| ✅ | `org.apache.hadoop.hdfs.TestFileConcurrentReader` | HIGH | Completed - Tests concurrent reads/writes to files with parameterized upgrade checkpoints. Includes 7 test methods testing unfinished block reads, CRC errors, and race conditions. |
 | 📋 | `org.apache.hadoop.hdfs.TestFileCorruption` | HIGH | |
 | ✅ | `org.apache.hadoop.hdfs.TestFileCreationClient` | HIGH | Completed - Tests client-triggered lease recovery with DataNode failure |
 | ❌ | `org.apache.hadoop.hdfs.TestFileCreationDelete` | HIGH | **SKIPPED**: Requires cluster shutdown/rebuild with format(false) to test lease persistence across restarts. ProcessBasedMiniDFSCluster doesn't support rebuilding with existing data directories. |
-| 📋 | `org.apache.hadoop.hdfs.TestFileCreationEmpty` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestFileLengthOnClusterRestart` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.TestFileCreationEmpty` | HIGH | **SKIPPED**: Requires cluster.setLeasePeriod() for dynamic lease period manipulation which directly accesses NameNode internal state via NameNodeAdapter.setLeasePeriod(getNamesystem()). No client API equivalent exists for dynamically changing lease periods after cluster startup. Test verifies that empty files don't cause ConcurrentModificationException during lease expiration. |
+| ✅ | `org.apache.hadoop.hdfs.TestFileLengthOnClusterRestart` | HIGH | Completed - Tests file length visibility after cluster restarts with parameterized upgrade checkpoints. Includes NameNode restarts and DataNode shutdowns. |
 | ✅ | `org.apache.hadoop.hdfs.TestFileStatus` | HIGH | Completed |
 | 📋 | `org.apache.hadoop.hdfs.TestFileStatusWithDefaultECPolicy` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithDecodingCorruptData` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithDecodingDeletedData` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithDNFailure` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestReadStripedFileWithMissingBlocks` | HIGH | |
-| 📋 | `org.apache.hadoop.hdfs.TestReadWhileWriting` | HIGH | |
+| ❌ | `org.apache.hadoop.hdfs.TestReadWhileWriting` | HIGH | **SKIPPED**: Requires cluster.setLeasePeriod() for setting soft/hard lease limits (500ms/600s) to test lease expiration and recovery. Uses NameNodeAdapter.setLeasePeriod(getNamesystem()) which directly manipulates internal NameNode state. Test verifies reading from file while being written and lease recovery allowing different user to append after soft limit expires. |
 | 📋 | `org.apache.hadoop.hdfs.TestWriteBlockGetsBlockLengthHint` | HIGH | |
 | 📋 | `org.apache.hadoop.hdfs.TestWriteConfigurationToDFS` | HIGH | |
 | ✅ | `org.apache.hadoop.hdfs.TestWriteRead` | HIGH | Completed - Tests read-while-write with parameterized upgrade checkpoints |
