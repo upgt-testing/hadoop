@@ -22,33 +22,53 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.qjournal.server.JournalNode;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.test.LambdaTestUtils;
 import org.apache.hadoop.test.PathUtils;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestMiniJournalCluster}.
  *
- * Note: This test doesn't use MiniDFSCluster for cluster creation.
+ * Note: This test doesn't use ProcessBasedMiniDFSCluster for cluster creation.
  * It creates a MiniJournalCluster (multiple JournalNodes for testing QJM).
  * The original only used MiniDFSCluster.getBaseDirectory() for test paths.
  *
+ * Since MiniJournalCluster doesn't support upgrade() method, this test uses
+ * parameterization with only NO_UPGRADE checkpoint for consistency with other tests.
+ *
  * @see TestMiniJournalCluster Original test
  */
+@RunWith(Parameterized.class)
 public class TestMiniJournalCluster_ProcessBased {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestMiniJournalCluster_ProcessBased.class);
   private static final File TEST_BUILD_DATA = PathUtils.getTestDir(TestMiniJournalCluster_ProcessBased.class);
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    // MiniJournalCluster doesn't have upgrade() method, so only NO_UPGRADE checkpoint
+    return Arrays.asList(UpgradeCheckpoints.NO_UPGRADE);
+  }
 
   @Test
   public void testStartStop() throws IOException {

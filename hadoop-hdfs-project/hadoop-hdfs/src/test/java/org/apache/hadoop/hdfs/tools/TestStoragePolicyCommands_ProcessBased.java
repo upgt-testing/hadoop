@@ -19,6 +19,8 @@ package org.apache.hadoop.hdfs.tools;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -32,9 +34,13 @@ import org.apache.hadoop.hdfs.protocol.BlockStoragePolicy;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.StoragePolicySatisfierMode;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockStoragePolicySuite;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
-import org.junit.After;
-import org.junit.Before;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestStoragePolicyCommands}.
@@ -46,17 +52,26 @@ import org.junit.Test;
  *
  * @see TestStoragePolicyCommands Original test using MiniDFSCluster
  */
-public class TestStoragePolicyCommands_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestStoragePolicyCommands_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final short REPL = 1;
   private static final int SIZE = 128;
 
-  protected static Configuration conf;
-  protected static ProcessBasedMiniDFSCluster cluster;
-  protected static FileSystem fs;
+  @Parameter
+  public String upgradeCheckpoint;
 
-  @Before
-  public void clusterSetUp() throws IOException, URISyntaxException, TimeoutException {
-    conf = new HdfsConfiguration();
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      "AFTER_POLICY_SET",
+      "AFTER_POLICY_GET"
+    );
+  }
+
+  private void setupCluster() throws IOException, URISyntaxException, TimeoutException {
     conf.set(DFSConfigKeys.DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
         StoragePolicySatisfierMode.EXTERNAL.toString());
 
@@ -71,25 +86,17 @@ public class TestStoragePolicyCommands_ProcessBased {
     fs = cluster.getFileSystem();
   }
 
-  @After
-  public void clusterShutdown() throws IOException{
-    if(fs != null) {
-      fs.close();
-      fs = null;
-    }
-    if(cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
-
 
   @Test
   public void testSetAndUnsetStoragePolicy() throws Exception {
+    setupCluster();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     final Path foo = new Path("/foo");
     final Path bar = new Path(foo, "bar");
     final Path wow = new Path(bar, "wow");
     DFSTestUtil.createFile(fs, wow, SIZE, REPL, 0);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
     /*
      * test: set storage policy
@@ -104,6 +111,7 @@ public class TestStoragePolicyCommands_ProcessBased {
         0, "Set storage policy HOT on " + wow.toString());
     DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /fooz -policy WARM",
         2, "File/Directory does not exist: /fooz");
+    checkpoint("AFTER_POLICY_SET");
 
     /*
      * test: get storage policy after set
@@ -122,6 +130,7 @@ public class TestStoragePolicyCommands_ProcessBased {
         "The storage policy of " + wow.toString() + ":\n" + hot);
     DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /fooz", 2,
         "File/Directory does not exist: /fooz");
+    checkpoint("AFTER_POLICY_GET");
 
     /*
      * test: unset storage policy
@@ -150,15 +159,20 @@ public class TestStoragePolicyCommands_ProcessBased {
 
   @Test
   public void testSetAndGetStoragePolicy() throws Exception {
+    setupCluster();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     final Path foo = new Path("/foo");
     final Path bar = new Path(foo, "bar");
     DFSTestUtil.createFile(fs, bar, SIZE, REPL, 0);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
     final StoragePolicyAdmin admin = new StoragePolicyAdmin(conf);
     DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo", 0,
         "The storage policy of " + foo.toString() + " is unspecified");
     DFSTestUtil.toolRun(admin, "-getStoragePolicy -path /foo/bar", 0,
         "The storage policy of " + bar.toString() + " is unspecified");
+    checkpoint("AFTER_POLICY_GET");
 
     DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /foo -policy WARM", 0,
         "Set storage policy WARM on " + foo.toString());
@@ -166,6 +180,7 @@ public class TestStoragePolicyCommands_ProcessBased {
         0, "Set storage policy COLD on " + bar.toString());
     DFSTestUtil.toolRun(admin, "-setStoragePolicy -path /fooz -policy WARM",
         2, "File/Directory does not exist: /fooz");
+    checkpoint("AFTER_POLICY_SET");
 
     final BlockStoragePolicySuite suite = BlockStoragePolicySuite
         .createDefaultSuite();

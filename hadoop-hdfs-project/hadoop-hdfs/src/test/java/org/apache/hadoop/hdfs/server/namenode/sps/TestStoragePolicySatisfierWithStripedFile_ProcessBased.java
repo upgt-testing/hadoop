@@ -20,6 +20,8 @@ package org.apache.hadoop.hdfs.server.namenode.sps;
 import static org.junit.Assume.assumeNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
@@ -44,11 +46,16 @@ import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.balancer.NameNodeConnector;
 import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.server.sps.ExternalSPSContext;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,12 +69,26 @@ import org.slf4j.LoggerFactory;
  * to be moved and finding its expected target locations in order to satisfy the
  * storage policy.
  *
+ * This test already has upgrade() calls in place, so parameterization adds
+ * NO_UPGRADE checkpoint to ensure tests pass without upgrades as well.
+ *
  * @see TestStoragePolicySatisfierWithStripedFile Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestStoragePolicySatisfierWithStripedFile_ProcessBased {
 
   private static final Logger LOG = LoggerFactory
       .getLogger(TestStoragePolicySatisfierWithStripedFile_ProcessBased.class);
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    // This test has explicit upgrade() calls, so we only add NO_UPGRADE
+    // to ensure the test passes without upgrades
+    return Arrays.asList(UpgradeCheckpoints.NO_UPGRADE);
+  }
 
   private final int stripesPerBlock = 2;
 
