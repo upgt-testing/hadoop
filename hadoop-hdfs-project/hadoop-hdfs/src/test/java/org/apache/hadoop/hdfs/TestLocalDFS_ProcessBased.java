@@ -23,13 +23,21 @@ import static org.junit.Assert.assertTrue;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestLocalDFS}.
@@ -42,7 +50,25 @@ import org.junit.Test;
  *
  * @see TestLocalDFS Original test using MiniDFSCluster
  */
-public class TestLocalDFS_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestLocalDFS_ProcessBased extends ProcessBasedUpgradeTestBase {
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_FILE_WRITE",
+      "BEFORE_CLEANUP"
+    );
+  }
 
   private void writeFile(FileSystem fileSys, Path name) throws IOException {
     DataOutputStream stm = fileSys.create(name);
@@ -76,40 +102,39 @@ public class TestLocalDFS_ProcessBased {
    */
   @Test(timeout=20000)
   public void testWorkingDirectory() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    FileSystem fileSys = cluster.getFileSystem();
-    try {
-      Path orig_path = fileSys.getWorkingDirectory();
-      assertTrue(orig_path.isAbsolute());
-      Path file1 = new Path("somewhat/random.txt");
-      writeFile(fileSys, file1);
-      assertTrue(fileSys.exists(new Path(orig_path, file1.toString())));
-      fileSys.delete(file1, true);
-      Path subdir1 = new Path("/somewhere");
-      fileSys.setWorkingDirectory(subdir1);
-      writeFile(fileSys, file1);
-      cleanupFile(fileSys, new Path(subdir1, file1.toString()));
-      Path subdir2 = new Path("else");
-      fileSys.setWorkingDirectory(subdir2);
-      writeFile(fileSys, file1);
-      readFile(fileSys, file1);
-      cleanupFile(fileSys, new Path(new Path(subdir1, subdir2.toString()),
-                                    file1.toString()));
+    fs = cluster.getFileSystem();
 
-      // test home directory
-      Path home =
-        fileSys.makeQualified(
-            new Path(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_DEFAULT
-                + "/" + getUserName(fileSys)));
-      Path fsHome = fileSys.getHomeDirectory();
-      assertEquals(home, fsHome);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
-    }
+    Path orig_path = fs.getWorkingDirectory();
+    assertTrue(orig_path.isAbsolute());
+    Path file1 = new Path("somewhat/random.txt");
+    writeFile(fs, file1);
+    checkpoint("AFTER_FILE_WRITE");
+    assertTrue(fs.exists(new Path(orig_path, file1.toString())));
+    fs.delete(file1, true);
+    Path subdir1 = new Path("/somewhere");
+    fs.setWorkingDirectory(subdir1);
+    writeFile(fs, file1);
+    cleanupFile(fs, new Path(subdir1, file1.toString()));
+    Path subdir2 = new Path("else");
+    fs.setWorkingDirectory(subdir2);
+    writeFile(fs, file1);
+    readFile(fs, file1);
+    checkpoint("BEFORE_CLEANUP");
+    cleanupFile(fs, new Path(new Path(subdir1, subdir2.toString()),
+                              file1.toString()));
+
+    // test home directory
+    Path home =
+      fs.makeQualified(
+          new Path(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_DEFAULT
+              + "/" + getUserName(fs)));
+    Path fsHome = fs.getHomeDirectory();
+    assertEquals(home, fsHome);
   }
 
   /**
@@ -118,23 +143,29 @@ public class TestLocalDFS_ProcessBased {
   @Test(timeout=30000)
   public void testHomeDirectory() throws Exception {
     final String[] homeBases = new String[] {"/home", "/home/user"};
-    Configuration conf = new HdfsConfiguration();
+    conf = new HdfsConfiguration();
     for (final String homeBase : homeBases) {
       conf.set(HdfsClientConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY, homeBase);
-      ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+      cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
       cluster.waitClusterUp();
-      FileSystem fileSys = cluster.getFileSystem();
-      try {
-        // test home directory
-        Path home =
-            fileSys.makeQualified(
-                new Path(homeBase + "/" + getUserName(fileSys)));
-        Path fsHome = fileSys.getHomeDirectory();
-        assertEquals(home, fsHome);
-      } finally {
-        fileSys.close();
-        cluster.shutdown();
-      }
+      fs = cluster.getFileSystem();
+
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+      // test home directory
+      Path home =
+          fs.makeQualified(
+              new Path(homeBase + "/" + getUserName(fs)));
+      Path fsHome = fs.getHomeDirectory();
+      assertEquals(home, fsHome);
+
+      checkpoint("BEFORE_CLEANUP");
+
+      // Cleanup between iterations
+      fs.close();
+      cluster.shutdown();
+      fs = null;
+      cluster = null;
     }
   }
 }

@@ -22,14 +22,22 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.tools.DFSAdmin;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,29 +52,55 @@ import static org.junit.Assert.assertTrue;
  *
  * @see TestQuotaAllowOwner Original test using MiniDFSCluster
  */
-public class TestQuotaAllowOwner_ProcessBased {
-  private static Configuration conf;
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static DistributedFileSystem dfs;
+@RunWith(Parameterized.class)
+public class TestQuotaAllowOwner_ProcessBased extends ProcessBasedUpgradeTestBase {
 
-  @BeforeClass
-  public static void setUpClass() throws Exception {
-    conf = new HdfsConfiguration();
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+        "AFTER_DIR_CREATION"
+    );
+  }
+
+  private DistributedFileSystem dfs;
+
+  @Before
+  public void setUp() throws Exception {
+    super.setupTest();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 512);
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ALLOW_OWNER_SET_QUOTA_KEY,
         true);
-    restartCluster();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(3).build();
+    cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+    dfs = cluster.getFileSystem();
   }
 
-  @AfterClass
-  public static void tearDownClass() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
+  @After
+  public void tearDown() {
+    if (dfs != null) {
+      try {
+        dfs.close();
+      } catch (Exception e) {
+        // Ignore
+      }
     }
+    super.tearDownTest();
   }
 
-  private static void restartCluster() throws IOException, java.util.concurrent.TimeoutException {
+  private void restartCluster() throws IOException, java.util.concurrent.TimeoutException {
+    if (dfs != null) {
+      try {
+        dfs.close();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
     if (cluster != null) {
       cluster.shutdown();
     }
@@ -82,6 +116,7 @@ public class TestQuotaAllowOwner_ProcessBased {
     assertTrue(dfs.mkdirs(parentPath));
     dfs.setOwner(parentPath, owner, group);
     assertTrue(dfs.mkdirs(new Path(subDir)));
+    checkpoint("AFTER_DIR_CREATION");
   }
 
   /**

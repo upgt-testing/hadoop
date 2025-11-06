@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
 
@@ -37,9 +39,15 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 import org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.util.Time;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSetTimes}.
@@ -55,7 +63,8 @@ import org.junit.Test;
  *
  * @see TestSetTimes Original test using MiniDFSCluster
  */
-public class TestSetTimes_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestSetTimes_ProcessBased extends ProcessBasedUpgradeTestBase {
   static final long seed = 0xDEADBEEFL;
   static final int blockSize = 8192;
   static final int fileSize = 16384;
@@ -66,6 +75,20 @@ public class TestSetTimes_ProcessBased {
   Random myrand = new Random();
   Path hostsFile;
   Path excludeFile;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      "AFTER_SET_TIMES",
+      UpgradeCheckpoints.AFTER_NAMENODE_RESTART
+    );
+  }
 
   private FSDataOutputStream writeFile(FileSystem fileSys, Path name, int repl)
     throws IOException {
@@ -98,24 +121,26 @@ public class TestSetTimes_ProcessBased {
    */
   @Test
   public void testTimes() throws Exception {
-    Configuration conf = new HdfsConfiguration();
+    conf = new HdfsConfiguration();
     final int MAX_IDLE_TIME = 2000; // 2s
     conf.setInt("ipc.client.connection.maxidletime", MAX_IDLE_TIME);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 1000);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
 
 
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     InetSocketAddress addr = cluster.getNameNodeRpcAddress();
     DFSClient client = new DFSClient(addr, conf);
     DatanodeInfo[] info = client.datanodeReport(DatanodeReportType.LIVE);
     assertEquals("Number of Datanodes ", numDatanodes, info.length);
-    FileSystem fileSys = cluster.getFileSystem();
+    fs = cluster.getFileSystem();
     int replicas = 1;
-    assertTrue(fileSys instanceof DistributedFileSystem);
+    assertTrue(fs instanceof DistributedFileSystem);
 
     try {
       //
@@ -124,16 +149,17 @@ public class TestSetTimes_ProcessBased {
       System.out.println("Creating testdir1 and testdir1/test1.dat.");
       Path dir1 = new Path("testdir1");
       Path file1 = new Path(dir1, "test1.dat");
-      FSDataOutputStream stm = writeFile(fileSys, file1, replicas);
-      FileStatus stat = fileSys.getFileStatus(file1);
+      FSDataOutputStream stm = writeFile(fs, file1, replicas);
+      FileStatus stat = fs.getFileStatus(file1);
       long atimeBeforeClose = stat.getAccessTime();
       String adate = dateForm.format(new Date(atimeBeforeClose));
       System.out.println("atime on " + file1 + " before close is " +
                          adate + " (" + atimeBeforeClose + ")");
       assertTrue(atimeBeforeClose != 0);
       stm.close();
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
-      stat = fileSys.getFileStatus(file1);
+      stat = fs.getFileStatus(file1);
       long atime1 = stat.getAccessTime();
       long mtime1 = stat.getModificationTime();
       adate = dateForm.format(new Date(atime1));
@@ -145,25 +171,25 @@ public class TestSetTimes_ProcessBased {
       assertTrue(atime1 != 0);
 
       // check setting negative value for atime and mtime.
-      fileSys.setTimes(file1, -2, -2);
+      fs.setTimes(file1, -2, -2);
       // The values shouldn't change.
-      stat = fileSys.getFileStatus(file1);
+      stat = fs.getFileStatus(file1);
       assertEquals(mtime1, stat.getModificationTime());
       assertEquals(atime1, stat.getAccessTime());
 
       //
       // record dir times
       //
-      stat = fileSys.getFileStatus(dir1);
+      stat = fs.getFileStatus(dir1);
       long mdir1 = stat.getAccessTime();
       assertTrue(mdir1 == 0);
 
       // set the access time to be one day in the past
       long atime2 = atime1 - (24L * 3600L * 1000L);
-      fileSys.setTimes(file1, -1, atime2);
+      fs.setTimes(file1, -1, atime2);
 
       // check new access time on file
-      stat = fileSys.getFileStatus(file1);
+      stat = fs.getFileStatus(file1);
       long atime3 = stat.getAccessTime();
       String adate3 = dateForm.format(new Date(atime3));
       System.out.println("new atime on " + file1 + " is " +
@@ -173,10 +199,10 @@ public class TestSetTimes_ProcessBased {
 
       // set the modification time to be 1 hour in the past
       long mtime2 = mtime1 - (3600L * 1000L);
-      fileSys.setTimes(file1, mtime2, -1);
+      fs.setTimes(file1, mtime2, -1);
 
       // check new modification time on file
-      stat = fileSys.getFileStatus(file1);
+      stat = fs.getFileStatus(file1);
       long mtime3 = stat.getModificationTime();
       String mdate3 = dateForm.format(new Date(mtime3));
       System.out.println("new mtime on " + file1 + " is " +
@@ -186,9 +212,9 @@ public class TestSetTimes_ProcessBased {
 
       long mtime4 = Time.now() - (3600L * 1000L);
       long atime4 = Time.now();
-      fileSys.setTimes(dir1, mtime4, atime4);
+      fs.setTimes(dir1, mtime4, atime4);
       // check new modification time on file
-      stat = fileSys.getFileStatus(dir1);
+      stat = fs.getFileStatus(dir1);
       assertTrue("Not matching the modification times", mtime4 == stat
           .getModificationTime());
       assertTrue("Not matching the access times", atime4 == stat
@@ -196,12 +222,14 @@ public class TestSetTimes_ProcessBased {
 
       Path nonExistingDir = new Path(dir1, "/nonExistingDir/");
       try {
-        fileSys.setTimes(nonExistingDir, mtime4, atime4);
+        fs.setTimes(nonExistingDir, mtime4, atime4);
         fail("Expecting FileNotFoundException");
       } catch (FileNotFoundException e) {
         assertTrue(e.getMessage().contains(
             "File/Directory " + nonExistingDir.toString() + " does not exist."));
       }
+      checkpoint("AFTER_SET_TIMES");
+
       // shutdown cluster and restart
       cluster.shutdown();
       try {Thread.sleep(2*MAX_IDLE_TIME);} catch (InterruptedException e) {}
@@ -209,24 +237,23 @@ public class TestSetTimes_ProcessBased {
                                                 .format(false)
                                                 .build();
       cluster.waitClusterUp();
-      fileSys = cluster.getFileSystem();
+      checkpoint(UpgradeCheckpoints.AFTER_NAMENODE_RESTART);
+
+      fs = cluster.getFileSystem();
 
       // verify that access times and modification times persist after a
       // cluster restart.
       System.out.println("Verifying times after cluster restart");
-      stat = fileSys.getFileStatus(file1);
+      stat = fs.getFileStatus(file1);
       assertTrue(atime2 == stat.getAccessTime());
       assertTrue(mtime3 == stat.getModificationTime());
 
-      cleanupFile(fileSys, file1);
-      cleanupFile(fileSys, dir1);
+      cleanupFile(fs, file1);
+      cleanupFile(fs, dir1);
     } catch (IOException e) {
       info = client.datanodeReport(DatanodeReportType.ALL);
       printDatanodeReport(info);
       throw e;
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
     }
   }
 
@@ -235,7 +262,7 @@ public class TestSetTimes_ProcessBased {
    */
   @Test
   public void testTimesAtClose() throws Exception {
-    Configuration conf = new HdfsConfiguration();
+    conf = new HdfsConfiguration();
     final int MAX_IDLE_TIME = 2000; // 2s
     int replicas = 1;
 
@@ -244,23 +271,25 @@ public class TestSetTimes_ProcessBased {
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 1000);
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_DATANODE_HANDLER_COUNT_KEY, 50);
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
                                                .numDataNodes(numDatanodes)
                                                .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     InetSocketAddress addr = cluster.getNameNodeRpcAddress();
     DFSClient client = new DFSClient(addr, conf);
     DatanodeInfo[] info = client.datanodeReport(DatanodeReportType.LIVE);
     assertEquals("Number of Datanodes ", numDatanodes, info.length);
-    FileSystem fileSys = cluster.getFileSystem();
-    assertTrue(fileSys instanceof DistributedFileSystem);
+    fs = cluster.getFileSystem();
+    assertTrue(fs instanceof DistributedFileSystem);
 
     try {
       // create a new file and write to it
       Path file1 = new Path("/simple.dat");
-      FSDataOutputStream stm = writeFile(fileSys, file1, replicas);
+      FSDataOutputStream stm = writeFile(fs, file1, replicas);
       System.out.println("Created and wrote file simple.dat");
-      FileStatus statBeforeClose = fileSys.getFileStatus(file1);
+      FileStatus statBeforeClose = fs.getFileStatus(file1);
       long mtimeBeforeClose = statBeforeClose.getModificationTime();
       String mdateBeforeClose = dateForm.format(new Date(
                                                      mtimeBeforeClose));
@@ -270,8 +299,10 @@ public class TestSetTimes_ProcessBased {
 
       //close file after writing
       stm.close();
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
       System.out.println("Closed file.");
-      FileStatus statAfterClose = fileSys.getFileStatus(file1);
+      FileStatus statAfterClose = fs.getFileStatus(file1);
       long mtimeAfterClose = statAfterClose.getModificationTime();
       String mdateAfterClose = dateForm.format(new Date(mtimeAfterClose));
       System.out.println("mtime on " + file1 + " after close is "
@@ -279,14 +310,11 @@ public class TestSetTimes_ProcessBased {
       assertTrue(mtimeAfterClose != 0);
       assertTrue(mtimeBeforeClose != mtimeAfterClose);
 
-      cleanupFile(fileSys, file1);
+      cleanupFile(fs, file1);
     } catch (IOException e) {
       info = client.datanodeReport(DatanodeReportType.ALL);
       printDatanodeReport(info);
       throw e;
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
     }
   }
 
@@ -299,29 +327,26 @@ public class TestSetTimes_ProcessBased {
    */
   @Test
   public void testAtimeUpdate() throws Exception {
-    Configuration conf = new HdfsConfiguration();
+    conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 0);
-    ProcessBasedMiniDFSCluster cluster = null;
-    FileSystem fs = null;
 
-    try {
-      cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
-          .numDataNodes(0)
-          .build();
-      cluster.waitClusterUp();
-      fs = cluster.getFileSystem();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+        .numDataNodes(0)
+        .build();
+    cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-      // Create an empty file
-      Path p = new Path("/testAtimeUpdate");
-      DFSTestUtil.createFile(cluster.getFileSystem(), p, 0, (short)1, 0L);
+    fs = cluster.getFileSystem();
 
-      fs.setTimes(p, -1L, 123456L);
-      Assert.assertEquals(123456L, fs.getFileStatus(p).getAccessTime());
-    } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
-    }
+    // Create an empty file
+    Path p = new Path("/testAtimeUpdate");
+    DFSTestUtil.createFile(cluster.getFileSystem(), p, 0, (short)1, 0L);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    fs.setTimes(p, -1L, 123456L);
+    checkpoint("AFTER_SET_TIMES");
+
+    Assert.assertEquals(123456L, fs.getFileStatus(p).getAccessTime());
   }
 
   public static void main(String[] args) throws Exception {

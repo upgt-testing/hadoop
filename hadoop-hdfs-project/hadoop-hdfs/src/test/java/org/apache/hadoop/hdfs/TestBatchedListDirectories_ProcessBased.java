@@ -30,19 +30,27 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.hamcrest.core.StringContains;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,17 +70,28 @@ import static org.junit.Assert.fail;
  *
  * @see TestBatchedListDirectories Original test using MiniDFSCluster
  */
-public class TestBatchedListDirectories_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestBatchedListDirectories_ProcessBased extends ProcessBasedUpgradeTestBase {
 
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Configuration conf;
-  private static DistributedFileSystem dfs;
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START,
+        "AFTER_DATA_LOAD"
+    );
+  }
+
+  private DistributedFileSystem dfs;
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private static final List<Path> SUBDIR_PATHS = Lists.newArrayList();
-  private static final List<Path> FILE_PATHS = Lists.newArrayList();
+  private final List<Path> SUBDIR_PATHS = Lists.newArrayList();
+  private final List<Path> FILE_PATHS = Lists.newArrayList();
   private static final int FIRST_LEVEL_DIRS = 2;
   private static final int SECOND_LEVEL_DIRS = 3;
   private static final int FILES_PER_DIR = 5;
@@ -82,30 +101,30 @@ public class TestBatchedListDirectories_ProcessBased {
   private static final Path INACCESSIBLE_FILE_PATH =
       new Path(INACCESSIBLE_DIR_PATH, "nopermsfile");
 
-  private static Path getSubDirName(int i, int j) {
+  private Path getSubDirName(int i, int j) {
     return new Path(String.format("/dir%d/subdir%d", i, j));
   }
 
-  private static Path getFileName(int i, int j, int k) {
+  private Path getFileName(int i, int j, int k) {
     Path dirPath = getSubDirName(i, j);
     return new Path(dirPath, "file" + k);
   }
 
-  private static void assertSubDirEquals(int i, int j, Path p) {
+  private void assertSubDirEquals(int i, int j, Path p) {
     assertTrue(p.toString().startsWith("hdfs://"));
     Path expected = getSubDirName(i, j);
     assertEquals("Unexpected subdir name",
         expected.toString(), p.toUri().getPath());
   }
 
-  private static void assertFileEquals(int i, int j, int k, Path p) {
+  private void assertFileEquals(int i, int j, int k, Path p) {
     assertTrue(p.toString().startsWith("hdfs://"));
     Path expected = getFileName(i, j, k);
     assertEquals("Unexpected file name",
         expected.toString(), p.toUri().getPath());
   }
 
-  private static void loadData() throws Exception {
+  private void loadData() throws Exception {
     for (int i = 0; i < FIRST_LEVEL_DIRS; i++) {
       for (int j = 0; j < SECOND_LEVEL_DIRS; j++) {
         Path dirPath = getSubDirName(i, j);
@@ -128,9 +147,9 @@ public class TestBatchedListDirectories_ProcessBased {
     dfs.setPermission(INACCESSIBLE_DIR_PATH, new FsPermission(0000));
   }
 
-  @BeforeClass
-  public static void beforeClass() throws Exception {
-    conf = new HdfsConfiguration();
+  @Before
+  public void setUp() throws Exception {
+    super.setupTest();
     conf.setInt(DFSConfigKeys.DFS_LIST_LIMIT, 7);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_BATCHED_LISTING_LIMIT,
         FIRST_LEVEL_DIRS * SECOND_LEVEL_DIRS * FILES_PER_DIR);
@@ -138,18 +157,26 @@ public class TestBatchedListDirectories_ProcessBased {
         .numDataNodes(1)
         .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     dfs = cluster.getFileSystem();
     loadData();
+    checkpoint("AFTER_DATA_LOAD");
   }
 
-  @AfterClass
-  public static void afterClass() {
-    if (cluster != null) {
-      cluster.shutdown();
+  @After
+  public void tearDown() {
+    if (dfs != null) {
+      try {
+        dfs.close();
+      } catch (Exception e) {
+        // Ignore
+      }
     }
+    super.tearDownTest();
   }
 
-  private static List<PartialListing<FileStatus>> getListings(List<Path> paths)
+  private List<PartialListing<FileStatus>> getListings(List<Path> paths)
       throws IOException {
     List<PartialListing<FileStatus>> returned = Lists.newArrayList();
     RemoteIterator<PartialListing<FileStatus>> it =
@@ -160,7 +187,7 @@ public class TestBatchedListDirectories_ProcessBased {
     return returned;
   }
 
-  private static List<FileStatus> listingsToStatuses(
+  private List<FileStatus> listingsToStatuses(
       List<PartialListing<FileStatus>> listings) throws IOException {
     List<FileStatus> returned = Lists.newArrayList();
     for (PartialListing<FileStatus> listing : listings) {
@@ -169,7 +196,7 @@ public class TestBatchedListDirectories_ProcessBased {
     return returned;
   }
 
-  private static List<FileStatus> getStatuses(List<Path> paths)
+  private List<FileStatus> getStatuses(List<Path> paths)
       throws IOException {
     List<PartialListing<FileStatus>> listings = getListings(paths);
     return listingsToStatuses(listings);

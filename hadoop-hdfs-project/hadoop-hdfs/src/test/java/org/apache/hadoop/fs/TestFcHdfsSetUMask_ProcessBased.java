@@ -20,6 +20,8 @@ package org.apache.hadoop.fs;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.security.auth.login.LoginException;
 
@@ -28,17 +30,20 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.StringUtils;
 import static org.apache.hadoop.fs.FileContextTestHelper.*;
 import org.apache.log4j.Level;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestFcHdfsSetUMask}.
@@ -48,13 +53,25 @@ import org.junit.Test;
  *
  * @see TestFcHdfsSetUMask Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestFcHdfsSetUMask_ProcessBased {
 
-  private static final FileContextTestHelper fileContextTestHelper =
+  private final FileContextTestHelper fileContextTestHelper =
       new FileContextTestHelper("/tmp/TestFcHdfsSetUMask_ProcessBased");
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Path defaultWorkingDirectory;
-  private static FileContext fc;
+  private ProcessBasedMiniDFSCluster cluster;
+  private Path defaultWorkingDirectory;
+  private FileContext fc;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
 
   // rwxrwx---
   private static final FsPermission USER_GROUP_OPEN_PERMISSIONS = FsPermission
@@ -89,27 +106,6 @@ public class TestFcHdfsSetUMask_ProcessBased {
   private static final FsPermission WIDE_OPEN_TEST_UMASK = FsPermission
       .createImmutable((short) (0777 ^ 0777));
 
-  @BeforeClass
-  public static void clusterSetupAtBegining()
-        throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    // set permissions very restrictive
-    conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,  "077");
-    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
-    cluster.waitClusterUp();
-    fc = FileContext.getFileContext(cluster.getURI(0), conf);
-    defaultWorkingDirectory = fc.makeQualified( new Path("/user/" +
-        UserGroupInformation.getCurrentUser().getShortUserName()));
-    fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
-  }
-
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-    }
-  }
-
   {
     try {
       GenericTestUtils.setLogLevel(FileSystem.LOG, Level.DEBUG);
@@ -122,13 +118,47 @@ public class TestFcHdfsSetUMask_ProcessBased {
 
   @Before
   public void setUp() throws Exception {
+    Configuration conf = new HdfsConfiguration();
+    // set permissions very restrictive
+    conf.set(CommonConfigurationKeys.FS_PERMISSIONS_UMASK_KEY,  "077");
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster.waitClusterUp();
+
+    if (shouldUpgrade(UpgradeCheckpoints.AFTER_CLUSTER_START)) {
+      cluster.upgrade();
+      cluster.waitClusterUp();
+    }
+
+    fc = FileContext.getFileContext(cluster.getURI(0), conf);
+    defaultWorkingDirectory = fc.makeQualified(new Path("/user/" +
+        UserGroupInformation.getCurrentUser().getShortUserName()));
+    fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
+
     fc.setUMask(WIDE_OPEN_TEST_UMASK);
     fc.mkdir(fileContextTestHelper.getTestRootPath(fc), FileContext.DEFAULT_PERM, true);
   }
 
   @After
   public void tearDown() throws Exception {
-    fc.delete(fileContextTestHelper.getTestRootPath(fc), true);
+    try {
+      if (fc != null) {
+        fc.delete(fileContextTestHelper.getTestRootPath(fc), true);
+      }
+    } finally {
+      if (cluster != null) {
+        try {
+          cluster.shutdown();
+        } catch (Exception e) {
+          // Ignore
+        }
+      }
+    }
+  }
+
+  private boolean shouldUpgrade(String checkpointName) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(checkpointName);
   }
 
   @Test

@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 import org.apache.hadoop.conf.Configuration;
@@ -29,9 +31,15 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSeekBug}.
@@ -43,9 +51,28 @@ import org.junit.Test;
  *
  * @see TestSeekBug Original test using MiniDFSCluster
  */
-public class TestSeekBug_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestSeekBug_ProcessBased extends ProcessBasedUpgradeTestBase {
   static final long seed = 0xDEADBEEFL;
   static final int ONEMB = 1 << 20;
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      "AFTER_SEEK_OPERATION",
+      "BEFORE_CLEANUP"
+    );
+  }
 
   private void checkAndEraseData(byte[] actual, int from, byte[] expected, String message) {
     for (int idx = 0; idx < actual.length; idx++) {
@@ -124,22 +151,27 @@ public class TestSeekBug_ProcessBased {
    */
   @Test
   public void testSeekBugDFS() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    FileSystem fileSys = cluster.getFileSystem();
-    try {
-      Path file1 = new Path("seektest.dat");
-      DFSTestUtil.createFile(fileSys, file1, ONEMB, ONEMB,
-          fileSys.getDefaultBlockSize(file1),
-          fileSys.getDefaultReplication(file1), seed);
-      seekReadFile(fileSys, file1);
-      smallReadSeek(fileSys, file1);
-      cleanupFile(fileSys, file1);
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
-    }
+    fs = cluster.getFileSystem();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    Path file1 = new Path("seektest.dat");
+    DFSTestUtil.createFile(fs, file1, ONEMB, ONEMB,
+        fs.getDefaultBlockSize(file1),
+        fs.getDefaultReplication(file1), seed);
+
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    seekReadFile(fs, file1);
+    checkpoint("AFTER_SEEK_OPERATION");
+
+    smallReadSeek(fs, file1);
+    checkpoint("BEFORE_CLEANUP");
+
+    cleanupFile(fs, file1);
   }
 
  /**
@@ -148,30 +180,34 @@ public class TestSeekBug_ProcessBased {
   */
   @Test (expected=IOException.class)
   public void testNegativeSeek() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    FileSystem fs = cluster.getFileSystem();
-    try {
-      Path seekFile = new Path("seekboundaries.dat");
-      DFSTestUtil.createFile(
-        fs,
-        seekFile,
-        ONEMB,
-        ONEMB,
-        fs.getDefaultBlockSize(seekFile),
-        fs.getDefaultReplication(seekFile),
-        seed);
-      FSDataInputStream stream = fs.open(seekFile);
-      // Perform "safe seek" (expected to pass)
-      stream.seek(65536);
-      assertEquals(65536, stream.getPos());
-      // expect IOE for this call
-      stream.seek(-73);
-    } finally {
-      fs.close();
-      cluster.shutdown();
-    }
+    fs = cluster.getFileSystem();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    Path seekFile = new Path("seekboundaries.dat");
+    DFSTestUtil.createFile(
+      fs,
+      seekFile,
+      ONEMB,
+      ONEMB,
+      fs.getDefaultBlockSize(seekFile),
+      fs.getDefaultReplication(seekFile),
+      seed);
+
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    FSDataInputStream stream = fs.open(seekFile);
+    // Perform "safe seek" (expected to pass)
+    stream.seek(65536);
+    assertEquals(65536, stream.getPos());
+
+    checkpoint("AFTER_SEEK_OPERATION");
+
+    // expect IOE for this call
+    stream.seek(-73);
   }
 
  /**
@@ -180,30 +216,34 @@ public class TestSeekBug_ProcessBased {
   */
   @Test (expected=IOException.class)
   public void testSeekPastFileSize() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    FileSystem fs = cluster.getFileSystem();
-    try {
-      Path seekFile = new Path("seekboundaries.dat");
-      DFSTestUtil.createFile(
-        fs,
-        seekFile,
-        ONEMB,
-        ONEMB,
-        fs.getDefaultBlockSize(seekFile),
-        fs.getDefaultReplication(seekFile),
-        seed);
-      FSDataInputStream stream = fs.open(seekFile);
-      // Perform "safe seek" (expected to pass)
-      stream.seek(65536);
-      assertEquals(65536, stream.getPos());
-      // expect IOE for this call
-      stream.seek(ONEMB + ONEMB + ONEMB);
-    } finally {
-      fs.close();
-      cluster.shutdown();
-    }
+    fs = cluster.getFileSystem();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    Path seekFile = new Path("seekboundaries.dat");
+    DFSTestUtil.createFile(
+      fs,
+      seekFile,
+      ONEMB,
+      ONEMB,
+      fs.getDefaultBlockSize(seekFile),
+      fs.getDefaultReplication(seekFile),
+      seed);
+
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    FSDataInputStream stream = fs.open(seekFile);
+    // Perform "safe seek" (expected to pass)
+    stream.seek(65536);
+    assertEquals(65536, stream.getPos());
+
+    checkpoint("AFTER_SEEK_OPERATION");
+
+    // expect IOE for this call
+    stream.seek(ONEMB + ONEMB + ONEMB);
   }
 
   /**

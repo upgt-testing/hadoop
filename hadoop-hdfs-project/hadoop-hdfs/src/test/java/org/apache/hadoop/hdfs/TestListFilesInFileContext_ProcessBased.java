@@ -22,6 +22,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Random;
 
@@ -36,12 +38,17 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.log4j.Level;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestListFilesInFileContext}.
@@ -53,27 +60,39 @@ import org.junit.Test;
  *
  * @see TestListFilesInFileContext Original test using MiniDFSCluster
  */
-public class TestListFilesInFileContext_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestListFilesInFileContext_ProcessBased extends ProcessBasedUpgradeTestBase {
   {
     GenericTestUtils.setLogLevel(FileSystem.LOG, Level.ALL);
   }
 
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
+
   static final long seed = 0xDEADBEEFL;
 
-  final private static Configuration conf = new Configuration();
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static FileContext fc;
-  final private static Path TEST_DIR = new Path("/main_");
-  final private static int FILE_LEN = 10;
-  final private static Path FILE1 = new Path(TEST_DIR, "file1");
-  final private static Path DIR1 = new Path(TEST_DIR, "dir1");
-  final private static Path FILE2 = new Path(DIR1, "file2");
-  final private static Path FILE3 = new Path(DIR1, "file3");
+  private FileContext fc;
+  private static final Path TEST_DIR = new Path("/main_");
+  private static final int FILE_LEN = 10;
+  private static final Path FILE1 = new Path(TEST_DIR, "file1");
+  private static final Path DIR1 = new Path(TEST_DIR, "dir1");
+  private static final Path FILE2 = new Path(DIR1, "file2");
+  private static final Path FILE3 = new Path(DIR1, "file3");
 
-  @BeforeClass
-  public static void testSetUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
+    super.setupTest();
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
     fc = FileContext.getFileContext(cluster.getConfiguration(0));
     fc.delete(TEST_DIR, true);
   }
@@ -90,11 +109,9 @@ public class TestListFilesInFileContext_ProcessBased {
     stm.close();
   }
 
-  @AfterClass
-  public static void testShutdown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-    }
+  @After
+  public void tearDown() {
+    super.tearDownTest();
   }
 
   /** Test when input path is a file */

@@ -20,6 +20,8 @@ package org.apache.hadoop.cli;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
 import org.apache.hadoop.cli.util.CLICommand;
 import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.fs.FileSystem;
@@ -27,10 +29,15 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HDFSPolicyProvider;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.authorize.PolicyProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestHDFSCLI}.
@@ -40,11 +47,23 @@ import org.junit.Test;
  *
  * @see TestHDFSCLI Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestHDFSCLI_ProcessBased extends CLITestHelperDFS {
 
   protected ProcessBasedMiniDFSCluster dfsCluster = null;
   protected FileSystem fs = null;
   protected String namenode = null;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "checkpoint={0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {UpgradeCheckpoints.NO_UPGRADE},
+        {UpgradeCheckpoints.AFTER_CLUSTER_START}
+    });
+  }
 
   @Before
   @Override
@@ -64,6 +83,13 @@ public class TestHDFSCLI_ProcessBased extends CLITestHelperDFS {
                                                  .racks(racks)
                                                  .build();
     dfsCluster.waitClusterUp();
+
+    // Apply upgrade checkpoint logic
+    if (upgradeCheckpoint != null && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(UpgradeCheckpoints.AFTER_CLUSTER_START)) {
+      dfsCluster.upgrade();
+    }
+
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
 
     username = System.getProperty("user.name");

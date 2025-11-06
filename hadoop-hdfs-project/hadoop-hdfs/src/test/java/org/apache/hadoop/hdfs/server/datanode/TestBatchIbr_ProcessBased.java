@@ -21,6 +21,8 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_BLOCKREPORT_INCREMENTAL_I
 import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
@@ -39,12 +41,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.util.Time;
 import org.slf4j.event.Level;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestBatchIbr}.
@@ -57,8 +65,26 @@ import org.junit.Test;
  *
  * @see TestBatchIbr Original test using MiniDFSCluster
  */
-public class TestBatchIbr_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestBatchIbr_ProcessBased extends ProcessBasedUpgradeTestBase {
   public static final Logger LOG = LoggerFactory.getLogger(TestBatchIbr_ProcessBased.class);
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_FILE_OPERATIONS",
+      "BEFORE_CLEANUP"
+    );
+  }
 
   private static final short NUM_DATANODES = 4;
   private static final int BLOCK_SIZE = 1024;
@@ -108,20 +134,23 @@ public class TestBatchIbr_ProcessBased {
     return executor;
   }
 
-  static void runIbrTest(final long ibrInterval) throws Exception {
+  void runIbrTest(final long ibrInterval) throws Exception {
     final ExecutorService executor = createExecutor();
     final Random ran = new Random();
 
-    final Configuration conf = newConf(ibrInterval);
-    final ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    conf = newConf(ibrInterval);
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(NUM_DATANODES).build();
     cluster.waitClusterUp();
-    final DistributedFileSystem dfs = cluster.getFileSystem();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    fs = cluster.getFileSystem();
 
     try {
       final String dirPathString = "/dir";
       final Path dir = new Path(dirPathString);
-      dfs.mkdirs(dir);
+      fs.mkdirs(dir);
 
       // start testing
       final long testStartTime = Time.monotonicNow();
@@ -140,7 +169,7 @@ public class TestBatchIbr_ProcessBased {
               final long seed = ran.nextLong();
               final int numBlocks = ran.nextInt(MAX_BLOCK_NUM) + 1;
               numBlockCreated.addAndGet(numBlocks);
-              return createFile(dir, numBlocks, seed, dfs);
+              return createFile(dir, numBlocks, seed, fs);
             } finally {
               createFileTime.addAndGet(Time.monotonicNow() - start);
             }
@@ -159,7 +188,7 @@ public class TestBatchIbr_ProcessBased {
           public Boolean call() throws Exception {
             final long start = Time.monotonicNow();
             try {
-              return verifyFile(file, dfs);
+              return verifyFile(file, fs);
             } finally {
               verifyFileTime.addAndGet(Time.monotonicNow() - start);
             }
@@ -169,6 +198,9 @@ public class TestBatchIbr_ProcessBased {
       for(int i = 0; i < NUM_FILES; i++) {
         Assert.assertTrue(verifyService.take().get());
       }
+
+      checkpoint("AFTER_FILE_OPERATIONS");
+
       final long testEndTime = Time.monotonicNow();
 
       LOG.info("ibrInterval=" + ibrInterval + " ("
@@ -188,9 +220,10 @@ public class TestBatchIbr_ProcessBased {
       // ProcessBasedMiniDFSCluster runs DataNodes in separate processes where
       // DataNode objects are not accessible. This logging is informational only
       // and not essential for test validation.
+
+      checkpoint("BEFORE_CLEANUP");
     } finally {
       executor.shutdown();
-      cluster.shutdown();
     }
   }
 

@@ -22,6 +22,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeNotNull;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -45,12 +47,17 @@ import org.apache.hadoop.hdfs.server.common.HdfsServerConstants;
 import org.apache.hadoop.hdfs.server.namenode.sps.BlockStorageMovementAttemptedItems;
 import org.apache.hadoop.hdfs.server.namenode.sps.StoragePolicySatisfier;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.test.GenericTestUtils.LogCapturer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +70,16 @@ import java.util.function.Supplier;
  * process-based testing with dynamic DataNode addition.
  *
  * This test verifies external Storage Policy Satisfier service with dynamic
- * DataNode addition and storage policy movements.
+ * DataNode addition and storage policy movements. Each test already includes
+ * upgrade() calls at strategic points to test rolling upgrades.
+ *
+ * Note: This test is parameterized for consistency but only runs NO_UPGRADE
+ * checkpoint as upgrade testing is already integrated into each test method
+ * via explicit upgrade() calls.
  *
  * @see TestExternalStoragePolicySatisfier Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestExternalStoragePolicySatisfier_ProcessBased {
   private static final String ONE_SSD = "ONE_SSD";
   private static final String COLD = "COLD";
@@ -82,6 +95,18 @@ public class TestExternalStoragePolicySatisfier_ProcessBased {
   private static final int DEFAULT_BLOCK_SIZE = 1024;
   private static final Logger LOG =
       LoggerFactory.getLogger(TestExternalStoragePolicySatisfier_ProcessBased.class);
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE
+      // Note: Each test method already includes explicit upgrade() calls
+      // for rolling upgrade testing. Parameterized checkpoints are not needed.
+    );
+  }
 
   @Before
   public void setUp() {

@@ -27,14 +27,20 @@ import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.protocol.OpenFileEntry;
 import org.apache.hadoop.hdfs.protocol.OpenFilesIterator.OpenFilesType;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.log4j.Level;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
@@ -54,7 +60,8 @@ import static org.junit.Assert.fail;
  *
  * @see TestStripedFileAppend Original test using MiniDFSCluster
  */
-public class TestStripedFileAppend_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestStripedFileAppend_ProcessBased extends ProcessBasedUpgradeTestBase {
   public static final Log LOG = LogFactory.getLog(TestStripedFileAppend_ProcessBased.class);
 
   static {
@@ -71,39 +78,51 @@ public class TestStripedFileAppend_ProcessBased {
   private static final int BLOCK_GROUP_SIZE = BLOCK_SIZE * NUM_DATA_BLOCKS;
   private static final Random RANDOM = new Random();
 
-  private ProcessBasedMiniDFSCluster cluster;
   private DistributedFileSystem dfs;
   private Path dir = new Path("/TestFileAppendStriped");
-  private HdfsConfiguration conf = new HdfsConfiguration();
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_DIR_SETUP",
+      "AFTER_APPEND_OPERATION",
+      UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
 
   @Before
-  public void setup() throws Exception {
+  @Override
+  public void setupTest() throws Exception {
+    super.setupTest();
+    conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, BLOCK_SIZE);
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(NUM_DN).build();
     cluster.waitClusterUp();
     dfs = cluster.getFileSystem();
+    fs = dfs;
     dfs.mkdirs(dir);
     dfs.setErasureCodingPolicy(dir, null);
-  }
-
-  @After
-  public void tearDown() throws IOException {
-    if (cluster != null) {
-      cluster.shutdown();
-    }
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
   /**
    * test simple append to a closed striped file, with NEW_BLOCK flag enabled.
    */
   @Test
-  public void testAppendToNewBlock() throws IOException {
+  public void testAppendToNewBlock() throws Exception {
     int fileLength = 0;
     int totalSplit = 6;
     byte[] expected =
         StripedFileTestUtil.generateBytes(BLOCK_GROUP_SIZE * totalSplit);
 
     Path file = new Path(dir, "testAppendToNewBlock");
+    checkpoint("AFTER_DIR_SETUP");
+
     FSDataOutputStream out;
     for (int split = 0; split < totalSplit; split++) {
       if (split == 0) {
@@ -117,6 +136,8 @@ public class TestStripedFileAppend_ProcessBased {
       fileLength += splitLength;
       out.close();
     }
+    checkpoint("AFTER_APPEND_OPERATION");
+
     expected = Arrays.copyOf(expected, fileLength);
     LocatedBlocks lbs =
         dfs.getClient().getLocatedBlocks(file.toString(), 0L, Long.MAX_VALUE);
@@ -125,16 +146,19 @@ public class TestStripedFileAppend_ProcessBased {
         new byte[4096]);
     StripedFileTestUtil.verifySeek(dfs, file, fileLength,
         StripedFileTestUtil.getDefaultECPolicy(), totalSplit);
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
   }
 
   @Test
-  public void testAppendWithoutNewBlock() throws IOException {
+  public void testAppendWithoutNewBlock() throws Exception {
     Path file = new Path(dir, "testAppendWithoutNewBlock");
+    checkpoint("AFTER_DIR_SETUP");
 
     // Create file
     FSDataOutputStream out = dfs.create(file);
     out.write("testAppendWithoutNewBlock".getBytes());
     out.close();
+    checkpoint("AFTER_APPEND_OPERATION");
 
     // Append file
     try {
@@ -153,5 +177,6 @@ public class TestStripedFileAppend_ProcessBased {
         .listOpenFiles(EnumSet.copyOf(types), file.toString());
     assertFalse("No file should be open after append failure",
         listOpenFiles.hasNext());
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
   }
 }

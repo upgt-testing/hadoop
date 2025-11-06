@@ -17,14 +17,21 @@
  */
 package org.apache.hadoop.cli;
 
+import java.util.Arrays;
+import java.util.Collection;
 import org.apache.hadoop.cli.util.CLICommand;
 import org.apache.hadoop.cli.util.CommandExecutor.Result;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestAclCLI}.
@@ -34,11 +41,23 @@ import org.junit.Test;
  *
  * @see TestAclCLI Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestAclCLI_ProcessBased extends CLITestHelperDFS {
   private ProcessBasedMiniDFSCluster cluster = null;
   private FileSystem fs = null;
   private String namenode = null;
   private String username = null;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "checkpoint={0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {UpgradeCheckpoints.NO_UPGRADE},
+        {UpgradeCheckpoints.AFTER_CLUSTER_START}
+    });
+  }
 
   protected void initConf() {
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
@@ -53,6 +72,13 @@ public class TestAclCLI_ProcessBased extends CLITestHelperDFS {
     initConf();
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitClusterUp();
+
+    // Apply upgrade checkpoint logic
+    if (upgradeCheckpoint != null && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(UpgradeCheckpoints.AFTER_CLUSTER_START)) {
+      cluster.upgrade();
+    }
+
     fs = cluster.getFileSystem();
     namenode = conf.get(DFSConfigKeys.FS_DEFAULT_NAME_KEY, "file:///");
     username = System.getProperty("user.name");

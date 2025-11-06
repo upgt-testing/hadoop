@@ -30,11 +30,20 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.PathUtils;
 import org.apache.hadoop.util.Time;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestLoadGenerator}.
@@ -46,7 +55,8 @@ import org.junit.Test;
  *
  * @see TestLoadGenerator Original test using MiniDFSCluster
  */
-public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
+@RunWith(Parameterized.class)
+public class TestLoadGenerator_ProcessBased extends ProcessBasedUpgradeTestBase implements Tool {
   private static final Configuration CONF = new HdfsConfiguration();
   private static final int DEFAULT_BLOCK_SIZE = 10;
   private static final File OUT_DIR = PathUtils.getTestDir(TestLoadGenerator_ProcessBased.class);
@@ -61,6 +71,21 @@ public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
   private static final String FILE_STRUCTURE_SECOND_LINE =
     "/dir1/_file_1 1.4729310851145203";
 
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_DATA_GENERATION"
+    );
+  }
 
   static {
     CONF.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, DEFAULT_BLOCK_SIZE);
@@ -158,15 +183,18 @@ public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
     writer.write(FILE_STRUCTURE_SECOND_LINE+"\n");
     writer.close();
 
-    ProcessBasedMiniDFSCluster cluster = null;
     try {
-      cluster = new ProcessBasedMiniDFSCluster.Builder(CONF).numDataNodes(3).build();
+      conf = new HdfsConfiguration(CONF);
+      cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(3).build();
       cluster.waitClusterUp();
+      fs = cluster.getFileSystem();
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
       DataGenerator dg = new DataGenerator();
-      dg.setConf(CONF);
+      dg.setConf(conf);
       String [] args = new String[] {"-inDir", OUT_DIR.getAbsolutePath(), "-root", TEST_SPACE_ROOT};
       assertEquals(0, dg.run(args));
+      checkpoint("AFTER_DATA_GENERATION");
 
       final int READ_PROBABILITY = 1;
       final int WRITE_PROBABILITY = 3;
@@ -176,7 +204,7 @@ public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
       final int ELAPSED_TIME = 13;
 
       LoadGenerator lg = new LoadGenerator();
-      lg.setConf(CONF);
+      lg.setConf(conf);
       args = new String[] {"-readProbability", "0.3", "-writeProbability", "0.3",
           "-root", TEST_SPACE_ROOT, "-maxDelayBetweenOps", "0",
           "-numOfThreads", "1", "-startTime",
@@ -253,9 +281,6 @@ public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
     } catch (TimeoutException e) {
       throw new RuntimeException("Cluster startup timeout", e);
     } finally {
-      if (cluster != null) {
-        cluster.shutdown();
-      }
       DIR_STRUCTURE_FILE.delete();
       FILE_STRUCTURE_FILE.delete();
       scriptFile1.delete();
@@ -277,5 +302,15 @@ public class TestLoadGenerator_ProcessBased extends Configured implements Tool {
     loadGeneratorTest.testStructureGenerator();
     loadGeneratorTest.testLoadGenerator();
     return 0;
+  }
+
+  @Override
+  public void setConf(Configuration configuration) {
+    this.conf = configuration;
+  }
+
+  @Override
+  public Configuration getConf() {
+    return this.conf;
   }
 }

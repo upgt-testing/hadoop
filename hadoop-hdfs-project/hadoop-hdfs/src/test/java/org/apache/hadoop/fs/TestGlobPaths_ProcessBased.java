@@ -22,6 +22,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -35,6 +37,10 @@ import org.apache.hadoop.hdfs.server.namenode.INodeId;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestGlobPaths}.
@@ -42,9 +48,28 @@ import org.junit.*;
  * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
+ * Parameterized test with checkpoint support for upgrade testing.
+ *
  * @see TestGlobPaths Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestGlobPaths_ProcessBased {
+
+  public enum Checkpoint {
+    NO_UPGRADE,
+    AFTER_CLUSTER_START
+  }
+
+  @Parameter(0)
+  public Checkpoint checkpoint;
+
+  @Parameters(name = "checkpoint={0}")
+  public static Collection<Object[]> checkpoints() {
+    return Arrays.asList(new Object[][] {
+      {Checkpoint.NO_UPGRADE},
+      {Checkpoint.AFTER_CLUSTER_START}
+    });
+  }
 
   private static final UserGroupInformation unprivilegedUser =
     UserGroupInformation.createUserForTesting("myuser",
@@ -64,17 +89,17 @@ public class TestGlobPaths_ProcessBased {
 
   }
 
-  static private ProcessBasedMiniDFSCluster dfsCluster;
-  static private FileSystem fs;
-  static private FileSystem privilegedFs;
-  static private FileContext fc;
-  static private FileContext privilegedFc;
-  static final private int NUM_OF_PATHS = 4;
-  static private String USER_DIR;
+  private ProcessBasedMiniDFSCluster dfsCluster;
+  private FileSystem fs;
+  private FileSystem privilegedFs;
+  private FileContext fc;
+  private FileContext privilegedFc;
+  private final int NUM_OF_PATHS = 4;
+  private String USER_DIR;
   private final Path[] path = new Path[NUM_OF_PATHS];
 
-  @BeforeClass
-  public static void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     dfsCluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     dfsCluster.waitClusterUp();
@@ -88,10 +113,16 @@ public class TestGlobPaths_ProcessBased {
     fs = FileSystem.get(conf);
     fc = FileContext.getFileContext(conf);
     USER_DIR = fs.getHomeDirectory().toUri().getPath().toString();
+
+    // Execute checkpoint-specific operations
+    if (checkpoint == Checkpoint.AFTER_CLUSTER_START) {
+      // Placeholder for upgrade operations at this checkpoint
+      // Can be used to perform rolling upgrades or version changes
+    }
   }
 
-  @AfterClass
-  public static void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     if(dfsCluster!=null) {
       dfsCluster.shutdown();
     }

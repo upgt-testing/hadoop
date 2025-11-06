@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -42,14 +43,18 @@ import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +66,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see TestStickyBit Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestStickyBit_ProcessBased {
 
   static final UserGroupInformation user1 =
@@ -69,26 +75,49 @@ public class TestStickyBit_ProcessBased {
     UserGroupInformation.createUserForTesting("rose", new String[] {"powellestates"});
   static final Logger LOG = LoggerFactory.getLogger(TestStickyBit_ProcessBased.class);
 
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Configuration conf;
-  private static FileSystem hdfs;
-  private static FileSystem hdfsAsUser1;
-  private static FileSystem hdfsAsUser2;
+  private ProcessBasedMiniDFSCluster cluster;
+  private Configuration conf;
+  private FileSystem hdfs;
+  private FileSystem hdfsAsUser1;
+  private FileSystem hdfsAsUser2;
 
-  @BeforeClass
-  public static void init() throws Exception {
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
+
+  @Before
+  public void setup() throws Exception {
     conf = new HdfsConfiguration();
     conf.setBoolean(DFSConfigKeys.DFS_PERMISSIONS_ENABLED_KEY, true);
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
     initCluster(true);
+
+    if (hdfs != null) {
+      for (FileStatus stat: hdfs.listStatus(new Path("/"))) {
+        hdfs.delete(stat.getPath(), true);
+      }
+    }
   }
 
-  private static void initCluster(boolean format) throws Exception {
+  private void initCluster(boolean format) throws Exception {
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(4)
         .format(format)
         .build();
     cluster.waitClusterUp();
+
+    if (shouldUpgrade(UpgradeCheckpoints.AFTER_CLUSTER_START)) {
+      cluster.upgrade();
+      cluster.waitClusterUp();
+    }
+
     hdfs = cluster.getFileSystem();
     assertTrue(hdfs instanceof DistributedFileSystem);
     hdfsAsUser1 = DFSTestUtil.getFileSystemAs(user1, conf);
@@ -97,21 +126,22 @@ public class TestStickyBit_ProcessBased {
     assertTrue(hdfsAsUser2 instanceof DistributedFileSystem);
   }
 
-  @Before
-  public void setup() throws Exception {
-    if (hdfs != null) {
-      for (FileStatus stat: hdfs.listStatus(new Path("/"))) {
-        hdfs.delete(stat.getPath(), true);
+  @After
+  public void shutdown() throws Exception {
+    IOUtils.cleanupWithLogger(null, hdfs, hdfsAsUser1, hdfsAsUser2);
+    if (cluster != null) {
+      try {
+        cluster.shutdown();
+      } catch (Exception e) {
+        // Ignore
       }
     }
   }
 
-  @AfterClass
-  public static void shutdown() throws Exception {
-    IOUtils.cleanupWithLogger(null, hdfs, hdfsAsUser1, hdfsAsUser2);
-    if (cluster != null) {
-      cluster.shutdown();
-    }
+  private boolean shouldUpgrade(String checkpointName) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(checkpointName);
   }
 
   /**
@@ -522,7 +552,7 @@ public class TestStickyBit_ProcessBased {
    * @param p Path to set
    * @throws IOException if an ACL could not be modified
    */
-  private static void applyAcl(Path p) throws IOException {
+  private void applyAcl(Path p) throws IOException {
     hdfs.modifyAclEntries(p, Arrays.asList(
       aclEntry(ACCESS, USER, user2.getShortUserName(), ALL),
       aclEntry(DEFAULT, USER, user2.getShortUserName(), ALL)));

@@ -28,15 +28,20 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.TimeoutException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.PathUtils;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestUrlStreamHandler}.
@@ -46,13 +51,27 @@ import org.junit.Test;
  *
  * @see TestUrlStreamHandler Original test using MiniDFSCluster
  */
-public class TestUrlStreamHandler_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestUrlStreamHandler_ProcessBased extends ProcessBasedUpgradeTestBase {
 
   private static final File TEST_ROOT_DIR =
       PathUtils.getTestDir(TestUrlStreamHandler_ProcessBased.class);
 
   private static final FsUrlStreamHandlerFactory HANDLER_FACTORY
       = new FsUrlStreamHandlerFactory();
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_WRITE,
+      UpgradeCheckpoints.AFTER_CLOSE
+    );
+  }
 
   @BeforeClass
   public static void setupHandler() {
@@ -71,51 +90,46 @@ public class TestUrlStreamHandler_ProcessBased {
    * try to open and read the file through the URL stream API.
    *
    * @throws IOException
-   * @throws TimeoutException
    */
   @Test
-  public void testDfsUrls() throws IOException, TimeoutException {
+  public void testDfsUrls() throws Exception {
 
-    Configuration conf = new HdfsConfiguration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
-    FileSystem fs = cluster.getFileSystem();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    fs = cluster.getFileSystem();
     Path filePath = new Path("/thefile");
 
-    try {
-      byte[] fileContent = new byte[1024];
-      for (int i = 0; i < fileContent.length; ++i)
-        fileContent[i] = (byte) i;
+    byte[] fileContent = new byte[1024];
+    for (int i = 0; i < fileContent.length; ++i)
+      fileContent[i] = (byte) i;
 
-      // First create the file through the FileSystem API
-      OutputStream os = fs.create(filePath);
-      os.write(fileContent);
-      os.close();
+    // First create the file through the FileSystem API
+    OutputStream os = fs.create(filePath);
+    os.write(fileContent);
+    checkpoint(UpgradeCheckpoints.AFTER_WRITE);
+    os.close();
+    checkpoint(UpgradeCheckpoints.AFTER_CLOSE);
 
-      // Second, open and read the file content through the URL API
-      URI uri = fs.getUri();
-      URL fileURL =
-          new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath
-              .toString());
+    // Second, open and read the file content through the URL API
+    URI uri = fs.getUri();
+    URL fileURL =
+        new URL(uri.getScheme(), uri.getHost(), uri.getPort(), filePath
+            .toString());
 
-      InputStream is = fileURL.openStream();
-      assertNotNull(is);
+    InputStream is = fileURL.openStream();
+    assertNotNull(is);
 
-      byte[] bytes = new byte[4096];
-      assertEquals(1024, is.read(bytes));
-      is.close();
+    byte[] bytes = new byte[4096];
+    assertEquals(1024, is.read(bytes));
+    is.close();
 
-      for (int i = 0; i < fileContent.length; ++i)
-        assertEquals(fileContent[i], bytes[i]);
+    for (int i = 0; i < fileContent.length; ++i)
+      assertEquals(fileContent[i], bytes[i]);
 
-      // Cleanup: delete the file
-      fs.delete(filePath, false);
-
-    } finally {
-      fs.close();
-      cluster.shutdown();
-    }
-
+    // Cleanup: delete the file
+    fs.delete(filePath, false);
   }
 
   /**
@@ -127,7 +141,6 @@ public class TestUrlStreamHandler_ProcessBased {
   @Test
   public void testFileUrls() throws IOException, URISyntaxException {
     // URLStreamHandler is already set in JVM by testDfsUrls()
-    Configuration conf = new HdfsConfiguration();
 
     // Locate the test temporary directory.
     if (!TEST_ROOT_DIR.exists()) {
@@ -138,7 +151,7 @@ public class TestUrlStreamHandler_ProcessBased {
     File tmpFile = new File(TEST_ROOT_DIR, "thefile");
     URI uri = tmpFile.toURI();
 
-    FileSystem fs = FileSystem.get(uri, conf);
+    FileSystem localFs = FileSystem.get(uri, conf);
 
     try {
       byte[] fileContent = new byte[1024];
@@ -146,7 +159,7 @@ public class TestUrlStreamHandler_ProcessBased {
         fileContent[i] = (byte) i;
 
       // First create the file through the FileSystem API
-      OutputStream os = fs.create(new Path(uri.getPath()));
+      OutputStream os = localFs.create(new Path(uri.getPath()));
       os.write(fileContent);
       os.close();
 
@@ -164,10 +177,10 @@ public class TestUrlStreamHandler_ProcessBased {
         assertEquals(fileContent[i], bytes[i]);
 
       // Cleanup: delete the file
-      fs.delete(new Path(uri.getPath()), false);
+      localFs.delete(new Path(uri.getPath()), false);
 
     } finally {
-      fs.close();
+      localFs.close();
     }
 
   }

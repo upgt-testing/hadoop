@@ -22,7 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.PeerCache;
 import org.apache.hadoop.hdfs.client.HdfsClientConfigKeys;
 import org.apache.hadoop.io.IOUtils;
@@ -30,9 +33,15 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -45,9 +54,28 @@ import java.util.concurrent.TimeoutException;
  *
  * @see TestUnbuffer Original test using MiniDFSCluster
  */
-public class TestUnbuffer_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestUnbuffer_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestUnbuffer_ProcessBased.class.getName());
+
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      "AFTER_UNBUFFER",
+      "BEFORE_CLEANUP"
+    );
+  }
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -57,7 +85,7 @@ public class TestUnbuffer_ProcessBased {
    */
   @Test
   public void testUnbufferClosesSockets() throws Exception {
-    Configuration conf = new Configuration();
+    conf = new HdfsConfiguration();
     // Set a new ClientContext.  This way, we will have our own PeerCache,
     // rather than sharing one with other unit tests.
     conf.set(HdfsClientConfigKeys.DFS_CLIENT_CONTEXT,
@@ -73,19 +101,20 @@ public class TestUnbuffer_ProcessBased {
     conf.setLong(HdfsClientConfigKeys.DFS_CLIENT_SOCKET_CACHE_EXPIRY_MSEC_KEY,
         100000000L);
 
-    ProcessBasedMiniDFSCluster cluster = null;
     FSDataInputStream stream = null;
     try {
-      try {
-        cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
-        cluster.waitClusterUp();
-      } catch (TimeoutException e) {
-        throw new IOException("Cluster startup timed out", e);
-      }
+      cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+      cluster.waitClusterUp();
+
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
       DistributedFileSystem dfs = (DistributedFileSystem)
           FileSystem.newInstance(conf);
       final Path TEST_PATH = new Path("/test1");
       DFSTestUtil.createFile(dfs, TEST_PATH, 128, (short)1, 1);
+
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
       stream = dfs.open(TEST_PATH);
       // Read a byte.  This will trigger the creation of a block reader.
       stream.seek(2);
@@ -99,16 +128,16 @@ public class TestUnbuffer_ProcessBased {
       // Unbuffer should clear the block reader and return the socket to the
       // cache.
       stream.unbuffer();
+      checkpoint("AFTER_UNBUFFER");
       stream.seek(2);
       Assert.assertEquals(1, cache.size());
       int b2 = stream.read();
       Assert.assertEquals(b, b2);
+
+      checkpoint("BEFORE_CLEANUP");
     } finally {
       if (stream != null) {
         IOUtils.cleanupWithLogger(null, stream);
-      }
-      if (cluster != null) {
-        cluster.shutdown();
       }
     }
   }
@@ -122,33 +151,33 @@ public class TestUnbuffer_ProcessBased {
   @Test
   public void testOpenManyFilesViaTcp() throws Exception {
     final int NUM_OPENS = 500;
-    Configuration conf = new Configuration();
+    conf = new HdfsConfiguration();
     conf.setBoolean(HdfsClientConfigKeys.Read.ShortCircuit.KEY, false);
-    ProcessBasedMiniDFSCluster cluster = null;
     FSDataInputStream[] streams = new FSDataInputStream[NUM_OPENS];
     try {
-      try {
-        cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
-        cluster.waitClusterUp();
-      } catch (TimeoutException e) {
-        throw new IOException("Cluster startup timed out", e);
-      }
-      DistributedFileSystem dfs = cluster.getFileSystem();
+      cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+      cluster.waitClusterUp();
+
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+      fs = cluster.getFileSystem();
       final Path TEST_PATH = new Path("/testFile");
-      DFSTestUtil.createFile(dfs, TEST_PATH, 131072, (short)1, 1);
+      DFSTestUtil.createFile(fs, TEST_PATH, 131072, (short)1, 1);
+
+      checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
       for (int i = 0; i < NUM_OPENS; i++) {
-        streams[i] = dfs.open(TEST_PATH);
+        streams[i] = fs.open(TEST_PATH);
         LOG.info("opening file " + i + "...");
         Assert.assertTrue(-1 != streams[i].read());
         streams[i].unbuffer();
       }
+
+      checkpoint("AFTER_UNBUFFER");
+      checkpoint("BEFORE_CLEANUP");
     } finally {
       for (FSDataInputStream stream : streams) {
         IOUtils.cleanupWithLogger(null, stream);
-      }
-      if (cluster != null) {
-        cluster.shutdown();
       }
     }
   }

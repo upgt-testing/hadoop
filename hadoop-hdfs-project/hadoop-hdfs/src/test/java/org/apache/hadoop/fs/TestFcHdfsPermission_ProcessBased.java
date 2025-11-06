@@ -20,17 +20,22 @@ package org.apache.hadoop.fs;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestFcHdfsPermission}.
@@ -40,14 +45,27 @@ import org.junit.BeforeClass;
  *
  * @see TestFcHdfsPermission Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestFcHdfsPermission_ProcessBased extends FileContextPermissionBase {
 
   private static final FileContextTestHelper fileContextTestHelper =
       new FileContextTestHelper("/tmp/TestFcHdfsPermission_ProcessBased");
-  private static FileContext fc;
+  private FileContext fcInstance;
 
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Path defaultWorkingDirectory;
+  private Path defaultWorkingDirectory;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  private ProcessBasedMiniDFSCluster cluster;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
 
   @Override
   protected FileContextTestHelper getFileContextHelper() {
@@ -56,38 +74,45 @@ public class TestFcHdfsPermission_ProcessBased extends FileContextPermissionBase
 
   @Override
   protected FileContext getFileContext() {
-    return fc;
+    return fcInstance;
   }
 
-  @BeforeClass
-  public static void clusterSetupAtBegining()
-                                    throws Exception {
+  @Before
+  @Override
+  public void setUp() throws Exception {
     Configuration conf = new HdfsConfiguration();
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
-    fc = FileContext.getFileContext(cluster.getURI(0), conf);
-    defaultWorkingDirectory = fc.makeQualified( new Path("/user/" +
-        UserGroupInformation.getCurrentUser().getShortUserName()));
-    fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
-  }
 
-
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+    if (shouldUpgrade(UpgradeCheckpoints.AFTER_CLUSTER_START)) {
+      cluster.upgrade();
+      cluster.waitClusterUp();
     }
-  }
 
-  @Override
-  @Before
-  public void setUp() throws Exception {
+    fcInstance = FileContext.getFileContext(cluster.getURI(0), conf);
+    defaultWorkingDirectory = fcInstance.makeQualified(new Path("/user/" +
+        UserGroupInformation.getCurrentUser().getShortUserName()));
+    fcInstance.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
+
     super.setUp();
   }
 
-  @Override
   @After
+  @Override
   public void tearDown() throws Exception {
     super.tearDown();
+    if (cluster != null) {
+      try {
+        cluster.shutdown();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
+  }
+
+  private boolean shouldUpgrade(String checkpointName) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(checkpointName);
   }
 }

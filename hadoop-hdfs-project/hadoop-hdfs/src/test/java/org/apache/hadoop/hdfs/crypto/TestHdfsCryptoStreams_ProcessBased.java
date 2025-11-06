@@ -20,9 +20,9 @@ package org.apache.hadoop.hdfs.crypto;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.TimeoutException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.crypto.CryptoCodec;
 import org.apache.hadoop.crypto.CryptoStreamsTestBase;
 import org.apache.hadoop.fs.FileSystem;
@@ -30,12 +30,14 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.crypto.CryptoFSDataInputStream;
 import org.apache.hadoop.fs.crypto.CryptoFSDataOutputStream;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestHdfsCryptoStreams}.
@@ -45,56 +47,81 @@ import org.junit.BeforeClass;
  *
  * @see TestHdfsCryptoStreams Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestHdfsCryptoStreams_ProcessBased extends CryptoStreamsTestBase {
-  private static ProcessBasedMiniDFSCluster dfsCluster;
-  private static FileSystem fs;
-  private static int pathCount = 0;
-  private static Path path;
-  private static Path file;
+  private ProcessBasedMiniDFSCluster dfsCluster;
+  private FileSystem testFs;
+  private int pathCount = 0;
+  private Path path;
+  private Path file;
 
-  @BeforeClass
-  public static void init() throws Exception {
-    Configuration conf = new HdfsConfiguration();
-    dfsCluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
-    dfsCluster.waitClusterUp();
-    fs = dfsCluster.getFileSystem();
-    codec = CryptoCodec.getInstance(conf);
-  }
+  @Parameter
+  public String upgradeCheckpoint;
 
-  @AfterClass
-  public static void shutdown() throws Exception {
-    if (dfsCluster != null) {
-      dfsCluster.shutdown();
-    }
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE
+    );
   }
 
   @Before
   @Override
   public void setUp() throws IOException {
+    org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.hdfs.HdfsConfiguration();
+    try {
+      dfsCluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+      dfsCluster.waitClusterUp();
+    } catch (Exception e) {
+      throw new IOException("Failed to start cluster", e);
+    }
+    testFs = dfsCluster.getFileSystem();
+    codec = CryptoCodec.getInstance(conf);
+
     ++pathCount;
     path = new Path("/p" + pathCount);
     file = new Path(path, "file");
-    FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short) 0700));
+    FileSystem.mkdirs(testFs, path, FsPermission.createImmutable((short) 0700));
 
     super.setUp();
   }
 
   @After
-  public void cleanUp() throws IOException {
-    fs.delete(path, true);
+  public void cleanUp() throws Exception {
+    if (testFs != null) {
+      try {
+        testFs.delete(path, true);
+      } catch (Exception e) {
+        // Ignore
+      }
+      try {
+        testFs.close();
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
+    if (dfsCluster != null) {
+      try {
+        dfsCluster.shutdown(true);
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
   }
 
   @Override
   protected OutputStream getOutputStream(int bufferSize, byte[] key, byte[] iv)
       throws IOException {
-    return new CryptoFSDataOutputStream(fs.create(file), codec, bufferSize,
+    return new CryptoFSDataOutputStream(testFs.create(file), codec, bufferSize,
         key, iv);
   }
 
   @Override
   protected InputStream getInputStream(int bufferSize, byte[] key, byte[] iv)
       throws IOException {
-    return new CryptoFSDataInputStream(fs.open(file), codec, bufferSize, key,
+    return new CryptoFSDataInputStream(testFs.open(file), codec, bufferSize, key,
         iv);
   }
 }

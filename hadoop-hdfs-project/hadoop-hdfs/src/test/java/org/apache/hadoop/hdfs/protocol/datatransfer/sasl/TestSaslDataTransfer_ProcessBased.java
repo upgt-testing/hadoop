@@ -53,15 +53,23 @@ import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.http.HttpConfig.Policy;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.token.Token;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.hadoop.test.GenericTestUtils.LogCapturer;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSaslDataTransfer}.
@@ -71,14 +79,28 @@ import org.mockito.Mockito;
  *
  * @see TestSaslDataTransfer Original test using MiniDFSCluster
  */
-public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase {
+@RunWith(Parameterized.class)
+public class TestSaslDataTransfer_ProcessBased extends ProcessBasedUpgradeTestBase {
 
   private static final int BLOCK_SIZE = 4096;
   private static final int NUM_BLOCKS = 3;
   private static final Path PATH  = new Path("/file1");
 
-  private ProcessBasedMiniDFSCluster cluster;
-  private FileSystem fs;
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE
+    );
+  }
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
@@ -86,13 +108,12 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
   @Rule
   public Timeout timeout = new Timeout(60000);
 
-  @After
-  public void shutdown() {
-    IOUtils.cleanupWithLogger(null, fs);
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
+  // Helper instance for SASL test utilities
+  private static final SaslDataTransferTestCase saslHelper = new SaslDataTransferTestCase() {};
+
+  // Delegate method for creating secure configurations
+  private HdfsConfiguration createSecureConfig(String dataTransferProtection) throws Exception {
+    return saslHelper.createSecureConfig(dataTransferProtection);
   }
 
   @Test
@@ -100,6 +121,8 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     HdfsConfiguration clusterConf = createSecureConfig(
       "authentication,integrity,privacy");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
     clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
     doTest(clientConf);
@@ -110,6 +133,8 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     HdfsConfiguration clusterConf = createSecureConfig(
       "authentication,integrity,privacy");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
     clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "integrity");
     doTest(clientConf);
@@ -120,6 +145,8 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     HdfsConfiguration clusterConf = createSecureConfig(
       "authentication,integrity,privacy");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
     clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "privacy");
     doTest(clientConf);
@@ -129,6 +156,8 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
   public void testClientAndServerDoNotHaveCommonQop() throws Exception {
     HdfsConfiguration clusterConf = createSecureConfig("privacy");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
     clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "authentication");
     exception.expect(IOException.class);
@@ -143,6 +172,8 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     // Set short retry timeouts so this test runs faster
     clusterConf.setInt(HdfsClientConfigKeys.Retry.WINDOW_BASE_KEY, 10);
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     HdfsConfiguration clientConf = new HdfsConfiguration(clusterConf);
     clientConf.set(DFS_DATA_TRANSFER_PROTECTION_KEY, "");
 
@@ -170,6 +201,7 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     exception.expect(RuntimeException.class);
     exception.expectMessage("Cannot start secure DataNode");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
   @Test
@@ -180,6 +212,7 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     exception.expect(RuntimeException.class);
     exception.expectMessage("Cannot start secure DataNode");
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
   @Test
@@ -188,6 +221,7 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     clusterConf.set(DFS_HTTP_POLICY_KEY,
         Policy.HTTPS_ONLY.name());
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
   @Test
@@ -195,21 +229,25 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
     HdfsConfiguration clusterConf = createSecureConfig("");
     clusterConf.setBoolean(IGNORE_SECURE_PORTS_FOR_TESTING_KEY, true);
     startCluster(clusterConf);
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
     doTest(clusterConf);
   }
 
   /**
    * Tests DataTransferProtocol with the given client configuration.
    *
-   * @param conf client configuration
-   * @throws IOException if there is an I/O error
+   * @param clientConf client configuration
+   * @throws Exception if there is an error
    */
-  private void doTest(HdfsConfiguration conf) throws IOException {
-    fs = FileSystem.get(cluster.getURI(), conf);
-    FileSystemTestHelper.createFile(fs, PATH, NUM_BLOCKS, BLOCK_SIZE);
+  private void doTest(HdfsConfiguration clientConf) throws Exception {
+    FileSystem testFs = FileSystem.get(cluster.getURI(), clientConf);
+    FileSystemTestHelper.createFile(testFs, PATH, NUM_BLOCKS, BLOCK_SIZE);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
     assertArrayEquals(FileSystemTestHelper.getFileData(NUM_BLOCKS, BLOCK_SIZE),
-      DFSTestUtil.readFile(fs, PATH).getBytes("UTF-8"));
-    BlockLocation[] blockLocations = fs.getFileBlockLocations(PATH, 0,
+      DFSTestUtil.readFile(testFs, PATH).getBytes("UTF-8"));
+    BlockLocation[] blockLocations = testFs.getFileBlockLocations(PATH, 0,
       Long.MAX_VALUE);
     assertNotNull(blockLocations);
     assertEquals(NUM_BLOCKS, blockLocations.length);
@@ -217,18 +255,20 @@ public class TestSaslDataTransfer_ProcessBased extends SaslDataTransferTestCase 
       assertNotNull(blockLocation.getHosts());
       assertEquals(3, blockLocation.getHosts().length);
     }
+    testFs.close();
   }
 
   /**
    * Starts a cluster with the given configuration.
    *
-   * @param conf cluster configuration
-   * @throws IOException if there is an I/O error
-   * @throws java.util.concurrent.TimeoutException if cluster startup times out
+   * @param clusterConf cluster configuration
+   * @throws Exception if there is an error
    */
-  private void startCluster(HdfsConfiguration conf) throws IOException, java.util.concurrent.TimeoutException {
+  private void startCluster(HdfsConfiguration clusterConf) throws Exception {
+    conf = clusterConf;
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(3).build();
     cluster.waitClusterUp();
+    fs = cluster.getFileSystem();
   }
 
   /**

@@ -20,6 +20,8 @@ package org.apache.hadoop.hdfs;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,10 +32,16 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.metrics2.util.Quantile;
 import org.apache.hadoop.metrics2.util.SampleQuantiles;
 import org.apache.hadoop.util.StopWatch;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestMultiThreadedHflush}.
@@ -45,12 +53,27 @@ import org.junit.Test;
  *
  * @see TestMultiThreadedHflush Original test using MiniDFSCluster
  */
-public class TestMultiThreadedHflush_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestMultiThreadedHflush_ProcessBased extends ProcessBasedUpgradeTestBase {
   static final int blockSize = 1024*1024;
 
   private static final int NUM_THREADS = 10;
   private static final int WRITE_SIZE = 517;
   private static final int NUM_WRITES_PER_THREAD = 1000;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      UpgradeCheckpoints.AFTER_FIRST_FLUSH,
+      "AFTER_WRITES_COMPLETE"
+    );
+  }
 
   private byte[] toWrite = null;
 
@@ -128,23 +151,19 @@ public class TestMultiThreadedHflush_ProcessBased {
   }
 
   private void doTestMultipleHflushers(int repl) throws Exception {
-    Configuration conf = new Configuration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
         .numDataNodes(repl)
         .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-    FileSystem fs = cluster.getFileSystem();
+    fs = cluster.getFileSystem();
     Path p = new Path("/multiple-hflushers.dat");
-    try {
-      doMultithreadedWrites(conf, p, NUM_THREADS, WRITE_SIZE,
-          NUM_WRITES_PER_THREAD, repl);
-      System.out.println("Latency quantiles (in microseconds):\n" +
-          quantiles);
-    } finally {
-      fs.close();
-      cluster.shutdown();
-    }
+    doMultithreadedWrites(conf, p, NUM_THREADS, WRITE_SIZE,
+        NUM_WRITES_PER_THREAD, repl);
+    System.out.println("Latency quantiles (in microseconds):\n" +
+        quantiles);
   }
 
   /**
@@ -156,62 +175,62 @@ public class TestMultiThreadedHflush_ProcessBased {
    */
   @Test
   public void testHflushWhileClosing() throws Throwable {
-    Configuration conf = new Configuration();
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    conf = new HdfsConfiguration();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    FileSystem fs = cluster.getFileSystem();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    fs = cluster.getFileSystem();
     Path p = new Path("/hflush-and-close.dat");
 
     final FSDataOutputStream stm = createFile(fs, p, 1);
-
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
     ArrayList<Thread> flushers = new ArrayList<Thread>();
     final AtomicReference<Throwable> thrown = new AtomicReference<Throwable>();
-    try {
-      for (int i = 0; i < 10; i++) {
-        Thread flusher = new Thread() {
-            @Override
-            public void run() {
-              try {
-                while (true) {
-                  try {
-                    stm.hflush();
-                  } catch (ClosedChannelException ioe) {
-                    // Expected exception caught. Ignoring.
-                    return;
-                  }
+    for (int i = 0; i < 10; i++) {
+      Thread flusher = new Thread() {
+          @Override
+          public void run() {
+            try {
+              while (true) {
+                try {
+                  stm.hflush();
+                } catch (ClosedChannelException ioe) {
+                  // Expected exception caught. Ignoring.
+                  return;
                 }
-              } catch (Throwable t) {
-                thrown.set(t);
               }
+            } catch (Throwable t) {
+              thrown.set(t);
             }
-          };
-        flusher.start();
-        flushers.add(flusher);
-      }
+          }
+        };
+      flusher.start();
+      flushers.add(flusher);
+    }
 
-      // Write some data
-      for (int i = 0; i < 10000; i++) {
-        stm.write(1);
-      }
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_FLUSH);
 
-      // Close it while the flushing threads are still flushing
-      stm.close();
+    // Write some data
+    for (int i = 0; i < 10000; i++) {
+      stm.write(1);
+    }
 
-      // Wait for the flushers to all die.
-      for (Thread t : flushers) {
-        t.join();
-      }
+    checkpoint("AFTER_WRITES_COMPLETE");
 
-      // They should have all gotten the expected exception, not anything
-      // else.
-      if (thrown.get() != null) {
-        throw thrown.get();
-      }
+    // Close it while the flushing threads are still flushing
+    stm.close();
 
-    } finally {
-      fs.close();
-      cluster.shutdown();
+    // Wait for the flushers to all die.
+    for (Thread t : flushers) {
+      t.join();
+    }
+
+    // They should have all gotten the expected exception, not anything
+    // else.
+    if (thrown.get() != null) {
+      throw thrown.get();
     }
   }
 
@@ -221,9 +240,10 @@ public class TestMultiThreadedHflush_ProcessBased {
     initBuffer(bufferSize);
 
     // create a new file.
-    FileSystem fs = p.getFileSystem(conf);
-    FSDataOutputStream stm = createFile(fs, p, replication);
+    FileSystem fileSystem = p.getFileSystem(conf);
+    FSDataOutputStream stm = createFile(fileSystem, p, replication);
     System.out.println("Created file simpleFlush.dat");
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
     // There have been a couple issues with flushing empty buffers, so do
     // some empty flushes first.
@@ -232,6 +252,7 @@ public class TestMultiThreadedHflush_ProcessBased {
     stm.write(1);
     stm.hflush();
     stm.hflush();
+    checkpoint(UpgradeCheckpoints.AFTER_FIRST_FLUSH);
 
     CountDownLatch countdown = new CountDownLatch(1);
     ArrayList<Thread> threads = new ArrayList<Thread>();
@@ -251,6 +272,7 @@ public class TestMultiThreadedHflush_ProcessBased {
     if (thrown.get() != null) {
       throw new RuntimeException("Deferred", thrown.get());
     }
+    checkpoint("AFTER_WRITES_COMPLETE");
     stm.close();
     System.out.println("Closed file.");
   }

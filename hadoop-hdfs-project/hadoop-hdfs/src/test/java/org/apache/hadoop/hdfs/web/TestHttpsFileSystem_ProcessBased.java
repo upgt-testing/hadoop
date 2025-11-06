@@ -20,21 +20,28 @@ package org.apache.hadoop.hdfs.web;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collection;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.security.ssl.KeyStoreTestUtil;
 import org.apache.hadoop.test.GenericTestUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestHttpsFileSystem}.
@@ -46,20 +53,33 @@ import org.junit.Test;
  *
  * @see TestHttpsFileSystem Original test using MiniDFSCluster
  */
-public class TestHttpsFileSystem_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestHttpsFileSystem_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final String BASEDIR =
       GenericTestUtils.getTempPath(TestHttpsFileSystem_ProcessBased.class.getSimpleName());
 
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Configuration conf;
+  private String keystoresDir;
+  private String sslConfDir;
+  private String nnAddr;
 
-  private static String keystoresDir;
-  private static String sslConfDir;
-  private static String nnAddr;
+  @Parameter
+  public String upgradeCheckpoint;
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    conf = new Configuration();
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      UpgradeCheckpoints.AFTER_WRITE
+    );
+  }
+
+  @Override
+  @Before
+  public void setupTest() throws Exception {
+    super.setupTest();
+
     conf.set(DFSConfigKeys.DFS_HTTP_POLICY_KEY, HttpConfig.Policy.HTTPS_ONLY.name());
     conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, "localhost:0");
     conf.set(DFSConfigKeys.DFS_DATANODE_HTTPS_ADDRESS_KEY, "localhost:0");
@@ -81,9 +101,13 @@ public class TestHttpsFileSystem_ProcessBased {
         .format(true)
         .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
 
-    OutputStream os = cluster.getFileSystem().create(new Path("/test"));
+    fs = cluster.getFileSystem();
+    OutputStream os = fs.create(new Path("/test"));
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
     os.write(23);
+    checkpoint(UpgradeCheckpoints.AFTER_WRITE);
     os.close();
 
     // Get HTTPS address from configuration
@@ -93,26 +117,30 @@ public class TestHttpsFileSystem_ProcessBased {
     conf.set(DFSConfigKeys.DFS_NAMENODE_HTTPS_ADDRESS_KEY, nnAddr);
   }
 
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+  @Override
+  @After
+  public void tearDownTest() {
+    super.tearDownTest();
+
+    try {
+      FileUtil.fullyDelete(new File(BASEDIR));
+      KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
+    } catch (Exception e) {
+      // Log but don't fail test
     }
-    FileUtil.fullyDelete(new File(BASEDIR));
-    KeyStoreTestUtil.cleanupSSLConfig(keystoresDir, sslConfDir);
   }
 
   @Test
   public void testSWebHdfsFileSystem() throws Exception {
-    FileSystem fs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
+    FileSystem webFs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, "swebhdfs");
     final Path f = new Path("/testswebhdfs");
-    FSDataOutputStream os = fs.create(f);
+    FSDataOutputStream os = webFs.create(f);
     os.write(23);
     os.close();
-    Assert.assertTrue(fs.exists(f));
-    InputStream is = fs.open(f);
+    Assert.assertTrue(webFs.exists(f));
+    InputStream is = webFs.open(f);
     Assert.assertEquals(23, is.read());
     is.close();
-    fs.close();
+    webFs.close();
   }
 }

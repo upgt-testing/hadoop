@@ -18,19 +18,19 @@
 
 package org.apache.hadoop.fs;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 
-import javax.security.auth.login.LoginException;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestFcHdfsCreateMkdir}.
@@ -40,47 +40,54 @@ import org.junit.BeforeClass;
  *
  * @see TestFcHdfsCreateMkdir Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestFcHdfsCreateMkdir_ProcessBased extends
                     FileContextCreateMkdirBaseTest {
 
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Path defaultWorkingDirectory;
+  private ProcessBasedMiniDFSCluster cluster;
+  private Path defaultWorkingDirectory;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
 
   @Override
   protected FileContextTestHelper createFileContextHelper() {
     return new FileContextTestHelper("/tmp/TestFcHdfsCreateMkdir_ProcessBased");
   }
 
-
-  @BeforeClass
-  public static void clusterSetupAtBegining()
-                                    throws Exception {
-    Configuration conf = new HdfsConfiguration();
+  @Before
+  @Override
+  public void setUp() throws Exception {
+    org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.hdfs.HdfsConfiguration();
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
     fc = FileContext.getFileContext(cluster.getURI(0), conf);
     defaultWorkingDirectory = fc.makeQualified( new Path("/user/" +
         UserGroupInformation.getCurrentUser().getShortUserName()));
     fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
-  }
 
-
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-    }
-  }
-
-  @Override
-  @Before
-  public void setUp() throws Exception {
     super.setUp();
   }
 
-  @Override
   @After
+  @Override
   public void tearDown() throws Exception {
     super.tearDown();
+
+    if (cluster != null) {
+      try {
+        cluster.shutdown(true);
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
   }
 }

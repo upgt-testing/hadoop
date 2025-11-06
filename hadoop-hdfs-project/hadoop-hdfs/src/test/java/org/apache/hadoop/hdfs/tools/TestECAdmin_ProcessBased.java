@@ -20,17 +20,25 @@ package org.apache.hadoop.hdfs.tools;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -49,11 +57,10 @@ import static org.junit.Assert.assertTrue;
  *
  * @see TestECAdmin Original test using MiniDFSCluster
  */
-public class TestECAdmin_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestECAdmin_ProcessBased extends ProcessBasedUpgradeTestBase {
   public static final Logger LOG = LoggerFactory.getLogger(TestECAdmin_ProcessBased.class);
-  private Configuration conf = new Configuration();
-  private ProcessBasedMiniDFSCluster cluster;
-  private ECAdmin admin = new ECAdmin(conf);
+  private ECAdmin admin;
 
   private final ByteArrayOutputStream out = new ByteArrayOutputStream();
   private final ByteArrayOutputStream err = new ByteArrayOutputStream();
@@ -74,14 +81,27 @@ public class TestECAdmin_ProcessBased {
       SystemErasureCodingPolicies.getByID(
           SystemErasureCodingPolicies.XOR_2_1_POLICY_ID).getName();
 
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
+
   @Rule
   public Timeout globalTimeout =
       new Timeout(300000, TimeUnit.MILLISECONDS);
 
   @Before
   public void setup() throws Exception {
+    super.setupTest();
     System.setOut(new PrintStream(out));
     System.setErr(new PrintStream(err));
+    admin = new ECAdmin(conf);
   }
 
   @After
@@ -95,10 +115,7 @@ public class TestECAdmin_ProcessBased {
       System.setErr(OLD_ERR);
     }
 
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
+    super.tearDownTest();
   }
 
   /**
@@ -107,19 +124,19 @@ public class TestECAdmin_ProcessBased {
    */
   private ProcessBasedMiniDFSCluster setupCluster(Configuration conf,
       int numDataNodes, int numRacks, int storagesPerDatanode)
-      throws IOException, TimeoutException {
+      throws Exception {
     // Generate rack names based on numRacks
     String[] racks = new String[numDataNodes];
     for (int i = 0; i < numDataNodes; i++) {
       racks[i] = "/rack" + (i % numRacks);
     }
 
-    ProcessBasedMiniDFSCluster cluster =
-        new ProcessBasedMiniDFSCluster.Builder(conf)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
             .numDataNodes(numDataNodes)
             .racks(racks)
             .build();
     cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
     return cluster;
   }
 

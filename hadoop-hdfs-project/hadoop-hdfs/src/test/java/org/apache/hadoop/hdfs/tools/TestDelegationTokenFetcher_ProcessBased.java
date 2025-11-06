@@ -45,13 +45,22 @@ import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.test.GenericTestUtils;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.tools.FakeRenewer;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestDelegationTokenFetcher}.
@@ -61,11 +70,26 @@ import org.slf4j.LoggerFactory;
  *
  * @see TestDelegationTokenFetcher Original test using MiniDFSCluster
  */
-public class TestDelegationTokenFetcher_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestDelegationTokenFetcher_ProcessBased extends ProcessBasedUpgradeTestBase {
   private static final Logger LOG = LoggerFactory.getLogger(
       TestDelegationTokenFetcher_ProcessBased.class);
 
-  private Configuration conf = new Configuration();
+  /**
+   * The upgrade checkpoint for this test execution.
+   * Set by JUnit parameterization framework.
+   */
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_TOKEN_FETCH"
+    );
+  }
 
   @Rule
   public TemporaryFolder f = new TemporaryFolder();
@@ -76,10 +100,11 @@ public class TestDelegationTokenFetcher_ProcessBased {
    */
   @Test(expected = IOException.class)
   public void testTokenFetchFail() throws Exception {
-    WebHdfsFileSystem fs = mock(WebHdfsFileSystem.class);
-    doThrow(new IOException()).when(fs).getDelegationToken(any());
+    conf = new Configuration();
+    WebHdfsFileSystem testFs = mock(WebHdfsFileSystem.class);
+    doThrow(new IOException()).when(testFs).getDelegationToken(any());
     Path p = new Path(f.getRoot().getAbsolutePath(), tokenFile);
-    DelegationTokenFetcher.saveDelegationToken(conf, fs, null, p);
+    DelegationTokenFetcher.saveDelegationToken(conf, testFs, null, p);
   }
 
   /**
@@ -87,15 +112,16 @@ public class TestDelegationTokenFetcher_ProcessBased {
    */
   @Test
   public void expectedTokenIsRetrievedFromHttp() throws Exception {
+    conf = new Configuration();
     final Token<DelegationTokenIdentifier> testToken = new Token<DelegationTokenIdentifier>(
         "id".getBytes(), "pwd".getBytes(), FakeRenewer.KIND, new Text(
             "127.0.0.1:1234"));
 
-    WebHdfsFileSystem fs = mock(WebHdfsFileSystem.class);
+    WebHdfsFileSystem testFs = mock(WebHdfsFileSystem.class);
 
-    doReturn(testToken).when(fs).getDelegationToken(any());
+    doReturn(testToken).when(testFs).getDelegationToken(any());
     Path p = new Path(f.getRoot().getAbsolutePath(), tokenFile);
-    DelegationTokenFetcher.saveDelegationToken(conf, fs, null, p);
+    DelegationTokenFetcher.saveDelegationToken(conf, testFs, null, p);
 
     Credentials creds = Credentials.readTokenStorageFile(p, conf);
     Iterator<Token<?>> itr = creds.getAllTokens().iterator();
@@ -120,10 +146,11 @@ public class TestDelegationTokenFetcher_ProcessBased {
    */
   @Test
   public void testReturnedTokenIsNull() throws Exception {
-    WebHdfsFileSystem fs = mock(WebHdfsFileSystem.class);
-    doReturn(null).when(fs).getDelegationToken(anyString());
+    conf = new Configuration();
+    WebHdfsFileSystem testFs = mock(WebHdfsFileSystem.class);
+    doReturn(null).when(testFs).getDelegationToken(anyString());
     Path p = new Path(f.getRoot().getAbsolutePath(), tokenFile);
-    DelegationTokenFetcher.saveDelegationToken(conf, fs, null, p);
+    DelegationTokenFetcher.saveDelegationToken(conf, testFs, null, p);
     // When Token returned is null, TokenFile should not exist
     Assert.assertFalse(p.getFileSystem(conf).exists(p));
 
@@ -131,17 +158,22 @@ public class TestDelegationTokenFetcher_ProcessBased {
 
   @Test
   public void testDelegationTokenWithoutRenewerViaRPC() throws Exception {
+    conf = new Configuration();
     conf.setBoolean(DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(0)
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(0)
         .build();
     try {
       cluster.waitClusterUp();
-      DistributedFileSystem fs = cluster.getFileSystem();
+      fs = cluster.getFileSystem();
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
       // Should be able to fetch token without renewer.
       LocalFileSystem localFileSystem = FileSystem.getLocal(conf);
       Path p = new Path(f.getRoot().getAbsolutePath(), tokenFile);
       p = localFileSystem.makeQualified(p);
       DelegationTokenFetcher.saveDelegationToken(conf, fs, null, p);
+      checkpoint("AFTER_TOKEN_FETCH");
+
       Credentials creds = Credentials.readTokenStorageFile(p, conf);
       Iterator<Token<?>> itr = creds.getAllTokens().iterator();
       assertTrue("token not exist error", itr.hasNext());
@@ -170,8 +202,6 @@ public class TestDelegationTokenFetcher_ProcessBased {
       }
     } catch (TimeoutException e) {
       throw new IOException("Cluster startup timeout", e);
-    } finally {
-      cluster.shutdown();
     }
   }
 }

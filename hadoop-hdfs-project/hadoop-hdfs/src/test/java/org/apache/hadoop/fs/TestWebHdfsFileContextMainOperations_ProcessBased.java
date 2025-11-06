@@ -22,17 +22,23 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.concurrent.TimeoutException;
 
@@ -50,18 +56,30 @@ import static org.junit.Assert.assertTrue;
  *
  * @see TestWebHdfsFileContextMainOperations Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestWebHdfsFileContextMainOperations_ProcessBased
     extends FileContextMainOperationsBaseTest {
 
-  protected static ProcessBasedMiniDFSCluster cluster;
-  private static Path defaultWorkingDirectory;
-  protected static URI webhdfsUrl;
+  @Parameter
+  public String upgradeCheckpoint;
 
-  protected static int numBlocks = 2;
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
 
-  protected static final byte[] data = getFileData(numBlocks,
+  protected ProcessBasedMiniDFSCluster cluster;
+  private Path defaultWorkingDirectory;
+  protected URI webhdfsUrl;
+
+  protected int numBlocks = 2;
+
+  protected final byte[] data = getFileData(numBlocks,
       getDefaultBlockSize());
-  protected static final HdfsConfiguration CONF = new HdfsConfiguration();
+  protected HdfsConfiguration conf;
 
   @Override
   public Path getDefaultWorkingDirectory() {
@@ -77,22 +95,24 @@ public class TestWebHdfsFileContextMainOperations_ProcessBased
     return webhdfsUrl;
   }
 
-  @BeforeClass
-  public static void clusterSetupAtBeginning()
-      throws IOException, LoginException, URISyntaxException, TimeoutException {
+  @Before
+  public void setUp() throws Exception {
 
-    cluster = new ProcessBasedMiniDFSCluster.Builder(CONF).numDataNodes(2).build();
+    conf = new HdfsConfiguration();
+
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(2).build();
     cluster.waitClusterUp();
     webhdfsUrl = new URI(WebHdfs.SCHEME + "://" + cluster.getConfiguration(0)
         .get(DFSConfigKeys.DFS_NAMENODE_HTTP_ADDRESS_KEY));
-    fc = FileContext.getFileContext(webhdfsUrl, CONF);
+    fc = FileContext.getFileContext(webhdfsUrl, conf);
     defaultWorkingDirectory = fc.makeQualified(new Path(
         "/user/" + UserGroupInformation.getCurrentUser().getShortUserName()));
     fc.mkdir(defaultWorkingDirectory, FileContext.DEFAULT_PERM, true);
-  }
 
-  @Before
-  public void setUp() throws Exception {
+    // Upgrade checkpoint after cluster start
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    // Now initialize test paths
     URI webhdfsUrlReal = getWebhdfsUrl();
     Path testBuildData = new Path(
         webhdfsUrlReal + "/" + GenericTestUtils.DEFAULT_TEST_DATA_PATH
@@ -101,6 +121,33 @@ public class TestWebHdfsFileContextMainOperations_ProcessBased
 
     localFsRootPath = rootPath.makeQualified(webhdfsUrlReal, null);
     fc.mkdir(getTestRootPath(fc, "test"), FileContext.DEFAULT_PERM, true);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    if (cluster != null) {
+      cluster.shutdown();
+      cluster = null;
+    }
+  }
+
+  /**
+   * Check if upgrade should be performed at the given checkpoint.
+   */
+  protected boolean shouldUpgrade(String name) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(name);
+  }
+
+  /**
+   * Insert an upgrade checkpoint in the test.
+   */
+  protected void checkpoint(String name) throws Exception {
+    if (shouldUpgrade(name)) {
+      cluster.upgrade();
+      cluster.waitClusterUp();
+    }
   }
 
   private Path getTestRootPath(FileContext fc, String path) {
@@ -159,11 +206,4 @@ public class TestWebHdfsFileContextMainOperations_ProcessBased
     assertArrayEquals(data, bb);
   }
 
-  @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
-  }
 }

@@ -41,6 +41,8 @@ import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_WEB_AUTHENTICATION_KERBER
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.TimeoutException;
 
@@ -49,6 +51,7 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.http.HttpConfig;
 import org.apache.hadoop.http.HttpServer2;
 import org.apache.hadoop.io.IOUtils;
@@ -66,6 +69,10 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSecureNNWithQJM}.
@@ -75,7 +82,19 @@ import org.junit.rules.Timeout;
  *
  * @see TestSecureNNWithQJM Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestSecureNNWithQJM_ProcessBased {
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
 
   private static final Path TEST_PATH = new Path("/test-dir");
   private static final Path TEST_PATH_2 = new Path("/test-dir-2");
@@ -184,6 +203,25 @@ public class TestSecureNNWithQJM_ProcessBased {
     }
   }
 
+  /**
+   * Check if upgrade should be performed at the given checkpoint.
+   */
+  protected boolean shouldUpgrade(String name) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(name);
+  }
+
+  /**
+   * Insert an upgrade checkpoint in the test.
+   */
+  protected void checkpoint(String name) throws Exception {
+    if (shouldUpgrade(name)) {
+      cluster.upgrade();
+      cluster.waitClusterUp();
+    }
+  }
+
   @Test
   public void testSecureMode() throws Exception {
     doNNWithQJMTest();
@@ -202,6 +240,20 @@ public class TestSecureNNWithQJM_ProcessBased {
    */
   private void doNNWithQJMTest() throws IOException, TimeoutException {
     startCluster();
+
+    // Upgrade checkpoint after cluster start
+    try {
+      checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+    } catch (Exception e) {
+      if (e instanceof IOException) {
+        throw (IOException) e;
+      } else if (e instanceof TimeoutException) {
+        throw (TimeoutException) e;
+      } else {
+        throw new IOException("Upgrade failed", e);
+      }
+    }
+
     assertTrue(fs.mkdirs(TEST_PATH));
 
     // Restart the NN and make sure the edit was persisted

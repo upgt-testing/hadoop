@@ -21,6 +21,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 import org.apache.hadoop.conf.Configuration;
@@ -31,7 +33,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
 import org.apache.hadoop.hdfs.server.datanode.SimulatedFSDataset;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSmallBlock}.
@@ -44,11 +52,25 @@ import org.junit.Test;
  *
  * @see TestSmallBlock Original test using MiniDFSCluster
  */
-public class TestSmallBlock_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestSmallBlock_ProcessBased extends ProcessBasedUpgradeTestBase {
   static final long seed = 0xDEADBEEFL;
   static final int blockSize = 1;
   static final int fileSize = 20;
   boolean simulatedStorage = false;
+
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE,
+      UpgradeCheckpoints.AFTER_READ
+    );
+  }
 
   private void checkAndEraseData(byte[] actual, int from, byte[] expected, String message) {
     for (int idx = 0; idx < actual.length; idx++) {
@@ -92,24 +114,25 @@ public class TestSmallBlock_ProcessBased {
    */
   @Test
   public void testSmallBlock() throws Exception {
-    Configuration conf = new HdfsConfiguration();
+    conf = new HdfsConfiguration();
     if (simulatedStorage) {
       SimulatedFSDataset.setFactory(conf);
     }
     conf.set(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, "1");
-    ProcessBasedMiniDFSCluster cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-    DistributedFileSystem fileSys = cluster.getFileSystem();
-    try {
-      Path file1 = new Path("/smallblocktest.dat");
-      DFSTestUtil.createFile(fileSys, file1, fileSize, fileSize, blockSize,
-          (short) 1, seed);
-      checkFile(fileSys, file1);
-      cleanupFile(fileSys, file1);
-    } finally {
-      fileSys.close();
-      cluster.shutdown();
-    }
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    fs = cluster.getFileSystem();
+    Path file1 = new Path("/smallblocktest.dat");
+    DFSTestUtil.createFile(fs, file1, fileSize, fileSize, blockSize,
+        (short) 1, seed);
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
+
+    checkFile((DistributedFileSystem)fs, file1);
+    checkpoint(UpgradeCheckpoints.AFTER_READ);
+
+    cleanupFile(fs, file1);
   }
   @Test
   public void testSmallBlockSimulatedStorage() throws Exception {

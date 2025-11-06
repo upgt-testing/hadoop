@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -33,15 +35,21 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DFSTestUtil;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdentifier;
 import org.apache.hadoop.test.GenericTestUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestResolveHdfsSymlink}.
@@ -55,25 +63,35 @@ import org.junit.Test;
  *
  * @see TestResolveHdfsSymlink Original test using MiniDFSCluster
  */
-public class TestResolveHdfsSymlink_ProcessBased {
-  private static final FileContextTestHelper helper = new FileContextTestHelper();
-  private static ProcessBasedMiniDFSCluster cluster = null;
+@RunWith(Parameterized.class)
+public class TestResolveHdfsSymlink_ProcessBased extends ProcessBasedUpgradeTestBase {
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    Configuration conf = new HdfsConfiguration();
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+        UpgradeCheckpoints.NO_UPGRADE,
+        UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
+
+  private final FileContextTestHelper helper = new FileContextTestHelper();
+
+  @Before
+  public void setUp() throws Exception {
+    super.setupTest();
     conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
     cluster.waitClusterUp();
-
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
-  @AfterClass
-  public static void tearDown() {
-    if (cluster != null) {
-      cluster.shutdown();
-    }
+  @After
+  public void tearDown() {
+    super.tearDownTest();
   }
 
   /**

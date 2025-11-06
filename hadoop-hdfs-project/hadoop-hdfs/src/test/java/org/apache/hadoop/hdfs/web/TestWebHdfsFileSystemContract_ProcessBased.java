@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 
@@ -46,15 +47,21 @@ import org.apache.hadoop.fs.permission.FsAction;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.AppendTestUtil;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.web.resources.*;
 import org.apache.hadoop.hdfs.web.resources.NamenodeAddressParam;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.test.GenericTestUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestWebHdfsFileSystemContract}.
@@ -66,19 +73,35 @@ import org.junit.Test;
  *
  * Note: This test extends FileSystemContractBaseTest which provides 43 inherited
  * test methods. Parameterized upgrade checkpoints are not used because checkpoint
- * insertion is not feasible for inherited test methods.
+ * insertion is not feasible for inherited test methods. Only NO_UPGRADE checkpoint
+ * is tested.
  *
  * @see TestWebHdfsFileSystemContract Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestWebHdfsFileSystemContract_ProcessBased extends FileSystemContractBaseTest {
   private static final Configuration conf = new Configuration();
-  private static final ProcessBasedMiniDFSCluster cluster;
+  private static ProcessBasedMiniDFSCluster cluster;
   private String defaultWorkingDirectory;
 
   private UserGroupInformation ugi;
 
-  static {
-    try {
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE
+      // Note: This test extends FileSystemContractBaseTest with 43 inherited test methods.
+      // Checkpoint insertion is not feasible for inherited tests, so only NO_UPGRADE is tested.
+    );
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    // Initialize cluster once per test (not static)
+    if (cluster == null) {
       cluster = new ProcessBasedMiniDFSCluster.Builder(conf)
           .numDataNodes(2)
           .format(true)
@@ -88,19 +111,24 @@ public class TestWebHdfsFileSystemContract_ProcessBased extends FileSystemContra
       //change root permission to 777
       cluster.getFileSystem().setPermission(
           new Path("/"), new FsPermission((short)0777));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
-  }
 
-  @Before
-  public void setUp() throws Exception {
     //get file system as a non-superuser
     final UserGroupInformation current = UserGroupInformation.getCurrentUser();
     ugi = UserGroupInformation.createUserForTesting(
         current.getShortUserName() + "x", new String[]{"user"});
     fs = WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, conf, WebHdfsConstants.WEBHDFS_SCHEME);
     defaultWorkingDirectory = fs.getWorkingDirectory().toUri().getPath();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    if (fs != null) {
+      fs.close();
+      fs = null;
+    }
+    // Note: cluster is shared across tests for this parameterized run
+    // It will be cleaned up in @AfterClass if needed
   }
 
   @Override

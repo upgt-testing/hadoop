@@ -24,18 +24,25 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.protocol.SystemErasureCodingPolicies;
 import org.apache.hadoop.hdfs.protocol.ErasureCodingPolicy;
 import org.apache.hadoop.hdfs.protocol.NoECPolicySetException;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.io.erasurecode.CodecUtil;
 import org.apache.hadoop.io.erasurecode.ErasureCodeNative;
 import org.apache.hadoop.io.erasurecode.rawcoder.NativeRSRawErasureCoderFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.junit.Assert;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.apache.hadoop.test.GenericTestUtils.assertExceptionContains;
 import static org.junit.Assert.fail;
@@ -50,14 +57,12 @@ import static org.junit.Assert.fail;
  *
  * @see TestUnsetAndChangeDirectoryEcPolicy Original test using MiniDFSCluster
  */
-public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
+@RunWith(Parameterized.class)
+public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased extends ProcessBasedUpgradeTestBase {
 
   public static final Logger LOG =
       LoggerFactory.getLogger(TestUnsetAndChangeDirectoryEcPolicy_ProcessBased.class);
 
-  private org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster cluster;
-  private Configuration conf = new Configuration();
-  private DistributedFileSystem fs;
   private ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
   private final short dataBlocks = (short) ecPolicy.getNumDataUnits();
   private final short parityBlocks = (short) ecPolicy.getNumParityUnits();
@@ -66,11 +71,27 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
   private final int blockSize = stripsPerBlock * cellSize;
   private final int blockGroupSize =  dataBlocks * blockSize;
 
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      "AFTER_EC_POLICY_SETUP",
+      "AFTER_FIRST_OPERATION",
+      UpgradeCheckpoints.BEFORE_VERIFICATION
+    );
+  }
+
   @Rule
   public Timeout globalTimeout = new Timeout(300000);
 
   @Before
-  public void setup() throws Exception {
+  @Override
+  public void setupTest() throws Exception {
+    super.setupTest();
     conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, blockSize);
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 0);
     if (ErasureCodeNative.isNativeCodeLoaded()) {
@@ -83,14 +104,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     cluster.waitClusterUp();
     fs = cluster.getFileSystem();
     DFSTestUtil.enableAllECPolicies(fs);
-  }
-
-  @After
-  public void tearDown() {
-    if (cluster != null) {
-      cluster.shutdown();
-      cluster = null;
-    }
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
   /*
@@ -113,10 +127,12 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     }
     // Set EC policy on directory
     fs.setErasureCodingPolicy(dirPath, ecPolicy.getName());
+    checkpoint("AFTER_EC_POLICY_SETUP");
 
     DFSTestUtil.createFile(fs, ecFilePath, fileLen, (short) 1, 0L);
     fs.unsetErasureCodingPolicy(dirPath);
     DFSTestUtil.createFile(fs, replicateFilePath, fileLen, (short) 1, 0L);
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // ec_file should has EC policy
     ErasureCodingPolicy tempEcPolicy =
@@ -133,6 +149,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     tempEcPolicy = fs.getErasureCodingPolicy(dirPath);
     Assert.assertNull("Directory should no have erasure coding policy set!",
         tempEcPolicy);
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     fs.delete(dirPath, true);
   }
@@ -161,6 +178,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     fs.setErasureCodingPolicy(childDir, ec32Policy.getName());
     // Create RS(3,2) EC policy file
     DFSTestUtil.createFile(fs, ec32FilePath, fileLen, (short) 1, 0L);
+    checkpoint("AFTER_EC_POLICY_SETUP");
 
     // Start to check
     // ec_6_3_file should has RS-6-3 EC policy
@@ -179,6 +197,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     Assert.assertTrue(
         "Directory should have erasure coding policy set!",
         tempEcPolicy.getName().equals(ec32Policy.getName()));
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // Unset EC policy on child directory
     fs.unsetErasureCodingPolicy(childDir);
@@ -194,6 +213,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     Assert.assertTrue(
         "Directory should have erasure coding policy set!",
         tempEcPolicy.getName().equals(ecPolicy.getName()));
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     fs.delete(parentDir, true);
   }
@@ -221,6 +241,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     DFSTestUtil.createFile(fs, ecFilePath, fileLen, (short) 1, 0L);
     fs.unsetErasureCodingPolicy(rootPath);
     DFSTestUtil.createFile(fs, replicateFilePath, fileLen, (short) 1, 0L);
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // ec_file should has EC policy set
     ErasureCodingPolicy tempEcPolicy =
@@ -237,6 +258,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     tempEcPolicy = fs.getErasureCodingPolicy(rootPath);
     Assert.assertNull("Directory should not have erasure coding policy set!",
         tempEcPolicy);
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     fs.delete(rootPath, true);
   }
@@ -265,6 +287,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     // Change EC policy from RS(6,3) to RS(3,2)
     fs.setErasureCodingPolicy(rootPath, ec32Policy.getName());
     DFSTestUtil.createFile(fs, ec32FilePath, fileLen, (short) 1, 0L);
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // start to check
     // ec_6_3_file should has RS-6-3 ec policy set
@@ -283,6 +306,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     Assert.assertTrue(
         "Directory should have erasure coding policy!",
         tempEcPolicy.getName().equals(ec32Policy.getName()));
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     fs.delete(rootPath, true);
   }
@@ -305,6 +329,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     fs.unsetErasureCodingPolicy(ecDirPath);
     DFSTestUtil.createFile(fs, replicateFilePath, fileLen, (short) 3, 0L);
     DFSTestUtil.createFile(fs, replicateFilePath2, fileLen, (short) 2, 0L);
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // ec_file should has EC policy set
     ErasureCodingPolicy tempEcPolicy =
@@ -324,6 +349,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     tempEcPolicy = fs.getErasureCodingPolicy(ecDirPath);
     Assert.assertNull("Directory should not have erasure coding policy set!",
         tempEcPolicy);
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
 
     fs.delete(ecDirPath, true);
   }
@@ -335,6 +361,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
   @Test
   public void testNonExistentDir() throws Exception {
     final Path dirPath = new Path("/striped");
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // Unset EC policy on non-existent directory
     try {
@@ -353,6 +380,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     } catch (FileNotFoundException e) {
       assertExceptionContains("Path not found: " + dirPath, e);
     }
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
   }
 
   /*
@@ -363,6 +391,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
     final Path ecFilePath = new Path("/striped_file");
     final int fileLen = blockGroupSize * 2;
     DFSTestUtil.createFile(fs, ecFilePath, fileLen, (short) 1, 0L);
+    checkpoint("AFTER_FIRST_OPERATION");
 
     // Set EC policy on file
     try {
@@ -381,6 +410,7 @@ public class TestUnsetAndChangeDirectoryEcPolicy_ProcessBased {
       assertExceptionContains("Cannot unset an erasure coding policy on a file "
           + ecFilePath, e);
     }
+    checkpoint(UpgradeCheckpoints.BEFORE_VERIFICATION);
   }
 
   // testUnsetEcPolicyInEditLog excluded - requires cluster.restartNameNode()

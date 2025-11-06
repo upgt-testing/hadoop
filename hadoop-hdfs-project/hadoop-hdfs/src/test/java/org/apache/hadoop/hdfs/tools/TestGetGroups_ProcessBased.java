@@ -19,14 +19,21 @@ package org.apache.hadoop.hdfs.tools;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.tools.GetGroupsTestBase;
 import org.apache.hadoop.util.Tool;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestGetGroups}.
@@ -38,18 +45,32 @@ import org.junit.Before;
  *
  * @see TestGetGroups Original test using MiniDFSCluster
  */
+@RunWith(Parameterized.class)
 public class TestGetGroups_ProcessBased extends GetGroupsTestBase {
 
   private ProcessBasedMiniDFSCluster cluster;
 
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START
+    );
+  }
+
   @Before
-  public void setUpNameNode() throws IOException, TimeoutException {
+  public void setUpNameNode() throws Exception {
     conf = new HdfsConfiguration();
     cluster = new ProcessBasedMiniDFSCluster.Builder(conf).numDataNodes(0).build();
     cluster.waitClusterUp();
+
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
   }
 
-  @After
+  @org.junit.After
   public void tearDownNameNode() {
     if (cluster != null) {
       cluster.shutdown();
@@ -60,6 +81,24 @@ public class TestGetGroups_ProcessBased extends GetGroupsTestBase {
   @Override
   protected Tool getTool(PrintStream o) {
     return new GetGroups(conf, o);
+  }
+
+  /**
+   * Insert an upgrade checkpoint in the test.
+   */
+  protected void checkpoint(String name) throws Exception {
+    if (shouldUpgrade(name)) {
+      cluster.upgrade();
+    }
+  }
+
+  /**
+   * Check if upgrade should be performed at the given checkpoint.
+   */
+  protected boolean shouldUpgrade(String name) {
+    return upgradeCheckpoint != null
+        && !upgradeCheckpoint.equals(UpgradeCheckpoints.NO_UPGRADE)
+        && upgradeCheckpoint.equals(name);
   }
 
 }

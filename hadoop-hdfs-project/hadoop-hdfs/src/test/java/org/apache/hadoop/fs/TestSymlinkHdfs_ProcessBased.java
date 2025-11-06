@@ -22,6 +22,8 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -40,9 +42,13 @@ import org.apache.hadoop.hdfs.web.WebHdfsTestUtil;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.test.GenericTestUtils;
 import org.apache.log4j.Level;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestSymlinkHdfs}.
@@ -50,19 +56,42 @@ import org.junit.Test;
  * Transformed from MiniDFSCluster to ProcessBasedMiniDFSCluster to enable
  * process-based testing and multi-version upgrade scenarios.
  *
+ * Parameterized test with checkpoint support for upgrade testing.
+ *
  * Test symbolic links in HDFS.
+ *
+ * Note: The original TestSymlinkHdfs is abstract with concrete subclasses
+ * TestSymlinkHdfsFileSystem and TestSymlinkHdfsFileContext. This ProcessBased
+ * version is made concrete and uses FileSystemTestWrapper for simplicity.
  *
  * @see TestSymlinkHdfs Original test using MiniDFSCluster
  */
-abstract public class TestSymlinkHdfs_ProcessBased extends SymlinkBaseTest {
+@RunWith(Parameterized.class)
+public class TestSymlinkHdfs_ProcessBased extends SymlinkBaseTest {
+
+  public enum Checkpoint {
+    NO_UPGRADE,
+    AFTER_CLUSTER_START
+  }
+
+  @Parameter(0)
+  public Checkpoint checkpoint;
+
+  @Parameters(name = "checkpoint={0}")
+  public static Collection<Object[]> checkpoints() {
+    return Arrays.asList(new Object[][] {
+      {Checkpoint.NO_UPGRADE},
+      {Checkpoint.AFTER_CLUSTER_START}
+    });
+  }
 
   {
     GenericTestUtils.setLogLevel(NameNode.stateChangeLog, Level.ALL);
   }
 
-  protected static ProcessBasedMiniDFSCluster cluster;
-  protected static WebHdfsFileSystem webhdfs;
-  protected static DistributedFileSystem dfs;
+  protected ProcessBasedMiniDFSCluster cluster;
+  protected WebHdfsFileSystem webhdfs;
+  protected DistributedFileSystem dfs;
 
   @Override
   protected String getScheme() {
@@ -92,8 +121,8 @@ abstract public class TestSymlinkHdfs_ProcessBased extends SymlinkBaseTest {
     return e;
   }
 
-  @BeforeClass
-  public static void beforeClassSetup() throws Exception {
+  @Before
+  public void beforeSetup() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.set(FsPermission.UMASK_LABEL, "000");
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MAX_COMPONENT_LENGTH_KEY, 0);
@@ -105,12 +134,29 @@ abstract public class TestSymlinkHdfs_ProcessBased extends SymlinkBaseTest {
     }
     webhdfs = WebHdfsTestUtil.getWebHdfsFileSystem(conf, WebHdfsConstants.WEBHDFS_SCHEME);
     dfs = cluster.getFileSystem();
+
+    // Initialize wrapper from parent class (using FileSystem implementation)
+    wrapper = new FileSystemTestWrapper(dfs);
+
+    // Execute checkpoint-specific operations
+    if (checkpoint == Checkpoint.AFTER_CLUSTER_START) {
+      // Placeholder for upgrade operations at this checkpoint
+      // Can be used to perform rolling upgrades or version changes
+    }
+
+    // Call parent setUp to create test directories
+    super.setUp();
   }
 
-  @AfterClass
-  public static void afterClassTeardown() throws Exception {
-    if (cluster != null) {
-      cluster.shutdown();
+  @After
+  public void afterTeardown() throws Exception {
+    // Call parent tearDown to cleanup test directories
+    try {
+      super.tearDown();
+    } finally {
+      if (cluster != null) {
+        cluster.shutdown();
+      }
     }
   }
 

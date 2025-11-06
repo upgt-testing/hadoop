@@ -27,20 +27,20 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
-import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.hdfs.server.process.ProcessBasedMiniDFSCluster;
+import org.apache.hadoop.hdfs.server.process.ProcessBasedUpgradeTestBase;
+import org.apache.hadoop.hdfs.server.process.UpgradeCheckpoints;
 import org.apache.hadoop.hdfs.security.token.delegation.DelegationTokenIdentifier;
 import org.apache.hadoop.hdfs.web.WebHdfsConstants;
 import org.apache.hadoop.hdfs.web.WebHdfsFileSystem;
@@ -51,10 +51,14 @@ import org.apache.hadoop.security.authorize.DefaultImpersonationProvider;
 import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.test.Whitebox;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * ProcessBasedMiniDFSCluster version of {@link TestDelegationTokenForProxyUser}.
@@ -64,22 +68,33 @@ import org.junit.Test;
  *
  * @see TestDelegationTokenForProxyUser Original test using MiniDFSCluster
  */
-public class TestDelegationTokenForProxyUser_ProcessBased {
-  private static ProcessBasedMiniDFSCluster cluster;
-  private static Configuration config;
+@RunWith(Parameterized.class)
+public class TestDelegationTokenForProxyUser_ProcessBased extends ProcessBasedUpgradeTestBase {
   final private static String GROUP1_NAME = "group1";
   final private static String GROUP2_NAME = "group2";
   final private static String[] GROUP_NAMES = new String[] { GROUP1_NAME,
       GROUP2_NAME };
   final private static String REAL_USER = "RealUser";
   final private static String PROXY_USER = "ProxyUser";
-  private static UserGroupInformation ugi;
-  private static UserGroupInformation proxyUgi;
+  private UserGroupInformation ugi;
+  private UserGroupInformation proxyUgi;
 
   private static final Logger LOG =
       LoggerFactory.getLogger(TestDoAsEffectiveUser.class);
 
-  private static void configureSuperUserIPAddresses(Configuration conf,
+  @Parameter
+  public String upgradeCheckpoint;
+
+  @Parameters(name = "upgrade-at={0}")
+  public static Collection<String> checkpoints() {
+    return Arrays.asList(
+      UpgradeCheckpoints.NO_UPGRADE,
+      UpgradeCheckpoints.AFTER_CLUSTER_START,
+      UpgradeCheckpoints.AFTER_FILE_CREATE
+    );
+  }
+
+  private void configureSuperUserIPAddresses(
       String superUserShortName) throws IOException {
     ArrayList<String> ipList = new ArrayList<String>();
     Enumeration<NetworkInterface> netInterfaceList = NetworkInterface
@@ -105,41 +120,42 @@ public class TestDelegationTokenForProxyUser_ProcessBased {
         builder.toString());
   }
 
-  @BeforeClass
-  public static void setUp() throws Exception {
-    config = new HdfsConfiguration();
-    config.setLong(
+  @Override
+  @Before
+  public void setupTest() throws Exception {
+    super.setupTest();
+
+    conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_MAX_LIFETIME_KEY, 10000);
-    config.setLong(
+    conf.setLong(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_RENEW_INTERVAL_KEY, 5000);
-    config.setStrings(DefaultImpersonationProvider.getTestProvider().
+    conf.setStrings(DefaultImpersonationProvider.getTestProvider().
             getProxySuperuserGroupConfKey(REAL_USER),
         "group1");
-    config.setBoolean(
+    conf.setBoolean(
         DFSConfigKeys.DFS_NAMENODE_DELEGATION_TOKEN_ALWAYS_USE_KEY, true);
-    configureSuperUserIPAddresses(config, REAL_USER);
-    FileSystem.setDefaultUri(config, "hdfs://localhost:" + "0");
-    cluster = new ProcessBasedMiniDFSCluster.Builder(config).build();
-    try {
-      cluster.waitClusterUp();
-    } catch (TimeoutException e) {
-      throw new IOException("Cluster startup timeout", e);
-    }
-    ProxyUsers.refreshSuperUserGroupsConfiguration(config);
+    configureSuperUserIPAddresses(REAL_USER);
+    org.apache.hadoop.fs.FileSystem.setDefaultUri(conf, "hdfs://localhost:" + "0");
+    cluster = new ProcessBasedMiniDFSCluster.Builder(conf).build();
+    cluster.waitClusterUp();
+    checkpoint(UpgradeCheckpoints.AFTER_CLUSTER_START);
+
+    ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
     ugi = UserGroupInformation.createRemoteUser(REAL_USER);
     proxyUgi = UserGroupInformation.createProxyUserForTesting(PROXY_USER, ugi,
         GROUP_NAMES);
+
+    fs = cluster.getFileSystem();
   }
 
-  @AfterClass
-  public static void tearDown() throws Exception {
-    if(cluster!=null) {
-      cluster.shutdown();
-    }
+  @Override
+  @After
+  public void tearDownTest() {
+    super.tearDownTest();
   }
 
   @Test(timeout=20000)
-  public void testDelegationTokenWithRealUser() throws IOException {
+  public void testDelegationTokenWithRealUser() throws Exception {
     try {
       Token<?>[] tokens = proxyUgi
           .doAs(new PrivilegedExceptionAction<Token<?>[]>() {
@@ -164,10 +180,11 @@ public class TestDelegationTokenForProxyUser_ProcessBased {
   public void testWebHdfsDoAs() throws Exception {
     WebHdfsTestUtil.LOG.info("START: testWebHdfsDoAs()");
     WebHdfsTestUtil.LOG.info("ugi.getShortUserName()=" + ugi.getShortUserName());
-    final WebHdfsFileSystem webhdfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, config, WebHdfsConstants.WEBHDFS_SCHEME);
+    final WebHdfsFileSystem webhdfs = WebHdfsTestUtil.getWebHdfsFileSystemAs(ugi, conf, WebHdfsConstants.WEBHDFS_SCHEME);
 
     final Path root = new Path("/");
-    cluster.getFileSystem().setPermission(root, new FsPermission((short)0777));
+    fs.setPermission(root, new FsPermission((short)0777));
+    checkpoint(UpgradeCheckpoints.AFTER_FILE_CREATE);
 
     Whitebox.setInternalState(webhdfs, "ugi", proxyUgi);
 
@@ -198,5 +215,7 @@ public class TestDelegationTokenForProxyUser_ProcessBased {
       WebHdfsTestUtil.LOG.info("status.getLen()  =" + status.getLen());
       Assert.assertEquals(PROXY_USER, status.getOwner());
     }
+
+    webhdfs.close();
   }
 }
