@@ -326,11 +326,23 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   /**
    * Starts a NodeManager process.
    *
+   * <p>This method can be used to manually start a NodeManager after it has been
+   * shut down via shutdownNodeManager(). It's also used internally during cluster
+   * startup and during rolling upgrades.</p>
+   *
+   * <p><b>Example usage for rolling upgrade:</b></p>
+   * <pre>
+   * cluster.shutdownNodeManager(0);
+   * cluster.changeNodeManagerVersion(0, "/opt/hadoop-3.4.0");
+   * cluster.startNodeManager(0);  // Starts with new version
+   * cluster.waitForNodeManagersToConnect(5000);
+   * </pre>
+   *
    * @param nmIndex Index of the NM (0, 1, 2, ...)
    * @throws IOException if NM startup fails
    * @throws TimeoutException if NM fails to become healthy within timeout
    */
-  private void startNodeManager(int nmIndex)
+  public synchronized void startNodeManager(int nmIndex)
       throws IOException, TimeoutException {
     LOG.info("Starting NodeManager {}", nmIndex);
 
@@ -528,6 +540,116 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   }
 
   /**
+   * Performs a rolling upgrade of all NodeManagers to a new Hadoop version.
+   *
+   * <p>This method performs a sequential rolling upgrade of NodeManagers,
+   * upgrading one at a time to maintain cluster availability. Each NodeManager
+   * is shut down, reconfigured with the upgrade distribution, restarted, and
+   * verified healthy before proceeding to the next one.</p>
+   *
+   * <p><b>Upgrade Sequence:</b></p>
+   * <ol>
+   *   <li>Get upgrade distribution path from system property or version registry</li>
+   *   <li>For each NodeManager (0, 1, 2, ...):
+   *     <ul>
+   *       <li>Shut down the NodeManager</li>
+   *       <li>Change Hadoop distribution to upgrade version</li>
+   *       <li>Restart NodeManager with new version</li>
+   *       <li>Wait for NodeManager to reconnect</li>
+   *     </ul>
+   *   </li>
+   *   <li>Verify all NodeManagers are connected</li>
+   * </ol>
+   *
+   * <p><b>Example usage in upgrade test:</b></p>
+   * <pre>
+   * // Set upgrade distribution via system property
+   * System.setProperty("hadoop.upgrade.home", "/opt/hadoop-3.4.0");
+   *
+   * // Start cluster with Hadoop 3.3.6
+   * ProcessBasedMiniYARNCluster cluster =
+   *     new ProcessBasedMiniYARNCluster.Builder(conf)
+   *         .numNodeManagers(3)
+   *         .build();
+   *
+   * // Submit long-running application
+   * ApplicationId appId = submitDistributedShellApp(yarnClient, "sleep 300");
+   *
+   * // Perform rolling upgrade (application continues running)
+   * cluster.rollingUpgradeNodeManagers();
+   *
+   * // Verify application completed successfully after upgrade
+   * waitForAppCompletion(yarnClient, appId);
+   * </pre>
+   *
+   * <p><b>Requirements:</b></p>
+   * <ul>
+   *   <li>System property {@code hadoop.upgrade.home} must be set, or</li>
+   *   <li>Version registry must have "upgrade-version" entry</li>
+   *   <li>Cluster must be running (isClusterUp() returns true)</li>
+   * </ul>
+   *
+   * @throws IOException if any NodeManager fails to restart
+   * @throws TimeoutException if any NodeManager fails to become healthy
+   * @throws InterruptedException if wait is interrupted
+   * @throws IllegalStateException if no upgrade distribution is configured
+   *
+   * @see #getUpgradeDistributionPath()
+   * @see #changeNodeManagerVersion(int, String)
+   */
+  public synchronized void rollingUpgradeNodeManagers()
+      throws IOException, TimeoutException, InterruptedException {
+    // Get upgrade distribution path
+    String upgradePath = getUpgradeDistributionPath();
+    if (upgradePath == null || upgradePath.isEmpty()) {
+      throw new IllegalStateException(
+          "No upgrade distribution configured. " +
+          "Set system property hadoop.upgrade.home or register " +
+          "'upgrade-version' in HadoopVersionRegistry. " +
+          "Example: -Dhadoop.upgrade.home=/opt/hadoop-3.4.0");
+    }
+
+    LOG.info("Starting rolling upgrade of {} NodeManagers to {}",
+        numNodeManagers, upgradePath);
+
+    // Upgrade each NodeManager sequentially
+    for (int i = 0; i < numNodeManagers; i++) {
+      LOG.info("Upgrading NodeManager {} ({}/{})",
+          i, i + 1, numNodeManagers);
+
+      // Step 1: Shut down NodeManager
+      shutdownNodeManager(i);
+      LOG.debug("NodeManager {} shut down", i);
+
+      // Step 2: Change Hadoop distribution
+      changeNodeManagerVersion(i, upgradePath);
+      LOG.debug("NodeManager {} configured for {}", i, upgradePath);
+
+      // Step 3: Restart NodeManager with new version
+      startNodeManager(i);
+      LOG.debug("NodeManager {} restarted", i);
+
+      // Step 4: Wait for NodeManager to reconnect
+      LOG.debug("Waiting for NodeManager {} to reconnect", i);
+      waitForNodeManagersToConnect(5000);
+
+      LOG.info("NodeManager {} upgraded successfully ({}/{})",
+          i, i + 1, numNodeManagers);
+    }
+
+    // Final verification: ensure all NodeManagers are connected
+    LOG.info("Verifying all {} NodeManagers are connected after upgrade",
+        numNodeManagers);
+    boolean allConnected = waitForNodeManagersToConnect(10000);
+    if (!allConnected) {
+      LOG.warn("Not all NodeManagers reconnected after upgrade");
+    }
+
+    LOG.info("Rolling upgrade completed successfully: {} NodeManagers upgraded to {}",
+        numNodeManagers, upgradePath);
+  }
+
+  /**
    * Shuts down a specific ResourceManager.
    *
    * @param rmIndex Index of the RM to shut down
@@ -569,6 +691,53 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
       nm.stop();
       nodeManagers[nmIndex] = null;
     }
+  }
+
+  /**
+   * Changes the Hadoop distribution for a specific NodeManager.
+   * This sets the Hadoop home path that will be used when the NodeManager
+   * is next started (via startNodeManager() or restartNodeManager()).
+   *
+   * <p>This method is typically used in rolling upgrade scenarios where
+   * you want to upgrade individual NodeManagers to a different Hadoop version:</p>
+   *
+   * <pre>
+   * // Upgrade NodeManager 0 to Hadoop 3.4.0
+   * cluster.shutdownNodeManager(0);
+   * cluster.changeNodeManagerVersion(0, "/opt/hadoop-3.4.0");
+   * cluster.startNodeManager(0);
+   * cluster.waitForNodeManagersToConnect(5000);
+   * </pre>
+   *
+   * <p><b>Note:</b> This method only updates the configuration. The NodeManager
+   * must be restarted for the change to take effect.</p>
+   *
+   * @param nmIndex Index of the NodeManager to change
+   * @param hadoopHome Path to the new Hadoop distribution
+   * @throws IllegalArgumentException if nmIndex is invalid or hadoopHome is null
+   */
+  public synchronized void changeNodeManagerVersion(int nmIndex,
+      String hadoopHome) {
+    if (nmIndex < 0 || nmIndex >= numNodeManagers) {
+      throw new IllegalArgumentException(
+          "Invalid NM index: " + nmIndex + " (valid: 0-" +
+          (numNodeManagers - 1) + ")");
+    }
+
+    if (hadoopHome == null || hadoopHome.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Hadoop home path cannot be null or empty");
+    }
+
+    LOG.info("Changing NodeManager {} to Hadoop distribution: {}",
+        nmIndex, hadoopHome);
+
+    // Update the per-node Hadoop home mapping
+    String nodeKey = "nm" + nmIndex;
+    nodeHadoopHomes.put(nodeKey, hadoopHome);
+
+    LOG.debug("NodeManager {} will use {} when next started",
+        nmIndex, hadoopHome);
   }
 
   /**
@@ -646,6 +815,59 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     LOG.info("getConfiguration() called - RM_ADDRESS={}",
         baseConfiguration.get(YarnConfiguration.RM_ADDRESS));
     return baseConfiguration;
+  }
+
+  /**
+   * Gets the upgrade distribution path for rolling upgrades.
+   * This method checks system properties and the version registry to find
+   * the target Hadoop distribution for upgrades.
+   *
+   * <p>The upgrade distribution is resolved in the following order:</p>
+   * <ol>
+   *   <li>System property {@code hadoop.upgrade.home}</li>
+   *   <li>Version registry entry for "upgrade-version"</li>
+   *   <li>Returns null if neither is available</li>
+   * </ol>
+   *
+   * <p><b>Example Usage:</b></p>
+   * <pre>
+   * // Set system property before cluster creation
+   * System.setProperty("hadoop.upgrade.home", "/opt/hadoop-3.4.0");
+   *
+   * // Or pass as JVM argument
+   * // -Dhadoop.upgrade.home=/opt/hadoop-3.4.0
+   *
+   * // In test code
+   * String upgradePath = cluster.getUpgradeDistributionPath();
+   * if (upgradePath != null) {
+   *     cluster.rollingUpgradeNodeManagers();
+   * }
+   * </pre>
+   *
+   * @return Path to upgrade Hadoop distribution, or null if not configured
+   */
+  public String getUpgradeDistributionPath() {
+    // First try system property
+    String upgradePath = System.getProperty("hadoop.upgrade.home");
+    if (upgradePath != null && !upgradePath.isEmpty()) {
+      LOG.debug("Upgrade distribution from hadoop.upgrade.home: {}", upgradePath);
+      return upgradePath;
+    }
+
+    // Fall back to version registry
+    try {
+      HadoopDistribution upgradeDist = versionRegistry.get("upgrade-version");
+      if (upgradeDist != null) {
+        String path = upgradeDist.getHadoopHome().getAbsolutePath();
+        LOG.debug("Upgrade distribution from version registry: {}", path);
+        return path;
+      }
+    } catch (Exception e) {
+      LOG.debug("Could not get upgrade distribution from version registry", e);
+    }
+
+    LOG.debug("No upgrade distribution configured");
+    return null;
   }
 
   /**

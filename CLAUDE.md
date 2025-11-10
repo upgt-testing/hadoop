@@ -67,20 +67,20 @@ mvn test -Dtest=TestYarnFeature \
 
 # Run ProcessBased test with system properties (for multi-version testing)
 mvn test -Dtest=TestYarnFeature_ProcessBased \
-  -Dhadoop.start.home=/opt/hadoop-3.3.6 \
-  -Dhadoop.upgrade.home=/opt/hadoop-3.4.0 \
+  -Dhadoop.start.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.4.0 \
   -pl hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests
 
 # Run all ProcessBased tests
 mvn test -Dtest="*_ProcessBased" \
-  -Dhadoop.start.home=/opt/hadoop-3.3.6 \
-  -Dhadoop.upgrade.home=/opt/hadoop-3.4.0 \
+  -Dhadoop.start.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.4.0 \
   -pl hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests
 
 # Run specific parameterized checkpoint
 mvn test -Dtest='TestYarnFeature_ProcessBased#testMethod[upgrade-at=AFTER_APP_RUNNING]' \
-  -Dhadoop.start.home=/opt/hadoop-3.3.6 \
-  -Dhadoop.upgrade.home=/opt/hadoop-3.4.0 \
+  -Dhadoop.start.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.3.5 \
+  -Dhadoop.upgrade.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.4.0 \
   -pl hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests
 ```
 
@@ -165,6 +165,27 @@ ProcessBasedMiniYARNCluster automatically reads these system properties:
 ```
 
 **No manual environment variable checks needed** - the cluster handles this automatically in the Builder.
+
+### Available Test Distributions
+
+Hadoop distributions for testing are located at `/Users/allenwang/xlab/hadoop-test-distributions/`:
+
+| Version | Path | Use Case |
+|---------|------|----------|
+| 2.8.5 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-2.8.5` | Legacy 2.x testing |
+| 2.9.2 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-2.9.2` | Legacy 2.x testing |
+| 2.10.2 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-2.10.2` | Latest 2.x |
+| 3.0.3 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.0.3` | Early 3.x |
+| 3.1.4 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.1.4` | 3.1 series |
+| 3.2.4 | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.2.4` | 3.2 series |
+| **3.3.5** | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.3.5` | **Current branch - use for start** |
+| **3.4.0** | `/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.4.0` | **Use for upgrade testing** |
+
+**Recommended test configuration:**
+```bash
+-Dhadoop.start.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.3.5
+-Dhadoop.upgrade.home=/Users/allenwang/xlab/hadoop-test-distributions/hadoop-3.4.0
+```
 
 ## YARN Testing Architecture
 
