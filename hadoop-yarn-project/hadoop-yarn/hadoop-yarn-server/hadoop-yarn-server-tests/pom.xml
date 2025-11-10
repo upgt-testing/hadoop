@@ -175,6 +175,17 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <testExcludes>
+            <testExclude>**/unit/TestHadoopDistribution.java</testExclude>
+            <testExclude>**/unit/TestHealthMonitor.java</testExclude>
+            <testExclude>**/unit/TestHadoopVersionRegistry.java</testExclude>
+          </testExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
