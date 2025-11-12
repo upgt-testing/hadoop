@@ -23,9 +23,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.yarn.api.ApplicationClientProtocol;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest;
+import org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponse;
+import org.apache.hadoop.yarn.api.records.NodeReport;
+import org.apache.hadoop.yarn.api.records.NodeState;
+import org.apache.hadoop.yarn.client.ClientRMProxy;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.process.ProcessBasedMiniYARNCluster;
 import org.junit.After;
@@ -237,6 +244,88 @@ public abstract class YarnUpgradeTestBase {
   // =========================================================================
 
   /**
+   * Waits for the expected number of NodeManagers to register with the
+   * ResourceManager as RUNNING.
+   *
+   * <p>This method creates a temporary YarnClient to poll the ResourceManager
+   * for NodeManager registration status. It continues polling until the expected
+   * number of RUNNING NodeManagers is reached or the timeout expires.</p>
+   *
+   * <p><b>Why this matters:</b> After starting or upgrading NodeManagers, the
+   * processes may start successfully but take time to complete registration with
+   * the ResourceManager. This method ensures NodeManagers are fully operational
+   * before proceeding with tests.</p>
+   *
+   * @param expectedCount Expected number of RUNNING NodeManagers
+   * @param timeoutMs Maximum time to wait in milliseconds
+   * @throws TimeoutException if expected count not reached within timeout
+   * @throws InterruptedException if wait is interrupted
+   */
+  protected void waitForNodeManagersToRegister(int expectedCount, long timeoutMs)
+      throws TimeoutException, InterruptedException {
+    if (expectedCount == 0) {
+      LOG.debug("No NodeManagers expected, skipping registration check");
+      return;
+    }
+
+    LOG.info("Waiting for {} NodeManagers to register as RUNNING (timeout: {}ms)",
+        expectedCount, timeoutMs);
+
+    long deadline = System.currentTimeMillis() + timeoutMs;
+    ApplicationClientProtocol rmClient = null;
+
+    try {
+      // Create RM client proxy
+      rmClient = ClientRMProxy.createRMProxy(conf, ApplicationClientProtocol.class);
+
+      while (System.currentTimeMillis() < deadline) {
+        try {
+          // Get cluster nodes with RUNNING state filter
+          GetClusterNodesRequest request = GetClusterNodesRequest.newInstance();
+          request.setNodeStates(java.util.EnumSet.of(NodeState.RUNNING));
+          GetClusterNodesResponse response = rmClient.getClusterNodes(request);
+
+          List<NodeReport> runningNodes = response.getNodeReports();
+          int runningCount = runningNodes.size();
+
+          if (runningCount >= expectedCount) {
+            LOG.info("All {} NodeManagers are registered as RUNNING", expectedCount);
+            return;
+          }
+
+          LOG.debug("NodeManagers registered: {}/{}, waiting...",
+              runningCount, expectedCount);
+          Thread.sleep(500);
+
+        } catch (Exception e) {
+          LOG.warn("Error checking NodeManager registration: {}", e.getMessage());
+          Thread.sleep(500);
+        }
+      }
+
+      // Timeout - get final count for error message
+      int finalCount = 0;
+      try {
+        GetClusterNodesRequest request = GetClusterNodesRequest.newInstance();
+        request.setNodeStates(java.util.EnumSet.of(NodeState.RUNNING));
+        GetClusterNodesResponse response = rmClient.getClusterNodes(request);
+        finalCount = response.getNodeReports().size();
+      } catch (Exception e) {
+        LOG.warn("Error getting final NodeManager count", e);
+      }
+
+      throw new TimeoutException(
+          "Only " + finalCount + "/" + expectedCount +
+          " NodeManagers registered as RUNNING within " + timeoutMs + "ms");
+
+    } catch (TimeoutException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException("Error during NodeManager registration check", e);
+    }
+  }
+
+  /**
    * Checkpoint for potential upgrade.
    *
    * <p><b>IMPORTANT:</b> Close all streams and resources before calling checkpoint().</p>
@@ -265,12 +354,13 @@ public abstract class YarnUpgradeTestBase {
     }
 
     if (cluster.getNumNodeManagers() > 0) {
-      boolean allConnected = cluster.waitForNodeManagersToConnect(
-          NM_RECONNECT_TIMEOUT_MS);
-      if (!allConnected) {
-        throw new IllegalStateException(
-            "Not all NodeManagers connected before upgrade at checkpoint: " + name);
-      }
+      // Wait for NodeManager processes to start
+      cluster.waitForNodeManagersToConnect(NM_RECONNECT_TIMEOUT_MS);
+
+      // Verify NodeManagers are actually registered as RUNNING
+      LOG.info("Verifying NodeManagers are registered before upgrade");
+      waitForNodeManagersToRegister(cluster.getNumNodeManagers(),
+          NM_RECONNECT_TIMEOUT_MS * 3); // 30 seconds for full registration
     }
 
     LOG.info("Pre-upgrade health check passed at checkpoint: {}", name);
@@ -287,7 +377,16 @@ public abstract class YarnUpgradeTestBase {
 
     // Post-upgrade health check
     LOG.info("Verifying cluster health after upgrade at checkpoint: {}", name);
+
+    // Wait for NodeManager processes to reconnect
     cluster.waitForNodeManagersToConnect(NM_RECONNECT_TIMEOUT_MS);
+
+    // Verify upgraded NodeManagers are registered as RUNNING
+    if (cluster.getNumNodeManagers() > 0) {
+      LOG.info("Verifying upgraded NodeManagers are registered as RUNNING");
+      waitForNodeManagersToRegister(cluster.getNumNodeManagers(),
+          NM_RECONNECT_TIMEOUT_MS * 3); // 30 seconds for full registration
+    }
 
     if (!cluster.isClusterUp()) {
       throw new IllegalStateException(

@@ -148,6 +148,9 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   /** NodeManager process managers */
   private NodeManagerProcessManager[] nodeManagers;
 
+  /** Cached NodeManager configurations (for port reuse during upgrades) */
+  private final Map<Integer, YarnConfiguration> nmConfigurations;
+
   /** Cluster root directory */
   private File clusterRoot;
 
@@ -175,9 +178,10 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     this.versionRegistry = builder.versionRegistry != null ?
         builder.versionRegistry : HadoopVersionRegistry.fromSystemProperties();
 
-    // Initialize arrays
+    // Initialize arrays and caches
     this.resourceManagers = new ResourceManagerProcessManager[numResourceManagers];
     this.nodeManagers = new NodeManagerProcessManager[numNodeManagers];
+    this.nmConfigurations = new HashMap<>();
 
     LOG.info("Created ProcessBasedMiniYARNCluster: name={}, numRMs={}, " +
         "numNMs={}, haEnabled={}", clusterName, numResourceManagers,
@@ -259,8 +263,19 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     baseConfiguration.set(YarnConfiguration.RM_CLUSTER_ID,
         "test-cluster-" + System.currentTimeMillis());
 
-    // ZooKeeper address (embedded ZK for testing)
-    baseConfiguration.set(YarnConfiguration.RM_ZK_ADDRESS, "localhost:2181");
+    // Only set ZooKeeper address if automatic failover is enabled
+    // If AUTO_FAILOVER_ENABLED is false, manual failover will be used (no ZK needed)
+    boolean autoFailoverEnabled = baseConfiguration.getBoolean(
+        YarnConfiguration.AUTO_FAILOVER_ENABLED,
+        YarnConfiguration.DEFAULT_AUTO_FAILOVER_ENABLED);
+
+    if (autoFailoverEnabled) {
+      // ZooKeeper address (embedded ZK for testing)
+      baseConfiguration.set(YarnConfiguration.RM_ZK_ADDRESS, "localhost:2181");
+      LOG.info("Auto-failover enabled - configured ZooKeeper at localhost:2181");
+    } else {
+      LOG.info("Auto-failover disabled - manual RM failover will be used");
+    }
 
     LOG.debug("HA configured with RM IDs: {}", String.join(",", rmIds));
   }
@@ -356,9 +371,35 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     // Get RM address
     String rmAddress = getActiveRMAddress();
 
-    // Generate NM configuration
-    YarnConfiguration nmConf = configGenerator.generateNodeManagerConfig(
-        baseConfiguration, nmIndex, nmDir, rmAddress, portAllocator);
+    // Generate or reuse NM configuration
+    // IMPORTANT: Reuse cached configuration to preserve port assignments
+    // across NM restarts. This ensures YARN recognizes the restarted NM
+    // as the same node (hostname:port) rather than a new node.
+    YarnConfiguration nmConf;
+    if (nmConfigurations.containsKey(nmIndex)) {
+      LOG.info("Reusing cached configuration for NodeManager {} " +
+          "(preserves ports across restarts)", nmIndex);
+      // Clone the cached config to allow directory updates
+      nmConf = new YarnConfiguration(nmConfigurations.get(nmIndex));
+
+      // Update directory paths (may have changed)
+      nmConf.set(YarnConfiguration.NM_LOCAL_DIRS,
+          nmDir.getAbsolutePath() + "/local");
+      nmConf.set(YarnConfiguration.NM_LOG_DIRS,
+          nmDir.getAbsolutePath() + "/logs");
+    } else {
+      LOG.info("Generating new configuration for NodeManager {}", nmIndex);
+      nmConf = configGenerator.generateNodeManagerConfig(
+          baseConfiguration, nmIndex, nmDir, rmAddress, portAllocator);
+
+      // Cache this configuration for future restarts
+      nmConfigurations.put(nmIndex, new YarnConfiguration(nmConf));
+      LOG.debug("Cached configuration for NodeManager {}: ports={}, {}, {}",
+          nmIndex,
+          nmConf.get(YarnConfiguration.NM_ADDRESS),
+          nmConf.get(YarnConfiguration.NM_LOCALIZER_ADDRESS),
+          nmConf.get(YarnConfiguration.NM_WEBAPP_ADDRESS));
+    }
 
     // Write configuration to file
     File confDir = directoryManager.getConfDir(nmDir);
@@ -454,30 +495,28 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   }
 
   /**
-   * Waits for NodeManagers to connect to the ResourceManager.
-   * This is a convenience method that simply waits for the configured timeout.
+   * Waits a fixed period for NodeManagers to connect to the ResourceManager.
+   * This method gives NMs time to start up and register, but does not verify
+   * actual registration status.
    *
-   * <p>To check if NMs are actually connected, create a YarnClient and query:</p>
-   * <pre>
-   * YarnClient client = YarnClient.createYarnClient();
-   * client.init(cluster.getConfiguration());
-   * client.start();
-   * List&lt;NodeReport&gt; nodes = client.getNodeReports(NodeState.RUNNING);
-   * boolean connected = (nodes.size() >= expectedCount);
-   * client.close();
-   * </pre>
+   * <p><b>Important:</b> Tests should create a YarnClient after cluster.start()
+   * and poll for actual NM registration using yarnClient.getYarnClusterMetrics()
+   * to verify NMs have actually connected.</p>
    *
-   * @param timeoutMs Timeout to wait in milliseconds
-   * @return true (always, after waiting)
+   * @param timeoutMs Maximum time to wait in milliseconds (unused, kept for API compatibility)
+   * @return true (always)
    * @throws InterruptedException if wait is interrupted
    */
   public boolean waitForNodeManagersToConnect(long timeoutMs)
       throws InterruptedException {
-    LOG.info("Waiting {}ms for {} NodeManagers to connect",
-        timeoutMs, numNodeManagers);
+    // Give NMs 10 seconds to start up and begin registration
+    // Tests should use YarnClient to poll for actual registration status
+    long waitMs = Math.min(10000, timeoutMs);
+    LOG.info("Giving {} NodeManagers {}ms to start registration process",
+        numNodeManagers, waitMs);
 
-    Thread.sleep(timeoutMs);
-    LOG.info("Wait period completed");
+    Thread.sleep(waitMs);
+    LOG.info("Initial wait period completed - tests should verify NM registration");
     return true;
   }
 
@@ -626,8 +665,10 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
       LOG.debug("NodeManager {} configured for {}", i, upgradePath);
 
       // Step 3: Restart NodeManager with new version
+      // The new NM will reuse the same ports as the old NM, so YARN
+      // will recognize it as the same node (hostname:port) reconnecting
       startNodeManager(i);
-      LOG.debug("NodeManager {} restarted", i);
+      LOG.debug("NodeManager {} restarted with new version", i);
 
       // Step 4: Wait for NodeManager to reconnect
       LOG.debug("Waiting for NodeManager {} to reconnect", i);
@@ -640,10 +681,7 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     // Final verification: ensure all NodeManagers are connected
     LOG.info("Verifying all {} NodeManagers are connected after upgrade",
         numNodeManagers);
-    boolean allConnected = waitForNodeManagersToConnect(10000);
-    if (!allConnected) {
-      LOG.warn("Not all NodeManagers reconnected after upgrade");
-    }
+    waitForNodeManagersToConnect(10000);
 
     LOG.info("Rolling upgrade completed successfully: {} NodeManagers upgraded to {}",
         numNodeManagers, upgradePath);
@@ -1194,9 +1232,32 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     /**
      * Builds the ProcessBasedMiniYARNCluster.
      *
+     * <p>If no Hadoop distributions are explicitly set via
+     * {@link #allNodesHadoopDistribution(String)} or related methods, this will
+     * automatically use the {@code hadoop.start.home} system property as the
+     * default distribution for all nodes.</p>
+     *
      * @return A new ProcessBasedMiniYARNCluster instance
+     * @throws IOException if the cluster cannot be created
+     * @throws IllegalStateException if no Hadoop distribution can be determined
      */
     public ProcessBasedMiniYARNCluster build() throws IOException {
+      // If no Hadoop distributions were explicitly set, use hadoop.start.home
+      if (nodeHadoopHomes.isEmpty()) {
+        String defaultHome = System.getProperty("hadoop.start.home");
+        if (defaultHome != null && !defaultHome.isEmpty()) {
+          LOG.info("No Hadoop distributions specified. Using hadoop.start.home: {}",
+              defaultHome);
+          nodeHadoopHomes.put("all", defaultHome);
+        } else {
+          throw new IllegalStateException(
+              "No Hadoop distributions specified and hadoop.start.home system " +
+              "property is not set. Either:\n" +
+              "  1. Call .allNodesHadoopDistribution(path) on the Builder, OR\n" +
+              "  2. Set system property: -Dhadoop.start.home=/path/to/hadoop");
+        }
+      }
+
       return new ProcessBasedMiniYARNCluster(this);
     }
   }
