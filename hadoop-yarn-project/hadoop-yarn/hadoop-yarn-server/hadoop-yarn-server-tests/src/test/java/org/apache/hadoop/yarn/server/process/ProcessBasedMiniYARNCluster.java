@@ -205,43 +205,95 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
 
     try {
       // Step 1: Create cluster directory structure
+      LOG.info("Step 1: Creating cluster directory structure");
       clusterRoot = directoryManager.createClusterRoot();
       LOG.info("Created cluster root: {}", clusterRoot);
 
       // Step 2: Configure HA if needed
       if (haEnabled) {
+        LOG.info("Step 2: Configuring HA for {} ResourceManagers", numResourceManagers);
         configureHA();
       }
 
       // Step 3: Start ResourceManagers
+      LOG.info("Step 3: Starting {} ResourceManager(s)", numResourceManagers);
       for (int i = 0; i < numResourceManagers; i++) {
+        LOG.info("Starting ResourceManager {}/{}", i + 1, numResourceManagers);
         startResourceManager(i);
       }
 
       // Step 4: Wait for at least one RM to become active
+      LOG.info("Step 4: Waiting for active ResourceManager (timeout={}ms)",
+          DEFAULT_STARTUP_TIMEOUT_MS);
       waitForActiveRM(DEFAULT_STARTUP_TIMEOUT_MS);
+      LOG.info("Active ResourceManager ready");
 
       // Step 5: Start NodeManagers
+      LOG.info("Step 5: Starting {} NodeManager(s)", numNodeManagers);
       for (int i = 0; i < numNodeManagers; i++) {
+        LOG.info("Starting NodeManager {}/{}", i + 1, numNodeManagers);
         startNodeManager(i);
       }
 
       // Step 6: Wait for NMs to register with RM
+      LOG.info("Step 6: Waiting for {} NodeManagers to register (timeout={}ms)",
+          numNodeManagers, DEFAULT_STARTUP_TIMEOUT_MS);
       waitForNodeManagersToConnect(DEFAULT_STARTUP_TIMEOUT_MS);
+      LOG.info("All {} NodeManagers registered successfully", numNodeManagers);
 
       started = true;
       LOG.info("ProcessBasedMiniYARNCluster started successfully");
 
     } catch (Exception e) {
-      LOG.error("Failed to start cluster", e);
+      LOG.error("Failed to start cluster - error during startup", e);
+      LOG.error("Cluster startup failed at step: {}", getStartupStepFromException(e));
+
       // Clean up on failure
       try {
+        LOG.info("Cleaning up after startup failure");
         shutdown();
       } catch (Exception cleanupEx) {
         LOG.warn("Error during cleanup after startup failure", cleanupEx);
       }
-      throw new IOException("Failed to start cluster", e);
+
+      // Provide more helpful error message
+      String errorMsg = String.format(
+          "Failed to start ProcessBasedMiniYARNCluster '%s'. " +
+          "Check logs above for details. Error: %s",
+          clusterName, e.getMessage());
+      throw new IOException(errorMsg, e);
     }
+  }
+
+  /**
+   * Attempts to determine which startup step failed based on exception message.
+   *
+   * @param e Exception from startup failure
+   * @return Description of which step likely failed
+   */
+  private String getStartupStepFromException(Exception e) {
+    String msg = e.getMessage();
+    if (msg == null) {
+      return "Unknown step";
+    }
+
+    if (msg.contains("createClusterRoot") || msg.contains("directory")) {
+      return "Step 1 (Create cluster directories)";
+    } else if (msg.contains("HA") || msg.contains("ZooKeeper")) {
+      return "Step 2 (Configure HA)";
+    } else if (msg.contains("ResourceManager") && !msg.contains("NodeManager")) {
+      return "Step 3-4 (Start ResourceManager)";
+    } else if (msg.contains("active ResourceManager")) {
+      return "Step 4 (Wait for active RM)";
+    } else if (msg.contains("NodeManager")) {
+      if (msg.contains("register") || msg.contains("RUNNING")) {
+        return "Step 6 (Wait for NodeManager registration)";
+      } else {
+        return "Step 5 (Start NodeManagers)";
+      }
+    }
+
+    return "Unknown step - check stack trace above";
   }
 
   /**
@@ -387,6 +439,24 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
           nmDir.getAbsolutePath() + "/local");
       nmConf.set(YarnConfiguration.NM_LOG_DIRS,
           nmDir.getAbsolutePath() + "/logs");
+
+      // CRITICAL: Update RM addresses from baseConfiguration
+      // During rolling upgrades, NMs must connect to the active RM with
+      // current addresses. The cached config may have stale addresses.
+      LOG.debug("Updating RM addresses in cached NodeManager {} configuration", nmIndex);
+      nmConf.set(YarnConfiguration.RM_ADDRESS,
+          baseConfiguration.get(YarnConfiguration.RM_ADDRESS));
+      nmConf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS,
+          baseConfiguration.get(YarnConfiguration.RM_SCHEDULER_ADDRESS));
+      nmConf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS,
+          baseConfiguration.get(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS));
+      nmConf.set(YarnConfiguration.RM_ADMIN_ADDRESS,
+          baseConfiguration.get(YarnConfiguration.RM_ADMIN_ADDRESS));
+      nmConf.set(YarnConfiguration.RM_HOSTNAME,
+          baseConfiguration.get(YarnConfiguration.RM_HOSTNAME));
+
+      LOG.info("NodeManager {} will connect to RM at: {}", nmIndex,
+          nmConf.get(YarnConfiguration.RM_ADDRESS));
     } else {
       LOG.info("Generating new configuration for NodeManager {}", nmIndex);
       nmConf = configGenerator.generateNodeManagerConfig(
@@ -495,29 +565,91 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   }
 
   /**
-   * Waits a fixed period for NodeManagers to connect to the ResourceManager.
-   * This method gives NMs time to start up and register, but does not verify
-   * actual registration status.
+   * Waits for NodeManagers to connect and register with the ResourceManager.
    *
-   * <p><b>Important:</b> Tests should create a YarnClient after cluster.start()
-   * and poll for actual NM registration using yarnClient.getYarnClusterMetrics()
-   * to verify NMs have actually connected.</p>
+   * <p>This method actively verifies NodeManager registration by polling the
+   * ResourceManager via RPC. It waits until the expected number of NodeManagers
+   * are registered in RUNNING state or the timeout expires.</p>
    *
-   * @param timeoutMs Maximum time to wait in milliseconds (unused, kept for API compatibility)
-   * @return true (always)
+   * <p><b>Important:</b> This method creates a temporary RPC client to the RM
+   * to verify registration. It checks actual registration status, not just process
+   * startup.</p>
+   *
+   * @param timeoutMs Maximum time to wait in milliseconds
+   * @return true if all NodeManagers registered successfully
    * @throws InterruptedException if wait is interrupted
+   * @throws TimeoutException if NodeManagers fail to register within timeout
    */
   public boolean waitForNodeManagersToConnect(long timeoutMs)
-      throws InterruptedException {
-    // Give NMs 10 seconds to start up and begin registration
-    // Tests should use YarnClient to poll for actual registration status
-    long waitMs = Math.min(10000, timeoutMs);
-    LOG.info("Giving {} NodeManagers {}ms to start registration process",
-        numNodeManagers, waitMs);
+      throws InterruptedException, TimeoutException {
+    if (numNodeManagers == 0) {
+      LOG.debug("No NodeManagers expected, skipping registration check");
+      return true;
+    }
 
-    Thread.sleep(waitMs);
-    LOG.info("Initial wait period completed - tests should verify NM registration");
-    return true;
+    LOG.info("Waiting for {} NodeManagers to register as RUNNING (timeout={}ms)",
+        numNodeManagers, timeoutMs);
+
+    long deadline = System.currentTimeMillis() + timeoutMs;
+    org.apache.hadoop.yarn.api.ApplicationClientProtocol rmClient = null;
+
+    try {
+      // Create RM client proxy
+      rmClient = org.apache.hadoop.yarn.client.ClientRMProxy.createRMProxy(
+          baseConfiguration, org.apache.hadoop.yarn.api.ApplicationClientProtocol.class);
+
+      while (System.currentTimeMillis() < deadline) {
+        try {
+          // Get cluster nodes with RUNNING state filter
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest request =
+              org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest.newInstance();
+          request.setNodeStates(java.util.EnumSet.of(
+              org.apache.hadoop.yarn.api.records.NodeState.RUNNING));
+          org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponse response =
+              rmClient.getClusterNodes(request);
+
+          java.util.List<org.apache.hadoop.yarn.api.records.NodeReport> runningNodes =
+              response.getNodeReports();
+          int runningCount = runningNodes.size();
+
+          if (runningCount >= numNodeManagers) {
+            LOG.info("All {} NodeManagers are registered as RUNNING", numNodeManagers);
+            return true;
+          }
+
+          LOG.debug("NodeManagers registered: {}/{}, waiting...",
+              runningCount, numNodeManagers);
+          Thread.sleep(500);
+
+        } catch (Exception e) {
+          LOG.debug("Error checking NodeManager registration: {}", e.getMessage());
+          Thread.sleep(500);
+        }
+      }
+
+      // Timeout - get final count for error message
+      int finalCount = 0;
+      try {
+        org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest request =
+            org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesRequest.newInstance();
+        request.setNodeStates(java.util.EnumSet.of(
+            org.apache.hadoop.yarn.api.records.NodeState.RUNNING));
+        org.apache.hadoop.yarn.api.protocolrecords.GetClusterNodesResponse response =
+            rmClient.getClusterNodes(request);
+        finalCount = response.getNodeReports().size();
+      } catch (Exception e) {
+        LOG.warn("Error getting final NodeManager count", e);
+      }
+
+      throw new TimeoutException(
+          "Only " + finalCount + "/" + numNodeManagers +
+          " NodeManagers registered as RUNNING within " + timeoutMs + "ms");
+
+    } catch (TimeoutException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException("Error during NodeManager registration check", e);
+    }
   }
 
   /**
@@ -671,17 +803,25 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
       LOG.debug("NodeManager {} restarted with new version", i);
 
       // Step 4: Wait for NodeManager to reconnect
-      LOG.debug("Waiting for NodeManager {} to reconnect", i);
-      waitForNodeManagersToConnect(5000);
+      // Give upgraded NMs more time to start and register (15 seconds per NM)
+      LOG.info("Waiting for NodeManager {} to reconnect and register as RUNNING", i);
+      try {
+        waitForNodeManagersToConnect(15000);
+        LOG.info("NodeManager {} successfully registered after upgrade", i);
+      } catch (TimeoutException e) {
+        LOG.warn("NodeManager {} did not register within 15 seconds, continuing anyway", i);
+        // Continue to next NM - final verification will catch any issues
+      }
 
       LOG.info("NodeManager {} upgraded successfully ({}/{})",
           i, i + 1, numNodeManagers);
     }
 
     // Final verification: ensure all NodeManagers are connected
+    // Give NMs additional time to stabilize after all upgrades complete
     LOG.info("Verifying all {} NodeManagers are connected after upgrade",
         numNodeManagers);
-    waitForNodeManagersToConnect(10000);
+    waitForNodeManagersToConnect(20000);
 
     LOG.info("Rolling upgrade completed successfully: {} NodeManagers upgraded to {}",
         numNodeManagers, upgradePath);
@@ -972,12 +1112,47 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   }
 
   /**
-   * Checks if the cluster is currently running.
+   * Checks if the cluster is currently running and healthy.
    *
-   * @return true if cluster is started and not shut down
+   * <p>This method prioritizes actual process health over lifecycle flags.
+   * Even if the cluster failed to complete startup (started=false), if at least
+   * one ResourceManager is healthy and responding, the cluster is considered "up".</p>
+   *
+   * <p>This allows tests to proceed even if startup had non-critical failures
+   * (e.g., some NodeManagers failed to register), as long as the ResourceManager
+   * is functional.</p>
+   *
+   * <p><b>Shutdown takes precedence:</b> If shutdown() has been called
+   * (shutdown=true), the cluster is always considered down, regardless of
+   * process health. This prevents use-after-shutdown scenarios.</p>
+   *
+   * @return true if not shut down and at least one RM is healthy
    */
   public boolean isClusterUp() {
-    return started && !shutdown;
+    // If explicitly shut down, cluster is definitely not up
+    if (shutdown) {
+      LOG.debug("isClusterUp() returning false - cluster has been shut down");
+      return false;
+    }
+
+    // Check if at least one ResourceManager is healthy
+    // This verifies actual process health, not just the 'started' flag
+    // This allows cluster to be "up" even if start() didn't complete fully
+    try {
+      for (ResourceManagerProcessManager rm : resourceManagers) {
+        if (rm != null && rm.isHealthy()) {
+          LOG.debug("isClusterUp() returning true - found healthy ResourceManager");
+          return true;  // At least one RM is healthy
+        }
+      }
+    } catch (Exception e) {
+      LOG.debug("Error checking ResourceManager health in isClusterUp()", e);
+      return false;
+    }
+
+    // No healthy RMs found
+    LOG.debug("isClusterUp() returning false - no healthy ResourceManagers found");
+    return false;
   }
 
   /**

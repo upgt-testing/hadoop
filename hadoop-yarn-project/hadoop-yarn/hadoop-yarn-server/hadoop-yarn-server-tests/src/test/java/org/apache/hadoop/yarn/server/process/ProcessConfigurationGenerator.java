@@ -249,6 +249,12 @@ public class ProcessConfigurationGenerator {
     conf.setInt(YarnConfiguration.NM_PROCESS_KILL_WAIT_MS, 1000);
     conf.setInt(YarnConfiguration.NM_CONTAINER_EXECUTOR_SCHED_PRIORITY, 0);
 
+    // Disable strict disk health checking for test environments
+    // Allow up to 99% disk usage (default is 90%, which may be too strict for dev machines)
+    conf.setFloat("yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage", 99.0f);
+    // Allow NM to run even with minimal healthy disks (default requires 25% of disks to be healthy)
+    conf.setFloat("yarn.nodemanager.disk-health-checker.min-healthy-disks", 0.0f);
+
     LOG.debug("Generated NM config with ports: localizer={}, webapp={}",
         localizerPort, webappPort);
 
