@@ -122,6 +122,7 @@ public class ITUseMiniCluster_ProcessBased {
         .numNodeManagers(1)
         .numResourceManagers(1)
         .build();
+    yarnCluster.start();
 
     checkpoint(YarnUpgradeCheckpoints.AFTER_CLUSTER_START);
   }

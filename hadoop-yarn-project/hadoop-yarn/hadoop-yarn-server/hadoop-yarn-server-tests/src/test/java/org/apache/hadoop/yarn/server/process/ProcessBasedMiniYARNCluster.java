@@ -165,7 +165,11 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
    */
   private ProcessBasedMiniYARNCluster(Builder builder) throws IOException {
     this.clusterName = builder.clusterName;
-    this.baseConfiguration = new YarnConfiguration(builder.conf);
+
+    // Convert to YarnConfiguration if needed
+    this.baseConfiguration = (builder.conf instanceof YarnConfiguration) ?
+        (YarnConfiguration) builder.conf : new YarnConfiguration(builder.conf);
+
     this.numResourceManagers = builder.numResourceManagers;
     this.numNodeManagers = builder.numNodeManagers;
     this.haEnabled = (numResourceManagers > 1);
@@ -368,11 +372,20 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
     resourceManagers[rmIndex] = rmProcess;
 
     // Copy RM addresses to base configuration so clients can connect
+    // IMPORTANT: Unset first to clear any variable references from yarn-default.xml
+    // Otherwise ${yarn.resourcemanager.hostname}:8032 reference might get re-evaluated
+    baseConfiguration.unset(YarnConfiguration.RM_HOSTNAME);
+    baseConfiguration.unset(YarnConfiguration.RM_ADDRESS);
+    baseConfiguration.unset(YarnConfiguration.RM_SCHEDULER_ADDRESS);
+    baseConfiguration.unset(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS);
+    baseConfiguration.unset(YarnConfiguration.RM_ADMIN_ADDRESS);
+    baseConfiguration.unset(YarnConfiguration.RM_WEBAPP_ADDRESS);
+
+    // Now set the literal values without any variable references
+    String rmHostname = rmConf.get(YarnConfiguration.RM_HOSTNAME);
     String rmAddress = rmConf.get(YarnConfiguration.RM_ADDRESS);
-    System.out.println("DEBUG_COPY: rmAddress from rmConf = " + rmAddress);
+    baseConfiguration.set(YarnConfiguration.RM_HOSTNAME, rmHostname);
     baseConfiguration.set(YarnConfiguration.RM_ADDRESS, rmAddress);
-    System.out.println("DEBUG_COPY: After set, baseConfiguration.RM_ADDRESS = " +
-        baseConfiguration.get(YarnConfiguration.RM_ADDRESS));
     baseConfiguration.set(YarnConfiguration.RM_SCHEDULER_ADDRESS,
         rmConf.get(YarnConfiguration.RM_SCHEDULER_ADDRESS));
     baseConfiguration.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS,
@@ -381,8 +394,6 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
         rmConf.get(YarnConfiguration.RM_ADMIN_ADDRESS));
     baseConfiguration.set(YarnConfiguration.RM_WEBAPP_ADDRESS,
         rmConf.get(YarnConfiguration.RM_WEBAPP_ADDRESS));
-    baseConfiguration.set(YarnConfiguration.RM_HOSTNAME,
-        rmConf.get(YarnConfiguration.RM_HOSTNAME));
 
     LOG.info("ResourceManager {} started successfully at {}",
         rmIndex, rmAddress);
@@ -990,9 +1001,25 @@ public class ProcessBasedMiniYARNCluster implements Closeable {
   public YarnConfiguration getConfiguration() {
     // Return baseConfiguration directly so RM addresses set in start() are available
     // Creating new YarnConfiguration(baseConfiguration) would load defaults that override our values
-    LOG.info("getConfiguration() called - RM_ADDRESS={}",
-        baseConfiguration.get(YarnConfiguration.RM_ADDRESS));
-    return baseConfiguration;
+    LOG.info("getConfiguration() called - RM_ADDRESS={}, RM_HOSTNAME={}",
+        baseConfiguration.get(YarnConfiguration.RM_ADDRESS),
+        baseConfiguration.get(YarnConfiguration.RM_HOSTNAME));
+    LOG.info("getConfiguration() raw RM_ADDRESS (no variable substitution): {}",
+        baseConfiguration.getRaw(YarnConfiguration.RM_ADDRESS));
+
+    // CRITICAL FIX: Create a NEW Configuration, copy properties, then wrap in YarnConfiguration
+    // This ensures our explicitly-set addresses override any variable references
+    Configuration tempConf = new Configuration(false);  // Empty configuration
+    // Copy ALL properties from baseConfiguration
+    for (Map.Entry<String, String> entry : baseConfiguration) {
+      tempConf.set(entry.getKey(), entry.getValue());
+    }
+    // Now create YarnConfiguration from this - it will load defaults but our values take precedence
+    YarnConfiguration clientConf = new YarnConfiguration(tempConf);
+
+    LOG.info("Returning new YarnConfiguration with RM_ADDRESS={}",
+        clientConf.get(YarnConfiguration.RM_ADDRESS));
+    return clientConf;
   }
 
   /**
