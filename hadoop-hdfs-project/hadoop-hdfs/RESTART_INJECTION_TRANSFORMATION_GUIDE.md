@@ -148,11 +148,6 @@ Do NOT inject restarts:
 
 **Reason:** Parameterized tests already generate multiple test variants. Combining with restart injection creates combinatorial explosion and complex test management.
 
-**Also SKIP:**
-- Tests that are already restart/recovery tests
-- Tests that mock cluster components extensively
-- Tests with complex multi-threading that depend on timing
-- Tests marked `@Ignore` or `@Disabled`
 
 ---
 
