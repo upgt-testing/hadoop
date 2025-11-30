@@ -40,6 +40,14 @@ import static org.junit.Assert.assertTrue;
  * Provides utilities to inject restarts at various points in test execution
  * and verify system behavior after recovery.
  *
+ * <p>This framework supports two modes of restart injection:
+ * <ol>
+ * <li><b>Direct restart calls:</b> Use executeRestart() for programmatic control</li>
+ * <li><b>Conditional restart calls:</b> Use restart() with system properties for
+ *     property-based control, enabling a single test method to support multiple
+ *     restart configurations</li>
+ * </ol>
+ *
  * <p>This framework enables transformation of existing MiniDFSCluster tests
  * to include restart scenarios, helping discover bugs related to:
  * - State recovery and persistence
@@ -53,6 +61,18 @@ public class RestartInjectionFramework {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(RestartInjectionFramework.class);
+
+  /**
+   * Thread-local storage for cluster context.
+   * Used by conditional restart() method to access cluster without passing it as parameter.
+   */
+  private static final ThreadLocal<MiniDFSCluster> clusterContext = new ThreadLocal<>();
+
+  /**
+   * Thread-local storage for FileSystem context.
+   * Used by conditional restart() method to access FileSystem without passing it as parameter.
+   */
+  private static final ThreadLocal<FileSystem> fsContext = new ThreadLocal<>();
 
   /**
    * Defines points in test execution where restarts can be injected.
@@ -106,6 +126,147 @@ public class RestartInjectionFramework {
     CRASH,
     /** Crash after a short delay to allow partial state propagation */
     DELAYED_CRASH
+  }
+
+  /**
+   * Set the cluster context for the current test thread.
+   * This must be called in test setup (@Before method) when using conditional restart() calls.
+   *
+   * @param cluster the MiniDFSCluster instance for this test
+   * @param fs the FileSystem instance for this test
+   */
+  public static void setClusterContext(MiniDFSCluster cluster, FileSystem fs) {
+    clusterContext.set(cluster);
+    fsContext.set(fs);
+    LOG.debug("Cluster context set for thread {}", Thread.currentThread().getName());
+  }
+
+  /**
+   * Clear the cluster context for the current test thread.
+   * This should be called in test teardown (@After method) to prevent memory leaks.
+   */
+  public static void clearClusterContext() {
+    clusterContext.remove();
+    fsContext.remove();
+    LOG.debug("Cluster context cleared for thread {}", Thread.currentThread().getName());
+  }
+
+  /**
+   * Conditional restart point - only executes if system properties match.
+   *
+   * <p>This method enables a single test method to support multiple restart configurations.
+   * The test includes multiple restart() calls at different points, but only the one
+   * matching the system properties will execute.
+   *
+   * <p><b>Usage in transformed tests:</b>
+   * <pre>
+   * {@literal @}Before
+   * public void setup() throws Exception {
+   *   cluster = new MiniDFSCluster.Builder(conf).build();
+   *   fs = cluster.getFileSystem();
+   *   setClusterContext(cluster, fs); // Required for restart() to work
+   * }
+   *
+   * {@literal @}After
+   * public void teardown() {
+   *   clearClusterContext();
+   *   if (cluster != null) {
+   *     cluster.shutdown();
+   *   }
+   * }
+   *
+   * {@literal @}Test
+   * public void testHFlush() throws Exception {
+   *   out.write(data);
+   *   out.hflush();
+   *
+   *   // Multiple restart points - only one executes per test run
+   *   restart("after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+   *   restart("after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
+   *   restart("after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
+   *   restart("after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
+   *
+   *   // Continue with original test assertions
+   *   assertEquals(expectedLength, fs.getFileStatus(path).getLen());
+   *   out.close();
+   *
+   *   restart("after_close", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+   *   restart("after_close", RestartTarget.NAMENODE, RestartMode.CRASH);
+   * }
+   * </pre>
+   *
+   * <p><b>Running with specific restart configuration:</b>
+   * <pre>
+   * # Run test with NameNode graceful restart after flush
+   * mvn test -Dtest=TestHFlush#testHFlush \
+   *   -Drestart.position=after_flush \
+   *   -Drestart.target=NAMENODE \
+   *   -Drestart.mode=GRACEFUL
+   *
+   * # Run test with DataNode crash restart after flush
+   * mvn test -Dtest=TestHFlush#testHFlush \
+   *   -Drestart.position=after_flush \
+   *   -Drestart.target=SINGLE_DATANODE \
+   *   -Drestart.mode=CRASH
+   *
+   * # Run test without any restart (original behavior)
+   * mvn test -Dtest=TestHFlush#testHFlush
+   * </pre>
+   *
+   * @param position the restart position identifier (e.g., "after_flush", "after_close")
+   * @param target which component to restart
+   * @param mode the restart mode
+   * @throws Exception if restart fails or cluster context not set
+   */
+  public static void restart(String position, RestartTarget target, RestartMode mode)
+      throws Exception {
+
+    // Check if restart is configured via system properties
+    String activePosition = System.getProperty("restart.position");
+
+    // If no restart.position property set, skip all restart points
+    // This allows test to run normally without any restarts
+    if (activePosition == null) {
+      return;
+    }
+
+    String activeTarget = System.getProperty("restart.target");
+    String activeMode = System.getProperty("restart.mode");
+
+    // Check if this restart point matches the active configuration
+    boolean positionMatches = position.equals(activePosition);
+    boolean targetMatches = (activeTarget != null && target.toString().equals(activeTarget));
+    boolean modeMatches = (activeMode != null && mode.toString().equals(activeMode));
+
+    if (positionMatches && targetMatches && modeMatches) {
+      LOG.info("=== ACTIVATING RESTART POINT: {} {} {} ===", position, target, mode);
+
+      // Get cluster context from thread-local storage
+      MiniDFSCluster cluster = clusterContext.get();
+      FileSystem fs = fsContext.get();
+
+      if (cluster == null) {
+        throw new IllegalStateException(
+            "Cluster context not set. Call setClusterContext() in @Before method.");
+      }
+
+      // Execute the restart
+      executeRestart(cluster, target, mode, true);
+
+      // Verify cluster health after restart
+      if (fs != null) {
+        verifyClusterHealth(cluster, fs);
+      } else {
+        // If no FileSystem provided, just verify cluster is active
+        cluster.waitActive();
+      }
+
+      // Clear the property to prevent this restart from executing again
+      // This is important if the test has loops or multiple execution paths
+      System.clearProperty("restart.position");
+
+      LOG.info("=== RESTART POINT COMPLETED: {} {} {} ===", position, target, mode);
+    }
   }
 
   /**
