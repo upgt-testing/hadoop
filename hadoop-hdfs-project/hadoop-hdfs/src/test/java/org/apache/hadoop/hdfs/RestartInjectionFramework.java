@@ -168,10 +168,10 @@ public class RestartInjectionFramework {
    * @param position the restart position identifier (e.g., "after_flush", "after_close")
    * @param target which component to restart
    * @param mode the restart mode
-   * @throws Exception if restart fails
+   * @throws RuntimeException if restart fails
    */
   public static void restart(MiniDFSCluster cluster, String position,
-      RestartTarget target, RestartMode mode) throws Exception {
+      RestartTarget target, RestartMode mode) {
 
     // Check if restart is configured via system properties
     String activePosition = System.getProperty("restart.position");
@@ -193,11 +193,15 @@ public class RestartInjectionFramework {
     if (positionMatches && targetMatches && modeMatches) {
       LOG.info("=== ACTIVATING RESTART POINT: {} {} {} ===", position, target, mode);
 
-      // Execute the restart
-      executeRestart(cluster, target, mode, true);
+      try {
+        // Execute the restart
+        executeRestart(cluster, target, mode, true);
 
-      // Verify cluster health after restart
-      verifyClusterHealth(cluster, cluster.getFileSystem());
+        // Verify cluster health after restart
+        verifyClusterHealth(cluster, cluster.getFileSystem());
+      } catch (Exception e) {
+        throw new RuntimeException("Restart failed at position " + position, e);
+      }
 
       // Clear the property to prevent this restart from executing again
       // This is important if the test has loops or multiple execution paths
@@ -359,39 +363,43 @@ public class RestartInjectionFramework {
    *
    * @param cluster the cluster to verify
    * @param fs the FileSystem to use for checks
-   * @throws Exception if cluster is not healthy
+   * @throws RuntimeException if cluster is not healthy
    */
   public static void verifyClusterHealth(
       MiniDFSCluster cluster,
-      FileSystem fs) throws Exception {
+      FileSystem fs) {
 
     LOG.info("Verifying cluster health after restart");
 
-    // Verify cluster is active
-    cluster.waitActive();
-    LOG.info("✓ Cluster is active");
+    try {
+      // Verify cluster is active
+      cluster.waitActive();
+      LOG.info("✓ Cluster is active");
 
-    // Verify cluster is out of safemode
-    cluster.waitClusterUp();
-    LOG.info("✓ Cluster is out of safemode");
+      // Verify cluster is out of safemode
+      cluster.waitClusterUp();
+      LOG.info("✓ Cluster is out of safemode");
 
-    // Verify all DataNodes are registered
-    List<DatanodeDescriptor> datanodes = cluster.getNameNode().getNamesystem()
-        .getBlockManager().getDatanodeManager().getDatanodeListForReport(
-            org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType.LIVE);
-    int expectedDNs = cluster.getDataNodes().size();
-    assertEquals("Not all DataNodes registered after restart",
-        expectedDNs, datanodes.size());
-    LOG.info("✓ All {} DataNodes registered", expectedDNs);
+      // Verify all DataNodes are registered
+      List<DatanodeDescriptor> datanodes = cluster.getNameNode().getNamesystem()
+          .getBlockManager().getDatanodeManager().getDatanodeListForReport(
+              org.apache.hadoop.hdfs.protocol.HdfsConstants.DatanodeReportType.LIVE);
+      int expectedDNs = cluster.getDataNodes().size();
+      assertEquals("Not all DataNodes registered after restart",
+          expectedDNs, datanodes.size());
+      LOG.info("✓ All {} DataNodes registered", expectedDNs);
 
-    // Verify no dangling leases (all files properly closed/recovered)
-    LeaseManager leaseManager = NameNodeAdapter.getLeaseManager(cluster.getNamesystem());
-    int leaseCount = leaseManager.countLease();
-    LOG.info("Lease count after restart: {}", leaseCount);
-    // Note: We don't assert leaseCount == 0 because tests might intentionally
-    // have open files. Callers should verify this if needed.
+      // Verify no dangling leases (all files properly closed/recovered)
+      LeaseManager leaseManager = NameNodeAdapter.getLeaseManager(cluster.getNamesystem());
+      int leaseCount = leaseManager.countLease();
+      LOG.info("Lease count after restart: {}", leaseCount);
+      // Note: We don't assert leaseCount == 0 because tests might intentionally
+      // have open files. Callers should verify this if needed.
 
-    LOG.info("Cluster health verification passed");
+      LOG.info("Cluster health verification passed");
+    } catch (Exception e) {
+      throw new RuntimeException("Cluster health verification failed", e);
+    }
   }
 
   /**
@@ -405,32 +413,36 @@ public class RestartInjectionFramework {
    * @param path the file to verify
    * @param expectedLength expected file length in bytes
    * @param expectedData expected file contents (null to skip content check)
-   * @throws Exception if verification fails
+   * @throws RuntimeException if verification fails
    */
   public static void verifyFileIntegrity(
       FileSystem fs,
       Path path,
       long expectedLength,
-      byte[] expectedData) throws Exception {
+      byte[] expectedData) {
 
     LOG.info("Verifying integrity of file: {}", path);
 
-    // Verify file exists
-    assertTrue("File does not exist: " + path, fs.exists(path));
-    LOG.info("✓ File exists");
+    try {
+      // Verify file exists
+      assertTrue("File does not exist: " + path, fs.exists(path));
+      LOG.info("✓ File exists");
 
-    // Verify file length
-    long actualLength = fs.getFileStatus(path).getLen();
-    assertEquals("File length mismatch", expectedLength, actualLength);
-    LOG.info("✓ File length correct: {} bytes", actualLength);
+      // Verify file length
+      long actualLength = fs.getFileStatus(path).getLen();
+      assertEquals("File length mismatch", expectedLength, actualLength);
+      LOG.info("✓ File length correct: {} bytes", actualLength);
 
-    // Verify file content if expected data provided
-    if (expectedData != null) {
-      AppendTestUtil.check(fs, path, expectedLength);
-      LOG.info("✓ File content verification passed");
+      // Verify file content if expected data provided
+      if (expectedData != null) {
+        AppendTestUtil.check(fs, path, expectedLength);
+        LOG.info("✓ File content verification passed");
+      }
+
+      LOG.info("File integrity verification passed for: {}", path);
+    } catch (Exception e) {
+      throw new RuntimeException("File integrity verification failed for: " + path, e);
     }
-
-    LOG.info("File integrity verification passed for: {}", path);
   }
 
   /**
@@ -442,37 +454,41 @@ public class RestartInjectionFramework {
    * @param fs the FileSystem
    * @param path the file to verify
    * @param expectedLength expected file length
-   * @throws IOException if verification fails
+   * @throws RuntimeException if verification fails
    */
   public static void verifyNoDataLoss(
       FileSystem fs,
       Path path,
-      long expectedLength) throws IOException {
+      long expectedLength) {
 
-    assertTrue("File lost after restart: " + path, fs.exists(path));
-    long actualLength = fs.getFileStatus(path).getLen();
-    assertEquals("File length changed after restart",
-        expectedLength, actualLength);
-
-    // Verify file is readable
-    InputStream in = null;
     try {
-      in = fs.open(path);
-      byte[] buf = new byte[4096];
-      long totalRead = 0;
-      int bytesRead;
-      while ((bytesRead = in.read(buf)) > 0) {
-        totalRead += bytesRead;
-      }
-      assertEquals("Could not read entire file after restart",
-          expectedLength, totalRead);
-    } finally {
-      if (in != null) {
-        in.close();
-      }
-    }
+      assertTrue("File lost after restart: " + path, fs.exists(path));
+      long actualLength = fs.getFileStatus(path).getLen();
+      assertEquals("File length changed after restart",
+          expectedLength, actualLength);
 
-    LOG.info("Verified no data loss for: {}", path);
+      // Verify file is readable
+      InputStream in = null;
+      try {
+        in = fs.open(path);
+        byte[] buf = new byte[4096];
+        long totalRead = 0;
+        int bytesRead;
+        while ((bytesRead = in.read(buf)) > 0) {
+          totalRead += bytesRead;
+        }
+        assertEquals("Could not read entire file after restart",
+            expectedLength, totalRead);
+      } finally {
+        if (in != null) {
+          in.close();
+        }
+      }
+
+      LOG.info("Verified no data loss for: {}", path);
+    } catch (Exception e) {
+      throw new RuntimeException("Data loss verification failed for: " + path, e);
+    }
   }
 
   /**
@@ -484,20 +500,26 @@ public class RestartInjectionFramework {
 
   /**
    * Helper to wait for lease recovery to complete.
+   * @throws RuntimeException if timeout occurs or thread is interrupted
    */
   public static void waitForLeaseRecovery(
       MiniDFSCluster cluster,
-      long timeoutMs) throws InterruptedException {
+      long timeoutMs) {
 
-    long startTime = System.currentTimeMillis();
-    while (getLeaseCount(cluster) > 0) {
-      if (System.currentTimeMillis() - startTime > timeoutMs) {
-        throw new RuntimeException(
-            "Timeout waiting for lease recovery: " + getLeaseCount(cluster) +
-            " leases still active");
+    try {
+      long startTime = System.currentTimeMillis();
+      while (getLeaseCount(cluster) > 0) {
+        if (System.currentTimeMillis() - startTime > timeoutMs) {
+          throw new RuntimeException(
+              "Timeout waiting for lease recovery: " + getLeaseCount(cluster) +
+              " leases still active");
+        }
+        Thread.sleep(100);
       }
-      Thread.sleep(100);
+      LOG.info("All leases recovered");
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new RuntimeException("Interrupted while waiting for lease recovery", e);
     }
-    LOG.info("All leases recovered");
   }
 }
