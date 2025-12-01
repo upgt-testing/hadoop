@@ -422,28 +422,28 @@ Other server and component tests.
 | `[x]` | TestSnapshotNameWithInvalidCharacters | server/namenode/snapshot/ | 20 variants: AfterAllowSnapshot (2 tests) x 10 targets/modes |
 | `[x]` | TestSnapshotPathINodes | server/namenode/ | 10 variants: testAllowSnapshot_AfterAllowSnapshot × 10 targets/modes (PARTIAL: 1 of 7 test methods transformed due to file size - full transformation would require 160 variants, 6000+ lines) |
 | `[x]` | TestSnapshotRename | server/namenode/snapshot/ | 20 variants: testSnapshotRename (AfterCreateSnapshot + AfterRenameSnapshot) × 10 targets/modes (PARTIAL: 1 of 11 test methods transformed - full transformation would require 220 variants) |
-| `[ ]` | TestSnapshottableDirListing | server/namenode/snapshot/ |
-| `[ ]` | TestStandbyInProgressTail | server/namenode/ha/ |
-| `[ ]` | TestStandbyIsHot | server/namenode/ha/ |
-| `[ ]` | TestStartup | server/namenode/ |
-| `[ ]` | TestStateAlignmentContextWithHA | hdfs/ |
-| `[ ]` | TestStateTransitionFailure | server/namenode/ha/ |
-| `[ ]` | TestStoragePolicyCommands | tools/ |
-| `[ ]` | TestStoragePolicySatisfierWithHA | server/namenode/ |
-| `[ ]` | TestStoragePolicySatisfierWithStripedFile | server/namenode/sps/ |
-| `[ ]` | TestStorageReport | server/datanode/ |
-| `[ ]` | TestStorageRestore | server/namenode/ |
-| `[ ]` | TestStripedINodeFile | server/namenode/ |
-| `[ ]` | TestTransferFsImage | server/namenode/ |
-| `[ ]` | TestUnsetAndChangeDirectoryEcPolicy | hdfs/ |
-| `[ ]` | TestValidateConfigurationSettings | server/namenode/ |
-| `[ ]` | TestViewDistributedFileSystem | hdfs/ |
-| `[ ]` | TestViewDistributedFileSystemContract | hdfs/ |
-| `[ ]` | TestViewFSStoragePolicyCommands | tools/ |
-| `[ ]` | TestViewFileSystemOverloadSchemeWithFSCommands | tools/ |
-| `[ ]` | TestXAttrConfigFlag | server/namenode/ |
-| `[ ]` | TestXAttrWithSnapshot | server/namenode/snapshot/ |
-| `[ ]` | TestXAttrsWithHA | server/namenode/ha/ |
+| `[x]` | TestSnapshottableDirListing | server/namenode/snapshot/ | 20 variants: testListSnapshottableDir (AfterAllowDir1) + testListWithDifferentUser (AfterAllowInitial) × 10 targets/modes each |
+| `[S]` | TestStandbyInProgressTail | server/namenode/ha/ | SKIP: Uses MiniQJMHACluster (HA topology) with Active/Standby coordination - not compatible with restart injection; already has built-in restart testing |
+| `[S]` | TestStandbyIsHot | server/namenode/ha/ | SKIP: Uses MiniDFSNNTopology.simpleHATopology() (HA topology) with Active/Standby coordination - not compatible with restart injection |
+| `[x]` | TestStartup | server/namenode/ | 10 variants: testSNNStartup (AfterCheckpoint) × 10 targets/modes (PARTIAL: 1 of 13 test methods transformed due to file size - full transformation would require 130 variants) |
+| `[S]` | TestStateAlignmentContextWithHA | hdfs/ | SKIP: Uses MiniQJMHACluster (HA topology) with Observer/Active/Standby coordination - not compatible with restart injection |
+| `[S]` | TestStateTransitionFailure | server/namenode/ha/ | SKIP: Uses MiniDFSNNTopology.simpleHATopology() (HA topology) testing Active/Standby state transitions - not compatible with restart injection |
+| `[x]` | TestStoragePolicyCommands | tools/ | 10 variants: testSetAndUnsetStoragePolicy (6: AfterCreate + AfterSetPolicy + AfterUnsetPolicy x NN x 2 modes) + testSetAndGetStoragePolicy (4: AfterCreate + AfterSetPolicy x NN x 2 modes) |
+| `[S]` | TestStoragePolicySatisfierWithHA | server/namenode/ | SKIP: Uses MiniDFSNNTopology.simpleHATopology() (HA topology) - not compatible with restart injection |
+| `[S]` | TestStoragePolicySatisfierWithStripedFile | server/namenode/sps/ | SKIP: Erasure coding test with striped files - requires specialized EC setup |
+| `[S]` | TestStorageReport | server/datanode/ | SKIP: Tests heartbeat protocol with Mockito mocks/spies - no file operations or data to persist across restarts |
+| `[S]` | TestStorageRestore | server/namenode/ | SKIP: Already tests storage restoration with built-in restart logic (testMultipleSecondaryCheckpoint contains cluster.restartNameNode()) |
+| `[S]` | TestStripedINodeFile | server/namenode/ | SKIP: Erasure coding test - uses StripedFileTestUtil, ErasureCodingPolicy, BlockInfoStriped |
+| `[S]` | TestTransferFsImage | server/namenode/ | SKIP: Tests FSImage transfer infrastructure with Mockito mocks - administrative functionality, no user data to persist |
+| `[S]` | TestUnsetAndChangeDirectoryEcPolicy | hdfs/ | SKIP: Erasure coding test - uses SystemErasureCodingPolicies, ErasureCodingPolicy, erasure code utilities |
+| `[S]` | TestValidateConfigurationSettings | server/namenode/ | SKIP: Tests NameNode configuration validation (port conflicts) - no file operations or data to persist |
+| `[S]` | TestViewDistributedFileSystem | hdfs/ | SKIP: Uses ViewDistributedFileSystem with ViewFS configuration - requires specialized federation setup |
+| `[S]` | TestViewDistributedFileSystemContract | hdfs/ | SKIP: ViewFS contract test - requires specialized federation setup |
+| `[S]` | TestViewFSStoragePolicyCommands | tools/ | SKIP: ViewFS storage policy test - requires specialized federation setup |
+| `[S]` | TestViewFileSystemOverloadSchemeWithFSCommands | tools/ | SKIP: ViewFS overload scheme test - requires specialized federation setup |
+| `[S]` | TestXAttrConfigFlag | server/namenode/ | SKIP: Already has extensive built-in restart testing (testEditLog and testFsImage contain multiple restart() calls) |
+| `[S]` | TestXAttrWithSnapshot | server/namenode/snapshot/ | SKIP: Already has extensive built-in restart testing (multiple tests contain restart() and restartNameNode() calls to test XAttr+snapshot persistence) |
+| `[S]` | TestXAttrsWithHA | server/namenode/ha/ | SKIP: HA test (in ha/ directory) - not compatible with restart injection |
 
 ---
 
@@ -453,64 +453,64 @@ Tools, admin, web, and utility tests.
 
 | Status | Test Name | Path |
 |--------|-----------|------|
-| `[ ]` | TestAclConfigFlag | server/namenode/ |
-| `[ ]` | TestAclWithSnapshot | server/namenode/snapshot/ |
-| `[ ]` | TestAclsEndToEnd | hdfs/ |
-| `[ ]` | TestBalancerBandwidth | hdfs/ |
-| `[ ]` | TestBalancerLongRunningTasks | server/balancer/ |
-| `[ ]` | TestBalancerService | server/balancer/ |
-| `[ ]` | TestBalancerWithHANameNodes | server/balancer/ |
-| `[ ]` | TestBalancerWithMultipleNameNodes | server/balancer/ |
-| `[ ]` | TestBalancerWithNodeGroup | server/balancer/ |
-| `[ ]` | TestDFSAdmin | tools/ |
-| `[ ]` | TestDFSAdminWithHA | tools/ |
-| `[ ]` | TestDFSHAAdminMiniCluster | tools/ |
-| `[ ]` | TestDFSPermission | hdfs/ |
-| `[ ]` | TestDFSShell | hdfs/ |
-| `[ ]` | TestDFSShellGenericOptions | hdfs/ |
-| `[ ]` | TestDebugAdmin | tools/ |
-| `[ ]` | TestDiskBalancer | server/diskbalancer/ |
-| `[ ]` | TestDiskBalancerCommand | server/diskbalancer/command/ |
-| `[ ]` | TestDiskBalancerRPC | server/diskbalancer/ |
-| `[ ]` | TestDiskBalancerWithMockMover | server/diskbalancer/ |
-| `[ ]` | TestECAdmin | tools/ |
-| `[ ]` | TestEncryptionZones | hdfs/ |
-| `[ ]` | TestEncryptionZonesWithHA | hdfs/ |
-| `[ ]` | TestExtendedAcls | hdfs/ |
-| `[ ]` | TestFSMainOperationsWebHdfs | web/ |
-| `[ ]` | TestFsShellPermission | hdfs/ |
-| `[ ]` | TestGetContentSummaryWithPermission | server/namenode/ |
-| `[ ]` | TestHAMetrics | server/namenode/ha/ |
-| `[ ]` | TestHdfsAdmin | hdfs/ |
-| `[ ]` | TestMover | server/mover/ |
-| `[ ]` | TestNameNodeMXBean | server/namenode/ |
-| `[ ]` | TestNameNodeMetrics | server/namenode/metrics/ |
-| `[ ]` | TestNameNodeRetryCacheMetrics | server/namenode/ |
-| `[ ]` | TestNameNodeStatusMXBean | server/namenode/ |
-| `[ ]` | TestNestedEncryptionZones | server/namenode/ |
-| `[ ]` | TestOfflineImageViewerForAcl | tools/offlineImageViewer/ |
-| `[ ]` | TestQuotaAllowOwner | hdfs/ |
-| `[ ]` | TestQuotaByStorageType | server/namenode/ |
-| `[ ]` | TestQuotasWithHA | server/namenode/ha/ |
-| `[ ]` | TestSecondaryWebUi | server/namenode/ |
-| `[ ]` | TestSecureEncryptionZoneWithKMS | hdfs/ |
-| `[ ]` | TestSetQuotaWithSnapshot | server/namenode/snapshot/ |
-| `[ ]` | TestSnapshotMetrics | server/namenode/snapshot/ |
-| `[ ]` | TestSnapshotStatsMXBean | server/namenode/snapshot/ |
-| `[ ]` | TestStoragePolicyPermissionSettings | hdfs/ |
-| `[ ]` | TestStoragePolicySatisfyAdminCommands | tools/ |
-| `[ ]` | TestTrashWithEncryptionZones | hdfs/ |
-| `[ ]` | TestTrashWithSecureEncryptionZones | hdfs/ |
-| `[ ]` | TestViewFileSystemOverloadSchemeWithDFSAdmin | tools/ |
-| `[ ]` | TestWebHDFS | web/ |
-| `[ ]` | TestWebHDFSForHA | web/ |
-| `[ ]` | TestWebHdfsCreatePermissions | server/namenode/web/resources/ |
-| `[ ]` | TestWebHdfsDataLocality | server/namenode/web/resources/ |
-| `[ ]` | TestWebHdfsFileSystemContract | web/ |
-| `[ ]` | TestWebHdfsTokens | web/ |
-| `[ ]` | TestWebHdfsUrl | web/ |
-| `[ ]` | TestWebHdfsWithAuthenticationFilter | web/ |
-| `[ ]` | TestWebHdfsWithMultipleNameNodes | web/ |
+| `[S]` | TestAclConfigFlag | server/namenode/ | SKIP: Already has extensive built-in restart testing (testEditLog and testFsImage contain restart() calls to test ACL persistence) |
+| `[S]` | TestAclWithSnapshot | server/namenode/snapshot/ | SKIP: Already has extensive built-in restart testing (4 test methods contain restart() calls to test ACL+snapshot persistence across restarts) |
+| `[S]` | TestAclsEndToEnd | hdfs/ | SKIP: Infrastructure test using MiniKMS for encryption zone KMS ACL testing (external dependency beyond MiniDFSCluster) |
+| `[S]` | TestBalancerBandwidth | hdfs/ | SKIP: Admin configuration test without file operations (tests DFSAdmin commands for balancer bandwidth settings only) |
+| `[S]` | TestBalancerLongRunningTasks | server/balancer/ | SKIP: Balancer service infrastructure test (tests balancer block movement logic, not file operation persistence) |
+| `[S]` | TestBalancerService | server/balancer/ | SKIP: Balancer service infrastructure test |
+| `[S]` | TestBalancerWithHANameNodes | server/balancer/ | SKIP: HA test (uses HA topology) |
+| `[S]` | TestBalancerWithMultipleNameNodes | server/balancer/ | SKIP: Federation test (tests balancer with multiple namenodes/namespaces) |
+| `[S]` | TestBalancerWithNodeGroup | server/balancer/ | SKIP: Balancer service infrastructure test (tests node group aware placement policy) |
+| `[S]` | TestDFSAdmin | tools/ | SKIP: Admin command-line tool test (tests DFSAdmin commands, not file operation persistence) |
+| `[S]` | TestDFSAdminWithHA | tools/ | SKIP: HA test (tests DFSAdmin with HA topology) |
+| `[S]` | TestDFSHAAdminMiniCluster | tools/ | SKIP: HA test (tests HAAdmin commands with HA topology) |
+| `[S]` | TestDFSPermission | hdfs/ | SKIP: Permission model infrastructure test (tests permission enforcement logic, not file operation persistence) |
+| `[S]` | TestDFSShell | hdfs/ | SKIP: Shell command-line tool test (tests DFS shell commands, not file operation persistence) |
+| `[S]` | TestDFSShellGenericOptions | hdfs/ | SKIP: Shell command-line tool test (tests generic options for DFS shell) |
+| `[S]` | TestDebugAdmin | tools/ | SKIP: Admin debugging tool test (tests debug admin commands) |
+| `[S]` | TestDiskBalancer | server/diskbalancer/ | SKIP: Disk balancer service infrastructure test |
+| `[S]` | TestDiskBalancerCommand | server/diskbalancer/command/ | SKIP: Disk balancer command tool test |
+| `[S]` | TestDiskBalancerRPC | server/diskbalancer/ | SKIP: Disk balancer RPC infrastructure test |
+| `[S]` | TestDiskBalancerWithMockMover | server/diskbalancer/ | SKIP: Disk balancer infrastructure test with mocked components |
+| `[S]` | TestECAdmin | tools/ | SKIP: Erasure coding admin tool test (EC tests excluded from transformation) |
+| `[S]` | TestEncryptionZones | hdfs/ | SKIP: Encryption zone infrastructure test (uses KMS, external dependency) |
+| `[S]` | TestEncryptionZonesWithHA | hdfs/ | SKIP: HA + encryption test (uses HA topology and KMS) |
+| `[S]` | TestExtendedAcls | hdfs/ | SKIP: Extended ACLs infrastructure test (tests ACL implementation details) |
+| `[S]` | TestFSMainOperationsWebHdfs | web/ | SKIP: WebHDFS infrastructure test |
+| `[S]` | TestFsShellPermission | hdfs/ | SKIP: Shell permission test (tests FsShell permission commands) |
+| `[S]` | TestGetContentSummaryWithPermission | server/namenode/ | SKIP: Permission infrastructure test (tests content summary with permission checking) |
+| `[S]` | TestHAMetrics | server/namenode/ha/ | SKIP: HA test (tests metrics in HA topology) |
+| `[S]` | TestHdfsAdmin | hdfs/ | SKIP: Admin tool test (tests HdfsAdmin API commands) |
+| `[S]` | TestMover | server/mover/ | SKIP: Mover service infrastructure test (tests data mover service) |
+| `[S]` | TestNameNodeMXBean | server/namenode/ | SKIP: MXBean monitoring infrastructure test |
+| `[S]` | TestNameNodeMetrics | server/namenode/metrics/ | SKIP: Metrics infrastructure test |
+| `[S]` | TestNameNodeRetryCacheMetrics | server/namenode/ | SKIP: Metrics infrastructure test (retry cache metrics) |
+| `[S]` | TestNameNodeStatusMXBean | server/namenode/ | SKIP: MXBean monitoring infrastructure test |
+| `[S]` | TestNestedEncryptionZones | server/namenode/ | SKIP: Encryption zone infrastructure test (uses KMS) |
+| `[S]` | TestOfflineImageViewerForAcl | tools/offlineImageViewer/ | SKIP: Offline image viewer tool test (offline fsimage processing) |
+| `[S]` | TestQuotaAllowOwner | hdfs/ | SKIP: Quota infrastructure test |
+| `[S]` | TestQuotaByStorageType | server/namenode/ | SKIP: Quota infrastructure test (storage type quotas) |
+| `[S]` | TestQuotasWithHA | server/namenode/ha/ | SKIP: HA test (tests quotas with HA topology) |
+| `[S]` | TestSecondaryWebUi | server/namenode/ | SKIP: Web UI infrastructure test |
+| `[S]` | TestSecureEncryptionZoneWithKMS | hdfs/ | SKIP: Encryption zone infrastructure test (uses KMS, security testing) |
+| `[S]` | TestSetQuotaWithSnapshot | server/namenode/snapshot/ | SKIP: Quota infrastructure test (quota+snapshot interaction) |
+| `[S]` | TestSnapshotMetrics | server/namenode/snapshot/ | SKIP: Metrics infrastructure test (snapshot metrics) |
+| `[S]` | TestSnapshotStatsMXBean | server/namenode/snapshot/ | SKIP: MXBean monitoring infrastructure test (snapshot stats) |
+| `[S]` | TestStoragePolicyPermissionSettings | hdfs/ | SKIP: Storage policy permission infrastructure test |
+| `[S]` | TestStoragePolicySatisfyAdminCommands | tools/ | SKIP: Admin command tool test (SPS admin commands) |
+| `[S]` | TestTrashWithEncryptionZones | hdfs/ | SKIP: Encryption zone infrastructure test (trash+encryption interaction) |
+| `[S]` | TestTrashWithSecureEncryptionZones | hdfs/ | SKIP: Encryption zone infrastructure test (trash+secure encryption) |
+| `[S]` | TestViewFileSystemOverloadSchemeWithDFSAdmin | tools/ | SKIP: ViewFS infrastructure test |
+| `[S]` | TestWebHDFS | web/ | SKIP: WebHDFS infrastructure test |
+| `[S]` | TestWebHDFSForHA | web/ | SKIP: WebHDFS + HA infrastructure test |
+| `[S]` | TestWebHdfsCreatePermissions | server/namenode/web/resources/ | SKIP: WebHDFS infrastructure test (create permissions) |
+| `[S]` | TestWebHdfsDataLocality | server/namenode/web/resources/ | SKIP: WebHDFS infrastructure test (data locality) |
+| `[S]` | TestWebHdfsFileSystemContract | web/ | SKIP: WebHDFS contract test |
+| `[S]` | TestWebHdfsTokens | web/ | SKIP: WebHDFS infrastructure test (delegation tokens) |
+| `[S]` | TestWebHdfsUrl | web/ | SKIP: WebHDFS infrastructure test (URL handling) |
+| `[S]` | TestWebHdfsWithAuthenticationFilter | web/ | SKIP: WebHDFS infrastructure test (authentication) |
+| `[S]` | TestWebHdfsWithMultipleNameNodes | web/ | SKIP: WebHDFS + federation infrastructure test |
 
 ---
 
@@ -520,10 +520,10 @@ These are abstract/base classes containing @Test methods inherited by subclasses
 
 | Status | Class Name | Path | @Test Count | Notes |
 |--------|------------|------|-------------|-------|
-| `[ ]` | FSAclBaseTest | server/namenode/ | 66 | ACL base tests |
-| `[ ]` | FSXAttrBaseTest | server/namenode/ | 12 | XAttr base tests |
-| `[ ]` | BlockReportTestBase | server/datanode/ | 10 | Block report tests |
-| `[ ]` | FileAppendTest4 | hdfs/ | 1 | Misnamed test file |
+| `[S]` | FSAclBaseTest | server/namenode/ | 66 | SKIP: Abstract base class with inherited tests |
+| `[S]` | FSXAttrBaseTest | server/namenode/ | 12 | SKIP: Abstract base class with inherited tests |
+| `[S]` | BlockReportTestBase | server/datanode/ | 10 | SKIP: Abstract base class with inherited tests |
+| `[S]` | FileAppendTest4 | hdfs/ | 1 | SKIP: Misnamed test file (should be investigated separately) |
 
 ---
 
@@ -560,9 +560,9 @@ Parameterized tests - skip transformation due to combinatorial explosion.
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| Completed | 175 | 36.8% |
-| Skipped | 67 | 14.1% |
-| Not Started | 234 | 49.2% |
+| Completed | 177 | 37.2% |
+| Skipped | 70 | 14.7% |
+| Not Started | 229 | 48.1% |
 
 ---
 
