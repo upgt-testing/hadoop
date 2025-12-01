@@ -30,91 +30,18 @@ verifyFileIntegrity(fs, path, expectedLength, expectedData)
 
 ---
 
-## 2. CRITICAL DIFF GENERATION RULES (HIGHEST PRIORITY)
+## 2. HARD RULES FOR TRANSFORMATION
 
-### ⚠️ MOST IMPORTANT: NO HALLUCINATED DIFF HUNKS
+### Rule 1: Create a NEW File - Do NOT Modify Original
 
-**Git patches MUST be byte-perfect or they will fail to apply. Follow these rules EXACTLY:**
+**NEVER modify the original test file.** Instead, create a new file with the `_RestartInjected.java` suffix.
 
-#### Rule 2.0: ONLY ADD LINES - NEVER DELETE OR MODIFY
+```
+Original: TestHFlush.java           (DO NOT TOUCH)
+New file: TestHFlush_RestartInjected.java  (CREATE THIS)
+```
 
-1. **You may ONLY add new lines** (lines with "+" prefix in diff hunks).
-   - You MUST NOT delete lines (no "-" prefix allowed).
-   - You MUST NOT modify existing lines.
-   - All existing lines MUST remain byte-for-byte identical.
-
-2. **All context lines in the diff MUST EXACTLY match the original file.**
-   - No extra spaces.
-   - No removed spaces.
-   - No normalized indentation.
-   - No tab-to-space conversions or vice versa.
-   - Context lines MUST be exact character-for-character copies from the original file.
-
-3. **The diff MUST use git unified diff format:**
-   - First line:    `--- a/path/to/file`
-   - Second line:   `+++ b/path/to/file`
-   - Hunk header:   `@@ -old_start,old_len +new_start,new_len @@`
-   - Context lines: Prefixed with single space ` `
-   - Added lines:   Prefixed with `+`
-
-4. **Hunk headers MUST be mathematically correct:**
-   - `old_len` = number of context lines in the hunk (before insertion point + after insertion point)
-   - `new_len` = old_len + number of inserted lines
-   - Example: If you have 3 context lines before, insert 5 lines, and 3 context lines after:
-     - old_len = 3 + 3 = 6
-     - new_len = 6 + 5 = 11
-     - Header: `@@ -X,6 +Y,11 @@`
-
-5. **ABSOLUTELY NO hallucinated lines:**
-   - Every context line (space-prefixed) MUST exist exactly as-is in the original file.
-   - No lines that "look similar" to the original - they must be EXACT matches.
-   - If you cannot find the exact line in the original, DO NOT generate a diff.
-
-#### MANDATORY SELF-VERIFICATION BEFORE OUTPUT
-
-**Before outputting any diff, you MUST internally verify:**
-
-1. **Parse original file into lines:**
-   - Read the original file content provided in the user prompt.
-   - Split it into an array: L[0], L[1], L[2], ... L[N]
-
-2. **Simulate applying each insertion:**
-   - For each hunk, identify the exact line number where insertions occur.
-   - Insert the new lines at the specified locations.
-   - Produce a simulated UPDATED_FILE.
-
-3. **Verify invariants:**
-   - UPDATED_FILE contains exactly the old lines + only the allowed insertions.
-   - No line was deleted from the original.
-   - No line was modified from the original.
-   - All context lines in your diff match the original lines byte-for-byte.
-
-4. **Test the diff:**
-   - Your diff, when applied with `git apply`, MUST produce EXACTLY the simulated UPDATED_FILE.
-   - No extra blank lines.
-   - No missing lines.
-   - No changed indentation.
-
-5. **If ANY uncertainty exists:**
-   - DO NOT output a diff.
-   - Instead output exactly:
-     ```
-     ERROR: Cannot generate valid diff. Context lines do not match original file exactly.
-     ```
-
----
-
-## 3. HARD RULES FOR TRANSFORMATION
-
-### Rule 1: Modify Original File (Output Git Diff)
-
-**DO:**
-- Output a unified git diff showing changes to the original test file
-- Format must be compatible with `git apply`
-- Preserve original file path in diff headers
-
-**DO NOT:**
-- Output a complete Java file
+The new file should be in the same directory as the original.
 
 ### Rule 2: Preserve Original Test Logic Exactly
 
@@ -147,15 +74,15 @@ The transformed test must validate the **same invariants** as the original, plus
 
 Output MUST consist of TWO parts:
 
-**Part 1: Git Unified Diff**
-- Compatible with `git apply` command
-- Shows line-by-line changes to original file
-- Includes context lines (3 before and after each change)
-- Adds import statement if not already present
-- Adds `restart()` calls at identified restart points
+**Part 1: Complete Java File**
+- Create new file with `_RestartInjected.java` suffix
+- Copy original test method with `restart()` calls added
+- Include import statement: `import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;`
+- Preserve all original code exactly (only add `restart()` calls)
 
 **Part 2: Metadata JSON**
 - Maps test methods to restart configurations
+- Saved to `./test-restart-config` directory
 - Includes file paths, restart positions, line numbers, targets, and modes
 - Machine-readable format for test orchestration
 
@@ -180,9 +107,9 @@ No explanatory comments like:
 
 ---
 
-## 4. Identifying Valid Restart Positions
+## 3. Identifying Valid Restart Positions
 
-### 4.1 Understand the Test First
+### 3.1 Understand the Test First
 
 **Before identifying restart points, you must understand what the test is actually testing.**
 
@@ -201,7 +128,7 @@ No explanatory comments like:
 - Where would a restart be most likely to expose a bug?
 - What state needs to survive the restart for the test to pass?
 
-### 4.2 High-Value Restart Points (Reference)
+### 3.2 High-Value Restart Points (Reference)
 
 The following table provides **reference patterns** for common restart points. Use this as guidance, but always prioritize understanding the specific test's intent.
 
@@ -217,7 +144,7 @@ The following table provides **reference patterns** for common restart points. U
 | `delete()` | During delete | MEDIUM | Tests delete atomicity |
 | `rename()` | During rename | MEDIUM | Tests rename atomicity |
 
-### 4.3 Code Patterns (Reference)
+### 3.3 Code Patterns (Reference)
 
 Look for these code patterns as restart injection points:
 
@@ -259,7 +186,7 @@ fs.rename(src, dst);
 // <-- RESTART POINT: after_rename
 ```
 
-### 4.4 Invalid Restart Points (AVOID)
+### 3.4 Invalid Restart Points (AVOID)
 
 Do NOT inject restarts:
 - Inside tight loops without synchronization
@@ -267,7 +194,7 @@ Do NOT inject restarts:
 - After test assertions (test already passed/failed)
 - In finally/cleanup blocks
 
-### 4.5 Tests to SKIP (Do Not Transform)
+### 3.5 Tests to SKIP (Do Not Transform)
 
 **SKIP Parameterized Tests:**
 - Tests using `@Parameterized` or `@RunWith(Parameterized.class)`
@@ -278,9 +205,9 @@ Do NOT inject restarts:
 
 ---
 
-## 5. Determining Restart Targets and Modes
+## 4. Determining Restart Targets and Modes
 
-### 5.1 Choose Targets Based on Test Intent
+### 4.1 Choose Targets Based on Test Intent
 
 **Before selecting restart targets, understand what the test is verifying and which components are involved.**
 
@@ -300,7 +227,7 @@ Do NOT inject restarts:
 
 **Do NOT blindly apply all targets to every restart point.** Select targets that meaningfully test the operation's recovery semantics.
 
-### 5.2 Target Selection Matrix (Reference)
+### 4.2 Target Selection Matrix (Reference)
 
 The following matrix provides **reference guidance** for which targets are typically applicable. Always prioritize understanding the specific test.
 
@@ -316,7 +243,7 @@ The following matrix provides **reference guidance** for which targets are typic
 | Replication change | YES | YES | YES | YES | YES |
 | Block operations | YES | YES | YES | YES | YES |
 
-### 5.3 Restart Target Rationale (Reference)
+### 4.3 Restart Target Rationale (Reference)
 
 **NAMENODE Restart Tests:**
 - EditLog replay correctness
@@ -346,7 +273,7 @@ The following matrix provides **reference guidance** for which targets are typic
 - Complete state recovery
 - Startup coordination
 
-### 5.4 Restart Mode Selection
+### 4.4 Restart Mode Selection
 
 | Mode | Use Case | Simulation |
 |------|----------|------------|
@@ -356,7 +283,7 @@ The following matrix provides **reference guidance** for which targets are typic
 
 ---
 
-## 6. Transformation Process
+## 5. Transformation Process
 
 ### Step 1: Analyze Original Test
 
@@ -415,43 +342,80 @@ restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.GRACEFU
 restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.CRASH);
 ```
 
-### Step 4: Generate Git Unified Diff
+### Step 4: Create New Java File with Restart Calls
 
-Create a unified diff showing:
+Create a new Java file with `_RestartInjected.java` suffix:
 
-1. **File headers:**
-   ```diff
-   --- a/path/to/TestClassName.java
-   +++ b/path/to/TestClassName.java
+1. **Copy the original file structure:**
+   - Package declaration
+   - Import statements
+   - Class declaration
+   - Instance variables
+   - @Before and @After methods (if present)
+
+2. **Add the restart framework import:**
+   ```java
+   import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
    ```
 
-2. **Import statement** (if not already present):
-   ```diff
-   @@ -12,6 +12,7 @@ import org.apache.hadoop.fs.Path;
-    import org.junit.Test;
-   +import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
-   ```
+3. **Copy the test method and inject restart() calls:**
+   - Copy the original test method exactly
+   - Insert `restart()` calls at identified restart points
+   - Preserve all original code, assertions, and logic
 
-3. **Restart() calls** at each restart point:
-   ```diff
-   @@ -45,6 +46,9 @@ public void testHFlush() throws Exception {
+**Example:**
+```java
+package org.apache.hadoop.hdfs;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
+
+public class TestHFlush_RestartInjected {
+    private MiniDFSCluster cluster;
+    private FileSystem fs;
+
+    @Before
+    public void setup() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        cluster = new MiniDFSCluster.Builder(conf).build();
+        fs = cluster.getFileSystem();
+    }
+
+    @Test
+    public void testHFlush() throws Exception {
+        Path path = new Path("/test");
+        FSDataOutputStream out = fs.create(path, (short)3);
+
+        byte[] data = new byte[1024];
+        new Random().nextBytes(data);
         out.write(data);
         out.hflush();
-   +    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-   +    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
-   +    restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
-   ```
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
 
-**Format requirements:**
-- Use unified diff format (compatible with `git apply`)
-- Include 3 context lines before and after each change
-- Preserve correct line numbers
-- Use `+` prefix for added lines
-- Use space prefix for context lines
+        assertEquals(1024, fs.getFileStatus(path).getLen());
+
+        out.close();
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.CRASH);
+    }
+}
+```
 
 ### Step 5: Generate Metadata JSON
 
-Create a JSON file mapping test methods to restart configurations.
+Create a JSON file mapping test methods to restart configurations. This file should be saved to the `./test-restart-config` directory.
 
 **Format:**
 ```json
@@ -487,42 +451,88 @@ Create a JSON file mapping test methods to restart configurations.
 
 ---
 
-## 7. Output Format Specification
+## 6. Output Format Specification
 
-### 7.1 Git Diff Format (Part 1 of Output)
+### 6.1 Complete Java File (Part 1 of Output)
 
-**Header:**
+**File name:**
 ```
-TRANSFORMATION DIFF FOR: TestClassName.java
-```
-
-**Diff content:**
-```diff
---- a/src/test/java/org/apache/hadoop/hdfs/TestHFlush.java
-+++ b/src/test/java/org/apache/hadoop/hdfs/TestHFlush.java
-@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.Path;
- import org.junit.Before;
- import org.junit.Test;
-+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
-
- public class TestHFlush {
-@@ -85,6 +86,11 @@ public void testHFlush() throws Exception {
-     out.write(data);
-     out.hflush();
-+    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-+    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
-+    restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
-+    restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
-+    restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.GRACEFUL);
-
-     assertEquals(1024, fs.getFileStatus(path).getLen());
+TestClassName_RestartInjected.java
 ```
 
-### 7.2 Metadata JSON Format (Part 2 of Output)
+**File location:**
+Same directory as the original test file.
 
-**Header:**
+**File content:**
+Complete Java source file with the following structure:
+
+```java
+package org.apache.hadoop.hdfs;
+
+// All original imports
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+
+// Add restart framework import
+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
+
+// Class name with _RestartInjected suffix
+public class TestHFlush_RestartInjected {
+    // Copy all instance variables
+    private MiniDFSCluster cluster;
+    private FileSystem fs;
+
+    // Copy @Before method
+    @Before
+    public void setup() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        cluster = new MiniDFSCluster.Builder(conf).build();
+        fs = cluster.getFileSystem();
+    }
+
+    // Copy test method and add restart() calls
+    @Test
+    public void testHFlush() throws Exception {
+        Path path = new Path("/test");
+        FSDataOutputStream out = fs.create(path, (short)3);
+
+        byte[] data = new byte[1024];
+        new Random().nextBytes(data);
+        out.write(data);
+        out.hflush();
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
+        restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.GRACEFUL);
+
+        assertEquals(1024, fs.getFileStatus(path).getLen());
+
+        out.close();
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.CRASH);
+    }
+}
 ```
-METADATA JSON FOR: TestClassName.java
+
+### 6.2 Metadata JSON Format (Part 2 of Output)
+
+**File name:**
+```
+TestClassName.json
+```
+
+**File location:**
+```
+./test-restart-config/TestClassName.json
 ```
 
 **JSON content:**
@@ -543,28 +553,30 @@ METADATA JSON FOR: TestClassName.java
 }
 ```
 
-### 7.3 Output Structure
+### 6.3 Output Structure
 
-For each test file transformed, output BOTH parts in this order:
+For each test file transformed, create TWO files:
 
-```
-TRANSFORMATION DIFF FOR: TestClassName.java
-[Git unified diff]
+1. **Transformed Java file:**
+   ```
+   src/test/java/org/apache/hadoop/hdfs/TestClassName_RestartInjected.java
+   ```
 
-METADATA JSON FOR: TestClassName.java
-[JSON metadata]
-```
+2. **Metadata JSON file:**
+   ```
+   ./test-restart-config/TestClassName.json
+   ```
 
 ---
 
-## 8. Restart Position Naming Convention
+## 7. Restart Position Naming Convention
 
 Position names must follow these rules:
 - **Format:** snake_case (lowercase with underscores)
 - **Structure:** `<timing>_<operation>` (e.g., `after_flush`, `before_close`)
 - **Consistency:** Use same name for same operation across all tests
 
-### 8.1 Standard Position Names
+### 7.1 Standard Position Names
 
 | Position Name | When to Use | Example |
 |--------------|-------------|---------|
@@ -581,7 +593,7 @@ Position names must follow these rules:
 | `during_replication` | During setReplication | `fs.setReplication(path, n)` |
 | `after_write_block` | After complete block written | Full BLOCK_SIZE written |
 
-### 8.2 Position Name Examples
+### 7.2 Position Name Examples
 
 **Good:**
 - `after_flush` ✓
@@ -596,9 +608,9 @@ Position names must follow these rules:
 
 ---
 
-## 9. Complete Transformation Example
+## 8. Complete Transformation Example
 
-### 9.1 Original Test
+### 8.1 Original Test
 
 ```java
 package org.apache.hadoop.hdfs;
@@ -642,48 +654,63 @@ public class TestHFlush {
 }
 ```
 
-### 9.2 Transformed Output
+### 8.2 Transformed Output
 
-**Part 1: Git Unified Diff**
+**Part 1: Complete Java File (TestHFlush_RestartInjected.java)**
 
+```java
+package org.apache.hadoop.hdfs;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
+
+public class TestHFlush_RestartInjected {
+    private MiniDFSCluster cluster;
+    private FileSystem fs;
+
+    @Before
+    public void setup() throws Exception {
+        Configuration conf = new HdfsConfiguration();
+        cluster = new MiniDFSCluster.Builder(conf).build();
+        fs = cluster.getFileSystem();
+    }
+
+    @Test
+    public void testHFlush() throws Exception {
+        Path path = new Path("/test");
+        FSDataOutputStream out = fs.create(path, (short)3);
+
+        byte[] data = new byte[1024];
+        new Random().nextBytes(data);
+        out.write(data);
+        out.hflush();
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
+        restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.GRACEFUL);
+
+        assertEquals(1024, fs.getFileStatus(path).getLen());
+
+        out.close();
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.CRASH);
+    }
+}
 ```
-TRANSFORMATION DIFF FOR: TestHFlush.java
 
---- a/src/test/java/org/apache/hadoop/hdfs/TestHFlush.java
-+++ b/src/test/java/org/apache/hadoop/hdfs/TestHFlush.java
-@@ -11,6 +11,8 @@ import org.junit.Before;
- import org.junit.Test;
+**Part 2: Metadata JSON (./test-restart-config/TestHFlush.json)**
 
-+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
-+
- import java.util.Random;
-
- import static org.junit.Assert.assertEquals;
-@@ -43,10 +45,17 @@ public void testHFlush() throws Exception {
-         byte[] data = new byte[1024];
-         new Random().nextBytes(data);
-         out.write(data);
-         out.hflush();
-+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-+        restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.CRASH);
-+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.GRACEFUL);
-+        restart(cluster, "after_flush", RestartTarget.SINGLE_DATANODE, RestartMode.CRASH);
-+        restart(cluster, "after_flush", RestartTarget.ALL_DATANODES, RestartMode.GRACEFUL);
-
-         assertEquals(1024, fs.getFileStatus(path).getLen());
-
-         out.close();
-+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-+        restart(cluster, "after_close", RestartTarget.NAMENODE, RestartMode.CRASH);
-     }
- }
-```
-
-**Part 2: Metadata JSON**
-
-```
-METADATA JSON FOR: TestHFlush.java
-
+```json
 {
   "org.apache.hadoop.hdfs.TestHFlush.testHFlush": {
     "file_path": "/Users/user/hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/TestHFlush.java",
@@ -691,13 +718,13 @@ METADATA JSON FOR: TestHFlush.java
     "restart_points": [
       {
         "position": "after_flush",
-        "line_number": 48,
+        "line_number": 36,
         "targets": ["NAMENODE", "SINGLE_DATANODE", "ALL_DATANODES"],
         "modes": ["GRACEFUL", "CRASH"]
       },
       {
         "position": "after_close",
-        "line_number": 54,
+        "line_number": 44,
         "targets": ["NAMENODE"],
         "modes": ["GRACEFUL", "CRASH"]
       }
@@ -708,32 +735,33 @@ METADATA JSON FOR: TestHFlush.java
 
 ---
 
-## 10. Verification Checklist
+## 9. Verification Checklist
 
 After transformation, verify:
 
-- ✓ **CRITICAL: All context lines in diff EXACTLY match original file (byte-for-byte, no hallucinations)**
-- ✓ **CRITICAL: Diff only contains additions (+ lines), no deletions (-) or modifications**
-- ✓ **CRITICAL: Hunk headers are mathematically correct (old_len, new_len)**
-- ✓ Git diff is valid unified diff format (can be applied with `git apply`)
-- ✓ Original test logic is EXACTLY preserved (diff shows only additions)
+- ✓ **NEW file created** with `_RestartInjected.java` suffix (original file NOT modified)
+- ✓ New file is in the same directory as the original test file
+- ✓ Original test logic is EXACTLY preserved (only `restart()` calls added)
 - ✓ Restart injection points are at meaningful operation boundaries
 - ✓ `restart()` calls use correct format: `restart(cluster, "position", RestartTarget.X, RestartMode.Y)`
 - ✓ Position names are snake_case and descriptive (e.g., `after_flush`, not `afterFlush`)
-- ✓ Import statement added if not already present: `import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;`
+- ✓ Import statement added: `import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;`
 - ✓ NO comments added anywhere in the code
-- ✓ NO modifications to @Before or @After methods
+- ✓ @Before and @After methods copied exactly (if present in original)
+- ✓ All instance variables copied exactly
+- ✓ Class name has `_RestartInjected` suffix
 - ✓ Metadata JSON is valid JSON and complete
-- ✓ Line numbers in metadata match the diff
+- ✓ Metadata JSON saved to `./test-restart-config` directory
+- ✓ Line numbers in metadata match the transformed file
 - ✓ `cluster_variable` field correctly identifies the cluster variable name
 - ✓ All applicable targets and modes included for each restart point
 - ✓ Test is NOT a parameterized test (those should be skipped)
 
 ---
 
-## 11. Common Pitfalls
+## 10. Common Pitfalls
 
-### 11.1 Pitfall: Adding Comments
+### 10.1 Pitfall: Adding Comments
 
 **Wrong:**
 ```java
@@ -748,7 +776,7 @@ out.hflush();
 restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
 ```
 
-### 11.2 Pitfall: Modifying @Before/@After
+### 10.2 Pitfall: Modifying @Before/@After
 
 **Wrong:**
 Modifying setup/teardown methods is unnecessary. The cluster is passed directly to `restart()`.
@@ -756,7 +784,7 @@ Modifying setup/teardown methods is unnecessary. The cluster is passed directly 
 **Correct:**
 Do NOT modify @Before or @After. Just pass cluster to `restart()` calls.
 
-### 11.3 Pitfall: Wrong Position Names
+### 10.3 Pitfall: Wrong Position Names
 
 **Wrong:**
 ```java
@@ -769,30 +797,18 @@ restart(cluster, "AFTER_FLUSH", RestartTarget.NAMENODE, RestartMode.GRACEFUL);  
 restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);  // snake_case
 ```
 
-### 11.4 Pitfall: Invalid Diff Format
-
-**Wrong:**
-```
-File: TestHFlush.java
-Changed lines: 48-50
-Add: restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-```
-
-**Correct:**
-Use standard unified diff format with `---`, `+++`, `@@` markers.
-
-### 11.5 Pitfall: Missing Import
+### 10.4 Pitfall: Missing Import
 
 **Wrong:**
 Only add restart() calls without checking if import is present.
 
 **Correct:**
-Add import statement in diff if not already in file:
-```diff
-+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
+Always add import statement in the new file:
+```java
+import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;
 ```
 
-### 11.6 Pitfall: Incomplete Metadata
+### 10.5 Pitfall: Incomplete Metadata
 
 **Wrong:**
 ```json
@@ -821,7 +837,7 @@ Include ALL applicable targets and modes:
 }
 ```
 
-### 11.7 Pitfall: Wrong Restart Point
+### 10.6 Pitfall: Wrong Restart Point
 
 **Wrong:**
 ```java
@@ -837,60 +853,52 @@ out.hflush();
 restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);  // Correct position
 ```
 
-### 11.8 Pitfall: Modifying Original Logic
+### 10.7 Pitfall: Modifying Original Logic
 
 **Wrong:**
-```diff
--    assertEquals(1024, fs.getFileStatus(path).getLen());
-+    assertTrue(fs.getFileStatus(path).getLen() >= 1024);  // Changed assertion
+```java
+// In the new _RestartInjected.java file:
+assertEquals(1024, fs.getFileStatus(path).getLen());  // Changed from original
 ```
 
 **Correct:**
-Never modify original assertions. Only add restart() calls.
-
-### 11.9 Pitfall: Hallucinated Diff Context Lines
-
-**Wrong:**
-```diff
-@@ -45,6 +46,9 @@ public void testHFlush() throws Exception {
-     byte[] data = new byte[1024];
-     Random rnd = new Random();  // WRONG: This line doesn't exist in original!
-     rnd.nextBytes(data);
-+    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-```
-
-**Correct:**
-Every context line (space-prefixed) must be an EXACT copy from the original file:
-```diff
-@@ -45,6 +46,9 @@ public void testHFlush() throws Exception {
-     byte[] data = new byte[1024];
-     new Random().nextBytes(data);  // Matches original exactly
-     out.hflush();
-+    restart(cluster, "after_flush", RestartTarget.NAMENODE, RestartMode.GRACEFUL);
-```
-
-**Key point:** If you cannot find the exact context lines in the original file, DO NOT generate a diff. Output an error instead.
+Never modify original assertions. Copy them exactly and only add restart() calls.
 
 ---
 
-## 12. Output Instructions Summary
+## 11. Output Instructions Summary
 
-When transforming a test, you MUST output:
+When transforming a test, you MUST create TWO files:
 
-1. **Header:** `TRANSFORMATION DIFF FOR: TestClassName.java`
-2. **Git unified diff** showing:
-   - Import statement (if needed)
-   - restart() calls at each restart point
-   - Proper line numbers and context
-3. **Header:** `METADATA JSON FOR: TestClassName.java`
-4. **JSON metadata** with:
-   - Fully qualified test method name
-   - File path
-   - cluster_variable name
-   - Complete restart point configurations
+### File 1: Transformed Java File
 
-**Output ONLY these two parts. Do NOT include:**
-- Explanations of what you did
-- Suggestions for running the tests
-- Additional commentary
-- Code snippets outside the diff format
+**File name:** `TestClassName_RestartInjected.java`
+
+**Location:** Same directory as the original test file
+
+**Content:**
+1. Package declaration (same as original)
+2. All original imports
+3. Import statement: `import static org.apache.hadoop.hdfs.RestartInjectionFramework.*;`
+4. Class declaration with `_RestartInjected` suffix
+5. All instance variables (copied from original)
+6. @Before and @After methods (copied from original, if present)
+7. Test methods with `restart()` calls injected at identified restart points
+8. All original assertions and logic preserved exactly
+
+### File 2: Metadata JSON File
+
+**File name:** `TestClassName.json`
+
+**Location:** `./test-restart-config/TestClassName.json`
+
+**Content:**
+- Fully qualified test method name
+- File path to original test
+- cluster_variable name
+- Complete restart point configurations (position, line_number, targets, modes)
+
+**IMPORTANT:**
+- Create actual files, do NOT output explanations or commentary
+- The transformed Java file must be a complete, compilable Java source file
+- The JSON file must be valid JSON

@@ -216,7 +216,7 @@ public class RestartInjectionFramework {
    * @param waitActive whether to wait for cluster to become active after restart
    * @throws Exception if restart fails
    */
-  public static void executeRestart(
+  private static void executeRestart(
       MiniDFSCluster cluster,
       RestartTarget target,
       RestartMode mode,
