@@ -34,7 +34,15 @@ import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
+import org.apache.hadoop.hdfs.server.datanode.DataNode;
 import org.apache.hadoop.hdfs.server.namenode.NameNode;
+import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
+import org.apache.hadoop.hdfs.server.namenode.INodeFile;
+import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
+import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+import org.apache.hadoop.hdfs.protocol.ExtendedBlock;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.FsDatasetSpi;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +72,99 @@ public class TestBlockToken_RestartInjected {
     Configuration conf = new Configuration();
     conf.set(HADOOP_SECURITY_AUTHENTICATION, "simple");
     UserGroupInformation.setConfiguration(conf);
+  }
+
+  /**
+   * Log detailed state about file, blocks, leases, and replicas.
+   */
+  private void logFileAndBlockState(MiniDFSCluster cluster, DistributedFileSystem fs,
+      Path p, String context) throws Exception {
+    LOG.info("=== {} ===", context);
+
+    try {
+      // File status
+      LOG.info("File exists: {}", fs.exists(p));
+      if (!fs.exists(p)) {
+        LOG.warn("File does not exist!");
+        return;
+      }
+
+      LOG.info("File status: {}", fs.getFileStatus(p));
+
+      // Get FSNamesystem and check if file is under construction
+      FSNamesystem namesystem = cluster.getNamesystem();
+      namesystem.readLock();
+      try {
+        // Get INodeFile to check blocks
+        INodeFile inode = namesystem.getFSDirectory().getINode(p.toString()).asFile();
+        if (inode == null) {
+          LOG.warn("INode not found for path: {}", p);
+          return;
+        }
+
+        boolean isUC = inode.isUnderConstruction();
+        LOG.info("Is file under construction: {}", isUC);
+
+        BlockInfo[] blocks = inode.getBlocks();
+        LOG.info("Number of blocks in INode: {}", blocks.length);
+
+        for (int i = 0; i < blocks.length; i++) {
+          BlockInfo block = blocks[i];
+          LOG.info("Block[{}]: {}", i, block);
+          LOG.info("  Block ID: {}", block.getBlockId());
+          LOG.info("  Block length: {}", block.getNumBytes());
+          LOG.info("  Is complete: {}", block.isComplete());
+          LOG.info("  Num replicas: {}", block.numNodes());
+        }
+
+      } finally {
+        namesystem.readUnlock();
+      }
+
+      // Get located blocks (what client sees)
+      try {
+        LocatedBlocks locatedBlocks = fs.getClient().getLocatedBlocks(p.toString(), 0);
+        LOG.info("Located blocks: {}", locatedBlocks);
+        LOG.info("  File length: {}", locatedBlocks.getFileLength());
+        LOG.info("  Num located blocks: {}", locatedBlocks.getLocatedBlocks().size());
+        LOG.info("  Is under construction: {}", locatedBlocks.isUnderConstruction());
+        LOG.info("  Last located block: {}", locatedBlocks.getLastLocatedBlock());
+
+        if (locatedBlocks.getLastLocatedBlock() != null) {
+          LocatedBlock lastBlock = locatedBlocks.getLastLocatedBlock();
+          LOG.info("  Last block size: {}", lastBlock.getBlockSize());
+          LOG.info("  Last block offset: {}", lastBlock.getStartOffset());
+          LOG.info("  Last block num locations: {}", lastBlock.getLocations().length);
+        }
+      } catch (Exception e) {
+        LOG.error("Failed to get located blocks: {}", e.getMessage(), e);
+      }
+
+      // Check DataNode replica visible length
+      if (cluster.getDataNodes().size() > 0) {
+        DataNode dn = cluster.getDataNodes().get(0);
+        LOG.info("DataNode: {}", dn.getDatanodeId());
+
+        try {
+          LocatedBlocks locatedBlocks = fs.getClient().getLocatedBlocks(p.toString(), 0);
+          if (locatedBlocks.getLocatedBlocks().size() > 0) {
+            LocatedBlock firstBlock = locatedBlocks.getLocatedBlocks().get(0);
+            ExtendedBlock extBlock = firstBlock.getBlock();
+
+            FsDatasetSpi<?> dataset = dn.getFSDataset();
+            long visibleLength = dataset.getReplicaVisibleLength(extBlock);
+            LOG.info("DataNode replica visible length: {}", visibleLength);
+          }
+        } catch (Exception e) {
+          LOG.error("Failed to get replica visible length: {}", e.getMessage(), e);
+        }
+      }
+
+    } catch (Exception e) {
+      LOG.error("Error logging file/block state: ", e);
+    }
+
+    LOG.info("=== END {} ===", context);
   }
 
   /**
@@ -99,11 +200,43 @@ public class TestBlockToken_RestartInjected {
       out.write(data);
       out.hflush();
 
+      // === DIAGNOSTIC: Before restart ===
+      LOG.info("=== BEFORE RESTART DIAGNOSTICS ===");
+      logFileAndBlockState(cluster, fs, p, "BEFORE RESTART");
+
       // === RESTART INJECTION POINT: After hflush ===
       LOG.info("=== INJECTING RESTART: target={}, mode={} ===", target, mode);
       executeRestart(cluster, target, mode, true);
       verifyClusterHealth(cluster, fs);
       LOG.info("=== RESTART COMPLETE ===");
+
+      // === DIAGNOSTIC: After restart ===
+      LOG.info("=== AFTER RESTART DIAGNOSTICS ===");
+      logFileAndBlockState(cluster, fs, p, "AFTER RESTART");
+
+      // === TEST: Wait for automatic lease recovery ===
+      LOG.info("=== WAITING FOR AUTOMATIC LEASE RECOVERY ===");
+      LOG.info("Lease soft limit: {}", cluster.getConfiguration(0).getLong("dfs.namenode.lease-soft-limit-millis", 60000));
+      LOG.info("Lease hard limit: {}", cluster.getConfiguration(0).getLong("dfs.namenode.lease-hard-limit-millis", 60000));
+
+      // Wait to see if automatic lease recovery happens
+      // Note: Default lease soft limit is 60 seconds, hard limit is 60 seconds
+      LOG.info("Waiting 10 seconds to see if automatic recovery happens...");
+      Thread.sleep(10000);
+
+      LOG.info("=== AFTER WAITING DIAGNOSTICS ===");
+      logFileAndBlockState(cluster, fs, p, "AFTER WAITING");
+
+      // === TEST: Now try explicit lease recovery ===
+      LOG.info("=== TESTING EXPLICIT LEASE RECOVERY ===");
+      boolean recovered = cluster.getFileSystem().recoverLease(p);
+      LOG.info("Lease recovery initiated: {}", recovered);
+
+      // Wait for lease recovery to complete
+      Thread.sleep(5000);
+
+      LOG.info("=== AFTER LEASE RECOVERY DIAGNOSTICS ===");
+      logFileAndBlockState(cluster, fs, p, "AFTER LEASE RECOVERY");
 
       // Re-set block token lifetime after potential NN restart
       if (target == RestartTarget.NAMENODE || target == RestartTarget.NAMENODE_AND_DATANODES) {
@@ -141,6 +274,7 @@ public class TestBlockToken_RestartInjected {
 
   @Test(timeout = 180000)
   public void testLastLocatedBlockTokenExpiry_AfterHflush_NN_Crash() throws Exception {
+    LOG.info("=== TESTING WITH NAMENODE-ONLY RESTART (NO DN RESTART) ===");
     testLastLocatedBlockTokenExpiryWithRestart(RestartTarget.NAMENODE, RestartMode.CRASH);
   }
 

@@ -510,6 +510,19 @@ class FSDirWriteFileOp {
             HdfsServerConstants.BlockUCState.UNDER_CONSTRUCTION, targets);
       } else {
         // check quota limits and updated space consumed
+        System.err.println("QUOTA_DEBUG: addBlock() - file=" + path);
+        System.err.println("  Preferred block size: " + fileINode.getPreferredBlockSize());
+        System.err.println("  Replication: " + fileINode.getFileReplication());
+        System.err.println("  Existing blocks: " + fileINode.getBlocks().length);
+        long existingSpace = 0;
+        for (BlockInfo blk : fileINode.getBlocks()) {
+          if (blk != null) {
+            existingSpace += blk.getNumBytes();
+            System.err.println("    Block: " + blk + ", bytes=" + blk.getNumBytes());
+          }
+        }
+        System.err.println("  Total existing space: " + existingSpace);
+
         fsd.updateCount(inodesInPath, 0, fileINode.getPreferredBlockSize(),
             fileINode.getFileReplication(), true);
 

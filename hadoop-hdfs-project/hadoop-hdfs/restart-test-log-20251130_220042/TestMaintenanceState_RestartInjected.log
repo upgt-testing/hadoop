@@ -1,0 +1,121 @@
+================================================================================
+Test: org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected
+Command: mvn surefire:test -Dtest=org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected
+Start time: 2025-11-30 23:11:38
+================================================================================
+
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 5.15
+[[1;34mINFO[m] os.detected.version.major: 5
+[[1;34mINFO[m] os.detected.version.minor: 15
+[[1;34mINFO[m] os.detected.release: ubuntu
+[[1;34mINFO[m] os.detected.release.version: 20.04
+[[1;34mINFO[m] os.detected.release.like.ubuntu: true
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------------< [0;36morg.apache.hadoop:hadoop-hdfs[0;1m >--------------------[m
+[[1;34mINFO[m] [1mBuilding Apache Hadoop HDFS 3.3.5[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.0.0-M1:test[m [1m(default-cli)[m @ [36mhadoop-hdfs[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running org.apache.hadoop.hdfs.[1mTestMaintenanceState_RestartInjected[m
+[[1;31mERROR[m] [1;31mTests [0;1mrun: [0;1m8[m, Failures: 0, [1;31mErrors: [0;1;31m6[m, Skipped: 0, Time elapsed: 30.83 s[1;31m <<< FAILURE![m - in org.apache.hadoop.hdfs.[1mTestMaintenanceState_RestartInjected[m
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_AllDN_Crash(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 2.665 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:38885,DS-7990089a-3ceb-4de8-b4be-555fbc8b20b6,DISK], DatanodeInfoWithStorage[127.0.0.1:46675,DS-155d40c1-fc9f-4e1f-94d5-6a9ba3f9f62c,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:38885,DS-7990089a-3ceb-4de8-b4be-555fbc8b20b6,DISK], DatanodeInfoWithStorage[127.0.0.1:46675,DS-155d40c1-fc9f-4e1f-94d5-6a9ba3f9f62c,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_SingleDN_Crash(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 0.549 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:34969,DS-db577d9b-e2e5-48d8-8882-7e8588ea7806,DISK], DatanodeInfoWithStorage[127.0.0.1:46533,DS-766ca871-e10a-470c-b53f-e8b1a8ef6843,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:34969,DS-db577d9b-e2e5-48d8-8882-7e8588ea7806,DISK], DatanodeInfoWithStorage[127.0.0.1:46533,DS-766ca871-e10a-470c-b53f-e8b1a8ef6843,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_AllDN_Graceful(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 0.739 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:36931,DS-42783b71-30bc-4ac1-9ee9-5a3605aaa6b2,DISK], DatanodeInfoWithStorage[127.0.0.1:37815,DS-a18ec90a-28d4-4bc5-bf81-e09c42d84cf8,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:37815,DS-a18ec90a-28d4-4bc5-bf81-e09c42d84cf8,DISK], DatanodeInfoWithStorage[127.0.0.1:36931,DS-42783b71-30bc-4ac1-9ee9-5a3605aaa6b2,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_NNDN_Crash(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 6.764 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:42369,DS-6bceb294-b650-49d7-bec0-69c66bb8e5d9,DISK], DatanodeInfoWithStorage[127.0.0.1:34895,DS-7d4b0f37-db7b-4c10-815e-7908549c7a76,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:42369,DS-6bceb294-b650-49d7-bec0-69c66bb8e5d9,DISK], DatanodeInfoWithStorage[127.0.0.1:34895,DS-7d4b0f37-db7b-4c10-815e-7908549c7a76,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_SingleDN_Graceful(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 0.486 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:46563,DS-15a393c6-fc7a-47ce-b1cb-09a68a330aea,DISK], DatanodeInfoWithStorage[127.0.0.1:36165,DS-ee4c057a-283f-4495-983a-02f691b90080,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:36165,DS-ee4c057a-283f-4495-983a-02f691b90080,DISK], DatanodeInfoWithStorage[127.0.0.1:46563,DS-15a393c6-fc7a-47ce-b1cb-09a68a330aea,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testMaintenanceState_AfterHsync_NNDN_Graceful(org.apache.hadoop.hdfs.TestMaintenanceState_RestartInjected)  Time elapsed: 6.683 s  <<< ERROR!
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[127.0.0.1:45587,DS-abfa4a94-6cd9-4b4b-af38-8359ddcba97a,DISK], DatanodeInfoWithStorage[127.0.0.1:34773,DS-107f2a82-8864-4779-800a-4304b0aa64ca,DISK]], original=[DatanodeInfoWithStorage[127.0.0.1:45587,DS-abfa4a94-6cd9-4b4b-af38-8359ddcba97a,DISK], DatanodeInfoWithStorage[127.0.0.1:34773,DS-107f2a82-8864-4779-800a-4304b0aa64ca,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+	at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java:1352)
+	at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java:1420)
+	at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java:1646)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1547)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mErrors: [m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_AllDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_AllDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_NNDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_NNDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_SingleDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_SingleDN_Graceful » IO[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mTests run: 8, Failures: 0, Errors: 6, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] There are test failures.
+
+Please refer to /home/shuai/xlab/upgrade_testing/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  32.955 s
+[[1;34mINFO[m] Finished at: 2025-11-30T23:12:12-06:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+
+================================================================================
+End time: 2025-11-30 23:12:12
+Exit code: 0
+================================================================================

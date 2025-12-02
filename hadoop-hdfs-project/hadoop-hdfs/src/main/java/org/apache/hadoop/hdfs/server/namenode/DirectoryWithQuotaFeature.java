@@ -195,9 +195,17 @@ public final class DirectoryWithQuotaFeature implements INode.Feature {
   }
   /** Verify if the storagespace quota is violated after applying delta. */
   private void verifyStoragespaceQuota(long delta) throws DSQuotaExceededException {
-    if (Quota.isViolated(quota.getStorageSpace(), usage.getStorageSpace(), delta)) {
-      throw new DSQuotaExceededException(quota.getStorageSpace(),
-          usage.getStorageSpace() + delta);
+    long currentUsage = usage.getStorageSpace();
+    long quotaLimit = quota.getStorageSpace();
+    System.err.println("QUOTA_DEBUG: verifyStoragespaceQuota()");
+    System.err.println("  Quota limit: " + quotaLimit + " bytes (" + (quotaLimit/1024/1024) + " MB)");
+    System.err.println("  Current usage: " + currentUsage + " bytes (" + (currentUsage/1024/1024) + " MB)");
+    System.err.println("  Delta: " + delta + " bytes (" + (delta/1024/1024) + " MB)");
+    System.err.println("  After delta: " + (currentUsage + delta) + " bytes (" + ((currentUsage + delta)/1024/1024) + " MB)");
+
+    if (Quota.isViolated(quotaLimit, currentUsage, delta)) {
+      throw new DSQuotaExceededException(quotaLimit,
+          currentUsage + delta);
     }
   }
 

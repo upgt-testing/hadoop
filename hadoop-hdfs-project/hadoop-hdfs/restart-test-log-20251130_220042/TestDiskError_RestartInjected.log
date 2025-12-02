@@ -1,0 +1,109 @@
+================================================================================
+Test: org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected
+Command: mvn surefire:test -Dtest=org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected
+Start time: 2025-12-01 01:02:02
+================================================================================
+
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 5.15
+[[1;34mINFO[m] os.detected.version.major: 5
+[[1;34mINFO[m] os.detected.version.minor: 15
+[[1;34mINFO[m] os.detected.release: ubuntu
+[[1;34mINFO[m] os.detected.release.version: 20.04
+[[1;34mINFO[m] os.detected.release.like.ubuntu: true
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------------< [0;36morg.apache.hadoop:hadoop-hdfs[0;1m >--------------------[m
+[[1;34mINFO[m] [1mBuilding Apache Hadoop HDFS 3.3.5[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.0.0-M1:test[m [1m(default-cli)[m @ [36mhadoop-hdfs[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running org.apache.hadoop.hdfs.server.datanode.[1mTestDiskError_RestartInjected[m
+[[1;31mERROR[m] [1;31mTests [0;1mrun: [0;1m8[m, Failures: 0, [1;31mErrors: [0;1;31m6[m, Skipped: 0, Time elapsed: 27.06 s[1;31m <<< FAILURE![m - in org.apache.hadoop.hdfs.server.datanode.[1mTestDiskError_RestartInjected[m
+[[1;31mERROR[m] testDiskError_AfterHflush_SingleDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 0.515 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:38467,DS-fb2104d6-fc93-4252-b6f5-095e7a449f1f,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDiskError_AfterHflush_NNDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 6.588 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:35325,DS-54a16b50-f31c-40d4-9306-fad1e6578a54,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDiskError_AfterHflush_AllDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 0.41 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:41221,DS-c194ddf7-b37d-4456-a906-0f49b6925c06,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDiskError_AfterHflush_SingleDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 0.474 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:36303,DS-0b1a665e-b3e6-4be0-85a2-56066d0fd585,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDiskError_AfterHflush_NNDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 6.499 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:39959,DS-8b47f0c4-6aeb-4145-8232-3b87134f5e63,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDiskError_AfterHflush_AllDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected)  Time elapsed: 0.411 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:39213,DS-f1c87d12-4a71-4467-89b9-0996d201e009,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mErrors: [m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_AllDN_Crash » IO All d...[m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_AllDN_Graceful » IO Al...[m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_NNDN_Crash » IO All da...[m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_NNDN_Graceful » IO All...[m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_SingleDN_Crash » IO Al...[m
+[[1;31mERROR[m] [1;31m  TestDiskError_RestartInjected.testDiskError_AfterHflush_SingleDN_Graceful » IO[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mTests run: 8, Failures: 0, Errors: 6, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] There are test failures.
+
+Please refer to /home/shuai/xlab/upgrade_testing/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  29.079 s
+[[1;34mINFO[m] Finished at: 2025-12-01T01:02:32-06:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+
+================================================================================
+End time: 2025-12-01 01:02:32
+Exit code: 0
+================================================================================

@@ -1,0 +1,109 @@
+================================================================================
+Test: org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected
+Command: mvn surefire:test -Dtest=org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected
+Start time: 2025-12-01 00:43:43
+================================================================================
+
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 5.15
+[[1;34mINFO[m] os.detected.version.major: 5
+[[1;34mINFO[m] os.detected.version.minor: 15
+[[1;34mINFO[m] os.detected.release: ubuntu
+[[1;34mINFO[m] os.detected.release.version: 20.04
+[[1;34mINFO[m] os.detected.release.like.ubuntu: true
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------------< [0;36morg.apache.hadoop:hadoop-hdfs[0;1m >--------------------[m
+[[1;34mINFO[m] [1mBuilding Apache Hadoop HDFS 3.3.5[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.0.0-M1:test[m [1m(default-cli)[m @ [36mhadoop-hdfs[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running org.apache.hadoop.hdfs.server.datanode.[1mTestCorruptMetadataFile_RestartInjected[m
+[[1;31mERROR[m] [1;31mTests [0;1mrun: [0;1m8[m, Failures: 0, [1;31mErrors: [0;1;31m6[m, Skipped: 0, Time elapsed: 34.489 s[1;31m <<< FAILURE![m - in org.apache.hadoop.hdfs.server.datanode.[1mTestCorruptMetadataFile_RestartInjected[m
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 2.584 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:35195,DS-bb8a332a-eeb5-413b-a3fc-b28dd8ae2a08,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 3.53 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:35839,DS-618ee047-91c6-4d6a-8b2c-f9d3549d025a,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 6.575 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:44977,DS-4a2fe221-9def-4a51-9b3d-32e9946ccb85,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 0.471 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:46663,DS-c869a668-2a8b-4660-ad07-708b89b8c9a7,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 0.385 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:37439,DS-0fd3e1e3-94f9-40ba-a0d7-6c7a9291f90a,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestCorruptMetadataFile_RestartInjected)  Time elapsed: 0.451 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:45065,DS-ee593dd7-4d2a-473a-9c4b-db481fd27208,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mErrors: [m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Graceful » IO[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mTests run: 8, Failures: 0, Errors: 6, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] There are test failures.
+
+Please refer to /home/shuai/xlab/upgrade_testing/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  36.609 s
+[[1;34mINFO[m] Finished at: 2025-12-01T00:44:20-06:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+
+================================================================================
+End time: 2025-12-01 00:44:20
+Exit code: 0
+================================================================================

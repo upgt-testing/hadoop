@@ -1,0 +1,163 @@
+================================================================================
+Test: org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected
+Command: mvn surefire:test -Dtest=org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected
+Start time: 2025-12-01 00:50:01
+================================================================================
+
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 5.15
+[[1;34mINFO[m] os.detected.version.major: 5
+[[1;34mINFO[m] os.detected.version.minor: 15
+[[1;34mINFO[m] os.detected.release: ubuntu
+[[1;34mINFO[m] os.detected.release.version: 20.04
+[[1;34mINFO[m] os.detected.release.like.ubuntu: true
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------------< [0;36morg.apache.hadoop:hadoop-hdfs[0;1m >--------------------[m
+[[1;34mINFO[m] [1mBuilding Apache Hadoop HDFS 3.3.5[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.0.0-M1:test[m [1m(default-cli)[m @ [36mhadoop-hdfs[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running org.apache.hadoop.hdfs.server.datanode.[1mTestDataNodeMetrics_RestartInjected[m
+[[1;31mERROR[m] [1;31mTests [0;1mrun: [0;1m16[m, Failures: 0, [1;31mErrors: [0;1;31m12[m, Skipped: 0, Time elapsed: 54.736 s[1;31m <<< FAILURE![m - in org.apache.hadoop.hdfs.server.datanode.[1mTestDataNodeMetrics_RestartInjected[m
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 2.544 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:42301,DS-c5c01130-28eb-4fd6-a21b-722bf193c87a,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_NNDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 3.537 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:40555,DS-f2160c54-1a47-4586-b9c5-f8a259752c32,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_SingleDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.465 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:46117,DS-6d03aecd-66ea-4f60-aaad-f27a755a2b3e,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 6.517 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:37095,DS-18d4576c-db99-4f37-bc50-d85b476564ec,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_AllDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.376 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:44027,DS-489a9c95-f254-47a0-a0ec-6ac55f8fede4,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.441 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:34421,DS-910da1f4-d9d6-4e23-af34-351fb793cd90,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_SingleDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.397 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:39137,DS-01539fae-bd7b-4c3c-a48b-9ba582014075,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_NNDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 6.483 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:42609,DS-63c7eb90-97aa-4c8f-8e80-ff28b4d8b9ad,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testReceivePacketMetrics_AfterHsync_AllDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.37 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:37751,DS-48233a73-7fc3-4785-a2a6-8a6a1f3231aa,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 6.463 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:36315,DS-55d1ae6a-33d4-4870-a3cd-d9e967b78a8c,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Crash(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.478 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:46041,DS-1d31b7c1-889b-4420-9660-cfa603673633,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Graceful(org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics_RestartInjected)  Time elapsed: 0.395 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:39693,DS-21f8ee17-fb9f-42b7-9469-b67774b57ce0,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mErrors: [m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_AllDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_AllDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_NNDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_NNDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_SingleDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_SingleDN_Graceful » IO[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mTests run: 16, Failures: 0, Errors: 12, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] There are test failures.
+
+Please refer to /home/shuai/xlab/upgrade_testing/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  56.807 s
+[[1;34mINFO[m] Finished at: 2025-12-01T00:50:59-06:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+
+================================================================================
+End time: 2025-12-01 00:50:59
+Exit code: 0
+================================================================================

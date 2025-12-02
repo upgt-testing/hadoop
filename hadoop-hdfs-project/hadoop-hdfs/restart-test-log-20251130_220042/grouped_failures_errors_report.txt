@@ -1,0 +1,1456 @@
+================================================================================
+FAILURES GROUPED BY ROOT CAUSE
+================================================================================
+
+Total failures: 26
+Unique failure signatures: 5
+
+Failure Group #1 - 8 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFSInputChecker_RestartInjected.testFSInputChecker_AfterFileWrite_DN_Crash
+  - TestFSInputChecker_RestartInjected.testFSInputChecker_AfterFileWrite_DN_Graceful
+  - TestFSInputChecker_RestartInjected.testFSInputChecker_AfterFileWrite_NN_Crash
+  - TestFSInputChecker_RestartInjected.testFSInputChecker_AfterFileWrite_NN_Graceful
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_AllDN_Crash
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_AllDN_Graceful
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_DN_Crash
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_RandomDN_Crash
+
+Normalized stack trace:
+java.lang.AssertionError
+at org.junit.Assert.fail(Assert.java)
+at org.junit.Assert.assertTrue(Assert.java)
+at org.junit.Assert.assertTrue(Assert.java)
+
+================================================================================
+
+Failure Group #2 - 8 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestPendingReconstruction_RestartInjected.testBlockReceived_AfterCreate_NNAndDN_Crash
+  - TestPendingReconstruction_RestartInjected.testBlockReceived_AfterCreate_NNAndDN_Graceful
+  - TestPendingReconstruction_RestartInjected.testBlockReceived_AfterCreate_NN_Crash
+  - TestPendingReconstruction_RestartInjected.testBlockReceived_AfterCreate_NN_Graceful
+  - TestPendingReconstruction_RestartInjected.testPendingReConstructionBlocksForSameDN_AfterCreate_NNAndDN_Crash
+  - TestPendingReconstruction_RestartInjected.testPendingReConstructionBlocksForSameDN_AfterCreate_NNAndDN_Graceful
+  - TestPendingReconstruction_RestartInjected.testPendingReConstructionBlocksForSameDN_AfterCreate_NN_Crash
+  - TestPendingReconstruction_RestartInjected.testPendingReConstructionBlocksForSameDN_AfterCreate_NN_Graceful
+
+Normalized stack trace:
+java.lang.AssertionError: expected:<1> but was:<0>
+at org.junit.Assert.fail(Assert.java)
+at org.junit.Assert.failNotEquals(Assert.java)
+at org.junit.Assert.assertEquals(Assert.java)
+at org.junit.Assert.assertEquals(Assert.java)
+
+================================================================================
+
+Failure Group #3 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestPendingReconstruction_RestartInjected.testPendingAndInvalidate_AfterCreate_NNAndDN_Crash
+  - TestPendingReconstruction_RestartInjected.testPendingAndInvalidate_AfterCreate_NNAndDN_Graceful
+  - TestPendingReconstruction_RestartInjected.testPendingAndInvalidate_AfterCreate_NN_Crash
+  - TestPendingReconstruction_RestartInjected.testPendingAndInvalidate_AfterCreate_NN_Graceful
+
+Normalized stack trace:
+java.lang.AssertionError
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.findAndMarkBlockAsCorrupt(BlockManager.java)
+
+================================================================================
+
+Failure Group #4 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestSnapshotPathINodes_RestartInjected.testAllowSnapshot_AfterAllowSnapshot_NNAndDN_Crash
+  - TestSnapshotPathINodes_RestartInjected.testAllowSnapshot_AfterAllowSnapshot_NNAndDN_Graceful
+  - TestSnapshotPathINodes_RestartInjected.testAllowSnapshot_AfterAllowSnapshot_NN_Crash
+  - TestSnapshotPathINodes_RestartInjected.testAllowSnapshot_AfterAllowSnapshot_NN_Graceful
+
+Normalized stack trace:
+java.lang.AssertionError
+at org.junit.Assert.fail(Assert.java)
+at org.junit.Assert.assertTrue(Assert.java)
+at org.junit.Assert.assertFalse(Assert.java)
+at org.junit.Assert.assertFalse(Assert.java)
+
+================================================================================
+
+Failure Group #5 - 2 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Crash
+  - TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Graceful
+
+Normalized stack trace:
+java.lang.AssertionError: Not all DataNodes registered after restart expected:<2> but was:<1>
+at org.junit.Assert.fail(Assert.java)
+at org.junit.Assert.failNotEquals(Assert.java)
+at org.junit.Assert.assertEquals(Assert.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.verifyClusterHealth(RestartInjectionFramework.java)
+
+================================================================================
+
+
+================================================================================
+ERRORS GROUPED BY ROOT CAUSE
+================================================================================
+
+Total errors: 438
+Unique error signatures: 36
+
+Error Group #1 - 190 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_AllDN_Crash
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_AllDN_Graceful
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_DN_Crash
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_DN_Graceful
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_NNAndDN_Crash
+  - TestAddBlock_RestartInjected.testAddBlockUC_AfterSync_NNAndDN_Graceful
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_AllDN_Crash
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_AllDN_Graceful
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_NNDN_Crash
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_NNDN_Graceful
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_SingleDN_Crash
+  - TestCheckpoint_RestartInjected.testSecondaryNameNodeWithSavedLeases_AfterHflush_SingleDN_Graceful
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_AllDN_Crash
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_AllDN_Graceful
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_NNDN_Crash
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_NNDN_Graceful
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_SingleDN_Crash
+  - TestDFSClientRetries_RestartInjected.testNamenodeRestart_AfterHflush_SingleDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_AllDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_AllDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_NNDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_NNDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_SingleDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHflush_SingleDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_AllDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_AllDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_NNDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_NNDN_Graceful
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_SingleDN_Crash
+  - TestDFSOutputStream_RestartInjected.testStreamFlush_AfterHsync_SingleDN_Graceful
+  - TestDataNodeHotSwapVolumes_RestartInjected.testVolumeWrite_AfterHflush_AllDN_Crash
+  - TestDataNodeHotSwapVolumes_RestartInjected.testVolumeWrite_AfterHflush_AllDN_Graceful
+  - TestDataNodeHotSwapVolumes_RestartInjected.testVolumeWrite_AfterHflush_NNDN_Crash
+  - TestDataNodeHotSwapVolumes_RestartInjected.testVolumeWrite_AfterHflush_NNDN_Graceful
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_AllDN_Crash
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_AllDN_Graceful
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_NNDN_Crash
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_NNDN_Graceful
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_SingleDN_Crash
+  - TestDeleteRace_RestartInjected.testDeleteRace_AfterHflush_SingleDN_Graceful
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_AllDN_Crash
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_AllDN_Graceful
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_NNDN_Crash
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_NNDN_Graceful
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_SingleDN_Crash
+  - TestDiskspaceQuotaUpdate_RestartInjected.testDiskspaceQuotaUpdate_AfterHflush_SingleDN_Graceful
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_AllDN_Crash
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_AllDN_Graceful
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_NNDN_Crash
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_NNDN_Graceful
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_SingleDN_Crash
+  - TestFSImage_RestartInjected.testPersist_AfterHsync_SingleDN_Graceful
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_AllDN_Crash
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_AllDN_Graceful
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_NNDN_Crash
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_NNDN_Graceful
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_SingleDN_Crash
+  - TestFileAppend3_RestartInjected.testTC11_AfterHflush_SingleDN_Graceful
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_AllDN_Crash
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_AllDN_Graceful
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_NNDN_Crash
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_NNDN_Graceful
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_SingleDN_Crash
+  - TestFileCreation_RestartInjected.testLeaseExpireHardLimit_AfterHflush_SingleDN_Graceful
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_AllDN_Crash
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_AllDN_Graceful
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_NNDN_Crash
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_NNDN_Graceful
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_SingleDN_Crash
+  - TestFsDatasetImpl_RestartInjected.testFsDatasetAppend_AfterHflush_SingleDN_Graceful
+  - TestHSync_RestartInjected.testHSync_AfterHsync_AllDN_Crash
+  - TestHSync_RestartInjected.testHSync_AfterHsync_AllDN_Graceful
+  - TestHSync_RestartInjected.testHSync_AfterHsync_NNDN_Crash
+  - TestHSync_RestartInjected.testHSync_AfterHsync_NNDN_Graceful
+  - TestHSync_RestartInjected.testHSync_AfterHsync_SingleDN_Crash
+  - TestHSync_RestartInjected.testHSync_AfterHsync_SingleDN_Graceful
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_AllDN_Crash
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_AllDN_Graceful
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_NNDN_Crash
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_NNDN_Graceful
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_SingleDN_Crash
+  - TestLeaseRecovery2_RestartInjected.testCloseWhileRecoverLease_AfterHflush_SingleDN_Graceful
+  - TestLease_RestartInjected.testLease_AfterHflush_AllDN_Crash
+  - TestLease_RestartInjected.testLease_AfterHflush_AllDN_Graceful
+  - TestLease_RestartInjected.testLease_AfterHflush_NNDN_Crash
+  - TestLease_RestartInjected.testLease_AfterHflush_NNDN_Graceful
+  - TestLease_RestartInjected.testLease_AfterHflush_SingleDN_Crash
+  - TestLease_RestartInjected.testLease_AfterHflush_SingleDN_Graceful
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_AllDN_Crash
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_AllDN_Graceful
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_NNDN_Crash
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_NNDN_Graceful
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_SingleDN_Crash
+  - TestMaintenanceState_RestartInjected.testMaintenanceState_AfterHsync_SingleDN_Graceful
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_AllDN_Crash
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_AllDN_Graceful
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_NNDN_Crash
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_NNDN_Graceful
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_SingleDN_Crash
+  - TestMultiThreadedHflush_RestartInjected.testMultiThreadedHflush_AfterHflush_SingleDN_Graceful
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_AllDN_Crash
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_AllDN_Graceful
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_NNDN_Crash
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_NNDN_Graceful
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_SingleDN_Crash
+  - TestNamenodeCapacityReport_RestartInjected.testCapacityReport_AfterHsync_SingleDN_Graceful
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_AllDN_Crash
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_AllDN_Graceful
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_NNDN_Crash
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_NNDN_Graceful
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_SingleDN_Crash
+  - TestOpenFilesWithSnapshot_RestartInjected.testOpenFilesWithSnapshot_AfterHsync_SingleDN_Graceful
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_AllDN_Crash
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_AllDN_Graceful
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_NNDN_Crash
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_NNDN_Graceful
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_SingleDN_Crash
+  - TestPipelines_RestartInjected.testPipeline_AfterHflush_SingleDN_Graceful
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_AllDN_Crash
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_AllDN_Graceful
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_NNDN_Crash
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_NNDN_Graceful
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_SingleDN_Crash
+  - TestRBWBlockInvalidation_RestartInjected.testRBWBlockInvalidation_AfterHflush_SingleDN_Graceful
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_AllDN_Crash
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_AllDN_Graceful
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_NNDN_Crash
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_NNDN_Graceful
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_SingleDN_Crash
+  - TestReadWhileWriting_RestartInjected.testReadWhileWriting_AfterHflush_SingleDN_Graceful
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_AllDN_Crash
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_AllDN_Graceful
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_NNDN_Crash
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_NNDN_Graceful
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_SingleDN_Crash
+  - TestRenameWithSnapshots_RestartInjected.testRenameWithSnapshots_AfterHsync_SingleDN_Graceful
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_AllDN_Crash
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_AllDN_Graceful
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_NNDN_Crash
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_NNDN_Graceful
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_SingleDN_Crash
+  - TestReplaceDatanodeFailureReplication_RestartInjected.testReplaceDatanodeFailureReplication_AfterHflush_SingleDN_Graceful
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_AllDN_Crash
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_AllDN_Graceful
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_NNDN_Crash
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_NNDN_Graceful
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_SingleDN_Crash
+  - TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsed_AfterHsync_SingleDN_Graceful
+  - TestReplication_RestartInjected.testReplication_AfterHflush_AllDN_Crash
+  - TestReplication_RestartInjected.testReplication_AfterHflush_AllDN_Graceful
+  - TestReplication_RestartInjected.testReplication_AfterHflush_NNDN_Crash
+  - TestReplication_RestartInjected.testReplication_AfterHflush_NNDN_Graceful
+  - TestReplication_RestartInjected.testReplication_AfterHflush_SingleDN_Crash
+  - TestReplication_RestartInjected.testReplication_AfterHflush_SingleDN_Graceful
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_AllDN_Crash
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_AllDN_Graceful
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_NNDN_Crash
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_NNDN_Graceful
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_SingleDN_Crash
+  - TestSafeMode_RestartInjected.testSafeMode_AfterHflush_SingleDN_Graceful
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_AllDN_Crash
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_AllDN_Graceful
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_NNDN_Crash
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_NNDN_Graceful
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_SingleDN_Crash
+  - TestSnapshotFileLength_RestartInjected.testSnapshotFileLength_AfterHflush_SingleDN_Graceful
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_AllDN_Crash
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_AllDN_Graceful
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_NNDN_Crash
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_NNDN_Graceful
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_SingleDN_Crash
+  - TestSpaceReservation_RestartInjected.testSpaceReservation_AfterHsync_SingleDN_Graceful
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_AllDN_Crash
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_AllDN_Graceful
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_NNDN_Crash
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_NNDN_Graceful
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_SingleDN_Crash
+  - TestTransferRbw_RestartInjected.testTransferRbw_AfterHflush_SingleDN_Graceful
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_AllDN_Crash
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_AllDN_Graceful
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_NNDN_Crash
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_NNDN_Graceful
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_SingleDN_Crash
+  - TestUpdatePipelineWithSnapshots_RestartInjected.testUpdatePipelineWithSnapshots_AfterHflush_SingleDN_Graceful
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_AllDN_Crash
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_AllDN_Graceful
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_NNDN_Crash
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_NNDN_Graceful
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_SingleDN_Crash
+  - TestWriteRead_RestartInjected.testWriteRead_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK], DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]], original=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK], DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+
+================================================================================
+
+Error Group #2 - 94 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockManager_RestartInjected.testNeededReconstructionWhileAppending_AfterFlush_DN_Crash
+  - TestBlockManager_RestartInjected.testNeededReconstructionWhileAppending_AfterFlush_DN_Graceful
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_AllDN_Crash
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_AllDN_Graceful
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_NNDN_Crash
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_NNDN_Graceful
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_SingleDN_Crash
+  - TestBlockScanner_RestartInjected.testAppendWhileScanning_AfterHflush_SingleDN_Graceful
+  - TestBlockUnderConstruction_RestartInjected.testEmptyExpectedLocations_AfterHflush_AllDN_Crash
+  - TestBlockUnderConstruction_RestartInjected.testEmptyExpectedLocations_AfterHflush_AllDN_Graceful
+  - TestBlockUnderConstruction_RestartInjected.testEmptyExpectedLocations_AfterHflush_NNDN_Crash
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_AllDN_Crash
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_AllDN_Graceful
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_NNDN_Crash
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_NNDN_Graceful
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_SingleDN_Crash
+  - TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_SingleDN_Graceful
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Crash
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_AllDN_Graceful
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Crash
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_NNDN_Graceful
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Crash
+  - TestCorruptMetadataFile_RestartInjected.testReadBlockFailsWhenMetaIsCorrupt_AfterHflush_SingleDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_AllDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_NNDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testDataNodeMXBeanActiveThreadCount_AfterHsync_SingleDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_AllDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_AllDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_NNDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_NNDN_Graceful
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_SingleDN_Crash
+  - TestDataNodeMetrics_RestartInjected.testReceivePacketMetrics_AfterHsync_SingleDN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_AllDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_AllDN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_NNDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_NNDN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_SingleDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_SingleDN_Graceful
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_AllDN_Crash
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_AllDN_Graceful
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_NNDN_Crash
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_NNDN_Graceful
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_SingleDN_Crash
+  - TestDataStream_RestartInjected.testDfsClient_AfterHflush_SingleDN_Graceful
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_AllDN_Crash
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_AllDN_Graceful
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_NNDN_Crash
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_NNDN_Graceful
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_SingleDN_Crash
+  - TestDataTransferProtocol_RestartInjected.testDataTransfer_AfterHflush_SingleDN_Graceful
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_AllDN_Crash
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_AllDN_Graceful
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_NNDN_Crash
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_NNDN_Graceful
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_SingleDN_Crash
+  - TestDiskError_RestartInjected.testDiskError_AfterHflush_SingleDN_Graceful
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_AllDN_Crash
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_AllDN_Graceful
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_NNDN_Crash
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_NNDN_Graceful
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_SingleDN_Crash
+  - TestFileAppend_RestartInjected.testComplexFlush_AfterHflush_SingleDN_Graceful
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_AllDN_Crash
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_AllDN_Graceful
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_NNDN_Crash
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_NNDN_Graceful
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_SingleDN_Crash
+  - TestFileAppend_RestartInjected.testSimpleFlush_AfterHflush_SingleDN_Graceful
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_AllDN_Crash
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_AllDN_Graceful
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_NNDN_Crash
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_NNDN_Graceful
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_SingleDN_Crash
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_SingleDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_AllDN_Crash
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_AllDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_NNDN_Crash
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_NNDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_SingleDN_Crash
+  - TestLeaseRecovery_RestartInjected.testBlockRecovery_AfterHsync_SingleDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_AllDN_Crash
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_AllDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_NNDN_Crash
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_NNDN_Graceful
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_SingleDN_Crash
+  - TestLeaseRecovery_RestartInjected.testLeaseRecoveryAndAppend_AfterHsync_SingleDN_Graceful
+  - TestOverReplicatedBlocks_RestartInjected.testOverReplicatedBlocks_AfterHsync_AllDN_Graceful
+  - TestRenameWhileOpen_RestartInjected.testRenameWhileOpen_AfterHflush_AllDN_Crash
+  - TestRenameWhileOpen_RestartInjected.testRenameWhileOpen_AfterHflush_AllDN_Graceful
+  - TestRenameWhileOpen_RestartInjected.testRenameWhileOpen_AfterHflush_NNDN_Crash
+  - TestStorageMover_RestartInjected.testStorageMover_AfterHsync_AllDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]] are bad. Aborting...
+at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+
+================================================================================
+
+Error Group #3 - 24 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestCorruptionWithFailover_RestartInjected.testCorruptReplicaAfterFailover_AfterHsync_AllDN_Crash
+  - TestCorruptionWithFailover_RestartInjected.testCorruptReplicaAfterFailover_AfterHsync_AllDN_Graceful
+  - TestCorruptionWithFailover_RestartInjected.testCorruptReplicaAfterFailover_AfterHsync_SingleDN_Crash
+  - TestCorruptionWithFailover_RestartInjected.testCorruptReplicaAfterFailover_AfterHsync_SingleDN_Graceful
+  - TestDNFencingWithReplication_RestartInjected.testDNFencingWithReplication_AfterCreate_AllDN_Crash
+  - TestDNFencingWithReplication_RestartInjected.testDNFencingWithReplication_AfterCreate_AllDN_Graceful
+  - TestDNFencingWithReplication_RestartInjected.testDNFencingWithReplication_AfterCreate_SingleDN_Crash
+  - TestDNFencingWithReplication_RestartInjected.testDNFencingWithReplication_AfterCreate_SingleDN_Graceful
+  - TestHAAppend_RestartInjected.testHAAppend_AfterHflush_AllDN_Crash
+  - TestHAAppend_RestartInjected.testHAAppend_AfterHflush_AllDN_Graceful
+  - TestHAAppend_RestartInjected.testHAAppend_AfterHflush_SingleDN_Crash
+  - TestHAAppend_RestartInjected.testHAAppend_AfterHflush_SingleDN_Graceful
+  - TestHASafeMode_RestartInjected.testHASafeMode_AfterHflush_AllDN_Crash
+  - TestHASafeMode_RestartInjected.testHASafeMode_AfterHflush_AllDN_Graceful
+  - TestHASafeMode_RestartInjected.testHASafeMode_AfterHflush_SingleDN_Crash
+  - TestHASafeMode_RestartInjected.testHASafeMode_AfterHflush_SingleDN_Graceful
+  - TestPipelinesFailover_RestartInjected.testPipelineFailover_AfterHflush_AllDN_Crash
+  - TestPipelinesFailover_RestartInjected.testPipelineFailover_AfterHflush_AllDN_Graceful
+  - TestPipelinesFailover_RestartInjected.testPipelineFailover_AfterHflush_SingleDN_Crash
+  - TestPipelinesFailover_RestartInjected.testPipelineFailover_AfterHflush_SingleDN_Graceful
+  - TestRetryCacheWithHA_RestartInjected.testRetryCacheWithHA_AfterHsync_AllDN_Crash
+  - TestRetryCacheWithHA_RestartInjected.testRetryCacheWithHA_AfterHsync_AllDN_Graceful
+  - TestRetryCacheWithHA_RestartInjected.testRetryCacheWithHA_AfterHsync_SingleDN_Crash
+  - TestRetryCacheWithHA_RestartInjected.testRetryCacheWithHA_AfterHsync_SingleDN_Graceful
+
+Normalized stack trace:
+java.lang.IllegalArgumentException: Namenode index is needed
+at org.apache.hadoop.hdfs.MiniDFSCluster.checkSingleNameNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.getNameNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.verifyClusterHealth(RestartInjectionFramework.java)
+
+================================================================================
+
+Error Group #4 - 16 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_AllDN_Crash
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_AllDN_Graceful
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_NNDN_Crash
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_NNDN_Graceful
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_NN_Crash
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_NN_Graceful
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_SingleDN_Crash
+  - TestConnectors_RestartInjected.testJsonConnector_AfterSerialization_SingleDN_Graceful
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_AllDN_Crash
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_AllDN_Graceful
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_NNDN_Crash
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_NNDN_Graceful
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_NN_Crash
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_NN_Graceful
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_SingleDN_Crash
+  - TestConnectors_RestartInjected.testNameNodeConnector_AfterRead_SingleDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: Another DiskBalancer is running.
+at org.apache.hadoop.hdfs.server.balancer.NameNodeConnector.<init>(NameNodeConnector.java)
+at org.apache.hadoop.hdfs.server.diskbalancer.connectors.DBNameNodeConnector.<init>(DBNameNodeConnector.java)
+at org.apache.hadoop.hdfs.server.diskbalancer.connectors.ConnectorFactory.getCluster(ConnectorFactory.java)
+
+================================================================================
+
+Error Group #5 - 8 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_AllDN_Crash
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_AllDN_Graceful
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_NNDN_Crash
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_NNDN_Graceful
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_NN_Crash
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_NN_Graceful
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_SingleDN_Crash
+  - TestBlockReaderLocal_RestartInjected.testBlockReaderLocal_AfterCreate_SingleDN_Graceful
+
+Normalized stack trace:
+java.lang.RuntimeException: Although a UNIX domain socket path is configured as /tmp/dn.sock.test, we cannot start a localDataXceiverServer because libhadoop cannot be loaded.
+at org.apache.hadoop.hdfs.server.datanode.DataNode.getDomainPeerServer(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.initDataXceiver(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.startDataNodes(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.initMiniDFSCluster(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.<init>(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster$Builder.build(MiniDFSCluster.java)
+
+================================================================================
+
+Error Group #6 - 8 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestQuota_RestartInjected.testQuota_AfterHflush_AllDN_Crash
+  - TestQuota_RestartInjected.testQuota_AfterHflush_AllDN_Graceful
+  - TestQuota_RestartInjected.testQuota_AfterHflush_NNDN_Crash
+  - TestQuota_RestartInjected.testQuota_AfterHflush_NNDN_Graceful
+  - TestQuota_RestartInjected.testQuota_AfterHflush_NN_Crash
+  - TestQuota_RestartInjected.testQuota_AfterHflush_NN_Graceful
+  - TestQuota_RestartInjected.testQuota_AfterHflush_SingleDN_Crash
+  - TestQuota_RestartInjected.testQuota_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.protocol.DSQuotaExceededException:
+The DiskSpace quota of /quota_restart_test is exceeded: quota = 10485760 B = 10 MB but diskspace consumed = 402653184 B = 384 MB
+at org.apache.hadoop.hdfs.server.namenode.DirectoryWithQuotaFeature.verifyStoragespaceQuota(DirectoryWithQuotaFeature.java)
+at org.apache.hadoop.hdfs.server.namenode.DirectoryWithQuotaFeature.verifyQuota(DirectoryWithQuotaFeature.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.verifyQuota(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.updateCount(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.updateCount(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.addBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.saveAllocatedBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.storeAllocatedBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.getAdditionalBlock(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.addBlock(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.addBlock(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java)
+at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java)
+at java.lang.reflect.Constructor.newInstance(Constructor.java)
+at org.apache.hadoop.ipc.RemoteException.instantiateException(RemoteException.java)
+at org.apache.hadoop.ipc.RemoteException.unwrapRemoteException(RemoteException.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.addBlock(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DataStreamer.locateFollowingBlock(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.nextBlockOutputStream(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.DSQuotaExceededException): The DiskSpace quota of /quota_restart_test is exceeded: quota = 10485760 B = 10 MB but diskspace consumed = 402653184 B = 384 MB
+at org.apache.hadoop.hdfs.server.namenode.DirectoryWithQuotaFeature.verifyStoragespaceQuota(DirectoryWithQuotaFeature.java)
+at org.apache.hadoop.hdfs.server.namenode.DirectoryWithQuotaFeature.verifyQuota(DirectoryWithQuotaFeature.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.verifyQuota(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.updateCount(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirectory.updateCount(FSDirectory.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.addBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.saveAllocatedBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.storeAllocatedBlock(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.getAdditionalBlock(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.addBlock(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.addBlock(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.addBlock(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.addBlock(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy25.addBlock(Unknown Source)
+at org.apache.hadoop.hdfs.DFSOutputStream.addBlock(DFSOutputStream.java)
+... 3 more
+
+================================================================================
+
+Error Group #7 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_AllDN_Crash
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_AllDN_Graceful
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_DN_Crash
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_DN_Graceful
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_NNAndDN_Crash
+  - TestBlockManager_RestartInjected.testDeleteCorruptReplicaWithStaleStorages_AfterFlush_NNAndDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]], original=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]). The current failed datanode replacement policy is DEFAULT, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+
+================================================================================
+
+Error Group #8 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_AllDN_Crash
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_AllDN_Graceful
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_NNDN_Crash
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_NNDN_Graceful
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_SingleDN_Crash
+  - TestBlockToken_RestartInjected.testLastLocatedBlockTokenExpiry_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=6; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /tmp/abc.log
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #9 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_AllDN_Crash
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_AllDN_Graceful
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_NNDN_Crash
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_NNDN_Graceful
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_SingleDN_Crash
+  - TestClientProtocolForPipelineRecovery_RestartInjected.testGetNewStamp_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=2; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /user/shuai/dataprotocol.dat
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #10 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_AllDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_AllDN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_NNDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_NNDN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_SingleDN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_SingleDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[***.***.***:***,SimulatedStorage-DS-***,DISK]] are bad. Aborting...
+at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+
+================================================================================
+
+Error Group #11 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_NN_Crash
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_NN_Graceful
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_DN_Graceful
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasing_AfterCreate_DN_Crash
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasing_AfterCreate_NN_Crash
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasing_AfterSetrep_RandomDN_Crash
+
+Normalized stack trace:
+java.lang.OutOfMemoryError: Java heap space
+
+================================================================================
+
+Error Group #12 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_AllDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_AllDN_Graceful
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_NNDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_NNDN_Graceful
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_SingleDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockPacketBufferOverrun_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=511; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /unfinished-block-buffer
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #13 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_AllDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_AllDN_Graceful
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_NNDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_NNDN_Graceful
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_SingleDN_Crash
+  - TestFileConcurrentReader_RestartInjected.testUnfinishedBlockRead_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=4096; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /unfinished-block
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #14 - 6 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_AllDN_Crash
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_AllDN_Graceful
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_NNDN_Crash
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_NNDN_Graceful
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_SingleDN_Crash
+  - TestReplaceDatanodeOnFailure_RestartInjected.testReplaceDatanodeOnFailure_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+java.io.IOException: Failed to replace a bad datanode on the existing pipeline due to no more good datanodes being available to try. (Nodes: current=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK], DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]], original=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK], DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]). The current failed datanode replacement policy is ALWAYS, and a client may configure this via 'dfs.client.block.write.replace-datanode-on-failure.policy' in its configuration.
+at org.apache.hadoop.hdfs.DataStreamer.findNewDatanode(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.addDatanode2ExistingPipeline(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.handleDatanodeReplacement(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java)
+at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java)
+
+================================================================================
+
+Error Group #15 - 5 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_AllDN_Crash
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_AllDN_Graceful
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_NNDN_Crash
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_NNDN_Graceful
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=500; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /foo
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #16 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockTokenWithDFS_RestartInjected.testAppend_AfterHflush_NNDN_Crash
+  - TestBlockTokenWithDFS_RestartInjected.testAppend_AfterHflush_NNDN_Graceful
+  - TestBlockTokenWithDFS_RestartInjected.testWrite_AfterHflush_NNDN_Crash
+  - TestBlockTokenWithDFS_RestartInjected.testWrite_AfterHflush_NNDN_Graceful
+
+Normalized stack trace:
+org.junit.runners.model.TestTimedOutException: test timed out after 180000 milliseconds
+at java.lang.Thread.sleep(Native Method)
+
+================================================================================
+
+Error Group #17 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestHDFSConcat_RestartInjected.testConcatNotCompleteBlock_AfterConcat_NN_Crash
+  - TestHDFSConcat_RestartInjected.testConcatNotCompleteBlock_AfterConcat_NN_Graceful
+  - TestHDFSConcat_RestartInjected.testConcat_AfterConcat_NN_Crash
+  - TestHDFSConcat_RestartInjected.testConcat_AfterConcat_NN_Graceful
+
+Normalized stack trace:
+java.lang.NullPointerException
+at org.apache.hadoop.hdfs.server.blockmanagement.BlocksMap.numNodes(BlocksMap.java)
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.createLocatedBlock(BlockManager.java)
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.createLocatedBlock(BlockManager.java)
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.createLocatedBlockList(BlockManager.java)
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.createLocatedBlocks(BlockManager.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirStatAndListingOp.getBlockLocations(FSDirStatAndListingOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.getBlockLocations(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.getBlockLocations(NameNodeRpcServer.java)
+
+================================================================================
+
+Error Group #18 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestNodeCount_RestartInjected.testNodeCount_AfterFileCreate_NNAndDN_Crash
+  - TestNodeCount_RestartInjected.testNodeCount_AfterFileCreate_NNAndDN_Graceful
+  - TestNodeCount_RestartInjected.testNodeCount_AfterFileCreate_NN_Crash
+  - TestNodeCount_RestartInjected.testNodeCount_AfterFileCreate_NN_Graceful
+
+Normalized stack trace:
+java.lang.NullPointerException
+at org.apache.hadoop.hdfs.server.blockmanagement.BlocksMap.getStoredBlock(BlocksMap.java)
+at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.getStoredBlock(BlockManager.java)
+
+================================================================================
+
+Error Group #19 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestSnapshottableDirListing_RestartInjected.testListSnapshottableDir_AfterAllowDir1_NNAndDN_Crash
+  - TestSnapshottableDirListing_RestartInjected.testListSnapshottableDir_AfterAllowDir1_NNAndDN_Graceful
+  - TestSnapshottableDirListing_RestartInjected.testListSnapshottableDir_AfterAllowDir1_NN_Crash
+  - TestSnapshottableDirListing_RestartInjected.testListSnapshottableDir_AfterAllowDir1_NN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.protocol.SnapshotException:
+Nested snapshottable directories not allowed: path=/TestSnapshot1/sub1, the ancestor /TestSnapshot1 is already a snapshottable directory.
+at org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManager.checkNestedSnapshottable(SnapshotManager.java)
+at org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManager.setSnapshottable(SnapshotManager.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirSnapshotOp.allowSnapshot(FSDirSnapshotOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.allowSnapshot(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.allowSnapshot(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.allowSnapshot(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java)
+at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java)
+at java.lang.reflect.Constructor.newInstance(Constructor.java)
+at org.apache.hadoop.ipc.RemoteException.instantiateException(RemoteException.java)
+at org.apache.hadoop.ipc.RemoteException.unwrapRemoteException(RemoteException.java)
+at org.apache.hadoop.hdfs.DFSClient.allowSnapshot(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$38.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$38.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.allowSnapshot(DistributedFileSystem.java)
+
+================================================================================
+
+Error Group #20 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestSnapshottableDirListing_RestartInjected.testListWithDifferentUser_AfterAllowInitial_NNAndDN_Crash
+  - TestSnapshottableDirListing_RestartInjected.testListWithDifferentUser_AfterAllowInitial_NNAndDN_Graceful
+  - TestSnapshottableDirListing_RestartInjected.testListWithDifferentUser_AfterAllowInitial_NN_Crash
+  - TestSnapshottableDirListing_RestartInjected.testListWithDifferentUser_AfterAllowInitial_NN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.protocol.SnapshotException:
+Nested snapshottable directories not allowed: path=/dir_user2/subdir, the ancestor /dir_user2 is already a snapshottable directory.
+at org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManager.checkNestedSnapshottable(SnapshotManager.java)
+at org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotManager.setSnapshottable(SnapshotManager.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirSnapshotOp.allowSnapshot(FSDirSnapshotOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.allowSnapshot(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.allowSnapshot(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.allowSnapshot(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java)
+at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java)
+at java.lang.reflect.Constructor.newInstance(Constructor.java)
+at org.apache.hadoop.ipc.RemoteException.instantiateException(RemoteException.java)
+at org.apache.hadoop.ipc.RemoteException.unwrapRemoteException(RemoteException.java)
+at org.apache.hadoop.hdfs.DFSClient.allowSnapshot(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$38.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$38.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.allowSnapshot(DistributedFileSystem.java)
+
+================================================================================
+
+Error Group #21 - 4 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestStartup_RestartInjected.testSNNStartup_AfterCheckpoint_NAMENODE_AND_DATANODES_CRASH
+  - TestStartup_RestartInjected.testSNNStartup_AfterCheckpoint_NAMENODE_AND_DATANODES_GRACEFUL
+  - TestStartup_RestartInjected.testSNNStartup_AfterCheckpoint_NAMENODE_CRASH
+  - TestStartup_RestartInjected.testSNNStartup_AfterCheckpoint_NAMENODE_GRACEFUL
+
+Normalized stack trace:
+java.lang.ArrayIndexOutOfBoundsException: 0
+at java.util.concurrent.CopyOnWriteArrayList.get(CopyOnWriteArrayList.java)
+at java.util.concurrent.CopyOnWriteArrayList.get(CopyOnWriteArrayList.java)
+at org.apache.hadoop.hdfs.server.common.Storage.getStorageDir(Storage.java)
+
+================================================================================
+
+Error Group #22 - 3 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDataNodeFaultInjector_RestartInjected.testDelaySendingPacketDownstream_AfterHflush_AllDN_Crash
+  - TestDataNodeFaultInjector_RestartInjected.testDelaySendingPacketDownstream_AfterHflush_NNDN_Crash
+  - TestDataNodeFaultInjector_RestartInjected.testDelaySendingPacketDownstream_AfterHflush_NNDN_Graceful
+
+Normalized stack trace:
+java.lang.IllegalArgumentException: Self-suppression not permitted
+at java.lang.Throwable.addSuppressed(Throwable.java)
+
+================================================================================
+
+Error Group #23 - 3 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestSetRepIncreasing_RestartInjected.testSetRepWithStoragePolicyOnEmptyFile_AfterCreate_RandomDN_Crash
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterSetrep_NN_Graceful
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasing_AfterCreate_NN_Graceful
+
+Normalized stack trace:
+java.lang.OutOfMemoryError: GC overhead limit exceeded
+
+================================================================================
+
+Error Group #24 - 2 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock_AfterSync_DN_Crash
+  - TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock_AfterSync_DN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-***:blk_***; getBlockSize()=4; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[***.***.***:***,DS-***,DISK]]; cachedLocs=[]} of /test
+at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java)
+at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.open(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.open(FileSystem.java)
+
+================================================================================
+
+Error Group #25 - 2 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetrics_AfterHsync_NN_Graceful
+  - TestDataNodeVolumeMetrics_RestartInjected.testWriteIoVolumeMetrics_AfterHflush_NN_Crash
+
+Normalized stack trace:
+java.lang.OutOfMemoryError: Java heap space
+at java.util.Arrays.copyOf(Arrays.java)
+at java.io.ByteArrayOutputStream.grow(ByteArrayOutputStream.java)
+at java.io.ByteArrayOutputStream.ensureCapacity(ByteArrayOutputStream.java)
+at java.io.ByteArrayOutputStream.write(ByteArrayOutputStream.java)
+at org.apache.hadoop.io.IOUtils.copyBytes(IOUtils.java)
+at org.apache.hadoop.io.IOUtils.copyBytes(IOUtils.java)
+at org.apache.hadoop.hdfs.DFSTestUtil.readFileBuffer(DFSTestUtil.java)
+at org.apache.hadoop.hdfs.DFSTestUtil.readFile(DFSTestUtil.java)
+
+================================================================================
+
+Error Group #26 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockManager_RestartInjected.testNeededReconstructionWhileAppending_AfterFlush_NN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException: Failed to APPEND_FILE /test-file for DFSClient_NONMAPREDUCE_986372177_4819 on  because DFSClient_NONMAPREDUCE_986372177_4819 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+
+================================================================================
+
+Error Group #27 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestBlockManager_RestartInjected.testNeededReconstructionWhileAppending_AfterFlush_NN_Crash
+
+Normalized stack trace:
+org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException: Failed to APPEND_FILE /test-file for DFSClient_NONMAPREDUCE_1581659962_7043 on  because DFSClient_NONMAPREDUCE_1581659962_7043 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+
+================================================================================
+
+Error Group #28 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDNFencing_RestartInjected.testQueueingWithAppend_AfterHflush_SingleDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException): Failed to APPEND_FILE /testStandbyIsHot for DFSClient_NONMAPREDUCE_-205238194_1507 on 127.0.0.1 because DFSClient_NONMAPREDUCE_-205238194_1507 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.append(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.append(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.append(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy25.append(Unknown Source)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.append(FileSystem.java)
+
+================================================================================
+
+Error Group #29 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDNFencing_RestartInjected.testQueueingWithAppend_AfterHflush_AllDN_Crash
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException): Failed to APPEND_FILE /testStandbyIsHot for DFSClient_NONMAPREDUCE_-823275593_2116 on 127.0.0.1 because DFSClient_NONMAPREDUCE_-823275593_2116 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.append(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.append(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.append(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy25.append(Unknown Source)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.append(FileSystem.java)
+
+================================================================================
+
+Error Group #30 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDNFencing_RestartInjected.testQueueingWithAppend_AfterHflush_SingleDN_Crash
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException): Failed to APPEND_FILE /testStandbyIsHot for DFSClient_NONMAPREDUCE_-1834922307_4424 on 127.0.0.1 because DFSClient_NONMAPREDUCE_-1834922307_4424 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.append(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.append(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.append(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy25.append(Unknown Source)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.append(FileSystem.java)
+
+================================================================================
+
+Error Group #31 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestDNFencing_RestartInjected.testQueueingWithAppend_AfterHflush_AllDN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.hdfs.protocol.AlreadyBeingCreatedException): Failed to APPEND_FILE /testStandbyIsHot for DFSClient_NONMAPREDUCE_-577806728_5655 on 127.0.0.1 because DFSClient_NONMAPREDUCE_-577806728_5655 is already the current lease holder.
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.recoverLeaseInternal(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirAppendOp.appendFile(FSDirAppendOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.appendFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.append(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.append(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.append(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.append(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy25.append(Unknown Source)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.callAppend(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DFSClient.append(DFSClient.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem$5.doCall(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.hdfs.DistributedFileSystem.append(DistributedFileSystem.java)
+at org.apache.hadoop.fs.FileSystem.append(FileSystem.java)
+
+================================================================================
+
+Error Group #32 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileAppend2_RestartInjected.testAppendLessThanChecksumChunk_AfterHflush_SingleDN_Crash
+
+Normalized stack trace:
+java.net.BindException: Problem binding to [localhost:40413] java.net.BindException: Address already in use; For more details see:  http://wiki.apache.org/hadoop/BindException
+at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java)
+at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java)
+at java.lang.reflect.Constructor.newInstance(Constructor.java)
+at org.apache.hadoop.net.NetUtils.wrapWithMessage(NetUtils.java)
+at org.apache.hadoop.net.NetUtils.wrapException(NetUtils.java)
+at org.apache.hadoop.ipc.Server.bind(Server.java)
+at org.apache.hadoop.ipc.Server$Listener.<init>(Server.java)
+at org.apache.hadoop.ipc.Server.<init>(Server.java)
+at org.apache.hadoop.ipc.RPC$Server.<init>(RPC.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server.<init>(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2.getServer(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Builder.build(RPC.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.initIpcServer(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.createDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.restartDataNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.restartDataNode(RestartInjectionFramework.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.executeRestart(RestartInjectionFramework.java)
+
+================================================================================
+
+Error Group #33 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileContextSnapshot_RestartInjected.testCreateAndDeleteSnapshot_AfterCreate_AllDN_Graceful
+
+Normalized stack trace:
+java.net.BindException: Problem binding to [localhost:43849] java.net.BindException: Address already in use; For more details see:  http://wiki.apache.org/hadoop/BindException
+at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java)
+at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java)
+at java.lang.reflect.Constructor.newInstance(Constructor.java)
+at org.apache.hadoop.net.NetUtils.wrapWithMessage(NetUtils.java)
+at org.apache.hadoop.net.NetUtils.wrapException(NetUtils.java)
+at org.apache.hadoop.ipc.Server.bind(Server.java)
+at org.apache.hadoop.ipc.Server$Listener.<init>(Server.java)
+at org.apache.hadoop.ipc.Server.<init>(Server.java)
+at org.apache.hadoop.ipc.RPC$Server.<init>(RPC.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server.<init>(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2.getServer(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Builder.build(RPC.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.initIpcServer(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.startDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.<init>(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.makeInstance(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.instantiateDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.server.datanode.DataNode.createDataNode(DataNode.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.restartDataNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.restartDataNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.MiniDFSCluster.restartDataNode(MiniDFSCluster.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.restartDataNode(RestartInjectionFramework.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.restartAllDataNodes(RestartInjectionFramework.java)
+at org.apache.hadoop.hdfs.RestartInjectionFramework.executeRestart(RestartInjectionFramework.java)
+
+================================================================================
+
+Error Group #34 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_NN_Crash
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(java.io.FileNotFoundException): File does not exist: /foo_restart/file1 (inode 16387) [Lease.  Holder: DFSClient_NONMAPREDUCE_2107315383_720, pending creates: 1]
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.checkLease(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.completeFileInternal(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.completeFile(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.completeFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.complete(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.complete(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.complete(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.complete(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy24.complete(Unknown Source)
+at org.apache.hadoop.hdfs.DFSOutputStream.completeFile(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.completeFile(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.closeImpl(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.close(DFSOutputStream.java)
+at org.apache.hadoop.fs.FSDataOutputStream$PositionCache.close(FSDataOutputStream.java)
+at org.apache.hadoop.fs.FSDataOutputStream.close(FSDataOutputStream.java)
+
+================================================================================
+
+Error Group #35 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestFileCreationDelete_RestartInjected.testFileCreationDeleteParent_AfterHflush_NN_Graceful
+
+Normalized stack trace:
+org.apache.hadoop.ipc.RemoteException(java.io.FileNotFoundException): File does not exist: /foo_restart/file1 (inode 16387) [Lease.  Holder: DFSClient_NONMAPREDUCE_1749040064_2506, pending creates: 1]
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.checkLease(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.completeFileInternal(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.completeFile(FSDirWriteFileOp.java)
+at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.completeFile(FSNamesystem.java)
+at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.complete(NameNodeRpcServer.java)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.complete(ClientNamenodeProtocolServerSideTranslatorPB.java)
+at org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.RPC$Server.call(RPC.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at org.apache.hadoop.ipc.Server$RpcCall.run(Server.java)
+at java.security.AccessController.doPrivileged(Native Method)
+at javax.security.auth.Subject.doAs(Subject.java)
+at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java)
+at org.apache.hadoop.ipc.Server$Handler.run(Server.java)
+
+at org.apache.hadoop.ipc.Client.getRpcResponse(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.Client.call(Client.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at org.apache.hadoop.ipc.ProtobufRpcEngine2$Invoker.invoke(ProtobufRpcEngine2.java)
+at com.sun.proxy.$Proxy22.complete(Unknown Source)
+at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.complete(ClientNamenodeProtocolTranslatorPB.java)
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java)
+at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java)
+at java.lang.reflect.Method.invoke(Method.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeMethod(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invoke(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler$Call.invokeOnce(RetryInvocationHandler.java)
+at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java)
+at com.sun.proxy.$Proxy24.complete(Unknown Source)
+at org.apache.hadoop.hdfs.DFSOutputStream.completeFile(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.completeFile(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.closeImpl(DFSOutputStream.java)
+at org.apache.hadoop.hdfs.DFSOutputStream.close(DFSOutputStream.java)
+at org.apache.hadoop.fs.FSDataOutputStream$PositionCache.close(FSDataOutputStream.java)
+at org.apache.hadoop.fs.FSDataOutputStream.close(FSDataOutputStream.java)
+
+================================================================================
+
+Error Group #36 - 1 occurrence(s)
+--------------------------------------------------------------------------------
+Affected tests:
+  - TestSetRepIncreasing_RestartInjected.testSetrepIncreasingSimulatedStorage_AfterCreate_AllDN_Graceful
+
+Normalized stack trace:
+org.junit.runners.model.TestTimedOutException: test timed out after 120000 milliseconds
+at java.lang.Thread.sleep(Native Method)
+at org.apache.hadoop.fs.shell.SetReplication.waitForReplication(SetReplication.java)
+at org.apache.hadoop.fs.shell.SetReplication.processArguments(SetReplication.java)
+at org.apache.hadoop.fs.shell.FsCommand.processRawArguments(FsCommand.java)
+at org.apache.hadoop.fs.shell.Command.run(Command.java)
+at org.apache.hadoop.fs.FsShell.run(FsShell.java)
+
+================================================================================
+

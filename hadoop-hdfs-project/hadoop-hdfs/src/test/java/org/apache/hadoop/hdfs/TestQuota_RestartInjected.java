@@ -69,6 +69,24 @@ public class TestQuota_RestartInjected {
       stream.write(buffer);
       stream.hflush();
 
+      // DEBUG: Check blocks before restart
+      try {
+        org.apache.hadoop.hdfs.server.namenode.INode inode =
+            cluster.getNamesystem().getFSDirectory().getINode(file.toUri().getPath());
+        if (inode != null && inode.isFile()) {
+          org.apache.hadoop.hdfs.server.namenode.INodeFile fileINode = inode.asFile();
+          System.err.println("BEFORE RESTART: file has " + fileINode.getBlocks().length + " blocks");
+          for (org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo blk : fileINode.getBlocks()) {
+            System.err.println("  Block: " + blk + ", complete=" + blk.isComplete() + ", bytes=" + blk.getNumBytes());
+          }
+        } else {
+          System.err.println("BEFORE RESTART: Could not find file inode");
+        }
+      } catch (Exception e) {
+        System.err.println("BEFORE RESTART: Exception getting blocks: " + e);
+        e.printStackTrace(System.err);
+      }
+
       // === RESTART INJECTION POINT: After hflush ===
       LOG.info("=== INJECTING RESTART: target={}, mode={} ===", target, mode);
       executeRestart(cluster, target, mode, true);

@@ -1,0 +1,1348 @@
+================================================================================
+DETAILED TEST RESULTS REPORT
+================================================================================
+
+Total Test Classes:  444
+Total Test Methods:  3759
+
+  Passed:   3295 (87.7%)
+  Failed:     26 (0.7%)
+  Errors:    438 (11.7%)
+  Skipped:     0 (0.0%)
+
+================================================================================
+ALL TEST CLASSES
+================================================================================
+
+[PASS   ] TestAbandonBlock_RestartInjected
+           Tests: 18, Passed: 18, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAclConfigFlag_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAclWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAclsEndToEnd_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAddBlockRetry_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestAddBlock_RestartInjected
+           Tests: 16, Passed: 10, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestAddOverReplicatedStripedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAddStripedBlockInFBR_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAddStripedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAllowFormat_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAppendDifferentChecksum_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAppendSnapshotTruncate_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestApplyingStoragePolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAuditLoggerWithCommands_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestAuditLogger_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBPOfferService_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBackupNode_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerBandwidth_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerLongRunningTasks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerService_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerWithHANameNodes_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerWithMultipleNameNodes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancerWithNodeGroup_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBalancer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBatchIbr_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBatchedListDirectories_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBestEffortLongFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockCountersInPendingIBR_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockHasMultipleReplicasOnSameDN_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestBlockManager_RestartInjected
+           Tests: 12, Passed: 2, Failed: 0, Errors: 10, Skipped: 0
+
+[PASS   ] TestBlockMissingException_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockPlacementPolicyRackFaultTolerant_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockReaderBase_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockReaderFactory_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockReaderLocalLegacy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestBlockReaderLocal_RestartInjected
+           Tests: 8, Passed: 0, Failed: 0, Errors: 8, Skipped: 0
+
+[ERROR  ] TestBlockRecovery2_RestartInjected
+           Tests: 8, Passed: 6, Failed: 0, Errors: 2, Skipped: 0
+
+[PASS   ] TestBlockReplacement_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockReportLease_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockReportRateLimiting_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestBlockScanner_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestBlockStatsMXBean_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockStoragePolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBlockTokenWithDFSStriped_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestBlockTokenWithDFS_RestartInjected
+           Tests: 16, Passed: 12, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestBlockTokenWithShortCircuitRead_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestBlockToken_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestBlockUnderConstruction_RestartInjected
+           Tests: 8, Passed: 5, Failed: 0, Errors: 3, Skipped: 0
+
+[FAIL   ] TestBlocksScheduledCounter_RestartInjected
+           Tests: 16, Passed: 8, Failed: 2, Errors: 6, Skipped: 0
+
+[PASS   ] TestBlocksWithNotEnoughRacks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBootstrapAliasmap_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBootstrapStandbyWithQJM_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestBootstrapStandby_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestByteBufferPread_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCacheByPmemMappableBlockLoader_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCacheDirectivesWithViewDFS_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCacheDirectives_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCachingStrategy_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCheckPointForSecurityTokens_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestCheckpoint_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestCheckpointsWithSnapshots_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestClientProtocolForPipelineRecovery_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestClientReportBadBlock_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestClose_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCommitBlockSynchronization_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCommitBlockWithInvalidGenStamp_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestComputeInvalidateWork_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestConnectors_RestartInjected
+           Tests: 16, Passed: 0, Failed: 0, Errors: 16, Skipped: 0
+
+[PASS   ] TestConsistentReadsObserver_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestCorruptMetadataFile_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestCorruptionWithFailover_RestartInjected
+           Tests: 8, Passed: 4, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestCrcCorruption_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestCreateEditsLog_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSAddressConfig_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSAdminWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSAdmin_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSClientExcludedNodes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSClientFailover_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDFSClientRetries_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestDFSClientSocketSize_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSFinalize_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSHAAdminMiniCluster_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSInputStream_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSMkdirs_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDFSOutputStream_RestartInjected
+           Tests: 16, Passed: 4, Failed: 0, Errors: 12, Skipped: 0
+
+[PASS   ] TestDFSPermission_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSRemove_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSRename_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSRollback_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSShellGenericOptions_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSShell_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSStartupVersions_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSStorageStateRecovery_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSStripedInputStream_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSStripedOutputStreamUpdatePipeline_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSUpgradeFromImage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSUpgradeWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSUpgrade_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDFSZKFailoverController_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDNFencingWithReplication_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[ERROR  ] TestDNFencing_RestartInjected
+           Tests: 12, Passed: 8, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestDataNodeECN_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeErasureCodingMetrics_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeExit_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDataNodeFaultInjector_RestartInjected
+           Tests: 16, Passed: 13, Failed: 0, Errors: 3, Skipped: 0
+
+[ERROR  ] TestDataNodeHotSwapVolumes_RestartInjected
+           Tests: 8, Passed: 4, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestDataNodeInitStorage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeLifeline_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeMXBean_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeMetricsLogger_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDataNodeMetrics_RestartInjected
+           Tests: 16, Passed: 4, Failed: 0, Errors: 12, Skipped: 0
+
+[PASS   ] TestDataNodeMultipleRegistrations_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeReconfiguration_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeRollingUpgrade_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeTcpNoDelay_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeTransferSocketSize_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeUUID_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeVolumeFailureReporting_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeVolumeFailureToleration_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDataNodeVolumeFailure_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDataNodeVolumeMetrics_RestartInjected
+           Tests: 16, Passed: 0, Failed: 0, Errors: 16, Skipped: 0
+
+[ERROR  ] TestDataStream_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestDataTransferKeepalive_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDataTransferProtocol_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestDatanodeConfig_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeDeath_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeHttpXFrame_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeLayoutUpgrade_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeProtocolRetryPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeRegistration_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeRestart_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDatanodeStartupFixesLegacyStorageIDs_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDeadDatanode_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDeadNodeDetection_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDebugAdmin_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDecommissionWithStriped_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDecommission_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDecommissioningStatusWithBackoffMonitor_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDecommissioningStatus_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDefaultBlockPlacementPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDelegationTokenFetcher_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDelegationTokenForProxyUser_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDelegationToken_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDelegationTokensWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDeleteBlockPool_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDeleteRace_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestDiffListBySkipList_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDirectoryScanner_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDisableConnCache_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDisallowModifyROSnapshot_RestartInjected
+           Tests: 44, Passed: 44, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDiskBalancerCommand_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDiskBalancerRPC_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDiskBalancerWithMockMover_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDiskBalancer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestDiskError_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestDiskspaceQuotaUpdate_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestDistributedFileSystemWithECFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDistributedFileSystem_RestartInjected
+           Tests: 16, Passed: 16, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestDnRespectsBlockReportSplitThreshold_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestECAdmin_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestEditLog_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestEditLogsDuringFailover_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestEncryptedTransfer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestEncryptionZonesWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestEncryptionZones_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingAddConfig_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingCorruption_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingExerciseAPIs_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingMultipleRacks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingPolicies_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingPolicyWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestErasureCodingZones_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestExtendedAcls_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestExternalBlockReader_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestExternalStoragePolicySatisfier_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSDirectory_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSImageWithAcl_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSImageWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSImageWithXAttr_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFSImage_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[FAIL   ] TestFSInputChecker_RestartInjected
+           Tests: 4, Passed: 0, Failed: 4, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSMainOperationsWebHdfs_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSNamesystemMBean_RestartInjected
+           Tests: 14, Passed: 14, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFSOutputSummer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFailoverWithBlockTokensEnabled_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFailureOfSharedDir_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFavoredNodesEndToEnd_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFetchImage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFileAppend2_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestFileAppend3_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestFileAppend4_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileAppendRestart_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFileAppend_RestartInjected
+           Tests: 16, Passed: 4, Failed: 0, Errors: 12, Skipped: 0
+
+[PASS   ] TestFileChecksum_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFileConcurrentReader_RestartInjected
+           Tests: 16, Passed: 4, Failed: 0, Errors: 12, Skipped: 0
+
+[ERROR  ] TestFileContextSnapshot_RestartInjected
+           Tests: 8, Passed: 7, Failed: 0, Errors: 1, Skipped: 0
+
+[PASS   ] TestFileCorruption_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileCreationClient_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFileCreationDelete_RestartInjected
+           Tests: 8, Passed: 0, Failed: 0, Errors: 8, Skipped: 0
+
+[PASS   ] TestFileCreationEmpty_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFileCreation_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestFileInputStreamCache_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileJournalManager_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileLengthOnClusterRestart_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileLimit_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileStatusWithDefaultECPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileStatus_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFileTruncate_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsDatasetCacheRevocation_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsDatasetCache_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestFsDatasetImpl_RestartInjected
+           Tests: 16, Passed: 10, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestFsLimits_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsShellPermission_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsVolumeList_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsckWithMultipleNameNodes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestFsck_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGenericJournalConf_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetBlockLocations_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetContentSummaryWithPermission_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetContentSummaryWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetFileChecksum_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetGroupsWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGetGroups_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestGlobPaths_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestHAAppend_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestHAAuxiliaryPort_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHAMetrics_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestHASafeMode_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestHAStateTransitions_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestHDFSConcat_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestHDFSFileContextMainOperations_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHDFSServerPorts_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHDFSTrash_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHFlush_RestartInjected
+           Tests: 24, Passed: 24, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestHSync_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestHarFileSystemWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHardLink_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHdfsAdmin_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHdfsCryptoStreams_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHeartbeatHandling_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHostsFiles_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestHttpsFileSystem_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestINodeAttributeProvider_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestINodeFileUnderConstructionWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestINodeFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestINodeId_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestImageTransfer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestIncrementalBlockReports_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestIncrementalBrVariations_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestInitializeSharedEdits_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestInjectionForSimulatedStorage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestInterDatanodeProtocol_RestartInjected
+           Tests: 29, Passed: 29, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestIsMethodSupported_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLargeBlockReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLargeBlock_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLargeFilesQuota_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLeaseManager_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestLeaseRecovery2_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestLeaseRecoveryStriped_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestLeaseRecovery_RestartInjected
+           Tests: 16, Passed: 4, Failed: 0, Errors: 12, Skipped: 0
+
+[ERROR  ] TestLease_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestListCorruptFileBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestListFilesInDFS_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestListFilesInFileContext_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestListOpenFilesWithSnapshots_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestListOpenFiles_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLocalDFS_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLocatedBlocksRefresher_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLossyRetryInvocationHandler_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestLowRedundancyBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestMaintenanceState_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestMetadataVersionOutput_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestMiniDFSCluster_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestMissingBlocksAlert_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestModTime_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestMover_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestMultiObserverNode_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestMultiThreadedHflush_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestMultipleNNPortQOP_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNNHealthCheck_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameEditsConfigs_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeHttpServer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeMXBean_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeMetrics_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodePrunesMissingStorages_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeRecovery_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeResourceChecker_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeRespectsBindHostKeys_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeRetryCacheMetrics_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeRpcServerMethods_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeRpcServer_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNameNodeStatusMXBean_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestNamenodeCapacityReport_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestNamenodeRetryCache_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNestedEncryptionZones_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNestedSnapshots_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestNetworkTopologyMappingRetry_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[SKIPPED] TestNetworkTopologyServlet_RestartInjected
+           Tests: 0, Passed: 0, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestNodeCount_RestartInjected
+           Tests: 8, Passed: 4, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestObserverNode_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestOfflineImageViewerWithStripedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestOpenFilesWithSnapshot_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestOverReplicatedBlocks_RestartInjected
+           Tests: 8, Passed: 7, Failed: 0, Errors: 1, Skipped: 0
+
+[PASS   ] TestParallelImageWrite_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestParallelRead_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestParallelShortCircuitReadUnCached_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPeerCache_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPendingCorruptDnMessages_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPendingDataNodeMessages_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPendingInvalidateBlock_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[FAIL   ] TestPendingReconstruction_RestartInjected
+           Tests: 24, Passed: 12, Failed: 12, Errors: 0, Skipped: 0
+
+[PASS   ] TestPendingReplication_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPersistBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestPersistentStoragePolicySatisfier_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestPipelinesFailover_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[ERROR  ] TestPipelines_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestProcessCorruptBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestProvidedImpl_RestartInjected
+           Tests: 18, Passed: 18, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestQuotaAllowOwner_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestQuotaByStorageType_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestQuotaWithStripedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestQuota_RestartInjected
+           Tests: 8, Passed: 0, Failed: 0, Errors: 8, Skipped: 0
+
+[PASS   ] TestQuotasWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestRBWBlockInvalidation_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestRandomOpsWithSnapshots_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestReadOnlySharedStorage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestReadStripedFileWithDecoding_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestReadStripedFileWithMissingBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestReadWhileWriting_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestReconstructStripedBlocksWithRackAwareness_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestReconstructStripedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRecoverStripedFileWithDataNodeRestart_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRecoverStripedFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRedudantBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRedundancyMonitor_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRefreshBlockPlacementPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRefreshNamenodeReplicationConfig_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRefreshNamenodes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRemoteBlockReader2_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRemoteNameNodeInfo_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestRenameWhileOpen_RestartInjected
+           Tests: 8, Passed: 5, Failed: 0, Errors: 3, Skipped: 0
+
+[ERROR  ] TestRenameWithSnapshots_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestRename_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestReplaceDatanodeFailureReplication_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[ERROR  ] TestReplaceDatanodeOnFailure_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestReplicaAccessorLoading_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestReplicaCachingGetSpaceUsed_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestReplicationControl_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestReplicationPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestReplication_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestReservedRawPaths_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestRestartDFS_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestRetryCacheWithHA_RestartInjected
+           Tests: 4, Passed: 0, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestRollingUpgrade_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSafeModeDuringReconfiguration_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestSafeMode_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestSaslDataTransferExpiredBlockToken_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSaveNamespace_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSecurityTokenEditLog_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSeekBug_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSequentialBlockGroupId_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSequentialBlockId_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSetQuotaWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[FAIL   ] TestSetRepIncreasing_RestartInjected
+           Tests: 42, Passed: 30, Failed: 4, Errors: 8, Skipped: 0
+
+[PASS   ] TestSetTimes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSeveralNameNodes_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestShortCircuitLocalRead_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSlowDatanodeReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSlowDiskTracker_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSmallBlock_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapRootDescendantDiff_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotBlocksMap_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotCommands_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotDeletion_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotDiffReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestSnapshotFileLength_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestSnapshotListing_RestartInjected
+           Tests: 30, Passed: 30, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotMetrics_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotNameWithInvalidCharacters_RestartInjected
+           Tests: 20, Passed: 20, Failed: 0, Errors: 0, Skipped: 0
+
+[FAIL   ] TestSnapshotPathINodes_RestartInjected
+           Tests: 12, Passed: 8, Failed: 4, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotRename_RestartInjected
+           Tests: 20, Passed: 20, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotReplication_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshotStatsMXBean_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestSnapshottableDirListing_RestartInjected
+           Tests: 20, Passed: 12, Failed: 0, Errors: 8, Skipped: 0
+
+[ERROR  ] TestSpaceReservation_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestSrcBlocksRecoveryPath_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStandbyBlockManagement_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStandbyCheckpoints_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStandbyInProgressTail_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStandbyIsHot_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStartSecureDataNode_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestStartup_RestartInjected
+           Tests: 10, Passed: 6, Failed: 0, Errors: 4, Skipped: 0
+
+[PASS   ] TestStateAlignmentContextWithHA_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStateTransitionFailure_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStorageBlockReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStorageLocation_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestStorageMover_RestartInjected
+           Tests: 8, Passed: 7, Failed: 0, Errors: 1, Skipped: 0
+
+[PASS   ] TestStoragePolicyCommands_RestartInjected
+           Tests: 10, Passed: 10, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStoragePolicyPermissionSettings_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStoragePolicySatisfier_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStorageReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStorageRestore_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStreamFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStripedFileAppend_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestStripedFileRenameAfterRestart_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSubtreeLock_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestSymlink_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestTransferFsImage_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestTransferRbw_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestTrashWithEncryptionZones_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestTriggerBlockReport_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestTruncateQuotaUpdate_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestTruncate_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestUnderReplicatedBlocks_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestUnknownBlockToken_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestUnsetAndChangeDirectoryEcPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestUpdateBlockTailing_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestUpdatePipelineWithSnapshots_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestUpgradeDomainBlockPlacementPolicy_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestValidateConfigurationSettings_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestViewDistributedFileSystemContract_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestViewDistributedFileSystem_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestViewFileSystemAtHdfsRoot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHDFSForHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHDFS_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsFileSystemContract_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsRead_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsTimeouts_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsTokens_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsUrl_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsWithAuthenticationFilter_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWebHdfsWithMultipleNameNodes_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWriteBlockGetsBlockLengthHint_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWriteBlockPipelineWithBreak_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWriteConfigurationToDFS_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWriteReadStripedFile_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[ERROR  ] TestWriteRead_RestartInjected
+           Tests: 8, Passed: 2, Failed: 0, Errors: 6, Skipped: 0
+
+[PASS   ] TestWriteStripedFileWithFailure_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestWriteToReplica_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestXAttrWithSnapshot_RestartInjected
+           Tests: 8, Passed: 8, Failed: 0, Errors: 0, Skipped: 0
+
+[PASS   ] TestXAttrsWithHA_RestartInjected
+           Tests: 4, Passed: 4, Failed: 0, Errors: 0, Skipped: 0
+

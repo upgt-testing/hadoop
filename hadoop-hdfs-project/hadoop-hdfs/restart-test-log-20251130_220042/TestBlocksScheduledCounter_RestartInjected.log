@@ -1,0 +1,154 @@
+================================================================================
+Test: org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected
+Command: mvn surefire:test -Dtest=org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected
+Start time: 2025-11-30 22:08:42
+================================================================================
+
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] Detecting the operating system and CPU architecture
+[[1;34mINFO[m] ------------------------------------------------------------------------
+[[1;34mINFO[m] os.detected.name: linux
+[[1;34mINFO[m] os.detected.arch: x86_64
+[[1;34mINFO[m] os.detected.bitness: 64
+[[1;34mINFO[m] os.detected.version: 5.15
+[[1;34mINFO[m] os.detected.version.major: 5
+[[1;34mINFO[m] os.detected.version.minor: 15
+[[1;34mINFO[m] os.detected.release: ubuntu
+[[1;34mINFO[m] os.detected.release.version: 20.04
+[[1;34mINFO[m] os.detected.release.like.ubuntu: true
+[[1;34mINFO[m] os.detected.release.like.debian: true
+[[1;34mINFO[m] os.detected.classifier: linux-x86_64
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m-------------------< [0;36morg.apache.hadoop:hadoop-hdfs[0;1m >--------------------[m
+[[1;34mINFO[m] [1mBuilding Apache Hadoop HDFS 3.3.5[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-surefire-plugin:3.0.0-M1:test[m [1m(default-cli)[m @ [36mhadoop-hdfs[0;1m ---[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m]  T E S T S
+[[1;34mINFO[m] -------------------------------------------------------
+[[1;34mINFO[m] Running org.apache.hadoop.hdfs.[1mTestBlocksScheduledCounter_RestartInjected[m
+[[1;31mERROR[m] [1;31mTests [0;1mrun: [0;1m16[m, [1;31mFailures: [0;1;31m2[m, [1;31mErrors: [0;1;31m6[m, Skipped: 0, Time elapsed: 54.658 s[1;31m <<< FAILURE![m - in org.apache.hadoop.hdfs.[1mTestBlocksScheduledCounter_RestartInjected[m
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_NNDN_Graceful(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 5.712 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:45733,DS-ed8e8c5a-7db4-4590-884a-9004779230cd,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testAbandonBlockDecrement_AfterHflush_NN_Graceful(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 6.441 s  <<< FAILURE!
+java.lang.AssertionError: Not all DataNodes registered after restart expected:<2> but was:<1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at org.apache.hadoop.hdfs.RestartInjectionFramework.verifyClusterHealth(RestartInjectionFramework.java:383)
+	at org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrementWithRestart(TestBlocksScheduledCounter_RestartInjected.java:141)
+	at org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Graceful(TestBlocksScheduledCounter_RestartInjected.java:218)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:299)
+	at org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:293)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.lang.Thread.run(Thread.java:750)
+
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_SingleDN_Graceful(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 0.395 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:41275,DS-17789276-bde4-4b8d-b6b6-f0028a6e92db,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_NNDN_Crash(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 6.493 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:38479,DS-8f7746b5-de7d-416c-87ae-310e6a79efbd,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_AllDN_Crash(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 0.448 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:35891,DS-c4d8e7b0-76f6-4160-b655-9271554008ec,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_SingleDN_Crash(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 0.422 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:41867,DS-11f19f97-de23-4fee-a7bc-48a37fec0582,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testBlocksScheduledCounter_AfterHflush_AllDN_Graceful(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 0.356 s  <<< ERROR!
+java.io.IOException: All datanodes [DatanodeInfoWithStorage[127.0.0.1:43681,DS-175ce7dc-9dab-4ac0-98a7-5d7aa7413d3d,DISK]] are bad. Aborting...
+	at org.apache.hadoop.hdfs.DataStreamer.handleBadDatanode(DataStreamer.java:1609)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineInternal(DataStreamer.java:1543)
+	at org.apache.hadoop.hdfs.DataStreamer.setupPipelineForAppendOrRecovery(DataStreamer.java:1529)
+	at org.apache.hadoop.hdfs.DataStreamer.processDatanodeOrExternalError(DataStreamer.java:1305)
+	at org.apache.hadoop.hdfs.DataStreamer.run(DataStreamer.java:668)
+
+[[1;31mERROR[m] testAbandonBlockDecrement_AfterHflush_NN_Crash(org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected)  Time elapsed: 6.566 s  <<< FAILURE!
+java.lang.AssertionError: Not all DataNodes registered after restart expected:<2> but was:<1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at org.apache.hadoop.hdfs.RestartInjectionFramework.verifyClusterHealth(RestartInjectionFramework.java:383)
+	at org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrementWithRestart(TestBlocksScheduledCounter_RestartInjected.java:141)
+	at org.apache.hadoop.hdfs.TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Crash(TestBlocksScheduledCounter_RestartInjected.java:223)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:299)
+	at org.junit.internal.runners.statements.FailOnTimeout$CallableStatement.call(FailOnTimeout.java:293)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.lang.Thread.run(Thread.java:750)
+
+[[1;34mINFO[m] 
+[[1;34mINFO[m] Results:
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mFailures: [m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Crash:223->testAbandonBlockDecrementWithRestart:141 Not all DataNodes registered after restart expected:<2> but was:<1>[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testAbandonBlockDecrement_AfterHflush_NN_Graceful:218->testAbandonBlockDecrementWithRestart:141 Not all DataNodes registered after restart expected:<2> but was:<1>[m
+[[1;31mERROR[m] [1;31mErrors: [m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_AllDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_AllDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_NNDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_NNDN_Graceful » IO[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_SingleDN_Crash » IO[m
+[[1;31mERROR[m] [1;31m  TestBlocksScheduledCounter_RestartInjected.testBlocksScheduledCounter_AfterHflush_SingleDN_Graceful » IO[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] [1;31mTests run: 16, Failures: 2, Errors: 6, Skipped: 0[m
+[[1;34mINFO[m] 
+[[1;31mERROR[m] There are test failures.
+
+Please refer to /home/shuai/xlab/upgrade_testing/hadoop-transform/hadoop-hdfs-project/hadoop-hdfs/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;32mBUILD SUCCESS[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  56.657 s
+[[1;34mINFO[m] Finished at: 2025-11-30T22:09:39-06:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+
+================================================================================
+End time: 2025-11-30 22:09:39
+Exit code: 0
+================================================================================
