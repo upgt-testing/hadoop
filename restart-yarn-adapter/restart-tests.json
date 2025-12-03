@@ -1,0 +1,48 @@
+{
+  "tests": [
+    {
+      "testClass": "org.restarttest.adapter.yarn.YarnAdapterIntegrationTest",
+      "testMethod": "testResourceManagerGracefulRestart",
+      "restartPoints": [
+        {
+          "position": "test-rm-graceful-restart",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.restarttest.adapter.yarn.YarnAdapterIntegrationTest",
+      "testMethod": "testNodeManagerGracefulRestart",
+      "restartPoints": [
+        {
+          "position": "test-nm-graceful-restart",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.restarttest.adapter.yarn.YarnAdapterHATest",
+      "testMethod": "testActiveResourceManagerRestart",
+      "restartPoints": [
+        {
+          "position": "test-active-rm-restart",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.restarttest.adapter.yarn.YarnAdapterHATest",
+      "testMethod": "testStandbyResourceManagerRestart",
+      "restartPoints": [
+        {
+          "position": "test-standby-rm-restart",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL"]
+        }
+      ]
+    }
+  ]
+}
