@@ -132,6 +132,22 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
+
+    <!-- Restart Testing Framework - Core -->
+    <dependency>
+      <groupId>org.restarttest</groupId>
+      <artifactId>restart-core</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Restart Testing Framework - YARN Adapter -->
+    <dependency>
+      <groupId>org.restarttest</groupId>
+      <artifactId>restart-yarn-adapter</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
