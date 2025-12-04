@@ -1,0 +1,75 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] -------------< org.apache.hadoop:hadoop-yarn-services-api >-------------
+[INFO] Building Apache Hadoop YARN Services API 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-services-api ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-services-api ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-services-api ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-services-api ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-services-api ---
+[INFO] Replacement run on 13 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-services-api ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 4 resources
+[INFO] skip non existing resourceDirectory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/src/main/scripts
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-services-api ---
+[INFO] Compiling 6 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/target/classes
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-services-api ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-services-api ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 9 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-services-api ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-services-api ---
+[INFO] Compiling 7 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/src/test/java/org/apache/hadoop/yarn/service/TestCleanupAfterKill_RestartInjected.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/src/test/java/org/apache/hadoop/yarn/service/TestCleanupAfterKill_RestartInjected.java uses unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/src/test/java/org/apache/hadoop/yarn/service/TestCleanupAfterKill_RestartInjected.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-services-api ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 60.989 s - in org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:03 min
+[INFO] Finished at: 2025-12-03T18:33:18-06:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,17 @@
+========================================
+YARN Restart Test Summary
+========================================
+Timestamp: 20251203-002527
+Date: Wed Dec  3 04:36:14 CST 2025
+
+Modules Tested: 6
+Passed: 6
+Failed: 0
+
+Module Results:
+  - hadoop-yarn-client
+  - hadoop-yarn-applications-distributedshell
+  - hadoop-yarn-applications-unmanaged-am-launcher
+  - hadoop-yarn-services-core
+  - hadoop-yarn-services-api
+  - hadoop-yarn-server-tests

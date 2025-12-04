@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_launcher_init",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_launcher_run",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    }
+  ]
+}

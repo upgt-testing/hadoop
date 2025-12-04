@@ -1,0 +1,743 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----< org.apache.hadoop:hadoop-yarn-applications-distributedshell >-----
+[INFO] Building Apache Hadoop YARN DistributedShell 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-applications-distributedshell ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/restarts-config/restart-config.json
+[INFO] Generated 116 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 7 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 8 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 9 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 10 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 11 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 12 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSRestartWithPreviousRunningContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 13 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 14 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 15 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 16 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalSuccess [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 17 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 18 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 19 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 20 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 21 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 22 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 23 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 24 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithCustomLogPropertyFile [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 25 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 26 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 27 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 28 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testSpecifyingLogAggregationContext [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 29 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 30 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 31 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 32 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithMultipleArgs [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 33 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 34 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 35 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 36 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithShellScript [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 37 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 38 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 39 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 40 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithInvalidArgs [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 41 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 42 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 43 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 44 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSTimelineClientWithConnectionRefuse [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 45 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 46 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 47 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 48 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testContainerLaunchFailureHandling [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 49 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 50 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 51 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 52 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDebugFlag [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 53 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 54 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 55 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 56 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellResourceProfiles [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 57 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 58 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 59 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 60 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSShellWithOpportunisticContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 61 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 62 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 63 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 64 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellAMResourcesWithUnknownResource [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 65 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 66 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 67 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 68 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellNonExistentQueue [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 69 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 70 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 71 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 72 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithSingleFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 73 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 74 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 75 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 76 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithMultiFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 77 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 78 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 79 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 80 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellWithNonExistentFileLocalization [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 81 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 82 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 83 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 84 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDistributedShellCleanup [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 85 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 86 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 87 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 88 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 89 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 90 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 91 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 92 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 93 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 94 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 95 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 96 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithEnforceExecutionType [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 97 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 98 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 99 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 100 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResources [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 101 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 102 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 103 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 104 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDistributedShellWithResourcesWithLargeContainers [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 105 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 106 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 107 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 108 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomain [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 109 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 110 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 111 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 112 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainDefaultFlow [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 113 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 114 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 115 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 116 of 116
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV20_RestartInjected#testDSShellWithoutDomainCustomizedFlow [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  116
+[INFO] Passed: 108
+[INFO] Failed: 8
+[INFO] Pass Rate: 93.1%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain@baseline
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain@after_cluster_setup[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithDomain@after_cluster_setup[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain@baseline
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain@after_cluster_setup[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV15_RestartInjected#testDSShellWithoutDomain@after_cluster_setup[resourcemanager,DELAYED_CRASH]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11:14 min
+[INFO] Finished at: 2025-12-03T17:05:40-06:00
+[INFO] ------------------------------------------------------------------------

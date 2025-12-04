@@ -1,0 +1,463 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ------------< org.apache.hadoop:hadoop-yarn-services-core >-------------
+[INFO] Building Apache Hadoop YARN Services Core 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-services-core ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/restarts-config/restart-config.json
+[INFO] Generated 68 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 7 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 8 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 9 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 10 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart R...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 11 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 12 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 13 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 14 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 15 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 16 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 17 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 18 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 19 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 20 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 21 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 22 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 23 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 24 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 25 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 26 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart Restart faile...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 27 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 28 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 29 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 30 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart Restar...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 31 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 32 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 33 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 34 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart Restart...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 35 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 36 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 37 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 38 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 39 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 40 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 41 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 42 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 43 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 44 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 45 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 46 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 47 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 48 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 49 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 50 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 51 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 52 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 53 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 54 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 55 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 56 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 57 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 58 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart Re...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 59 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 60 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 61 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 62 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 63 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 64 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 65 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 66 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 67 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 68 of 68
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances [position=after_cluster_setup, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  68
+[INFO] Passed: 52
+[INFO] Failed: 16
+[INFO] Pass Rate: 76.5%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances@after_cluster_setup[resourcemanager,GRACEFUL]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:22 h
+[INFO] Finished at: 2025-12-03T18:32:11-06:00
+[INFO] ------------------------------------------------------------------------

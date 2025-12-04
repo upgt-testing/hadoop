@@ -1,0 +1,191 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateFlexStopDestroyService",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testStopDestroySavedService",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentStartOrder",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameDifferentUser",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameSameUser",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRecoverComponentsAfterRMRestart",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testUpgrade",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testExpressUpgrade",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCancelUpgrade",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceWithPlacementPolicy",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigtermDoesNotKillApplication",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigkillDoesNotKillApplication",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentHealthThresholdMonitor",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRestartServiceForNonExistingInRM",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMFailureValidity",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testServiceSameNameWithFailure",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected",
+      "testMethod": "testDecommissionInstances",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    }
+  ]
+}

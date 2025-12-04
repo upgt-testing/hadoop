@@ -1,0 +1,49 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----------------< org.apache.hadoop:hadoop-yarn-client >----------------
+[INFO] Building Apache Hadoop YARN Client 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-client ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/restarts-config/restart-config.json
+[INFO] Generated 295 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=CRASH] - YarnRuntime
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=GRACEFUL] - YarnRuntime
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=CRASH]

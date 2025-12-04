@@ -1,0 +1,329 @@
+2025-12-03 16:56:14,324 INFO  [Time-limited test] distributedshell.DistributedShellBaseTest_RestartInjected (DistributedShellBaseTest_RestartInjected.java:setupInternal(507)) - ========== Setting UP UnitTest org.apache.hadoop.yarn.applications.distributedshell.TestDSTimelineV10_RestartInjected#testDSAttemptFailuresValidityIntervalFailed ==========
+2025-12-03 16:56:14,324 INFO  [Time-limited test] distributedshell.DistributedShellBaseTest_RestartInjected (DistributedShellBaseTest_RestartInjected.java:setupInternal(509)) - Starting up YARN cluster. Timeline version 1.0
+2025-12-03 16:56:14,361 INFO  [Time-limited test] net.ServerSocketUtil (ServerSocketUtil.java:getPort(55)) - Using port 10021
+2025-12-03 16:56:14,362 INFO  [Time-limited test] Configuration.deprecation (Configuration.java:logDeprecation(1442)) - yarn.resourcemanager.system-metrics-publisher.enabled is deprecated. Instead, use yarn.system-metrics-publisher.enabled
+2025-12-03 16:56:14,403 WARN  [Time-limited test] util.NativeCodeLoader (NativeCodeLoader.java:<clinit>(60)) - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2025-12-03 16:56:14,443 INFO  [Time-limited test] net.ServerSocketUtil (ServerSocketUtil.java:getPort(55)) - Using port 9188
+2025-12-03 16:56:14,443 INFO  [Time-limited test] Configuration.deprecation (Configuration.java:logDeprecation(1442)) - yarn.resourcemanager.zk-timeout-ms is deprecated. Instead, use hadoop.zk.timeout-ms
+2025-12-03 16:56:14,450 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2854)) - resource-types.xml not found
+2025-12-03 16:56:14,450 INFO  [Time-limited test] resource.ResourceUtils (ResourceUtils.java:addResourcesFileToConf(476)) - Unable to find 'resource-types.xml'.
+2025-12-03 16:56:14,502 INFO  [Time-limited test] resourcemanager.RMNMInfo (RMInfo.java:register(55)) - Registered RMInfo MBean
+2025-12-03 16:56:14,502 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2854)) - core-site.xml not found
+2025-12-03 16:56:14,521 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2857)) - found resource yarn-site.xml at file:/Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-classes/yarn-site.xml
+2025-12-03 16:56:14,523 INFO  [Time-limited test] metrics.GenericEventTypeMetrics (GenericEventTypeMetrics.java:registerMetrics(75)) - Registering GenericEventTypeMetrics
+2025-12-03 16:56:14,524 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.RMFatalEventType for class org.apache.hadoop.yarn.server.resourcemanager.ResourceManager$RMFatalEventDispatcher
+2025-12-03 16:56:14,539 INFO  [Time-limited test] security.NMTokenSecretManagerInRM (NMTokenSecretManagerInRM.java:<init>(75)) - NMTokenKeyRollingInterval: 86400000ms and NMTokenKeyActivationDelay: 900000ms
+2025-12-03 16:56:14,540 INFO  [Time-limited test] security.RMContainerTokenSecretManager (RMContainerTokenSecretManager.java:<init>(81)) - ContainerTokenKeyRollingInterval: 86400000ms and ContainerTokenKeyActivationDelay: 900000ms
+2025-12-03 16:56:14,542 INFO  [Time-limited test] security.AMRMTokenSecretManager (AMRMTokenSecretManager.java:<init>(94)) - AMRMTokenKeyRollingInterval: 86400000ms and AMRMTokenKeyActivationDelay: 900000 ms
+2025-12-03 16:56:14,562 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.recovery.RMStateStoreEventType for class org.apache.hadoop.yarn.server.resourcemanager.recovery.RMStateStore$ForwardingEventHandler
+2025-12-03 16:56:14,564 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.NodesListManagerEventType for class org.apache.hadoop.yarn.server.resourcemanager.NodesListManager
+2025-12-03 16:56:14,564 INFO  [Time-limited test] resourcemanager.ResourceManager (ResourceManager.java:createScheduler(488)) - Using Scheduler: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
+2025-12-03 16:56:14,584 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.scheduler.event.SchedulerEventType for class org.apache.hadoop.yarn.server.resourcemanager.ResourceManager$SchedulerEventDispatcher
+2025-12-03 16:56:14,584 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppEventType for class org.apache.hadoop.yarn.server.resourcemanager.ResourceManager$ApplicationEventDispatcher
+2025-12-03 16:56:14,585 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptEventType for class org.apache.hadoop.yarn.server.resourcemanager.ResourceManager$ApplicationAttemptEventDispatcher
+2025-12-03 16:56:14,585 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.rmnode.RMNodeEventType for class org.apache.hadoop.yarn.server.resourcemanager.ResourceManager$NodeEventDispatcher
+2025-12-03 16:56:14,609 WARN  [Time-limited test] impl.MetricsConfig (MetricsConfig.java:loadFirst(136)) - Cannot locate configuration: tried hadoop-metrics2-resourcemanager.properties,hadoop-metrics2.properties
+2025-12-03 16:56:14,618 INFO  [Time-limited test] impl.MetricsSystemImpl (MetricsSystemImpl.java:startTimer(378)) - Scheduled Metric snapshot period at 10 second(s).
+2025-12-03 16:56:14,618 INFO  [Time-limited test] impl.MetricsSystemImpl (MetricsSystemImpl.java:start(191)) - ResourceManager metrics system started
+2025-12-03 16:56:14,635 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.scheduler.event.SchedulerEventType for class org.apache.hadoop.yarn.event.EventDispatcher
+2025-12-03 16:56:14,637 INFO  [Time-limited test] security.YarnAuthorizationProvider (YarnAuthorizationProvider.java:getInstance(59)) - org.apache.hadoop.yarn.security.ConfiguredYarnAuthorizer is instantiated.
+2025-12-03 16:56:14,639 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.RMAppManagerEventType for class org.apache.hadoop.yarn.server.resourcemanager.RMAppManager
+2025-12-03 16:56:14,643 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.amlauncher.AMLauncherEventType for class org.apache.hadoop.yarn.server.resourcemanager.amlauncher.ApplicationMasterLauncher
+2025-12-03 16:56:14,822 INFO  [Time-limited test] resourcemanager.RMNMInfo (RMNMInfo.java:<init>(66)) - Registered RMNMInfo MBean
+2025-12-03 16:56:14,823 INFO  [Time-limited test] monitor.RMAppLifetimeMonitor (RMAppLifetimeMonitor.java:serviceInit(67)) - Application lifelime monitor interval set to 3000 ms.
+2025-12-03 16:56:14,825 INFO  [Time-limited test] placement.MultiNodeSortingManager (MultiNodeSortingManager.java:serviceInit(59)) - Initializing NodeSortingService=MultiNodeSortingManager
+2025-12-03 16:56:14,825 INFO  [Time-limited test] util.HostsFileReader (HostsFileReader.java:refresh(239)) - Refreshing hosts (include/exclude) list
+2025-12-03 16:56:14,828 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2857)) - found resource capacity-scheduler.xml at jar:file:/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-yarn-server-tests/3.3.5/hadoop-yarn-server-tests-3.3.5-tests.jar!/capacity-scheduler.xml
+2025-12-03 16:56:14,830 INFO  [Time-limited test] scheduler.AbstractYarnScheduler (AbstractYarnScheduler.java:getMinimumAllocation(1524)) - Minimum allocation = <memory:128, vCores:1>
+2025-12-03 16:56:14,830 INFO  [Time-limited test] scheduler.AbstractYarnScheduler (AbstractYarnScheduler.java:getMaximumAllocation(1536)) - Maximum allocation = <memory:8192, vCores:4>
+2025-12-03 16:56:14,852 INFO  [Time-limited test] capacity.ParentQueue (ParentQueue.java:setupQueueConfigs(154)) - root, capacity=1.0, absoluteCapacity=1.0, maxCapacity=1.0, absoluteMaxCapacity=1.0, state=RUNNING, acls=SUBMIT_APP:*ADMINISTER_QUEUE:*, labels=*,
+, reservationsContinueLooking=true, orderingPolicy=utilization, priority=0
+2025-12-03 16:56:14,852 INFO  [Time-limited test] capacity.ParentQueue (ParentQueue.java:<init>(117)) - Initialized parent-queue root name=root, fullname=root
+2025-12-03 16:56:14,859 INFO  [Time-limited test] capacity.LeafQueue (LeafQueue.java:setupQueueConfigs(283)) - Initializing root.default
+capacity = 1.0 [= (float) configuredCapacity / 100 ]
+absoluteCapacity = 1.0 [= parentAbsoluteCapacity * capacity ]
+maxCapacity = 1.0 [= configuredMaxCapacity ]
+absoluteMaxCapacity = 1.0 [= 1.0 maximumCapacity undefined, (parentAbsoluteMaxCapacity * maximumCapacity) / 100 otherwise ]
+effectiveMinResource=<memory:0, vCores:0>
+ , effectiveMaxResource=<memory:0, vCores:0>
+userLimit = 100 [= configuredUserLimit ]
+userLimitFactor = 1.0 [= configuredUserLimitFactor ]
+maxApplications = 10000 [= configuredMaximumSystemApplicationsPerQueue or (int)(configuredMaximumSystemApplications * absoluteCapacity)]
+maxApplicationsPerUser = 10000 [= (int)(maxApplications * (userLimit / 100.0f) * userLimitFactor) ]
+maxParallelApps = 2147483647
+usedCapacity = 0.0 [= usedResourcesMemory / (clusterResourceMemory * absoluteCapacity)]
+absoluteUsedCapacity = 0.0 [= usedResourcesMemory / clusterResourceMemory]
+maxAMResourcePerQueuePercent = 0.1 [= configuredMaximumAMResourcePercent ]
+minimumAllocationFactor = 0.984375 [= (float)(maximumAllocationMemory - minimumAllocationMemory) / maximumAllocationMemory ]
+maximumAllocation = <memory:8192, vCores:4> [= configuredMaxAllocation ]
+numContainers = 0 [= currentNumContainers ]
+state = RUNNING [= configuredState ]
+acls = SUBMIT_APP:*ADMINISTER_QUEUE:* [= configuredAcls ]
+nodeLocalityDelay = -1
+rackLocalityAdditionalDelay = -1
+labels=*,
+reservationsContinueLooking = true
+preemptionDisabled = true
+defaultAppPriorityPerQueue = 0
+priority = 0
+maxLifetime = -1 seconds
+defaultLifetime = -1 seconds
+2025-12-03 16:56:14,859 INFO  [Time-limited test] capacity.CapacitySchedulerQueueManager (CapacitySchedulerQueueManager.java:parseQueue(299)) - Initialized queue: root.default
+2025-12-03 16:56:14,859 INFO  [Time-limited test] capacity.CapacitySchedulerQueueManager (CapacitySchedulerQueueManager.java:parseQueue(299)) - Initialized queue: root
+2025-12-03 16:56:14,861 INFO  [Time-limited test] capacity.CapacitySchedulerQueueManager (CapacitySchedulerQueueManager.java:initializeQueues(167)) - Initialized root queue root: numChildQueue= 1, capacity=1.0, absoluteCapacity=1.0, usedResources=<memory:0, vCores:0>usedCapacity=0.0, numApps=0, numContainers=0
+2025-12-03 16:56:14,861 INFO  [Time-limited test] placement.UserGroupMappingPlacementRule (UserGroupMappingPlacementRule.java:initialize(376)) - Initialized queue mappings, override: false
+2025-12-03 16:56:14,861 INFO  [Time-limited test] capacity.WorkflowPriorityMappingsManager (WorkflowPriorityMappingsManager.java:initialize(107)) - Initialized workflow priority mappings, override: false
+2025-12-03 16:56:14,861 INFO  [Time-limited test] placement.MultiNodeSortingManager (MultiNodeSortingManager.java:registerMultiNodePolicyNames(104)) - MultiNode scheduling is 'false', and configured policies are 
+2025-12-03 16:56:14,861 INFO  [Time-limited test] capacity.CapacityScheduler (CapacityScheduler.java:initScheduler(388)) - Initialized CapacityScheduler with calculator=class org.apache.hadoop.yarn.util.resource.DefaultResourceCalculator, minimumAllocation=<<memory:128, vCores:1>>, maximumAllocation=<<memory:8192, vCores:4>>, asynchronousScheduling=false, asyncScheduleInterval=5ms,multiNodePlacementEnabled=false, assignMultipleEnabled=true, maxAssignPerHeartbeat=100, offswitchPerHeartbeatLimit=1
+2025-12-03 16:56:14,864 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2854)) - dynamic-resources.xml not found
+2025-12-03 16:56:14,865 INFO  [Time-limited test] resourcemanager.AMSProcessingChain (AMSProcessingChain.java:init(63)) - Initializing AMS Processing chain. Root Processor=[org.apache.hadoop.yarn.server.resourcemanager.DefaultAMSProcessor].
+2025-12-03 16:56:14,865 INFO  [Time-limited test] resourcemanager.ApplicationMasterService (ApplicationMasterService.java:addPlacementConstraintHandler(139)) - placement-processor placement handler will be used. Scheduling requests will be handled by the placement constraint processor
+2025-12-03 16:56:14,867 INFO  [Time-limited test] resourcemanager.AMSProcessingChain (AMSProcessingChain.java:addProcessor(76)) - Adding [org.apache.hadoop.yarn.server.resourcemanager.scheduler.constraint.processor.PlacementConstraintProcessor] tp top of AMS Processing chain. 
+2025-12-03 16:56:14,867 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(103)) - Initializing Constraint Placement Processor:
+2025-12-03 16:56:14,868 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(119)) - Placement Algorithm [org.apache.hadoop.yarn.server.resourcemanager.scheduler.constraint.algorithm.DefaultPlacementAlgorithm]
+2025-12-03 16:56:14,868 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(124)) - Placement Algorithm Iterator[SERIAL]
+2025-12-03 16:56:14,868 INFO  [Time-limited test] processor.PlacementDispatcher (PlacementDispatcher.java:init(57)) - Initializing Constraint Placement Planner:
+2025-12-03 16:56:14,869 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(138)) - Planning Algorithm pool size [1]
+2025-12-03 16:56:14,869 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(144)) - Scheduler pool size [1]
+2025-12-03 16:56:14,869 INFO  [Time-limited test] processor.PlacementConstraintProcessor (PlacementConstraintProcessor.java:init(152)) - Num retry attempts [3]
+2025-12-03 16:56:14,870 INFO  [Time-limited test] resourcemanager.AMSProcessingChain (AMSProcessingChain.java:addProcessor(76)) - Adding [org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService$OpportunisticAMSProcessor] tp top of AMS Processing chain. 
+2025-12-03 16:56:14,872 INFO  [Time-limited test] metrics.TimelineServiceV1Publisher (TimelineServiceV1Publisher.java:serviceInit(115)) - Timeline service v1 batch publishing disabled
+2025-12-03 16:56:14,947 INFO  [Time-limited test] impl.TimelineClientImpl (TimelineClientImpl.java:serviceInit(130)) - Timeline service address: localhost:9188
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.metrics.AbstractSystemMetricsPublisher$SystemMetricsEventType for class org.apache.hadoop.yarn.server.resourcemanager.metrics.TimelineServiceV1Publisher$TimelineV1EventHandler
+2025-12-03 16:56:15,041 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.RMAppAttemptEventType for class org.apache.hadoop.yarn.server.MiniYARNCluster$1
+2025-12-03 16:56:15,042 INFO  [Time-limited test] server.MiniYARNCluster (MiniYARNCluster.java:prepareDirs(614)) - Created localDir in /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-localDir-nm-0_0
+2025-12-03 16:56:15,042 INFO  [Time-limited test] server.MiniYARNCluster (MiniYARNCluster.java:prepareDirs(614)) - Created logDir in /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-logDir-nm-0_0
+2025-12-03 16:56:15,042 INFO  [Time-limited test] net.ServerSocketUtil (ServerSocketUtil.java:getPort(55)) - Using port 8048
+2025-12-03 16:56:15,042 INFO  [Time-limited test] server.MiniYARNCluster (MiniYARNCluster.java:serviceInit(596)) - Starting NM: 0
+2025-12-03 16:56:15,047 INFO  [Time-limited test] resourceplugin.ResourcePluginManager (ResourcePluginManager.java:getPluginsFromConfig(96)) - No Resource plugins found from configuration!
+2025-12-03 16:56:15,048 INFO  [Time-limited test] resourceplugin.ResourcePluginManager (ResourcePluginManager.java:getPluginsFromConfig(98)) - Found Resource plugins from configuration: null
+2025-12-03 16:56:15,048 INFO  [Time-limited test] resourceplugin.ResourcePluginManager (ResourcePluginManager.java:initialize(86)) - The pluggable device framework is not enabled. If you want, please set true to yarn.nodemanager.pluggable-device-framework.enabled
+2025-12-03 16:56:15,075 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.container.ContainerEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManagerImpl$ContainerEventDispatcher
+2025-12-03 16:56:15,076 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.application.ApplicationEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManagerImpl$ApplicationEventDispatcher
+2025-12-03 16:56:15,076 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.event.LocalizationEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManagerImpl$LocalizationEventHandlerWrapper
+2025-12-03 16:56:15,076 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.AuxServicesEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.AuxServices
+2025-12-03 16:56:15,076 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.monitor.ContainersMonitorEventType for class org.apache.hadoop.yarn.server.MiniYARNCluster$CustomQueueingContainerManagerImpl$1
+2025-12-03 16:56:15,076 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainersLauncherEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainersLauncher
+2025-12-03 16:56:15,077 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.scheduler.ContainerSchedulerEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.scheduler.ContainerScheduler
+2025-12-03 16:56:15,077 INFO  [Time-limited test] tracker.NMLogAggregationStatusTracker (NMLogAggregationStatusTracker.java:<init>(89)) - the rolling interval seconds for the NodeManager Cached Log aggregation status is 600
+2025-12-03 16:56:15,079 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.ContainerManagerEventType for class org.apache.hadoop.yarn.server.MiniYARNCluster$CustomQueueingContainerManagerImpl
+2025-12-03 16:56:15,079 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.NodeManagerEventType for class org.apache.hadoop.yarn.server.MiniYARNCluster$ShortCircuitedNodeManager
+2025-12-03 16:56:15,079 INFO  [Time-limited test] impl.MetricsSystemImpl (MetricsSystemImpl.java:init(158)) - NodeManager metrics system started (again)
+2025-12-03 16:56:15,081 INFO  [Time-limited test] health.NodeHealthScriptRunner (NodeHealthScriptRunner.java:shouldRun(265)) - Missing location for the node health check script "script".
+2025-12-03 16:56:15,085 INFO  [Time-limited test] nodemanager.DirectoryCollection (DirectoryCollection.java:<init>(240)) - Disk Validator 'basic' is loaded.
+2025-12-03 16:56:15,088 INFO  [Time-limited test] nodemanager.DirectoryCollection (DirectoryCollection.java:<init>(240)) - Disk Validator 'basic' is loaded.
+2025-12-03 16:56:15,093 WARN  [Time-limited test] nodemanager.DirectoryCollection (DirectoryCollection.java:checkDirs(480)) - Directory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-localDir-nm-0_0 error, used space above threshold of 90.0%, removing from list of valid directories
+2025-12-03 16:56:15,094 WARN  [Time-limited test] nodemanager.DirectoryCollection (DirectoryCollection.java:checkDirs(480)) - Directory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-logDir-nm-0_0 error, used space above threshold of 90.0%, removing from list of valid directories
+2025-12-03 16:56:15,094 INFO  [Time-limited test] nodemanager.LocalDirsHandlerService (LocalDirsHandlerService.java:logDiskStatus(521)) - Disk(s) failed: 1/1 local-dirs usable space is below configured utilization percentage/no more usable space [ /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-localDir-nm-0_0 : used space above threshold of 90.0% ] ; 1/1 log-dirs usable space is below configured utilization percentage/no more usable space [ /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-logDir-nm-0_0 : used space above threshold of 90.0% ] 
+2025-12-03 16:56:15,094 ERROR [Time-limited test] nodemanager.LocalDirsHandlerService (LocalDirsHandlerService.java:updateDirsAfterTest(514)) - Most of the disks failed. 1/1 local-dirs usable space is below configured utilization percentage/no more usable space [ /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-localDir-nm-0_0 : used space above threshold of 90.0% ] ; 1/1 log-dirs usable space is below configured utilization percentage/no more usable space [ /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/TestDSTimelineV10_RestartInjected-logDir-nm-0_0 : used space above threshold of 90.0% ] 
+2025-12-03 16:56:15,095 WARN  [Time-limited test] util.ResourceCalculatorPlugin (ResourceCalculatorPlugin.java:getResourceCalculatorPlugin(194)) - Failed to instantiate default resource calculator. Could not determine OS
+2025-12-03 16:56:15,095 INFO  [Time-limited test] nodemanager.NodeResourceMonitorImpl (NodeResourceMonitorImpl.java:serviceInit(100)) -  Using ResourceCalculatorPlugin : null
+2025-12-03 16:56:15,096 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.loghandler.event.LogHandlerEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.loghandler.NonAggregatingLogHandler
+2025-12-03 16:56:15,096 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.sharedcache.SharedCacheUploadEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.sharedcache.SharedCacheUploadService
+2025-12-03 16:56:15,096 INFO  [Time-limited test] server.MiniYARNCluster (MiniYARNCluster.java:createAMRMProxyService(942)) - CustomAMRMProxyService is disabled
+2025-12-03 16:56:15,096 INFO  [Time-limited test] localizer.ResourceLocalizationService (ResourceLocalizationService.java:validateConf(243)) - per directory file limit = 8192
+2025-12-03 16:56:15,112 INFO  [Time-limited test] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.event.LocalizerEventType for class org.apache.hadoop.yarn.server.nodemanager.containermanager.localizer.ResourceLocalizationService$LocalizerTracker
+2025-12-03 16:56:15,114 INFO  [Time-limited test] resources.ResourceHandlerModule (ResourceHandlerModule.java:initNetworkResourceHandler(198)) - Using traffic control bandwidth handler
+2025-12-03 16:56:15,116 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(159)) - Using ResourceCalculatorPlugin: org.apache.hadoop.yarn.util.LinuxResourceCalculatorPlugin@51b58248
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(164)) - Using ResourceCalculatorProcessTree: class org.apache.hadoop.yarn.util.ProcfsBasedProcessTree
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:setAllocatedResourcesForContainers(1028)) - Setting the resources allocated to containers to <memory:4096, vCores:8>
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(208)) - Physical memory check enabled: true
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(209)) - Virtual memory check enabled: true
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(210)) - Elastic memory control enabled: false
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(211)) - Strict memory control enabled: true
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(236)) - ContainersMonitor enabled: true
+2025-12-03 16:56:15,118 INFO  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(241)) - Container Log Monitor Enabled: false
+2025-12-03 16:56:15,119 WARN  [Time-limited test] util.SysInfoLinux (SysInfoLinux.java:readProcMemInfoFile(254)) - Couldn't read /proc/meminfo; can't determine memory settings
+2025-12-03 16:56:15,119 WARN  [Time-limited test] monitor.ContainersMonitorImpl (ContainersMonitorImpl.java:serviceInit(253)) - NodeManager's totalPmem could not be calculated. Setting it to -1
+2025-12-03 16:56:15,119 INFO  [Time-limited test] containermanager.ContainerManagerImpl (ContainerManagerImpl.java:recover(399)) - Not a recoverable state store. Nothing to recover.
+2025-12-03 16:56:15,119 INFO  [Time-limited test] conf.Configuration (Configuration.java:getConfResourceAsInputStream(2854)) - node-resources.xml not found
+2025-12-03 16:56:15,119 INFO  [Time-limited test] resource.ResourceUtils (ResourceUtils.java:addResourcesFileToConf(476)) - Unable to find 'node-resources.xml'.
+2025-12-03 16:56:15,120 INFO  [Time-limited test] nodemanager.NodeStatusUpdaterImpl (NodeStatusUpdaterImpl.java:serviceInit(204)) - Nodemanager resources is set to: <memory:4096, vCores:8>
+2025-12-03 16:56:15,120 WARN  [Time-limited test] util.ResourceCalculatorPlugin (ResourceCalculatorPlugin.java:getResourceCalculatorPlugin(194)) - Failed to instantiate default resource calculator. Could not determine OS
+2025-12-03 16:56:15,120 INFO  [Time-limited test] nodemanager.NodeStatusUpdaterImpl (NodeStatusUpdaterImpl.java:serviceInit(250)) - Initialized nodemanager with : physical-memory=4096 virtual-memory=32768 virtual-cores=8
+2025-12-03 16:56:15,135 WARN  [Time-limited test] applicationhistoryservice.ApplicationHistoryServer (ApplicationHistoryServer.java:createApplicationHistoryManager(213)) - The filesystem based application history store is deprecated.
+2025-12-03 16:56:15,136 INFO  [Time-limited test] impl.MetricsSystemImpl (MetricsSystemImpl.java:init(158)) - ApplicationHistoryServer metrics system started (again)
+2025-12-03 16:56:15,138 INFO  [Time-limited test] applicationhistoryservice.ApplicationHistoryManagerImpl (ApplicationHistoryManagerImpl.java:serviceInit(61)) - ApplicationHistory Init
+2025-12-03 16:56:15,153 INFO  [Time-limited test] util.log (Log.java:initialized(170)) - Logging initialized @1069ms to org.eclipse.jetty.util.log.Slf4jLog
+2025-12-03 16:56:15,189 WARN  [Time-limited test] server.AuthenticationFilter (AuthenticationFilter.java:constructSecretProvider(240)) - Unable to initialize FileSignerSecretProvider, falling back to use random secrets. Reason: Could not read signature secret file: /Users/allenwang/hadoop-http-auth-signature-secret
+2025-12-03 16:56:15,191 INFO  [Time-limited test] http.HttpRequestLog (HttpRequestLog.java:getRequestLog(82)) - Http request log for http.requests.resourcemanager is not defined
+2025-12-03 16:56:15,193 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addGlobalFilter(1124)) - Added global filter 'safety' (class=org.apache.hadoop.http.HttpServer2$QuotingInputFilter)
+2025-12-03 16:56:15,194 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1097)) - Added filter RMAuthenticationFilter (class=org.apache.hadoop.yarn.server.security.http.RMAuthenticationFilter) to context cluster
+2025-12-03 16:56:15,194 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter RMAuthenticationFilter (class=org.apache.hadoop.yarn.server.security.http.RMAuthenticationFilter) to context static
+2025-12-03 16:56:15,194 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter RMAuthenticationFilter (class=org.apache.hadoop.yarn.server.security.http.RMAuthenticationFilter) to context logs
+2025-12-03 16:56:15,195 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1097)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context cluster
+2025-12-03 16:56:15,195 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context static
+2025-12-03 16:56:15,195 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context logs
+2025-12-03 16:56:15,404 INFO  [Time-limited test] webapp.WebApps (WebApps.java:build(428)) - Registered webapp guice modules
+2025-12-03 16:56:15,408 INFO  [Time-limited test] http.HttpServer2 (HttpServer2.java:bindListener(1357)) - Jetty bound to port 55208
+2025-12-03 16:56:15,408 INFO  [Time-limited test] server.Server (Server.java:doStart(375)) - jetty-9.4.48.v20220622; built: 2022-06-21T20:42:25.880Z; git: 6b67c5719d1f4371b33655ff2d047d24e171e49a; jvm 1.8.0_452-b09
+2025-12-03 16:56:15,421 INFO  [Time-limited test] server.session (DefaultSessionIdManager.java:doStart(334)) - DefaultSessionIdManager workerName=node0
+2025-12-03 16:56:15,421 INFO  [Time-limited test] server.session (DefaultSessionIdManager.java:doStart(339)) - No SessionScavenger set, using defaults
+2025-12-03 16:56:15,421 INFO  [Time-limited test] server.session (HouseKeeper.java:startScavenging(132)) - node0 Scavenging every 600000ms
+2025-12-03 16:56:15,427 WARN  [Time-limited test] server.AuthenticationFilter (AuthenticationFilter.java:constructSecretProvider(240)) - Unable to initialize FileSignerSecretProvider, falling back to use random secrets. Reason: Could not read signature secret file: /Users/allenwang/hadoop-http-auth-signature-secret
+2025-12-03 16:56:15,431 INFO  [Time-limited test] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:15,431 INFO  [Thread[Thread-24,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:run(763)) - Starting expired delegation token remover thread, tokenRemoverScanInterval=60 min(s)
+2025-12-03 16:56:15,431 INFO  [Thread[Thread-24,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:15,432 INFO  [Time-limited test] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.s.ServletContextHandler@7e091af{logs,/logs,file:///Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/log,AVAILABLE}
+2025-12-03 16:56:15,433 INFO  [Time-limited test] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.s.ServletContextHandler@234e82b7{static,/static,jar:file:/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-yarn-common/3.3.5/hadoop-yarn-common-3.3.5.jar!/webapps/static,AVAILABLE}
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.server.resourcemanager.webapp.JAXBContextResolver as a provider class
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.server.resourcemanager.webapp.RMWebServices as a root resource class
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.webapp.GenericExceptionHandler as a provider class
+Dec 03, 2025 4:56:15 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
+INFO: Initiating Jersey application, version 'Jersey: 1.19.4 05/24/2017 03:20 PM'
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.server.resourcemanager.webapp.JAXBContextResolver to GuiceManagedComponentProvider with the scope "Singleton"
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.webapp.GenericExceptionHandler to GuiceManagedComponentProvider with the scope "Singleton"
+Dec 03, 2025 4:56:15 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.server.resourcemanager.webapp.RMWebServices to GuiceManagedComponentProvider with the scope "Singleton"
+2025-12-03 16:56:15,820 INFO  [Time-limited test] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.w.WebAppContext@3e340494{cluster,/,file:///private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jetty-localhost-55208-hadoop-yarn-common-3_3_5_jar-_-any-269678207430537996/webapp/,AVAILABLE}{jar:file:/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-yarn-common/3.3.5/hadoop-yarn-common-3.3.5.jar!/webapps/cluster}
+2025-12-03 16:56:15,825 INFO  [Time-limited test] server.AbstractConnector (AbstractConnector.java:doStart(333)) - Started ServerConnector@61e7b01d{HTTP/1.1, (http/1.1)}{localhost:55208}
+2025-12-03 16:56:15,825 INFO  [Time-limited test] server.Server (Server.java:doStart(415)) - Started @1740ms
+2025-12-03 16:56:15,825 INFO  [Time-limited test] webapp.WebApps (WebApps.java:start(473)) - Web app cluster started at 55208
+2025-12-03 16:56:15,846 INFO  [Time-limited test] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 100, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:15,851 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:15,875 INFO  [Listener at localhost/55210] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.server.api.ResourceManagerAdministrationProtocolPB to the server
+2025-12-03 16:56:15,875 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:15,875 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:15,879 INFO  [Listener at localhost/55210] resourcemanager.ResourceManager (ResourceManager.java:transitionToActive(1455)) - Transitioning to active state
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] recovery.RMStateStore (RMStateStore.java:transition(565)) - Updating AMRMToken
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] security.RMContainerTokenSecretManager (RMContainerTokenSecretManager.java:rollMasterKey(109)) - Rolling master-key for container-tokens
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] security.NMTokenSecretManagerInRM (NMTokenSecretManagerInRM.java:rollMasterKey(95)) - Rolling master-key for nm-tokens
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] security.RMDelegationTokenSecretManager (RMDelegationTokenSecretManager.java:storeNewMasterKey(92)) - storing master key with keyID 1
+2025-12-03 16:56:15,883 INFO  [Listener at localhost/55210] recovery.RMStateStore (RMStateStore.java:transition(516)) - Storing RMDTMasterKey.
+2025-12-03 16:56:15,883 INFO  [Thread[Thread-42,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:run(763)) - Starting expired delegation token remover thread, tokenRemoverScanInterval=60 min(s)
+2025-12-03 16:56:15,883 INFO  [Thread[Thread-42,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:15,883 INFO  [Thread[Thread-42,5,main]] security.RMDelegationTokenSecretManager (RMDelegationTokenSecretManager.java:storeNewMasterKey(92)) - storing master key with keyID 2
+2025-12-03 16:56:15,883 INFO  [Thread[Thread-42,5,main]] recovery.RMStateStore (RMStateStore.java:transition(516)) - Storing RMDTMasterKey.
+2025-12-03 16:56:15,911 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:initStore(68)) - Created store directory :file:/tmp/hadoop-yarn-allenwang/node-labels
+2025-12-03 16:56:15,922 INFO  [Listener at localhost/55210] nodelabels.CommonNodeLabelsManager (RMNodeLabelsManager.java:replaceLabelsOnNode(178)) - No Modified Node label Mapping to replace
+2025-12-03 16:56:15,941 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:recoverFromStore(182)) - Finished write mirror at:file:/tmp/hadoop-yarn-allenwang/node-labels/nodelabel.mirror
+2025-12-03 16:56:15,941 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:recoverFromStore(183)) - Finished create editlog file at:file:/tmp/hadoop-yarn-allenwang/node-labels/nodelabel.editlog
+2025-12-03 16:56:15,949 INFO  [Listener at localhost/55210] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.nodelabels.event.NodeLabelsStoreEventType for class org.apache.hadoop.yarn.nodelabels.CommonNodeLabelsManager$ForwardingEventHandler
+2025-12-03 16:56:15,953 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:initStore(68)) - Created store directory :/Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/nodeattributes
+2025-12-03 16:56:15,966 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:recoverFromStore(182)) - Finished write mirror at:/Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/nodeattributes/nodeattribute.mirror
+2025-12-03 16:56:15,966 INFO  [Listener at localhost/55210] store.AbstractFSNodeStore (AbstractFSNodeStore.java:recoverFromStore(183)) - Finished create editlog file at:/Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/test-dir/TestDSTimelineV10_RestartInjected/yarn-8658441/nodeattributes/nodeattribute.editlog
+2025-12-03 16:56:15,966 INFO  [Listener at localhost/55210] event.AsyncDispatcher (AsyncDispatcher.java:register(267)) - Registering class org.apache.hadoop.yarn.server.resourcemanager.nodelabels.NodeAttributesStoreEventType for class org.apache.hadoop.yarn.server.resourcemanager.nodelabels.NodeAttributesManagerImpl$ForwardingEventHandler
+2025-12-03 16:56:15,966 INFO  [Listener at localhost/55210] placement.MultiNodeSortingManager (MultiNodeSortingManager.java:serviceStart(66)) - Starting NodeSortingService=MultiNodeSortingManager
+2025-12-03 16:56:15,971 INFO  [Listener at localhost/55210] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 5000, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:15,971 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:15,973 INFO  [Listener at localhost/55211] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.server.api.ResourceTrackerPB to the server
+2025-12-03 16:56:15,973 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:15,973 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:15,982 INFO  [org.apache.hadoop.util.JvmPauseMonitor$Monitor@50c62723] util.JvmPauseMonitor (JvmPauseMonitor.java:run(188)) - Starting JVM pause monitor
+2025-12-03 16:56:15,986 INFO  [Listener at localhost/55211] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 5000, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:15,989 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:15,991 INFO  [Listener at localhost/55212] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.api.ApplicationMasterProtocolPB to the server
+2025-12-03 16:56:15,991 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:15,991 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:16,019 INFO  [Listener at localhost/55212] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 5000, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:16,019 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:16,020 INFO  [Listener at localhost/55213] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.api.ApplicationClientProtocolPB to the server
+2025-12-03 16:56:16,020 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:16,020 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:16,250 INFO  [Listener at localhost/55213] webproxy.ProxyCA (ProxyCA.java:createCert(183)) - Created Certificate for OU=YARN-08237b8e-d30b-40cb-b5db-1418cb2240c2
+2025-12-03 16:56:16,274 INFO  [Listener at localhost/55213] recovery.RMStateStore (RMStateStore.java:transition(647)) - Storing CA Certificate and Private Key
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] resourcemanager.ResourceManager (ResourceManager.java:transitionToActive(1471)) - Transitioned to active state
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] server.MiniYARNCluster (MiniYARNCluster.java:startResourceManager(387)) - MiniYARN ResourceManager address: localhost:55213
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] server.MiniYARNCluster (MiniYARNCluster.java:startResourceManager(389)) - MiniYARN ResourceManager web address: localhost:55208
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] server.MiniYARNCluster (MiniYARNCluster.java:serviceStart(507)) - Starting resourcemanager 0
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] server.MiniYARNCluster (MiniYARNCluster.java:serviceStart(508)) - MiniYARN ResourceManager address: localhost:55213
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] server.MiniYARNCluster (MiniYARNCluster.java:serviceStart(510)) - MiniYARN ResourceManager web address: localhost:55208
+2025-12-03 16:56:16,275 INFO  [Listener at localhost/55213] nodemanager.NodeResourceMonitorImpl (NodeResourceMonitorImpl.java:isEnabled(115)) - ResourceCalculatorPlugin is unavailable on this system. org.apache.hadoop.yarn.server.nodemanager.NodeResourceMonitorImpl is disabled.
+2025-12-03 16:56:16,288 INFO  [Listener at localhost/55213] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 2000, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:16,289 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:16,290 INFO  [Listener at localhost/55215] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.api.ContainerManagementProtocolPB to the server
+2025-12-03 16:56:16,290 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:16,290 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:16,292 INFO  [Listener at localhost/55215] security.NMContainerTokenSecretManager (NMContainerTokenSecretManager.java:setNodeId(265)) - Updating node address : localhost:55215
+2025-12-03 16:56:16,294 INFO  [Listener at localhost/55215] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 500, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:16,294 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:16,295 INFO  [Listener at localhost/55216] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.server.nodemanager.api.LocalizationProtocolPB to the server
+2025-12-03 16:56:16,295 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:16,295 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:16,296 INFO  [Listener at localhost/55216] localizer.ResourceLocalizationService (ResourceLocalizationService.java:serviceStart(391)) - Localizer started on port 55216
+2025-12-03 16:56:16,297 INFO  [Listener at localhost/55216] containermanager.ContainerManagerImpl (ContainerManagerImpl.java:serviceStart(680)) - ContainerManager started at /127.0.0.1:55215
+2025-12-03 16:56:16,297 INFO  [Listener at localhost/55216] containermanager.ContainerManagerImpl (ContainerManagerImpl.java:serviceStart(681)) - ContainerManager bound to localhost/127.0.0.1:0
+2025-12-03 16:56:16,297 WARN  [Listener at localhost/55216] tracker.NMLogAggregationStatusTracker (NMLogAggregationStatusTracker.java:serviceStart(96)) - Log Aggregation is disabled.So is the LogAggregationStatusTracker.
+2025-12-03 16:56:16,298 INFO  [Listener at localhost/55216] webapp.WebServer (WebServer.java:serviceStart(108)) - Instantiating NMWebApp at localhost:0
+2025-12-03 16:56:16,299 WARN  [Listener at localhost/55216] server.AuthenticationFilter (AuthenticationFilter.java:constructSecretProvider(240)) - Unable to initialize FileSignerSecretProvider, falling back to use random secrets. Reason: Could not read signature secret file: /Users/allenwang/hadoop-http-auth-signature-secret
+2025-12-03 16:56:16,299 INFO  [Listener at localhost/55216] http.HttpRequestLog (HttpRequestLog.java:getRequestLog(82)) - Http request log for http.requests.nodemanager is not defined
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addGlobalFilter(1124)) - Added global filter 'safety' (class=org.apache.hadoop.http.HttpServer2$QuotingInputFilter)
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1097)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context node
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context static
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter static_user_filter (class=org.apache.hadoop.http.lib.StaticUserWebFilter$StaticUserFilter) to context logs
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1097)) - Added filter authentication (class=org.apache.hadoop.security.authentication.server.AuthenticationFilter) to context node
+2025-12-03 16:56:16,300 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter authentication (class=org.apache.hadoop.security.authentication.server.AuthenticationFilter) to context static
+2025-12-03 16:56:16,301 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:addFilter(1107)) - Added filter authentication (class=org.apache.hadoop.security.authentication.server.AuthenticationFilter) to context logs
+Dec 03, 2025 4:56:16 PM com.google.inject.servlet.GuiceFilter setPipeline
+WARNING: Multiple Servlet injectors detected. This is a warning indicating that you have more than one GuiceFilter running in your web application. If this is deliberate, you may safely ignore this message. If this is NOT deliberate however, your application may not work as expected.
+2025-12-03 16:56:16,315 INFO  [Listener at localhost/55216] webapp.WebApps (WebApps.java:build(428)) - Registered webapp guice modules
+2025-12-03 16:56:16,316 INFO  [Listener at localhost/55216] http.HttpServer2 (HttpServer2.java:bindListener(1357)) - Jetty bound to port 55217
+2025-12-03 16:56:16,316 INFO  [Listener at localhost/55216] server.Server (Server.java:doStart(375)) - jetty-9.4.48.v20220622; built: 2022-06-21T20:42:25.880Z; git: 6b67c5719d1f4371b33655ff2d047d24e171e49a; jvm 1.8.0_452-b09
+2025-12-03 16:56:16,316 INFO  [Listener at localhost/55216] server.session (DefaultSessionIdManager.java:doStart(334)) - DefaultSessionIdManager workerName=node0
+2025-12-03 16:56:16,316 INFO  [Listener at localhost/55216] server.session (DefaultSessionIdManager.java:doStart(339)) - No SessionScavenger set, using defaults
+2025-12-03 16:56:16,316 INFO  [Listener at localhost/55216] server.session (HouseKeeper.java:startScavenging(132)) - node0 Scavenging every 660000ms
+2025-12-03 16:56:16,317 WARN  [Listener at localhost/55216] server.AuthenticationFilter (AuthenticationFilter.java:constructSecretProvider(240)) - Unable to initialize FileSignerSecretProvider, falling back to use random secrets. Reason: Could not read signature secret file: /Users/allenwang/hadoop-http-auth-signature-secret
+2025-12-03 16:56:16,317 INFO  [Listener at localhost/55216] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.s.ServletContextHandler@10e5337{logs,/logs,file:///Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/target/log,AVAILABLE}
+2025-12-03 16:56:16,317 INFO  [Listener at localhost/55216] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.s.ServletContextHandler@1175f910{static,/static,jar:file:/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-yarn-common/3.3.5/hadoop-yarn-common-3.3.5.jar!/webapps/static,AVAILABLE}
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.server.nodemanager.webapp.NMWebServices as a root resource class
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.webapp.GenericExceptionHandler as a provider class
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory register
+INFO: Registering org.apache.hadoop.yarn.server.nodemanager.webapp.JAXBContextResolver as a provider class
+Dec 03, 2025 4:56:16 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
+INFO: Initiating Jersey application, version 'Jersey: 1.19.4 05/24/2017 03:20 PM'
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.server.nodemanager.webapp.JAXBContextResolver to GuiceManagedComponentProvider with the scope "Singleton"
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.webapp.GenericExceptionHandler to GuiceManagedComponentProvider with the scope "Singleton"
+Dec 03, 2025 4:56:16 PM com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory getComponentProvider
+INFO: Binding org.apache.hadoop.yarn.server.nodemanager.webapp.NMWebServices to GuiceManagedComponentProvider with the scope "Singleton"
+2025-12-03 16:56:16,440 INFO  [Listener at localhost/55216] handler.ContextHandler (ContextHandler.java:doStart(921)) - Started o.e.j.w.WebAppContext@4dfac4b1{node,/,file:///private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jetty-localhost-55217-hadoop-yarn-common-3_3_5_jar-_-any-3300231620480087359/webapp/,AVAILABLE}{jar:file:/Users/allenwang/.m2/repository/org/apache/hadoop/hadoop-yarn-common/3.3.5/hadoop-yarn-common-3.3.5.jar!/webapps/node}
+2025-12-03 16:56:16,441 INFO  [Listener at localhost/55216] server.AbstractConnector (AbstractConnector.java:doStart(333)) - Started ServerConnector@587e15f1{HTTP/1.1, (http/1.1)}{localhost:55217}
+2025-12-03 16:56:16,441 INFO  [Listener at localhost/55216] server.Server (Server.java:doStart(415)) - Started @2356ms
+2025-12-03 16:56:16,441 INFO  [Listener at localhost/55216] webapp.WebApps (WebApps.java:start(473)) - Web app node started at 55217
+2025-12-03 16:56:16,441 INFO  [Listener at localhost/55216] nodemanager.NodeStatusUpdaterImpl (NodeStatusUpdaterImpl.java:serviceStart(267)) - Node ID assigned is : localhost:55215
+2025-12-03 16:56:16,441 INFO  [org.apache.hadoop.util.JvmPauseMonitor$Monitor@7e305087] util.JvmPauseMonitor (JvmPauseMonitor.java:run(188)) - Starting JVM pause monitor
+2025-12-03 16:56:16,471 INFO  [Listener at localhost/55216] resourcemanager.ResourceTrackerService (ResourceTrackerService.java:registerNodeManager(617)) - NodeManager from node localhost(cmPort: 55215 httpPort: 55217) registered with capability: <memory:4096, vCores:8>, assigned nodeId localhost:55215
+2025-12-03 16:56:16,472 INFO  [Listener at localhost/55216] security.NMContainerTokenSecretManager (NMContainerTokenSecretManager.java:setMasterKey(143)) - Rolling master-key for container-tokens, got key with id -673850240
+2025-12-03 16:56:16,472 INFO  [RM Event dispatcher] rmnode.RMNodeImpl (RMNodeImpl.java:handle(774)) - localhost:55215 Node Transitioned from NEW to UNHEALTHY
+2025-12-03 16:56:16,472 INFO  [Listener at localhost/55216] security.NMTokenSecretManagerInNM (NMTokenSecretManagerInNM.java:setMasterKey(143)) - Rolling master-key for container-tokens, got key with id 1044766356
+2025-12-03 16:56:16,472 INFO  [Listener at localhost/55216] nodemanager.NodeStatusUpdaterImpl (NodeStatusUpdaterImpl.java:registerWithRM(486)) - Registered with ResourceManager as localhost:55215 with total resource of <memory:4096, vCores:8>
+2025-12-03 16:56:16,473 INFO  [org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService:Event Processor] distributed.NodeQueueLoadMonitor (NodeQueueLoadMonitor.java:removeNode(234)) - Node delete event for: localhost
+2025-12-03 16:56:16,473 ERROR [SchedulerEventDispatcher:Event Processor] capacity.CapacityScheduler (CapacityScheduler.java:removeNode(2123)) - Attempting to remove non-existent node localhost:55215
+2025-12-03 16:56:16,473 ERROR [org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService:Event Processor] event.EventDispatcher (MarkerIgnoringBase.java:error(159)) - Error in handling event type NODE_REMOVED to the Event Dispatcher
+java.lang.NullPointerException
+	at org.apache.hadoop.yarn.server.resourcemanager.scheduler.distributed.NodeQueueLoadMonitor.removeFromNodeIdsByRack(NodeQueueLoadMonitor.java:400)
+	at org.apache.hadoop.yarn.server.resourcemanager.scheduler.distributed.NodeQueueLoadMonitor.removeNode(NodeQueueLoadMonitor.java:236)
+	at org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService.handle(OpportunisticContainerAllocatorAMService.java:399)
+	at org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService.handle(OpportunisticContainerAllocatorAMService.java:94)
+	at org.apache.hadoop.yarn.event.EventDispatcher$EventProcessor.run(EventDispatcher.java:83)
+	at java.lang.Thread.run(Thread.java:750)
+2025-12-03 16:56:16,473 INFO  [Listener at localhost/55216] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:16,475 INFO  [org.apache.hadoop.yarn.server.resourcemanager.OpportunisticContainerAllocatorAMService:Event Processor] event.EventDispatcher (EventDispatcher.java:run(97)) - Exiting, bbye..
+2025-12-03 16:56:16,475 INFO  [Thread[Thread-261,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:run(763)) - Starting expired delegation token remover thread, tokenRemoverScanInterval=60 min(s)
+2025-12-03 16:56:16,475 INFO  [Thread[Thread-261,5,main]] delegation.AbstractDelegationTokenSecretManager (AbstractDelegationTokenSecretManager.java:updateCurrentKey(411)) - Updating the current master key for generating delegation tokens
+2025-12-03 16:56:16,476 INFO  [Listener at localhost/55216] ipc.CallQueueManager (CallQueueManager.java:<init>(90)) - Using callQueue: class java.util.concurrent.LinkedBlockingQueue, queueCapacity: 1000, scheduler: class org.apache.hadoop.ipc.DefaultRpcScheduler, ipcBackoff: false.
+2025-12-03 16:56:16,477 INFO  [Socket Reader #1 for port 0] ipc.Server (Server.java:run(1319)) - Starting Socket Reader #1 for port 0
+2025-12-03 16:56:16,478 INFO  [Listener at localhost/55218] pb.RpcServerFactoryPBImpl (RpcServerFactoryPBImpl.java:createServer(174)) - Adding protocol org.apache.hadoop.yarn.api.ApplicationHistoryProtocolPB to the server
+2025-12-03 16:56:16,478 INFO  [IPC Server Responder] ipc.Server (Server.java:run(1558)) - IPC Server Responder: starting
+2025-12-03 16:56:16,478 INFO  [IPC Server listener on 0] ipc.Server (Server.java:run(1398)) - IPC Server listener on 0: starting
+2025-12-03 16:56:16,480 INFO  [Listener at localhost/55218] applicationhistoryservice.ApplicationHistoryClientService (ApplicationHistoryClientService.java:serviceStart(111)) - Instantiated ApplicationHistoryClientService at localhost/127.0.0.1:55218
+2025-12-03 16:56:16,480 INFO  [Listener at localhost/55218] applicationhistoryservice.ApplicationHistoryManagerImpl (ApplicationHistoryManagerImpl.java:serviceStart(71)) - Starting ApplicationHistory
+2025-12-03 16:56:16,480 INFO  [org.apache.hadoop.util.JvmPauseMonitor$Monitor@413d855f] util.JvmPauseMonitor (JvmPauseMonitor.java:run(188)) - Starting JVM pause monitor

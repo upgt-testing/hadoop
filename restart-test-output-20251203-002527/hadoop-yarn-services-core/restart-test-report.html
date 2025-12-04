@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Restart Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    h2 { color: #666; margin-top: 30px; }
+    .summary { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+    .stat { display: inline-block; margin-right: 30px; }
+    .stat-label { font-weight: bold; color: #666; }
+    .stat-value { font-size: 24px; font-weight: bold; }
+    .passed { color: #4caf50; }
+    .failed { color: #f44336; }
+    .flaky { color: #ff9800; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
+    th { background: #333; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; }
+    tr:hover { background: #f5f5f5; }
+    .badge { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .badge-pass { background: #4caf50; color: white; }
+    .badge-fail { background: #f44336; color: white; }
+    .badge-baseline { background: #2196f3; color: white; }
+    .error-details { background: #fff3e0; padding: 10px; margin-top: 5px; border-left: 3px solid #ff9800; font-family: monospace; font-size: 12px; }
+    .timestamp { color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Restart Test Report</h1>
+  <div class="summary">
+    <div class="stat">
+      <div class="stat-label">Total Tests</div>
+      <div class="stat-value">68</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Passed</div>
+      <div class="stat-value passed">68</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Failed</div>
+      <div class="stat-value failed">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pass Rate</div>
+      <div class="stat-value">100.0%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Duration</div>
+      <div class="stat-value">82m 2s</div>
+    </div>
+    <div class="timestamp">Generated: 2025-12-03 04:19:36</div>
+  </div>
+  <h2>Test Results</h2>
+  <table>
+    <tr>
+      <th>Test</th>
+      <th>Scenario</th>
+      <th>Status</th>
+      <th>Duration</th>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>64976 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94405 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>65246 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateFlexStopDestroyService</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>64270 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11010 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94852 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11005 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testStopDestroySavedService</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11065 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54966 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94844 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54740 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentStartOrder</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54356 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34354 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94350 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34378 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameDifferentUser</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34338 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34272 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94909 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34853 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceSameNameSameUser</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>34305 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>69255 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>71511 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>68900 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRecoverComponentsAfterRMRestart</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>68863 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>83491 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94979 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>83329 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>83162 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>115600 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94848 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>115676 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testExpressUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>115302 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>79579 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94885 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>79593 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCancelUpgrade</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>79727 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95639 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95956 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95851 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testCreateServiceWithPlacementPolicy</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95765 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54238 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94413 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>56356 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigtermDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>56275 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>60024 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>94819 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>56356 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMSigkillDoesNotKillApplication</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54107 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>93402 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95966 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>92781 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testComponentHealthThresholdMonitor</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95038 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>62441 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95246 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>62552 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testRestartServiceForNonExistingInRM</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>62883 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>54440 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95821 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>52509 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testAMFailureValidity</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>52140 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>41317 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95779 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>41237 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected#testServiceSameNameWithFailure</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>41535 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>103620 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances</td>
+      <td>after_cluster_setup [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>95878 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances</td>
+      <td>after_cluster_setup [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>103994 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected#testDecommissionInstances</td>
+      <td>after_cluster_setup [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>104021 ms</td>
+    </tr>
+  </table>
+</body>
+</html>

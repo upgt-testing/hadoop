@@ -1,0 +1,285 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] -------------< org.apache.hadoop:hadoop-yarn-server-tests >-------------
+[INFO] Building Apache Hadoop YARN Server Tests 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-server-tests ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/restarts-config/restart-config.json
+[INFO] Generated 37 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=before_nm_connect, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=before_nm_connect, target=resourcemanager, mode=GRACEFUL] - Restart Restart...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=before_nm_connect, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=before_nm_connect, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 7 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=GRACEFUL] - Restart Restart...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 8 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 9 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks [position=after_nm_connect, target=nodemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 10 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 11 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 12 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 13 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization [position=after_nm_connect, target=nodemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 14 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=null, target=null, mode=null] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 15 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 16 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_cluster_start, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 17 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_initial_health_check, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_initial_health_check, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 18 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_initial_health_check, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_initial_health_check, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 19 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 20 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 21 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 22 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 23 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 24 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=null, target=null, mode=null] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 25 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 26 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_cluster_start, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 27 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_initial_health_check, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_initial_health_check, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 28 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_initial_health_check, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_initial_health_check, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 29 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 30 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 31 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_first_disk_failure, target=nodemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 32 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 33 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures [position=after_node_unhealthy, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 1, Errors: 0
+[INFO] ========================================
+[INFO] 
+[INFO] Test 34 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 35 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 36 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 37 of 37
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager [position=after_cluster_start, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  37
+[INFO] Passed: 13
+[INFO] Failed: 24
+[INFO] Pass Rate: 35.1%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks@before_nm_connect[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks@after_nm_connect[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization@after_nm_connect[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@baseline
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_cluster_start[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_initial_health_check[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_initial_health_check[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_first_disk_failure[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_first_disk_failure[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_first_disk_failure[nodemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_node_unhealthy[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures@after_node_unhealthy[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@baseline
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_cluster_start[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_initial_health_check[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_initial_health_check[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_first_disk_failure[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_first_disk_failure[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_first_disk_failure[nodemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_node_unhealthy[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures@after_node_unhealthy[resourcemanager,CRASH]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  08:48 min
+[INFO] Finished at: 2025-12-03T18:48:17-06:00
+[INFO] ------------------------------------------------------------------------

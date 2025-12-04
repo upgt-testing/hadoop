@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

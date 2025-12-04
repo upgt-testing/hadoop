@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Restart Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    h2 { color: #666; margin-top: 30px; }
+    .summary { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+    .stat { display: inline-block; margin-right: 30px; }
+    .stat-label { font-weight: bold; color: #666; }
+    .stat-value { font-size: 24px; font-weight: bold; }
+    .passed { color: #4caf50; }
+    .failed { color: #f44336; }
+    .flaky { color: #ff9800; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
+    th { background: #333; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; }
+    tr:hover { background: #f5f5f5; }
+    .badge { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .badge-pass { background: #4caf50; color: white; }
+    .badge-fail { background: #f44336; color: white; }
+    .badge-baseline { background: #2196f3; color: white; }
+    .error-details { background: #fff3e0; padding: 10px; margin-top: 5px; border-left: 3px solid #ff9800; font-family: monospace; font-size: 12px; }
+    .timestamp { color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Restart Test Report</h1>
+  <div class="summary">
+    <div class="stat">
+      <div class="stat-label">Total Tests</div>
+      <div class="stat-value">37</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Passed</div>
+      <div class="stat-value passed">37</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Failed</div>
+      <div class="stat-value failed">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pass Rate</div>
+      <div class="stat-value">100.0%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Duration</div>
+      <div class="stat-value">9m 7s</div>
+    </div>
+    <div class="timestamp">Generated: 2025-12-03 04:36:14</div>
+  </div>
+  <h2>Test Results</h2>
+  <table>
+    <tr>
+      <th>Test</th>
+      <th>Scenario</th>
+      <th>Status</th>
+      <th>Duration</th>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7222 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>90432 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected#testTimelineServiceStartInMiniCluster</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7356 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6151 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td>before_nm_connect [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>19199 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td>before_nm_connect [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6384 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td>after_nm_connect [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6206 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td>after_nm_connect [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6410 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected#testClusterWorks</td>
+      <td>after_nm_connect [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6280 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>27169 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization</td>
+      <td>after_nm_connect [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6166 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization</td>
+      <td>after_nm_connect [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>27192 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected#testUpdateNodeUtilization</td>
+      <td>after_nm_connect [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>27487 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6111 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>90553 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6134 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_initial_health_check [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5925 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_initial_health_check [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6046 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5954 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5943 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6043 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_node_unhealthy [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5891 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLocalDirsFailures</td>
+      <td>after_node_unhealthy [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6002 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5920 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>90283 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6252 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_initial_health_check [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6000 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_initial_health_check [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5881 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6053 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5904 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_first_disk_failure [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5929 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_node_unhealthy [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5954 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected#testLogDirsFailures</td>
+      <td>after_node_unhealthy [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5811 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>3795 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>3787 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>3810 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected#testContainerManager</td>
+      <td>after_cluster_start [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>3840 ms</td>
+    </tr>
+  </table>
+</body>
+</html>

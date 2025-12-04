@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Restart Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    h2 { color: #666; margin-top: 30px; }
+    .summary { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+    .stat { display: inline-block; margin-right: 30px; }
+    .stat-label { font-weight: bold; color: #666; }
+    .stat-value { font-size: 24px; font-weight: bold; }
+    .passed { color: #4caf50; }
+    .failed { color: #f44336; }
+    .flaky { color: #ff9800; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
+    th { background: #333; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; }
+    tr:hover { background: #f5f5f5; }
+    .badge { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .badge-pass { background: #4caf50; color: white; }
+    .badge-fail { background: #f44336; color: white; }
+    .badge-baseline { background: #2196f3; color: white; }
+    .error-details { background: #fff3e0; padding: 10px; margin-top: 5px; border-left: 3px solid #ff9800; font-family: monospace; font-size: 12px; }
+    .timestamp { color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Restart Test Report</h1>
+  <div class="summary">
+    <div class="stat">
+      <div class="stat-label">Total Tests</div>
+      <div class="stat-value">8</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Passed</div>
+      <div class="stat-value passed">8</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Failed</div>
+      <div class="stat-value failed">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pass Rate</div>
+      <div class="stat-value">100.0%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Duration</div>
+      <div class="stat-value">3m 40s</div>
+    </div>
+    <div class="timestamp">Generated: 2025-12-03 02:57:32</div>
+  </div>
+  <h2>Test Results</h2>
+  <table>
+    <tr>
+      <th>Test</th>
+      <th>Scenario</th>
+      <th>Status</th>
+      <th>Duration</th>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11208 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>89447 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11430 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_launcher_init [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>37212 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_launcher_init [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11132 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_launcher_run [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>37476 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_launcher_run [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11189 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher</td>
+      <td>after_launcher_run [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11264 ms</td>
+    </tr>
+  </table>
+</body>
+</html>

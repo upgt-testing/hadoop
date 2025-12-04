@@ -1,0 +1,2643 @@
+{
+  "summary": {
+    "passRate": 53.898305084745765,
+    "startTime": 1764794265048,
+    "passed": 159,
+    "failed": 136,
+    "endTime": 1764802463672,
+    "durationMs": 8198624,
+    "totalTests": 295
+  },
+  "flakiness": {
+    "flakyTests": [],
+    "flakinessRate": 0.0,
+    "totalScenarios": 295,
+    "flakyScenarios": 0,
+    "detected": false
+  },
+  "results": [
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "passed": true,
+      "durationMs": 8179
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 86037,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7944
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "position": "after_queue_status_check",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 86300,
+      "errorMessage": "YarnRuntime"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoOverrideIntraQueuePreemption",
+      "position": "after_queue_status_check",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 8211
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionEnabled",
+      "passed": true,
+      "durationMs": 7517
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionEnabled",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 85042,
+      "errorMessage": "Restart R..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionEnabled",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7895
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionDisabled",
+      "passed": true,
+      "durationMs": 8107
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionDisabled",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 85765,
+      "errorMessage": "Restart ..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected",
+      "testMethod": "testGetQueueInfoPreemptionDisabled",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7443
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testSubmitIncorrectQueueToCapacityScheduler",
+      "passed": true,
+      "durationMs": 4759
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testSubmitIncorrectQueueToCapacityScheduler",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4726
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testSubmitIncorrectQueueToCapacityScheduler",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4644
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testSubmitIncorrectQueueToCapacityScheduler",
+      "position": "before_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4630
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testSubmitIncorrectQueueToCapacityScheduler",
+      "position": "before_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4652
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "passed": true,
+      "durationMs": 4766
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4719
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4632
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "position": "after_managed_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4780
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "position": "after_managed_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4715
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected",
+      "testMethod": "testAMMRTokens",
+      "position": "after_managed_app_submit",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 4890
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testCreateReservation",
+      "passed": true,
+      "durationMs": 4725
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testCreateReservation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4742
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testCreateReservation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4639
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testCreateReservation",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4771
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testCreateReservation",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4774
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testUpdateReservation",
+      "passed": true,
+      "durationMs": 4699
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testUpdateReservation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4776
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testUpdateReservation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4841
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testUpdateReservation",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4698
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testUpdateReservation",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4706
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByReservationId",
+      "passed": true,
+      "durationMs": 4711
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByReservationId",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4686
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByReservationId",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4653
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByReservationId",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4661
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByReservationId",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4797
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeInterval",
+      "passed": true,
+      "durationMs": 4750
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeInterval",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4777
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeInterval",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4748
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeInterval",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4756
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeInterval",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4724
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByInvalidTimeInterval",
+      "passed": true,
+      "durationMs": 4805
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByInvalidTimeInterval",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4743
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByInvalidTimeInterval",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4740
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByInvalidTimeInterval",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4715
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByInvalidTimeInterval",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4733
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeIntervalContainingNoReservations",
+      "passed": true,
+      "durationMs": 4815
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeIntervalContainingNoReservations",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4697
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeIntervalContainingNoReservations",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4714
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeIntervalContainingNoReservations",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4623
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testListReservationsByTimeIntervalContainingNoReservations",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4759
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testReservationDelete",
+      "passed": true,
+      "durationMs": 4646
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testReservationDelete",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4661
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testReservationDelete",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4730
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testReservationDelete",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4709
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected",
+      "testMethod": "testReservationDelete",
+      "position": "after_reservation_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4796
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "passed": true,
+      "durationMs": 7029
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6998
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6940
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 7074
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7017
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6977
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testPromotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7044
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "passed": true,
+      "durationMs": 7047
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6941
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6893
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6964
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6776
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6854
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testDemotionFromAcquired",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6818
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "passed": true,
+      "durationMs": 6868
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6794
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6832
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6875
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6918
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 7104
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testMixedAllocationAndRelease",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6848
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "passed": true,
+      "durationMs": 6978
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6972
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6886
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6791
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6969
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6697
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected",
+      "testMethod": "testOpportunisticAllocation",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6776
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "passed": false,
+      "durationMs": 124695,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 84984,
+      "errorMessage": "Restart Restart failed at ..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 125000,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 125167,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 125077,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyE2E",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 125125,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "passed": false,
+      "durationMs": 125467,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 84103,
+      "errorMessage": "Restart Restart ..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 124781,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 124827,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 124778,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testAMRMProxyTokenRenewal",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 125331,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testE2ETokenSwap",
+      "passed": false,
+      "durationMs": 125234,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testE2ETokenSwap",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 85108,
+      "errorMessage": "Restart Restart failed at..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testE2ETokenSwap",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 124960,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testE2ETokenSwap",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 124751,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected",
+      "testMethod": "testE2ETokenSwap",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 124837,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "passed": false,
+      "durationMs": 12608,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 89486,
+      "errorMessage": "Restart Restart..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 12894,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 12520,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 12565,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_container_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 12603,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 12488,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "after_container_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 12490,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 12706,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClientNoCleanupOnStop",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 13369,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "passed": false,
+      "durationMs": 12890,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 90985,
+      "errorMessage": "Restart Restart failed at posi..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 13369,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 12569,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_container_management",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 12509,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_container_management",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 12499,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "after_container_management",
+      "target": "nodemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 12526,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 12475,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected",
+      "testMethod": "testNMClient",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 12525,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "passed": true,
+      "durationMs": 4856
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4847
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4747
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 4704
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4699
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4610
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4711
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4718
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4709
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClient",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4940
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "passed": true,
+      "durationMs": 4703
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4745
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4780
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 4770
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4805
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4943
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4777
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4736
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4830
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientAllocReqId",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4779
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "passed": true,
+      "durationMs": 4878
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4790
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 5263
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 4849
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 5094
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_container_allocation",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4969
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 5284
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "after_container_allocation",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4785
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4856
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAMRMClientWithSaslEncryption",
+      "position": "before_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4796
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "passed": true,
+      "durationMs": 4687
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4959
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 5107
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 5030
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "position": "after_blacklist_update",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 4987
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected",
+      "testMethod": "testAllocationWithBlacklist",
+      "position": "after_blacklist_update",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 4839
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "passed": true,
+      "durationMs": 7031
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6855
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6984
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 7072
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "position": "after_scheduling_request",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 7035
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByPlacementProcessor",
+      "position": "after_scheduling_request",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6966
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "passed": true,
+      "durationMs": 6958
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 6987
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6808
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 6980
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "position": "after_scheduling_request",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 7328
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected",
+      "testMethod": "testAMRMClientWithPlacementConstraintsByScheduler",
+      "position": "after_scheduling_request",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7146
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "passed": true,
+      "durationMs": 9675
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 904691
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 9467
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 10228,
+      "errorMessage": "Restart Restart fail..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 9012
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testExplicitFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 9013
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "passed": true,
+      "durationMs": 10803
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 9587,
+      "errorMessage": "Restart Restart fai..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 10935
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 10669,
+      "errorMessage": "Restart Restart fai..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 10907
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testAutomaticFailover",
+      "position": "after_first_failover",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 11124
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testWebAppProxyInStandAloneMode",
+      "passed": true,
+      "durationMs": 8060
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testWebAppProxyInStandAloneMode",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 904601
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testWebAppProxyInStandAloneMode",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 8150
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testWebAppProxyInStandAloneMode",
+      "position": "after_failover",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 10263,
+      "errorMessage": "Restart R..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected",
+      "testMethod": "testWebAppProxyInStandAloneMode",
+      "position": "after_failover",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 8116
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "passed": true,
+      "durationMs": 7317
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 19765,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7306
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_first_active",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 9712
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_first_active",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7457
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_first_active",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 7378
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_failover",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 9622
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testHedgingRequestProxyProvider",
+      "position": "after_failover",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7548
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testRestartedRM",
+      "passed": true,
+      "durationMs": 6878
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testRestartedRM",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 90615,
+      "errorMessage": "Restart R..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testRestartedRM",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 6889
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "passed": true,
+      "durationMs": 7491
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 19922,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7414
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 65105,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 7896
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProvider",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 7475
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "passed": true,
+      "durationMs": 10523
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 19938,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 9672
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 65196,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 9276
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected",
+      "testMethod": "testFederationRMFailoverProxyProviderWithoutFlushFacadeCache",
+      "position": "after_rm_active",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 9087
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationReportOnHA",
+      "passed": false,
+      "durationMs": 38842,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationReportOnHA",
+      "position": "after_get_app_report",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38981,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationReportOnHA",
+      "position": "after_get_app_report",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38699,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetNewApplicationOnHA",
+      "passed": false,
+      "durationMs": 38777,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetNewApplicationOnHA",
+      "position": "after_create_app",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38767,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetNewApplicationOnHA",
+      "position": "after_create_app",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38796,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterMetricsOnHA",
+      "passed": false,
+      "durationMs": 39360,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterMetricsOnHA",
+      "position": "after_get_cluster_metrics",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38723,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterMetricsOnHA",
+      "position": "after_get_cluster_metrics",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38936,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationsOnHA",
+      "passed": false,
+      "durationMs": 38756,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationsOnHA",
+      "position": "after_get_applications",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38704,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationsOnHA",
+      "position": "after_get_applications",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38644,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterNodesOnHA",
+      "passed": false,
+      "durationMs": 38951,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterNodesOnHA",
+      "position": "after_get_node_reports",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38894,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetClusterNodesOnHA",
+      "position": "after_get_node_reports",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38924,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueInfoOnHA",
+      "passed": false,
+      "durationMs": 38861,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueInfoOnHA",
+      "position": "after_get_queue_info",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38914,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueInfoOnHA",
+      "position": "after_get_queue_info",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38841,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueUserAclsOnHA",
+      "passed": false,
+      "durationMs": 38981,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueUserAclsOnHA",
+      "position": "after_get_queue_acls",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38895,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetQueueUserAclsOnHA",
+      "position": "after_get_queue_acls",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38906,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptReportOnHA",
+      "passed": false,
+      "durationMs": 39050,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptReportOnHA",
+      "position": "after_get_attempt_report",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38969,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptReportOnHA",
+      "position": "after_get_attempt_report",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38960,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptsOnHA",
+      "passed": false,
+      "durationMs": 38992,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptsOnHA",
+      "position": "after_get_attempts",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39205,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetApplicationAttemptsOnHA",
+      "position": "after_get_attempts",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38518,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainerReportOnHA",
+      "passed": false,
+      "durationMs": 38850,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainerReportOnHA",
+      "position": "after_get_container_report",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 38809,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainerReportOnHA",
+      "position": "after_get_container_report",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38929,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainersOnHA",
+      "passed": false,
+      "durationMs": 39032,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainersOnHA",
+      "position": "after_get_containers",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39094,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetContainersOnHA",
+      "position": "after_get_containers",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39254,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testSubmitApplicationOnHA",
+      "passed": false,
+      "durationMs": 39047,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testSubmitApplicationOnHA",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39237,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testSubmitApplicationOnHA",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39166,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testSubmitApplicationOnHA",
+      "position": "after_app_submit",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 39446,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testMoveApplicationAcrossQueuesOnHA",
+      "passed": false,
+      "durationMs": 39179,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testMoveApplicationAcrossQueuesOnHA",
+      "position": "after_move_app_queue",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39118,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testMoveApplicationAcrossQueuesOnHA",
+      "position": "after_move_app_queue",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39048,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testForceKillApplicationOnHA",
+      "passed": false,
+      "durationMs": 39159,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testForceKillApplicationOnHA",
+      "position": "after_app_kill",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39051,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testForceKillApplicationOnHA",
+      "position": "after_app_kill",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39098,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetDelegationTokenOnHA",
+      "passed": false,
+      "durationMs": 39197,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetDelegationTokenOnHA",
+      "position": "after_token_generation",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39145,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetDelegationTokenOnHA",
+      "position": "after_token_generation",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39986,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testGetDelegationTokenOnHA",
+      "position": "after_token_generation",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 39006,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testRenewDelegationTokenOnHA",
+      "passed": false,
+      "durationMs": 39326,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testRenewDelegationTokenOnHA",
+      "position": "after_token_renew",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39367,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testRenewDelegationTokenOnHA",
+      "position": "after_token_renew",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 38971,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testRenewDelegationTokenOnHA",
+      "position": "after_token_renew",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 40051,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testCancelDelegationTokenOnHA",
+      "passed": false,
+      "durationMs": 39846,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testCancelDelegationTokenOnHA",
+      "position": "after_token_cancel",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 39011,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected",
+      "testMethod": "testCancelDelegationTokenOnHA",
+      "position": "after_token_cancel",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 39447,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "passed": false,
+      "durationMs": 7407,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7339,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7415,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "nodemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 7373,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7410,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7357,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 7594,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_connect",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 8684,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_nm_connect",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7508,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7436,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7398,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "nodemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 7516,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7565,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7563,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected",
+      "testMethod": "testResourceTrackerOnHA",
+      "position": "after_heartbeat",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 7624,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testRegisterApplicationMasterOnHA",
+      "passed": false,
+      "durationMs": 7521,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testRegisterApplicationMasterOnHA",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 8776,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testRegisterApplicationMasterOnHA",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7377,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testRegisterApplicationMasterOnHA",
+      "position": "after_am_register",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": false,
+      "durationMs": 8778,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testFinishApplicationMasterOnHA",
+      "passed": false,
+      "durationMs": 7519,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testFinishApplicationMasterOnHA",
+      "position": "after_am_finish",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7702,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testFinishApplicationMasterOnHA",
+      "position": "after_am_finish",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7551,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testAllocateOnHA",
+      "passed": false,
+      "durationMs": 7585,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testAllocateOnHA",
+      "position": "after_allocate",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7383,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testAllocateOnHA",
+      "position": "after_allocate",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7661,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testAllocateOnHA",
+      "position": "after_allocate",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7548,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected",
+      "testMethod": "testAllocateOnHA",
+      "position": "after_allocate",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7572,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected",
+      "testMethod": "testAllocateForTimelineV2OnHA",
+      "passed": false,
+      "durationMs": 8539,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected",
+      "testMethod": "testAllocateForTimelineV2OnHA",
+      "position": "after_allocate_timeline",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7786,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected",
+      "testMethod": "testAllocateForTimelineV2OnHA",
+      "position": "after_allocate_timeline",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7788,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected",
+      "testMethod": "testAllocateForTimelineV2OnHA",
+      "position": "after_allocate_timeline",
+      "target": "nodemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 7676,
+      "errorMessage": "IllegalArgument"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected",
+      "testMethod": "testAllocateForTimelineV2OnHA",
+      "position": "after_allocate_timeline",
+      "target": "nodemanager",
+      "mode": "CRASH",
+      "passed": false,
+      "durationMs": 7892,
+      "errorMessage": "IllegalArgument"
+    }
+  ]
+}

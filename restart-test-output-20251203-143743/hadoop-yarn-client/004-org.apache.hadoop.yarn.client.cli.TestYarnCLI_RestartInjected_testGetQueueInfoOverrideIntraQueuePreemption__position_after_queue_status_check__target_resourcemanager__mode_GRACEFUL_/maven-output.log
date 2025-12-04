@@ -1,0 +1,510 @@
+Failed to load native library:jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib. osinfo: Mac/arm64
+java.lang.UnsatisfiedLinkError: /private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib: dlopen(/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib, 0x0001): tried: '/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib' (code signature in <F39BD07A-AAAE-33A8-89E0-5E893071FD25> '/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib' not valid for use in process: system is shutting down), '/System/Volumes/Preboot/Cryptexes/OS/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib' (no such file), '/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib' (code signature in <F39BD07A-AAAE-33A8-89E0-5E893071FD25> '/private/var/folders/0l/qfnj5yxj18x1hnk332p4wntw0000gn/T/jansi-2.4.1-5b83226afb1863e3-libjansi.jnilib' not valid for use in process: system is shutting d
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----------------< org.apache.hadoop:hadoop-yarn-client >----------------
+[INFO] Building Apache Hadoop YARN Client 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-client ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Skipping mojo execution
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-client ---
+[INFO] Replacement run on 96 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-client ---
+[INFO] Compiling 39 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java uses or overrides a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java uses unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Compiling 1 proto file(s) to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 57 files.
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 1 file.
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-client ---
+[INFO] Compiling 58 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Some input files use or override a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Some input files use unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.481 s <<< FAILURE! - in org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected
+[ERROR] testGetQueueInfoOverrideIntraQueuePreemption(org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected)  Time elapsed: 3.477 s  <<< ERROR!
+org.apache.hadoop.yarn.exceptions.YarnRuntimeException: 
+could not cleanup test dir: java.lang.RuntimeException: org.apache.hadoop.security.KerberosAuthException: failure to login: javax.security.auth.login.LoginException: java.lang.NullPointerException: invalid null input: name
+	at com.sun.security.auth.UnixPrincipal.<init>(UnixPrincipal.java:74)
+	at com.sun.security.auth.module.UnixLoginModule.login(UnixLoginModule.java:133)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at javax.security.auth.login.LoginContext.invoke(LoginContext.java:755)
+	at javax.security.auth.login.LoginContext.access$000(LoginContext.java:195)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:682)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:680)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.login.LoginContext.invokePriv(LoginContext.java:680)
+	at javax.security.auth.login.LoginContext.login(LoginContext.java:587)
+	at org.apache.hadoop.security.UserGroupInformation$HadoopLoginContext.login(UserGroupInformation.java:2091)
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2001)
+	at org.apache.hadoop.security.UserGroupInformation.createLoginUser(UserGroupInformation.java:722)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:672)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:579)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:470)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:448)
+	at org.apache.hadoop.fs.FileContext.getLocalFSFileContext(FileContext.java:434)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:182)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:239)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:251)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1764)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:186)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:239)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:251)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1764)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+Caused by: java.lang.RuntimeException: org.apache.hadoop.security.KerberosAuthException: failure to login: javax.security.auth.login.LoginException: java.lang.NullPointerException: invalid null input: name
+	at com.sun.security.auth.UnixPrincipal.<init>(UnixPrincipal.java:74)
+	at com.sun.security.auth.module.UnixLoginModule.login(UnixLoginModule.java:133)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at javax.security.auth.login.LoginContext.invoke(LoginContext.java:755)
+	at javax.security.auth.login.LoginContext.access$000(LoginContext.java:195)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:682)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:680)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.login.LoginContext.invokePriv(LoginContext.java:680)
+	at javax.security.auth.login.LoginContext.login(LoginContext.java:587)
+	at org.apache.hadoop.security.UserGroupInformation$HadoopLoginContext.login(UserGroupInformation.java:2091)
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2001)
+	at org.apache.hadoop.security.UserGroupInformation.createLoginUser(UserGroupInformation.java:722)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:672)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:579)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:470)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:448)
+	at org.apache.hadoop.fs.FileContext.getLocalFSFileContext(FileContext.java:434)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:182)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:239)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:251)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1764)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:476)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:448)
+	at org.apache.hadoop.fs.FileContext.getLocalFSFileContext(FileContext.java:434)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:182)
+	... 32 more
+Caused by: org.apache.hadoop.security.KerberosAuthException: failure to login: javax.security.auth.login.LoginException: java.lang.NullPointerException: invalid null input: name
+	at com.sun.security.auth.UnixPrincipal.<init>(UnixPrincipal.java:74)
+	at com.sun.security.auth.module.UnixLoginModule.login(UnixLoginModule.java:133)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at javax.security.auth.login.LoginContext.invoke(LoginContext.java:755)
+	at javax.security.auth.login.LoginContext.access$000(LoginContext.java:195)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:682)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:680)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.login.LoginContext.invokePriv(LoginContext.java:680)
+	at javax.security.auth.login.LoginContext.login(LoginContext.java:587)
+	at org.apache.hadoop.security.UserGroupInformation$HadoopLoginContext.login(UserGroupInformation.java:2091)
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2001)
+	at org.apache.hadoop.security.UserGroupInformation.createLoginUser(UserGroupInformation.java:722)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:672)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:579)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:470)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:448)
+	at org.apache.hadoop.fs.FileContext.getLocalFSFileContext(FileContext.java:434)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:182)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:239)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:251)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1764)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2012)
+	at org.apache.hadoop.security.UserGroupInformation.createLoginUser(UserGroupInformation.java:722)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:672)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:579)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:470)
+	... 35 more
+Caused by: javax.security.auth.login.LoginException: java.lang.NullPointerException: invalid null input: name
+	at com.sun.security.auth.UnixPrincipal.<init>(UnixPrincipal.java:74)
+	at com.sun.security.auth.module.UnixLoginModule.login(UnixLoginModule.java:133)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at javax.security.auth.login.LoginContext.invoke(LoginContext.java:755)
+	at javax.security.auth.login.LoginContext.access$000(LoginContext.java:195)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:682)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:680)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.login.LoginContext.invokePriv(LoginContext.java:680)
+	at javax.security.auth.login.LoginContext.login(LoginContext.java:587)
+	at org.apache.hadoop.security.UserGroupInformation$HadoopLoginContext.login(UserGroupInformation.java:2091)
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2001)
+	at org.apache.hadoop.security.UserGroupInformation.createLoginUser(UserGroupInformation.java:722)
+	at org.apache.hadoop.security.UserGroupInformation.getLoginUser(UserGroupInformation.java:672)
+	at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:579)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:470)
+	at org.apache.hadoop.fs.FileContext.getFileContext(FileContext.java:448)
+	at org.apache.hadoop.fs.FileContext.getLocalFSFileContext(FileContext.java:434)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:182)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:239)
+	at org.apache.hadoop.yarn.server.MiniYARNCluster.<init>(MiniYARNCluster.java:251)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1764)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+
+	at javax.security.auth.login.LoginContext.invoke(LoginContext.java:856)
+	at javax.security.auth.login.LoginContext.access$000(LoginContext.java:195)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:682)
+	at javax.security.auth.login.LoginContext$4.run(LoginContext.java:680)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at javax.security.auth.login.LoginContext.invokePriv(LoginContext.java:680)
+	at javax.security.auth.login.LoginContext.login(LoginContext.java:587)
+	at org.apache.hadoop.security.UserGroupInformation$HadoopLoginContext.login(UserGroupInformation.java:2091)
+	at org.apache.hadoop.security.UserGroupInformation.doSubjectLogin(UserGroupInformation.java:2001)
+	... 39 more
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption:1764 » YarnRuntime
+[INFO] 
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[ERROR] There are test failures.
+
+Please refer to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.290 s
+[INFO] Finished at: 2025-12-03T14:31:12-06:00
+[INFO] ------------------------------------------------------------------------
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----------------< org.apache.hadoop:hadoop-yarn-client >----------------
+[INFO] Building Apache Hadoop YARN Client 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-client ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Skipping mojo execution
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-client ---
+[INFO] Replacement run on 96 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-client ---
+[INFO] Compiling 39 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java uses or overrides a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java uses unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Compiling 1 proto file(s) to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 57 files.
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 1 file.
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-client ---
+[INFO] Compiling 58 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Some input files use or override a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Some input files use unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 80.985 s <<< FAILURE! - in org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected
+[ERROR] testGetQueueInfoOverrideIntraQueuePreemption(org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected)  Time elapsed: 80.946 s  <<< ERROR!
+org.restarttest.core.RestartException: Restart failed at position after_queue_status_check
+	at org.restarttest.core.RestartExecutor.execute(RestartExecutor.java:85)
+	at org.restarttest.api.RestartPointBuilder.execute(RestartPointBuilder.java:172)
+	at org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption(TestYarnCLI_RestartInjected.java:1801)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+Caused by: java.lang.Exception: NodeManagers failed to connect after restart
+	at org.restarttest.adapter.yarn.YarnClusterAdapter.waitActive(YarnClusterAdapter.java:136)
+	at org.restarttest.adapter.yarn.YarnClusterAdapter.waitActive(YarnClusterAdapter.java:25)
+	at org.restarttest.core.RestartExecutor.executeRestart(RestartExecutor.java:116)
+	at org.restarttest.core.RestartExecutor.execute(RestartExecutor.java:83)
+	... 31 more
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   TestYarnCLI_RestartInjected.testGetQueueInfoOverrideIntraQueuePreemption:1801 » Restart
+[INFO] 
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[ERROR] There are test failures.
+
+Please refer to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:25 min
+[INFO] Finished at: 2025-12-03T14:40:53-06:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,2514 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Restart Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    h2 { color: #666; margin-top: 30px; }
+    .summary { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+    .stat { display: inline-block; margin-right: 30px; }
+    .stat-label { font-weight: bold; color: #666; }
+    .stat-value { font-size: 24px; font-weight: bold; }
+    .passed { color: #4caf50; }
+    .failed { color: #f44336; }
+    .flaky { color: #ff9800; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
+    th { background: #333; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; }
+    tr:hover { background: #f5f5f5; }
+    .badge { padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+    .badge-pass { background: #4caf50; color: white; }
+    .badge-fail { background: #f44336; color: white; }
+    .badge-baseline { background: #2196f3; color: white; }
+    .error-details { background: #fff3e0; padding: 10px; margin-top: 5px; border-left: 3px solid #ff9800; font-family: monospace; font-size: 12px; }
+    .timestamp { color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Restart Test Report</h1>
+  <div class="summary">
+    <div class="stat">
+      <div class="stat-label">Total Tests</div>
+      <div class="stat-value">295</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Passed</div>
+      <div class="stat-value passed">159</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Failed</div>
+      <div class="stat-value failed">136</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pass Rate</div>
+      <div class="stat-value">53.9%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Duration</div>
+      <div class="stat-value">136m 38s</div>
+    </div>
+    <div class="timestamp">Generated: 2025-12-03 16:54:23</div>
+  </div>
+  <h2>Test Results</h2>
+  <table>
+    <tr>
+      <th>Test</th>
+      <th>Scenario</th>
+      <th>Status</th>
+      <th>Duration</th>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8179 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>86037 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7944 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption</td>
+      <td>after_queue_status_check [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>86300 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">YarnRuntime</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption</td>
+      <td>after_queue_status_check [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8211 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7517 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>85042 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart R...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7895 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8107 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>85765 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart ...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7443 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4759 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4726 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4644 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler</td>
+      <td>before_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4630 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler</td>
+      <td>before_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4652 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4766 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4719 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4632 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td>after_managed_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4780 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td>after_managed_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4715 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens</td>
+      <td>after_managed_app_submit [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4890 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4725 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4742 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4639 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4771 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4774 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4699 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4776 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4841 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4698 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4706 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4711 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4686 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4653 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4661 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4797 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4750 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4777 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4748 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4756 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4724 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4805 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4743 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4740 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4715 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4733 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4815 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4697 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4714 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4623 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4759 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4646 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4661 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4730 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete</td>
+      <td>after_reservation_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4709 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete</td>
+      <td>after_reservation_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4796 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7029 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6998 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6940 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_container_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7074 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_container_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7017 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_container_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6977 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired</td>
+      <td>after_container_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7044 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7047 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6941 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6893 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_container_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6964 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_container_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6776 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_container_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6854 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired</td>
+      <td>after_container_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6818 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6868 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6794 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6832 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_container_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6875 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_container_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6918 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_container_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7104 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease</td>
+      <td>after_container_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6848 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6978 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6972 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6886 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_container_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6791 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_container_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6969 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_container_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6697 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation</td>
+      <td>after_container_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6776 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124695 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>84984 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart failed at ...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125000 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td>after_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125167 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td>after_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125077 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E</td>
+      <td>after_app_submit [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125125 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125467 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>84103 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart ...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124781 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td>after_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124827 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td>after_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124778 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal</td>
+      <td>after_app_submit [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125331 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>125234 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>85108 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart failed at...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124960 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap</td>
+      <td>after_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124751 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap</td>
+      <td>after_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>124837 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12608 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>89486 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12894 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12520 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_container_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12565 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_container_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12603 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_container_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12488 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>after_container_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12490 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>before_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12706 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop</td>
+      <td>before_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>13369 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12890 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>90985 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart failed at posi...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>13369 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12569 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_container_management [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12509 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_container_management [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12499 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>after_container_management [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12526 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>before_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12475 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient</td>
+      <td>before_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>12525 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4856 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4847 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4747 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4704 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_container_allocation [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4699 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_container_allocation [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4610 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_container_allocation [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4711 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>after_container_allocation [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4718 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>before_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4709 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient</td>
+      <td>before_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4940 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4703 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4745 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4780 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4770 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_container_allocation [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4805 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_container_allocation [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4943 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_container_allocation [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4777 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>after_container_allocation [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4736 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>before_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4830 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId</td>
+      <td>before_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4779 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4878 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4790 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5263 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4849 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_container_allocation [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5094 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_container_allocation [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4969 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_container_allocation [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5284 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>after_container_allocation [nodemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4785 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>before_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4856 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption</td>
+      <td>before_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4796 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4687 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4959 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5107 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>5030 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td>after_blacklist_update [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4987 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist</td>
+      <td>after_blacklist_update [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>4839 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7031 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6855 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6984 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7072 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td>after_scheduling_request [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7035 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor</td>
+      <td>after_scheduling_request [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6966 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6958 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6987 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6808 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6980 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td>after_scheduling_request [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7328 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler</td>
+      <td>after_scheduling_request [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7146 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9675 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>904691 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9467 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td>after_first_failover [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>10228 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart fail...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td>after_first_failover [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9012 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover</td>
+      <td>after_first_failover [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9013 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>10803 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>9587 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart fai...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>10935 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td>after_first_failover [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>10669 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart Restart fai...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td>after_first_failover [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>10907 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover</td>
+      <td>after_first_failover [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>11124 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8060 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>904601 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8150 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode</td>
+      <td>after_failover [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>10263 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart R...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode</td>
+      <td>after_failover [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>8116 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7317 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>19765 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7306 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_first_active [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9712 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_first_active [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7457 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_first_active [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7378 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_failover [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9622 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider</td>
+      <td>after_failover [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7548 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6878 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>90615 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Restart R...</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>6889 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7491 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>19922 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7414 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td>after_rm_active [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>65105 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td>after_rm_active [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7896 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider</td>
+      <td>after_rm_active [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>7475 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>10523 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td>after_cluster_start [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>19938 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td>after_cluster_start [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9672 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td>after_rm_active [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>65196 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">Tests run: 1, Failures: 0, Errors: 1</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td>after_rm_active [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9276 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache</td>
+      <td>after_rm_active [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-pass">PASS</span></td>
+      <td>9087 ms</td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38842 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA</td>
+      <td>after_get_app_report [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38981 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA</td>
+      <td>after_get_app_report [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38699 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38777 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA</td>
+      <td>after_create_app [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38767 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA</td>
+      <td>after_create_app [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38796 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39360 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA</td>
+      <td>after_get_cluster_metrics [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38723 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA</td>
+      <td>after_get_cluster_metrics [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38936 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38756 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA</td>
+      <td>after_get_applications [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38704 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA</td>
+      <td>after_get_applications [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38644 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38951 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA</td>
+      <td>after_get_node_reports [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38894 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA</td>
+      <td>after_get_node_reports [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38924 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38861 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA</td>
+      <td>after_get_queue_info [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38914 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA</td>
+      <td>after_get_queue_info [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38841 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38981 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA</td>
+      <td>after_get_queue_acls [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38895 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA</td>
+      <td>after_get_queue_acls [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38906 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39050 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA</td>
+      <td>after_get_attempt_report [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38969 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA</td>
+      <td>after_get_attempt_report [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38960 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38992 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA</td>
+      <td>after_get_attempts [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39205 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA</td>
+      <td>after_get_attempts [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38518 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38850 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA</td>
+      <td>after_get_container_report [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38809 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA</td>
+      <td>after_get_container_report [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38929 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39032 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA</td>
+      <td>after_get_containers [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39094 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA</td>
+      <td>after_get_containers [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39254 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39047 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA</td>
+      <td>after_app_submit [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39237 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA</td>
+      <td>after_app_submit [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39166 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA</td>
+      <td>after_app_submit [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39446 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39179 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA</td>
+      <td>after_move_app_queue [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39118 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA</td>
+      <td>after_move_app_queue [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39048 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39159 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA</td>
+      <td>after_app_kill [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39051 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA</td>
+      <td>after_app_kill [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39098 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39197 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA</td>
+      <td>after_token_generation [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39145 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA</td>
+      <td>after_token_generation [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39986 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA</td>
+      <td>after_token_generation [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39006 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39326 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA</td>
+      <td>after_token_renew [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39367 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA</td>
+      <td>after_token_renew [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>38971 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA</td>
+      <td>after_token_renew [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>40051 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39846 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA</td>
+      <td>after_token_cancel [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39011 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA</td>
+      <td>after_token_cancel [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>39447 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7407 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7339 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7415 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7373 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7410 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7357 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7594 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_connect [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>8684 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_nm_connect [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7508 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7436 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7398 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [nodemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7516 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7565 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7563 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA</td>
+      <td>after_heartbeat [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7624 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7521 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA</td>
+      <td>after_am_register [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>8776 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA</td>
+      <td>after_am_register [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7377 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA</td>
+      <td>after_am_register [resourcemanager, DELAYED_CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>8778 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7519 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA</td>
+      <td>after_am_finish [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7702 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA</td>
+      <td>after_am_finish [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7551 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7585 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA</td>
+      <td>after_allocate [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7383 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA</td>
+      <td>after_allocate [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7661 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA</td>
+      <td>after_allocate [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7548 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA</td>
+      <td>after_allocate [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7572 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA</td>
+      <td><span class="badge badge-baseline">BASELINE</span></td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>8539 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA</td>
+      <td>after_allocate_timeline [resourcemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7786 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA</td>
+      <td>after_allocate_timeline [resourcemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7788 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA</td>
+      <td>after_allocate_timeline [nodemanager, GRACEFUL]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7676 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+    <tr>
+      <td>org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA</td>
+      <td>after_allocate_timeline [nodemanager, CRASH]</td>
+      <td><span class="badge badge-fail">FAIL</span></td>
+      <td>7892 ms</td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div class="error-details">IllegalArgument</div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

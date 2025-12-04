@@ -1,0 +1,1945 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----------------< org.apache.hadoop:hadoop-yarn-client >----------------
+[INFO] Building Apache Hadoop YARN Client 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-client ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/restarts-config/restart-config.json
+[INFO] Generated 295 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=GRACEFUL] - YarnRuntime
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption [position=after_queue_status_check, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 7 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart R...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 8 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 9 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 10 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart ...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 11 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 12 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 13 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 14 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 15 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=before_app_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=before_app_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 16 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=before_app_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testSubmitIncorrectQueueToCapacityScheduler [position=before_app_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 17 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 18 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 19 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 20 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 21 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 22 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClient_RestartInjected#testAMMRTokens [position=after_managed_app_submit, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 23 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 24 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 25 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 26 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 27 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testCreateReservation [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 28 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 29 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 30 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 31 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 32 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testUpdateReservation [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 33 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 34 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 35 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 36 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 37 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByReservationId [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 38 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 39 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 40 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 41 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 42 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 43 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 44 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 45 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 46 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 47 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByInvalidTimeInterval [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 48 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 49 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 50 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 51 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 52 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testListReservationsByTimeIntervalContainingNoReservations [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 53 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 54 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 55 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 56 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_reservation_submit, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 57 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestYarnClientWithReservation_RestartInjected#testReservationDelete [position=after_reservation_submit, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 58 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 59 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 60 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 61 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 62 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 63 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 64 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testPromotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 65 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 66 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 67 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 68 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 69 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 70 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 71 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testDemotionFromAcquired [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 72 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 73 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 74 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 75 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 76 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 77 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 78 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testMixedAllocationAndRelease [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 79 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 80 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 81 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 82 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 83 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 84 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 85 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected#testOpportunisticAllocation [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 86 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 87 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart Restart failed at ...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 88 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_cluster_start, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 89 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 90 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 91 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 92 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 93 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart Restart ...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 94 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_cluster_start, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 95 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 96 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 97 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 98 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 99 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart Restart failed at...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 100 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_cluster_start, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 101 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_app_submit, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_app_submit, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 102 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_app_submit, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap [position=after_app_submit, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 103 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 104 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=GRACEFUL] - Restart Restart...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 105 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 106 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 107 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 108 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 109 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 110 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=after_container_allocate, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 111 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=before_am_finish, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 112 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop [position=before_am_finish, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 113 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=null, target=null, mode=null] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 114 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=GRACEFUL] - Restart Restart failed at posi...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 115 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 116 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 117 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 118 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 119 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=after_container_management, target=nodemanager, mode=DELAYED_CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 120 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=before_am_finish, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 121 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient [position=before_am_finish, target=resourcemanager, mode=CRASH] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 122 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 123 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 124 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 125 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 126 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 127 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 128 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 129 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 130 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 131 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClient [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 132 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 133 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 134 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 135 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 136 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 137 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 138 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 139 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 140 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 141 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientAllocReqId [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 142 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 143 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 144 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 145 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 146 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 147 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 148 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=nodemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 149 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=after_container_allocation, target=nodemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 150 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=before_am_finish, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 151 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAMRMClientWithSaslEncryption [position=before_am_finish, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 152 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 153 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 154 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 155 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 156 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_blacklist_update, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_blacklist_update, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 157 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_blacklist_update, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClient_RestartInjected#testAllocationWithBlacklist [position=after_blacklist_update, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 158 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 159 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 160 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 161 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 162 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_scheduling_request, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_scheduling_request, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 163 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_scheduling_request, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByPlacementProcessor [position=after_scheduling_request, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 164 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 165 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 166 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 167 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 168 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_scheduling_request, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_scheduling_request, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 169 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_scheduling_request, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.api.impl.TestAMRMClientPlacementConstraints_RestartInjected#testAMRMClientWithPlacementConstraintsByScheduler [position=after_scheduling_request, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 170 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 171 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 172 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 173 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=GRACEFUL] - Restart Restart fail...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 174 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 175 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover [position=after_first_failover, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 176 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 177 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart Restart fai...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 178 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 179 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=GRACEFUL] - Restart Restart fai...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 180 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 181 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover [position=after_first_failover, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 182 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 183 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 184 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 185 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_failover, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_failover, target=resourcemanager, mode=GRACEFUL] - Restart R...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 186 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_failover, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode [position=after_failover, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 187 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 188 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 189 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 190 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 191 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 192 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_first_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 193 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_failover, target=resourcemanager, mode=GRACEFUL]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_failover, target=resourcemanager, mode=GRACEFUL]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 194 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_failover, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider [position=after_failover, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 195 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 196 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart R...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 197 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 198 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 199 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 200 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 201 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 202 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 203 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider [position=after_rm_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 204 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 205 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 206 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 207 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=GRACEFUL] - Tests run: 1, Failures: 0, Errors: 1
+[INFO] ========================================
+[INFO] 
+[INFO] Test 208 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 209 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache [position=after_rm_active, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 210 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 211 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=after_get_app_report, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=after_get_app_report, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 212 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=after_get_app_report, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA [position=after_get_app_report, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 213 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 214 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=after_create_app, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=after_create_app, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 215 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=after_create_app, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA [position=after_create_app, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 216 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 217 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=after_get_cluster_metrics, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=after_get_cluster_metrics, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 218 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=after_get_cluster_metrics, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA [position=after_get_cluster_metrics, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 219 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 220 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=after_get_applications, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=after_get_applications, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 221 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=after_get_applications, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA [position=after_get_applications, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 222 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 223 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=after_get_node_reports, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=after_get_node_reports, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 224 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=after_get_node_reports, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA [position=after_get_node_reports, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 225 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 226 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=after_get_queue_info, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=after_get_queue_info, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 227 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=after_get_queue_info, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA [position=after_get_queue_info, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 228 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 229 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=after_get_queue_acls, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=after_get_queue_acls, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 230 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=after_get_queue_acls, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA [position=after_get_queue_acls, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 231 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 232 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=after_get_attempt_report, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=after_get_attempt_report, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 233 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=after_get_attempt_report, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA [position=after_get_attempt_report, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 234 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 235 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=after_get_attempts, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=after_get_attempts, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 236 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=after_get_attempts, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA [position=after_get_attempts, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 237 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 238 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=after_get_container_report, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=after_get_container_report, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 239 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=after_get_container_report, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA [position=after_get_container_report, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 240 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 241 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=after_get_containers, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=after_get_containers, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 242 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=after_get_containers, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA [position=after_get_containers, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 243 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 244 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 245 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 246 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA [position=after_app_submit, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 247 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 248 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=after_move_app_queue, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=after_move_app_queue, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 249 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=after_move_app_queue, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA [position=after_move_app_queue, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 250 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 251 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=after_app_kill, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=after_app_kill, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 252 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=after_app_kill, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA [position=after_app_kill, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 253 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 254 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 255 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 256 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA [position=after_token_generation, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 257 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 258 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 259 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 260 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA [position=after_token_renew, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 261 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 262 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=after_token_cancel, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=after_token_cancel, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 263 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=after_token_cancel, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA [position=after_token_cancel, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 264 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 265 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 266 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 267 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=nodemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 268 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 269 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 270 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_register, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 271 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_connect, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_connect, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 272 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_connect, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_nm_connect, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 273 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 274 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 275 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=nodemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 276 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 277 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 278 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA [position=after_heartbeat, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 279 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 280 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 281 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 282 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA [position=after_am_register, target=resourcemanager, mode=DELAYED_CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 283 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 284 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=after_am_finish, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=after_am_finish, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 285 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=after_am_finish, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA [position=after_am_finish, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 286 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 287 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 288 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 289 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=nodemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 290 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA [position=after_allocate, target=nodemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 291 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=null, target=null, mode=null]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=null, target=null, mode=null] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 292 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=resourcemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 293 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=resourcemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=resourcemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 294 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=nodemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=nodemanager, mode=GRACEFUL] - IllegalArgument
+[INFO] ========================================
+[INFO] 
+[INFO] Test 295 of 295
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=nodemanager, mode=CRASH]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA [position=after_allocate_timeline, target=nodemanager, mode=CRASH] - IllegalArgument
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  295
+[INFO] Passed: 159
+[INFO] Failed: 136
+[INFO] Pass Rate: 53.9%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoOverrideIntraQueuePreemption@after_queue_status_check[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionEnabled@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.cli.TestYarnCLI_RestartInjected#testGetQueueInfoPreemptionDisabled@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@after_cluster_start[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@after_app_submit[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@after_app_submit[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyE2E@after_app_submit[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@after_cluster_start[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@after_app_submit[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@after_app_submit[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testAMRMProxyTokenRenewal@after_app_submit[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap@after_cluster_start[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap@after_app_submit[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected#testE2ETokenSwap@after_app_submit[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_am_register[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_am_register[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_am_register[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_container_allocate[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_container_allocate[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_container_allocate[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@after_container_allocate[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@before_am_finish[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClientNoCleanupOnStop@before_am_finish[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_am_register[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_am_register[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_am_register[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_container_management[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_container_management[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@after_container_management[nodemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@before_am_finish[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected#testNMClient@before_am_finish[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testExplicitFailover@after_first_failover[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testAutomaticFailover@after_first_failover[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected#testWebAppProxyInStandAloneMode@after_failover[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestHedgingRequestRMFailoverProxyProvider_RestartInjected#testHedgingRequestProxyProvider@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestNoHaRMFailoverProxyProvider_RestartInjected#testRestartedRM@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProvider@after_rm_active[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestFederationRMFailoverProxyProvider_RestartInjected#testFederationRMFailoverProxyProviderWithoutFlushFacadeCache@after_rm_active[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA@after_get_app_report[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationReportOnHA@after_get_app_report[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA@after_create_app[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetNewApplicationOnHA@after_create_app[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA@after_get_cluster_metrics[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterMetricsOnHA@after_get_cluster_metrics[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA@after_get_applications[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationsOnHA@after_get_applications[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA@after_get_node_reports[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetClusterNodesOnHA@after_get_node_reports[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA@after_get_queue_info[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueInfoOnHA@after_get_queue_info[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA@after_get_queue_acls[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetQueueUserAclsOnHA@after_get_queue_acls[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA@after_get_attempt_report[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptReportOnHA@after_get_attempt_report[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA@after_get_attempts[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetApplicationAttemptsOnHA@after_get_attempts[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA@after_get_container_report[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainerReportOnHA@after_get_container_report[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA@after_get_containers[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetContainersOnHA@after_get_containers[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA@after_app_submit[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA@after_app_submit[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testSubmitApplicationOnHA@after_app_submit[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA@after_move_app_queue[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testMoveApplicationAcrossQueuesOnHA@after_move_app_queue[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA@after_app_kill[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testForceKillApplicationOnHA@after_app_kill[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA@after_token_generation[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA@after_token_generation[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testGetDelegationTokenOnHA@after_token_generation[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA@after_token_renew[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA@after_token_renew[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testRenewDelegationTokenOnHA@after_token_renew[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA@after_token_cancel[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationClientProtocolOnHA_RestartInjected#testCancelDelegationTokenOnHA@after_token_cancel[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[nodemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_register[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_connect[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_nm_connect[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[nodemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestResourceTrackerOnHA_RestartInjected#testResourceTrackerOnHA@after_heartbeat[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA@after_am_register[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA@after_am_register[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testRegisterApplicationMasterOnHA@after_am_register[resourcemanager,DELAYED_CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA@after_am_finish[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testFinishApplicationMasterOnHA@after_am_finish[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA@after_allocate[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA@after_allocate[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA@after_allocate[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolOnHA_RestartInjected#testAllocateOnHA@after_allocate[nodemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA@baseline
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA@after_allocate_timeline[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA@after_allocate_timeline[resourcemanager,CRASH]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA@after_allocate_timeline[nodemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected#testAllocateForTimelineV2OnHA@after_allocate_timeline[nodemanager,CRASH]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:16 h
+[INFO] Finished at: 2025-12-03T16:54:23-06:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,77 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] -------------< org.apache.hadoop:hadoop-yarn-services-api >-------------
+[INFO] Building Apache Hadoop YARN Services API 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-services-api ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/restarts-config/restart-config.json
+[INFO] Generated 6 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_cluster_setup, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_cluster_setup, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=GRACEFUL] - Restart
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 6
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded [position=after_app_create, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-api/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  6
+[INFO] Passed: 4
+[INFO] Failed: 2
+[INFO] Pass Rate: 66.7%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded@after_cluster_setup[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected#testRegistryCleanedOnLifetimeExceeded@after_app_create[resourcemanager,GRACEFUL]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  07:15 min
+[INFO] Finished at: 2025-12-03T18:39:28-06:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,131 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ----------------< org.apache.hadoop:hadoop-yarn-client >----------------
+[INFO] Building Apache Hadoop YARN Client 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-client ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Skipping mojo execution
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-client ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-client ---
+[INFO] Replacement run on 96 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-client ---
+[INFO] Compiling 39 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java uses or overrides a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/LogsCLI.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java uses unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/main/java/org/apache/hadoop/yarn/client/cli/NodeAttributesCLI.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-yarn-client ---
+[INFO] Compiling 1 proto file(s) to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 57 files.
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-client ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 6 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-client ---
+[INFO] Replacement run on 1 file.
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-client ---
+[INFO] Compiling 58 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Some input files use or override a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/generated-test-sources/java/org/apache/hadoop/yarn/proto/YarnSecurityTestAMRMTokenProtos.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Some input files use unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/src/test/java/org/apache/hadoop/yarn/client/api/impl/TestYarnClientWithReservation_RestartInjected.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-client ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.263 s <<< FAILURE! - in org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected
+[ERROR] testAllocateForTimelineV2OnHA(org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected)  Time elapsed: 3.196 s  <<< ERROR!
+java.lang.IllegalArgumentException: No adapter registered or discovered for cluster type: org.apache.hadoop.yarn.client.ProtocolHATestBase$MiniYARNClusterForHATesting. Available adapters: [class org.apache.hadoop.yarn.server.MiniYARNCluster]. Make sure the adapter module is on the classpath and has META-INF/services/org.restarttest.core.ClusterAdapter configured.
+	at org.restarttest.core.AdapterRegistry.getAdapterOrDiscover(AdapterRegistry.java:118)
+	at org.restarttest.api.RestartPointBuilder.on(RestartPointBuilder.java:53)
+	at org.apache.hadoop.yarn.client.TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected.testAllocateForTimelineV2OnHA(TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected.java:72)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.apache.zookeeper.JUnit4ZKTestRunner$LoggedInvokeMethod.evaluate(JUnit4ZKTestRunner.java:80)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.rules.TestWatcher$1.evaluate(TestWatcher.java:61)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.execute(JUnit4Provider.java:365)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeWithRerun(JUnit4Provider.java:273)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:238)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:159)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:384)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:345)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Errors: 
+[ERROR]   TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected.testAllocateForTimelineV2OnHA:72 » IllegalArgument
+[INFO] 
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] 
+[ERROR] There are test failures.
+
+Please refer to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/target/surefire-reports for the individual test results.
+Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.107 s
+[INFO] Finished at: 2025-12-03T16:54:23-06:00
+[INFO] ------------------------------------------------------------------------

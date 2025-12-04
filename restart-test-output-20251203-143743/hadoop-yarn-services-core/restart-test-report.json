@@ -1,0 +1,597 @@
+{
+  "summary": {
+    "passRate": 76.47058823529412,
+    "startTime": 1764803362197,
+    "passed": 52,
+    "failed": 16,
+    "endTime": 1764808331589,
+    "durationMs": 4969392,
+    "totalTests": 68
+  },
+  "flakiness": {
+    "flakyTests": [],
+    "flakinessRate": 0.0,
+    "totalScenarios": 68,
+    "flakyScenarios": 0,
+    "detected": false
+  },
+  "results": [
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateFlexStopDestroyService",
+      "passed": true,
+      "durationMs": 65172
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateFlexStopDestroyService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94922,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateFlexStopDestroyService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 65058
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateFlexStopDestroyService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 64918
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testStopDestroySavedService",
+      "passed": true,
+      "durationMs": 11031
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testStopDestroySavedService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94727,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testStopDestroySavedService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 11050
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testStopDestroySavedService",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 10927
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentStartOrder",
+      "passed": true,
+      "durationMs": 54601
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentStartOrder",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94691,
+      "errorMessage": "Restart R..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentStartOrder",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 54648
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentStartOrder",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 54656
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameDifferentUser",
+      "passed": true,
+      "durationMs": 34495
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameDifferentUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94735,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameDifferentUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 34461
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameDifferentUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 34874
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameSameUser",
+      "passed": true,
+      "durationMs": 34564
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameSameUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94928,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameSameUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 34761
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceSameNameSameUser",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 34605
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRecoverComponentsAfterRMRestart",
+      "passed": true,
+      "durationMs": 68630
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRecoverComponentsAfterRMRestart",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": true,
+      "durationMs": 71247
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRecoverComponentsAfterRMRestart",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 68954
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRecoverComponentsAfterRMRestart",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 68883
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testUpgrade",
+      "passed": true,
+      "durationMs": 83442
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 95288,
+      "errorMessage": "Restart Restart faile..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 81434
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 83489
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testExpressUpgrade",
+      "passed": true,
+      "durationMs": 115279
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testExpressUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 94945,
+      "errorMessage": "Restart Restar..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testExpressUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 115354
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testExpressUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 115531
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCancelUpgrade",
+      "passed": true,
+      "durationMs": 79970
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCancelUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 95007,
+      "errorMessage": "Restart Restart..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCancelUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 79785
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCancelUpgrade",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 79708
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceWithPlacementPolicy",
+      "passed": true,
+      "durationMs": 95786
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceWithPlacementPolicy",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 95783,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceWithPlacementPolicy",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 95850
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testCreateServiceWithPlacementPolicy",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 96361
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigtermDoesNotKillApplication",
+      "passed": true,
+      "durationMs": 58894
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigtermDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 89425,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigtermDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 59079
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigtermDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 58608
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigkillDoesNotKillApplication",
+      "passed": true,
+      "durationMs": 58786
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigkillDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 88966,
+      "errorMessage": "Tests run: 1, Failures: 0, Errors: 1"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigkillDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 58855
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMSigkillDoesNotKillApplication",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 56679
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentHealthThresholdMonitor",
+      "passed": true,
+      "durationMs": 93323
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentHealthThresholdMonitor",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 90162,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentHealthThresholdMonitor",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 93272
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testComponentHealthThresholdMonitor",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 95858
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRestartServiceForNonExistingInRM",
+      "passed": true,
+      "durationMs": 64910
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRestartServiceForNonExistingInRM",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 90079,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRestartServiceForNonExistingInRM",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 65921
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testRestartServiceForNonExistingInRM",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 64886
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMFailureValidity",
+      "passed": true,
+      "durationMs": 61052
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMFailureValidity",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 90202,
+      "errorMessage": "Restart Re..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMFailureValidity",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 61106
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testAMFailureValidity",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 61143
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testServiceSameNameWithFailure",
+      "passed": true,
+      "durationMs": 47687
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testServiceSameNameWithFailure",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 89065,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testServiceSameNameWithFailure",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 48016
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected",
+      "testMethod": "testServiceSameNameWithFailure",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 47689
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected",
+      "testMethod": "testDecommissionInstances",
+      "passed": true,
+      "durationMs": 110638
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected",
+      "testMethod": "testDecommissionInstances",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 89787,
+      "errorMessage": "Restart"
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected",
+      "testMethod": "testDecommissionInstances",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 109737
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.service.component.TestComponentDecommissionInstances_RestartInjected",
+      "testMethod": "testDecommissionInstances",
+      "position": "after_cluster_setup",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 110764
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] ------------< org.apache.hadoop:hadoop-yarn-services-core >-------------
+[INFO] Building Apache Hadoop YARN Services Core 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-services-core ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-yarn-services-core ---
+[INFO] Compiling 1 proto file(s) to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/target/generated-sources/java
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-services-core ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-services-core ---
+[INFO] Replacement run on 1 file.
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-services-core ---
+[INFO] Replacement run on 128 files.
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-services-core ---
+[INFO] Replacement run on 163 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-services-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-services-core ---
+[INFO] Compiling 129 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/target/classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/ServiceScheduler.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/ServiceScheduler.java uses or overrides a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/ServiceScheduler.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/utils/ServiceApiUtil.java: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/utils/ServiceApiUtil.java uses unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/main/java/org/apache/hadoop/yarn/service/utils/ServiceApiUtil.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-yarn-services-core ---
+[INFO] Skipping mojo execution
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-services-core ---
+[INFO] Replacement run on 35 files.
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-services-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 10 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-services-core ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-services-core ---
+[INFO] Compiling 35 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/test/java/org/apache/hadoop/yarn/service/TestYarnNativeServices.java: Some input files use or override a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/test/java/org/apache/hadoop/yarn/service/TestYarnNativeServices.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/test/java/org/apache/hadoop/yarn/service/ServiceTestUtils.java: Some input files use unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-services/hadoop-yarn-services-core/src/test/java/org/apache/hadoop/yarn/service/ServiceTestUtils.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-services-core ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 75.093 s - in org.apache.hadoop.yarn.service.TestYarnNativeServices_RestartInjected
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:18 min
+[INFO] Finished at: 2025-12-03T17:49:13-06:00
+[INFO] ------------------------------------------------------------------------

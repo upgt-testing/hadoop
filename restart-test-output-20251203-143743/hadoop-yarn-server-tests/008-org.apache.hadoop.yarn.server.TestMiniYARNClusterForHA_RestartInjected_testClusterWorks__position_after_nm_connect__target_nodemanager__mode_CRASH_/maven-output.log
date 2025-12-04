@@ -1,0 +1,85 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] -------------< org.apache.hadoop:hadoop-yarn-server-tests >-------------
+[INFO] Building Apache Hadoop YARN Server Tests 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- antrun:1.7:run (create-testdirs) @ hadoop-yarn-server-tests ---
+[INFO] Executing tasks
+
+main:
+[INFO] Executed tasks
+[INFO] 
+[INFO] --- protobuf:0.5.1:compile (src-compile-protoc) @ hadoop-yarn-server-tests ---
+[INFO] Skipping mojo execution
+[INFO] 
+[INFO] --- enforcer:3.0.0-M1:enforce (banned-illegal-imports) @ hadoop-yarn-server-tests ---
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-sources) @ hadoop-yarn-server-tests ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-sources) @ hadoop-yarn-server-tests ---
+[INFO] Skipping
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-guava) @ hadoop-yarn-server-tests ---
+[INFO] Replacement run on 18 files.
+[INFO] 
+[INFO] --- resources:2.6:resources (default-resources) @ hadoop-yarn-server-tests ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.1:compile (default-compile) @ hadoop-yarn-server-tests ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- protobuf:0.5.1:test-compile (src-test-compile-protoc) @ hadoop-yarn-server-tests ---
+[INFO] Compiling 1 proto file(s) to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/generated-test-sources/java
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-test-sources) @ hadoop-yarn-server-tests ---
+[INFO] Replacement run on 18 files.
+[INFO] 
+[INFO] --- resources:2.6:testResources (default-testResources) @ hadoop-yarn-server-tests ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 3 resources
+[INFO] 
+[INFO] --- replacer:1.5.3:replace (replace-generated-test-sources) @ hadoop-yarn-server-tests ---
+[INFO] Replacement run on 1 file.
+[INFO] 
+[INFO] --- compiler:3.1:testCompile (default-testCompile) @ hadoop-yarn-server-tests ---
+[INFO] Compiling 19 source files to /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/test-classes
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/test/java/org/apache/hadoop/yarn/server/TestMiniYarnCluster.java: Some input files use or override a deprecated API.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/test/java/org/apache/hadoop/yarn/server/TestMiniYarnCluster.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/test/java/org/apache/hadoop/yarn/server/TestContainerManagerSecurity_RestartInjected.java: Some input files use unchecked or unsafe operations.
+[WARNING] /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/src/test/java/org/apache/hadoop/yarn/server/TestContainerManagerSecurity_RestartInjected.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- jar:2.5:test-jar (default) @ hadoop-yarn-server-tests ---
+[INFO] Building jar: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/target/hadoop-yarn-server-tests-3.3.5-tests.jar
+[INFO] 
+[INFO] --- surefire:3.0.0-M1:test (default-test) @ hadoop-yarn-server-tests ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.513 s - in org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.428 s
+[INFO] Finished at: 2025-12-03T18:41:50-06:00
+[INFO] ------------------------------------------------------------------------

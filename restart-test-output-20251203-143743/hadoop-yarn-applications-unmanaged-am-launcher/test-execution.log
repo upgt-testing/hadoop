@@ -1,0 +1,90 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: osx
+[INFO] os.detected.arch: aarch_64
+[INFO] os.detected.bitness: 64
+[INFO] os.detected.version: 26.0
+[INFO] os.detected.version.major: 26
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: osx-aarch_64
+[INFO] 
+[INFO] --< org.apache.hadoop:hadoop-yarn-applications-unmanaged-am-launcher >--
+[INFO] Building Apache Hadoop YARN Unmanaged Am Launcher 3.3.5
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- restart-test:1.0.0-SNAPSHOT:run (default-cli) @ hadoop-yarn-applications-unmanaged-am-launcher ---
+[INFO] Loading restart test configuration from: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/restarts-config/restart-config.json
+[INFO] Generated 8 test executions
+[INFO] ========================================
+[INFO] 
+[INFO] Test 1 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=null, target=null, mode=null]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=null, target=null, mode=null]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 2 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_cluster_start, target=resourcemanager, mode=GRACEFUL] - Restart Restart failed at p...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 3 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_cluster_start, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 4 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_init, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_init, target=resourcemanager, mode=GRACEFUL] - TestTimedOut tes...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 5 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_init, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_init, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 6 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=GRACEFUL]
+[ERROR] ✗ FAILED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=GRACEFUL] - TestTimedOut tes...
+[INFO] ========================================
+[INFO] 
+[INFO] Test 7 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=CRASH]
+[INFO] ========================================
+[INFO] 
+[INFO] Test 8 of 8
+[INFO] ========================================
+[INFO] Executing: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ✓ PASSED: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher [position=after_launcher_run, target=resourcemanager, mode=DELAYED_CRASH]
+[INFO] ========================================
+[INFO] HTML report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/target/restart-reports/restart-test-report.html
+[INFO] JSON report generated: /Users/allenwang/xlab/yarn-transform/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/target/restart-reports/restart-test-report.json
+[INFO] 
+[INFO] ========================================
+[INFO] RESTART TEST RESULTS
+[INFO] ========================================
+[INFO] Total:  8
+[INFO] Passed: 5
+[INFO] Failed: 3
+[INFO] Pass Rate: 62.5%
+[ERROR] 
+[ERROR] Failed tests:
+[ERROR]   - org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher@after_cluster_start[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher@after_launcher_init[resourcemanager,GRACEFUL]
+[ERROR]   - org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected#testUMALauncher@after_launcher_run[resourcemanager,GRACEFUL]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  03:39 min
+[INFO] Finished at: 2025-12-03T17:09:20-06:00
+[INFO] ------------------------------------------------------------------------

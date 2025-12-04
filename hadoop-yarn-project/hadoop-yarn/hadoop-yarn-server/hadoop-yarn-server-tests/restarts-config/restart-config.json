@@ -1,0 +1,105 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected",
+      "testMethod": "testTimelineServiceStartInMiniCluster",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestMiniYARNClusterForHA_RestartInjected",
+      "testMethod": "testClusterWorks",
+      "restartPoints": [
+        {
+          "position": "before_nm_connect",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nm_connect",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestMiniYarnClusterNodeUtilization_RestartInjected",
+      "testMethod": "testUpdateNodeUtilization",
+      "restartPoints": [
+        {
+          "position": "after_nm_connect",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected",
+      "testMethod": "testLocalDirsFailures",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_health_check",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_disk_failure",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_node_unhealthy",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestDiskFailures_RestartInjected",
+      "testMethod": "testLogDirsFailures",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_health_check",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_disk_failure",
+          "targets": ["nodemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_node_unhealthy",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.server.TestContainerManagerSecurity_RestartInjected",
+      "testMethod": "testContainerManager",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["resourcemanager"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    }
+  ]
+}

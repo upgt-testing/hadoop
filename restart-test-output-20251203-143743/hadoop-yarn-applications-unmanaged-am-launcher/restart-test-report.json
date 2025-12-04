@@ -1,0 +1,92 @@
+{
+  "summary": {
+    "passRate": 62.5,
+    "startTime": 1764803141619,
+    "passed": 5,
+    "failed": 3,
+    "endTime": 1764803360810,
+    "durationMs": 219191,
+    "totalTests": 8
+  },
+  "flakiness": {
+    "flakyTests": [],
+    "flakinessRate": 0.0,
+    "totalScenarios": 8,
+    "flakyScenarios": 0,
+    "detected": false
+  },
+  "results": [
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "passed": true,
+      "durationMs": 11189
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 89277,
+      "errorMessage": "Restart Restart failed at p..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_cluster_start",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 11098
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_launcher_init",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 37146,
+      "errorMessage": "TestTimedOut tes..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_launcher_init",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 11018
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_launcher_run",
+      "target": "resourcemanager",
+      "mode": "GRACEFUL",
+      "passed": false,
+      "durationMs": 37201,
+      "errorMessage": "TestTimedOut tes..."
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_launcher_run",
+      "target": "resourcemanager",
+      "mode": "CRASH",
+      "passed": true,
+      "durationMs": 11109
+    },
+    {
+      "testClass": "org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected",
+      "testMethod": "testUMALauncher",
+      "position": "after_launcher_run",
+      "target": "resourcemanager",
+      "mode": "DELAYED_CRASH",
+      "passed": true,
+      "durationMs": 11128
+    }
+  ]
+}
