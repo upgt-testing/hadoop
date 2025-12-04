@@ -1,5 +1,7 @@
 package org.restarttest.adapter.yarn;
 
+import org.apache.hadoop.ha.HAServiceProtocol;
+import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.service.Service;
 import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
@@ -166,11 +168,28 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
     /**
      * Restart a ResourceManager with the specified mode.
+     * Tracks and restores HA state to ensure RM returns to its previous role.
      */
     private void restartResourceManager(MiniYARNCluster cluster, int index, RestartMode mode)
             throws Exception {
         LOG.info("Restarting ResourceManager {} with mode {}", index, mode);
 
+        // STEP 1: Capture HA state before restart
+        ResourceManager rmBeforeRestart = cluster.getResourceManager(index);
+        HAServiceState previousHAState = null;
+        if (rmBeforeRestart != null && rmBeforeRestart.getRMContext() != null) {
+            try {
+                previousHAState = rmBeforeRestart.getRMContext()
+                    .getRMAdminService()
+                    .getServiceStatus()
+                    .getState();
+                LOG.info("RM {} was in HA state {} before restart", index, previousHAState);
+            } catch (Exception e) {
+                LOG.warn("Failed to get HA state for RM {}: {}", index, e.getMessage());
+            }
+        }
+
+        // STEP 2: Perform restart based on mode
         switch (mode) {
             case GRACEFUL:
                 // Use built-in restart which does graceful shutdown
@@ -194,8 +213,44 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
                 throw new IllegalArgumentException("Unknown restart mode: " + mode);
         }
 
-        // Wait for RM to be ready
+        // STEP 3: Wait for RM to be started
         waitForResourceManagerReady(cluster, index);
+
+        // STEP 4: Restore HA state if it was ACTIVE before restart
+        if (previousHAState == HAServiceState.ACTIVE) {
+            LOG.info("Restoring RM {} to ACTIVE state after restart", index);
+            ResourceManager rmAfterRestart = cluster.getResourceManager(index);
+            if (rmAfterRestart != null && rmAfterRestart.getRMContext() != null) {
+                try {
+                    // Transition back to ACTIVE
+                    rmAfterRestart.getRMContext().getRMAdminService()
+                        .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
+                            HAServiceProtocol.RequestSource.REQUEST_BY_USER));
+
+                    // Wait a bit for transition to complete and services to stabilize
+                    Thread.sleep(2000);
+
+                    // Verify the transition succeeded
+                    HAServiceState currentState = rmAfterRestart.getRMContext()
+                        .getRMAdminService()
+                        .getServiceStatus()
+                        .getState();
+
+                    if (currentState == HAServiceState.ACTIVE) {
+                        LOG.info("Successfully restored RM {} to ACTIVE state", index);
+                    } else {
+                        LOG.warn("RM {} is in {} state after transition attempt, expected ACTIVE",
+                                index, currentState);
+                    }
+                } catch (Exception e) {
+                    LOG.error("Failed to restore RM {} to ACTIVE state: {}", index, e.getMessage(), e);
+                    throw new Exception("Failed to restore RM HA state after restart", e);
+                }
+            }
+        } else if (previousHAState != null) {
+            LOG.info("RM {} was in {} state before restart, no HA state restoration needed",
+                    index, previousHAState);
+        }
     }
 
     /**
@@ -233,7 +288,9 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
         }
 
         // Restart the NodeManager
-        nm.init(cluster.getConfig());
+        // Use the NodeManager's own config to preserve instance-specific settings
+        // (e.g., dynamically assigned local-dirs and log-dirs)
+        nm.init(nm.getConfig());
         nm.start();
 
         // Wait for NodeManager to reconnect to ResourceManager
@@ -299,12 +356,21 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
     /**
      * Wait for ResourceManager to be ready after restart.
+     * Ensures the RM service is started and gives it time to initialize.
      */
     private void waitForResourceManagerReady(MiniYARNCluster cluster, int index)
             throws Exception {
         ResourceManager rm = cluster.getResourceManager(index);
         if (rm != null) {
+            // Wait for service to be started
             waitForServiceState(rm, Service.STATE.STARTED, 10000);
+
+            // Additional wait for RM to stabilize and initialize HA components
+            // This is important for HA setups where the RM needs time to
+            // initialize its AdminService before we can transition it to ACTIVE
+            Thread.sleep(1000);
+
+            LOG.info("ResourceManager {} is ready (service state: STARTED)", index);
         }
     }
 }
