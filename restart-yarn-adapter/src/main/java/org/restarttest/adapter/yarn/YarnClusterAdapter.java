@@ -261,8 +261,8 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
     /**
      * Restart a NodeManager with the specified mode.
-     * Uses MiniYARNCluster.restartNodeManager() which creates a new NM instance,
-     * since Hadoop's service state machine doesn't allow STOPPED → INITED transitions.
+     * Creates a new NodeManager instance since Hadoop's service state machine
+     * doesn't allow STOPPED → INITED transitions on the same instance.
      */
     private void restartNodeManager(MiniYARNCluster cluster, int index, RestartMode mode)
             throws Exception {
@@ -273,27 +273,73 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
             throw new Exception("NodeManager at index " + index + " is null");
         }
 
+        // Save the config before stopping - we'll need it for the new instance
+        org.apache.hadoop.conf.Configuration nmConfig = nm.getConfig();
+
         switch (mode) {
             case GRACEFUL:
-                // Use cluster's restart method which handles graceful shutdown and creates new instance
-                cluster.restartNodeManager(index);
+                nm.stop();
+                waitForServiceState(nm, Service.STATE.STOPPED, 5000);
                 break;
 
             case CRASH:
-                // Stop abruptly, then use cluster's restart
                 nm.stop();
-                cluster.restartNodeManager(index);
                 break;
 
             case DELAYED_CRASH:
-                // Stop, wait, then use cluster's restart
                 nm.stop();
                 Thread.sleep(500);
-                cluster.restartNodeManager(index);
                 break;
 
             default:
                 throw new IllegalArgumentException("Unknown restart mode: " + mode);
+        }
+
+        // Use reflection to create a new NodeManager and replace the old one
+        // MiniYARNCluster stores NodeManagers in a private array
+        try {
+            java.lang.reflect.Field nmField = MiniYARNCluster.class.getDeclaredField("nodeManagers");
+            nmField.setAccessible(true);
+            NodeManager[] nodeManagers = (NodeManager[]) nmField.get(cluster);
+
+            // Check if cluster uses RPC mode to determine NodeManager type
+            java.lang.reflect.Field useRpcField = MiniYARNCluster.class.getDeclaredField("useRpc");
+            useRpcField.setAccessible(true);
+            boolean useRpc = useRpcField.getBoolean(cluster);
+
+            // Create new NodeManager instance of the appropriate type
+            NodeManager newNm;
+            if (useRpc) {
+                // CustomNodeManager is a public inner class
+                Class<?> customNmClass = Class.forName(
+                    "org.apache.hadoop.yarn.server.MiniYARNCluster$CustomNodeManager");
+                java.lang.reflect.Constructor<?> ctor = customNmClass.getDeclaredConstructor(MiniYARNCluster.class);
+                ctor.setAccessible(true);
+                newNm = (NodeManager) ctor.newInstance(cluster);
+            } else {
+                // ShortCircuitedNodeManager
+                Class<?> shortCircuitNmClass = Class.forName(
+                    "org.apache.hadoop.yarn.server.MiniYARNCluster$ShortCircuitedNodeManager");
+                java.lang.reflect.Constructor<?> ctor = shortCircuitNmClass.getDeclaredConstructor(MiniYARNCluster.class);
+                ctor.setAccessible(true);
+                newNm = (NodeManager) ctor.newInstance(cluster);
+            }
+
+            // Replace in the array
+            nodeManagers[index] = newNm;
+
+            // Initialize and start the new NodeManager with the saved config
+            newNm.init(nmConfig);
+            newNm.start();
+
+            if (newNm.getServiceState() != Service.STATE.STARTED) {
+                throw new Exception("NodeManager " + index + " failed to start after restart");
+            }
+
+        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException |
+                 NoSuchMethodException | java.lang.reflect.InvocationTargetException |
+                 InstantiationException e) {
+            throw new Exception("Failed to restart NodeManager using reflection: " + e.getMessage(), e);
         }
 
         // Wait for NodeManager to reconnect to ResourceManager

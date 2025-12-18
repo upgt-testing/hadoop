@@ -471,7 +471,7 @@ public class MiniYARNCluster extends CompositeService {
     nodeManagers[index].init(config);
     nodeManagers[index].start();
 
-    if (nodeManagers[index].getServiceState() != Service.STATE.STARTED) {
+    if (nodeManagers[index].getServiceState() != STATE.STARTED) {
       throw new IOException("NodeManager " + index + " failed to start after restart");
     }
     LOG.info("NodeManager " + index + " restarted successfully");
