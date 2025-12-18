@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected",
+      "testMethod": "testRegistryCleanedOnLifetimeExceeded",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": [
+            "resourcemanager"
+          ],
+          "modes": [
+            "GRACEFUL"
+          ],
+          "index": 0
+        },
+        {
+          "position": "after_app_create",
+          "targets": [
+            "resourcemanager"
+          ],
+          "modes": [
+            "GRACEFUL"
+          ],
+          "index": 0
+        }
+      ]
+    }
+  ]
+}
