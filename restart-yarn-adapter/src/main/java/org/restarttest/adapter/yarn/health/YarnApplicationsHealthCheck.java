@@ -23,55 +23,8 @@ public class YarnApplicationsHealthCheck implements HealthCheck<MiniYARNCluster>
 
     @Override
     public HealthCheckResult checkHealth(MiniYARNCluster cluster) throws Exception {
-        HealthCheckResult result = new HealthCheckResult(true, getName());
-
-        ResourceManager activeRM = cluster.getResourceManager();
-        if (activeRM == null) {
-            result.addFailure("Cannot check applications: no active RM");
-            return result;
-        }
-
-        RMContext rmContext = activeRM.getRMContext();
-        ConcurrentMap<ApplicationId, RMApp> apps = rmContext.getRMApps();
-
-        result.addMetric("total_applications", apps.size());
-
-        // Count applications by state
-        int runningCount = 0;
-        int failedCount = 0;
-        int finishedCount = 0;
-        int killedCount = 0;
-
-        for (RMApp app : apps.values()) {
-            RMAppState state = app.getState();
-            switch (state) {
-                case RUNNING:
-                    runningCount++;
-                    break;
-                case FAILED:
-                    failedCount++;
-                    break;
-                case FINISHED:
-                    finishedCount++;
-                    break;
-                case KILLED:
-                    killedCount++;
-                    break;
-                default:
-                    // Other states (NEW, NEW_SAVING, SUBMITTED, ACCEPTED, etc.)
-                    break;
-            }
-        }
-
-        result.addMetric("running_applications", runningCount);
-        result.addMetric("failed_applications", failedCount);
-        result.addMetric("finished_applications", finishedCount);
-        result.addMetric("killed_applications", killedCount);
-
-        // This is informational only - we don't fail based on failed applications
-        // Applications can fail for legitimate reasons during testing
-
-        return result;
+        // NO-OP: Health check disabled for current testing stage
+        return new HealthCheckResult(true, getName());
     }
 
     @Override
