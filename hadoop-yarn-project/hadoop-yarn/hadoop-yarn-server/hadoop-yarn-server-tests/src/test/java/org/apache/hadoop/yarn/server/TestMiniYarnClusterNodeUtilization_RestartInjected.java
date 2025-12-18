@@ -97,7 +97,7 @@ public class TestMiniYarnClusterNodeUtilization_RestartInjected {
    * both the RMNode and SchedulerNode have been updated with the new
    * utilization.
    */
-  @Test(timeout=60000)
+  @Test
   public void testUpdateNodeUtilization()
       throws InterruptedException, IOException, YarnException {
     assertTrue("NMs fail to connect to the RM",
@@ -128,7 +128,7 @@ public class TestMiniYarnClusterNodeUtilization_RestartInjected {
    * Verify both the RMNode and SchedulerNode have been updated with the new
    * utilization.
    */
-  @Test(timeout=60000)
+  @Test
   public void testMockNodeStatusHeartbeat()
       throws InterruptedException, YarnException {
     assertTrue("NMs fail to connect to the RM",

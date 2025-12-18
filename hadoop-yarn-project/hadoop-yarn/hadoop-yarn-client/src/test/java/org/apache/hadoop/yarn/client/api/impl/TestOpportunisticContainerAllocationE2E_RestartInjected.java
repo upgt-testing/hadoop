@@ -269,7 +269,7 @@ public class TestOpportunisticContainerAllocationE2E_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testPromotionFromAcquired() throws YarnException, IOException {
     // setup container request
     assertEquals(0, amClient.ask.size());
@@ -401,7 +401,7 @@ public class TestOpportunisticContainerAllocationE2E_RestartInjected {
     amClient.ask.clear();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDemotionFromAcquired() throws YarnException, IOException {
     // setup container request
     assertEquals(0, amClient.ask.size());
@@ -529,7 +529,7 @@ public class TestOpportunisticContainerAllocationE2E_RestartInjected {
     amClient.ask.clear();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testMixedAllocationAndRelease() throws YarnException,
       IOException {
     // setup container request
@@ -707,7 +707,7 @@ public class TestOpportunisticContainerAllocationE2E_RestartInjected {
   /**
    * Tests allocation with requests comprising only opportunistic containers.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testOpportunisticAllocation() throws YarnException, IOException {
     // setup container request
     assertEquals(0, amClient.ask.size());

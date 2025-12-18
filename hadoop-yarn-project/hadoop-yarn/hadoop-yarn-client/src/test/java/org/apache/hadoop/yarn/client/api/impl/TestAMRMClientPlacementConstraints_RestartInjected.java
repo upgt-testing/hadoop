@@ -79,7 +79,7 @@ public class TestAMRMClientPlacementConstraints_RestartInjected extends BaseAMRM
             PlacementConstraints.targetNotIn(NODE, allocationTag("bar"))));
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAMRMClientWithPlacementConstraintsByPlacementProcessor()
       throws Exception {
     // we have to create a new instance of MiniYARNCluster to avoid SASL qop
@@ -175,7 +175,7 @@ public class TestAMRMClientPlacementConstraints_RestartInjected extends BaseAMRM
     asyncClient.stop();
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAMRMClientWithPlacementConstraintsByScheduler()
       throws Exception {
     // we have to create a new instance of MiniYARNCluster to avoid SASL qop

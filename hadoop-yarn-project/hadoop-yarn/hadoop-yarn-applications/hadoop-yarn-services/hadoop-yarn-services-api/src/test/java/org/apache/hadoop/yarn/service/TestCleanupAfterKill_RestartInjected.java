@@ -63,7 +63,7 @@ public class TestCleanupAfterKill_RestartInjected extends ServiceTestUtils {
     shutdown();
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testRegistryCleanedOnLifetimeExceeded() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")

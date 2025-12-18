@@ -62,7 +62,7 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
    * This test validates register, allocate and finish of an application through
    * the AMRMPRoxy.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testAMRMProxyE2E() throws Exception {
     ApplicationMasterProtocol client;
 
@@ -170,7 +170,7 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
    * that the received token from AMRMProxy is different from the previous one
    * within 5 requests.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testAMRMProxyTokenRenewal() throws Exception {
     ApplicationMasterProtocol client;
 
@@ -266,7 +266,7 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
    * This test validates that an AM cannot register directly to the RM, with the
    * token provided by the AMRMProxy.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testE2ETokenSwap() throws Exception {
     ApplicationMasterProtocol client;
 

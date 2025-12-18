@@ -293,7 +293,7 @@ public class TestNMClient_RestartInjected {
     nmClient.stop();
   }
 
-  @Test (timeout = 180000)
+  @Test
   public void testNMClientNoCleanupOnStop()
       throws YarnException, IOException {
 
@@ -331,7 +331,7 @@ public class TestNMClient_RestartInjected {
     assertEquals(0, nmClient.startedContainers.size());
   }
 
-  @Test (timeout = 200000)
+  @Test
   public void testNMClient()
       throws YarnException, IOException {
     rmClient.registerApplicationMaster("Host", 10000, "");

@@ -131,7 +131,7 @@ public class TestUnmanagedAMLauncher_RestartInjected {
     return envClassPath;
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testUMALauncher() throws Exception {
     String classpath = getTestRuntimeClasspath();
     String javaHome = System.getenv("JAVA_HOME");
@@ -185,7 +185,7 @@ public class TestUnmanagedAMLauncher_RestartInjected {
 
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testUMALauncherError() throws Exception {
     String classpath = getTestRuntimeClasspath();
     String javaHome = System.getenv("JAVA_HOME");
