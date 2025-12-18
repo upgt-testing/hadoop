@@ -43,6 +43,14 @@ public class TestMiniYarnCluster_RestartInjected {
      * and enableAHS flag == false
      */
     conf.setBoolean(YarnConfiguration.TIMELINE_SERVICE_ENABLED, false);
+    // Enable RPC mode with fixed ports for restart testing
+    // ShortCircuitedNodeManager uses direct object references which break on RM restart
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18033");
     enableAHS = false;
     try (MiniYARNCluster cluster =
         new MiniYARNCluster(TestMiniYarnCluster.class.getSimpleName(),

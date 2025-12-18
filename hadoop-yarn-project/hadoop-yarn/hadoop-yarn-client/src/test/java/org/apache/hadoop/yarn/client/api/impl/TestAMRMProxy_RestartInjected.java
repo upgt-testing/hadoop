@@ -74,6 +74,13 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
       // Make sure if using FairScheduler that we can assign multiple containers
       // in a single heartbeat later
       conf.setBoolean(FairSchedulerConfiguration.ASSIGN_MULTIPLE, true);
+      // Enable RPC mode with fixed ports for restart testing
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+      conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18132");
+      conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18130");
+      conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18131");
+      conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18133");
       cluster.init(conf);
       cluster.start();
       final Configuration yarnConf = cluster.getConfig();
@@ -179,6 +186,13 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
       // RM_AM_EXPIRY_INTERVAL_MS * 1.5 *3
       conf.setInt(
           YarnConfiguration.RM_AMRM_TOKEN_MASTER_KEY_ROLLING_INTERVAL_SECS, 20);
+      // Enable RPC mode with fixed ports for restart testing
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+      conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18232");
+      conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18230");
+      conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18231");
+      conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18233");
       cluster.init(conf);
       cluster.start();
       final Configuration yarnConf = cluster.getConfig();
@@ -261,6 +275,13 @@ public class TestAMRMProxy_RestartInjected extends BaseAMRMProxyE2ETest {
             YarnClient rmClient = YarnClient.createYarnClient()) {
       Configuration conf = new YarnConfiguration();
       conf.setBoolean(YarnConfiguration.AMRM_PROXY_ENABLED, true);
+      // Enable RPC mode with fixed ports for restart testing
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+      conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18332");
+      conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18330");
+      conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18331");
+      conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18333");
       cluster.init(conf);
       cluster.start();
 

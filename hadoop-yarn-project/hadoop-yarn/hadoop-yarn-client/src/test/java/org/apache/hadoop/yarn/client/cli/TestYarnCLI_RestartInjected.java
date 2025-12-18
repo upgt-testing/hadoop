@@ -1761,6 +1761,13 @@ public class TestYarnCLI_RestartInjected {
     // Enable intra-queue preemption for the a1 queue
     conf.setBoolean(CapacitySchedulerConfiguration.PREFIX
         + "root.a.a1.intra-queue-preemption.disable_preemption", false);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18033");
     MiniYARNCluster cluster =
         new MiniYARNCluster("testGetQueueInfoOverrideIntraQueuePreemption",
             2, 1, 1);
@@ -1833,6 +1840,13 @@ public class TestYarnCLI_RestartInjected {
         + "ProportionalCapacityPreemptionPolicy");
     conf.setBoolean(
         CapacitySchedulerConfiguration.INTRAQUEUE_PREEMPTION_ENABLED, true);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18132");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18130");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18131");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18133");
     MiniYARNCluster cluster =
         new MiniYARNCluster("testGetQueueInfoPreemptionEnabled", 2, 1, 1);
 
@@ -1883,6 +1897,13 @@ public class TestYarnCLI_RestartInjected {
         + "ProportionalCapacityPreemptionPolicy");
     conf.setBoolean(YarnConfiguration.RM_SCHEDULER_ENABLE_MONITORS, true);
     conf.setBoolean(PREFIX + "root.a.a1.disable_preemption", true);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18232");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18230");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18231");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18233");
 
     try (MiniYARNCluster cluster =
         new MiniYARNCluster("testReservationAPIs", 2, 1, 1);

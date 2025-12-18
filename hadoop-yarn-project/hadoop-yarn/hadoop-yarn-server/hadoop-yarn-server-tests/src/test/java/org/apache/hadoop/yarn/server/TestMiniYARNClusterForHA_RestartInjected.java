@@ -27,12 +27,19 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.apache.hadoop.yarn.server.resourcemanager.HATestUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.restarttest.api.RestartFramework;
 import org.restarttest.core.RestartMode;
 
 public class TestMiniYARNClusterForHA_RestartInjected {
+  private static final String RM1_NODE_ID = "rm1";
+  private static final String RM2_NODE_ID = "rm2";
+  private static final int RM1_PORT_BASE = 10000;
+  private static final int RM2_PORT_BASE = 20000;
+
   MiniYARNCluster cluster;
 
   @Before
@@ -41,12 +48,27 @@ public class TestMiniYARNClusterForHA_RestartInjected {
     conf.setBoolean(YarnConfiguration.AUTO_FAILOVER_ENABLED, false);
     conf.set(YarnConfiguration.RM_WEBAPP_ADDRESS, "localhost:0");
 
+    // Enable HA mode with RPC and fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.RM_HA_ENABLED, true);
+    conf.set(YarnConfiguration.RM_HA_IDS, RM1_NODE_ID + "," + RM2_NODE_ID);
+    HATestUtil.setRpcAddressForRM(RM1_NODE_ID, RM1_PORT_BASE, conf);
+    HATestUtil.setRpcAddressForRM(RM2_NODE_ID, RM2_PORT_BASE, conf);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+
     cluster = new MiniYARNCluster(TestMiniYARNClusterForHA.class.getName(),
         2, 1, 1, 1);
     cluster.init(conf);
     cluster.start();
 
     assertFalse("RM never turned active", -1 == cluster.getActiveRMIndex());
+  }
+
+  @After
+  public void tearDown() {
+    if (cluster != null) {
+      cluster.stop();
+    }
   }
 
   @Test

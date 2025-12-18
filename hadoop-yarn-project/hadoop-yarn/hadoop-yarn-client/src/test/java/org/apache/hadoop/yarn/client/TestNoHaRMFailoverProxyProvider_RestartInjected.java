@@ -78,6 +78,15 @@ public class TestNoHaRMFailoverProxyProvider_RestartInjected {
    */
   @Test
   public void testRestartedRM() throws Exception {
+    // Enable RPC mode with fixed ports for restart testing
+    // ShortCircuitedNodeManager uses direct object references which break on RM restart
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18033");
+
     MiniYARNCluster cluster =
         new MiniYARNCluster("testRestartedRMNegative", NUMNODEMANAGERS, 1, 1);
     YarnClient rmClient = YarnClient.createYarnClient();

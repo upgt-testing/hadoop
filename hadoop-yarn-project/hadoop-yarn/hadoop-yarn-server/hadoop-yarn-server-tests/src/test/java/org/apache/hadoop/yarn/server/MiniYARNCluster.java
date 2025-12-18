@@ -412,6 +412,90 @@ public class MiniYARNCluster extends CompositeService {
     startResourceManager(index);
   }
 
+  /**
+   * Restart a NodeManager by stopping the old instance and creating a new one.
+   * The new NodeManager will reuse the existing local/log directories
+   * that were created when the cluster was initialized.
+   *
+   * @param index the index of the NodeManager to restart
+   * @throws Exception if the restart fails
+   */
+  @InterfaceAudience.Private
+  @VisibleForTesting
+  public synchronized void restartNodeManager(int index) throws Exception {
+    if (nodeManagers[index] != null) {
+      nodeManagers[index].stop();
+      nodeManagers[index] = null;
+    }
+
+    // Create a new NodeManager instance (type depends on useRpc setting)
+    nodeManagers[index] = useRpc ? new CustomNodeManager() : new ShortCircuitedNodeManager();
+
+    // Build configuration similar to NodeManagerWrapper.serviceInit()
+    Configuration config = new YarnConfiguration(getConfig());
+
+    // Reuse existing local/log dirs (they were already created during cluster init)
+    // NodeManagerWrapper uses testWorkDir + cluster name pattern
+    String localDirsString = buildNMDirsString("local", numLocalDirs, index);
+    String logDirsString = buildNMDirsString("log", numLogDirs, index);
+    config.set(YarnConfiguration.NM_LOCAL_DIRS, localDirsString);
+    config.set(YarnConfiguration.NM_LOG_DIRS, logDirsString);
+
+    config.setInt(YarnConfiguration.NM_PMEM_MB, config.getInt(
+        YarnConfiguration.YARN_MINICLUSTER_NM_PMEM_MB,
+        YarnConfiguration.DEFAULT_YARN_MINICLUSTER_NM_PMEM_MB));
+
+    config.set(YarnConfiguration.NM_ADDRESS,
+        MiniYARNCluster.getHostname() + ":0");
+    config.set(YarnConfiguration.NM_LOCALIZER_ADDRESS,
+        MiniYARNCluster.getHostname() + ":0");
+    config.set(YarnConfiguration.NM_COLLECTOR_SERVICE_ADDRESS,
+        MiniYARNCluster.getHostname() + ":" +
+            ServerSocketUtil.getPort(
+                YarnConfiguration.DEFAULT_NM_COLLECTOR_SERVICE_PORT, 10));
+    WebAppUtils.setNMWebAppHostNameAndPort(config,
+        MiniYARNCluster.getHostname(), 0);
+
+    config.setBoolean(
+        YarnConfiguration.NM_ENABLE_HARDWARE_CAPABILITY_DETECTION, false);
+    // Disable resource checks by default
+    if (!config.getBoolean(
+        YarnConfiguration.YARN_MINICLUSTER_CONTROL_RESOURCE_MONITORING,
+        YarnConfiguration.DEFAULT_YARN_MINICLUSTER_CONTROL_RESOURCE_MONITORING)) {
+      config.setBoolean(
+          YarnConfiguration.NM_CONTAINER_MONITOR_ENABLED, false);
+      config.setLong(YarnConfiguration.NM_RESOURCE_MON_INTERVAL_MS, 0);
+    }
+
+    LOG.info("Restarting NM: " + index);
+    nodeManagers[index].init(config);
+    nodeManagers[index].start();
+
+    if (nodeManagers[index].getServiceState() != Service.STATE.STARTED) {
+      throw new IOException("NodeManager " + index + " failed to start after restart");
+    }
+    LOG.info("NodeManager " + index + " restarted successfully");
+  }
+
+  /**
+   * Build the directory string for NodeManager local/log dirs.
+   * Matches the pattern used by NodeManagerWrapper.prepareDirs().
+   */
+  private String buildNMDirsString(String dirType, int numDirs, int nmIndex) {
+    StringBuilder dirsString = new StringBuilder();
+    for (int i = 0; i < numDirs; i++) {
+      if (i > 0) {
+        dirsString.append(",");
+      }
+      File dir = new File(testWorkDir, this.getName()
+          + "-" + dirType + "Dir-nm-" + nmIndex + "_" + i);
+      // Ensure directory exists
+      dir.mkdirs();
+      dirsString.append(dir.getAbsolutePath());
+    }
+    return dirsString.toString();
+  }
+
   public File getTestWorkDir() {
     return testWorkDir;
   }

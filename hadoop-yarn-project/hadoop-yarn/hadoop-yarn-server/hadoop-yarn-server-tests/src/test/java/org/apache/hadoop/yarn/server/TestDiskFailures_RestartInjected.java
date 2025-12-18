@@ -161,6 +161,15 @@ public class TestDiskFailures_RestartInjected {
     // log-dirs fail, then the node's health status should become unhealthy.
     conf.setFloat(YarnConfiguration.NM_MIN_HEALTHY_DISKS_FRACTION, 0.60F);
 
+    // Enable RPC mode with fixed ports for restart testing
+    // ShortCircuitedNodeManager uses direct object references which break on RM restart
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18033");
+
     if (yarnCluster != null) {
       yarnCluster.stop();
       FileUtil.fullyDelete(localFSDirBase);

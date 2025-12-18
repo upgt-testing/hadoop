@@ -261,8 +261,8 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
     /**
      * Restart a NodeManager with the specified mode.
-     * Note: MiniYARNCluster doesn't have built-in NodeManager restart methods,
-     * so we implement custom restart logic.
+     * Uses MiniYARNCluster.restartNodeManager() which creates a new NM instance,
+     * since Hadoop's service state machine doesn't allow STOPPED → INITED transitions.
      */
     private void restartNodeManager(MiniYARNCluster cluster, int index, RestartMode mode)
             throws Exception {
@@ -275,29 +275,26 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
         switch (mode) {
             case GRACEFUL:
-                // Graceful shutdown
-                nm.stop();
-                waitForServiceState(nm, Service.STATE.STOPPED, 5000);
+                // Use cluster's restart method which handles graceful shutdown and creates new instance
+                cluster.restartNodeManager(index);
                 break;
 
             case CRASH:
-            case DELAYED_CRASH:
-                // Abrupt shutdown (stop without waiting)
+                // Stop abruptly, then use cluster's restart
                 nm.stop();
-                if (mode == RestartMode.DELAYED_CRASH) {
-                    Thread.sleep(500);
-                }
+                cluster.restartNodeManager(index);
+                break;
+
+            case DELAYED_CRASH:
+                // Stop, wait, then use cluster's restart
+                nm.stop();
+                Thread.sleep(500);
+                cluster.restartNodeManager(index);
                 break;
 
             default:
                 throw new IllegalArgumentException("Unknown restart mode: " + mode);
         }
-
-        // Restart the NodeManager
-        // Use the NodeManager's own config to preserve instance-specific settings
-        // (e.g., dynamically assigned local-dirs and log-dirs)
-        nm.init(nm.getConfig());
-        nm.start();
 
         // Wait for NodeManager to reconnect to ResourceManager
         if (!cluster.waitForNodeManagersToConnect(10000)) {

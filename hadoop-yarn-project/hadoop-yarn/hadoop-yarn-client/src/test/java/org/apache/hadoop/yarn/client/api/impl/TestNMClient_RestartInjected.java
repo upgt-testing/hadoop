@@ -167,6 +167,16 @@ public class TestNMClient_RestartInjected {
     // Turn on state tracking
     conf.set(YarnConfiguration.NM_CONTAINER_STATE_TRANSITION_LISTENERS,
         DebugSumContainerStateListener.class.getName());
+
+    // Enable RPC mode with fixed ports for restart testing
+    // ShortCircuitedNodeManager uses direct object references which break on RM restart
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:18032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:18030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:18031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:18033");
+
     yarnCluster =
         new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);
