@@ -252,22 +252,11 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
                     index, previousHAState);
         }
 
-        // STEP 5: Restart NodeManagers so they reconnect to the new RM address
-        // This is necessary because when RM restarts with dynamic ports, it gets a new
-        // address/port, and NMs still have the old address cached. Restarting NMs ensures
-        // they pick up the new RM address from the cluster configuration.
-        LOG.info("Restarting NodeManagers to reconnect to ResourceManager {}", index);
-        int nmCount = getNodeManagerCount(cluster);
-        for (int i = 0; i < nmCount; i++) {
-            try {
-                LOG.info("Restarting NodeManager {} to reconnect to RM {}", i, index);
-                restartNodeManager(cluster, i, RestartMode.GRACEFUL);
-            } catch (Exception e) {
-                LOG.error("Failed to restart NodeManager {}: {}", i, e.getMessage(), e);
-                // Continue with other NMs even if one fails
-            }
-        }
-        LOG.info("All NodeManagers restarted and should reconnect to ResourceManager {}", index);
+        // STEP 5: NodeManagers will automatically reconnect
+        // With YARN_MINICLUSTER_FIXED_PORTS enabled, the RM keeps the same address after restart,
+        // so NodeManagers can automatically reconnect without needing to be restarted.
+        // Their built-in retry logic will handle the reconnection.
+        LOG.info("ResourceManager {} restart complete. NodeManagers will automatically reconnect.", index);
     }
 
     /**

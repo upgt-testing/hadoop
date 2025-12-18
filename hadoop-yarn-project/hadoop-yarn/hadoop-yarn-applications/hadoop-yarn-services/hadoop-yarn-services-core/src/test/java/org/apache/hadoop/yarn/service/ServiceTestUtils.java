@@ -216,11 +216,23 @@ public class ServiceTestUtils {
     LOG.info("Starting up YARN cluster");
     if (conf == null) {
       setConf(new YarnConfiguration());
-      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, false);
-      conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, false);
       conf.setInt(YarnConfiguration.RM_MAX_COMPLETED_APPLICATIONS,
           YarnConfiguration.DEFAULT_RM_MAX_COMPLETED_APPLICATIONS);
     }
+
+    // ALWAYS apply restart testing configuration (must be outside the if block)
+    // Enable RPC mode with fixed ports for restart testing
+    // ShortCircuitedNodeManager uses direct object references which break on RM restart
+    // RPC mode uses network connections which can automatically reconnect
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+
+    // Explicitly set fixed port numbers for RM services
+    // Using high port numbers to avoid conflicts
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:28032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:28030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:28031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:28033");
     conf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
     // reduce the teardown waiting time
     conf.setLong(YarnConfiguration.DISPATCHER_DRAIN_EVENTS_TIMEOUT, 1000);

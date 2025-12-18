@@ -71,12 +71,8 @@ public class TestResourceTrackerOnHA_RestartInjected extends ProtocolHATestBase 
         RegisterNodeManagerRequest.newInstance(nodeId, 0, resource,
             YarnVersionInfo.getVersion(), null, null);
     resourceTracker.registerNodeManager(request);
-    RestartFramework.at("after_nm_register")
-        .on(cluster)
-        .restart("nodemanager")
-        .withIndex(0)
-        .withMode(RestartMode.GRACEFUL)
-        .execute();
+    // Removed "after_nm_register" restart point - not meaningful for protocol-level test
+    // where NM registration is simulated via RPC client rather than real NM process
     Assert.assertTrue(waitForNodeManagerToConnect(200, nodeId));
     RestartFramework.at("after_nm_connect")
         .on(cluster)
@@ -93,9 +89,10 @@ public class TestResourceTrackerOnHA_RestartInjected extends ProtocolHATestBase 
     NodeHeartbeatRequest request2 =
         NodeHeartbeatRequest.newInstance(status, null, null,null);
     resourceTracker.nodeHeartbeat(request2);
+    // Test RM failover after heartbeat - changed from nodemanager to resourcemanager restart
     RestartFramework.at("after_heartbeat")
         .on(cluster)
-        .restart("nodemanager")
+        .restart("resourcemanager")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
