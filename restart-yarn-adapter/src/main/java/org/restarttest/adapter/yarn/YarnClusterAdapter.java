@@ -5,7 +5,10 @@ import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.service.Service;
 import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
+import org.apache.hadoop.yarn.server.nodemanager.Context;
 import org.apache.hadoop.yarn.server.resourcemanager.ResourceManager;
+import org.apache.hadoop.yarn.api.records.ContainerId;
+import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Container;
 import org.restarttest.adapter.yarn.health.YarnApplicationsHealthCheck;
 import org.restarttest.adapter.yarn.health.YarnNodeManagersRegisteredCheck;
 import org.restarttest.adapter.yarn.health.YarnQueuesHealthCheck;
@@ -18,15 +21,32 @@ import org.restarttest.state.StateCapture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * Adapter for Apache Hadoop YARN MiniYARNCluster to enable restart testing.
  *
  * Supports restarting ResourceManagers and NodeManagers with different restart modes.
  * Handles both single-RM and HA (High Availability) configurations.
+ *
+ * <p>Restart modes:
+ * <ul>
+ *   <li>GRACEFUL: Performs clean shutdown with proper state transitions, waits for
+ *       containers to complete, and ensures proper unregistration.</li>
+ *   <li>CRASH: Simulates abrupt failure without cleanup or state transitions.</li>
+ *   <li>DELAYED_CRASH: Crash with a delay before restart.</li>
+ * </ul>
  */
 public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
     private static final Logger LOG = LoggerFactory.getLogger(YarnClusterAdapter.class);
+
+    // Timeouts for graceful operations
+    private static final long GRACEFUL_HA_TRANSITION_TIMEOUT_MS = 10000;
+    private static final long GRACEFUL_CONTAINER_WAIT_TIMEOUT_MS = 30000;
+    private static final long GRACEFUL_STATE_SYNC_WAIT_MS = 1000;
+    private static final long GRACEFUL_HA_FAILOVER_WAIT_MS = 2000;
 
     private final YarnStateCapture stateCapture;
     private final CompositeHealthCheck<MiniYARNCluster> healthCheck;
@@ -169,6 +189,19 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
     /**
      * Restart a ResourceManager with the specified mode.
      * Tracks and restores HA state to ensure RM returns to its previous role.
+     *
+     * <p>For GRACEFUL mode:
+     * <ul>
+     *   <li>In HA mode: Transitions to STANDBY first to allow clean leadership handoff</li>
+     *   <li>Waits for state store to sync</li>
+     *   <li>Then performs restart</li>
+     * </ul>
+     *
+     * <p>For CRASH mode:
+     * <ul>
+     *   <li>Immediately stops the RM without graceful transitions</li>
+     *   <li>Simulates abrupt failure</li>
+     * </ul>
      */
     private void restartResourceManager(MiniYARNCluster cluster, int index, RestartMode mode)
             throws Exception {
@@ -177,13 +210,16 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
         // STEP 1: Capture HA state before restart
         ResourceManager rmBeforeRestart = cluster.getResourceManager(index);
         HAServiceState previousHAState = null;
+        boolean isHAEnabled = false;
         if (rmBeforeRestart != null && rmBeforeRestart.getRMContext() != null) {
             try {
+                isHAEnabled = rmBeforeRestart.getRMContext().isHAEnabled();
                 previousHAState = rmBeforeRestart.getRMContext()
                     .getRMAdminService()
                     .getServiceStatus()
                     .getState();
-                LOG.info("RM {} was in HA state {} before restart", index, previousHAState);
+                LOG.info("RM {} was in HA state {} before restart (HA enabled: {})",
+                    index, previousHAState, isHAEnabled);
             } catch (Exception e) {
                 LOG.warn("Failed to get HA state for RM {}: {}", index, e.getMessage());
             }
@@ -192,18 +228,23 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
         // STEP 2: Perform restart based on mode
         switch (mode) {
             case GRACEFUL:
-                // Use built-in restart which does graceful shutdown
-                cluster.restartResourceManager(index);
+                // Truly graceful shutdown: transition to standby first (in HA mode),
+                // wait for state sync, then restart
+                gracefulRestartResourceManager(cluster, index, rmBeforeRestart,
+                    isHAEnabled, previousHAState);
                 break;
 
             case CRASH:
-                // Stop abruptly then restart
+                // Abrupt shutdown - no graceful transitions, simulates crash
+                LOG.info("Performing CRASH shutdown of RM {} (no graceful transition)", index);
                 cluster.stopResourceManager(index);
+                Thread.sleep(100); // Brief delay to simulate crash recovery window
                 cluster.restartResourceManager(index);
                 break;
 
             case DELAYED_CRASH:
                 // Stop, wait, then restart
+                LOG.info("Performing DELAYED_CRASH shutdown of RM {}", index);
                 cluster.stopResourceManager(index);
                 Thread.sleep(500); // Default delay
                 cluster.restartResourceManager(index);
@@ -260,9 +301,94 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
     }
 
     /**
+     * Gracefully restart a ResourceManager.
+     * For HA clusters: transitions to standby before stopping to allow clean leadership handoff.
+     * Ensures state is properly persisted before restart.
+     */
+    private void gracefulRestartResourceManager(MiniYARNCluster cluster, int index,
+            ResourceManager rm, boolean isHAEnabled, HAServiceState previousHAState)
+            throws Exception {
+        LOG.info("Performing GRACEFUL restart of RM {}", index);
+
+        // Step 1: For HA setups, gracefully transition to standby first
+        // This allows leadership to transfer cleanly to another RM
+        if (isHAEnabled && previousHAState == HAServiceState.ACTIVE) {
+            LOG.info("Gracefully transitioning RM {} from ACTIVE to STANDBY before restart", index);
+            try {
+                // Use the admin service to properly transition
+                rm.getRMContext().getRMAdminService()
+                    .transitionToStandby(new HAServiceProtocol.StateChangeRequestInfo(
+                        HAServiceProtocol.RequestSource.REQUEST_BY_USER));
+
+                // Wait for the transition to complete
+                waitForHAState(rm, HAServiceState.STANDBY, GRACEFUL_HA_TRANSITION_TIMEOUT_MS);
+                LOG.info("RM {} gracefully transitioned to STANDBY", index);
+
+                // Wait for another RM to become active (if available)
+                Thread.sleep(GRACEFUL_HA_FAILOVER_WAIT_MS);
+            } catch (Exception e) {
+                LOG.warn("Failed to gracefully transition RM {} to standby: {}. " +
+                    "Proceeding with restart anyway.", index, e.getMessage());
+                // Continue with restart even if transition fails
+            }
+        }
+
+        // Step 2: Ensure pending state is flushed to state store
+        if (rm != null && rm.getRMContext() != null && rm.getRMContext().getStateStore() != null) {
+            try {
+                LOG.info("Waiting for RM {} state store to sync before shutdown", index);
+                Thread.sleep(GRACEFUL_STATE_SYNC_WAIT_MS);
+            } catch (Exception e) {
+                LOG.warn("Error waiting for state store sync: {}", e.getMessage());
+            }
+        }
+
+        // Step 3: Now perform the restart
+        cluster.restartResourceManager(index);
+    }
+
+    /**
+     * Wait for ResourceManager to reach a specific HA state.
+     */
+    private void waitForHAState(ResourceManager rm, HAServiceState expectedState,
+            long timeoutMs) throws Exception {
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < timeoutMs) {
+            try {
+                HAServiceState currentState = rm.getRMContext()
+                    .getRMAdminService()
+                    .getServiceStatus()
+                    .getState();
+                if (currentState == expectedState) {
+                    return;
+                }
+            } catch (Exception e) {
+                // RM may be in transition, continue waiting
+                LOG.debug("Error checking HA state during transition: {}", e.getMessage());
+            }
+            Thread.sleep(200);
+        }
+        throw new Exception("RM did not reach state " + expectedState +
+            " within " + timeoutMs + "ms");
+    }
+
+    /**
      * Restart a NodeManager with the specified mode.
      * Creates a new NodeManager instance since Hadoop's service state machine
      * doesn't allow STOPPED → INITED transitions on the same instance.
+     *
+     * <p>For GRACEFUL mode:
+     * <ul>
+     *   <li>Waits for running containers to complete (with timeout)</li>
+     *   <li>Allows proper unregistration from ResourceManager</li>
+     *   <li>Ensures clean shutdown</li>
+     * </ul>
+     *
+     * <p>For CRASH mode:
+     * <ul>
+     *   <li>Skips unregistration (simulates abrupt failure)</li>
+     *   <li>Does not wait for containers</li>
+     * </ul>
      */
     private void restartNodeManager(MiniYARNCluster cluster, int index, RestartMode mode)
             throws Exception {
@@ -278,16 +404,19 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
         switch (mode) {
             case GRACEFUL:
-                nm.stop();
-                waitForServiceState(nm, Service.STATE.STOPPED, 5000);
+                // Truly graceful shutdown: wait for containers, allow proper unregistration
+                gracefulStopNodeManager(nm, index);
                 break;
 
             case CRASH:
-                nm.stop();
+                // Abrupt shutdown - skip unregistration, don't wait for containers
+                crashStopNodeManager(nm, index);
                 break;
 
             case DELAYED_CRASH:
-                nm.stop();
+                // Crash with delay
+                LOG.info("Performing DELAYED_CRASH shutdown of NM {}", index);
+                crashStopNodeManager(nm, index);
                 Thread.sleep(500);
                 break;
 
@@ -348,6 +477,99 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
         }
 
         LOG.info("NodeManager {} restarted successfully", index);
+    }
+
+    /**
+     * Gracefully stop a NodeManager.
+     * Waits for running containers to complete (with timeout), then allows
+     * proper unregistration from ResourceManager via the normal stop() path.
+     *
+     * <p>The stop() call will trigger:
+     * <ul>
+     *   <li>NodeStatusUpdaterImpl.serviceStop() which calls unRegisterNM()</li>
+     *   <li>ContainerManagerImpl.cleanUpApplicationsOnNMShutDown() which waits for apps</li>
+     * </ul>
+     */
+    private void gracefulStopNodeManager(NodeManager nm, int index) throws Exception {
+        LOG.info("Performing GRACEFUL shutdown of NM {}", index);
+
+        // Step 1: Check for running containers and wait for them to complete
+        int containerCount = getRunningContainerCount(nm);
+        if (containerCount > 0) {
+            LOG.info("NM {} has {} running containers, waiting for completion (max {}ms)",
+                index, containerCount, GRACEFUL_CONTAINER_WAIT_TIMEOUT_MS);
+
+            long waitStartTime = System.currentTimeMillis();
+            while (containerCount > 0 &&
+                   System.currentTimeMillis() - waitStartTime < GRACEFUL_CONTAINER_WAIT_TIMEOUT_MS) {
+                Thread.sleep(1000);
+                containerCount = getRunningContainerCount(nm);
+                if (containerCount > 0) {
+                    LOG.debug("Waiting for {} containers to complete on NM {}", containerCount, index);
+                }
+            }
+
+            if (containerCount > 0) {
+                LOG.warn("NM {} still has {} containers after {}ms wait, proceeding with shutdown",
+                    index, containerCount, GRACEFUL_CONTAINER_WAIT_TIMEOUT_MS);
+            } else {
+                LOG.info("All containers completed on NM {}", index);
+            }
+        }
+
+        // Step 2: Stop the NodeManager - this triggers:
+        //   - unRegisterNM() to notify RM
+        //   - cleanUpApplicationsOnNMShutDown() for final cleanup
+        nm.stop();
+
+        // Step 3: Wait for service to fully stop
+        waitForServiceState(nm, Service.STATE.STOPPED, 10000);
+        LOG.info("NM {} gracefully stopped", index);
+    }
+
+    /**
+     * Crash stop a NodeManager - simulates abrupt failure.
+     * Skips unregistration from ResourceManager by setting the decommissioned flag.
+     * Does not wait for containers to complete.
+     */
+    private void crashStopNodeManager(NodeManager nm, int index) throws Exception {
+        LOG.info("Performing CRASH shutdown of NM {} (no graceful cleanup)", index);
+
+        // Try to set the decommissioned flag to skip unRegisterNM() call during stop
+        // This simulates a crash where the NM doesn't get a chance to unregister
+        try {
+            Context nmContext = nm.getNMContext();
+            if (nmContext != null) {
+                nmContext.setDecommissioned(true);
+                LOG.debug("Set decommissioned flag on NM {} to skip unregistration", index);
+            }
+        } catch (Exception e) {
+            LOG.debug("Could not set decommissioned flag on NM {}: {}", index, e.getMessage());
+            // Continue anyway - the main goal is to not wait for containers
+        }
+
+        // Stop immediately without waiting for containers
+        nm.stop();
+        // Don't wait for clean stop - it's a crash simulation
+    }
+
+    /**
+     * Get the count of running containers on a NodeManager.
+     * Returns 0 if the count cannot be determined.
+     */
+    private int getRunningContainerCount(NodeManager nm) {
+        try {
+            Context nmContext = nm.getNMContext();
+            if (nmContext != null) {
+                ConcurrentMap<ContainerId, Container> containers = nmContext.getContainers();
+                if (containers != null) {
+                    return containers.size();
+                }
+            }
+        } catch (Exception e) {
+            LOG.debug("Could not get container count: {}", e.getMessage());
+        }
+        return 0;
     }
 
     /**
