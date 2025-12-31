@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServer_RestartInjected",
+      "testMethod": "testNamenodeRpcBindAny",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServer_RestartInjected",
+      "testMethod": "testNamenodeRpcClientIpProxy",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_caller_context_set",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

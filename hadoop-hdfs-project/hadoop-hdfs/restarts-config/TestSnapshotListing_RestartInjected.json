@@ -1,0 +1,18 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotListing_RestartInjected",
+  "restartPoints": {
+    "testListSnapshots": [
+      "after_allow_snapshot",
+      "after_create_snapshot_0",
+      "after_create_snapshot_1",
+      "after_create_snapshot_2",
+      "after_create_snapshot_3",
+      "after_create_snapshot_4",
+      "after_delete_snapshot_4",
+      "after_delete_snapshot_3",
+      "after_delete_snapshot_2",
+      "after_delete_snapshot_1",
+      "after_delete_last_snapshot"
+    ]
+  }
+}

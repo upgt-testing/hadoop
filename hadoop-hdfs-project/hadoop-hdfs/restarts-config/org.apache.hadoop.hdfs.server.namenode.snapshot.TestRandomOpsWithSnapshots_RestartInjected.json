@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestRandomOpsWithSnapshots_RestartInjected",
+      "testMethod": "testRandomOperationsWithSnapshots",
+      "restartPoints": [
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshottable_dirs_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_filesystem_operations",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_operations",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_health_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

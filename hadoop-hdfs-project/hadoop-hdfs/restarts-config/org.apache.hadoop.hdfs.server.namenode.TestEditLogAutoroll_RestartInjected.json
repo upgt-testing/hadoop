@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestEditLogAutoroll_RestartInjected",
+      "testMethod": "testEditLogAutoroll",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "during_mkdirs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_mkdirs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_autoroll",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

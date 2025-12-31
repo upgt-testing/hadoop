@@ -1,0 +1,96 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testTokenForNonTokenOp",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testGetOpRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testGetOpDoNotRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testPostOpRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testPutOpRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testPutOpDoNotRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testGetOpDoesNotRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testDeleteOpRequireAuth",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testLazyTokenFetchForWebhdfs",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_swebhdfs_token_fetch",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsTokens_RestartInjected",
+      "testMethod": "testSetTokenServiceAndKind",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_get_delegation_token",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

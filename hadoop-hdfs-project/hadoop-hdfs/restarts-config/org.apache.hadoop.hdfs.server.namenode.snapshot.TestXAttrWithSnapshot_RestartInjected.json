@@ -1,0 +1,193 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testModifyReadsCurrentState",
+      "restartPoints": [
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_xattr1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_xattr2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testXattrWithSnapshotAndNNRestart",
+      "restartPoints": [
+        {
+          "position": "after_set_xattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_save_namespace",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testRemoveReadsCurrentState",
+      "restartPoints": [
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_xattr_name2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_xattr_name1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testXAttrForSnapshotRootAfterChange",
+      "restartPoints": [
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_change_xattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testXAttrForSnapshotRootAfterRemove",
+      "restartPoints": [
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testSuccessiveSnapshotXAttrChanges",
+      "restartPoints": [
+        {
+          "position": "after_create_snapshot1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot3",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_snapshot2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testSetXAttrSnapshotPath",
+      "restartPoints": [
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testRemoveXAttrSnapshotPath",
+      "restartPoints": [
+        {
+          "position": "after_set_xattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot_RestartInjected",
+      "testMethod": "testCopySnapshotShouldPreserveXAttrs",
+      "restartPoints": [
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

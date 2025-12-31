@@ -1,0 +1,78 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMetaSave_RestartInjected",
+      "testMethod": "testMetaSave",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_datanode_stop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMetaSave_RestartInjected",
+      "testMethod": "testMetasaveAfterDelete",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_datanode_stop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMetaSave_RestartInjected",
+      "testMethod": "testMetaSaveOverwrite",
+      "restartPoints": [
+        {
+          "position": "after_first_metasave",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMetaSave_RestartInjected",
+      "testMethod": "testConcurrentMetaSave",
+      "restartPoints": [
+        {
+          "position": "before_concurrent_metasave",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concurrent_metasave",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

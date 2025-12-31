@@ -1,0 +1,198 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot_RestartInjected",
+      "testMethod": "testSnapshotAfterAppending",
+      "restartPoints": [
+        {
+          "position": "after_create_snapshot_s0",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_append",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setreplication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_append",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_third_append",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot_RestartInjected",
+      "testMethod": "testSnapshotWhileAppending",
+      "restartPoints": [
+        {
+          "position": "after_create_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_append_open",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_hsync_first",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s0",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_close_first",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_append_open",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_hsync_second",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_close_second",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setreplication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_third_append_open",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_hsync_third",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_close_third",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_verify_filesize",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot_RestartInjected",
+      "testMethod": "testGetBlockLocations",
+      "restartPoints": [
+        {
+          "position": "after_create_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s1",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_append",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_and_hsync",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_close_stream",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot_RestartInjected",
+      "testMethod": "testLease",
+      "restartPoints": [
+        {
+          "position": "after_create_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_and_hsync",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot_s0",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_foo",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_lease_checks",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

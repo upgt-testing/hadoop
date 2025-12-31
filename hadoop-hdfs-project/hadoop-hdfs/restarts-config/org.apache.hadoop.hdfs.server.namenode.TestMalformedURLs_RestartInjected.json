@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMalformedURLs_RestartInjected",
+      "testMethod": "testTryStartingCluster",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

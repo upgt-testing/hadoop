@@ -1,0 +1,85 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testWrite",
+      "restartPoints": [
+        {
+          "position": "after_metrics_init",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_write_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testAppend",
+      "restartPoints": [
+        {
+          "position": "after_append_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testSilentAppend",
+      "restartPoints": [
+        {
+          "position": "after_silent_append_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testNoAppend",
+      "restartPoints": [
+        {
+          "position": "after_no_append_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testSilentOverwrite",
+      "restartPoints": [
+        {
+          "position": "after_silent_overwrite_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs_RestartInjected",
+      "testMethod": "testFlushThread",
+      "restartPoints": [
+        {
+          "position": "after_flush_metrics_init",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_publish",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_publish",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

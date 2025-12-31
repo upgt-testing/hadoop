@@ -1,0 +1,101 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testBlockScheduledUpdate",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testAllocateBlockId",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testAddStripedBlock",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_write_flush",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testGetLocatedStripedBlocks",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_write_flush",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testAddUCReplica",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testCheckStripedReplicaCorrupt",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks_RestartInjected",
+      "testMethod": "testStripedFlagInBlockLocation",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

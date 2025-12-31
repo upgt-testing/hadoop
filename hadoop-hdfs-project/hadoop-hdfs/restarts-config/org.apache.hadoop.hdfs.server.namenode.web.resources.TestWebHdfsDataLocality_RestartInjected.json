@@ -1,0 +1,9 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsDataLocality_RestartInjected",
+  "restartPoints": [
+    "after_cluster_init",
+    "after_file_create",
+    "after_file_write",
+    "after_file_close"
+  ]
+}

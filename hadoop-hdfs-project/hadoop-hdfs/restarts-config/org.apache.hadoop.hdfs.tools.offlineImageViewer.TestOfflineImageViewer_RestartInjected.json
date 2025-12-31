@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewer_RestartInjected",
+      "testMethod": "testFileDistributionCalculatorForException",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_directory_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_namespace_save",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

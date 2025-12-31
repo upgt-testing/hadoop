@@ -1,0 +1,93 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected",
+      "testMethod": "testSaveNamespaceWithRenamedLease",
+      "restartPoints": [
+        {
+          "position": "after_target_directory_created",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_created_with_open_lease",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_with_open_lease",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_savenamespace_with_renamed_lease",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected",
+      "testMethod": "testSaveNamespaceWithDanglingLease",
+      "restartPoints": [
+        {
+          "position": "after_dangling_lease_added",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_savenamespace_with_dangling_lease",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected",
+      "testMethod": "testSkipSnapshotSection",
+      "restartPoints": [
+        {
+          "position": "after_file_created",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_bogus_snapshot_feature_added",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_savenamespace_skip_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected",
+      "testMethod": "testSaveNamespaceBeforeShutdown",
+      "restartPoints": [
+        {
+          "position": "after_first_savenamespace_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_savenamespace_checkpoint",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_directories_created",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_final_checkpoint",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

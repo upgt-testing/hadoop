@@ -1,0 +1,181 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testSetSafeMode",
+      "restartPoints": [
+        {
+          "position": "after_ha_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_safemode_enter",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_safemode_leave",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testSaveNamespace",
+      "restartPoints": [
+        {
+          "position": "after_safemode_enter",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_save_namespace",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRestoreFailedStorage",
+      "restartPoints": [
+        {
+          "position": "after_restore_failed_storage",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRefreshNodes",
+      "restartPoints": [
+        {
+          "position": "after_refresh_nodes",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testSetBalancerBandwidth",
+      "restartPoints": [
+        {
+          "position": "after_transition_to_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_balancer_bandwidth",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testMetaSave",
+      "restartPoints": [
+        {
+          "position": "after_transition_to_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_metasave",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRefreshServiceAcl",
+      "restartPoints": [
+        {
+          "position": "after_refresh_service_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRefreshUserToGroupsMappings",
+      "restartPoints": [
+        {
+          "position": "after_refresh_user_to_groups_mappings",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRefreshSuperUserGroupsConfiguration",
+      "restartPoints": [
+        {
+          "position": "after_refresh_super_user_groups_configuration",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testRefreshCallQueue",
+      "restartPoints": [
+        {
+          "position": "after_refresh_call_queue",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testFinalizeUpgrade",
+      "restartPoints": [
+        {
+          "position": "after_transition_to_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_finalize_upgrade",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected",
+      "testMethod": "testUpgradeCommand",
+      "restartPoints": [
+        {
+          "position": "after_upgrade_query_before_upgrade",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nn1_upgrade_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL"]
+        },
+        {
+          "position": "after_standby_bootstrap",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL"]
+        },
+        {
+          "position": "after_upgrade_finalize",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

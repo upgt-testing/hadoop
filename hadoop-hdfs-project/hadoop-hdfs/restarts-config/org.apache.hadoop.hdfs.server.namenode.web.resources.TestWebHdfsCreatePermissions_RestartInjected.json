@@ -1,0 +1,6 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsCreatePermissions_RestartInjected",
+  "restartPoints": [
+    "after_cluster_init"
+  ]
+}

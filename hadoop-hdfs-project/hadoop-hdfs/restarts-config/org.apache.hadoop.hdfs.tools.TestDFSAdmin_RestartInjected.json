@@ -1,0 +1,195 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testGetDatanodeInfo",
+      "restartPoints": [
+        {
+          "position": "after_get_datanode_info",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testTriggerBlockReport",
+      "restartPoints": [
+        {
+          "position": "after_trigger_block_report",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testGetVolumeReport",
+      "restartPoints": [
+        {
+          "position": "after_get_volume_report",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testDFSAdminUnreachableDatanode",
+      "restartPoints": [
+        {
+          "position": "after_datanode_stop",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testDataNodeGetReconfigurableProperties",
+      "restartPoints": [
+        {
+          "position": "after_get_reconfigurable_properties",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testDataNodeGetReconfigurationStatus",
+      "restartPoints": [
+        {
+          "position": "after_get_reconfiguration_status",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testNameNodeGetReconfigurableProperties",
+      "restartPoints": [
+        {
+          "position": "after_get_reconfigurable_properties",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testNameNodeGetReconfigurationStatus",
+      "restartPoints": [
+        {
+          "position": "after_get_reconfiguration_status",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testPrintTopology",
+      "restartPoints": [
+        {
+          "position": "after_print_topology",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testPrintTopologyWithStatus",
+      "restartPoints": [
+        {
+          "position": "after_print_topology_with_status",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testReportCommand",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_report_command",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testListOpenFiles",
+      "restartPoints": [
+        {
+          "position": "after_file_open",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_list_open_files",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testSetBalancerBandwidth",
+      "restartPoints": [
+        {
+          "position": "after_set_balancer_bandwidth",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testCheckNumOfBlocksInReportCommand",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_report_command",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testRefreshProxyUser",
+      "restartPoints": [
+        {
+          "position": "after_refresh_proxy_user",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestDFSAdmin_RestartInjected",
+      "testMethod": "testAllDatanodesReconfig",
+      "restartPoints": [
+        {
+          "position": "after_datanode_reconfig",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

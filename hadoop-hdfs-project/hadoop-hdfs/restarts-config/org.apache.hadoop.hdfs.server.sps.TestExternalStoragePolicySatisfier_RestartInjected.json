@@ -1,0 +1,6 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.sps.TestExternalStoragePolicySatisfier_RestartInjected",
+  "restartPoints": [
+    "after_cluster_creation"
+  ]
+}

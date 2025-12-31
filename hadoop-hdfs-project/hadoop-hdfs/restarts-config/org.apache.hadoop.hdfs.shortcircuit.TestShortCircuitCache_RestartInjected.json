@@ -1,0 +1,6 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.shortcircuit.TestShortCircuitCache_RestartInjected",
+  "restartPoints": [
+    "after_cluster_active"
+  ]
+}

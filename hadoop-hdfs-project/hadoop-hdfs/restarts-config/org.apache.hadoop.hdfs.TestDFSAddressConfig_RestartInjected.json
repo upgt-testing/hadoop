@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSAddressConfig_RestartInjected",
+      "testMethod": "testDFSAddressConfig",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_datanode_restart",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_datanode_restart",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

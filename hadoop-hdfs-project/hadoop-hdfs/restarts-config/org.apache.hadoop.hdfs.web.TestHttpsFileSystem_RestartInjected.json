@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestHttpsFileSystem_RestartInjected",
+      "testMethod": "testSWebHdfsFileSystem",
+      "restartPoints": [
+        {
+          "position": "after_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_close",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_read",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testWithCheckpoint",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy_file",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_checkpoint",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_verification",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy_dir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testWithRestarts",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_first_restart",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_verification",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_second_restart",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testMultipleSatisfyStoragePolicy",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_satisfy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_xattr_removed",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_satisfy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testDropSPS",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_drop_sps",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testSPSShouldNotLeakXattrIfStorageAlreadySatisfied",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testNameNodeRestartWhenSPSCalledOnChildFileAndParentDir",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_child_file",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_namenode_restart",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testSPSOnChildAndParentDirectory",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_child_dir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_parent_dir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testSPSxAttrWhenSpsCalledForDir",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_created",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier_RestartInjected",
+      "testMethod": "testSPSxAttrWhenSpsCalledForFile",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_created",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_satisfy_policy",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

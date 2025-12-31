@@ -1,0 +1,100 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testNoUserGiven",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_no_user",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testExistingUser",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_existing_user",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testMultipleExistingUsers",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_multiple_users",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testNonExistentUser",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_nonexistent_user",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testMultipleNonExistingUsers",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_multiple_nonexistent",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.TestGetGroups_RestartInjected",
+      "testMethod": "testExistingInterleavedWithNonExistentUsers",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_get_groups_interleaved_users",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

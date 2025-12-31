@@ -1,0 +1,132 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditAllowed",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setupauditlogs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditAllowedStat",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setupauditlogs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditDenied",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_permission_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditWebHdfs",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_permission_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditWebHdfsStat",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_permission_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditWebHdfsDenied",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_permission_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditWebHdfsOpen",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_permission_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAuditLogs_RestartInjected",
+      "testMethod": "testAuditCharacterEscape",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setupauditlogs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

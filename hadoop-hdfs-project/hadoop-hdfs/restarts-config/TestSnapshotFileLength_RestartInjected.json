@@ -1,0 +1,18 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotFileLength_RestartInjected",
+  "restartPoints": {
+    "testSnapshotfileLength": [
+      "after_create_file",
+      "after_first_append",
+      "after_create_snapshot",
+      "after_open_for_append",
+      "after_second_append",
+      "after_close_append_stream"
+    ],
+    "testSnapshotFileLengthWithCatCommand": [
+      "after_create_file",
+      "after_create_snapshot",
+      "after_append_file"
+    ]
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDeletion_RestartInjected",
+  "adapterClass": "org.apache.hadoop.hdfs.restarttest.HdfsClusterAdapter",
+  "tests": [
+    {
+      "testMethod": "testDeleteDirectoryWithSnapshot",
+      "restartPoints": [
+        "after_file_creation",
+        "after_snapshot_creation"
+      ]
+    },
+    {
+      "testMethod": "testApplyEditLogForDeletion",
+      "restartPoints": [
+        "after_mkdir",
+        "after_allow_snapshot",
+        "after_delete_foo",
+        "after_save_namespace"
+      ]
+    },
+    {
+      "testMethod": "testDeleteDirectoryWithSnapshot2",
+      "restartPoints": [
+        "after_file_creation",
+        "after_snapshot_creation"
+      ]
+    },
+    {
+      "testMethod": "testDeleteCurrentFileDirectory",
+      "restartPoints": [
+        "after_initial_file_creation",
+        "after_delete_deletedir",
+        "after_snapshot_s0",
+        "after_replication_changes",
+        "after_snapshot_s1",
+        "after_delete_nochangedirparent",
+        "after_delete_sub"
+      ]
+    },
+    {
+      "testMethod": "testDeleteEarliestSnapshot1",
+      "restartPoints": [
+        "after_file_creation",
+        "after_snapshot_s1_creation",
+        "after_snapshot_deletion",
+        "after_snapshot_s2_creation"
+      ]
+    },
+    {
+      "testMethod": "testDeleteEarliestSnapshot2",
+      "restartPoints": [
+        "after_file_creation",
+        "after_snapshot_s0",
+        "after_metadata_changes",
+        "after_snapshot_s1",
+        "after_snapshot_s0_deletion"
+      ]
+    },
+    {
+      "testMethod": "testDeleteSnapshot1",
+      "restartPoints": [
+        "after_file1_creation",
+        "after_snapshot_s1",
+        "after_snapshot_s2",
+        "after_directory_deletion",
+        "after_snapshot_s2_deletion"
+      ]
+    },
+    {
+      "testMethod": "testDeleteSnapshot2",
+      "restartPoints": [
+        "after_file1_creation",
+        "after_snapshot_s1",
+        "after_snapshot_s2",
+        "after_directory_deletion",
+        "after_snapshot_s2_deletion"
+      ]
+    },
+    {
+      "testMethod": "testCombineSnapshotDiff3",
+      "restartPoints": [
+        "after_directory_creation",
+        "after_snapshot_s1",
+        "after_file_creation",
+        "after_snapshot_s2",
+        "after_directory_deletion",
+        "after_snapshot_s2_deletion"
+      ]
+    },
+    {
+      "testMethod": "testDeleteSnapshotWithDirModification",
+      "restartPoints": [
+        "after_file_creation_and_owner_change",
+        "after_snapshot_s1_and_owner_change",
+        "after_snapshot_s2",
+        "after_snapshot_s3_and_owner_change",
+        "after_snapshot_s3_deletion",
+        "after_snapshot_s2_deletion"
+      ]
+    },
+    {
+      "testMethod": "testRenameSnapshotDiff",
+      "restartPoints": [
+        "after_initial_file_creation",
+        "after_snapshot_s0",
+        "after_new_file_creation",
+        "after_snapshot_s1",
+        "after_snapshot_s2",
+        "after_metadata_changes",
+        "after_delete_subfile1",
+        "after_snapshot_s2_deletion"
+      ]
+    },
+    {
+      "testMethod": "testHANNRestartAfterSnapshotDeletion",
+      "restartPoints": [
+        "after_file_creation",
+        "after_snapshot_creation",
+        "after_subdir_deletion",
+        "after_snapshot_deletion"
+      ]
+    },
+    {
+      "testMethod": "testCorrectNumberOfBlocksAfterRestart",
+      "restartPoints": [
+        "after_file_and_dir_creation",
+        "after_snapshot_creation",
+        "after_deletion"
+      ]
+    },
+    {
+      "testMethod": "testFsImageCorruption",
+      "restartPoints": [
+        "after_snapshot_s0",
+        "after_snapshot_s1",
+        "after_snapshot_s2",
+        "after_rename_and_delete",
+        "after_snapshot_deletion"
+      ]
+    },
+    {
+      "testMethod": "testRenameAndDelete",
+      "restartPoints": [
+        "after_snapshot_s0",
+        "after_file_creation",
+        "after_rename_to_y",
+        "after_snapshot_s1",
+        "after_rename_to_trash",
+        "after_snapshot_s2",
+        "after_delete_trash_y",
+        "after_snapshot_s1_deletion"
+      ]
+    },
+    {
+      "testMethod": "testSnapshotWithConcatException",
+      "restartPoints": [
+        "after_snapshot_ss",
+        "after_file_creation",
+        "after_snapshot_s0"
+      ]
+    },
+    {
+      "testMethod": "testSnapshotDeleteWithConcat",
+      "restartPoints": [
+        "after_snapshot_ss",
+        "after_file_creation_iteration_0",
+        "after_snapshot_s0",
+        "after_file_creation_iteration_1",
+        "after_snapshot_s1",
+        "after_file_creation_iteration_2",
+        "after_snapshot_s2",
+        "after_snapshot_s1_deletion"
+      ]
+    },
+    {
+      "testMethod": "testSnapshotDiffReportWithConcat",
+      "restartPoints": [
+        "after_snapshot_ss",
+        "after_file_creation_iteration_0",
+        "after_snapshot_s0",
+        "after_file_creation_iteration_1",
+        "after_snapshot_s1",
+        "after_file_creation_iteration_2",
+        "after_snapshot_s2",
+        "after_snapshot_s1_deletion"
+      ]
+    }
+  ]
+}

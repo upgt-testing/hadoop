@@ -1,0 +1,9 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestFsck_RestartInjected",
+      "testMethod": "NEEDS_COMPREHENSIVE_TRANSFORMATION",
+      "restartPoints": []
+    }
+  ]
+}

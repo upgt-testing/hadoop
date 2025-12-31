@@ -1,0 +1,313 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.metrics.TestNameNodeMetrics_RestartInjected",
+  "restartPoints": [
+    {
+      "testMethod": "testCapacityMetrics",
+      "position": "after_cluster_setup",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGcTimePercentageMetrics",
+      "position": "after_cluster_setup",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testStaleNodes",
+      "position": "after_stale_setup",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testStaleNodes",
+      "position": "after_heartbeat_check",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testVolumeFailures",
+      "position": "after_volume_failure",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testVolumeFailures",
+      "position": "after_heartbeat",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testDataNodeLivenessAndDecom",
+      "position": "after_decommission",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testDataNodeLivenessAndDecom",
+      "position": "after_dns_killed",
+      "nodeRole": "datanode",
+      "nodeIndex": 1,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testDataNodeLivenessAndDecom",
+      "position": "after_refresh_nodes",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFileAdd",
+      "position": "after_normal_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFileAdd",
+      "position": "after_ec_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFileAdd",
+      "position": "after_normal_file_deletion",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFileAdd",
+      "position": "after_ec_file_deletion",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testCorruptBlock",
+      "position": "after_file_replication",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testCorruptBlock",
+      "position": "after_block_corruption",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testCorruptBlock",
+      "position": "after_block_recovery",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testStripedFileCorruptBlocks",
+      "position": "after_ec_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testStripedFileCorruptBlocks",
+      "position": "after_ec_corruption",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testStripedFileCorruptBlocks",
+      "position": "after_ec_reconstruction",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testExcessBlocks",
+      "position": "after_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testExcessBlocks",
+      "position": "after_replication_change",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testMissingBlock",
+      "position": "after_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testMissingBlock",
+      "position": "after_block_corruption",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testRenameMetrics",
+      "position": "after_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testRenameMetrics",
+      "position": "after_rename",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGetBlockLocationMetric",
+      "position": "after_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGetBlockLocationMetric",
+      "position": "after_read",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testTransactionSinceLastCheckpointMetrics",
+      "position": "after_ha_setup",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testTransactionSinceLastCheckpointMetrics",
+      "position": "after_checkpoint",
+      "nodeRole": "namenode",
+      "nodeIndex": 1,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testTransactionAndCheckpointMetrics",
+      "position": "after_mkdir",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testTransactionAndCheckpointMetrics",
+      "position": "after_editlog_roll",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testTransactionAndCheckpointMetrics",
+      "position": "after_save_namespace",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testSyncAndBlockReportMetric",
+      "position": "after_initial_block_report",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testReadWriteOps",
+      "position": "after_file_creation",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testReadWriteOps",
+      "position": "after_read",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testNumActiveClientsAndFilesUnderConstructionMetrics",
+      "position": "after_first_file_open",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testNumActiveClientsAndFilesUnderConstructionMetrics",
+      "position": "after_multi_client_files",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGenerateEDEKTime",
+      "position": "after_encryption_zone_creation",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGenerateEDEKTime",
+      "position": "after_encrypted_file_creation_0",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGenerateEDEKTime",
+      "position": "after_encrypted_file_creation_1",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testGenerateEDEKTime",
+      "position": "after_encrypted_file_creation_2",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testResourceCheck",
+      "position": "after_ha_setup",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testEditLogTailing",
+      "position": "after_ha_setup",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testEditLogTailing",
+      "position": "after_editlog_roll",
+      "nodeRole": "namenode",
+      "nodeIndex": 1,
+      "restartMode": "GRACEFUL"
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateOneSSD",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateAllSSD",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateAppend",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateDelete",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateRename",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeExceptionWithFileCreate",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeParentOffChildOff",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeParentOffChildOn",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeParentOnChildOff",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeParentOnChildOn",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithTraditionalQuota",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeAndTraditionalQuotaException1",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeAndTraditionalQuotaException2",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeAndTraditionalQuotaException3",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithSnapshot",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypeWithFileCreateTruncate",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypePersistenceInEditLog",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testQuotaByStorageTypePersistenceInFsImage",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testContentSummaryWithoutQuotaByStorageType",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testContentSummaryWithoutStoragePolicy",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testStorageSpaceQuotaWithWarmPolicy",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testStorageSpaceQuotaWithRepFactor",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType_RestartInjected",
+      "testMethod": "testStorageSpaceQuotaPerQuotaClear",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

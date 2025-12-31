@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestTransferFsImage_RestartInjected",
+      "testMethod": "testClientSideException",
+      "restartPoints": [
+        {
+          "position": "after_cluster_build",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestTransferFsImage_RestartInjected",
+      "testMethod": "testClientSideExceptionOnJustOneDir",
+      "restartPoints": [
+        {
+          "position": "after_cluster_build",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestParallelImageWrite_RestartInjected",
+      "testMethod": "testRestartDFS",
+      "restartPoints": [
+        {
+          "position": "after_files_created",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_owner",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_cluster_restart_verification",
+          "targets": ["namenode", "datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_check_images",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_files_created",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_save_namespace",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServerMethods_RestartInjected",
+      "testMethod": "testDeleteSnapshotWhenSnapshotNameIsEmpty",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_second_validation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServerMethods_RestartInjected",
+      "testMethod": "testGetDatanodeStorageReportWithNumBLocksNotZero",
+      "restartPoints": [
+        {
+          "position": "after_create",
+          "targets": ["datanode", "namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_storage_report",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

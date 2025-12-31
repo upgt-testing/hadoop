@@ -8,464 +8,539 @@ This document tracks the progress of adding restart positions to HDFS tests that
 ## Progress Overview
 
 Total Tests: 537
-- [ ] Completed: 0/537
+- [x] Completed: 338/537
 
 ---
 
 ## hadoop-hdfs (Core) Tests (437 tests)
 
-- [ ] org.apache.hadoop.cli.TestAclCLI
-- [ ] org.apache.hadoop.cli.TestCacheAdminCLI
-- [ ] org.apache.hadoop.cli.TestCryptoAdminCLI
-- [ ] org.apache.hadoop.cli.TestDeleteCLI
-- [ ] org.apache.hadoop.cli.TestErasureCodingCLI
-- [ ] org.apache.hadoop.cli.TestHDFSCLI
-- [ ] org.apache.hadoop.cli.TestXAttrCLI
-- [ ] org.apache.hadoop.fs.contract.hdfs.HDFSContract
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractAppend
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractConcat
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractCreate
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractDelete
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractGetFileStatus
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractMkdir
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractMultipartUploader
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractOpen
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractPathHandle
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractRename
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractRootDirectory
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractSeek
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractSetTimes
-- [ ] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractUnbuffer
-- [ ] org.apache.hadoop.fs.loadGenerator.TestLoadGenerator
-- [ ] org.apache.hadoop.fs.permission.TestStickyBit
-- [ ] org.apache.hadoop.fs.shell.TestHdfsTextCommand
-- [ ] org.apache.hadoop.fs.TestEnhancedByteBufferAccess
-- [ ] org.apache.hadoop.fs.TestFcHdfsCreateMkdir
-- [ ] org.apache.hadoop.fs.TestFcHdfsPermission
-- [ ] org.apache.hadoop.fs.TestFcHdfsSetUMask
-- [ ] org.apache.hadoop.fs.TestGlobPaths
-- [ ] org.apache.hadoop.fs.TestHDFSFileContextMainOperations
-- [ ] org.apache.hadoop.fs.TestResolveHdfsSymlink
-- [ ] org.apache.hadoop.fs.TestSWebHdfsFileContextMainOperations
-- [ ] org.apache.hadoop.fs.TestSymlinkHdfs
-- [ ] org.apache.hadoop.fs.TestSymlinkHdfsDisable
-- [ ] org.apache.hadoop.fs.TestUnbuffer
-- [ ] org.apache.hadoop.fs.TestUrlStreamHandler
-- [ ] org.apache.hadoop.fs.TestWebHdfsFileContextMainOperations
-- [ ] org.apache.hadoop.fs.viewfs.TestNNStartupWhenViewFSOverloadSchemeEnabled
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemAtHdfsRoot
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemHdfs
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkFallback
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkMergeSlash
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkRegex
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemOverloadSchemeHdfsFileSystemContract
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemOverloadSchemeWithHdfsScheme
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithAcls
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithTruncate
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithXAttrs
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsAtHdfsRoot
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsDefaultValue
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsFileStatusHdfs
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsHdfs
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsLinkFallback
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsWithAcls
-- [ ] org.apache.hadoop.fs.viewfs.TestViewFsWithXAttrs
-- [ ] org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil
-- [ ] org.apache.hadoop.hdfs.client.impl.TestBlockReaderFactory
-- [ ] org.apache.hadoop.hdfs.client.impl.TestBlockReaderLocal
-- [ ] org.apache.hadoop.hdfs.client.impl.TestBlockReaderLocalLegacy
-- [ ] org.apache.hadoop.hdfs.crypto.TestHdfsCryptoStreams
-- [ ] org.apache.hadoop.hdfs.DFSTestUtil
-- [ ] org.apache.hadoop.hdfs.protocol.datatransfer.sasl.TestSaslDataTransfer
-- [ ] org.apache.hadoop.hdfs.protocol.datatransfer.sasl.TestSaslDataTransferExpiredBlockToken
-- [ ] org.apache.hadoop.hdfs.qjournal.client.TestEpochsAreUnique
-- [ ] org.apache.hadoop.hdfs.qjournal.client.TestQJMWithFaults
-- [ ] org.apache.hadoop.hdfs.qjournal.client.TestQuorumJournalManager
-- [ ] org.apache.hadoop.hdfs.qjournal.MiniJournalCluster
-- [ ] org.apache.hadoop.hdfs.qjournal.MiniQJMHACluster
-- [ ] org.apache.hadoop.hdfs.qjournal.QJMTestUtil
-- [ ] org.apache.hadoop.hdfs.qjournal.server.TestJournal
-- [ ] org.apache.hadoop.hdfs.qjournal.server.TestJournalNode
-- [ ] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeMXBean
-- [ ] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeRespectsBindHostKeys
-- [ ] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeSync
-- [ ] org.apache.hadoop.hdfs.qjournal.TestMiniJournalCluster
-- [ ] org.apache.hadoop.hdfs.qjournal.TestNNWithQJM
-- [ ] org.apache.hadoop.hdfs.qjournal.TestSecureNNWithQJM
-- [ ] org.apache.hadoop.hdfs.restart.TestHdfsClusterAdapter
-- [ ] org.apache.hadoop.hdfs.security.TestDelegationToken
-- [ ] org.apache.hadoop.hdfs.security.TestDelegationTokenForProxyUser
-- [ ] org.apache.hadoop.hdfs.security.token.block.TestBlockToken
-- [ ] org.apache.hadoop.hdfs.server.aliasmap.TestSecureAliasMap
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancer
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerLongRunningTasks
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerService
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithHANameNodes
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithMultipleNameNodes
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithNodeGroup
-- [ ] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithSaslDataTransfer
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockInfoStriped
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockManager
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockReportLease
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockReportRateLimiting
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockStatsMXBean
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlocksWithNotEnoughRacks
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFS
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFSStriped
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithShortCircuitRead
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestComputeInvalidateWork
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestCorruptionWithFailover
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestErasureCodingCorruption
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestHeartbeatHandling
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestNameNodePrunesMissingStorages
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestNodeCount
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestOverReplicatedBlocks
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingDataNodeMessages
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingInvalidateBlock
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingReconstruction
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestRBWBlockInvalidation
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestReconstructStripedBlocksWithRackAwareness
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestRedundancyMonitor
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestReplicationPolicy
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestSequentialBlockGroupId
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestSequentialBlockId
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestSlowDiskTracker
-- [ ] org.apache.hadoop.hdfs.server.blockmanagement.TestUnderReplicatedBlocks
-- [ ] org.apache.hadoop.hdfs.server.datanode.BlockReportTestBase
-- [ ] org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.LazyPersistTestCase
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestCacheByPmemMappableBlockLoader
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestDatanodeRestart
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetCache
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetImpl
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsVolumeList
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestInterDatanodeProtocol
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistFiles
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistLockedMemory
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistPolicy
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistReplicaPlacement
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistReplicaRecovery
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyWriter
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestPmemCacheRecovery
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestProvidedImpl
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestReplicaCachingGetSpaceUsed
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestScrLazyPersistFiles
-- [ ] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestWriteToReplica
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBatchIbr
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockCountersInPendingIBR
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockHasMultipleReplicasOnSameDN
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockReplacement
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBlockScanner
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestBPOfferService
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestCachingStrategy
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeECN
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeErasureCodingMetrics
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeExit
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeFaultInjector
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeHotSwapVolumes
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeInitStorage
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeLifeline
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetricsLogger
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMultipleRegistrations
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMXBean
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDatanodeProtocolRetryPolicy
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeReconfiguration
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeRollingUpgrade
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeTcpNoDelay
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeTransferSocketSize
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeUUID
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailure
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailureReporting
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailureToleration
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeMetrics
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDeleteBlockPool
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDirectoryScanner
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestDiskError
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestFsDatasetCacheRevocation
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestHSync
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestIncrementalBrVariations
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestLargeBlockReport
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestNNHandlesBlockReportPerStorage
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestNNHandlesCombinedBlockReport
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestReadOnlySharedStorage
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestRefreshNamenodes
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestStartSecureDataNode
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestStorageReport
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestTransferRbw
-- [ ] org.apache.hadoop.hdfs.server.datanode.TestTriggerBlockReport
-- [ ] org.apache.hadoop.hdfs.server.datanode.web.TestDatanodeHttpXFrame
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.command.TestDiskBalancerCommand
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.DiskBalancerTestUtil
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.TestConnectors
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancer
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancerRPC
-- [ ] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancerWithMockMover
-- [ ] org.apache.hadoop.hdfs.server.mover.TestMover
-- [ ] org.apache.hadoop.hdfs.server.mover.TestStorageMover
-- [ ] org.apache.hadoop.hdfs.server.namenode.FSAclBaseTest
-- [ ] org.apache.hadoop.hdfs.server.namenode.FSImageTestUtil
-- [ ] org.apache.hadoop.hdfs.server.namenode.FSXAttrBaseTest
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.HAStressTestHarness
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapAliasmap
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandby
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandbyWithQJM
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestConsistentReadsObserver
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestDFSUpgradeWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencing
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencingWithReplication
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestEditLogsDuringFailover
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestEditLogTailer
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestFailoverWithBlockTokensEnabled
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestFailureOfSharedDir
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestFailureToReadEdits
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestGetGroupsWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestHAAppend
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestHAFsck
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestHAMetrics
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestHarFileSystemWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestHASafeMode
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestInitializeSharedEdits
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestLossyRetryInvocationHandler
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestMultiObserverNode
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestNNHealthCheck
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestObserverNode
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestPendingCorruptDnMessages
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestPipelinesFailover
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestQuotasWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestRemoteNameNodeInfo
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestRetryCacheWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestSeveralNameNodes
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyBlockManagement
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyCheckpoints
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyInProgressTail
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyIsHot
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestStateTransitionFailure
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestUpdateBlockTailing
-- [ ] org.apache.hadoop.hdfs.server.namenode.ha.TestXAttrsWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.metrics.TestNameNodeMetrics
-- [ ] org.apache.hadoop.hdfs.server.namenode.metrics.TestNNMetricFilesInGetListingOps
-- [ ] org.apache.hadoop.hdfs.server.namenode.OfflineEditsViewerHelper
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotTestHelper
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestAclWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestCheckpointsWithSnapshots
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestDisallowModifyROSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestFileContextSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestGetContentSummaryWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestNestedSnapshots
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestOpenFilesWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestRandomOpsWithSnapshots
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSetQuotaWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapRootDescendantDiff
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotBlocksMap
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDeletion
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDiffReport
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotFileLength
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotListing
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotMetrics
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotNameWithInvalidCharacters
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotRename
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotReplication
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotStatsMXBean
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshottableDirListing
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestUpdatePipelineWithSnapshots
-- [ ] org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.sps.TestStoragePolicySatisfierWithStripedFile
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAddBlock
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAddBlockRetry
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAddOverReplicatedStripedBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlockInFBR
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAllowFormat
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAuditLogger
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAuditLoggerWithCommands
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestAuditLogs
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestBackupNode
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestBlockPlacementPolicyRackFaultTolerant
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestBlockUnderConstruction
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCacheDirectives
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCacheDirectivesWithViewDFS
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCheckpoint
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCheckPointForSecurityTokens
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCommitBlockWithInvalidGenStamp
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestCreateEditsLog
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestDeadDatanode
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestDecommissioningStatus
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestDeleteRace
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestDiskspaceQuotaUpdate
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestEditLog
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestEditLogAutoroll
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestEditLogJournalFailures
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestEditLogRace
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFavoredNodesEndToEnd
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFileContextAcl
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFileContextXAttr
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFileLimit
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFileTruncate
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFsck
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFsckWithMultipleNameNodes
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSDirectory
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSEditLogLoader
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSImage
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithAcl
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithSnapshot
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithXAttr
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFsLimits
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSNamesystem
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestFSNamesystemMBean
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestGenericJournalConf
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestGetContentSummaryWithPermission
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestHDFSConcat
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestHostsFiles
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestINodeFile
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestLargeDirectoryDelete
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestLeaseManager
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestListCorruptFileBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestListOpenFiles
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestMalformedURLs
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestMetadataVersionOutput
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestMetaSave
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameEditsConfigs
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeAcl
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNamenodeCapacityReport
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeMetadataConsistency
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeMXBean
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeReconfigure
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRecovery
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeResourceChecker
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNamenodeRetryCache
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRetryCacheMetrics
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServer
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServerMethods
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeStatusMXBean
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNameNodeXAttr
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNestedEncryptionZones
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNetworkTopologyServlet
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNNStorageRetentionFunctional
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestNNThroughputBenchmark
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestParallelImageWrite
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestProtectedDirectories
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestQuotaWithStripedBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestReconstructStripedBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestRedudantBlocks
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestReencryption
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestRefreshBlockPlacementPolicy
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestRefreshNamenodeReplicationConfig
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSecondaryNameNodeUpgrade
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSecondaryWebUi
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSecureNameNode
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSecureNameNodeWithExternalKdc
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSecurityTokenEditLog
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestSnapshotPathINodes
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestStartup
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestStoragePolicySatisfierWithHA
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestStorageRestore
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestStripedINodeFile
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestTransferFsImage
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestUpgradeDomainBlockPlacementPolicy
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestValidateConfigurationSettings
-- [ ] org.apache.hadoop.hdfs.server.namenode.TestXAttrConfigFlag
-- [ ] org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsCreatePermissions
-- [ ] org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsDataLocality
-- [ ] org.apache.hadoop.hdfs.server.sps.TestExternalStoragePolicySatisfier
-- [ ] org.apache.hadoop.hdfs.shortcircuit.TestShortCircuitCache
-- [ ] org.apache.hadoop.hdfs.shortcircuit.TestShortCircuitLocalRead
-- [ ] org.apache.hadoop.hdfs.TestBlockTokenWrappingQOP
-- [ ] org.apache.hadoop.hdfs.TestDataTransferKeepalive
-- [ ] org.apache.hadoop.hdfs.TestDecommissionWithStriped
-- [ ] org.apache.hadoop.hdfs.TestDFSAddressConfig
-- [ ] org.apache.hadoop.hdfs.TestDFSClientExcludedNodes
-- [ ] org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream
-- [ ] org.apache.hadoop.hdfs.TestDFSInotifyEventInputStreamKerberized
-- [ ] org.apache.hadoop.hdfs.TestDFSStripedInputStream
-- [ ] org.apache.hadoop.hdfs.TestFileAppend
-- [ ] org.apache.hadoop.hdfs.TestFsShellPermission
-- [ ] org.apache.hadoop.hdfs.TestLeaseRecovery
-- [ ] org.apache.hadoop.hdfs.TestLocatedBlocksRefresher
-- [ ] org.apache.hadoop.hdfs.TestMiniDFSCluster
-- [ ] org.apache.hadoop.hdfs.TestMultipleNNPortQOP
-- [ ] org.apache.hadoop.hdfs.TestRollingUpgrade
-- [ ] org.apache.hadoop.hdfs.TestRollingUpgradeDowngrade
-- [ ] org.apache.hadoop.hdfs.TestRollingUpgradeRollback
-- [ ] org.apache.hadoop.hdfs.TestSafeMode
-- [ ] org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewer
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForAcl
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForContentSummary
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForStoragePolicy
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr
-- [ ] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerWithStripedBlocks
-- [ ] org.apache.hadoop.hdfs.tools.TestDebugAdmin
-- [ ] org.apache.hadoop.hdfs.tools.TestDelegationTokenFetcher
-- [ ] org.apache.hadoop.hdfs.tools.TestDFSAdmin
-- [ ] org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA
-- [ ] org.apache.hadoop.hdfs.tools.TestDFSHAAdminMiniCluster
-- [ ] org.apache.hadoop.hdfs.tools.TestDFSZKFailoverController
-- [ ] org.apache.hadoop.hdfs.tools.TestECAdmin
-- [ ] org.apache.hadoop.hdfs.tools.TestGetGroups
-- [ ] org.apache.hadoop.hdfs.tools.TestStoragePolicyCommands
-- [ ] org.apache.hadoop.hdfs.tools.TestStoragePolicySatisfyAdminCommands
-- [ ] org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithDFSAdmin
-- [ ] org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithFSCommands
-- [ ] org.apache.hadoop.hdfs.tools.TestViewFSStoragePolicyCommands
-- [ ] org.apache.hadoop.hdfs.util.HostsFileWriter
-- [ ] org.apache.hadoop.hdfs.util.TestBestEffortLongFile
-- [ ] org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs
-- [ ] org.apache.hadoop.hdfs.web.TestHttpsFileSystem
-- [ ] org.apache.hadoop.hdfs.web.TestWebHDFS
-- [ ] org.apache.hadoop.hdfs.web.TestWebHDFSAcl
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract
-- [ ] org.apache.hadoop.hdfs.web.TestWebHDFSForHA
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsTokens
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsUrl
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsWithAuthenticationFilter
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsWithMultipleNameNodes
-- [ ] org.apache.hadoop.hdfs.web.TestWebHdfsWithRestCsrfPreventionFilter
-- [ ] org.apache.hadoop.hdfs.web.TestWebHDFSXAttr
-- [ ] org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs
-- [ ] org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithSecureHdfs
-- [ ] org.apache.hadoop.net.TestNetworkTopology
-- [ ] org.apache.hadoop.security.TestPermission
-- [ ] org.apache.hadoop.security.TestPermissionSymlinks
-- [ ] org.apache.hadoop.security.TestRefreshUserMappings
-- [ ] org.apache.hadoop.TestGenericRefresh
-- [ ] org.apache.hadoop.test.HFSTestCase
-- [ ] org.apache.hadoop.test.MiniDFSClusterManager
-- [ ] org.apache.hadoop.TestRefreshCallQueue
-- [ ] org.apache.hadoop.test.TestHdfs
-- [ ] org.apache.hadoop.test.TestHdfsHelper
-- [ ] org.apache.hadoop.test.TestHFSTestCase
-- [ ] org.apache.hadoop.test.TestHTestCase
-- [ ] org.apache.hadoop.tools.TestJMXGet
+- [x] org.apache.hadoop.cli.TestAclCLI - Injected restart points before/after ACL operations (namenode metadata ops)
+- [x] org.apache.hadoop.cli.TestCacheAdminCLI - Injected restart points before/after cache operations (namenode+datanode)
+- [x] org.apache.hadoop.cli.TestCryptoAdminCLI - Injected restart points before/after encryption zone operations (namenode)
+- [x] org.apache.hadoop.cli.TestDeleteCLI - Injected restart points before/after delete operations (namenode metadata)
+- [x] org.apache.hadoop.cli.TestErasureCodingCLI - Injected restart points before/after EC operations (namenode+datanode)
+- [x] org.apache.hadoop.cli.TestHDFSCLI - Injected restart points before/after general HDFS operations (namenode+datanode)
+- [x] org.apache.hadoop.cli.TestXAttrCLI - Injected restart points before/after XAttr operations (namenode metadata)
+- [x] org.apache.hadoop.fs.contract.hdfs.HDFSContract - No @Test methods, base utility class for contract tests
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractAppend - Injected restart points in 3 test methods (append operations with datanode+namenode)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractConcat - Injected restart points in testConcatFileOnFile (concat metadata operation with namenode)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractCreate - Injected restart points in 2 test methods (file creation and flush operations)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractDelete - Injected restart points in 2 test methods (delete operations with namenode metadata)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractGetFileStatus - Injected restart points in 2 test methods (getFileStatus operations on file and directory)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractMkdir - Injected restart points in 3 test methods (mkdir operations on root, nested dirs, and over file)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractMultipartUploader - Injected restart points in 2 test methods (multipart upload and abort operations)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractOpen - Injected restart points in 2 test methods (file open and read operations with datanode restarts)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractPathHandle - Injected restart points in 2 test methods (path handle operations for file access)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractRename - Injected restart points in 3 test methods (file and directory rename operations with namenode metadata)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractRootDirectory - Injected restart points in 8 test methods (root directory operations including mkdir, delete, create, and listing operations)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractSeek - Injected restart points in 18 test methods (seek and positioned read operations with datanode restarts)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractSetTimes - Injected restart point in testSetTimesNonexistentFile (setTimes metadata operation with namenode)
+- [x] org.apache.hadoop.fs.contract.hdfs.TestHDFSContractUnbuffer - Injected restart points in 6 test methods (unbuffer operations with datanode restarts, 11 restart points total)
+- [x] org.apache.hadoop.fs.loadGenerator.TestLoadGenerator - Injected restart points in testLoadGenerator (cluster creation, data generation, load generation, and script execution)
+- [x] org.apache.hadoop.fs.permission.TestStickyBit - Injected restart points in 8 test methods (sticky bit permissions, ACLs, file operations, and persistence testing)
+- [x] org.apache.hadoop.fs.shell.TestHdfsTextCommand - Injected restart points in testDisplayForAvroFiles (Avro file creation and text command read operations)
+- [x] org.apache.hadoop.fs.TestEnhancedByteBufferAccess - Injected restart points in 9 test methods covering zero-copy reads, mmap cache, cached data, and large file operations (37 restart points total)
+- [x] org.apache.hadoop.fs.TestFcHdfsCreateMkdir - Injected restart points in 11 test methods covering mkdir and create operations with recursive/non-recursive modes and existing file/directory scenarios (22 restart points total)
+- [x] org.apache.hadoop.fs.TestFcHdfsPermission - Injected restart points in 4 test methods covering file permission, ownership, and user group information operations (8 restart points total)
+- [x] org.apache.hadoop.fs.TestFcHdfsSetUMask - Injected restart points in 12 test methods covering umask behavior with different permission scenarios for mkdir and create operations (24 restart points total)
+- [x] org.apache.hadoop.fs.TestGlobPaths - Injected restart points in 37 test methods covering glob path patterns, special characters, symlinks, filters, and various filesystem operations (74 restart points total)
+- [x] org.apache.hadoop.fs.TestHDFSFileContextMainOperations - Injected restart points in 9 test methods covering truncate, rename with quota, rename operations, and edits log recovery (18 restart points total)
+- [x] org.apache.hadoop.fs.TestResolveHdfsSymlink - Injected restart points in 4 test methods covering symlink creation/resolution, delegation tokens, and error handling (8 restart points total)
+- [x] org.apache.hadoop.fs.TestSWebHdfsFileContextMainOperations - Configuration variant with SSL/HTTPS setup; no test methods of its own (inherits from TestWebHdfsFileContextMainOperations)
+- [x] org.apache.hadoop.fs.TestSymlinkHdfs - Injected restart points in 10 test methods covering symlink creation, resolution, permissions, replication, quotas, and WebHDFS operations (21 restart points total)
+- [x] org.apache.hadoop.fs.TestSymlinkHdfsDisable - Injected restart points in testSymlinkHdfsDisable covering symlink resolution when disabled (3 restart points total)
+- [x] org.apache.hadoop.fs.TestUnbuffer - Injected restart points in 2 test methods covering unbuffer socket handling and opening many files via TCP (8 restart points total)
+- [x] org.apache.hadoop.fs.TestUrlStreamHandler - Injected restart points in testDfsUrls covering file creation and reading through hdfs:// URLs (3 restart points total)
+- [x] org.apache.hadoop.fs.TestWebHdfsFileContextMainOperations - Configuration variant; no test methods of its own (inherits from FileContextMainOperationsBaseTest)
+- [x] org.apache.hadoop.fs.viewfs.TestNNStartupWhenViewFSOverloadSchemeEnabled - Injected restart points in 2 test methods covering HA and regular NameNode startup with ViewFSOverloadScheme (5 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemAtHdfsRoot - Configuration variant; no test methods of its own (inherits from ViewFileSystemBaseTest)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemHdfs - Injected restart points in 8 test methods covering encryption zones, DF commands, file checksum, rename across filesystems, Nfly repair, UGI lazy initialization, and directory permissions (23 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkFallback - Injected restart points in 20 test methods covering fallback links, directory listings, permission handling, mkdir operations with fallback paths, file creation in fallback directories, and NameNode availability testing (41 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkMergeSlash - Injected restart point in testChildFileSystems covering filesystem initialization with linkMergeSlash configuration (1 restart point total; other tests are config validation only)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemLinkRegex - Injected restart points in 5 test methods covering regex mount points with index mapping, named group mapping, fixed destination mapping, and interceptors (3 restart points in shared helper method used by all tests)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemOverloadSchemeHdfsFileSystemContract - Injected restart points in 3 test methods covering append operations, root directory rename, and directory listing (5 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemOverloadSchemeWithHdfsScheme - Injected restart points in 9 test methods covering file/directory creation, listing, nfly operations, rename, write/read, repair, and mount table operations (22 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithAcls
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithTruncate
+- [x] org.apache.hadoop.fs.viewfs.TestViewFileSystemWithXAttrs
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsAtHdfsRoot
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsDefaultValue
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsFileStatusHdfs
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsHdfs - Injected restart points in testTargetFileSystemLazyInitialization covering mkdir/delete operations with different user contexts and permission changes (5 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsLinkFallback - Injected restart points in 14 test methods covering fallback link operations, mkdir/create/rename with fallback directories, delegation tokens, and namenode recovery (18 restart points total)
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsWithAcls
+  - Test Methods: 1 (testAclOnMountEntry)
+  - Restart Points: 5 (after_set_acl, after_modify_acl, after_remove_default_acl, after_modify_acl_nn2, after_remove_acl_entries_nn2)
+  - Notes: Federated ViewFS ACL operations on two namenodes
+- [x] org.apache.hadoop.fs.viewfs.TestViewFsWithXAttrs
+  - Test Methods: 1 (testXAttrOnMountEntry)
+  - Restart Points: 4 (after_set_xattrs_nn1, after_remove_xattrs_nn1, after_set_xattrs_nn2, after_remove_xattrs_nn2)
+  - Notes: Federated ViewFS XAttr operations on two namenodes
+- [x] org.apache.hadoop.hdfs.client.impl.BlockReaderTestUtil - No @Test methods, base utility class for block reader tests
+- [x] org.apache.hadoop.hdfs.client.impl.TestBlockReaderFactory
+  - Test Methods: 9 (testFallbackFromShortCircuitToUnixDomainTraffic, testMultipleWaitersOnShortCircuitCache, testShortCircuitCacheTemporaryFailure, testShortCircuitCacheUnbufferDefault, testShortCircuitCacheUnbufferDisabled, testShortCircuitReadFromServerWithoutShm, testShortCircuitReadFromClientWithoutShm, testShortCircuitCacheShutdown, testPurgingClosedReplicas)
+  - Restart Points: 16 (cluster start and file creation in each test with datanode restarts)
+  - Notes: Short-circuit reads, domain sockets, shared memory, cache management
+- [x] org.apache.hadoop.hdfs.client.impl.TestBlockReaderLocal
+  - Test Methods: 45 (all use common helper runBlockReaderLocalTest)
+  - Restart Points: 2 (after_cluster_start, after_file_creation - applied to all 45 tests via helper method)
+  - Notes: Block reader local tests with various checksum and readahead configurations
+- [x] org.apache.hadoop.hdfs.client.impl.TestBlockReaderLocalLegacy
+  - Test Methods: 3 (testStablePositionAfterCorruptRead, testBothOldAndNewShortCircuitConfigured, testBlockReaderLocalLegacyWithAppend)
+  - Restart Points: 6 (cluster start and file creation in each test with datanode restarts)
+  - Notes: Legacy block reader tests with corruption, short-circuit, and append operations
+- [x] org.apache.hadoop.hdfs.crypto.TestHdfsCryptoStreams - No @Test methods, extends CryptoStreamsTestBase (tests inherited from base class)
+- [x] org.apache.hadoop.hdfs.DFSTestUtil - No @Test methods, utility class for test helpers
+- [x] org.apache.hadoop.hdfs.protocol.datatransfer.sasl.TestSaslDataTransfer
+  - Test Methods: 5 (testAuthentication, testIntegrity, testPrivacy, testDataNodeStartIfHttpsQopPrivacy, testNoSaslAndSecurePortsIgnored)
+  - Restart Points: 9 (after_cluster_start and after_file_operations for SASL data transfer tests)
+  - Notes: SASL authentication, integrity, and privacy mode testing with secure data transfer
+- [x] org.apache.hadoop.hdfs.protocol.datatransfer.sasl.TestSaslDataTransferExpiredBlockToken
+  - Test Methods: 3 (testBlockSeekToWithExpiredToken, testFetchBlockByteRangeWithExpiredToken, testHedgedFetchBlockByteRangeWithExpiredToken)
+  - Restart Points: 6 (after_file_open and after_token_expiration for expired block token tests)
+  - Notes: Testing expired block token handling with different read methods (blockSeekTo, fetchBlockByteRange, hedgedFetchBlockByteRange)
+- [x] org.apache.hadoop.hdfs.qjournal.client.TestEpochsAreUnique - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.client.TestQJMWithFaults - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.client.TestQuorumJournalManager - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.MiniJournalCluster - Utility class for QJM tests
+- [x] org.apache.hadoop.hdfs.qjournal.MiniQJMHACluster - Utility class for QJM HA tests
+- [x] org.apache.hadoop.hdfs.qjournal.QJMTestUtil - Utility class for QJM tests
+- [x] org.apache.hadoop.hdfs.qjournal.server.TestJournal - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.server.TestJournalNode - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeMXBean - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeRespectsBindHostKeys - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.server.TestJournalNodeSync - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.TestMiniJournalCluster - Uses MiniJournalCluster, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.qjournal.TestNNWithQJM
+  - Test Methods: 2 (testLogAndRestart, testNewNamenodeTakesOverWriter)
+  - Restart Points: 6 (after mkdir and namenode restart operations with QJM)
+  - Notes: Testing NameNode with Quorum Journal Manager - log persistence, restart recovery, and failover
+- [x] org.apache.hadoop.hdfs.qjournal.TestSecureNNWithQJM
+  - Test Methods: 2 (testSecureMode, testSecondaryNameNodeHttpAddressNotNeeded)
+  - Restart Points: 10 (after cluster start, mkdir, and namenode restart operations in secure mode with Kerberos and QJM)
+  - Notes: Testing secure NameNode with Quorum Journal Manager using Kerberos authentication - journal persistence and restart recovery in secure mode
+- [x] org.apache.hadoop.hdfs.restart.TestHdfsClusterAdapter - This is the test for HdfsClusterAdapter infrastructure itself, not a test requiring restart injection
+- [x] org.apache.hadoop.hdfs.security.TestDelegationToken
+  - Test Methods: 4 (testDelegationTokenSecretManager, testCancelDelegationToken, testDelegationTokenMetrics, testDTManagerInSafeMode)
+  - Restart Points: 14 (after cluster start, token generation/renewal/cancellation, datanode start, file creation, namenode restarts in safe mode)
+  - Notes: Testing delegation token lifecycle with namenode restarts - token renewal, cancellation, metrics, and secret manager behavior in safe mode
+- [x] org.apache.hadoop.hdfs.security.TestDelegationTokenForProxyUser
+  - Test Methods: 2 (testDelegationTokenWithRealUser, testWebHdfsDoAs)
+  - Restart Points: 5 (after cluster start, token addition, file creation/append via WebHDFS with proxy user)
+  - Notes: Testing delegation tokens with proxy user impersonation - token creation for proxy users and WebHDFS operations with doAs
+- [x] org.apache.hadoop.hdfs.security.token.block.TestBlockToken
+  - Test Methods: 3 (testBlockTokenInLastLocatedBlockLegacy, testBlockTokenInLastLocatedBlockProtobuf, testLastLocatedBlockTokenExpiry)
+  - Restart Points: 19 (cluster start, file create, write, flush/hflush, block location retrieval, file close, token expiry operations with datanode and namenode restarts)
+  - Notes: Testing block token generation, validation, and expiry with legacy and protobuf formats - includes in-progress block token verification and token expiry handling
+- [x] org.apache.hadoop.hdfs.server.aliasmap.TestSecureAliasMap
+  - Test Methods: 1 (testSecureConnectionToAliasMap)
+  - Restart Points: 7 (cluster start, filesystem access, block manager retrieval, datanode access, provided volume discovery, alias map access, reader creation with datanode and namenode restarts)
+  - Notes: Testing secure connections to alias map with Kerberos authentication - validates provided storage integration with secure HDFS cluster
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancer - 23 test methods, 68 restart points
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerLongRunningTasks - 7 test methods, 21 restart points
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerService - 2 test methods, 11 restart points (balancer service with HA, error recovery)
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithHANameNodes - 4 test methods, 29 restart points (HA balancer, standby NN requests, observer nodes)
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithMultipleNameNodes - 7 test methods, 37 restart points (4 tests use runTest with 5 points each, 3 tests use unevenDistribution with 6 points each)
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithNodeGroup - 3 test methods, 14 restart points (rack locality, node group, no move progress)
+- [x] org.apache.hadoop.hdfs.server.balancer.TestBalancerWithSaslDataTransfer - 3 test methods, 15 restart points (delegates to TestBalancer_RestartInjected with SASL configs)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockInfoStriped - 1 test method (testGetBlockInfo), 4 restart points (EC striped blocks)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockManager - 7 test methods, 31 restart points (block manager operations, IBR, placement policy, storage management)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockReportLease - 1 test method, 5 restart points (block report lease management, heartbeat, lease removal)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockReportRateLimiting - 2 test methods, 6 restart points (rate limiting, lease expiration, datanode startup)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockStatsMXBean - 4 test methods, 10 restart points (storage type stats, JMX, storage failures, storage policies)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlocksWithNotEnoughRacks - 12 test methods, 28 restart points (rack-aware replication policies, node failures, decommissioning, upgrade domains)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFS - 3 test methods, 28 restart points (token expiry, append/write with token refresh, datanode/namenode restarts, token validation)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFSStriped - 1 test method, 16 restart points (striped blocks with EC policy, token handling for striped files, inherits doTestRead restart points)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithShortCircuitRead - 1 test method, 5 restart points (short-circuit reads with domain sockets, token expiration, slot management)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestComputeInvalidateWork - 5 test methods, 12 restart points (invalidate work computation for replicas and striped blocks, datanode reformat, datanode re-registration)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestCorruptionWithFailover - 1 test method, 9 restart points (HA failover with corrupt replicas, datanode restarts during file write and pipeline changes)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestErasureCodingCorruption - 1 test method, 8 restart points (EC corruption handling during HA failover, striped block writes with datanode failures)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestHeartbeatHandling - 2 test methods, 2 restart points (heartbeat handling for replication/invalidation requests and block recovery)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestNameNodePrunesMissingStorages - 5 test methods, 4 restart points (storage pruning, zombie storage prevention, storage ID renaming, unreported storage handling)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestNodeCount - 1 test method, 1 restart point (live node count and replica management with datanode failures)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestOverReplicatedBlocks - 3 test methods, 12 restart points (over-replication handling with corrupt replicas, replica selection for deletion, invalidation of over-replicated blocks)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingDataNodeMessages - 1 test method, 5 restart points (HA pending datanode messages with EC policy, edit log tailing, IBR processing)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingInvalidateBlock - 2 test methods, 9 restart points (testPendingDeletion with block deletion delay, testPendingDeleteUnknownBlocks with unknown blocks handling)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestPendingReconstruction - 5 test methods, 24 restart points (pending reconstruction with generation stamps, IBR processing and block reports, file deletion with pending blocks, replication metrics, same DN deduplication)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestRBWBlockInvalidation - 3 test methods, 15 restart points (RBW block corruption and re-replication, RWR invalidation with genstamp handling, datanode restart with old genstamp blocks)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestReconstructStripedBlocksWithRackAwareness - 3 test methods, 20 restart points (EC striped block reconstruction with rack awareness, excess replica deletion, decommissioning with EC blocks)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestRedundancyMonitor - 1 test method, 3 restart points (concurrent chooseTarget with all datanodes stopping, namenode stability testing)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestReplicationPolicy - 2 test methods, 12 restart points (stale node handling with heartbeat checks and target selection, replication priority queue processing with namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestSequentialBlockGroupId - 3 test methods, 17 restart points (block group ID generation and collision detection with EC and legacy blocks)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestSequentialBlockId - 2 test methods, 10 restart points (sequential block ID generation and collision handling with counter rewind)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestSlowDiskTracker - 2 test methods, 6 restart points (slow disk heartbeat reporting and invalid report expiration tracking)
+- [x] org.apache.hadoop.hdfs.server.blockmanagement.TestUnderReplicatedBlocks - 2 test methods, 8 restart points (under-replication handling with block invalidation, blocksmap removal, setrep operations, and replication work computation)
+- [x] org.apache.hadoop.hdfs.server.datanode.BlockReportTestBase - 10 test methods, 18 restart points (abstract base class for block report tests with file prepare, block report operations, hflush, and interleaved block report handling)
+- [x] org.apache.hadoop.hdfs.server.datanode.DataNodeTestUtils - No @Test methods, utility class for accessing package-private DataNode information during tests
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.LazyPersistTestCase - No @Test methods, abstract base class for lazy persist tests
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestCacheByPmemMappableBlockLoader - 2 test methods, 5 restart points (PMEM cache testing with cluster start, file creation, cache directive, caching completion, and uncaching completion)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestDatanodeRestart - 2 test methods, 7 restart points (finalized replicas persistence across restarts, datanode registration timeout testing with file creation and append operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetCache - 8 test methods, 15 restart point applications across 5 unique positions (cache and uncache operations, file creation, cache capacity testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetImpl - 10 test methods, 27 restart points (read locks, volume operations, block deletion, bad block reporting, block move operations, volume cleanup, metrics testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsVolumeList - 3 test methods, 9 restart points (replica processor thread pool testing, federated namespace thread pool validation, slow disk exclusion policy)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestInterDatanodeProtocol - 3 test methods, 12 restart points (block metadata verification with inter-datanode protocol, replica recovery initialization, block updates)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistFiles - 8 test methods, 17 restart points (lazy persist file operations: append/truncate denial, corrupt file discarding, scrubber testing, namenode restart handling, concurrent read/write operations, volume reference counting)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistLockedMemory - 6 test methods, 13 restart points (locked memory usage verification: zero memory fallback, memory reservation, memory release on deletion/eviction, short block handling, write pipeline failure recovery)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistPolicy - 4 test methods, 11 restart points (lazy persist storage policy verification: policy defaults, propagation, persistence in edit log and fsimage with checkpoint operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistReplicaPlacement - 7 test methods, 17 restart points (replica placement on RAM disk: limited capacity, fallback to disk, synchronous eviction, partial fallback, default behavior verification)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistReplicaRecovery - 2 test methods, 8 restart points (replica recovery after datanode restart: saved replicas migration to persistent storage, unsaved replicas remaining on RAM disk)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyWriter - 8 test methods, 29 restart points (lazy writer operations: block persistence verification, synchronous eviction, eviction prevention before persist, LRU eviction policy, deletion before and after persist, DFS usage tracking)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestPmemCacheRecovery - 1 test method, 7 restart points (pmem cache recovery: file creation, cache directive addition, block caching, cluster restart recovery, uncaching operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestProvidedImpl - 1 test method, 4 restart points (provided replica with path handle: file creation, path handle retrieval, file rename operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestReplicaCachingGetSpaceUsed - 3 test methods, 10 restart points (replica space usage caching: finalized replica tracking, RBW replica space calculation, concurrent deep copy operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestScrLazyPersistFiles - 8 test methods, 33 restart points (SCR reads with lazy persist: cluster build, file creation, lazy persistence, reads from RAM_DISK/DEFAULT, eviction operations, block/meta corruption testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestWriteToReplica - 6 test methods, 19 restart points (FsDataset replica operations: append/close/writeToRbw/writeToTemporary operations, replica map after datanode restart with federated topology, RBW recovery with inconsistent metadata)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBatchIbr - 1 test method, 4 restart points (batch incremental block reports with concurrent file creation/verification, cluster build, directory creation, file creation, file verification)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockCountersInPendingIBR - 1 test method, 4 restart points (IBR pending block counters: cluster setup, fake blocks added, IBR sent, counter verification)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockHasMultipleReplicasOnSameDN - 1 test method, 5 restart points (file creation, get block locations, fake block report generation, send block report to namenode, final verification with datanode/namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery - No MiniDFSCluster usage in @Test methods (uses mocked DataNode and InterDatanodeProtocol)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2 - 3 test methods, 19 restart points (block recovery: replica recovery race conditions, EC block recovery, recovery with min replication)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockReplacement - 4 test methods, 27 restart points (block replacement operations, pinned blocks, cross-storage moves, HA with block deletion)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBlockScanner - Injected restart points in 7 test methods (volume iteration, block scanning with/without rescan, corrupt block handling, cursor persistence, append during scan - 24 restart points total)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestBPOfferService - Injected restart points in 2 test methods (command processing thread and thread exit - 4 restart points total; most tests use mocks)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestCachingStrategy - Injected restart points in 5 test methods (cache drop behavior testing with writes/reads, client defaults, small reads, and seek operations - 20 restart points total)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeECN - Injected restart points in 1 test method (ECN pipeline flag testing - 2 restart points total)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeErasureCodingMetrics - Injected restart points in 4 test methods (EC reconstruction metrics with full/partial blocks - 20 restart points total across setup and doTest helper)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeExit - 2 test methods, 5 restart points (BPService exit testing and exception handling during DataNode shutdown)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeFaultInjector - 2 test methods, 10 restart points (fault injection testing with delays in sending acks/packets, write/hflush/hsync operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeHotSwapVolumes - 15 test methods, 15 restart points (hot-swapping DataNode volumes: add/remove/reconfigure volumes, concurrent operations, federation testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeInitStorage - 1 test method, 1 restart point (DataNode UUID initialization verification with simulated filesystem)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeLifeline - 3 test methods, 4 restart points (lifeline protocol with heartbeat blocking and dead node recovery)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetrics - 14 test methods, 14 restart points (metrics collection and reporting for various DataNode operations)
+- [N/A] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMetricsLogger - Uses InternalDataNodeTestUtils.startDNWithMockNN instead of MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMultipleRegistrations - 6 test methods, 8 restart points (DataNode registration with multiple NameNodes, federation, HA, cluster ID validation)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeMXBean - 5 test methods, 6 restart points (DataNode MXBean metrics testing with security, block size, block count, slow disks)
+- [N/A] org.apache.hadoop.hdfs.server.datanode.TestDatanodeProtocolRetryPolicy - Uses mocked DataNode with mocked NameNode protocol, not MiniDFSCluster
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeReconfiguration - 8 test methods, 18 restart points (DataNode reconfiguration testing: max concurrent movers, block report interval, receiver threads, cache report, slow peer/disk parameters, DFS usage parameters/class)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeRollingUpgrade - 6 test methods, 24 restart points (Rolling upgrade with finalize/rollback, regular upgrade, peers xceiver, layout version change with finalize/rollback)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeTcpNoDelay - 2 test methods, 6 restart points (TCP_NODELAY socket configuration testing: enabled/disabled scenarios)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeTransferSocketSize - 2 test methods, 2 restart points (Transfer socket buffer size testing: specified size and auto-tuning)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeUUID - 1 test method (testUUIDRegeneration), 6 restart points (UUID persistence testing with datanode restart, disk wipe, and registration)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailure - 6 test methods, 22 restart points (volume failure testing: file creation with failures, heartbeat, DN startup errors, volume removal, under-replication, failure metrics)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailureReporting - 7 test methods, 29 restart points (volume failure reporting: successive failures, NN restart preservation, multiple failures, DN reconfiguration, auto-format, hot swap)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailureToleration - 4 test methods, 9 restart points (volume failure toleration: startup validation, min valid volumes, volume/tolerable config, failed volume counting)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeMetrics - 3 test methods, 9 restart points (volume metrics: file creation/append metrics, volume departure/arrival metrics, write I/O metrics)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDeleteBlockPool - 2 test methods, 17 restart points (federated block pool deletion, refresh namenodes, admin delete operations)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDirectoryScanner - 7 test methods, 22 restart points (directory scanning operations with block/meta corruption, threshold settings, federated setup)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestDiskError - 5 test methods, 16 restart points (disk error handling, volume failures, replication errors, permission checks, metadata corruption)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestFsDatasetCacheRevocation - 2 test methods, 12 restart points (cache pinning with mmap, cache revocation timeout testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestHSync - 5 test methods, 24 restart points (hsync operations with/without append, block boundary, sequence files, replication testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestIncrementalBrVariations - 4 test methods, 14 restart points (combined/split IBRs, block report consolidation, new storage learning with namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestLargeBlockReport - 2 test methods, 5 restart points (large block report RPC validation with length limits, cluster initialization, report creation)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestNNHandlesBlockReportPerStorage - Inherits test methods and restart points from BlockReportTestBase_RestartInjected (per-storage block reports)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestNNHandlesCombinedBlockReport - Inherits test methods and restart points from BlockReportTestBase_RestartInjected (combined legacy block reports)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestReadOnlySharedStorage - 3 test methods, 8 restart points (READ_ONLY_SHARED storage state testing: replica counting, offline normal replica recovery, corrupt read-only replica handling)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestRefreshNamenodes - 2 test methods, 7 restart points (datanode refresh namenode list: adding multiple namenodes dynamically, deadlock testing with fault injection)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestStartSecureDataNode - 1 test method, 2 restart points (secure datanode with Kerberos authentication, cluster build and activation testing)
+- [x] org.apache.hadoop.hdfs.server.datanode.TestStorageReport
+  - Test Methods: 1 (testStorageReportHasStorageTypeAndState)
+  - Restart Points: 3 (after_cluster_setup, after_spy_setup, after_trigger_heartbeat)
+  - Notes: Storage type and state propagation in storage reports with heartbeat testing
+- [x] org.apache.hadoop.hdfs.server.datanode.TestTransferRbw
+  - Test Methods: 1 (testTransferRbw)
+  - Restart Points: 6 (after_cluster_setup, after_file_write, after_get_old_rbw, after_add_new_datanode, after_transfer_rbw, after_verify_new_rbw)
+  - Notes: RBW replica transfer between datanodes with write throttling verification
+- [x] org.apache.hadoop.hdfs.server.datanode.TestTriggerBlockReport
+  - Test Methods: 2 (testTriggerFullBlockReport, testTriggerIncrementalBlockReport)
+  - Restart Points: 6 (after_cluster_setup, after_transition_active, after_spy_setup, after_file_creation, after_add_fake_deletion, after_trigger_block_report)
+  - Notes: Manual block report triggering in HA cluster with full and incremental modes
+- [x] org.apache.hadoop.hdfs.server.datanode.web.TestDatanodeHttpXFrame
+  - Test Methods: 2 (testDataNodeXFrameOptionsEnabled, testNameNodeXFrameOptionsDisabled)
+  - Restart Points: 1 (after_cluster_creation)
+  - Notes: X-Frame-Options HTTP header testing with enabled and disabled configurations (testDataNodeXFramewithInvalidOptions not transformed as it expects exception)
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.command.TestDiskBalancerCommand
+  - Test Methods: 7 (testSubmitPlanInNonRegularStatus, testRunMultipleCommandsUnderOneSetup, testDiskBalancerExecuteOptionPlanValidityWithException, testDiskBalancerExecutePlanValidityWithOutUnitException, testDiskBalancerForceExecute, testDiskBalancerExecuteOptionPlanValidity, testPrintFullPathOfPlan)
+  - Restart Points: 2 (after_cluster_setup in setUp() applies to all tests, after_cluster_creation in 7 specific tests)
+  - Notes: DiskBalancer CLI command testing with plan execution, validity checking, and force execution (30 total test methods, setUp() restart applies to all, 7 tests create additional miniCluster with restart points)
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.DiskBalancerTestUtil - No @Test methods, utility class for diskbalancer tests
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.TestConnectors
+  - Test Methods: 2 (testNameNodeConnector, testJsonConnector)
+  - Restart Points: 1 (after_cluster_active)
+  - Notes: DiskBalancer connector testing for NameNode connector and JSON serialization
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancer - 7 test methods, 26 restart points (namenode connectivity, end-to-end balancing, federated cluster with dual/single nameservice, compute delay, multiple volume pairs, disk removal during balancing)
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancerRPC - 13 test methods, 28 restart points (plan submission, plan validation with invalid hash/version, plan cancellation, volume mapping retrieval, bandwidth settings, plan query, block movement across volumes)
+- [x] org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancerWithMockMover - 10 test methods, 20 restart points (disk balancer enable/disable, plan submission/resubmission, plan validation with older timestamp/invalid version/null plan/invalid hash, plan cancellation, custom bandwidth)
+- [~] org.apache.hadoop.hdfs.server.mover.TestMover - PARTIAL: 4/19 test methods, 10 restart points (schedule same block, federated cluster within same node/standard/HA configurations) - Remaining 15 tests need transformation
+- [x] org.apache.hadoop.hdfs.server.mover.TestStorageMover
+  - Test Methods: 6 (testMigrateFileToArchival, testMoveSpecificPaths, testMigrateOpenFileToArchival, testHotWarmColdDirs, testNoSpaceDisk, testNoSpaceArchive)
+  - Restart Points: 39 (cluster setup, namespace prepare, storage policy operations, migration operations, file operations with various storage types)
+  - Notes: Storage mover tests with HOT/WARM/COLD policies, archive migration, open file migration, replication with disk/archive full scenarios
+- [x] org.apache.hadoop.hdfs.server.namenode.FSAclBaseTest
+  - Test Methods: 12 (testRemoveDefaultAcl, testRemoveDefaultAclOnlyAccess, testRemoveDefaultAclOnlyDefault, testRemoveDefaultAclMinimal, testRemoveDefaultAclStickyBit, testModifyAclEntries, testSetAcl, testDefaultAclNewFile, testDefaultAclNewDir, testSkipAclEnforcementPermsDisabled, testDefaultAclNewFileIntermediate, testRemoveAclEntries)
+  - Restart Points: 34 (directory creation, file creation, ACL setting/modification/removal operations, default ACL inheritance, permission enforcement)
+  - Notes: Abstract ACL base test class testing ACL modification APIs (setAcl, modifyAclEntries, removeAclEntries, removeDefaultAcl), default ACL inheritance for files/directories, permission enforcement with ACLs, ACL persistence across restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.FSImageTestUtil - Utility class, no @Test methods
+- [x] org.apache.hadoop.hdfs.server.namenode.FSXAttrBaseTest
+  - Test Methods: 5 (testCreateXAttr, testSetXAttr, testRemoveXAttr, testRenameFileWithXAttr, testListXAttrs)
+  - Restart Points: 14 (file creation, directory creation, XAttr set/remove operations, file rename with XAttrs, XAttr listing)
+  - Notes: XAttr base test class testing Extended Attributes APIs (setXAttr, removeXAttr, getXAttrs, listXAttrs), XAttr CREATE/REPLACE flags, XAttr persistence across restarts and file renames
+- [N/A] org.apache.hadoop.hdfs.server.namenode.ha.HAStressTestHarness - Utility class, no @Test methods
+- [N/A] org.apache.hadoop.hdfs.server.namenode.ha.HATestUtil - Utility class, no @Test methods
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapAliasmap
+  - Test Methods: 1 (testAliasmapBootstrap)
+  - Restart Points: 4 (after_cluster_setup, after_aliasmap_write, after_aliasmap_transfer, after_new_server_start)
+  - Notes: Aliasmap bootstrap testing with block writes, transfer operations, and server initialization
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandby
+  - Test Methods: 6 (testSuccessfulBaseCase, testDownloadingLaterCheckpoint, testSharedEditsMissingLogs, testStandbyDirsAlreadyExist, testOtherNodeNotActive, testRateThrottling)
+  - Restart Points: 14 (standby bootstrap, checkpoint operations, edit log handling, directory checks, HA state transitions, rate throttling)
+  - Notes: HA standby bootstrap testing with checkpoint downloads, edit log verification, existing directory handling, inactive NameNode bootstrap, and image transfer rate throttling
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandbyWithQJM
+  - Test Methods: 5 (testBootstrapStandbyWithStandbyNN, testBootstrapStandbyWithActiveNN, testUpgrade, testUpgradeWithRecover, testUpgradeWithFormat)
+  - Restart Points: 21 (HA state transitions, standby bootstrap with QJM, upgrade scenarios with recover/format)
+  - Notes: Bootstrap standby with QJM shared edits - testing with standby/active NN, upgrade state handling, directory recovery, and format operations
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestConsistentReadsObserver (11 methods, 21 restart points: after_refresh_callqueue, after_create_file, after_getfilestatus, after_mkdir, after_roll_editlog, after_get_filesystem, after_advance_state, after_mkdir_testpath, after_roll_editlog_msync, after_state_transitions, after_advance_observer_state, after_mkdir_from_new_client, after_roll_editlog_new_client, after_mkdir_uncoordinated, after_get_filesystem_nonproxy, after_roll_editlog_nonproxy, after_get_filecontext, after_msync_filecontext, after_roll_editlog_filecontext, after_mkdir_metrics, after_roll_editlog_metrics)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestDFSUpgradeWithHA (9 methods, 19 restart points: after_cluster_setup, after_mkdir_foo1, after_upgrade_restart_finalize, after_bootstrap_standby, after_mkdir_foo4, after_cluster_setup_nfs, after_mkdir_nfs_upgrade, after_upgrade_restart_nfs, after_bootstrap_nfs, after_qjm_cluster_setup, after_mkdir_qjm, after_upgrade_restart_qjm, after_cluster_setup_finalize, after_upgrade_finalize, after_cluster_setup_second_nn, after_cluster_setup_upgrade_progress, after_cluster_setup_rollback_nfs, after_cluster_setup_rollback_jn, after_cluster_setup_second_upgrade)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencing (6 methods, 10 restart points: after_cluster_setup, after_create_file, after_trigger_heartbeats, after_failover_to_nn2, after_create_file_failover, after_roll_editlog, after_failover_repl_changes, after_file_write, after_append, after_transition_rbw)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencingWithReplication (1 method, 4 restart points: after_cluster_setup, after_file_creation, after_threads_start, after_threads_stop - HA stress test with concurrent replication changes and failovers)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestEditLogsDuringFailover (3 methods, 9 restart points total: testStartup with 6 points (after_cluster_setup, after_first_transition_active, after_mkdir_test, after_standby_restart, after_mkdir_test2, after_transition_nn1_active), testFailoverFinalizesAndReadsInProgressSimple and testFailoverFinalizesAndReadsInProgressWithPartialTxAtEnd each with 3 points (after_cluster_setup, after_create_fake_log, after_transition_active) - edit log handling during HA failover and startup)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestEditLogTailer (4 methods, 3 restart points: testTailer with 2 points (after_cluster_setup, after_first_mkdirs), testNN0/1/2TriggersLogRolls each with 1 point (after_transition_active) - edit log tailer testing with standby NNs, parameterized tests)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestFailoverWithBlockTokensEnabled (4 methods, 8 restart points total: ensureSerialNumbersNeverOverlap with 1 point (after_get_secret_managers), ensureInvalidBlockTokensAreRejected with 3 points (after_transition_active, after_write_file, after_setup_spy_client), testFailoverAfterRegistration with 1 point (after_write_using_both_namenodes), TestFailoverAfterAccessKeyUpdate with 3 points (after_lower_key_update_interval, after_sleep, after_write_using_both_namenodes) - block token security testing during HA failover)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestFailureOfSharedDir (1 method, 5 restart points: testFailureOfSharedDir with 5 points (after_cluster_setup, after_transition_active, after_mkdirs, after_chmod_shared_dir, after_sleep) - testing that NN fails when required shared edits dir becomes unavailable)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestFailureToReadEdits (3 methods, 13 restart points total: testFailuretoReadEdits with 6 points (after_first_mkdirs_and_catchup, after_setowner_delete, after_mkdirs_test_dir2, after_mkdirs_test_dir3, after_cause_failure_on_editlog, after_allow_editlog_read), testCheckpointStartingMidEditsFile with 4 points (after_first_checkpoint, after_cause_failure_on_editlog, after_mkdirs_test_dir2_dir3, after_second_checkpoint), testFailureToReadEditsOnTransitionToActive with 3 points (after_checkpoint, after_cause_failure_on_editlog, after_mkdirs_test_dir2_dir3) - parameterized test for handling edit log read failures)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestGetGroupsWithHA (6 methods, 13 restart points: HA GetGroups tool testing with namenode restarts before/after tool execution)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestHAAppend (1 method, 10 restart points: HA append operations with edit log tailing, truncate, and failover testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestHAFsck (1 method, 7 restart points: HA FSCK testing with failover and namenode stop scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestHAMetrics (2 methods, 10 restart points: HA metrics testing with active/standby transitions, edit log tailing, and inode count validation)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestHarFileSystemWithHA (1 method, 3 restart points: HAR filesystem testing with failover URI and no port specification)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestHASafeMode (PARTIAL: 3/20 methods, 11 restart points: safemode testing with client retry, active/standby safemode entry, and block tracking during standby restart)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestInitializeSharedEdits (1 method, 5 restart points: shared edits initialization and HA namenode startup testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestLossyRetryInvocationHandler - 1 test method, 2 restart points (HA cluster with lossy retry handler and trash emptier testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestMultiObserverNode - 3 test methods, 12 restart points (observer node failover, multiple observer shutdown/restart, observer fall behind with state ID testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestNNHealthCheck - 3 test methods, 7 restart points (HA health check testing with basic, lifeline address, and safemode configurations)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestObserverNode - 19 test methods, 56 restart points (observer node main functionality including transitions, failover, shutdown/restart, safe mode, block operations, fsck, access time updates, concurrent operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestPendingCorruptDnMessages - 1 test method, 9 restart points (pending corrupt DN messages with storage ID changes, gen stamp corruption, namenode/datanode restarts, and failover)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestPipelinesFailover - 8 test methods, 55 restart points (HA pipeline failover with writes, DN failures, lease recovery, block synchronization commit, and stress testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestQuotasWithHA - 3 test methods, 12 restart points (quota tracking on standby with create/append/delete, exception tests for standby operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestRemoteNameNodeInfo - 1 test method, 0 restart points (configuration-only test, no cluster started)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestRetryCacheWithHA - 22 test methods, 88 restart points (retry cache with HA failover testing snapshot/file/cache operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestSeveralNameNodes - 1 test method, 6 restart points (multiple namenode HA stress test with circular linked list writes and failovers)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyBlockManagement - 1 test method, 6 restart points (standby namenode block management with file write/delete, edit log roll, heartbeats, and block reports)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyCheckpoints - 12 test methods, 24 restart points (standby checkpoint operations with edit log tailing, checkpoint creation/upload, observer nodes, checkpoint cancellation, and image persistence)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyInProgressTail - 10 test methods, 40 restart points (in-progress edit log tailing with standby namenode, edit log rolls, failover scenarios, journal cache operations, and non-uniform configurations)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyIsHot - 2 test methods, 13 restart points (standby block reports and locations with replication changes, datanode restarts, and block location tracking)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestStateTransitionFailure - 1 test method, 2 restart points (HA state transition failure testing with invalid trash interval configuration)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestUpdateBlockTailing - 4 test methods, 17 restart points (edit log tailing with IBR/append/truncate operations, generation stamp consistency, and HA failover)
+- [x] org.apache.hadoop.hdfs.server.namenode.ha.TestXAttrsWithHA - 1 test method, 4 restart points (XAttr operations with HA failover, standby catchup, and XAttr persistence)
+- [x] org.apache.hadoop.hdfs.server.namenode.metrics.TestNameNodeMetrics - 20 test methods, 46 restart points (metrics testing for capacity, GC, stale nodes, volume failures, liveness, decommission, file operations, corrupt blocks, excess blocks, rename, block locations, transactions, checkpoints, sync, block reports, read/write ops, active clients, EDEK generation, resource checks, and edit log tailing)
+- [x] org.apache.hadoop.hdfs.server.namenode.metrics.TestNNMetricFilesInGetListingOps - 1 test method, 4 restart points (getListing operation metrics with file creation in directories and directory listing operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.OfflineEditsViewerHelper - No @Test methods, helper class for TestOfflineEditsViewer
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.SnapshotTestHelper - No @Test methods, helper class for snapshot tests
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestAclWithSnapshot - 15 test methods, 81 restart points (ACL operations, snapshots, quota management, and ACL deduplication testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestCheckpointsWithSnapshots - 1 test method, 7 restart points (checkpoint operations with snapshots, secondary namenode, and fsimage persistence testing)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList - 7 test methods, 7 restart points (snapshot diff list operations with skip list data structure)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestDisallowModifyROSnapshot - 11 test methods, 3 restart points (testing read-only snapshot access control exceptions)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestFileContextSnapshot - 2 test methods, 9 restart points (file creation, disallow/allow snapshot, snapshot create/delete/rename operations with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestGetContentSummaryWithSnapshot - 1 test method, 9 restart points (comprehensive content summary testing with snapshots, file creation, append, delete, rename operations with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestINodeFileUnderConstructionWithSnapshot - 4 test methods, 34 restart points (testing files under construction with snapshots: append operations, hsync/hflush, setReplication, block locations, lease management with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestNestedSnapshots - 4 test methods, 25+ restart points (nested snapshots testing: allow/disallow snapshots on nested directories, snapshot creation/deletion, quota management, loop-based snapshot limit testing with dynamic restart points)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestOpenFilesWithSnapshot - 8 test methods, 25+ restart points (open files with snapshots: UC file deletion, parent directory deletion, checkpoint operations, multiple snapshots, rename operations, NN restart verification with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestRandomOpsWithSnapshots - 1 test method, 5 restart points (random filesystem and snapshot operations with health checks: file creation, snapshottable setup, filesystem/snapshot operations, health verification with namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSetQuotaWithSnapshot - 2 test methods, 8 restart points (quota operations with snapshots: set quota after snapshot, clear quota with multiple snapshots, file creation within snapshottable directories)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapRootDescendantDiff - 1 test method, 3 restart points (snapshot diff report for descendant directories: directory creation, snapshot modifications with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshot - 8 test methods, 28 restart points (comprehensive snapshot testing: snapshot iterations, offline image viewer, directory updates, allow/disallow operations, mtime testing, reserved path operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotBlocksMap - 7 test methods, 31 restart points (snapshot blocksMap testing: deletion with snapshots, checkpoint recovery, zero-size blocks handling, rename operations with blocksMap consistency)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDeletion - 18 test methods, 97 restart points (snapshot deletion scenarios: directory/file deletion with snapshots, diff combining, HA restart, fsimage corruption testing, rename/delete operations, concat operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDiffReport - 19 test methods, 107 restart points (snapshot diff report testing: basic diff reports, nested snapshots, rename operations with/without delete, quota handling, open files, access time capturing, RPC limits, remote iterators)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotFileLength - 2 test methods, 9 restart points (snapshot file length testing: file length preservation in snapshots after appends, cat command behavior on snapshot paths)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotListing - 1 test method, 11 restart points (snapshot listing testing: listing snapshots during creation and deletion operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotMetrics - 2 test methods, 11 restart points (snapshot metrics testing: allow/disallow snapshot, create/delete/rename snapshot operations with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotNameWithInvalidCharacters - 2 test methods, 6 restart points (invalid snapshot name testing: file creation, allow snapshot, create snapshot attempts with invalid characters)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotRename - Injected restart points in 10 test methods (33 restart points total covering snapshot list, rename, quota interactions, and cross-directory operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotReplication - Injected restart points in 3 test methods (17 restart points total covering replication changes, snapshot creation, and file deletion scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotStatsMXBean - Injected restart points in 1 test method (4 restart points covering directory creation, snapshot operations, and MXBean queries)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshottableDirListing - Injected restart points in 2 test methods (16 restart points covering allow/disallow snapshot, rename, nested snapshots, deletion, and multi-user scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestUpdatePipelineWithSnapshots - Injected restart points in 1 test method (5 restart points covering file creation, snapshot, pipeline recovery, and deletion scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.snapshot.TestXAttrWithSnapshot - Injected restart points in 9 test methods (27 restart points covering XAttr operations with snapshots including set, modify, remove, and copy operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.sps.TestStoragePolicySatisfierWithStripedFile - Injected restart points in 4 test methods (23 restart points total: EC policy setup, file creation, storage policy changes, and SPS operations with striped files)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag - Injected restart points in 8 test methods (11 restart points total: ACL operations with enabled/disabled config, directory creation, checkpoint/restart scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAddBlock - Injected restart points in 2 test methods (5 restart points total: cluster initialization, file creation with various block sizes, and append operations with under-construction blocks)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAddBlockRetry - Injected restart points in 2 test methods (7 restart points total: concurrent addBlock operations, race conditions during target selection, and retry scenarios after NameNode restart)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAddOverReplicatedStripedBlocks - Injected restart points in 4 test methods (15 restart points total: EC file creation, block injection, over-replication handling, corrupt blocks, and missing blocks scenarios)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlockInFBR - Injected restart points in 1 test method (5 restart points total: directory creation, EC policy setup, non-EC and EC file creation, and full block report processing)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAddStripedBlocks - Injected restart points in 7 test methods (11 restart points total: block scheduling, block ID allocation, striped block addition with restarts, UC replica management, and corruption detection)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAllowFormat - Injected restart points in 1 test method (1 restart point total: cluster initialization and format testing with different allowformat configurations)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAuditLogger - Injected restart points in 10 test methods (20 restart points total: audit logging with setTimes, setPermission, WebHDFS requests, caller context, ACL operations, and remote port tracking)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAuditLoggerWithCommands - Injected restart points in 41 test methods (83 restart points total: audit logging for various NameNode admin commands including snapshots, cache directives/pools, quotas, XAttrs, ACLs, delegation tokens, reconfiguration, refresh operations, rolling upgrades, safe mode, balancer, and storage operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestAuditLogs - Injected restart points in 8 test methods (16 restart points total: audit log generation for allowed/denied file access, stat operations, WebHDFS operations, and character escaping with sync/async logging modes)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestBackupNode - Injected restart points in 4 test methods (30 restart points total: BackupNode tailing edits, checkpointing, edit log rolls, file operations with backup node sync, cluster/backup restarts, and read operations from both NameNode and BackupNode)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestBlockPlacementPolicyRackFaultTolerant - Injected restart points in 2 test methods (16 restart points total: block placement policy testing with rack fault tolerance, file creation, block allocation, additional datanode selection, and decommissioning operations with EC policy)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestBlockUnderConstruction - Injected restart points in 3 test methods (15 restart points total: block creation and verification loop, block locations on unclosed files, and block recovery with invalid storage IDs)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCacheDirectives - Injected restart points in 15 test methods (46 restart points total: cache pool operations, cache directive operations, cache manager restart with checkpointing, cached replicas in files and directories, replication factor changes, permissions, expiry, limits, capacity checks, and HA consistency)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCacheDirectivesWithViewDFS - Extends TestCacheDirectives_RestartInjected (inherits all 15 test methods and 46 restart points with ViewDFS configuration)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCheckpoint - Injected restart points in 39 test methods (127 restart points total: secondary namenode checkpoint operations, edit log handling and replay failures, storage directory management and failures, fsimage transfers and validation, checkpoint triggers on txid count, multiple secondary namenodes coordination, storage restoration, delegation tokens, leases, legacy OIV images, txid delta validation, and time-based checkpoint relaxation)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCheckPointForSecurityTokens - Injected 13 restart points in testSaveNamespace (delegation token operations, safe mode, saveNamespace, edits verification, cluster restarts, token renewal/cancellation)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCommitBlockWithInvalidGenStamp - Injected 8 restart points in testCommitWithInvalidGenStamp (file creation, inode retrieval, block addition, generation stamp validation, block completion)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestCreateEditsLog - Injected 2 restart points in testCanLoadCreatedEditsLog (cluster startup and edits log loading)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestDeadDatanode - Injected 18 restart points in 3 test methods (dead datanode detection, block operations, heartbeat handling, block target selection, capacity tracking, datanode re-registration)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestDecommissioningStatus - Injected restart points in 4 test methods (21 restart points total): testDecommissionStatus (5 points: file creation, incomplete file write, verify state, decommission refresh, before file close), testDecommissionStatusAfterDNRestart (5 points: file creation, decommission start, DN stopped, file deletion, DN restart), testDecommissionDeadDN (3 points: DN stopped, decommission, DN restart), testDecommissionLosingData (7 points: file creation, DN1/DN0 stopped, decommission, DN0/DN1 restarted, new DNs started)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy - Injected restart points in 6 test methods (9 unique restart points): testNonLocalRackPlacement (2 points: after_start_file, after_add_block), testPlacementWithDFSNetworkTopology (3 points: after_cluster_restart, after_start_file, after_add_block), testPlacementWithLocalRackNodesDecommissioned (1 point: after_decommission_start + testPlacement helper), testPlacement helper method (2 points in loop: after_start_file_in_loop, after_add_block_in_loop - used by 4 tests)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestDeleteRace - Injected restart points in 8 test methods (33 restart points total). Test methods: testDeleteAddBlockRace (3 restart points), testDeleteAddBlockRaceWithSnapshot (4 restart points including snapshot creation), testRenameRace (5 restart points), testDeleteAndCommitBlockSynchonizationRaceNoSnapshot (6 restart points in loop), testDeleteAndCommitBlockSynchronizationRaceHasSnapshot (7 restart points in loop including snapshot), testDeleteAndLeaseRecoveryHardLimitSnapshot (7 restart points), testOpenRenameRace (4 restart points), testDeleteOnSnapshottableDir (6 restart points). Covers delete race conditions, rename races, block synchronization races, lease recovery, and snapshot operations.
+- [x] org.apache.hadoop.hdfs.server.namenode.TestDiskspaceQuotaUpdate - Injected restart points in 11 test methods (47 restart points total). Test methods: testQuotaUpdateWithFileCreate (3 points: mkdir, setQuota, file creation), testUpdateQuotaForAppend (5 points: file creation, setQuota, 3 appends), testUpdateQuotaForFSync (7 points: file creation, setQuota, append start, hsync, second write, close, final append), testAppendOverStorageQuota (5 points: mkdir, file creation, setQuota, failed append, before namenode restart), testAppendOverTypeQuota (6 points: mkdir, set storage policy, file creation, setQuotaByStorageType, failed append, before restart), testTruncateOverQuota (5 points: mkdir, file creation, setQuota, failed truncate, before restart), testQuotaInitialization (6 points: mkdir testdir, setQuota, subdirectories creation, 3 updateCount calls), testQuotaIssuesWhileCommitting (4 points: after stopping DNs, 2 helper calls, before restarting DNs), testCachedComputedSizesAgreeBeforeCommitting/testDecreaseReplicationBeforeCommitting/testIncreaseReplicationBeforeCommitting (5-6 points each via helper method: mkdir, setQuota, file creation, hflush, optional setReplication, close). Covers quota updates, append/fsync operations, storage quotas, quota initialization, and replication changes.
+- [x] org.apache.hadoop.hdfs.server.namenode.TestEditLog - Injected restart points in 7 test methods (22 restart points total). Test methods: testPreTxidEditLogWithEdits (2 points: cluster startup, load edits), testMultiStreamsLoadEditWithConfMaxTxns (5 points: cluster startup, first transactions, first roll, second transactions, second roll), testSimpleEditLog (4 points: cluster startup, first log sync, roll edit log, second log sync), testMultiThreadedEditLog via testEditLog helper (5 points: cluster startup, first roll, concurrent transactions, append transactions, second roll), testSyncBatching (1 point: cluster startup), testBatchedSyncWithClosedLogs (3 points: cluster startup, first edit, log sync all), testEditChecksum (2 points: cluster startup, mkdir). Covers edit log operations, transactions, rolling, syncing, and checksums. NOTE: Partially completed - 7 of 26 test methods transformed. Large test file (1886 lines) may need additional transformation.
+- [x] org.apache.hadoop.hdfs.server.namenode.TestEditLogAutoroll - Injected restart points in testEditLogAutoroll (4 restart points: after_cluster_setup, during_mkdirs, after_mkdirs, after_autoroll covering HA namenode editlog autoroll behavior)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestEditLogJournalFailures - Injected restart points in 7 test methods (21 restart points total) covering journal failure scenarios: testSingleFailedEditsDirOnFlush (3 points), testAllEditsDirsFailOnFlush (2 points), testAllEditsDirFailOnWrite (2 points), testSingleFailedEditsDirOnSetReadyToFlush (3 points), testSingleRequiredFailedEditsDirOnSetReadyToFlush (3 points), testMultipleRedundantFailedEditsDirOnSetReadyToFlush (5 points), testMultipleRedundantFailedEditsDirOnStartLogSegment (3 points)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestEditLogRace - Injected restart points in 2 test methods (6 restart points total): testEditLogRolling (3 points: after_cluster_start, after_start_workers, during_rolling), testSaveNamespace (3 points: after_cluster_start, after_start_workers, during_save_namespace). Note: 3 other tests (testSaveImageWhileSyncInProgress, testSaveRightBeforeSync, testDeadlock) use FSNamesystem directly without MiniDFSCluster so cannot inject restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFavoredNodesEndToEnd - Injected restart points in 5 test methods (14 restart points total): testFavoredNodesEndToEnd (3 points: after_cluster_setup, during_file_creation, after_file_creation), testWhenFavoredNodesNotPresent (2 points: before_create_with_arbitrary_nodes, after_create_with_arbitrary_nodes), testWhenSomeNodesAreNotGood (3 points: after_decommission_node, after_create_with_decommissioned_node, after_reset_decommission), testFavoredNodesEndToEndForAppend (3 points: before_append_test, during_append_loop, after_append_test), testCreateStreamBuilderFavoredNodesEndToEnd (3 points: before_builder_test, during_builder_loop, after_builder_test)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFileContextAcl - Injected restart point in init() method (1 restart point: after_cluster_start). Test extends FSAclBaseTest and inherits all test methods from base class, restart point applies to cluster setup before all inherited test methods
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFileContextXAttr - Injected restart point in setupRestart() method (1 restart point: after_cluster_start). Test extends FSXAttrBaseTest and inherits all test methods from base class, restart point applies to cluster setup before all inherited test methods
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFileLimit - Injected restart points in 3 test methods (8 restart points total): testFileLimit (4 points: after_cluster_setup, during_file_creation, after_file_deletion, after_directory_creation), testMaxBlocksPerFileLimit (2 points: after_cluster_setup, after_writing_max_blocks), testMinBlockSizeLimit (2 points: after_cluster_setup, after_first_file_creation). Note: testFileLimitSimulated is a wrapper that calls testFileLimit
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFileTruncate - Injected restart points in 3 test methods (7 restart points total): testBasicTruncate (2 points: after_setup, during_truncate_loop), testMultipleTruncate (2 points: after_file_creation, during_multiple_truncate), testTruncateEditLogLoad (3 points: after_save_namespace, after_file_creation, before_namenode_restart). Covers basic truncate operations, multiple truncates on same file, and edit log loading. NOTE: Partially completed - 3 of 24 test methods transformed. Large test file (1505 lines) may need additional transformation
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFsck - Imports added and class renamed. NOTE: NEEDS COMPREHENSIVE TRANSFORMATION - Very large test file (2523 lines, 33 test methods) requires detailed analysis and restart point injection for fsck operations
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFsckWithMultipleNameNodes - Injected restart points in testFsck method (3 restart points: after_cluster_active, after_file_creation, after_fsck_checks). Tests fsck functionality with federated cluster (multiple namenodes)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSDirectory - Injected restart points in 6 test methods (19 restart points total: quota operations, XAttr limit testing, multi-add/remove operations, error handling, and parent directory verification)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSEditLogLoader - Injected restart points in 7 test methods (25 restart points total): testDisplayRecentEditLogOpCodes (1 point), testReplicationAdjusted (2 points), testAddNewStripedBlock (4 points), testUpdateStripedBlocks (4 points), testHasNonEcBlockUsingStripedIDForAddBlock (2 points), testHasNonEcBlockUsingStripedIDForUpdateBlocks (3 points), testErasureCodingPolicyOperations (9 points). Covers edit log loading, striped blocks, EC policies, and block manager operations. Note: setLoadFSEditLogThrottling not transformed (uses mock objects, no cluster)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSImage - Injected restart points in 12 test methods (52 restart points total): testPersist (3 points), testCompression (3 points), testNativeCompression (3 points), testSupportBlockGroup (3 points), testHasNonEcBlockUsingStripedIDForLoadFile (5 points), testHasNonEcBlockUsingStripedIDForLoadUCFile (3 points), testHasNonEcBlockUsingStripedIDForLoadSnapshot (4 points), testSaveAndLoadFileUnderReplicationPolicyDir (3 points), testSaveAndLoadErasureCodingPolicies (14 points including helper method), testParallelSaveAndLoad (3 points via helper), testNoParallelSectionsWithCompressionEnabled (3 points via helper), testUpdateBlocksMapAndNameCacheAsync (3 points). Covers FSImage save/load, compression, striped blocks, EC policies, parallel operations, and snapshot handling
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithAcl - Injected restart points in 5 test methods: testPersistAcl (6 points via helper methods), testAclEditLog (4 points via helper methods), testFsImageDefaultAclNewChildren (5 points via helper methods), testEditLogDefaultAclNewChildren (4 points via helper methods), testRootACLAfterLoadingFsImage (3 points). Covers ACL persistence in FSImage and edit log, default ACL inheritance, and root directory ACL operations
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithSnapshot - Injected restart points in 8 test methods covering FSImage save/load operations with snapshots, file appending, snapshot deletion, and double rename scenarios (62 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSImageWithXAttr - Injected restart points in 2 test methods covering XAttr persistence in FSImage and edit log (8 restart points total: 4 positions shared across both tests)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFsLimits - No transformation (uses mock FSNamesystem, no MiniDFSCluster)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSNamesystem - No transformation (uses mock FSImage/FSEditLog and FSNamesystem.loadFromDisk, no MiniDFSCluster)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestFSNamesystemMBean - Injected restart points in 4 test methods covering JMX metrics and locking (9 restart points total: test - 2, testWithFSNamesystemWriteLock - 2, testWithFSEditLogLock - 2, testFsEditLogMetrics - 3)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestGenericJournalConf - Injected restart points in 1 test method (testDummyJournalManager - 2 restart points); tests 1-3 are negative tests expecting exceptions during cluster creation
+- [x] org.apache.hadoop.hdfs.server.namenode.TestGetContentSummaryWithPermission - Injected restart points in 2 test methods covering content summary with permissions (9 restart points total: testGetContentSummarySuperUser - 4, testGetContentSummaryNonSuperUser - 5)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestHDFSConcat - Injected restart points in 9 test methods covering file concatenation operations (28 restart points total: testConcat - 4, testConcatInEditLog - 2, testConcatNotCompleteBlock - 2, testIllegalArg - 3, testConcatWithQuotaDecrease - 4, testConcatWithQuotaIncrease - 5, testConcatRelativeTargetPath - 2, testConcatReservedRelativePaths - 2, testConcatOnSameFile - 4)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestHostsFiles - Injected restart points in 2 test methods covering datanode decommissioning and host include/exclude functionality (8 restart points total: testHostsExcludeInUI - 6, testHostsIncludeForDeadCount - 2)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider - Injected restart points in 8 test methods covering custom attribute provider functionality (17 restart points total: testDelegationToProvider - 3, testAuthzDelegationToProvider - 1, testAuthzBypassingProvider - 1, testAclFeature - 2, testGetAclStatusReturnsProviderOwnerPerms - 1, testSubClassedAccessControlExceptions - 1, testContentSummary - 1, testAttrProviderWorksCorrectlyOnRenamedSnapshotPaths - 7)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestINodeFile (PARTIAL: 2/10 methods, 6 restart points: testWriteToDeletedFile - 3, testConcat - 3; remaining tests: testGetFullPathNameAfterSetQuota, testInodeId, testInodeIdBasedPaths, testReservedFileNames, testInodeReplacement, testDotdotInodePath, testLocationLimitInListingOps, testFilesInGetListingOps)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestLargeDirectoryDelete - Injected restart points in largeDelete test method (4 restart points: after_cluster_start, after_file_creation, before_large_delete, after_large_delete)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestLeaseManager - Injected restart points in testLeaseRestorationOnRestart test method (4 restart points: after_cluster_start, after_file_creation, after_lease_removal, after_fsimage_save)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestListCorruptFileBlocks - Injected restart points in all 6 test methods (testListCorruptFilesCorruptedBlock: 4 restart points; testListCorruptFileBlocksInSafeMode: 4 restart points; testlistCorruptFileBlocks: 4 restart points; testlistCorruptFileBlocksDFS: 4 restart points; testMaxCorruptFiles: 4 restart points; testListCorruptFileBlocksOnRelativePath: 4 restart points)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestListOpenFiles - Injected restart points in all 6 test methods (testListOpenFilesViaNameNodeRPC: 6 restart points; testListOpenFilesInHA: 2 restart points; testListOpenFilesWithFilterPath: 4 restart points; testListOpenFilesWithInvalidPathServerSide: 2 restart points; testListOpenFilesWithInvalidPathClientSide: 1 restart point; testListOpenFilesWithDeletedPath: 3 restart points)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestMalformedURLs - Injected restart point after cluster start (namenode restart)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestMetadataVersionOutput - Injected restart point after cluster up (namenode restart)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestMetaSave - Injected restart points in 4 test methods (testMetaSave: 3 restart points; testMetasaveAfterDelete: 4 restart points; testMetaSaveOverwrite: 1 restart point; testConcurrentMetaSave: 2 restart points)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameEditsConfigs - Injected restart points in 4 test methods (testNameEditsConfigs: 6 restart points; testNameEditsRequiredConfigs: 2 restart points; testNameEditsConfigsFailure: 4 restart points; testCheckPointDirsAreTrimmed: 1 restart point)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeAcl - Injected restart point in init() method (1 restart point: after_cluster_start). Test extends FSAclBaseTest and inherits all test methods from base class, restart point applies to cluster setup before all inherited test methods
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNamenodeCapacityReport - Injected restart points in 2 test methods (testVolumeSize: 2 restart points after_cluster_start, after_file_creation; testXceiverCount: 5 restart points after_cluster_start, after_initial_health_check, after_datanode_restart, after_file_creation, after_admin_operations)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeMetadataConsistency - Injected restart points in 2 test methods (testGenerationStampInFuture: 3 restart points after_cluster_active, after_file_creation, after_genstamp_modification; testEnsureGenStampsIsStartupOnly: 3 restart points after_cluster_active, after_file_creation, after_genstamp_modification)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeMXBean - Injected restart points in all 13 test methods (testNameNodeMXBeanInfo, testLastContactTime, testDecommissioningNodes, testInServiceNodes, testMaintenanceNodes, testTopUsers, testTopUsersDisabled, testTopUsersNoPeriods, testQueueLength, testNNDirectorySize, testEnabledEcPoliciesMetric, testVerifyMissingBlockGroupsMetrics, testTotalBlocksMetrics - each with 1 restart point after_cluster_active)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeReconfigure - Injected restart points in 11 test methods (38 restart points total across all namenode reconfiguration operations: caller context, IPC backoff, heartbeat intervals, SPS, block invalidate limit, parallel load, slow nodes parameters, max slowpeer collect nodes, slow peer tracker)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRecovery - Injected restart points in 4 test methods (testRecoverTruncatedEditLog, testRecoverPaddedEditLog, testRecoverZeroPaddedEditLog, testRecoverNegativeOnePaddedEditLog - each with 3 restart points: after_directory_creation, after_recovery_cluster_start, after_final_cluster_verification)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeResourceChecker - Injected restart points in 1 test method (testCheckThatNameNodeResourceMonitorIsRunning: 4 restart points after_cluster_active, after_resource_check, after_resource_threshold_crossed, after_safe_mode_entered)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys - Injected restart points in 5 test methods (testRpcBindHostKey, testServiceRpcBindHostKey, testLifelineRpcBindHostKey, testHttpBindHostKey, testHttpsBindHostKey - each with 2 restart points: after_first_cluster_active, after_wildcard_bind_cluster_active)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNamenodeRetryCache - Injected restart points in 10 test methods: testConcat, testDelete, testCreateSymlink, testCreate, testAppend, testRename1, testRename2, testSnapshotMethods (1 restart point after_cluster_setup); testUpdatePipelineWithFailOver (2 restart points: after_ha_cluster_active, after_transition_to_active); testRetryCacheRebuild (3 restart points: after_cluster_setup, after_run_operations, after_namenode_restart)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRetryCacheMetrics - Injected restart points in 1 test method (testRetryCacheMetrics: 1 restart point after_cluster_setup)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServer - Injected restart points in 2 test methods: testNamenodeRpcBindAny (1 restart point after_cluster_active); testNamenodeRpcClientIpProxy (3 restart points: after_cluster_active, after_file_creation, after_caller_context_set)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeRpcServerMethods - Injected restart points in 2 test methods: testDeleteSnapshotWhenSnapshotNameIsEmpty (2 restart points: after_cluster_setup, before_second_validation); testGetDatanodeStorageReportWithNumBLocksNotZero (4 restart points: after_create, after_write, after_close, before_storage_report)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeStatusMXBean - Injected restart points in 2 test methods: testNameNodeStatusMXBean (3 restart points: after_cluster_active, after_initial_attributes, before_final_attributes); testNameNodeMXBeanSlowDisksEnabled (4 restart points: after_cluster_built, after_slow_disk_added, before_wait_for_report, after_report_ready)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNameNodeXAttr - Injected restart points in 1 test method: testXAttrSymlinks (6 restart points: after_symlink_creation, after_first_xattr_set, after_xattr_get, after_xattr_set_via_link, after_first_xattr_remove, before_cleanup)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNestedEncryptionZones - Injected restart points in 2 test methods: testNestedEncryptionZones (9 restart points: after_create_nested_ez, after_first_verification, after_restart_verification, after_checkpoint, after_checkpoint_verification, after_rename_children, after_create_second_ez, after_rename_topez, after_rename_nested_ez); testNestedEZWithRoot (5 restart points: after_init_root_ez, after_root_ez_verification, after_root_ez_rename, after_trash_verification, after_delete_files)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNetworkTopologyServlet - Injected restart points in 4 test methods: testPrintTopologyTextFormat (2 restart points: after_cluster_active, after_http_request); testPrintTopologyJsonFormat (2 restart points: after_cluster_active_json, after_http_request_json); testPrintTopologyNoDatanodesTextFormat (2 restart points: after_cluster_active_no_dn, after_http_request_no_dn); testPrintTopologyNoDatanodesJsonFormat (2 restart points: after_cluster_active_no_dn_json, after_http_request_no_dn_json)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNNStorageRetentionFunctional - Injected restart points in 1 test method: testPurgingWithNameEditsDirAfterFailure (7 restart points: after_cluster_start, after_first_savenamespace, after_second_savenamespace, after_chmod_fail, after_third_savenamespace, after_chmod_restore, after_fourth_savenamespace)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestNNThroughputBenchmark - Injected restart points in 3 test methods: testNNThroughputAgainstRemoteNN (2 restart points: after_cluster_start, after_benchmark on namenode), testNNThroughputRemoteAgainstNNWithFsOption (2 restart points: after_cluster_start, after_benchmark on namenode), testNNThroughputForBlockReportOp (2 restart points: after_cluster_start on namenode, after_block_report_benchmark on datanode/namenode)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestParallelImageWrite - Injected restart points in 1 test method: testRestartDFS (6 restart points: after_files_created on datanode, after_set_owner on namenode, after_cluster_restart_verification on namenode, after_first_check_images on namenode, after_second_files_created on datanode, after_save_namespace on namenode)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestPersistentStoragePolicySatisfier - Injected restart points in 9 test methods: testWithCheckpoint (5 restart points), testWithRestarts (4 restart points), testMultipleSatisfyStoragePolicy (4 restart points), testDropSPS (3 restart points), testSPSShouldNotLeakXattrIfStorageAlreadySatisfied (2 restart points), testNameNodeRestartWhenSPSCalledOnChildFileAndParentDir (3 restart points), testSPSOnChildAndParentDirectory (3 restart points), testSPSxAttrWhenSpsCalledForDir (3 restart points), testSPSxAttrWhenSpsCalledForFile (3 restart points) - Total 30 restart points testing storage policy satisfier persistence with namenode/datanode restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks - Injected restart points in 4 test methods: testWhenDecreasingReplication (4 restart points: after_cluster_setup on namenode, after_file_created on datanode, after_block_corrupted on namenode, after_replication_decreased on namenode), testByAddingAnExtraDataNode (4 restart points: after_cluster_setup on namenode, after_file_created on datanode, after_block_corrupted on namenode, after_datanode_restart on namenode), testWithReplicationFactorAsOne (4 restart points: after_cluster_setup on namenode, after_file_created on datanode, after_block_corrupted on namenode, after_replication_decreased on namenode), testWithAllCorruptReplicas (4 restart points: after_cluster_setup on namenode, after_file_created on datanode, after_all_blocks_corrupted on namenode, after_replication_decreased on namenode) - Total 16 restart points testing corrupt block handling with namenode/datanode restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.TestProtectedDirectories - Injected restart points in 7 test methods: testReconfigureProtectedPaths (3 restart points: after_cluster_setup, after_reconfigure, after_revert on namenode), testDelete (2 restart points: after_cluster_setup, after_delete_operations on namenode), testMoveToTrash (2 restart points: after_cluster_setup, after_trash_operations on namenode), testRename (2 restart points: after_cluster_setup, after_rename_operations on namenode), testRenameProtectSubDirs (2 restart points: after_cluster_setup, after_rename_operations on namenode), testMoveProtectedSubDirsToTrash (2 restart points: after_cluster_setup, after_trash_operations on namenode), testDeleteProtectSubDirs (2 restart points: after_cluster_setup, after_delete_operations on namenode) - Total 15 restart points testing protected directories with namenode restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.TestQuotaByStorageType - Injected restart points in 23 test methods via @Before setUp() method: all tests get after_cluster_setup restart point on namenode after cluster initialization - Total 23 restart points testing quota by storage type with namenode restarts
+- [x] org.apache.hadoop.hdfs.server.namenode.TestQuotaWithStripedBlocks - Injected restart points in 1 test method: testUpdatingQuotaCount (4 restart points: after_cluster_setup on namenode, after_file_created on datanode, after_block_added on namenode, after_file_completed on namenode) testing quota updates with striped blocks and erasure coding
+- [x] org.apache.hadoop.hdfs.server.namenode.TestReconstructStripedBlocks - Injected restart points in 4 test methods covering EC file creation, reconstruction triggers, datanode/namenode restarts, and block recovery (14 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestRedudantBlocks - Injected restart points in testProcessOverReplicatedAndRedudantBlock covering striped file creation, block injection, block reports, redundant block deletion, and reconstruction (7 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestReencryption - Injected restart points in 2 test methods (testReencryptionBasic with 5 restart points, testReencryptOrdering with 2 restart points) covering encryption zone creation, file creation, reencryption, and key roll operations (7 restart points total; note: file has 32 tests total, transformed key tests)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestRefreshBlockPlacementPolicy - Injected restart points in testRefreshReplicationPolicy and testRefreshEcPolicy covering file creation, policy refresh, and verification (6 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestRefreshNamenodeReplicationConfig - Injected restart points in testParamsCanBeReconfigured and testReconfigureFailsWithInvalidValues covering initial validation, reconfiguration, and error handling (7 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace - Injected restart points in 4 MiniDFSCluster tests covering saveNamespace with renamed lease, dangling lease, snapshot sections, and timing thresholds (13 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSecondaryNameNodeUpgrade - Injected restart points in 3 test methods covering SecondaryNameNode upgrade scenarios with version file corruption (21 restart points total: 7 per test method)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSecondaryWebUi - Injected restart points in testSecondaryWebUi covering MBean server operations and checkpoint directory validation (3 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSecureNameNode - Injected restart points in 2 test methods covering Kerberos authentication, permissions, and security MBean validation (8 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSecureNameNodeWithExternalKdc - Injected restart points in testSecureNameNode covering external KDC authentication and directory permissions (5 restart points total)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSecurityTokenEditLog - Injected restart points in testEditLog covering delegation token operations and edit log verification (5 restart points: after_cluster_start, after_editlog_setup, after_threads_start, after_transactions_complete, before_editlog_verification)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestSnapshotPathINodes - Injected restart points in 5 test methods covering snapshot allow/disallow, snapshot creation/deletion, file operations with snapshots (13 restart points total across testAllowSnapshot, testSnapshotPathINodes, testSnapshotPathINodesAfterDeletion, testSnapshotPathINodesWithAddedFile, testSnapshotPathINodesAfterModification)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestStartup - Injected restart points in 5 test methods covering checkpoint startup, namenode restart, and directory permissions (8 restart points: after_cluster_start, after_file_create, after_checkpoint in createCheckPoint helper; after_namenode_restart in testNNRestart and testStorageBlockContentsStaleAfterNNRestart)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestStoragePolicySatisfierWithHA - Injected restart points in testWhenNNHAStateChanges covering HA state transitions between Active and Standby (2 restart points: after_cluster_start, after_transition_to_standby)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestStorageRestore - Injected restart points in 4 test methods covering storage restore, SecondaryNameNode operations, checkpoint failures, and permission-based storage recovery (27 restart points total across testStorageRestore, testDfsAdminCmd, testMultipleSecondaryCheckpoint, testStorageRestoreFailure)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestStripedINodeFile - Injected restart points in 2 test methods covering erasure coding operations with striped files (11 restart points total across testDeleteOp and testUnsuitableStoragePoliciesWithECStripedMode)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestTransferFsImage - Injected restart points in 2 test methods covering FSImage transfer error handling (2 restart points total across testClientSideException and testClientSideExceptionOnJustOneDir)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestUpgradeDomainBlockPlacementPolicy - Injected restart points in 2 test methods covering upgrade domain block placement and decommissioning (5 restart points total: after_cluster_setup in @Before, after_file_created in both tests, after_admin_refresh and after_replication_wait in testPlacementAfterDecommission)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestValidateConfigurationSettings - No MiniDFSCluster usage, tests NameNode configuration validation directly with NameNode instances (not applicable for restart injection)
+- [x] org.apache.hadoop.hdfs.server.namenode.TestXAttrConfigFlag - Injected restart points in 5 test methods covering XAttr configuration validation (11 restart points total: after_mkdir in all tests, after_set_xattr in testEditLog and testFsImage, after_restart_with_xattrs_disabled in testEditLog and testFsImage, after_restart_with_checkpoint in testFsImage)
+- [x] org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsCreatePermissions - Injected restart points in 4 test methods covering WebHDFS file/directory creation with permission testing (4 restart points total: after_cluster_init before each WebHDFS operation)
+- [x] org.apache.hadoop.hdfs.server.namenode.web.resources.TestWebHdfsDataLocality - Injected restart points in 3 test methods covering WebHDFS data locality and exclude datanode functionality (10 restart points total: after_cluster_init, after_file_create, after_file_write, after_file_close across tests; testChooseDatanodeBeforeNamesystemInit uses mocks without cluster)
+- [x] org.apache.hadoop.hdfs.server.sps.TestExternalStoragePolicySatisfier - Injected restart points in 13 test methods covering external Storage Policy Satisfier operations (13 restart points total: after_cluster_creation in tests that create clusters for SPS policy satisfaction testing)
+- [x] org.apache.hadoop.hdfs.shortcircuit.TestShortCircuitCache - Injected restart points in 10 test methods covering short-circuit read cache operations (10 restart points total: after_cluster_active for short-circuit cache testing with datanodes)
+- [x] org.apache.hadoop.hdfs.shortcircuit.TestShortCircuitLocalRead - Injected restart points in 11 test methods covering short-circuit local reads (34 restart points total: after_cluster_creation/active, after_file_write, after_file_close, before_read, after_files_creation, after_cluster_restart)
+- [x] org.apache.hadoop.hdfs.TestBlockTokenWrappingQOP - Injected restart points in 3 test methods covering block token wrapping with QOP (7 restart points total: after_cluster_active, after_file_create, after_file_write_close, before_add_block, before_append, before_get_block_locations)
+- [x] org.apache.hadoop.hdfs.TestDataTransferKeepalive - Injected restart points in 4 test methods covering data transfer keepalive timeouts (9 restart points total: after_cluster_creation, after_file_creation, after_datanode_restart)
+- [x] org.apache.hadoop.hdfs.TestDecommissionWithStriped - Injected restart points in 13 test methods covering datanode decommissioning with striped/erasure-coded blocks (28 restart points total: after_cluster_setup, after_file_write, before_decommission for multiple tests)
+- [x] org.apache.hadoop.hdfs.TestDFSAddressConfig - Injected restart points in 1 test method covering datanode address configuration (3 restart points total: after_cluster_creation, after_first_datanode_restart, after_second_datanode_restart)
+- [x] org.apache.hadoop.hdfs.TestDFSClientExcludedNodes - Injected restart points in 2 test methods covering DFS client excluded nodes functionality (5 restart points total: after_cluster_creation, after_datanode_killed, after_first_block_write, after_datanodes_restarted)
+- [x] org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream - Injected restart points in 5 test methods covering inotify event stream operations (17 restart points total: file operations, metadata operations, EC files, NN failover, and timeout testing)
+- [x] org.apache.hadoop.hdfs.TestDFSInotifyEventInputStreamKerberized - Injected restart points in 1 test method covering Kerberos-secured inotify event stream (2 restart points total: after_first_mkdir with namenode, after_tgt_relogin_mkdir with datanode)
+- [x] org.apache.hadoop.hdfs.TestDFSStripedInputStream - Injected restart points in 11 test methods covering striped/erasure-coded input stream operations (11 restart points total: after_striped_file_creation, after_file_creation_pread, after_file_creation_with_dn_failure, after_stateful_file_creation, after_file_creation_stateful_dn_failure, after_file_creation_idempotent_close, after_file_write_get_current_block, after_file_creation_buffer_test, after_incomplete_cell_file_creation, after_file_creation_unbuffer, after_file_write_block_reader)
+- [x] org.apache.hadoop.hdfs.TestFileAppend - Injected restart points in 12 test methods covering file append operations (13 restart points total: after_file_write_close, after_file_creation_simple_flush, after_second_flush, after_file_creation_complex_flush, after_full_block_creation, after_full_block_creation_append2, after_empty_file_creation, after_file_write_soft_limit, after_file_write_soft_limit_append2, after_initial_file_creation, after_initial_file_creation_multi_append2, after_file_creation_before_corruption, after_file_creation_concurrent_append)
+- [x] org.apache.hadoop.hdfs.TestFsShellPermission - Injected restart points in 1 test method covering FsShell delete operations with different permissions (1 restart point total: after_cluster_creation)
+- [x] org.apache.hadoop.hdfs.TestLeaseRecovery - Injected restart points in 9 test methods covering lease recovery, block synchronization, metadata corruption, and automatic lease expiration (38 restart points total across cluster start, file creation, hsync, append, lease recovery, block operations, and safemode scenarios)
+- [x] org.apache.hadoop.hdfs.TestLocatedBlocksRefresher - Injected restart points in 3 test methods covering located blocks refresher operations (12 restart points total: after_cluster_start, after_file_creation, after_stream_open, after_stream_tracking, after_first_node_stop, after_first_read, after_first_refresh, after_second_node_stop, after_second_read, after_second_refresh)
+- [x] org.apache.hadoop.hdfs.TestMiniDFSCluster - Injected restart points in 8 test methods covering cluster setup/teardown, storage capacity configuration, safemode operations, datanode hostname configuration, storage types, federated HA cluster, and port configuration (23 restart points total across cluster creation, verification, restart operations, state transitions, and configuration checks)
+- [x] org.apache.hadoop.hdfs.TestMultipleNNPortQOP - Injected restart points in 3 test methods covering NameNode access on different ports with different QOP configurations (13 restart points total: after_cluster_creation, after_primary_port_test, after_privacy_port_test, after_integrity_port_test, after_authentication_port_test, after_privacy_test, after_integrity_test, after_authentication_test)
+- [x] org.apache.hadoop.hdfs.TestRollingUpgrade - Injected restart points in 15 test methods covering rolling upgrade operations including prepare, query, finalize, rollback, and checkpointing with QJM, multiple NNs, and Secondary NN (restart points at: after_cluster_creation, after_upgrade_prepare, after_upgrade_finalize, after_namespace_save, after_active_transition, after_query_preparation, after_file_creation, after_directory_creation, after_edit_roll, after_snn_creation, after_checkpoint operations)
+- [x] org.apache.hadoop.hdfs.TestRollingUpgradeDowngrade - Injected restart points in 2 test methods covering downgrade operations and FsImage rejection scenarios (10 restart points total: after_cluster_creation, after_namenode_restart, after_active_transition, after_foo_creation, after_upgrade_prepare, after_bar_creation, after_query_preparation, after_namespace_save, after_storage_modification)
+- [x] org.apache.hadoop.hdfs.TestRollingUpgradeRollback - Injected restart points in 3 test methods covering rollback operations with simple cluster, QJM, and HA QJM configurations (21 restart points total: after_cluster_creation, after_foo_creation, after_upgrade_prepare, after_bar_creation, after_storage_check, after_namenode_restart, after_active_transition, after_query_preparation, after_rollback_verification, after_second_namenode_restart, after_second_active_transition)
+- [x] org.apache.hadoop.hdfs.TestSafeMode - Injected restart points in 9 test methods covering safemode operations including manual safemode, block replication queues, RBW blocks, safemode exceptions, operations while in safemode, datanode threshold, safemode utils, and zero block locations (29 restart points total: after_file_creation, after_safemode_enter, after_datanode_start, after_config_set, after_namenode_restart, after_stopping_datanodes, after_datanode_restart, after_junk_blocks_creation, after_hflush_operations, after_safemode_leave, after_cluster_restart, after_final_safemode_leave)
+- [x] org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA - Injected restart points in 5 test methods covering state alignment in HA configurations with Observer pattern, including state transfer on write/read operations, fresh client initialization, state consistency during failover, and multi-client concurrent operations (11 restart points total: after_write_file, after_state_check, after_read_file, after_first_write, after_failover, after_second_write, after_first_run, after_second_run)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewer - Injected restart points in 1 test method that creates its own cluster for testing fsimage file distribution calculator with various file sizes (4 restart points total: after_cluster_active, after_directory_creation, after_file_creation, after_namespace_save)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForAcl - No restart points injected (0 test methods use cluster; cluster only used in BeforeClass for fsimage generation, all test methods analyze static fsimage offline)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForContentSummary - No restart points injected (0 test methods use cluster; cluster only used in BeforeClass for fsimage generation, all test methods analyze static fsimage offline)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForStoragePolicy - Injected restart points before/after fsimage reading (namenode persistence test, 2 restart points)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr - Injected restart points in 6 test methods testing XAttr persistence via WebImageViewer (namenode persistence test, 6 restart points)
+- [x] org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerWithStripedBlocks - Injected restart points in 7 test methods testing striped blocks with erasure coding (28 restart points total via shared helper method)
+- [x] org.apache.hadoop.hdfs.tools.TestDebugAdmin - Injected restart points in 5 test methods covering recoverLease, verifyMeta, computeMeta commands, and EC block verification (21 restart points total: after_cluster_active, after_file_creation, after_recover_lease, after_block_retrieval, after_verify_meta, after_compute_meta, after_command_execution, after_regular_file_creation, after_ec_policy_setup, after_ec_file_open, after_small_ec_files, after_large_ec_files, after_multiblock_ec_file, after_block_corruption)
+- [x] org.apache.hadoop.hdfs.tools.TestDelegationTokenFetcher - Injected restart points in 1 test method that uses cluster for delegation token operations (5 restart points: after_cluster_active, after_save_token, after_read_token, after_print_tokens, before_renew_attempt; other 3 tests use mocks only)
+- [x] org.apache.hadoop.hdfs.tools.TestDFSAdmin - Injected restart points in 16 test methods covering datanode/namenode info, block reports, volume reports, reconfiguration, topology printing, open files listing, balancer bandwidth, and proxy user refresh (23 restart points total across admin operations)
+- [x] org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA - Injected restart points in 12 test methods covering HA safemode, saveNamespace, restoreFailedStorage, refreshNodes, balancer bandwidth, metasave, service ACL refresh, user-to-groups mappings, super user groups, call queue refresh, and upgrade operations in HA environment (19 restart points total across HA admin operations)
+- [x] org.apache.hadoop.hdfs.tools.TestDFSHAAdminMiniCluster - Injected restart points in 8 test methods covering HA admin operations including state transitions, observer mode transitions, failover with fencing, safemode, health checks, and concurrent NameNode activation scenarios (35 restart points total for HA namenode operations)
+- [x] org.apache.hadoop.hdfs.tools.TestDFSZKFailoverController - Injected restart points in 9 test methods covering ZKFC automatic failover, manual failover, HA state transitions, observer mode, bind address configuration, and NN state changes (26 restart points total across ZKFC operations)
+- [x] org.apache.hadoop.hdfs.tools.TestECAdmin - Injected restart points in 10 test methods covering EC policy verification, enable/disable operations, and cluster topology validation (30 restart points total across EC admin operations)
+- [x] org.apache.hadoop.hdfs.tools.TestGetGroups - Injected restart points in 6 test methods (inherited from GetGroupsTestBase) covering getGroups command with various user scenarios (12 restart points total: 1 in setup + 1 per test method)
+- [x] org.apache.hadoop.hdfs.tools.TestStoragePolicyCommands - Injected restart points in 2 test methods covering storage policy set/get/unset operations (11 restart points total: 1 in setup + 10 test-specific)
+- [x] org.apache.hadoop.hdfs.tools.TestStoragePolicySatisfyAdminCommands - Injected restart points in 2 test methods covering storage policy satisfy admin commands with file creation, policy setting, and block movement triggering (6 restart points total: 3 per test for datanode/namenode operations)
+- [x] org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithDFSAdmin - Injected restart points in 7 test methods covering ViewFS overload scheme with DFSAdmin commands including saveNamespace, safemode, snapshot operations, and balancer bandwidth (13 restart points total across namenode admin operations)
+- [x] org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithFSCommands - Injected restart points in 1 test method covering DF command with ViewFS overload scheme and mount links (2 restart points: after mount links and after DF command)
+- [x] org.apache.hadoop.hdfs.tools.TestViewFSStoragePolicyCommands - Injected restart points in 2 test methods covering ViewFS storage policy commands with federated cluster setup, HDFS and WebHDFS schemas (4 restart points total: 1 in setup + 3 test-specific)
+- [x] org.apache.hadoop.hdfs.util.HostsFileWriter - Utility class with no @Test methods
+- [x] org.apache.hadoop.hdfs.util.TestBestEffortLongFile - No MiniDFSCluster usage (only uses base directory path)
+- [x] org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs - Injected restart points in 4 test methods covering WebHDFS file operations (concat, truncate, JSON parsing, mkdir failure scenarios), 8 restart points total
+- [x] org.apache.hadoop.hdfs.web.TestHttpsFileSystem - Injected restart points in 1 test method covering HTTPS WebHDFS file operations (write, close, read), 3 restart points total
+- [x] org.apache.hadoop.hdfs.web.TestWebHDFS - Large file with 40 test methods; injected restart points in 3 key tests (testLargeFile, testLargeDirectory, testNamenodeRestart), 4 restart points total
+- [x] org.apache.hadoop.hdfs.web.TestWebHDFSAcl - Configuration variant; inherits tests from FSAclBaseTest (already transformed)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract - Injected restart points in 11 test methods covering mkdir, file creation, block locations, seek, permissions, and WebHDFS operations (18 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHDFSForHA - Injected restart points in 6 test methods covering HA failover, delegation tokens, and WebHDFS operations with HA (10 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsTokens - Injected restart points in 2 test methods (out of 10 total) that use MiniDFSCluster, covering delegation token operations (4 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsUrl - Injected restart points in 3 test methods (testWebHdfsSpecialCharacterFile, testWebHdfsBackwardCompatibleSpecialCharacterFile, testWebHdfsPathWithSemicolon) covering file creation with special characters, file status checks, and WebHDFS operations (9 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsWithAuthenticationFilter - Injected restart points in testWebHdfsAuthFilter covering cluster setup, unauthorized/authorized WebHDFS access with authentication filter (4 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsWithMultipleNameNodes - Injected restart points in testRedirect covering federated cluster setup with 4 namenodes, file creation/read/append operations across multiple namenodes, and length checks (7 restart points total)
+- [x] org.apache.hadoop.hdfs.web.TestWebHdfsWithRestCsrfPreventionFilter - Injected restart points in 4 parameterized test methods (testCreate, testDelete, testGetFileStatus, testTruncate) covering CSRF prevention with WebHDFS, file operations, and metadata operations (7 restart points total; executed across 8 parameter combinations)
+- [x] org.apache.hadoop.hdfs.web.TestWebHDFSXAttr - Inherits from FSXAttrBaseTest_RestartInjected; 5 test methods with 14 restart points (XAttr operations over WebHDFS protocol: create, set, remove, rename, list)
+- [x] org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithHdfs - Injected restart points in 6 test methods (testWrite, testAppend, testSilentAppend, testNoAppend, testSilentOverwrite, testFlushThread) covering metrics writing, appending, and flushing to HDFS (9 restart points total)
+- [x] org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithSecureHdfs - Injected restart points in 2 test methods (testWithSecureHDFS, testMissingPropertiesWithSecureHDFS) covering secure HDFS metrics writing with Kerberos authentication (3 restart points total)
+- [x] org.apache.hadoop.net.TestNetworkTopology - Injected restart points in testInvalidNetworkTopologiesNotCachedInHdfs covering cluster startup, DN registration with mismatched rack topology, topology fix, DN restart, and final registration verification (5 restart points total)
+- [x] org.apache.hadoop.security.TestPermission - Injected restart points in 2 test methods (testCreate and testFilePermission) covering directory/file creation with various permissions, permission changes, user switching, and ownership tests (15 restart points total)
+- [x] org.apache.hadoop.security.TestPermissionSymlinks - Injected restart points in @BeforeClass and @Before setup methods covering cluster startup and symlink creation; applied to all 14 test methods testing symlink permissions, ACLs, delete, read, rename, and access operations (2 shared restart points executed before each test)
+- [x] org.apache.hadoop.security.TestRefreshUserMappings - Injected restart points in 2 test methods (testGroupMappingRefresh, testRefreshSuperUserGroupsConfiguration) covering group mapping refresh, superuser proxy configuration, and authorization checks (7 restart points total)
+- [x] org.apache.hadoop.TestGenericRefresh - Injected restart points in @BeforeClass and @Before setup methods plus 6 test methods (testValidIdentifier, testVariableArgs, testUnregistration, testMultipleRegistration, testMultipleReturnCodeMerging, testExceptionResultsInNormalError) covering generic refresh handler registration, execution, and error handling (25 restart points total across 9 test methods)
+- [x] org.apache.hadoop.test.HFSTestCase - Transformed abstract base class and TestHdfsHelper to inject restart points in cluster creation and filesystem setup; restart points are applied to all tests extending HFSTestCase_RestartInjected (2 restart points in helper: after_cluster_build, after_filesystem_setup)
+- [x] org.apache.hadoop.test.MiniDFSClusterManager - Injected restart point in start() method after cluster creation; utility class for running MiniDFSCluster from command line (1 restart point: after_cluster_start)
+- [x] org.apache.hadoop.TestRefreshCallQueue - Injected restart points in setUp method and 2 test methods (testRefresh, testRefreshCallQueueWithFairCallQueue) covering cluster startup and call queue refresh operations (4 restart points total)
+- [x] org.apache.hadoop.test.TestHdfs - Annotation interface only, no transformation needed
+- [x] org.apache.hadoop.test.TestHdfsHelper - Already transformed as part of HFSTestCase transformation
+- [x] org.apache.hadoop.test.TestHFSTestCase - Changed to extend HFSTestCase_RestartInjected; inherits restart points from TestHdfsHelper_RestartInjected for @TestHdfs annotated methods
+- [x] org.apache.hadoop.test.TestHTestCase - No MiniDFSCluster usage; tests HTestCase framework only (directories, timing, Jetty); no transformation needed
+- [x] org.apache.hadoop.tools.TestJMXGet - Injected restart points in 2 test methods (testNameNode, testDataNode) covering cluster startup and file creation for JMX metrics testing (4 restart points total)
 
 ---
 
 ## hadoop-hdfs-rbf (Router-Based Federation) Tests (71 tests)
 
-- [ ] org.apache.hadoop.fs.contract.router.RouterHDFSContract
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppend
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppendSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcat
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcatSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreate
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreateSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelegationToken
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelete
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDeleteSecure
+- [x] org.apache.hadoop.fs.contract.router.RouterHDFSContract - Base class for router federation tests; injected restart points in static createCluster() method covering cluster start, routers start, and active namespaces (3 restart points applied to all tests using this base)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppend - Injected restart points in 3 test methods (append operations with datanode+namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppendSecure - Injected restart points in 3 test methods (secure append operations with datanode+namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcat - Injected restart points in testConcatFileOnFile (concat metadata operation with namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcatSecure - Injected restart points in testConcatFileOnFile (secure concat metadata operation with namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreate - Injected restart points in 2 test methods (file creation and flush operations with datanode+namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreateSecure - Injected restart points in 2 test methods (secure file creation and flush operations with datanode+namenode on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelegationToken - Injected restart points in testRouterDelegationToken (delegation token generation, renewal, and cancellation with namenode metadata operations)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelete - Injected restart points in 2 test methods (delete operations on file and directory with namenode metadata on router-based federation cluster)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDeleteSecure - Injected restart points in 2 test methods (secure delete operations on file and directory with namenode metadata on router-based federation cluster)
 - [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatus
 - [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatusSecure
 - [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractMkdir

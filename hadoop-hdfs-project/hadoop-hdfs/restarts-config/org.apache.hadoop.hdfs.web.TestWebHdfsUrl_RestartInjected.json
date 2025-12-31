@@ -1,0 +1,67 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsUrl_RestartInjected",
+      "testMethod": "testWebHdfsSpecialCharacterFile",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_status_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsUrl_RestartInjected",
+      "testMethod": "testWebHdfsBackwardCompatibleSpecialCharacterFile",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_status_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsUrl_RestartInjected",
+      "testMethod": "testWebHdfsPathWithSemicolon",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_status_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

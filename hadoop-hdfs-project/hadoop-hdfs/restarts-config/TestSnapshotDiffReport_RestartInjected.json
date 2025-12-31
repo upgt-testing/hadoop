@@ -1,0 +1,149 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDiffReport_RestartInjected",
+  "restartPoints": {
+    "testDiffReport": [
+      "after_mkdir_subsubsub1",
+      "after_first_modify_and_snapshot",
+      "after_second_modify_and_snapshot"
+    ],
+    "testSnapRootDescendantDiffReport": [
+      "after_mkdir_dirs",
+      "after_modify_sub1",
+      "after_modify_subsub",
+      "after_modify_subsubsub"
+    ],
+    "testSnapRootDescendantDiffReportWithRename": [
+      "after_mkdir_dirs",
+      "after_snapshot_s0",
+      "after_rename_foo_case1",
+      "after_snapshot_s1_case1",
+      "after_snapshot_s0_case2",
+      "after_rename_foo_case2",
+      "after_snapshot_s1_case2",
+      "after_snapshot_s0_case3",
+      "after_rename_foo_case3",
+      "after_snapshot_s1_case3",
+      "after_snapshot_s0_case4",
+      "after_create_file_in_foo_case4",
+      "after_rename_foo_case4",
+      "after_snapshot_s1_case4"
+    ],
+    "testSnapshotDiffInfo": [
+      "after_mkdir_snapshot_dirs",
+      "after_create_snapshots"
+    ],
+    "testDiffReport2": [
+      "after_mkdir_subsubsub1",
+      "after_modify_and_snapshot",
+      "after_delete_subsub1"
+    ],
+    "testDiffReportWithQuota": [
+      "after_mkdir_testdir",
+      "after_set_quota",
+      "after_create_snapshot"
+    ],
+    "testDiffReportWithRename": [
+      "after_mkdir_dirs",
+      "after_snapshot_s1",
+      "after_rename_bar",
+      "after_rename_foo",
+      "after_snapshot_s2",
+      "after_delete_sdir2"
+    ],
+    "testDiffReportWithRenameOutside": [
+      "after_create_files",
+      "after_snapshot_s0",
+      "after_rename_bar_into_dir1",
+      "after_rename_foo_out_of_dir1",
+      "after_snapshot_s1"
+    ],
+    "testDiffReportWithRenameAndDelete": [
+      "after_create_files_in_foo_and_bar",
+      "after_snapshot_s0",
+      "after_rename_with_overwrite",
+      "after_snapshot_s1",
+      "after_delete_bar",
+      "after_snapshot_s2"
+    ],
+    "testDiffReportWithRenameToNewDir": [
+      "after_create_file_in_foo",
+      "after_snapshot_s0",
+      "after_mkdir_bar",
+      "after_rename_file_to_bar",
+      "after_snapshot_s1"
+    ],
+    "testDiffReportWithRenameAndAppend": [
+      "after_create_file_foo",
+      "after_snapshot_s0",
+      "after_rename_foo_to_bar",
+      "after_append_to_bar",
+      "after_snapshot_s1"
+    ],
+    "testDiffReportWithRenameAndSnapshotDeletion": [
+      "after_create_file_bar",
+      "after_snapshot_s0",
+      "after_rename_foo_to_foo2",
+      "after_delete_snapshot_s0",
+      "after_snapshot_s1",
+      "after_rename_bar_to_bar_new"
+    ],
+    "testDiffReportWithOpenFiles": [
+      "after_create_flume_file",
+      "after_append_flume_file",
+      "after_snapshot_flume_s1",
+      "after_write_to_flume_file_first",
+      "after_snapshot_flume_s2",
+      "after_write_to_flume_file_second",
+      "after_close_flume_stream"
+    ],
+    "testDontCaptureAccessTimeOnlyChangeReport": [
+      "after_create_pre_snapshot_files",
+      "after_snapshot_s0",
+      "after_create_post_snapshot_files",
+      "after_set_times_first",
+      "after_snapshot_s1",
+      "after_set_times_second",
+      "after_snapshot_s2",
+      "after_modify_filePostSS",
+      "after_snapshot_s3"
+    ],
+    "testDiffReportWithRpcLimit": [
+      "after_mkdir_dirs",
+      "after_snapshot_s0",
+      "after_create_files",
+      "after_snapshot_s1"
+    ],
+    "testDiffReportWithRpcLimit2": [
+      "after_mkdir_dirs",
+      "after_create_files",
+      "after_snapshot_s0",
+      "after_mkdir_dir4",
+      "after_move_files_to_dir4",
+      "after_overwrite_files_in_dir3",
+      "after_move_dir2_to_dir3",
+      "after_snapshot_s1"
+    ],
+    "testDiffReportWithRpcLimit3": [
+      "after_mkdir_dir1",
+      "after_create_initial_files",
+      "after_snapshot_s0",
+      "after_delete_files",
+      "after_create_new_files",
+      "after_snapshot_s1"
+    ],
+    "testSnapshotDiffReportRemoteIterator": [
+      "after_mkdir_dirs",
+      "after_create_files",
+      "after_snapshot_s0",
+      "after_mkdir_dir4",
+      "after_move_files_to_dir4",
+      "after_overwrite_files_in_dir3",
+      "after_move_dir2_to_dir3",
+      "after_snapshot_s1"
+    ],
+    "testSnapshotDiffReportRemoteIterator2": [
+      "after_mkdir_root",
+      "after_snapshot_s0"
+    ]
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream_RestartInjected",
+      "testMethod": "testBasic",
+      "restartPoints": [
+        {
+          "position": "after_initial_files",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_append_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concat",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_owner",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_xattr_ops",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_acl_ops",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_truncate",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream_RestartInjected",
+      "testMethod": "testErasureCodedFiles",
+      "restartPoints": [
+        {
+          "position": "after_ec_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_ec_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream_RestartInjected",
+      "testMethod": "testNNFailover",
+      "restartPoints": [
+        {
+          "position": "after_mkdirs_before_failover",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream_RestartInjected",
+      "testMethod": "testTwoActiveNNs",
+      "restartPoints": [
+        {
+          "position": "after_first_batch_mkdirs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_batch_mkdirs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStream_RestartInjected",
+      "testMethod": "testReadEventsWithTimeout",
+      "restartPoints": [
+        {
+          "position": "after_event_stream_init",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

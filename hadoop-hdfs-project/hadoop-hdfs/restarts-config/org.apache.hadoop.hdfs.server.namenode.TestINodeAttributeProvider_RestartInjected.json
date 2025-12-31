@@ -1,0 +1,142 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testDelegationToProvider",
+      "restartPoints": [
+        {
+          "position": "after_tmp_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_foo_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_list_status",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testAuthzDelegationToProvider",
+      "restartPoints": [
+        {
+          "position": "after_directory_structure_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testAuthzBypassingProvider",
+      "restartPoints": [
+        {
+          "position": "after_directory_structure_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testAclFeature",
+      "restartPoints": [
+        {
+          "position": "after_acl_dir_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_acl_child_dir_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testGetAclStatusReturnsProviderOwnerPerms",
+      "restartPoints": [
+        {
+          "position": "after_directory_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testSubClassedAccessControlExceptions",
+      "restartPoints": [
+        {
+          "position": "after_directory_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testContentSummary",
+      "restartPoints": [
+        {
+          "position": "after_directory_permissions_setup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestINodeAttributeProvider_RestartInjected",
+      "testMethod": "testAttrProviderWorksCorrectlyOnRenamedSnapshotPaths",
+      "restartPoints": [
+        {
+          "position": "after_sub1_structure_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_enabled",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_s0_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file1_file2_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_rename",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_s1_s2_snapshots",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_rename",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

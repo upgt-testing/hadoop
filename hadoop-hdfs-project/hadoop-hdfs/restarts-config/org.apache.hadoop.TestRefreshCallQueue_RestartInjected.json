@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.TestRefreshCallQueue_RestartInjected",
+      "testMethod": "testRefresh",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_refresh_command",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.TestRefreshCallQueue_RestartInjected",
+      "testMethod": "testRefreshCallQueueWithFairCallQueue",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_fair_queue_refresh",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys_RestartInjected",
+      "testMethod": "testRpcBindHostKey",
+      "restartPoints": [
+        {
+          "position": "after_first_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_wildcard_bind_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys_RestartInjected",
+      "testMethod": "testServiceRpcBindHostKey",
+      "restartPoints": [
+        {
+          "position": "after_first_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_wildcard_bind_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys_RestartInjected",
+      "testMethod": "testLifelineRpcBindHostKey",
+      "restartPoints": [
+        {
+          "position": "after_first_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_wildcard_bind_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys_RestartInjected",
+      "testMethod": "testHttpBindHostKey",
+      "restartPoints": [
+        {
+          "position": "after_first_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_wildcard_bind_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestNameNodeRespectsBindHostKeys_RestartInjected",
+      "testMethod": "testHttpsBindHostKey",
+      "restartPoints": [
+        {
+          "position": "after_first_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_wildcard_bind_cluster_active",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

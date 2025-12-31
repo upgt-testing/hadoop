@@ -1,0 +1,12 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList_RestartInjected",
+  "restartPoints": [
+    "after_cluster_setup",
+    "after_initial_snapshot_in_addDiff",
+    "after_all_snapshots_in_addDiff",
+    "after_creating_children_in_addFirst",
+    "after_initial_snapshot_in_addFirst",
+    "after_deletes_and_snapshots_in_addFirst",
+    "after_all_deletions_in_testRemove"
+  ]
+}

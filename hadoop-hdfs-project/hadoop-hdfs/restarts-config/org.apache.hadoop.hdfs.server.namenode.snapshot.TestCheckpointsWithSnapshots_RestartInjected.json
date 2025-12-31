@@ -1,0 +1,12 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestCheckpointsWithSnapshots_RestartInjected",
+  "restartPoints": [
+    "after_cluster_creation",
+    "after_allow_snapshot",
+    "after_create_snapshot",
+    "after_first_checkpoint",
+    "after_delete_snapshot_and_disallow",
+    "after_save_namespace",
+    "after_second_checkpoint"
+  ]
+}

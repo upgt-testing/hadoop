@@ -1,0 +1,526 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppend_RestartInjected",
+      "testMethod": "testAppendToEmptyFile",
+      "restartPoints": [
+        {
+          "position": "after_create_empty_file",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_append_open",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        },
+        {
+          "position": "before_append_close",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppend_RestartInjected",
+      "testMethod": "testAppendToExistingFile",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_append_open_existing",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        },
+        {
+          "position": "before_close_appended",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppend_RestartInjected",
+      "testMethod": "testRenameFileBeingAppended",
+      "restartPoints": [
+        {
+          "position": "after_append_before_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_rename_during_append",
+          "targets": [
+            "namenode",
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppendSecure_RestartInjected",
+      "testMethod": "testAppendToEmptyFile",
+      "restartPoints": [
+        {
+          "position": "after_create_empty_file",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_append_open",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        },
+        {
+          "position": "before_append_close",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppendSecure_RestartInjected",
+      "testMethod": "testAppendToExistingFile",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_append_open_existing",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        },
+        {
+          "position": "before_close_appended",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractAppendSecure_RestartInjected",
+      "testMethod": "testRenameFileBeingAppended",
+      "restartPoints": [
+        {
+          "position": "after_append_before_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_rename_during_append",
+          "targets": [
+            "namenode",
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcat_RestartInjected",
+      "testMethod": "testConcatFileOnFile",
+      "restartPoints": [
+        {
+          "position": "after_target_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_concat_operation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_concat_operation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractConcatSecure_RestartInjected",
+      "testMethod": "testConcatFileOnFile",
+      "restartPoints": [
+        {
+          "position": "after_target_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_concat_operation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_concat_operation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreate_RestartInjected",
+      "testMethod": "testCreateNewFile",
+      "restartPoints": [
+        {
+          "position": "before_file_creation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreate_RestartInjected",
+      "testMethod": "testCreatedFileIsVisibleOnFlush",
+      "restartPoints": [
+        {
+          "position": "after_file_create_before_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_flush",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreateSecure_RestartInjected",
+      "testMethod": "testCreateNewFile",
+      "restartPoints": [
+        {
+          "position": "before_file_creation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractCreateSecure_RestartInjected",
+      "testMethod": "testCreatedFileIsVisibleOnFlush",
+      "restartPoints": [
+        {
+          "position": "after_file_create_before_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_flush",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH",
+            "DELAYED_CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelegationToken_RestartInjected",
+      "testMethod": "testRouterDelegationToken",
+      "restartPoints": [
+        {
+          "position": "after_token_generation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_token_renewal",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_token_cancellation",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelete_RestartInjected",
+      "testMethod": "testDeleteSingleFile",
+      "restartPoints": [
+        {
+          "position": "before_delete_single_file",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_delete_single_file",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelete_RestartInjected",
+      "testMethod": "testDeleteNonEmptyDirRecursive",
+      "restartPoints": [
+        {
+          "position": "before_delete_directory",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_delete_directory",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDeleteSecure_RestartInjected",
+      "testMethod": "testDeleteSingleFile",
+      "restartPoints": [
+        {
+          "position": "before_delete_single_file",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_delete_single_file",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDeleteSecure_RestartInjected",
+      "testMethod": "testDeleteNonEmptyDirRecursive",
+      "restartPoints": [
+        {
+          "position": "before_delete_directory",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_delete_directory",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

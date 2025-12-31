@@ -1,0 +1,167 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testClusterWithoutSystemProperties",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testClusterSetStorageCapacity",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_datanode_restart_verification",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_namenode_restart_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_namenode_datanode_restart_verification",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_datanode_namenode_restart_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testIsClusterUpAfterShutdown",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_safemode_entry",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testClusterSetDatanodeHostname",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testClusterSetDatanodeDifferentStorageType",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testClusterNoStorageTypeSetForDatanodes",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testSetUpFederatedCluster",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_state_transitions",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_configuration_verification",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_namenode_shutdown",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_namenode_shutdown",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_namenode_restart",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_namenode_restart",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestMiniDFSCluster_RestartInjected",
+      "testMethod": "testStartStopWithPorts",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_port_verification",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

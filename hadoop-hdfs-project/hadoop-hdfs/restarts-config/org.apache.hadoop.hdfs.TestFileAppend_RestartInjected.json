@@ -1,0 +1,141 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testBreakHardlinksIfNeeded",
+      "restartPoints": [
+        {
+          "position": "after_file_write_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testSimpleFlush",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_simple_flush",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_flush",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testComplexFlush",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_complex_flush",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testAppendTwice",
+      "restartPoints": [
+        {
+          "position": "after_full_block_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testAppend2Twice",
+      "restartPoints": [
+        {
+          "position": "after_full_block_creation_append2",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testMultipleAppends",
+      "restartPoints": [
+        {
+          "position": "after_empty_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testAppendAfterSoftLimit",
+      "restartPoints": [
+        {
+          "position": "after_file_write_soft_limit",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testAppend2AfterSoftLimit",
+      "restartPoints": [
+        {
+          "position": "after_file_write_soft_limit_append2",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testFailedAppendBlockRejection",
+      "restartPoints": [
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testMultiAppend2",
+      "restartPoints": [
+        {
+          "position": "after_initial_file_creation_multi_append2",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testAppendCorruptedBlock",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_before_corruption",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFileAppend_RestartInjected",
+      "testMethod": "testConcurrentAppendRead",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_concurrent_append",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

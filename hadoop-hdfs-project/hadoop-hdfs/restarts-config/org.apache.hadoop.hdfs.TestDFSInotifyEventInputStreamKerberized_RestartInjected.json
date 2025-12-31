@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSInotifyEventInputStreamKerberized_RestartInjected",
+      "testMethod": "testWithKerberizedCluster",
+      "restartPoints": [
+        {
+          "position": "after_first_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_tgt_relogin_mkdir",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

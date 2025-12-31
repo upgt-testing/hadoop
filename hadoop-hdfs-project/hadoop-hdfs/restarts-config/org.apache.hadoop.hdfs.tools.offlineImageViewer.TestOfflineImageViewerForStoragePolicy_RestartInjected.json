@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForStoragePolicy_RestartInjected",
+      "testMethod": "testPBDelimitedWriterForStoragePolicy",
+      "restartPoints": [
+        {
+          "position": "before_read_fsimage",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_read_fsimage",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testRefreshBlock",
+      "restartPoints": [
+        {
+          "position": "after_striped_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testPread",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_pread",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testPreadWithDNFailure",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_with_dn_failure",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testStatefulRead",
+      "restartPoints": [
+        {
+          "position": "after_stateful_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testStatefulReadWithDNFailure",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_stateful_dn_failure",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testIdempotentClose",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_idempotent_close",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testReadFailToGetCurrentBlock",
+      "restartPoints": [
+        {
+          "position": "after_file_write_get_current_block",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testCloseDoesNotAllocateNewBuffer",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_buffer_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testReadWhenLastIncompleteCellComeInToDecodeAlignedStripe",
+      "restartPoints": [
+        {
+          "position": "after_incomplete_cell_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testUnbuffer",
+      "restartPoints": [
+        {
+          "position": "after_file_creation_unbuffer",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected",
+      "testMethod": "testBlockReader",
+      "restartPoints": [
+        {
+          "position": "after_file_write_block_reader",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

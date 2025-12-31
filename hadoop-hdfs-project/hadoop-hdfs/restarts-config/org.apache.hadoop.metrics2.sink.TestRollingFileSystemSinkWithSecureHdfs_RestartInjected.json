@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithSecureHdfs_RestartInjected",
+      "testMethod": "testWithSecureHDFS",
+      "restartPoints": [
+        {
+          "position": "after_secure_metrics_init",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_secure_write_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.metrics2.sink.TestRollingFileSystemSinkWithSecureHdfs_RestartInjected",
+      "testMethod": "testMissingPropertiesWithSecureHDFS",
+      "restartPoints": [
+        {
+          "position": "after_missing_properties_init",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testLocalRackPlacement",
+      "restartPoints": [
+        {
+          "position": "after_start_file_in_loop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block_in_loop",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testLocalStoragePlacement",
+      "restartPoints": [
+        {
+          "position": "after_start_file_in_loop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block_in_loop",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testNonLocalRackPlacement",
+      "restartPoints": [
+        {
+          "position": "after_start_file",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testPlacementWithDFSNetworkTopology",
+      "restartPoints": [
+        {
+          "position": "after_cluster_restart",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_start_file",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testPlacementWithLocalRackNodesDecommissioned",
+      "restartPoints": [
+        {
+          "position": "after_decommission_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_start_file_in_loop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block_in_loop",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestDefaultBlockPlacementPolicy_RestartInjected",
+      "testMethod": "testRandomRackSelectionForRemoteClient",
+      "restartPoints": [
+        {
+          "position": "after_start_file_in_loop",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_add_block_in_loop",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

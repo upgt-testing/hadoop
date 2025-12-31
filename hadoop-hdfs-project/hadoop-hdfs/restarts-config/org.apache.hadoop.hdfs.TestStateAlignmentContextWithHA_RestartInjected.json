@@ -1,0 +1,89 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA_RestartInjected",
+      "testMethod": "testStateTransferOnWrite",
+      "restartPoints": [
+        {
+          "position": "after_write_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_state_check",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA_RestartInjected",
+      "testMethod": "testStateTransferOnRead",
+      "restartPoints": [
+        {
+          "position": "after_write_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_read_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA_RestartInjected",
+      "testMethod": "testStateTransferOnFreshClient",
+      "restartPoints": [
+        {
+          "position": "after_write_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_read_file",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA_RestartInjected",
+      "testMethod": "testStateTransferOnWriteWithFailover",
+      "restartPoints": [
+        {
+          "position": "after_first_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_failover",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestStateAlignmentContextWithHA_RestartInjected",
+      "testMethod": "testMultiClientStatesWithRandomFailovers",
+      "restartPoints": [
+        {
+          "position": "after_first_run",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_run",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

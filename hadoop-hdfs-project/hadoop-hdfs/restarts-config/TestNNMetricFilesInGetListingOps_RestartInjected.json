@@ -1,0 +1,33 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.metrics.TestNNMetricFilesInGetListingOps_RestartInjected",
+  "restartPoints": [
+    {
+      "testMethod": "testFilesInGetListingOps",
+      "position": "after_tmp1_files",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFilesInGetListingOps",
+      "position": "after_tmp2_files",
+      "nodeRole": "datanode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFilesInGetListingOps",
+      "position": "after_first_listing",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    },
+    {
+      "testMethod": "testFilesInGetListingOps",
+      "position": "after_second_listing",
+      "nodeRole": "namenode",
+      "nodeIndex": 0,
+      "restartMode": "GRACEFUL"
+    }
+  ]
+}

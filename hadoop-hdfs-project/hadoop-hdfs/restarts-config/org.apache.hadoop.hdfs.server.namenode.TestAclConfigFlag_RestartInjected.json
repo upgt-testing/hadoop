@@ -1,0 +1,107 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testModifyAclEntries",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testRemoveAclEntries",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testRemoveDefaultAcl",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testRemoveAcl",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testSetAcl",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testGetAclStatus",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testEditLog",
+      "restartPoints": [
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_restart_acls_disabled",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestAclConfigFlag_RestartInjected",
+      "testMethod": "testFsImage",
+      "restartPoints": [
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_checkpoint_restart",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_restart_acls_disabled",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

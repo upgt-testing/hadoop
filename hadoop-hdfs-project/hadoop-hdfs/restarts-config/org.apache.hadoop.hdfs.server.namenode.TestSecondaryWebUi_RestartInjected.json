@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestSecondaryWebUi_RestartInjected",
+      "testMethod": "testSecondaryWebUi",
+      "restartPoints": [
+        {
+          "position": "after_mbean_server_obtained",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_checkpoint_directories_validated",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_checkpoint_editlog_directories_validated",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

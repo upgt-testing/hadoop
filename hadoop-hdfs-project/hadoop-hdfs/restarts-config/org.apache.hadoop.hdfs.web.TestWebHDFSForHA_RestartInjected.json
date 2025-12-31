@@ -1,0 +1,140 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testHA",
+      "restartPoints": [
+        {
+          "position": "after_first_mkdir",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_failover",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testSecureHAToken",
+      "restartPoints": [
+        {
+          "position": "after_get_delegation_token",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_failover",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testClientFailoverWhenStandbyNNHasStaleCredentials",
+      "restartPoints": [
+        {
+          "position": "after_failover",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testFailoverAfterOpen",
+      "restartPoints": [
+        {
+          "position": "after_create",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_failover",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testMultipleNamespacesConfigured",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected",
+      "testMethod": "testRetryWhileNNStartup",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

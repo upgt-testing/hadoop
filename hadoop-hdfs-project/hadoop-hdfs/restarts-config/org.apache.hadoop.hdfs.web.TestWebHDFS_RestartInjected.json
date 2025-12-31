@@ -1,0 +1,61 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFS_RestartInjected",
+      "testMethod": "testLargeFile",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_large_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFS_RestartInjected",
+      "testMethod": "testNamenodeRestart",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHDFS_RestartInjected",
+      "testMethod": "testLargeDirectory",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

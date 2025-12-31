@@ -1,0 +1,229 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testMkdirsFailsForSubdirectoryOfExistingFile",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_create_file",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testGetFileBlockLocations",
+      "restartPoints": [
+        {
+          "position": "after_create_file",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testCaseInsensitive",
+      "restartPoints": [
+        {
+          "position": "after_mkdirs",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testOpenNonExistFile",
+      "restartPoints": []
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testSeek",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testRootDir",
+      "restartPoints": [
+        {
+          "position": "after_get_status",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testLengthParamLongerThanFile",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testOffsetPlusLengthParamsLongerThanFile",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testResponseCode",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_write",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testDatanodeCreateMissingParameter",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected",
+      "testMethod": "testAccess",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_set_permission",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

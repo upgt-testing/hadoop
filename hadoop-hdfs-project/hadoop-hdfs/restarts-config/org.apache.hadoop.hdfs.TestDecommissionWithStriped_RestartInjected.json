@@ -1,0 +1,237 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testFileFullBlockGroup",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_decommission",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testFileMultipleBlockGroups",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_decommission",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testFileSmallerThanOneCell",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_decommission",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testFileSmallerThanOneStripe",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_decommission",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommissionTwoNodes",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_decommission",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommissionWithURBlockForSameBlockGroup",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommissionWithBusyNode",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommission2NodeWithBusyNode",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testFileChecksumAfterDecommission",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommissionWithFailedReplicating",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testDecommissionWithMissingBlock",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testCountNodes",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected",
+      "testMethod": "testRecoveryWithDecommission",
+      "restartPoints": [
+        {
+          "position": "after_cluster_setup",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

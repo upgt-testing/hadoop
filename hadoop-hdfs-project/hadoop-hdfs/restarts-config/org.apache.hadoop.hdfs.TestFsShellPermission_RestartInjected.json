@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestFsShellPermission_RestartInjected",
+      "testMethod": "testDelete",
+      "restartPoints": [
+        {
+          "position": "after_cluster_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

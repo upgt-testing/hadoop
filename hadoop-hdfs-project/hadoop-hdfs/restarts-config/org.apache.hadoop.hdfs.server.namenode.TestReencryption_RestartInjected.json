@@ -1,0 +1,51 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestReencryption_RestartInjected",
+      "testMethod": "testReencryptionBasic",
+      "restartPoints": [
+        {
+          "position": "after_encryption_zone_created",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_created_in_zone",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_first_reencryption",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_key_roll",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_second_reencryption",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestReencryption_RestartInjected",
+      "testMethod": "testReencryptOrdering",
+      "restartPoints": [
+        {
+          "position": "after_zone_created",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_created",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.TestXAttrConfigFlag_RestartInjected",
+  "restartPoints": [
+    "after_mkdir",
+    "after_set_xattr",
+    "after_restart_with_xattrs_disabled",
+    "after_restart_with_checkpoint"
+  ]
+}

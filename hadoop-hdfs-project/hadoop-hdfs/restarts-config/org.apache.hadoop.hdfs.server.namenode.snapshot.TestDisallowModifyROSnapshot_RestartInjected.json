@@ -1,0 +1,8 @@
+{
+  "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestDisallowModifyROSnapshot_RestartInjected",
+  "restartPoints": [
+    "after_cluster_creation",
+    "after_creating_directories",
+    "after_creating_snapshot"
+  ]
+}

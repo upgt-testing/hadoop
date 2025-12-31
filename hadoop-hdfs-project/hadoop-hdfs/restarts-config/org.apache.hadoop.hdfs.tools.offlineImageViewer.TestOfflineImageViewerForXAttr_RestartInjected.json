@@ -1,0 +1,70 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testWebImageViewerForListXAttrs",
+      "restartPoints": [
+        {
+          "position": "before_list_xattrs_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testWebImageViewerForGetXAttrsWithOutParameters",
+      "restartPoints": [
+        {
+          "position": "before_get_xattrs_without_params_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testWebImageViewerForGetXAttrsWithParameters",
+      "restartPoints": [
+        {
+          "position": "before_get_xattrs_with_params_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testWebImageViewerForGetXAttrsWithCodecParameters",
+      "restartPoints": [
+        {
+          "position": "before_get_xattrs_with_codec_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testWithWebHdfsFileSystem",
+      "restartPoints": [
+        {
+          "position": "before_webhdfs_filesystem_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.tools.offlineImageViewer.TestOfflineImageViewerForXAttr_RestartInjected",
+      "testMethod": "testResponseCode",
+      "restartPoints": [
+        {
+          "position": "before_response_code_test",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

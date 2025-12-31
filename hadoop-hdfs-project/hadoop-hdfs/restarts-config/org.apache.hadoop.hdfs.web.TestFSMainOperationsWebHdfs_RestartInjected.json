@@ -1,0 +1,108 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs_RestartInjected",
+      "testMethod": "testConcat",
+      "restartPoints": [
+        {
+          "position": "after_source_files_created",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "before_concat",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_concat",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs_RestartInjected",
+      "testMethod": "testTruncate",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_truncate",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs_RestartInjected",
+      "testMethod": "testJsonParseClosesInputStream",
+      "restartPoints": [
+        {
+          "position": "after_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.web.TestFSMainOperationsWebHdfs_RestartInjected",
+      "testMethod": "testMkdirsFailsForSubdirectoryOfExistingFile",
+      "restartPoints": [
+        {
+          "position": "after_mkdir",
+          "targets": [
+            "namenode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": [
+            "datanode"
+          ],
+          "modes": [
+            "GRACEFUL",
+            "CRASH"
+          ]
+        }
+      ]
+    }
+  ]
+}

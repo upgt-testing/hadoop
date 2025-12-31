@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.TestMetadataVersionOutput_RestartInjected",
+      "testMethod": "testMetadataVersionOutput",
+      "restartPoints": [
+        {
+          "position": "after_cluster_up",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

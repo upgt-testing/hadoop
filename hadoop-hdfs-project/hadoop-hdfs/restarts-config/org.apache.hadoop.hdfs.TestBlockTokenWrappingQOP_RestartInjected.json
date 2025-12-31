@@ -1,0 +1,67 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestBlockTokenWrappingQOP_RestartInjected",
+      "testMethod": "testAddBlockWrappingQOP",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_add_block",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestBlockTokenWrappingQOP_RestartInjected",
+      "testMethod": "testAppendWrappingQOP",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_append",
+          "targets": ["namenode", "datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.TestBlockTokenWrappingQOP_RestartInjected",
+      "testMethod": "testGetBlockLocationWrappingQOP",
+      "restartPoints": [
+        {
+          "position": "after_cluster_active",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_write_close",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_get_block_locations",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}
