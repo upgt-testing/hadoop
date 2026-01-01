@@ -19,17 +19,23 @@
 package org.apache.hadoop.fs.contract.router;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.contract.AbstractContractRenameTest;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.contract.AbstractContractSetTimesTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Test rename operations on the Router-based FS.
+ * Test set times operations on the Router-based FS.
  */
-public class TestRouterHDFSContractRename extends AbstractContractRenameTest {
+public class TestRouterHDFSContractSetTimes_RestartInjected
+    extends AbstractContractSetTimesTest {
 
   @BeforeClass
   public static void createCluster() throws IOException {
@@ -44,5 +50,25 @@ public class TestRouterHDFSContractRename extends AbstractContractRenameTest {
   @Override
   protected AbstractFSContract createContract(Configuration conf) {
     return new RouterHDFSContract(conf);
+  }
+
+  @Test
+  @Override
+  public void testSetTimesNonexistentFile() throws Throwable {
+    RestartFramework.at("before_set_times_on_nonexistent")
+        .on(RouterHDFSContract.getCluster())
+        .restart("namenode")
+        .withIndex(0)
+        .withMode(RestartMode.GRACEFUL)
+        .execute();
+
+    try {
+      long time = System.currentTimeMillis();
+      Path target = path("test/target");
+      getFileSystem().setTimes(target, time, time);
+      fail("expected a failure");
+    } catch (FileNotFoundException e) {
+      handleExpectedException(e);
+    }
   }
 }

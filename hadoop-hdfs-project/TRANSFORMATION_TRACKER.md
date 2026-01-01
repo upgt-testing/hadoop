@@ -8,7 +8,7 @@ This document tracks the progress of adding restart positions to HDFS tests that
 ## Progress Overview
 
 Total Tests: 537
-- [x] Completed: 338/537
+- [x] Completed: 374/537
 
 ---
 
@@ -541,106 +541,154 @@ Total Tests: 537
 - [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelegationToken - Injected restart points in testRouterDelegationToken (delegation token generation, renewal, and cancellation with namenode metadata operations)
 - [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDelete - Injected restart points in 2 test methods (delete operations on file and directory with namenode metadata on router-based federation cluster)
 - [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractDeleteSecure - Injected restart points in 2 test methods (secure delete operations on file and directory with namenode metadata on router-based federation cluster)
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatus
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatusSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractMkdir
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractMkdirSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractOpen
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractOpenSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRename
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRenameSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRootDirectory
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRootDirectorySecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSeek
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSeekSecure
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSetTimes
-- [ ] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSetTimesSecure
-- [ ] org.apache.hadoop.fs.contract.router.web.RouterWebHDFSContract
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractAppend
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractConcat
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractCreate
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractDelete
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractMkdir
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractOpen
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractRename
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractRootDirectory
-- [ ] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractSeek
-- [ ] org.apache.hadoop.hdfs.server.federation.FederationTestUtils
-- [ ] org.apache.hadoop.hdfs.server.federation.metrics.TestMetricsBase
-- [ ] org.apache.hadoop.hdfs.server.federation.metrics.TestRBFMetrics
-- [ ] org.apache.hadoop.hdfs.server.federation.MiniRouterDFSCluster
-- [ ] org.apache.hadoop.hdfs.server.federation.resolver.TestNamenodeResolver
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestDisableNameservices
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterAdmin
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterAdminCLI
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterAllResolver
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterClientRejectOverload
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterFaultTolerant
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterFsck
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterMissingFolderMulti
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTable
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTableCacheRefresh
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTableCacheRefreshSecure
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterMultiRack
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterNamenodeHeartbeat
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterNamenodeMonitoring
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterNetworkTopologyServlet
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterQuota
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRefreshSuperUserGroupsConfiguration
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpc
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRPCClientRetries
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcMultiDestination
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRPCMultipleDestinationMountTableResolver
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcSingleNS
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcStoragePolicySatisfier
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterUserMappings
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestRouterWithSecureStartup
-- [ ] org.apache.hadoop.hdfs.server.federation.router.TestSafeMode
-- [ ] org.apache.hadoop.hdfs.server.federation.security.TestRouterSecurityManager
-- [ ] org.apache.hadoop.hdfs.server.federation.StateStoreDFSCluster
-- [ ] org.apache.hadoop.hdfs.server.federation.store.driver.TestStateStoreFileSystem
-- [ ] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreMembershipState
-- [ ] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreMountTable
-- [ ] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreRouterState
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatus
+  - Test Methods: 19 (testGetFileStatusRoot, testListStatusEmptyDirectory, testListFilesEmptyDirectoryNonrecursive, testListFilesEmptyDirectoryRecursive, testListLocatedStatusEmptyDirectory, testComplexDirActions, testListFilesNoDir, testListStatusIteratorNoDir, testLocatedStatusNoDir, testListStatusNoDir, testListStatusFilteredNoDir, testListStatusFilteredFile, testListStatusFile, testListStatusIteratorFile, testListFilesFile, testListFilesFileRecursive, testListLocatedStatusFile, testListStatusFiltering, testListLocatedStatusFiltering)
+  - Restart Points: 20 (metadata listing operations on namenode)
+  - Notes: Router-based federated HDFS testing - all tests involve getFileStatus, listStatus, listFiles, and listLocatedStatus operations
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractGetFileStatusSecure
+  - Test Methods: 19 (testGetFileStatusRoot, testListStatusEmptyDirectory, testListFilesEmptyDirectoryNonrecursive, testListFilesEmptyDirectoryRecursive, testListLocatedStatusEmptyDirectory, testComplexDirActions, testListFilesNoDir, testListStatusIteratorNoDir, testLocatedStatusNoDir, testListStatusNoDir, testListStatusFilteredNoDir, testListStatusFilteredFile, testListStatusFile, testListStatusIteratorFile, testListFilesFile, testListFilesFileRecursive, testListLocatedStatusFile, testListStatusFiltering, testListLocatedStatusFiltering)
+  - Restart Points: 20 (metadata listing operations on namenode)
+  - Notes: Secure variant of Router-based federated HDFS testing with Kerberos authentication
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractMkdir
+  - Test Methods: 8 (testMkDirRmDir, testMkDirRmRfDir, testNoMkdirOverFile, testMkdirOverParentFile, testMkdirSlashHandling, testMkdirsPopulatingAllNonexistentAncestors, testMkdirsDoesNotRemoveParentDirectories, testCreateDirWithExistingDir)
+  - Restart Points: 8 (mkdir and rmdir operations on namenode)
+  - Notes: Router-based federated HDFS testing for directory creation/deletion operations
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractMkdirSecure
+  - Test Methods: 8 (testMkDirRmDir, testMkDirRmRfDir, testNoMkdirOverFile, testMkdirOverParentFile, testMkdirSlashHandling, testMkdirsPopulatingAllNonexistentAncestors, testMkdirsDoesNotRemoveParentDirectories, testCreateDirWithExistingDir)
+  - Restart Points: 8 (mkdir and rmdir operations on namenode)
+  - Notes: Secure variant of Router-based federated HDFS directory creation/deletion testing with Kerberos
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractOpen
+  - Test Methods: 10 (testOpenReadZeroByteFile, testFsIsEncrypted, testOpenReadDir, testOpenReadDirWithChild, testOpenFileTwice, testSequentialRead, testOpenFileReadZeroByte, testOpenFileApplyRead, testOpenFileApplyAsyncRead, testOpenFileNullStatusButFileLength)
+  - Restart Points: 14 (before/after open operations on datanode and namenode)
+  - Notes: Router-based federated HDFS file open and read operations testing
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractOpenSecure
+  - Test Methods: 10 (testOpenReadZeroByteFile, testFsIsEncrypted, testOpenReadDir, testOpenReadDirWithChild, testOpenFileTwice, testSequentialRead, testOpenFileReadZeroByte, testOpenFileApplyRead, testOpenFileApplyAsyncRead, testOpenFileNullStatusButFileLength)
+  - Restart Points: 14 (before/after open operations on datanode and namenode)
+  - Notes: Secure variant with Kerberos for Router-based federated HDFS file open and read operations testing
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRename
+  - Test Methods: 6 (testRenameNewFileSameDir, testRenameFileOverExistingFile, testRenameDirIntoExistingDir, testRenameWithNonEmptySubDir, testRenamePopulatesDirectoryAncestors, testRenamePopulatesFileAncestors)
+  - Restart Points: 8 (before/after rename operations on namenode)
+  - Notes: Router-based federated HDFS file and directory rename operations testing
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRenameSecure
+  - Test Methods: 6 (testRenameNewFileSameDir, testRenameFileOverExistingFile, testRenameDirIntoExistingDir, testRenameWithNonEmptySubDir, testRenamePopulatesDirectoryAncestors, testRenamePopulatesFileAncestors)
+  - Restart Points: 8 (before/after rename operations on namenode)
+  - Notes: Secure variant with Kerberos for Router-based federated HDFS file and directory rename operations testing
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRootDirectory
+  - Test Methods: 4 (testMkDirDepth1, testRmNonEmptyRootDirNonRecursive, testCreateFileOverRoot, testSimpleRootListing)
+  - Restart Points: 6 (after_mkdir, before_delete, after_touch_file, before_delete_nonempty_root, before_create_file_over_root, before_listing_operations)
+  - Notes: Router-based federated HDFS root directory operations testing (5 test methods disabled due to mount points)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractRootDirectorySecure
+  - Test Methods: 4 (testMkDirDepth1, testRmNonEmptyRootDirNonRecursive, testCreateFileOverRoot, testSimpleRootListing)
+  - Restart Points: 6 (after_mkdir, before_delete, after_touch_file, before_delete_nonempty_root, before_create_file_over_root, before_listing_operations)
+  - Notes: Secure variant with Kerberos for Router-based federated HDFS root directory operations testing (5 test methods disabled due to mount points)
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSeek
+  - Test Methods: 18 (seek and positioned read operations)
+  - Restart Points: 20 (datanode restarts after file operations, during seeks, and read operations)
+  - Notes: Router-based federated HDFS seek and positioned read testing with comprehensive coverage
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSeekSecure
+  - Test Methods: 18 (seek and positioned read operations with security enabled)
+  - Restart Points: 20 (datanode restarts after file operations, during seeks, and read operations)
+  - Notes: Secure router-based federated HDFS seek and positioned read testing with comprehensive coverage
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSetTimes
+  - Test Methods: 1 (testSetTimesNonexistentFile)
+  - Restart Points: 1 (namenode restart before setTimes on nonexistent file)
+  - Notes: Router-based federated HDFS setTimes metadata operation testing
+- [x] org.apache.hadoop.fs.contract.router.TestRouterHDFSContractSetTimesSecure
+  - Test Methods: 1 (testSetTimesNonexistentFile with security enabled)
+  - Restart Points: 1 (namenode restart before setTimes on nonexistent file)
+  - Notes: Secure router-based federated HDFS setTimes metadata operation testing
+- [x] org.apache.hadoop.fs.contract.router.web.RouterWebHDFSContract - No @Test methods, base utility class for WebHDFS contract tests
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractAppend
+  - Test Methods: 3 (testAppendToEmptyFile, testAppendToExistingFile, testRenameFileBeingAppended)
+  - Restart Points: 8 (append operations with datanode and namenode restarts)
+  - Notes: Router-based WebHDFS append operations testing with file creation, append, and rename scenarios
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractConcat
+  - Test Methods: 1 (testConcatFileOnFile)
+  - Restart Points: 3 (concat metadata operation with namenode and datanode restarts)
+  - Notes: Router-based WebHDFS file concatenation testing
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractCreate - Injected restart points in 2 test methods (file creation and flush operations with namenode+datanode)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractDelete - Injected restart points in 2 test methods (delete operations with namenode metadata)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractMkdir - Injected restart points in 3 test methods (mkdir operations on root, nested dirs, and over file with namenode+datanode)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractOpen - Injected restart points in 2 test methods (file open and read operations with datanode restarts)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractRename - Injected restart points in 3 test methods (file and directory rename operations with namenode metadata)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractRootDirectory - All test methods are empty/not applicable for Router WebHDFS (mount points)
+- [x] org.apache.hadoop.fs.contract.router.web.TestRouterWebHDFSContractSeek - Injected restart points in 3 test methods (seek and read operations with datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.FederationTestUtils - No @Test methods, utility class for federation testing
+- [x] org.apache.hadoop.hdfs.server.federation.metrics.TestMetricsBase - No MiniDFSCluster usage, tests router metrics with mocked registrations
+- [x] org.apache.hadoop.hdfs.server.federation.metrics.TestRBFMetrics - No MiniDFSCluster usage, tests router JMX metrics with mocked registrations
+- [x] org.apache.hadoop.hdfs.server.federation.MiniRouterDFSCluster - No @Test methods, utility class for federated cluster testing
+- [x] org.apache.hadoop.hdfs.server.federation.resolver.TestNamenodeResolver - No MiniDFSCluster usage, tests resolver logic with StateStore and mocked reports
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestDisableNameservices - Injected restart points in 3 test methods (8 restart points total: renewLease, listStatus operations with namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterAdmin - Injected restart points in 9 test methods (14 restart points total: mount table operations and nameservice management with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterAdminCLI - Injected restart points in 6 test methods (10 restart points total: CLI operations for mount table, quota, safemode, nameservice management with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterAllResolver - Injected restart points in 3 test methods (12 restart points total: directory/file operations with ALL resolvers (HASH_ALL, RANDOM, SPACE) using namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterClientRejectOverload - Injected restart points in 3 test methods (4 restart points total: overload control testing with slow namenode simulation and failover transitions using namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterFaultTolerant - No MiniDFSCluster usage, uses MockNamenode for fault tolerant testing
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterFsck - Injected restart points in 1 test method (2 restart points total: fsck testing with mount table setup and file creation using namenode/datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterMissingFolderMulti - No MiniDFSCluster usage, uses MockNamenode for router federation testing
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTable - Injected restart points in 17 test methods (31 restart points total: mount table operations, permission testing, multi-destination mounts, EC policy operations with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTableCacheRefresh - Injected restart points in 7 test methods covering mount table add/remove/update, router client behavior, refresh API, timeout, and connection expiration (13 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterMountTableCacheRefreshSecure - Injected restart points in 4 test methods covering secure mount table add/remove/update and router client behavior with security enabled (8 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterMultiRack - Injected restart points in 1 test method covering EC topology verification with multiple racks and EC policy operations (4 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterNamenodeHeartbeat - Injected restart points in 2 test methods covering namenode heartbeat service lifecycle and HA failover scenarios (4 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterNamenodeMonitoring - No MiniDFSCluster usage, uses MockNamenode and direct Router instantiation for namenode monitoring tests
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterNetworkTopologyServlet - Injected restart points in 4 test methods covering network topology servlet with text/JSON formats and with/without datanodes (4 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterQuota - Injected restart points in 20 test methods covering comprehensive quota behaviors including namespace/storage/type quotas, mount table operations, quota synchronization, and update services (27 restart points total)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRefreshSuperUserGroupsConfiguration - Injected restart points in testRefreshSuperUserGroupsConfiguration (5 restart points: after_config_init, after_auth_check, after_config_resource_add, before_refresh, after_refresh) for Router admin configuration refresh operations with namenode restarts
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpc - Injected restart points in 8 key test methods out of 47 total (17 restart points total covering RPC server lifecycle, file listing, rename operations, snapshots, erasure coding, mkdir, append, and cache admin operations with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRPCClientRetries - Injected restart points in 3 test methods (10 restart points total: testRetryWhenAllNameServiceDown with cluster shutdown/invalid report/mkdir attempt, testRetryWhenOneNameServiceDown with namenode shutdown/invalid report/renew lease, testNamenodeMetricsSlow with initial check/cache update/nn0 slow/nn1 slow - all with namenode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcMultiDestination - Injected restart points in 6 test methods (17 restart points total: testProxyOpWithRemoteException, testPreviousBlockNotNull with block operations, testRecoverLease with hflush/lease recovery, testIsFileClosed with hflush/file closed check, testGetContentSummaryEc with EC policy operations, testCallerContextWithMultiDestinations with mkdir/listStatus/getFileStatus)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRPCMultipleDestinationMountTableResolver - Injected restart points in 6 test methods (22 restart points total: testInvocationHashAllOrder, testECMultipleDestinations with EC operations, testACLMultipleDestinations with comprehensive ACL operations, testRenameMultipleDestDirectories with rename/rename2 across different destination orders, testClearQuota with quota operations, testContentSummaryWithMultipleDest)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcSingleNS - Injected restart points in 2 test methods (4 restart points total: testGetCurrentTXIDandRollEdits with namenode metadata operations, testSaveNamespace with safemode and saveNamespace operations)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterRpcStoragePolicySatisfier - Injected restart points in testStoragePolicySatisfier (6 restart points total: file creation, storage type verification, set/get/satisfy storage policy operations with namenode and datanode restarts)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterUserMappings - Injected restart points in 2 test methods (10 restart points total: testRefreshSuperUserGroupsConfiguration with proxy config/authorization/refresh operations, testGroupMappingRefresh with group retrieval and refresh operations)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestRouterWithSecureStartup - Injected restart points in 2 test methods (2 restart points total: testStartupWithoutSpnegoPrincipal and testSuccessfulStartup with cluster creation; testStartupWithoutKeytab skipped as it expects failure)
+- [x] org.apache.hadoop.hdfs.server.federation.router.TestSafeMode - Injected restart points in testProxySetSafemode (3 restart points: after_router_setup, after_first_safemode_get, after_second_safemode_get with namenode restarts for safemode operations)
+- [x] org.apache.hadoop.hdfs.server.federation.security.TestRouterSecurityManager - No transformation needed (test does not use MiniDFSCluster - only tests RouterSecurityManager in isolation)
+- [x] org.apache.hadoop.hdfs.server.federation.StateStoreDFSCluster - No transformation needed (utility class for testing, no @Test methods)
+- [x] org.apache.hadoop.hdfs.server.federation.store.driver.TestStateStoreFileSystem - Injected restart points in 6 test methods (12 restart points total: before/after insert, update, delete, fetch_errors, metrics, and error_test operations with datanode restarts for state store persistence)
+- [x] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreMembershipState - No transformation needed (test does not use MiniDFSCluster - only tests StateStore in isolation)
+- [x] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreMountTable - No transformation needed (test does not use MiniDFSCluster - only tests StateStore in isolation)
+- [x] org.apache.hadoop.hdfs.server.federation.store.TestStateStoreRouterState - No transformation needed (test does not use MiniDFSCluster - only tests StateStore in isolation)
 
 ---
 
 ## hadoop-hdfs-httpfs (HttpFS) Tests (21 tests)
 
-- [ ] org.apache.hadoop.fs.http.client.BaseTestHttpFSWith
-- [ ] org.apache.hadoop.fs.http.client.TestHttpFSFileSystemLocalFileSystem
-- [ ] org.apache.hadoop.fs.http.client.TestHttpFSWithHttpFSFileSystem
-- [ ] org.apache.hadoop.fs.http.server.TestHttpFSAccessControlled
-- [ ] org.apache.hadoop.fs.http.server.TestHttpFSServer
-- [ ] org.apache.hadoop.fs.http.server.TestHttpFSServerNoACLs
-- [ ] org.apache.hadoop.fs.http.server.TestHttpFSServerNoXAttrs
-- [ ] org.apache.hadoop.fs.http.server.TestHttpFSWithKerberos
-- [ ] org.apache.hadoop.lib.lang.TestRunnableCallable
-- [ ] org.apache.hadoop.lib.lang.TestXException
-- [ ] org.apache.hadoop.lib.server.TestBaseService
-- [ ] org.apache.hadoop.lib.server.TestServer
-- [ ] org.apache.hadoop.lib.server.TestServerConstructor
-- [ ] org.apache.hadoop.lib.service.hadoop.TestFileSystemAccessService
-- [ ] org.apache.hadoop.lib.service.instrumentation.TestInstrumentationService
-- [ ] org.apache.hadoop.lib.service.scheduler.TestSchedulerService
-- [ ] org.apache.hadoop.lib.service.security.TestGroupsService
-- [ ] org.apache.hadoop.lib.servlet.TestHostnameFilter
-- [ ] org.apache.hadoop.lib.servlet.TestMDCFilter
-- [ ] org.apache.hadoop.lib.servlet.TestServerWebApp
-- [ ] org.apache.hadoop.lib.util.TestCheck
+- [x] org.apache.hadoop.fs.http.client.BaseTestHttpFSWith - Injected restart points in 11 test methods covering file creation, append, truncate, concat, replication, quota, xattrs, ACLs, and snapshot operations (25 restart points total)
+- [x] org.apache.hadoop.fs.http.client.TestHttpFSFileSystemLocalFileSystem - No transformation needed (extends BaseTestHttpFSWith but uses LocalFileSystem, not MiniDFSCluster)
+- [x] org.apache.hadoop.fs.http.client.TestHttpFSWithHttpFSFileSystem - Extends BaseTestHttpFSWith_RestartInjected, inherits all restart points from base class
+- [x] org.apache.hadoop.fs.http.server.TestHttpFSAccessControlled - Injected restart points in testAcessControlledFS after file creation and between different access mode tests (3 restart points total)
+- [x] org.apache.hadoop.fs.http.server.TestHttpFSServer - No transformation needed (uses @TestHdfs annotation, cluster not directly accessible in test code)
+- [x] org.apache.hadoop.fs.http.server.TestHttpFSServerNoACLs - Injected restart point in testWithNoAcls after test file creation (1 restart point total)
+- [x] org.apache.hadoop.fs.http.server.TestHttpFSServerNoXAttrs - Injected restart point in testWithXAttrs after test file creation (1 restart point total)
+- [x] org.apache.hadoop.fs.http.server.TestHttpFSWithKerberos - No transformation needed (uses @TestHdfs annotation, cluster not directly accessible in test code)
+- [x] org.apache.hadoop.lib.lang.TestRunnableCallable - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.lang.TestXException - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.server.TestBaseService - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.server.TestServer - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.server.TestServerConstructor - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.service.hadoop.TestFileSystemAccessService - No transformation needed (uses @TestHdfs annotation, cluster not directly accessible in test code)
+- [x] org.apache.hadoop.lib.service.instrumentation.TestInstrumentationService - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.service.scheduler.TestSchedulerService - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.service.security.TestGroupsService - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.servlet.TestHostnameFilter - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.servlet.TestMDCFilter - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.servlet.TestServerWebApp - No transformation needed (utility test, does not use MiniDFSCluster)
+- [x] org.apache.hadoop.lib.util.TestCheck - No transformation needed (utility test, does not use MiniDFSCluster)
 
 ---
 
 ## hadoop-hdfs-nfs (NFS Gateway) Tests (8 tests)
 
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestClientAccessPrivilege
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestExportsTable
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestNfs3HttpServer
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestReaddir
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3
-- [ ] org.apache.hadoop.hdfs.nfs.nfs3.TestWrites
-- [ ] org.apache.hadoop.hdfs.nfs.TestMountd
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestClientAccessPrivilege - Injected restart points in testClientAccessPrivilegeForRemove (NFS access control with file creation, NFS start, and remove operations)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestExportsTable - Injected restart points in 6 test methods covering HDFS and ViewFS export points with cluster start, directory operations, and NFS service start (15 restart points total)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestNfs3HttpServer - Injected restart points in testHttpServer (NFS HTTP server with NFS start and HTTP access operations)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestReaddir - Injected restart points in 2 test methods covering READDIR and READDIRPLUS operations with file creation, directory listing, file info retrieval, and file deletion (10 restart points total)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3 - Injected restart points in 20 test methods covering comprehensive NFS3 RPC operations including getattr, setattr, lookup, access, read, write, create, mkdir, symlink, remove, rmdir, rename, readdir, readdirplus, fsstat, fsinfo, pathconf, commit, and encrypted read/write (43 restart points total)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3 - Injected restart points in 8 test methods covering ViewFS with federated NFS3 operations including file status retrieval on multiple namenodes, NFS access tests for NN1/NN2, write operations, and rename operations both within single namenode and cross-namenode (18 restart points total)
+- [x] org.apache.hadoop.hdfs.nfs.nfs3.TestWrites - Injected restart points in 3 test methods covering NFS write operations including DATA_SYNC and FILE_SYNC writes, out-of-order writes, and overlapping writes (12 restart points total)
+- [x] org.apache.hadoop.hdfs.nfs.TestMountd - Injected restart points in testStart covering mount daemon initialization and NFS service startup (3 restart points total)
 
 ---
 

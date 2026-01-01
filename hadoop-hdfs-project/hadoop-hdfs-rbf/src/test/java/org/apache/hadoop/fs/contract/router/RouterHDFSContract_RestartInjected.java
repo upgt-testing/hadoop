@@ -40,7 +40,7 @@ public class RouterHDFSContract_RestartInjected extends HDFSContract {
       AbstractFSContractTestBase.TEST_FILE_LEN;
   private static MiniRouterDFSCluster cluster;
 
-  public RouterHDFSContract(Configuration conf) {
+  public RouterHDFSContract_RestartInjected(Configuration conf) {
     super(conf);
   }
 

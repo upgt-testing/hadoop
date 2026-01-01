@@ -16,10 +16,10 @@
  *  limitations under the License.
  */
 
-package org.apache.hadoop.fs.contract.router;
+package org.apache.hadoop.fs.contract.router.web;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.contract.AbstractContractRenameTest;
+import org.apache.hadoop.fs.contract.AbstractContractRootDirectoryTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -27,22 +27,53 @@ import org.junit.BeforeClass;
 import java.io.IOException;
 
 /**
- * Test rename operations on the Router-based FS.
+ * Test dir operations on a Router WebHDFS FS.
  */
-public class TestRouterHDFSContractRename extends AbstractContractRenameTest {
+public class TestRouterWebHDFSContractRootDirectory_RestartInjected extends
+    AbstractContractRootDirectoryTest {
 
   @BeforeClass
   public static void createCluster() throws IOException {
-    RouterHDFSContract.createCluster();
+    RouterWebHDFSContract.createCluster();
   }
 
   @AfterClass
   public static void teardownCluster() throws IOException {
-    RouterHDFSContract.destroyCluster();
+    RouterWebHDFSContract.destroyCluster();
   }
 
   @Override
   protected AbstractFSContract createContract(Configuration conf) {
-    return new RouterHDFSContract(conf);
+    return new RouterWebHDFSContract(conf);
+  }
+
+  @Override
+  public void testListEmptyRootDirectory() throws IOException {
+    // It doesn't apply because we still have the mount points here
+  }
+
+  @Override
+  public void testRmEmptyRootDirNonRecursive() throws IOException {
+    // It doesn't apply because we still have the mount points here
+  }
+
+  @Override
+  public void testRecursiveRootListing() throws IOException {
+    // It doesn't apply because we still have the mount points here
+  }
+
+  @Override
+  public void testRmRootRecursive() {
+    // It doesn't apply because we still have the mount points here
+  }
+
+  @Override
+  public void testRmEmptyRootDirRecursive() {
+    // It doesn't apply because we still have the mount points here
+  }
+
+  @Override
+  public void testSimpleRootListing() {
+    // It doesn't apply because DFSRouter dosn't support LISTSTATUS_BATCH.
   }
 }

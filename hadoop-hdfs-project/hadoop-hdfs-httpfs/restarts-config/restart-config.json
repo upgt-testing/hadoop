@@ -1,0 +1,571 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.fs.http.client.BaseTestHttpFSWith_RestartInjected",
+      "testMethod": "testOperation",
+      "restartPoints": [
+        {
+          "position": "after_create_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_truncate",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_replication_change",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_quota",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creations",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_quota_set",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create_for_acl",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl_entries",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_preconditions",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_create_for_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.client.BaseTestHttpFSWith_RestartInjected",
+      "testMethod": "testOperationDoAs",
+      "restartPoints": [
+        {
+          "position": "after_create_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_truncate",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_replication_change",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_quota",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creations",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_quota_set",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create_for_acl",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl_entries",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_preconditions",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_create_for_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.client.TestHttpFSWithHttpFSFileSystem_RestartInjected",
+      "testMethod": "testOperation",
+      "restartPoints": [
+        {
+          "position": "after_create_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_truncate",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_replication_change",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_quota",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creations",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_quota_set",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create_for_acl",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl_entries",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_preconditions",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_create_for_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.client.TestHttpFSWithHttpFSFileSystem_RestartInjected",
+      "testMethod": "testOperationDoAs",
+      "restartPoints": [
+        {
+          "position": "after_create_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_initial_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_append_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_truncate",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_concat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_replication",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_replication_change",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_quota",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creations",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_storage_quota_set",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_xattrs",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_create_for_acl",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_set_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_modify_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl_entries",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove_acl",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_preconditions",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_snapshot_create_for_delete",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_delete_snapshot",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.server.TestHttpFSAccessControlled_RestartInjected",
+      "testMethod": "testAcessControlledFS",
+      "restartPoints": [
+        {
+          "position": "after_test_files_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_read_write_mode_tests",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_write_only_mode_tests",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.server.TestHttpFSServerNoACLs_RestartInjected",
+      "testMethod": "testWithNoAcls",
+      "restartPoints": [
+        {
+          "position": "after_test_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.fs.http.server.TestHttpFSServerNoXAttrs_RestartInjected",
+      "testMethod": "testWithXAttrs",
+      "restartPoints": [
+        {
+          "position": "after_test_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}

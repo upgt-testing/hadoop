@@ -1,0 +1,576 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testGetattr",
+      "restartPoints": [
+        {
+          "position": "before_getattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_getattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testSetattr",
+      "restartPoints": [
+        {
+          "position": "before_setattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_setattr",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testLookup",
+      "restartPoints": [
+        {
+          "position": "before_lookup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_lookup",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testAccess",
+      "restartPoints": [
+        {
+          "position": "before_access",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_access",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testReadlink",
+      "restartPoints": [
+        {
+          "position": "after_symlink_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_readlink",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testRead",
+      "restartPoints": [
+        {
+          "position": "before_read",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_read",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testEncryptedReadWrite",
+      "restartPoints": [
+        {
+          "position": "after_encryption_zone_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nfs_file_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_commit",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_encrypted_file_read",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_dfs_file_creation",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testWrite",
+      "restartPoints": [
+        {
+          "position": "before_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testCreate",
+      "restartPoints": [
+        {
+          "position": "before_create",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_create",
+          "targets": ["namenode", "datanode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testMkdir",
+      "restartPoints": [
+        {
+          "position": "before_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_mkdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testSymlink",
+      "restartPoints": [
+        {
+          "position": "before_symlink",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_symlink",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testRemove",
+      "restartPoints": [
+        {
+          "position": "before_remove",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_remove",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testRmdir",
+      "restartPoints": [
+        {
+          "position": "before_rmdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rmdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testRename",
+      "restartPoints": [
+        {
+          "position": "before_rename",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testReaddir",
+      "restartPoints": [
+        {
+          "position": "before_readdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_readdir",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testReaddirplus",
+      "restartPoints": [
+        {
+          "position": "before_readdirplus",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_readdirplus",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testFsstat",
+      "restartPoints": [
+        {
+          "position": "before_fsstat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_fsstat",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testFsinfo",
+      "restartPoints": [
+        {
+          "position": "before_fsinfo",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_fsinfo",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testPathconf",
+      "restartPoints": [
+        {
+          "position": "before_pathconf",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_pathconf",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestRpcProgramNfs3_RestartInjected",
+      "testMethod": "testCommit",
+      "restartPoints": [
+        {
+          "position": "before_commit",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_commit_test",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testFileStatus",
+      "restartPoints": [
+        {
+          "position": "before_nn1_getfileinfo",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nn1_getfileinfo",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_nn2_getfileinfo",
+          "targets": ["namenode:1"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nn2_getfileinfo",
+          "targets": ["namenode:1"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsAccessNN1",
+      "restartPoints": [
+        {
+          "position": "before_nn1_access",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nn1_access",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsAccessNN2",
+      "restartPoints": [
+        {
+          "position": "before_nn2_access",
+          "targets": ["namenode:1"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nn2_access",
+          "targets": ["namenode:1"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testWrongNfsAccess",
+      "restartPoints": [
+        {
+          "position": "before_file_creation",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_file_creation",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsWriteNN1",
+      "restartPoints": [
+        {
+          "position": "before_write_nn1",
+          "targets": ["datanode:0"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_write_nn1",
+          "targets": ["datanode:0"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsWriteNN2",
+      "restartPoints": [
+        {
+          "position": "before_write_nn2",
+          "targets": ["datanode:1"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_write_nn2",
+          "targets": ["datanode:1"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsRenameMultiNN",
+      "restartPoints": [
+        {
+          "position": "before_rename_multi_nn",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_multi_nn",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestViewfsWithNfs3_RestartInjected",
+      "testMethod": "testNfsRenameSingleNN",
+      "restartPoints": [
+        {
+          "position": "before_rename_single_nn",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_rename_single_nn",
+          "targets": ["namenode:0"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestWrites_RestartInjected",
+      "testMethod": "testWriteStableHow",
+      "restartPoints": [
+        {
+          "position": "after_file1_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_data_sync_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_data_sync_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file2_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_file_sync_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_file_sync_write",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestWrites_RestartInjected",
+      "testMethod": "testOOOWrites",
+      "restartPoints": [
+        {
+          "position": "after_ooo_file_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_ooo_writes",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_ooo_writes",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.nfs3.TestWrites_RestartInjected",
+      "testMethod": "testOverlappingWrites",
+      "restartPoints": [
+        {
+          "position": "after_overlapping_file_creation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "before_overlapping_writes",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        },
+        {
+          "position": "after_overlapping_writes",
+          "targets": ["datanode"],
+          "modes": ["GRACEFUL", "CRASH", "DELAYED_CRASH"]
+        }
+      ]
+    },
+    {
+      "testClass": "org.apache.hadoop.hdfs.nfs.TestMountd_RestartInjected",
+      "testMethod": "testStart",
+      "restartPoints": [
+        {
+          "position": "after_cluster_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_nfs_start",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        },
+        {
+          "position": "after_mountd_operation",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL", "CRASH"]
+        }
+      ]
+    }
+  ]
+}
