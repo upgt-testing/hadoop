@@ -32,8 +32,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.apache.hadoop.hdfs.restart.RestartFramework;
-import org.apache.hadoop.hdfs.restart.RestartMode;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
 public class TestFcHdfsPermission_RestartInjected extends FileContextPermissionBase {
 

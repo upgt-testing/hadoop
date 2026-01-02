@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.PathHandle;
 import org.apache.hadoop.fs.contract.AbstractContractPathHandleTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.apache.hadoop.fs.contract.ContractTestUtils;
+import static org.apache.hadoop.fs.contract.ContractTestUtils.dataset;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,7 +59,6 @@ public class TestHDFSContractPathHandle_RestartInjected
   }
 
   @Test
-  @Override
   public void testGetPathHandle() throws Exception {
     describe("test getting path handle with restart injection");
     FileSystem fs = getFileSystem();
@@ -95,7 +95,6 @@ public class TestHDFSContractPathHandle_RestartInjected
   }
 
   @Test
-  @Override
   public void testOpenWithPathHandle() throws Exception {
     describe("test opening file with path handle and restart injection");
     FileSystem fs = getFileSystem();

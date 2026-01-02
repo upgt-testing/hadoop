@@ -39,8 +39,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.apache.hadoop.hdfs.restart.RestartFramework;
-import org.apache.hadoop.hdfs.restart.RestartMode;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
 public class TestFcHdfsSetUMask_RestartInjected {
 

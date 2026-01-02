@@ -76,7 +76,7 @@ public class TestNameNodeRecovery_RestartInjected {
   }
 
   private static boolean useAsyncEditLog;
-  public TestNameNodeRecovery(Boolean async) {
+  public TestNameNodeRecovery_RestartInjected(Boolean async) {
     useAsyncEditLog = async;
   }
 

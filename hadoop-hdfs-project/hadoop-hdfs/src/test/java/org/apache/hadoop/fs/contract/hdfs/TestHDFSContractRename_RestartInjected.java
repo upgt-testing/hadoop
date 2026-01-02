@@ -24,6 +24,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.contract.AbstractContractRenameTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.apache.hadoop.fs.contract.ContractTestUtils;
+import static org.apache.hadoop.fs.contract.ContractTestUtils.dataset;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,7 +51,6 @@ public class TestHDFSContractRename_RestartInjected extends AbstractContractRena
   }
 
   @Test
-  @Override
   public void testRenameFile() throws Throwable {
     describe("test renaming a file with restart injection");
     FileSystem fs = getFileSystem();
@@ -97,7 +97,6 @@ public class TestHDFSContractRename_RestartInjected extends AbstractContractRena
   }
 
   @Test
-  @Override
   public void testRenameFileOverExistingFile() throws Throwable {
     describe("test renaming a file over existing file with restart injection");
     FileSystem fs = getFileSystem();
@@ -137,7 +136,6 @@ public class TestHDFSContractRename_RestartInjected extends AbstractContractRena
   }
 
   @Test
-  @Override
   public void testRenameDirectory() throws Throwable {
     describe("test renaming a directory with restart injection");
     FileSystem fs = getFileSystem();

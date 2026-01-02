@@ -75,7 +75,7 @@ public class TestBlockTokenWrappingQOP_RestartInjected extends SaslDataTransferT
     });
   }
 
-  public TestBlockTokenWrappingQOP(String configKey, String qopValue) {
+  public TestBlockTokenWrappingQOP_RestartInjected(String configKey, String qopValue) {
     this.configKey = configKey;
     this.qopValue = qopValue;
   }

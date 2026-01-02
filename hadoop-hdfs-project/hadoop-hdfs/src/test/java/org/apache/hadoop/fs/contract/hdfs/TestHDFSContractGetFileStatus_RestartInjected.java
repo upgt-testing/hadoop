@@ -25,6 +25,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.contract.AbstractContractGetFileStatusTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.apache.hadoop.fs.contract.ContractTestUtils;
+import static org.apache.hadoop.fs.contract.ContractTestUtils.dataset;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,7 +53,6 @@ public class TestHDFSContractGetFileStatus_RestartInjected extends
   }
 
   @Test
-  @Override
   public void testGetFileStatusFile() throws Throwable {
     describe("test getFileStatus on a file with restart injection");
     FileSystem fs = getFileSystem();
@@ -78,7 +78,7 @@ public class TestHDFSContractGetFileStatus_RestartInjected extends
         .execute();
 
     FileStatus status = fs.getFileStatus(path);
-    assertIsFile(path, status);
+    assertIsFile(path);
 
     RestartFramework.at("after_get_file_status")
         .on(HDFSContract.getCluster())
@@ -89,7 +89,6 @@ public class TestHDFSContractGetFileStatus_RestartInjected extends
   }
 
   @Test
-  @Override
   public void testGetFileStatusDir() throws Throwable {
     describe("test getFileStatus on a directory with restart injection");
     FileSystem fs = getFileSystem();
@@ -113,7 +112,7 @@ public class TestHDFSContractGetFileStatus_RestartInjected extends
         .execute();
 
     FileStatus status = fs.getFileStatus(dir);
-    assertIsDirectory(status);
+    assertIsDirectory(dir);
 
     RestartFramework.at("after_get_dir_status")
         .on(HDFSContract.getCluster())

@@ -89,7 +89,7 @@ public class TestFSEditLogLoader_RestartInjected {
   }
 
   private static boolean useAsyncEditLog;
-  public TestFSEditLogLoader(Boolean async) {
+  public TestFSEditLogLoader_RestartInjected(Boolean async) {
     useAsyncEditLog = async;
   }
 

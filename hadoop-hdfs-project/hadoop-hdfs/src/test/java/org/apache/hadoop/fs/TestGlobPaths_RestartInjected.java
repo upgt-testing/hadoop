@@ -35,8 +35,8 @@ import org.apache.hadoop.hdfs.server.namenode.INodeId;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.*;
-import org.apache.hadoop.hdfs.restart.RestartFramework;
-import org.apache.hadoop.hdfs.restart.RestartMode;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
 public class TestGlobPaths_RestartInjected {
 

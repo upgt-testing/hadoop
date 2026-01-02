@@ -127,7 +127,7 @@ public class TestEditLog_RestartInjected {
   }
 
   private static boolean useAsyncEditLog;
-  public TestEditLog(Boolean async) {
+  public TestEditLog_RestartInjected(Boolean async) {
     useAsyncEditLog = async;
   }
 

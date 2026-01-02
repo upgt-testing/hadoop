@@ -32,8 +32,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.apache.hadoop.hdfs.restart.RestartFramework;
-import org.apache.hadoop.hdfs.restart.RestartMode;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
 public class TestFcHdfsCreateMkdir_RestartInjected extends
                     FileContextCreateMkdirBaseTest {
@@ -60,7 +60,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
       
   @AfterClass
-  public static void ClusterShutdownAtEnd() throws Exception {
+  public static void ClusterShutdownAtEnd() throws IOException {
     if (cluster != null) {
       cluster.shutdown();
     }
@@ -71,7 +71,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
   public void setUp() throws Exception {
     super.setUp();
   }
-  
+
   @Override
   @After
   public void tearDown() throws Exception {
@@ -80,14 +80,14 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testMkdirRecursiveWithNonExistentAncestor() throws Exception {
+  public void testMkdirRecursiveWithNonExistingDir() throws IOException {
     RestartFramework.at("before_mkdir_recursive")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    super.testMkdirRecursiveWithNonExistentAncestor();
+    super.testMkdirRecursiveWithNonExistingDir();
     RestartFramework.at("after_mkdir_recursive")
         .on(cluster)
         .restart("namenode")
@@ -98,7 +98,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testMkdirRecursiveWithExistingDir() throws Exception {
+  public void testMkdirRecursiveWithExistingDir() throws IOException {
     RestartFramework.at("before_mkdir_existing")
         .on(cluster)
         .restart("namenode")
@@ -116,14 +116,14 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testMkdirNonRecursiveWithNonExistentAncestor() throws Exception {
+  public void testMkdirNonRecursiveWithNonExistingDir() {
     RestartFramework.at("before_mkdir_nonrecursive")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    super.testMkdirNonRecursiveWithNonExistentAncestor();
+    super.testMkdirNonRecursiveWithNonExistingDir();
     RestartFramework.at("after_mkdir_nonrecursive")
         .on(cluster)
         .restart("namenode")
@@ -134,7 +134,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testMkdirNonRecursiveWithExistingDir() throws Exception {
+  public void testMkdirNonRecursiveWithExistingDir() throws IOException {
     RestartFramework.at("before_mkdir_nonrecursive_existing")
         .on(cluster)
         .restart("namenode")
@@ -152,14 +152,14 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testCreateRecursiveWithNonExistentAncestor() throws Exception {
+  public void testCreateRecursiveWithNonExistingDir() throws IOException {
     RestartFramework.at("before_create_recursive")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    super.testCreateRecursiveWithNonExistentAncestor();
+    super.testCreateRecursiveWithNonExistingDir();
     RestartFramework.at("after_create_recursive")
         .on(cluster)
         .restart("datanode")
@@ -170,7 +170,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testCreateRecursiveWithExistingDir() throws Exception {
+  public void testCreateRecursiveWithExistingDir() throws IOException {
     RestartFramework.at("before_create_existing_dir")
         .on(cluster)
         .restart("namenode")
@@ -188,14 +188,14 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testCreateNonRecursiveWithNonExistentAncestor() throws Exception {
+  public void testCreateNonRecursiveWithNonExistingDir() {
     RestartFramework.at("before_create_nonrecursive")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    super.testCreateNonRecursiveWithNonExistentAncestor();
+    super.testCreateNonRecursiveWithNonExistingDir();
     RestartFramework.at("after_create_nonrecursive")
         .on(cluster)
         .restart("namenode")
@@ -206,7 +206,7 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testCreateNonRecursiveWithExistingDir() throws Exception {
+  public void testCreateNonRecursiveWithExistingDir() throws IOException {
     RestartFramework.at("before_create_nonrecursive_existing")
         .on(cluster)
         .restart("namenode")
@@ -224,14 +224,14 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
 
   @Test
   @Override
-  public void testMkdirNonRecursiveWithExistingFile() throws Exception {
+  public void testMkdirRecursiveWithExistingFile() throws IOException {
     RestartFramework.at("before_mkdir_existing_file")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    super.testMkdirNonRecursiveWithExistingFile();
+    super.testMkdirRecursiveWithExistingFile();
     RestartFramework.at("after_mkdir_existing_file")
         .on(cluster)
         .restart("namenode")
@@ -240,39 +240,4 @@ public class TestFcHdfsCreateMkdir_RestartInjected extends
         .execute();
   }
 
-  @Test
-  @Override
-  public void testCreateNonRecursiveWithExistingFile() throws Exception {
-    RestartFramework.at("before_create_existing_file")
-        .on(cluster)
-        .restart("namenode")
-        .withIndex(0)
-        .withMode(RestartMode.GRACEFUL)
-        .execute();
-    super.testCreateNonRecursiveWithExistingFile();
-    RestartFramework.at("after_create_existing_file")
-        .on(cluster)
-        .restart("datanode")
-        .withIndex(0)
-        .withMode(RestartMode.GRACEFUL)
-        .execute();
-  }
-
-  @Test
-  @Override
-  public void testCreateRecursiveWithExistingFile() throws Exception {
-    RestartFramework.at("before_create_recursive_existing_file")
-        .on(cluster)
-        .restart("namenode")
-        .withIndex(0)
-        .withMode(RestartMode.GRACEFUL)
-        .execute();
-    super.testCreateRecursiveWithExistingFile();
-    RestartFramework.at("after_create_recursive_existing_file")
-        .on(cluster)
-        .restart("datanode")
-        .withIndex(0)
-        .withMode(RestartMode.GRACEFUL)
-        .execute();
-  }
 }

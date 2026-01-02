@@ -46,8 +46,8 @@ import static org.apache.hadoop.io.nativeio.NativeIO.POSIX.POSIX_FADV_DONTNEED;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.apache.hadoop.hdfs.restart.RestartFramework;
-import org.apache.hadoop.hdfs.restart.RestartMode;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
 
 public class TestCachingStrategy_RestartInjected {
   private static final Logger LOG =

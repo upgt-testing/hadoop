@@ -31,6 +31,9 @@ import org.restarttest.core.RestartMode;
 
 import java.io.IOException;
 
+import static org.apache.hadoop.fs.contract.ContractTestUtils.dataset;
+import static org.apache.hadoop.fs.contract.ContractTestUtils.createFile;
+
 public class TestHDFSContractMkdir_RestartInjected extends AbstractContractMkdirTest {
 
   @BeforeClass
@@ -49,7 +52,6 @@ public class TestHDFSContractMkdir_RestartInjected extends AbstractContractMkdir
   }
 
   @Test
-  @Override
   public void testMkdirRootDir() throws Throwable {
     describe("test mkdir on root directory with restart injection");
     FileSystem fs = getFileSystem();
@@ -75,7 +77,6 @@ public class TestHDFSContractMkdir_RestartInjected extends AbstractContractMkdir
   }
 
   @Test
-  @Override
   public void testMkdirNonRecursive() throws Throwable {
     describe("test non-recursive mkdir with restart injection");
     FileSystem fs = getFileSystem();
@@ -113,7 +114,6 @@ public class TestHDFSContractMkdir_RestartInjected extends AbstractContractMkdir
   }
 
   @Test
-  @Override
   public void testMkdirOverFile() throws Throwable {
     describe("test mkdir over existing file with restart injection");
     FileSystem fs = getFileSystem();
@@ -126,8 +126,8 @@ public class TestHDFSContractMkdir_RestartInjected extends AbstractContractMkdir
         .withMode(RestartMode.GRACEFUL)
         .execute();
 
-    byte[] dataset = dataset(1024, 'a', 'z');
-    createFile(fs, path, false, dataset);
+    byte[] data = dataset(1024, 'a', 'z');
+    createFile(fs, path, false, data);
     assertPathExists("file not created", path);
 
     RestartFramework.at("after_file_creation")

@@ -25,6 +25,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.contract.AbstractContractOpenTest;
 import org.apache.hadoop.fs.contract.AbstractFSContract;
 import org.apache.hadoop.fs.contract.ContractTestUtils;
+import static org.apache.hadoop.fs.contract.ContractTestUtils.dataset;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +52,6 @@ public class TestHDFSContractOpen_RestartInjected extends AbstractContractOpenTe
   }
 
   @Test
-  @Override
   public void testOpenFile() throws Throwable {
     describe("test open file with restart injection");
     FileSystem fs = getFileSystem();
@@ -99,7 +99,6 @@ public class TestHDFSContractOpen_RestartInjected extends AbstractContractOpenTe
   }
 
   @Test
-  @Override
   public void testOpenReadClose() throws Throwable {
     describe("test open, read, and close file with restart injection");
     FileSystem fs = getFileSystem();

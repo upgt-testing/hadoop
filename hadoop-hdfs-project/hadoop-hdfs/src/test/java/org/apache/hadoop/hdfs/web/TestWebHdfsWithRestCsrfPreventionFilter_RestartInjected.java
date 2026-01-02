@@ -69,7 +69,7 @@ public class TestWebHdfsWithRestCsrfPreventionFilter_RestartInjected {
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
-  public TestWebHdfsWithRestCsrfPreventionFilter(boolean nnRestCsrf,
+  public TestWebHdfsWithRestCsrfPreventionFilter_RestartInjected(boolean nnRestCsrf,
       boolean dnRestCsrf, boolean clientRestCsrf) {
     this.nnRestCsrf = nnRestCsrf;
     this.dnRestCsrf = dnRestCsrf;
