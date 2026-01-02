@@ -20,9 +20,9 @@
 
     <parent>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-hdfs-project</artifactId>
+        <artifactId>hadoop-project-dist</artifactId>
         <version>3.3.5</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../hadoop-project-dist</relativePath>
     </parent>
 
     <artifactId>hadoop-hdfs-restart-adapter</artifactId>
@@ -39,35 +39,45 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- Hadoop HDFS (provided - from parent project) -->
+        <!-- Hadoop HDFS (system scope - using pre-built jars from lib/) -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
-            <scope>provided</scope>
+            <version>3.3.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hadoop-hdfs-3.3.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs-client</artifactId>
-            <scope>provided</scope>
+            <version>3.3.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hadoop-hdfs-client-3.3.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <scope>provided</scope>
+            <version>3.3.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hadoop-common-3.3.5.jar</systemPath>
         </dependency>
 
-        <!-- Test jars for MiniDFSCluster -->
+        <!-- Test jars for MiniDFSCluster (system scope - using pre-built jars) -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
+            <version>3.3.5</version>
             <type>test-jar</type>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hadoop-hdfs-3.3.5-tests.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
+            <version>3.3.5</version>
             <type>test-jar</type>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/hadoop-common-3.3.5-tests.jar</systemPath>
         </dependency>
 
         <!-- Logging -->
