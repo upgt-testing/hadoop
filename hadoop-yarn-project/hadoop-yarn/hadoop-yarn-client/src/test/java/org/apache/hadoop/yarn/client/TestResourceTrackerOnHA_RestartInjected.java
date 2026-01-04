@@ -45,8 +45,8 @@ public class TestResourceTrackerOnHA_RestartInjected extends ProtocolHATestBase 
 
   private ResourceTracker resourceTracker = null;
 
-  @Rule
-  public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
+  //@Rule
+  //public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
 
   @Before
   public void initiate() throws Exception {

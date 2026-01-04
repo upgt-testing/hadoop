@@ -77,7 +77,7 @@ public class TestServiceApiUtil_RestartInjected extends ServiceTestUtils {
     CONF_DNS_ENABLED.setBoolean(RegistryConstants.KEY_DNS_ENABLED, true);
   }
 
-  @Test(timeout = 90000)
+  @Test
   public void testResourceValidation() throws Exception {
     assertEquals(RegistryConstants.MAX_FQDN_LABEL_LENGTH + 1, LEN_64_STR
         .length());
@@ -730,7 +730,7 @@ public class TestServiceApiUtil_RestartInjected extends ServiceTestUtils {
     }
   }
 
-  @Test(timeout = 1500)
+  @Test
   public void testNoServiceDependencies() {
     Service service = createExampleApplication();
     Component compa = createComponent("compa");

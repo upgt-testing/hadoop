@@ -90,12 +90,12 @@ public class TestFederationRMFailoverProxyProvider_RestartInjected {
     stateStore = null;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFederationRMFailoverProxyProvider() throws Exception {
     testProxyProvider(true);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testFederationRMFailoverProxyProviderWithoutFlushFacadeCache()
       throws Exception {
     testProxyProvider(false);

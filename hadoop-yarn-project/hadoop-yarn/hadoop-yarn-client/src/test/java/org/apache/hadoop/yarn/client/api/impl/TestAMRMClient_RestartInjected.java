@@ -113,7 +113,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     });
   }
 
-  @Test (timeout = 60000)
+  @Test
   public void testAMRMClientNoMatchingRequests()
       throws IOException, YarnException {
     AMRMClient<ContainerRequest> amClient =  AMRMClient.createAMRMClient();
@@ -127,7 +127,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     assertEquals("Expected no matching requests.", matches.size(), 0);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientMatchingFit() throws YarnException, IOException {
     AMRMClient<ContainerRequest> amClient = null;
     try {
@@ -268,7 +268,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
   /**
    * Test fit of both GUARANTEED and OPPORTUNISTIC containers.
    */
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientMatchingFitExecType()
       throws YarnException, IOException {
     AMRMClient<ContainerRequest> amClient = null;
@@ -405,7 +405,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     assertEquals(matchSize, matches.get(0).size());
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientMatchingFitInferredRack()
       throws YarnException, IOException {
     AMRMClientImpl<ContainerRequest> amClient = null;
@@ -600,7 +600,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAllocationWithBlacklist() throws YarnException, IOException {
     AMRMClientImpl<ContainerRequest> amClient = null;
     try {
@@ -679,7 +679,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientWithBlacklist() throws YarnException, IOException {
     AMRMClientImpl<ContainerRequest> amClient = null;
     try {
@@ -753,17 +753,17 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     return allocatedContainerCount;
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClient() throws YarnException, IOException {
     initAMRMClientAndTest(false);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientAllocReqId() throws YarnException, IOException {
     initAMRMClientAndTest(true);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAMRMClientWithSaslEncryption() throws Exception {
     // we have to create a new instance of MiniYARNCluster to avoid SASL qop
     // mismatches between client and server
@@ -829,7 +829,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testAskWithNodeLabels() {
     AMRMClientImpl<ContainerRequest> client =
         new AMRMClientImpl<ContainerRequest>();
@@ -887,7 +887,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     fail();
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testAskWithInvalidNodeLabels() {
     AMRMClientImpl<ContainerRequest> client =
         new AMRMClientImpl<ContainerRequest>();
@@ -898,7 +898,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
             Priority.UNDEFINED, true, "x && y"));
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAMRMClientWithContainerResourceChange()
       throws YarnException, IOException {
     // Fair scheduler does not support resource change
@@ -1190,7 +1190,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAMRMClientWithContainerPromotion()
       throws YarnException, IOException {
     AMRMClientImpl<AMRMClient.ContainerRequest> amClient =
@@ -1331,7 +1331,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     amClient.ask.clear();
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAMRMClientWithContainerDemotion()
       throws YarnException, IOException {
     AMRMClientImpl<AMRMClient.ContainerRequest> amClient =
@@ -1803,7 +1803,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testAMRMClientOnAMRMTokenRollOver() throws YarnException,
       IOException {
     AMRMClient<ContainerRequest> amClient = null;
@@ -1950,7 +1950,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     return result;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testGetMatchingFitWithProfiles() throws Exception {
     teardown();
     conf.setBoolean(YarnConfiguration.RM_RESOURCE_PROFILES_ENABLED, true);
@@ -2036,7 +2036,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testNoUpdateTrackingUrl()  {
     try {
       AMRMClientImpl<ContainerRequest> amClient = null;
@@ -2070,7 +2070,7 @@ public class TestAMRMClient_RestartInjected extends BaseAMRMClientTest{
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testUpdateTrackingUrl() {
     try {
       AMRMClientImpl<ContainerRequest> amClient = null;

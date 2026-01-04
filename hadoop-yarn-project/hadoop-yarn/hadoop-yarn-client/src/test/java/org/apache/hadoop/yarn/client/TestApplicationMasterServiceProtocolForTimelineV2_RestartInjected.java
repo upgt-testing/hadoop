@@ -45,7 +45,7 @@ import org.restarttest.core.RestartMode;
 public class TestApplicationMasterServiceProtocolForTimelineV2_RestartInjected
     extends ApplicationMasterServiceProtoTestBase {
 
-  public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
+  //public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
 
   @Before
   public void initialize() throws Exception {

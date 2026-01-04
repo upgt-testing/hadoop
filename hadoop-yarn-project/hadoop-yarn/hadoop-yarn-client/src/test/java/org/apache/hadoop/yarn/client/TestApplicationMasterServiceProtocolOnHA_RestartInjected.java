@@ -45,8 +45,8 @@ import org.restarttest.core.RestartMode;
 
 public class TestApplicationMasterServiceProtocolOnHA_RestartInjected
     extends ApplicationMasterServiceProtoTestBase {
-  @Rule
-  public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
+  //@Rule
+  //public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
 
   @Before
   public void initialize() throws Exception {

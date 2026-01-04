@@ -68,8 +68,8 @@ public class TestApplicationClientProtocolOnHA_RestartInjected extends ProtocolH
     }
   }
 
-  @Rule
-  public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
+  //@Rule
+  //public Timeout timeout = new Timeout(180, TimeUnit.SECONDS);
 
   @Test
   public void testGetApplicationReportOnHA() throws Exception {

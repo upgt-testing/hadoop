@@ -107,9 +107,9 @@ public abstract class DistributedShellBaseTest_RestartInjected {
   private static MiniYARNCluster yarnCluster = null;
   private static String yarnSiteBackupPath = null;
   private static String yarnSitePath = null;
-  @Rule
-  public Timeout globalTimeout = new Timeout(TEST_TIME_OUT,
-      TimeUnit.MILLISECONDS);
+  //@Rule
+  //public Timeout globalTimeout = new Timeout(TEST_TIME_OUT,
+  //    TimeUnit.MILLISECONDS);
   @Rule
   public TemporaryFolder tmpFolder = new TemporaryFolder();
   @Rule

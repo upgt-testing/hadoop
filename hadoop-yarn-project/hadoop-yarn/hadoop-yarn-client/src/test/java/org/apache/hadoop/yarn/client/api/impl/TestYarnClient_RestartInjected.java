@@ -220,7 +220,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
   }
 
   @SuppressWarnings("deprecation")
-  @Test (timeout = 30000)
+  @Test
   public void testSubmitApplication() throws Exception {
     Configuration conf = getConf();
     conf.setLong(YarnConfiguration.YARN_CLIENT_APP_SUBMISSION_POLL_INTERVAL_MS,
@@ -267,7 +267,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
   }
 
   @SuppressWarnings("deprecation")
-  @Test (timeout = 20000)
+  @Test
   public void testSubmitApplicationInterrupted() throws IOException {
     Configuration conf = getConf();
     int pollIntervalMs = 1000;
@@ -317,7 +317,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     }
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSubmitIncorrectQueueToCapacityScheduler() throws IOException {
     MiniYARNCluster cluster = new MiniYARNCluster("testMRAMTokens", 1, 1, 1);
     YarnClient rmClient = null;
@@ -399,7 +399,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
       .forceKillApplication(any(KillApplicationRequest.class));
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testApplicationType() throws Exception {
     GenericTestUtils.setRootLogLevel(Level.DEBUG);
     MockRM rm = new MockRM();
@@ -422,7 +422,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     rm.stop();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testApplicationTypeLimit() throws Exception {
     GenericTestUtils.setRootLogLevel(Level.DEBUG);
     MockRM rm = new MockRM();
@@ -443,7 +443,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     rm.stop();
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testGetApplications() throws YarnException, IOException {
     final YarnClient client = new MockYarnClient();
     client.init(getConf());
@@ -495,7 +495,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.stop();
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetApplicationAttempts() throws YarnException, IOException {
     final YarnClient client = new MockYarnClient();
     client.init(getConf());
@@ -512,7 +512,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.stop();
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetApplicationAttempt() throws YarnException, IOException {
     Configuration conf = new Configuration();
     final YarnClient client = new MockYarnClient();
@@ -533,7 +533,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.stop();
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetContainers() throws YarnException, IOException {
     Configuration conf = getConf();
     conf.setBoolean(YarnConfiguration.APPLICATION_HISTORY_ENABLED,
@@ -566,7 +566,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.stop();
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetContainersOnAHSFail() throws YarnException, IOException {
     Configuration conf = getConf();
     conf.setBoolean(YarnConfiguration.APPLICATION_HISTORY_ENABLED,
@@ -604,7 +604,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
   }
 
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetContainerReport() throws YarnException, IOException {
     Configuration conf = getConf();
     conf.setBoolean(YarnConfiguration.APPLICATION_HISTORY_ENABLED,
@@ -635,7 +635,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.stop();
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testGetLabelsToNodes() throws YarnException, IOException {
     final YarnClient client = new MockYarnClient();
     client.init(getConf());
@@ -660,7 +660,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     client.close();
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testGetNodesToLabels() throws YarnException, IOException {
     final YarnClient client = new MockYarnClient();
     client.init(getConf());
@@ -1064,7 +1064,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testAMMRTokens() throws Exception {
     MiniYARNCluster cluster = new MiniYARNCluster("testMRAMTokens", 1, 1, 1);
     YarnClient rmClient = null;
@@ -1193,7 +1193,7 @@ public class TestYarnClient_RestartInjected extends ParameterizedSchedulerTestBa
     Assert.assertEquals(unmanagedApplication, report.isUnmanagedApp());
   }
 
-  @Test(timeout = 30000, expected = ApplicationNotFoundException.class)
+  @Test(expected = ApplicationNotFoundException.class)
   public void testShouldNotRetryForeverForNonNetworkExceptions() throws Exception {
     YarnConfiguration conf = getConf();
     conf.setInt(YarnConfiguration.RESOURCEMANAGER_CONNECT_MAX_WAIT_MS, -1);

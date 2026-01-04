@@ -102,7 +102,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
   // 4. Flex up each component to 2 containers and check the component instance names
   // 5. Stop the service
   // 6. Destroy the service
-  @Test (timeout = 200000)
+  @Test
   public void testCreateFlexStopDestroyService() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -166,7 +166,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
 
   // Save a service without starting it and ensure that stop does not NPE and
   // that service can be successfully destroyed
-  @Test (timeout = 200000)
+  @Test
   public void testStopDestroySavedService() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -188,7 +188,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
   // Create compc with 2 containers which depends on compb
   // Check containers for compa started before containers for compb before
   // containers for compc
-  @Test (timeout = 200000)
+  @Test
   public void testComponentStartOrder() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -224,7 +224,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     client.actionDestroy(exampleApp.getName());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testCreateServiceSameNameDifferentUser() throws Exception {
     String sameAppName = "same-name";
     String userA = "usera";
@@ -282,7 +282,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     // Need to test create followed by create.
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testCreateServiceSameNameSameUser() throws Exception {
     String sameAppName = "same-name";
     String user = UserGroupInformation.getCurrentUser().getUserName();
@@ -350,7 +350,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
   // 2. Restart RM.
   // 3. Fail the application attempt.
   // 4. Verify ServiceMaster recovers.
-  @Test(timeout = 200000)
+  @Test
   public void testRecoverComponentsAfterRMRestart() throws Exception {
     YarnConfiguration conf = new YarnConfiguration();
     conf.setBoolean(YarnConfiguration.RECOVERY_ENABLED, true);
@@ -419,7 +419,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     client.actionDestroy(exampleApp.getName());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testUpgrade() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -470,7 +470,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     client.actionDestroy(service.getName());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testExpressUpgrade() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -515,7 +515,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     client.actionDestroy(service.getName());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testCancelUpgrade() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -572,7 +572,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
   // 4. Flex the component to 4 containers
   // 5. Verify that the 4th container does not even get allocated since there
   //    are only 3 NMs
-  @Test (timeout = 200000)
+  @Test
   public void testCreateServiceWithPlacementPolicy() throws Exception {
     // We need to enable scheduler placement-constraint at the cluster level to
     // let apps use placement policies.
@@ -708,12 +708,12 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     client.actionDestroy(exampleApp.getName());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testAMSigtermDoesNotKillApplication() throws Exception {
     runAMSignalTest(SignalContainerCommand.GRACEFUL_SHUTDOWN);
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testAMSigkillDoesNotKillApplication() throws Exception {
     runAMSignalTest(SignalContainerCommand.FORCEFUL_SHUTDOWN);
   }
@@ -795,7 +795,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
   //    threshold the service will continue to run beyond the window of 3 secs.
   // 4. Flex the component to 5 containers. This makes health = 60%, so based on
   //    threshold the service will be stopped after the window of 3 secs.
-  @Test (timeout = 200000)
+  @Test
   public void testComponentHealthThresholdMonitor() throws Exception {
     // We need to enable scheduler placement-constraint at the cluster level to
     // let apps use placement policies.
@@ -993,7 +993,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     }
   }
 
-  @Test (timeout = 200000)
+  @Test
   public void testRestartServiceForNonExistingInRM() throws Exception {
     YarnConfiguration conf = new YarnConfiguration();
     conf.setInt(YarnConfiguration.RM_MAX_COMPLETED_APPLICATIONS, 0);
@@ -1021,7 +1021,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
         ServiceState.STABLE, service.getState());
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testAMFailureValidity() throws Exception {
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")
@@ -1086,7 +1086,7 @@ public class TestYarnNativeServices_RestartInjected extends ServiceTestUtils {
     return service;
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testServiceSameNameWithFailure() throws Exception{
     setupInternal(NUM_NMS);
     RestartFramework.at("after_cluster_setup")

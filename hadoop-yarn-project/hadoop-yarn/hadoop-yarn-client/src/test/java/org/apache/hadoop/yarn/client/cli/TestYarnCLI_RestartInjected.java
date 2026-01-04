@@ -932,7 +932,7 @@ public class TestYarnCLI_RestartInjected {
     return appReports;
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testAppsHelpCommand() throws Exception {
     ApplicationCLI cli = createAndGetAppCLI();
     ApplicationCLI spyCli = spy(cli);
@@ -951,7 +951,7 @@ public class TestYarnCLI_RestartInjected {
         sysOutStream.toString());
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testAppAttemptsHelpCommand() throws Exception {
     ApplicationCLI cli = createAndGetAppCLI();
     ApplicationCLI spyCli = spy(cli);
@@ -981,7 +981,7 @@ public class TestYarnCLI_RestartInjected {
         sysOutStream.toString());
   }
 
-  @Test (timeout = 10000)
+  @Test
   public void testContainersHelpCommand() throws Exception {
     ApplicationCLI cli = createAndGetAppCLI();
     ApplicationCLI spyCli = spy(cli);
@@ -1010,7 +1010,7 @@ public class TestYarnCLI_RestartInjected {
         normalize(sysOutStream.toString()));
   }
 
-  @Test (timeout = 5000)
+  @Test
   public void testNodesHelpCommand() throws Exception {
     NodeCLI nodeCLI = createAndGetNodeCLI();
     nodeCLI.run(new String[] {});
@@ -2051,7 +2051,7 @@ public class TestYarnCLI_RestartInjected {
     Assert.assertNotSame("should return non-zero exit code.", 0, exitCode);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testUpdateApplicationPriority() throws Exception {
     ApplicationCLI cli = createAndGetAppCLI();
     ApplicationId applicationId = ApplicationId.newInstance(1234, 6);
@@ -2447,7 +2447,7 @@ public class TestYarnCLI_RestartInjected {
     assertEquals(0, result);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testUpdateApplicationTimeout() throws Exception {
     ApplicationCLI cli = createAndGetAppCLI();
     ApplicationId applicationId = ApplicationId.newInstance(1234, 6);

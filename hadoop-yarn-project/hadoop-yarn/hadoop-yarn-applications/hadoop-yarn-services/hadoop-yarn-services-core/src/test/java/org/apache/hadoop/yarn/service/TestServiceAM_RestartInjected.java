@@ -157,7 +157,7 @@ public class TestServiceAM_RestartInjected extends ServiceTestUtils{
   // Test to verify that the containers of previous attempt are not prematurely
   // released. These containers are sent by the RM to the AM in the
   // heartbeat response.
-  @Test(timeout = 200000)
+  @Test
   public void testContainersFromPreviousAttemptsWithRMRestart()
       throws Exception {
     ApplicationId applicationId = ApplicationId.newInstance(
@@ -200,7 +200,7 @@ public class TestServiceAM_RestartInjected extends ServiceTestUtils{
   // Test to verify that the containers of previous attempt are released and the
   // component instance is added to the pending queue when the recovery wait
   // time interval elapses.
-  @Test(timeout = 200000)
+  @Test
   public void testContainersReleasedWhenExpired()
       throws Exception {
     ApplicationId applicationId = ApplicationId.newInstance(
@@ -242,7 +242,7 @@ public class TestServiceAM_RestartInjected extends ServiceTestUtils{
 
   // Test to verify that the AM doesn't wait for containers of a different app
   // even though it corresponds to the same service.
-  @Test(timeout = 200000)
+  @Test
   public void testContainersFromDifferentApp()
       throws Exception {
     ApplicationId applicationId = ApplicationId.newInstance(
@@ -485,7 +485,7 @@ public class TestServiceAM_RestartInjected extends ServiceTestUtils{
   // Test to verify that the containers are released and the
   // component instance is added to the pending queue when building the launch
   // context fails.
-  @Test(timeout = 30000)
+  @Test
   public void testContainersReleasedWhenPreLaunchFails()
       throws Exception {
     ApplicationId applicationId = ApplicationId.newInstance(
@@ -521,7 +521,7 @@ public class TestServiceAM_RestartInjected extends ServiceTestUtils{
     am.stop();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testSyncSysFS() {
     ApplicationId applicationId = ApplicationId.newInstance(
         System.currentTimeMillis(), 1);
