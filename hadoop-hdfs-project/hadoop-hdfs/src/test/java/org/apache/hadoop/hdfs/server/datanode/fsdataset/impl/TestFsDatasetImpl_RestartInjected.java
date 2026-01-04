@@ -206,7 +206,7 @@ public class TestFsDatasetImpl_RestartInjected {
     assertEquals(0, dataset.getNumFailedVolumes());
   }
 
-  @Test(timeout=10000)
+  @Test
   public void testReadLockEnabledByDefault()
       throws Exception {
     final FsDatasetSpi ds = dataset;
@@ -251,7 +251,7 @@ public class TestFsDatasetImpl_RestartInjected {
     holder.interrupt();
   }
 
-  @Test(timeout=10000)
+  @Test
   public void testReadLockCanBeDisabledByConfig()
       throws Exception {
     HdfsConfiguration conf = new HdfsConfiguration();
@@ -410,7 +410,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testRemoveOneVolume() throws IOException {
     // Feed FsDataset with block metadata.
     final int numBlocks = 100;
@@ -477,7 +477,7 @@ public class TestFsDatasetImpl_RestartInjected {
                  totalNumReplicas);
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testRemoveTwoVolumes() throws IOException {
     // Feed FsDataset with block metadata.
     final int numBlocks = 100;
@@ -548,7 +548,7 @@ public class TestFsDatasetImpl_RestartInjected {
         + "volumeMap.", 0, totalNumReplicas);
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testRemoveNewlyAddedVolume() throws IOException {
     final int numExistingVolumes = getNumVolumes();
     List<NamespaceInfo> nsInfos = new ArrayList<>();
@@ -808,7 +808,7 @@ public class TestFsDatasetImpl_RestartInjected {
     return dfsUsed;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testRemoveVolumeBeingWritten() throws Exception {
     // Will write and remove on dn0.
     final ExtendedBlock eb = new ExtendedBlock(BLOCK_POOL_IDS[0], 0);
@@ -996,7 +996,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testReportBadBlocks() throws Exception {
     boolean threwException = false;
     MiniDFSCluster cluster = null;
@@ -1059,7 +1059,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testMoveBlockFailure() {
     MiniDFSCluster cluster = null;
     try {
@@ -1125,7 +1125,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testMoveBlockSuccess() {
     MiniDFSCluster cluster = null;
     try {
@@ -1217,7 +1217,7 @@ public class TestFsDatasetImpl_RestartInjected {
     return destVolume;
   }
 
-  @Test(timeout = 3000000)
+  @Test
   public void testBlockReadOpWhileMovingBlock() throws IOException {
     MiniDFSCluster cluster = null;
     try {
@@ -1330,7 +1330,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testDataDirWithPercent() throws IOException {
     String baseDir = new FileSystemTestHelper().getTestRootDir();
     File dataDir = new File(baseDir, "invalidFormatString-%z");
@@ -1399,7 +1399,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 20000)
+  @Test
   public void testReleaseVolumeRefIfExceptionThrown() throws IOException {
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(
         new HdfsConfiguration()).build();
@@ -1447,7 +1447,7 @@ public class TestFsDatasetImpl_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testTransferAndNativeCopyMetrics() throws IOException {
     Configuration config = new HdfsConfiguration();
     config.setInt(

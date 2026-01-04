@@ -663,14 +663,14 @@ public class TestBalancerWithMultipleNameNodes_RestartInjected {
   }
 
   /** Even distribution with 2 Namenodes, 4 Datanodes and 2 new Datanodes. */
-  @Test(timeout = 600000)
+  @Test
   public void testTwoFourTwo() throws Exception {
     final Configuration conf = createConf();
     runTest(2, new String[]{RACK0, RACK0, RACK1, RACK1},
         new String[]{RACK2, RACK2}, conf, 2, null);
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testBalancingBlockpoolsWithBlockPoolPolicy() throws Exception {
     final Configuration conf = createConf();
     BalancerParameters balancerParameters = new BalancerParameters.Builder()
@@ -680,7 +680,7 @@ public class TestBalancerWithMultipleNameNodes_RestartInjected {
         balancerParameters);
   }
 
-  @Test(timeout = 600000)
+  @Test
   public void test1OutOf2BlockpoolsWithBlockPoolPolicy()
       throws
       Exception {

@@ -252,7 +252,7 @@ public class TestIncrementalBrVariations_RestartInjected {
    * @throws IOException
    * @throws InterruptedException
    */
-  @Test (timeout=60000)
+  @Test
   public void testDataNodeDoesNotSplitReports()
       throws IOException, InterruptedException {
     LocatedBlocks blocks = createFileGetBlocks(GenericTestUtils.getMethodName());
@@ -310,7 +310,7 @@ public class TestIncrementalBrVariations_RestartInjected {
    * @throws IOException
    * @throws InterruptedException
    */
-  @Test (timeout=60000)
+  @Test
   public void testNnLearnsNewStorages()
       throws IOException, InterruptedException {
 

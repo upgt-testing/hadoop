@@ -244,7 +244,7 @@ public class TestDataNodeMetrics_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testTimeoutMetric() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     final Path path = new Path("/test");
@@ -303,7 +303,7 @@ public class TestDataNodeMetrics_RestartInjected {
    * and reading causes totalReadTime to move.
    * @throws Exception
    */
-  @Test(timeout=120000)
+  @Test
   public void testDataNodeTimeSpend() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();

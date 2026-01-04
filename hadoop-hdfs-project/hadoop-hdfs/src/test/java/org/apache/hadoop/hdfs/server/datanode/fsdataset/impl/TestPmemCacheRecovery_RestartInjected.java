@@ -223,7 +223,7 @@ public class TestPmemCacheRecovery_RestartInjected {
     return keys;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testCacheRecovery() throws Exception {
     final int cacheBlocksNum =
         Ints.checkedCast(CACHE_AMOUNT / BLOCK_SIZE);

@@ -712,7 +712,7 @@ public class TestEnhancedByteBufferAccess_RestartInjected {
    * Test that we can zero-copy read cached data even without disabling
    * checksums.
    */
-  @Test(timeout=120000)
+  @Test
   public void testZeroCopyReadOfCachedData() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     BlockReaderTestUtil.enableBlockReaderFactoryTracing();

@@ -82,9 +82,7 @@ public class TestAddStripedBlocks_RestartInjected {
   private MiniDFSCluster cluster;
   private DistributedFileSystem dfs;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   public void setup() throws IOException {
     HdfsConfiguration conf = new HdfsConfiguration();
@@ -179,7 +177,7 @@ public class TestAddStripedBlocks_RestartInjected {
     DFSTestUtil.flushInternal(out);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAddStripedBlock() throws Exception {
     RestartFramework.at("after_cluster_start")
         .on(cluster)

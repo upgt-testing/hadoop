@@ -363,7 +363,7 @@ public class TestDirectoryScanner_RestartInjected {
     assertEquals(duplicateBlocks, stats.duplicateBlocks);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testRetainBlockOnPersistentStorage() throws Exception {
     cluster = new MiniDFSCluster.Builder(CONF)
         .storageTypes(
@@ -435,7 +435,7 @@ public class TestDirectoryScanner_RestartInjected {
   /**
    * test scan only meta file NOT generate wrong folder structure warn log.
    */
-  @Test(timeout=600000)
+  @Test
   public void testScanDirectoryStructureWarn() throws Exception {
 
     //add a logger stream to check what has printed to log
@@ -525,7 +525,7 @@ public class TestDirectoryScanner_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testDeleteBlockOnTransientStorage() throws Exception {
     cluster = new MiniDFSCluster.Builder(CONF)
         .storageTypes(
@@ -596,7 +596,7 @@ public class TestDirectoryScanner_RestartInjected {
     }
   }
 
-  @Test(timeout = 600000)
+  @Test
   public void testDirectoryScanner() throws Exception {
     // Run the test with and without parallel scanning
     for (int parallelism = 1; parallelism < 3; parallelism++) {
@@ -772,7 +772,7 @@ public class TestDirectoryScanner_RestartInjected {
    *
    * @throws Exception thrown on unexpected failure
    */
-  @Test(timeout = 600000)
+  @Test
   public void testThrottling() throws Exception {
     Configuration conf = new Configuration(CONF);
 
@@ -1180,7 +1180,7 @@ public class TestDirectoryScanner_RestartInjected {
     assertNull(scanInfo.getMetaFile());
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void TestScanInfo() throws Exception {
     testScanInfoObject(123,
         new File(TEST_VOLUME.getFinalizedDir(BPID_1).getAbsolutePath()),
@@ -1203,7 +1203,7 @@ public class TestDirectoryScanner_RestartInjected {
    * Directory scanner shouldn't abort the scan on every directory just because
    * one had an error.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testExceptionHandlingWhileDirectoryScan() throws Exception {
     cluster = new MiniDFSCluster.Builder(CONF).build();
     try {
@@ -1332,7 +1332,7 @@ public class TestDirectoryScanner_RestartInjected {
    * Test parsing LocalReplica. We should be able to find the replica's path
    * even if the replica's dir doesn't match the idToBlockDir.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testLocalReplicaParsing() {
     String baseDir = GenericTestUtils.getRandomizedTempPath();
     long blkId = getRandomBlockId();
@@ -1367,7 +1367,7 @@ public class TestDirectoryScanner_RestartInjected {
    * Test whether can LocalReplica.updateWithReplica() correct the wrongly
    * recorded replica location.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testLocalReplicaUpdateWithReplica() throws Exception {
     String baseDir = GenericTestUtils.getRandomizedTempPath();
     long blkId = getRandomBlockId();

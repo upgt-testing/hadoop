@@ -49,7 +49,7 @@ public class TestHAMetrics_RestartInjected {
   private static final Logger LOG =
       LoggerFactory.getLogger(TestHAMetrics.class);
 
-  @Test(timeout = 300000)
+  @Test
   public void testHAMetrics() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);

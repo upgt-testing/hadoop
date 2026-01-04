@@ -293,17 +293,17 @@ public class TestBlockScanner_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testVolumeIteratorWithoutCaching() throws Exception {
     testVolumeIteratorImpl(5, 0);
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testVolumeIteratorWithCaching() throws Exception {
     testVolumeIteratorImpl(600, 100);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testDisableVolumeScanner() throws Exception {
     Configuration conf = new Configuration();
     disableBlockScanner(conf);
@@ -312,7 +312,7 @@ public class TestBlockScanner_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testDisableVolumeScanner2() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFS_BLOCK_SCANNER_VOLUME_BYTES_PER_SECOND, -1L);
@@ -492,7 +492,7 @@ public class TestBlockScanner_RestartInjected {
    * Test scanning all blocks.  Set the scan period high enough that
    * we shouldn't rescan any block during this test.
    */
-  @Test(timeout=60000)
+  @Test
   public void testScanAllBlocksNoRescan() throws Exception {
     testScanAllBlocksImpl(false);
   }
@@ -501,7 +501,7 @@ public class TestBlockScanner_RestartInjected {
    * Test scanning all blocks.  Set the scan period high enough that
    * we should rescan all blocks at least twice during this test.
    */
-  @Test(timeout=60000)
+  @Test
   public void testScanAllBlocksWithRescan() throws Exception {
     testScanAllBlocksImpl(true);
   }
@@ -509,7 +509,7 @@ public class TestBlockScanner_RestartInjected {
   /**
    * Test that we don't scan too many blocks per second.
    */
-  @Test(timeout=120000)
+  @Test
   public void testScanRateLimit() throws Exception {
     Configuration conf = new Configuration();
     // Limit scan bytes per second dramatically
@@ -550,7 +550,7 @@ public class TestBlockScanner_RestartInjected {
     ctx.close();
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testCorruptBlockHandling() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, 100L);
@@ -623,7 +623,7 @@ public class TestBlockScanner_RestartInjected {
    * Test that we save the scan cursor when shutting down the datanode, and
    * restart scanning from there when the datanode is restarted.
    */
-  @Test(timeout=120000)
+  @Test
   public void testDatanodeCursor() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, 100L);
@@ -746,7 +746,7 @@ public class TestBlockScanner_RestartInjected {
     ctx.close();
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testMultipleBlockPoolScanning() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFS_DATANODE_SCAN_PERIOD_HOURS_KEY, 100L);
@@ -796,7 +796,7 @@ public class TestBlockScanner_RestartInjected {
     ctx.close();
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testNextSorted() throws Exception {
     List<String> arr = new LinkedList<String>();
     arr.add("1");
@@ -810,7 +810,7 @@ public class TestBlockScanner_RestartInjected {
     Assert.assertEquals(null, FsVolumeImpl.nextSorted(arr, "9"));
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testCalculateNeededBytesPerSec() throws Exception {
     // If we didn't check anything the last hour, we should scan now.
     Assert.assertTrue(
@@ -839,7 +839,7 @@ public class TestBlockScanner_RestartInjected {
    * Test that we can mark certain blocks as suspect, and get them quickly
    * rescanned that way.  See HDFS-7686 and HDFS-7548.
    */
-  @Test(timeout=120000)
+  @Test
   public void testMarkSuspectBlock() throws Exception {
     Configuration conf = new Configuration();
     // Set a really long scan period.
@@ -955,7 +955,7 @@ public class TestBlockScanner_RestartInjected {
   /**
    * Test that blocks which are in the wrong location are ignored.
    */
-  @Test(timeout=120000)
+  @Test
   public void testIgnoreMisplacedBlock() throws Exception {
     Configuration conf = new Configuration();
     // Set a really long scan period.
@@ -1013,7 +1013,7 @@ public class TestBlockScanner_RestartInjected {
    * Test concurrent append and scan.
    * @throws Exception
    */
-  @Test(timeout=120000)
+  @Test
   public void testAppendWhileScanning() throws Exception {
     GenericTestUtils.setLogLevel(DataNode.LOG, Level.ALL);
     Configuration conf = new Configuration();
@@ -1188,7 +1188,7 @@ public class TestBlockScanner_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout=120000)
+  @Test
   public void testFastDatanodeShutdown() throws Exception {
     // set the joinTimeOut to a value smaller than the completion time of the
     // VolumeScanner.
@@ -1200,7 +1200,7 @@ public class TestBlockScanner_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout=120000)
+  @Test
   public void testSlowDatanodeShutdown() throws Exception {
     // Set the joinTimeOut to a value larger than the completion time of the
     // volume scanner

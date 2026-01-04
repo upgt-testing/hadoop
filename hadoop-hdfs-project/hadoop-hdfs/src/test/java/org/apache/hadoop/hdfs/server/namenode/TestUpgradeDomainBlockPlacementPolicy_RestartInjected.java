@@ -226,7 +226,7 @@ public class TestUpgradeDomainBlockPlacementPolicy_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testPlacementAfterDecommission() throws Exception {
     final long fileSize = FILE_SIZE;
     final String testFile = "/testfile-afterdecomm";

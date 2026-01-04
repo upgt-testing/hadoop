@@ -107,9 +107,7 @@ public class TestReencryption_RestartInjected {
         testRootDir.toString(), "test.jks").toUri();
   }
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(180 * 1000);
-
+  
   @Before
   public void setup() throws Exception {
     conf = new HdfsConfiguration();

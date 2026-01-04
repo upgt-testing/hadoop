@@ -261,20 +261,20 @@ public class TestNameNodeRecovery_RestartInjected {
   }
   
   /** Test an empty edit log */
-  @Test(timeout=180000)
+  @Test
   public void testEmptyLog() throws IOException {
     runEditLogTest(new EltsTestEmptyLog(0));
   }
 
   /** Test an empty edit log with padding */
-  @Test(timeout=180000)
+  @Test
   public void testEmptyPaddedLog() throws IOException {
     runEditLogTest(new EltsTestEmptyLog(
         EditLogFileOutputStream.MIN_PREALLOCATION_LENGTH));
   }
   
   /** Test an empty edit log with extra-long padding */
-  @Test(timeout=180000)
+  @Test
   public void testEmptyExtraPaddedLog() throws IOException {
     runEditLogTest(new EltsTestEmptyLog(
         3 * EditLogFileOutputStream.MIN_PREALLOCATION_LENGTH));
@@ -311,7 +311,7 @@ public class TestNameNodeRecovery_RestartInjected {
   }
 
   /** Test an empty edit log with extra-long padding */
-  @Test(timeout=180000)
+  @Test
   public void testNonDefaultMaxOpSize() throws IOException {
     runEditLogTest(new EltsTestNonDefaultMaxOpSize());
   }
@@ -348,13 +348,13 @@ public class TestNameNodeRecovery_RestartInjected {
     } 
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testOpcodesAfterPadding() throws IOException {
     runEditLogTest(new EltsTestOpcodesAfterPadding(
         EditLogFileOutputStream.MIN_PREALLOCATION_LENGTH));
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testOpcodesAfterExtraPadding() throws IOException {
     runEditLogTest(new EltsTestOpcodesAfterPadding(
         3 * EditLogFileOutputStream.MIN_PREALLOCATION_LENGTH));
@@ -396,7 +396,7 @@ public class TestNameNodeRecovery_RestartInjected {
   
   /** Test that we can successfully recover from a situation where there is
    * garbage in the middle of the edit log file output stream. */
-  @Test(timeout=180000)
+  @Test
   public void testSkipEdit() throws IOException {
     runEditLogTest(new EltsTestGarbageInEditLog());
   }
@@ -675,7 +675,7 @@ public class TestNameNodeRecovery_RestartInjected {
 
   /** Test that we can successfully recover from a situation where the last
    * entry in the edit log has been truncated. */
-  @Test(timeout=180000)
+  @Test
   public void testRecoverTruncatedEditLog() throws IOException {
     testNameNodeRecoveryImpl(new TruncatingCorruptor(), true);
     testNameNodeRecoveryImpl(new TruncatingCorruptor(), false);
@@ -683,7 +683,7 @@ public class TestNameNodeRecovery_RestartInjected {
 
   /** Test that we can successfully recover from a situation where the last
    * entry in the edit log has been padded with garbage. */
-  @Test(timeout=180000)
+  @Test
   public void testRecoverPaddedEditLog() throws IOException {
     testNameNodeRecoveryImpl(new PaddingCorruptor(), true);
     testNameNodeRecoveryImpl(new PaddingCorruptor(), false);
@@ -691,7 +691,7 @@ public class TestNameNodeRecovery_RestartInjected {
 
   /** Test that don't need to recover from a situation where the last
    * entry in the edit log has been padded with 0. */
-  @Test(timeout=180000)
+  @Test
   public void testRecoverZeroPaddedEditLog() throws IOException {
     testNameNodeRecoveryImpl(new SafePaddingCorruptor((byte)0), true);
     testNameNodeRecoveryImpl(new SafePaddingCorruptor((byte)0), false);
@@ -699,7 +699,7 @@ public class TestNameNodeRecovery_RestartInjected {
 
   /** Test that don't need to recover from a situation where the last
    * entry in the edit log has been padded with 0xff bytes. */
-  @Test(timeout=180000)
+  @Test
   public void testRecoverNegativeOnePaddedEditLog() throws IOException {
     testNameNodeRecoveryImpl(new SafePaddingCorruptor((byte)-1), true);
     testNameNodeRecoveryImpl(new SafePaddingCorruptor((byte)-1), false);

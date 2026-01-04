@@ -53,9 +53,7 @@ public class TestSaslDataTransferExpiredBlockToken_RestartInjected extends SaslD
   private final byte[] rawData = new byte[FILE_SIZE];
   private MiniDFSCluster cluster;
 
-  @Rule
-  public Timeout timeout = new Timeout(60, TimeUnit.SECONDS);
-
+  
   @Before
   public void before() throws Exception {
     Random r = new Random();

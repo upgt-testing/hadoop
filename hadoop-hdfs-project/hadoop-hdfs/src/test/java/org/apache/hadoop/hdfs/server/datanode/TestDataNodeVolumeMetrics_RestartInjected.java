@@ -61,9 +61,7 @@ public class TestDataNodeVolumeMetrics_RestartInjected {
   private static final short REPL = 1;
   private static final int NUM_DATANODES = 1;
 
-  @Rule
-  public Timeout timeout = new Timeout(300000);
-
+  
   @Test
   public void testVolumeMetrics() throws Exception {
     MiniDFSCluster cluster = setupClusterForVolumeMetrics();

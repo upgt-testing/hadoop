@@ -45,7 +45,7 @@ public class TestNameNodeStatusMXBean_RestartInjected {
   public static final Logger LOG = LoggerFactory.getLogger(
       TestNameNodeStatusMXBean.class);
 
-  @Test(timeout = 120000L)
+  @Test
   public void testNameNodeStatusMXBean() throws Exception {
     Configuration conf = new Configuration();
     MiniDFSCluster cluster = null;

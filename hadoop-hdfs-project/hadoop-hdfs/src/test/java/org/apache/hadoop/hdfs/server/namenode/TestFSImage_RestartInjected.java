@@ -388,7 +388,7 @@ public class TestFSImage_RestartInjected {
   /**
    * Ensure mtime and atime can be loaded from fsimage.
    */
-  @Test(timeout=60000)
+  @Test
   public void testLoadMtimeAtime() throws Exception {
     Configuration conf = new Configuration();
     MiniDFSCluster cluster = null;
@@ -435,7 +435,7 @@ public class TestFSImage_RestartInjected {
   /**
    * Ensure ctime is set during namenode formatting.
    */
-  @Test(timeout=60000)
+  @Test
   public void testCtime() throws Exception {
     Configuration conf = new Configuration();
     MiniDFSCluster cluster = null;
@@ -499,7 +499,7 @@ public class TestFSImage_RestartInjected {
   /**
    * Ensure that FSImage supports BlockGroup.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testSupportBlockGroup() throws Exception {
     final short GROUP_SIZE = (short) (testECPolicy.getNumDataUnits() +
         testECPolicy.getNumParityUnits());

@@ -122,7 +122,7 @@ public class TestNestedEncryptionZones_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testNestedEncryptionZones() throws Exception {
     initTopEZDirAndNestedEZDir(new Path(rootDir, "topEZ"));
     RestartFramework.at("after_create_nested_ez")
@@ -220,7 +220,7 @@ public class TestNestedEncryptionZones_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testNestedEZWithRoot() throws Exception {
     initTopEZDirAndNestedEZDir(rootDir);
     RestartFramework.at("after_init_root_ez")

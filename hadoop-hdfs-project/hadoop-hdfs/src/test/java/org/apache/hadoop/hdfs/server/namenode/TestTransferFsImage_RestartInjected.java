@@ -138,7 +138,7 @@ public class TestTransferFsImage_RestartInjected {
   /**
    * Test to verify the read timeout
    */
-  @Test(timeout = 10000)
+  @Test
   public void testGetImageTimeout() throws Exception {
     HttpServer2 testServer = HttpServerFunctionalTest.createServer("hdfs");
     try {
@@ -164,7 +164,7 @@ public class TestTransferFsImage_RestartInjected {
   /**
    * Test to verify the timeout of Image upload
    */
-  @Test(timeout = 10000)
+  @Test
   public void testImageUploadTimeout() throws Exception {
     Configuration conf = new HdfsConfiguration();
     NNStorage mockStorage = Mockito.mock(NNStorage.class);

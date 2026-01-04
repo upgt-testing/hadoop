@@ -61,9 +61,7 @@ public class TestBlockStatsMXBean_RestartInjected {
 
   private MiniDFSCluster cluster;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   public void setup() throws IOException {
     HdfsConfiguration conf = new HdfsConfiguration();

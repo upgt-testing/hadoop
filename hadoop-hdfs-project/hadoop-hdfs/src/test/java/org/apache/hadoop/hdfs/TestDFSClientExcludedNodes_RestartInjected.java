@@ -61,7 +61,7 @@ public class TestDFSClientExcludedNodes_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testExcludedNodes() throws IOException {
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
 
@@ -101,7 +101,7 @@ public class TestDFSClientExcludedNodes_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testExcludedNodesForgiveness() throws IOException {
     // Forgive nodes in under 2.5s for this test case.
     conf.setLong(

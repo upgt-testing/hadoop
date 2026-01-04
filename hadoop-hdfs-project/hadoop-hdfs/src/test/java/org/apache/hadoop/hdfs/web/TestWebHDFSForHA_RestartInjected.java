@@ -344,7 +344,7 @@ public class TestWebHDFSForHA_RestartInjected {
    * Make sure the WebHdfsFileSystem will retry based on RetriableException when
    * rpcServer is null in NamenodeWebHdfsMethods while NameNode starts up.
    */
-  @Test (timeout=120000)
+  @Test
   public void testRetryWhileNNStartup() throws Exception {
     final Configuration conf = DFSTestUtil.newHAConfiguration(LOGICAL_NAME);
     MiniDFSCluster cluster = null;

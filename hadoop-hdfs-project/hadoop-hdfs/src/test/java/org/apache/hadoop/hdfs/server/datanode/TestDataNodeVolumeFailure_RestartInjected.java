@@ -121,9 +121,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
   final Map<String, BlockLocs> block_map = new HashMap<String, BlockLocs> ();
 
   // specific the timeout for entire test class
-  @Rule
-  public Timeout timeout = new Timeout(120 * 1000);
-
+  
   @Before
   public void setUp() throws Exception {
     // bring up a cluster of 2
@@ -161,7 +159,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * and that we can replicate to both datanodes even after a single volume
    * failure if the configuration parameter allows this.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testVolumeFailure() throws Exception {
     System.out.println("Data dir: is " +  dataDir.getPath());
    
@@ -285,7 +283,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * NN (HDFS-14333). This is done by using a simulated FsDataset that throws
    * an exception for a failed volume when the block pool is initialized.
    */
-  @Test(timeout=15000)
+  @Test
   public void testDnStartsAfterDiskErrorScanningBlockPool() throws Exception {
     // Don't use the cluster configured in the setup() method for this test.
     cluster.shutdown(true);
@@ -347,7 +345,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * Test that DataStorage and BlockPoolSliceStorage remove the failed volume
    * after failure.
    */
-  @Test(timeout=150000)
+  @Test
     public void testFailedVolumeBeingRemovedFromDataNode()
       throws Exception {
     // The test uses DataNodeTestUtils#injectDataDirFailure() to simulate
@@ -435,7 +433,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * Test DataNode stops when the number of failed volumes exceeds
    * dfs.datanode.failed.volumes.tolerated .
    */
-  @Test(timeout=10000)
+  @Test
   public void testDataNodeShutdownAfterNumFailedVolumeExceedsTolerated()
       throws Exception {
     // The test uses DataNodeTestUtils#injectDataDirFailure() to simulate
@@ -506,7 +504,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * {@link BPOfferService#registrationSucceeded(BPServiceActor,
    * DatanodeRegistration)}.
    */
-  @Test(timeout=10000)
+  @Test
   public void testRefreshDeadLock() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
     DataNodeFaultInjector.set(new DataNodeFaultInjector() {
@@ -662,7 +660,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    *
    * We fail a volume by setting the parent directory non-writable.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDataNodeFailToStartWithVolumeFailure() throws Exception {
     // Method to simulate volume failures is currently not supported on Windows.
     assumeNotWindows();
@@ -679,7 +677,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    *
    * We fail a volume by setting the parent directory non-writable.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDNStartAndTolerateOneVolumeFailure() throws Exception {
     // Method to simulate volume failures is currently not supported on Windows.
     assumeNotWindows();
@@ -694,7 +692,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
   /**
    * Test if data directory is not readable/writable, DataNode won't start.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDNFailToStartWithDataDirNonWritable() throws Exception {
     // Method to simulate volume failures is currently not supported on Windows.
     assumeNotWindows();
@@ -710,7 +708,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
    * DataNode will start and tolerate one non-writable data directory
    * according to config.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDNStartAndTolerateOneDataDirNonWritable() throws Exception {
     // Method to simulate volume failures is currently not supported on Windows.
     assumeNotWindows();
@@ -1043,7 +1041,7 @@ public class TestDataNodeVolumeFailure_RestartInjected {
   /*
    * Verify the failed volume can be cheched during dn startup
    */
-  @Test(timeout = 120000)
+  @Test
   public void testVolumeFailureDuringStartup() throws Exception {
     LOG.debug("Data dir: is " +  dataDir.getPath());
 

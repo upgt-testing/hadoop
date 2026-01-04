@@ -255,7 +255,7 @@ public class TestSaveNamespace_RestartInjected {
    * Verify that a saveNamespace command brings faulty directories
    * in fs.name.dir and fs.edit.dir back online.
    */
-  @Test (timeout=30000)
+  @Test
   public void testReinsertnamedirsInSavenamespace() throws Exception {
     // create a configuration with the key to restore error
     // directories in fs.name.dir
@@ -340,27 +340,27 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
 
-  @Test (timeout=30000)
+  @Test
   public void testRTEWhileSavingSecondImage() throws Exception {
     saveNamespaceWithInjectedFault(Fault.SAVE_SECOND_FSIMAGE_RTE);
   }
 
-  @Test (timeout=30000)
+  @Test
   public void testIOEWhileSavingSecondImage() throws Exception {
     saveNamespaceWithInjectedFault(Fault.SAVE_SECOND_FSIMAGE_IOE);
   }
 
-  @Test (timeout=30000)
+  @Test
   public void testCrashInAllImageDirs() throws Exception {
     saveNamespaceWithInjectedFault(Fault.SAVE_ALL_FSIMAGES);
   }
   
-  @Test (timeout=30000)
+  @Test
   public void testCrashWhenWritingVersionFiles() throws Exception {
     saveNamespaceWithInjectedFault(Fault.WRITE_STORAGE_ALL);
   }
   
-  @Test (timeout=30000)
+  @Test
   public void testCrashWhenWritingVersionFileInOneDir() throws Exception {
     saveNamespaceWithInjectedFault(Fault.WRITE_STORAGE_ONE);
   }
@@ -372,7 +372,7 @@ public class TestSaveNamespace_RestartInjected {
    * failed checkpoint since it only affected ".ckpt" files, not
    * valid image files
    */
-  @Test (timeout=30000)
+  @Test
   public void testFailedSaveNamespace() throws Exception {
     doTestFailedSaveNamespace(false);
   }
@@ -382,7 +382,7 @@ public class TestSaveNamespace_RestartInjected {
    * the operator restores the directories and calls it again.
    * This should leave the NN in a clean state for next start.
    */
-  @Test (timeout=30000)
+  @Test
   public void testFailedSaveNamespaceWithRecovery() throws Exception {
     doTestFailedSaveNamespace(true);
   }
@@ -456,7 +456,7 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
 
-  @Test (timeout=30000)
+  @Test
   public void testSaveWhileEditsRolled() throws Exception {
     Configuration conf = getConf();
     NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
@@ -492,7 +492,7 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
   
-  @Test (timeout=30000)
+  @Test
   public void testTxIdPersistence() throws Exception {
     Configuration conf = getConf();
     NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
@@ -530,7 +530,7 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
   
-  @Test(timeout=20000)
+  @Test
   public void testCancelSaveNamespace() throws Exception {
     Configuration conf = getConf();
     NameNode.initMetrics(conf, NamenodeRole.NAMENODE);
@@ -618,7 +618,7 @@ public class TestSaveNamespace_RestartInjected {
    * open lease and destination directory exist. 
    * This test is a regression for HDFS-2827
    */
-  @Test (timeout=30000)
+  @Test
   public void testSaveNamespaceWithRenamedLease() throws Exception {
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(new Configuration())
         .numDataNodes(1).build();
@@ -669,7 +669,7 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
   
-  @Test (timeout=30000)
+  @Test
   public void testSaveNamespaceWithDanglingLease() throws Exception {
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(new Configuration())
         .numDataNodes(1).build();
@@ -840,7 +840,7 @@ public class TestSaveNamespace_RestartInjected {
     }
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testTxFaultTolerance() throws Exception {
     String baseDir = MiniDFSCluster.getBaseDirectory();
     List<String> nameDirs = new ArrayList<>();

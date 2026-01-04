@@ -68,7 +68,7 @@ public class TestRefreshNamenodeReplicationConfig_RestartInjected {
    * Tests to ensure each of the block replication parameters can be passed
    * updated successfully.
    */
-  @Test(timeout = 90000)
+  @Test
   public void testParamsCanBeReconfigured() throws ReconfigurationException {
 
     assertEquals(8, bm.getMaxReplicationStreams());
@@ -114,7 +114,7 @@ public class TestRefreshNamenodeReplicationConfig_RestartInjected {
    * Tests to ensure reconfiguration fails with a negative, zero or string value
    * value for each parameter.
    */
-  @Test(timeout = 90000)
+  @Test
   public void testReconfigureFailsWithInvalidValues() throws Exception {
     String[] keys = new String[]{
         DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY,

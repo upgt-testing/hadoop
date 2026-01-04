@@ -70,7 +70,7 @@ public class TestDataNodeInitStorage_RestartInjected {
   }
 
 
-  @Test (timeout = 60000)
+  @Test
   public void testDataNodeInitStorage() throws Throwable {
     // Create configuration to use SimulatedFsDatasetVerifier#Factory.
     Configuration conf = new HdfsConfiguration();

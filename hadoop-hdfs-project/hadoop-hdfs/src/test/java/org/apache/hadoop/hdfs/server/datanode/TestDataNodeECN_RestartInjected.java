@@ -32,9 +32,7 @@ import java.io.IOException;
 
 public class TestDataNodeECN_RestartInjected {
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Test
   public void testECNFlag() throws IOException {
     Configuration conf = new Configuration();

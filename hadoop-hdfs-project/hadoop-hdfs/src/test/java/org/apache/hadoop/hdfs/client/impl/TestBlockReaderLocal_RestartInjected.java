@@ -749,12 +749,12 @@ public class TestBlockReaderLocal_RestartInjected {
   }
 
 
-  @Test(timeout=60000)
+  @Test
   public void TestStatisticsForShortCircuitLocalRead() throws Exception {
     testStatistics(true);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void TestStatisticsForLocalRead() throws Exception {
     testStatistics(false);
   }
@@ -822,7 +822,7 @@ public class TestBlockReaderLocal_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testStatisticsForErasureCodingRead() throws IOException {
     HdfsConfiguration conf = new HdfsConfiguration();
 

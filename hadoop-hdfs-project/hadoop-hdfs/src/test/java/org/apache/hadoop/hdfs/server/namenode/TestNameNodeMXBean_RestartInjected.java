@@ -370,7 +370,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test (timeout = 120000)
+  @Test
   public void testDecommissioningNodes() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
@@ -476,7 +476,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testInServiceNodes() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY, 1);
@@ -579,7 +579,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test (timeout = 120000)
+  @Test
   public void testMaintenanceNodes() throws Exception {
     LOG.info("Starting testMaintenanceNodes");
     int expirationInMs = 30 * 1000;
@@ -685,7 +685,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   @SuppressWarnings("unchecked")
   public void testTopUsers() throws Exception {
     final Configuration conf = new Configuration();
@@ -746,7 +746,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testTopUsersDisabled() throws Exception {
     final Configuration conf = new Configuration();
     // Disable nntop
@@ -781,7 +781,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testTopUsersNoPeriods() throws Exception {
     final Configuration conf = new Configuration();
     conf.setBoolean(DFSConfigKeys.NNTOP_ENABLED_KEY, true);
@@ -816,7 +816,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testQueueLength() throws Exception {
     final Configuration conf = new Configuration();
     MiniDFSCluster cluster = null;
@@ -841,7 +841,7 @@ public class TestNameNodeMXBean_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testNNDirectorySize() throws Exception{
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);

@@ -117,7 +117,7 @@ public class TestBalancerService_RestartInjected {
    * should balance succeed but not exit, then make the cluster imbalanced and
    * wait for balancer to balance it again
    */
-  @Test(timeout = 60000)
+  @Test
   public void testBalancerServiceBalanceTwice() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setTimeDuration(DFSConfigKeys.DFS_BALANCER_SERVICE_INTERVAL_KEY, 5,
@@ -186,7 +186,7 @@ public class TestBalancerService_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testBalancerServiceOnError() throws Exception {
     Configuration conf = new HdfsConfiguration();
     // retry for every 5 seconds

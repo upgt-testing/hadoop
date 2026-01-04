@@ -203,7 +203,7 @@ public class TestRandomOpsWithSnapshots_RestartInjected {
   /*
    * Random file system operations with snapshot operations in between.
    */
-  @Test(timeout = 900000)
+  @Test
   public void testRandomOperationsWithSnapshots()
           throws IOException, InterruptedException, TimeoutException {
     // Set

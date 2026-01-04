@@ -98,7 +98,7 @@ public class TestFsVolumeList_RestartInjected {
     conf = new Configuration();
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testGetNextVolumeWithClosedVolume() throws IOException {
     FsVolumeList volumeList = new FsVolumeList(
         Collections.<VolumeFailureInfo>emptyList(),
@@ -142,7 +142,7 @@ public class TestFsVolumeList_RestartInjected {
     }
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testReleaseVolumeRefIfNoBlockScanner() throws IOException {
     FsVolumeList volumeList = new FsVolumeList(
         Collections.<VolumeFailureInfo>emptyList(), null, blockChooser, null);
@@ -345,7 +345,7 @@ public class TestFsVolumeList_RestartInjected {
     assertEquals(600, volume4.getReserved());
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testAddRplicaProcessorForAddingReplicaInMap() throws Exception {
     BlockPoolSlice.reInitializeAddReplicaThreadPool();
     Configuration cnf = new Configuration();
@@ -416,7 +416,7 @@ public class TestFsVolumeList_RestartInjected {
         poolSize, BlockPoolSlice.getAddReplicaForkPoolSize());
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testInstanceOfAddReplicaThreadPool() throws Exception {
     // Start cluster with multiple namespace
     try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(

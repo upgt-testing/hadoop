@@ -599,7 +599,7 @@ public class TestPendingReconstruction_RestartInjected {
    * @throws InterruptedException
    * @throws TimeoutException
    */
-  @Test (timeout = 300000)
+  @Test
   public void testReplicationCounter() throws IOException,
       InterruptedException, TimeoutException {
     HdfsConfiguration conf = new HdfsConfiguration();

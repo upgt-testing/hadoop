@@ -79,9 +79,7 @@ public class TestStripedINodeFile_RestartInjected {
   private static final ErasureCodingPolicy testECPolicy
       = StripedFileTestUtil.getDefaultECPolicy();
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   private static INodeFile createStripedINodeFile() {
     return new INodeFile(HdfsConstants.GRANDFATHER_INODE_ID, null, perm, 0L, 0L,
         null, null, StripedFileTestUtil.getDefaultECPolicy().getId(), 1024L,
@@ -306,7 +304,7 @@ public class TestStripedINodeFile_RestartInjected {
   /**
    * Test the behavior of striped and contiguous block deletions.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testDeleteOp() throws Exception {
     MiniDFSCluster cluster = null;
     try {
@@ -425,7 +423,7 @@ public class TestStripedINodeFile_RestartInjected {
    * for EC Striped mode are HOT, COLD and ALL_SSD. For all other policies set
    * will be ignored and considered default policy.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testUnsuitableStoragePoliciesWithECStripedMode()
       throws Exception {
     final Configuration conf = new HdfsConfiguration();

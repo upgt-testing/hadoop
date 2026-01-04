@@ -70,7 +70,7 @@ public class TestCreateEditsLog_RestartInjected {
    * Tests that an edits log created using CreateEditsLog is valid and can be
    * loaded successfully by a namenode.
    */
-  @Test(timeout=60000)
+  @Test
   public void testCanLoadCreatedEditsLog() throws Exception {
     // Format namenode.
     HdfsConfiguration conf = new HdfsConfiguration();

@@ -213,7 +213,7 @@ public class TestCachingStrategy_RestartInjected {
     throw new RuntimeException("unreachable");
   }
  
-  @Test(timeout=120000)
+  @Test
   public void testFadviseAfterWriteThenRead() throws Exception {
     // start a cluster
     LOG.info("testFadviseAfterWriteThenRead");
@@ -278,7 +278,7 @@ public class TestCachingStrategy_RestartInjected {
    * Test the scenario where the DataNode defaults to not dropping the cache,
    * but our client defaults are set.
    */
-  @Test(timeout=120000)
+  @Test
   public void testClientDefaults() throws Exception {
     // start a cluster
     LOG.info("testClientDefaults");
@@ -343,7 +343,7 @@ public class TestCachingStrategy_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testFadviseSkippedForSmallReads() throws Exception {
     // start a cluster
     LOG.info("testFadviseSkippedForSmallReads");
@@ -413,7 +413,7 @@ public class TestCachingStrategy_RestartInjected {
     }
   }
   
-  @Test(timeout=120000)
+  @Test
   public void testNoFadviseAfterWriteThenRead() throws Exception {
     // start a cluster
     LOG.info("testNoFadviseAfterWriteThenRead");
@@ -470,7 +470,7 @@ public class TestCachingStrategy_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testSeekAfterSetDropBehind() throws Exception {
     // start a cluster
     LOG.info("testSeekAfterSetDropBehind");

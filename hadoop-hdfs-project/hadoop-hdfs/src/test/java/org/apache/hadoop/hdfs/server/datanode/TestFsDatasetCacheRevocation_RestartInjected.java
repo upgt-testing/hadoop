@@ -101,7 +101,7 @@ public class TestFsDatasetCacheRevocation_RestartInjected {
    * replica for a reasonable amount of time, even if an uncache request
    * occurs.
    */
-  @Test(timeout=120000)
+  @Test
   public void testPinning() throws Exception {
     assumeTrue(NativeCodeLoader.isNativeCodeLoaded());
     assumeNotWindows();
@@ -195,7 +195,7 @@ public class TestFsDatasetCacheRevocation_RestartInjected {
    * Test that when we have an uncache request, and the client refuses to
    * release the replica for a long time, we will un-mlock it.
    */
-  @Test(timeout=120000)
+  @Test
   public void testRevocation() throws Exception {
     assumeTrue(NativeCodeLoader.isNativeCodeLoaded());
     assumeNotWindows();

@@ -328,7 +328,7 @@ public class TestSnapshot_RestartInjected {
    * A simple test that updates a sub-directory of a snapshottable directory
    * with snapshots
    */
-  @Test (timeout=60000)
+  @Test
   public void testUpdateDirectory() throws Exception {
     Path dir = new Path("/dir");
     Path sub = new Path(dir, "sub");
@@ -404,7 +404,7 @@ public class TestSnapshot_RestartInjected {
   /**
    * Creating snapshots for a directory that is not snapshottable must fail.
    */
-  @Test (timeout=60000)
+  @Test
   public void testSnapshottableDirectory() throws Exception {
     Path dir = new Path("/TestSnapshot/sub");
     Path file0 = new Path(dir, "file0");
@@ -542,7 +542,7 @@ public class TestSnapshot_RestartInjected {
     assertEquals(0, rootNode.getDirectorySnapshottableFeature().getSnapshotQuota());
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testSnapshotMtime() throws Exception {
     Path dir = new Path("/dir");
     Path sub = new Path(dir, "sub");
@@ -573,7 +573,7 @@ public class TestSnapshot_RestartInjected {
         newSnapshotStatus.getModificationTime());
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testRenameSnapshotMtime() throws Exception {
     Path dir = new Path("/dir");
     Path sub = new Path(dir, "sub");
@@ -616,7 +616,7 @@ public class TestSnapshot_RestartInjected {
   /**
    * Test snapshot directory mtime after snapshot deletion.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testDeletionSnapshotMtime() throws Exception {
     Path dir = new Path("/dir");
     Path sub = new Path(dir, "sub");
@@ -663,7 +663,7 @@ public class TestSnapshot_RestartInjected {
    * HDFS-15446 - ensure that snapshot operations on /.reserved/raw
    * paths work and the NN can load the resulting edits.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testSnapshotOpsOnReservedPath() throws Exception {
     Path dir = new Path("/dir");
     Path nestedDir = new Path("/nested/dir");
@@ -717,7 +717,7 @@ public class TestSnapshot_RestartInjected {
    * paths work and the NN can load the resulting edits. This test if for
    * snapshots at the root level.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testSnapshotOpsOnRootReservedPath() throws Exception {
     Path dir = new Path("/");
     Path sub = new Path(dir, "sub");

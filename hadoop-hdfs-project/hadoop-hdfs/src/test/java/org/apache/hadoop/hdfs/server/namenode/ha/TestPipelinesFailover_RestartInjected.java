@@ -122,19 +122,19 @@ public class TestPipelinesFailover_RestartInjected {
   /**
    * Tests continuing a write pipeline over a failover.
    */
-  @Test(timeout=30000)
+  @Test
   public void testWriteOverGracefulFailover() throws Exception {
     doWriteOverFailoverTest(TestScenario.GRACEFUL_FAILOVER,
         MethodToTestIdempotence.ALLOCATE_BLOCK);
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testAllocateBlockAfterCrashFailover() throws Exception {
     doWriteOverFailoverTest(TestScenario.ORIGINAL_ACTIVE_CRASHED,
         MethodToTestIdempotence.ALLOCATE_BLOCK);
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testCompleteFileAfterCrashFailover() throws Exception {
     doWriteOverFailoverTest(TestScenario.ORIGINAL_ACTIVE_CRASHED,
         MethodToTestIdempotence.COMPLETE_FILE);
@@ -256,12 +256,12 @@ public class TestPipelinesFailover_RestartInjected {
    * after the failover - ensures that updating the pipeline succeeds
    * even when the pipeline was constructed on a different NN.
    */
-  @Test(timeout=30000)
+  @Test
   public void testWriteOverGracefulFailoverWithDnFail() throws Exception {
     doTestWriteOverFailoverWithDnFail(TestScenario.GRACEFUL_FAILOVER);
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testWriteOverCrashFailoverWithDnFail() throws Exception {
     doTestWriteOverFailoverWithDnFail(TestScenario.ORIGINAL_ACTIVE_CRASHED);
   }
@@ -399,7 +399,7 @@ public class TestPipelinesFailover_RestartInjected {
    * Tests lease recovery if a client crashes. This approximates the
    * use case of HBase WALs being recovered after a NN failover.
    */
-  @Test(timeout=30000)
+  @Test
   public void testLeaseRecoveryAfterFailover() throws Exception {
     final Configuration conf = new Configuration();
     // Disable permissions so that another user can recover the lease.
@@ -502,7 +502,7 @@ public class TestPipelinesFailover_RestartInjected {
    * DN running the recovery should then fail to commit the synchronization
    * and a later retry will succeed.
    */
-  @Test(timeout=30000)
+  @Test
   public void testFailoverRightBeforeCommitSynchronization() throws Exception {
     final Configuration conf = new Configuration();
     // Disable permissions so that another user can recover the lease.
@@ -654,7 +654,7 @@ public class TestPipelinesFailover_RestartInjected {
    * break the lease. While these threads run, failover proceeds
    * back and forth between two namenodes.
    */
-  @Test(timeout=STRESS_RUNTIME*3)
+  @Test
   public void testPipelineRecoveryStress() throws Exception {
 
     // The following section of code is to help debug HDFS-6694 about

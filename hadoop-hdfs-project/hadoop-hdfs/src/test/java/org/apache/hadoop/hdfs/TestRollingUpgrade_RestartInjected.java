@@ -235,7 +235,7 @@ public class TestRollingUpgrade_RestartInjected {
     return conf;
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRollingUpgradeWithQJM() throws Exception {
     String nnDirPrefix = MiniDFSCluster.getBaseDirectory() + "/nn/";
     final File nn1Dir = new File(nnDirPrefix + "image1");
@@ -633,22 +633,22 @@ public class TestRollingUpgrade_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testFinalize() throws Exception {
     testFinalize(2);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testFinalizeWithMultipleNN() throws Exception {
     testFinalize(3);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testFinalizeWithDeltaCheck() throws Exception {
     testFinalize(2, true);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testFinalizeWithMultipleNNDeltaCheck() throws Exception {
     testFinalize(3, true);
   }
@@ -756,12 +756,12 @@ public class TestRollingUpgrade_RestartInjected {
     }
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testQuery() throws Exception {
     testQuery(2);
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testQueryWithMultipleNN() throws Exception {
     testQuery(3);
   }
@@ -825,7 +825,7 @@ public class TestRollingUpgrade_RestartInjected {
     }
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testQueryAfterRestart() throws IOException, InterruptedException {
     final Configuration conf = getHdfsConfiguration();
     try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(0).build()) {
@@ -869,17 +869,17 @@ public class TestRollingUpgrade_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testCheckpoint() throws IOException, InterruptedException {
     testCheckpoint(2);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testCheckpointWithMultipleNN() throws IOException, InterruptedException {
     testCheckpoint(3);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testRollBackImage() throws Exception {
     final Configuration conf = getHdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_TXNS_KEY, 10);

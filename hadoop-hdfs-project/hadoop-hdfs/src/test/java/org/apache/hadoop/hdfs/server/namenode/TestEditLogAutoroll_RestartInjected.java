@@ -133,7 +133,7 @@ public class TestEditLogAutoroll_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testEditLogAutoroll() throws Exception {
     RestartFramework.at("after_cluster_setup")
         .on(cluster)

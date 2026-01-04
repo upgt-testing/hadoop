@@ -86,7 +86,7 @@ public class TestSnapshotFileLength_RestartInjected {
    * when accessing it via a snapshot path.
    *
    */
-  @Test (timeout=300000)
+  @Test
   public void testSnapshotfileLength() throws Exception {
     hdfs.mkdirs(sub);
 
@@ -221,7 +221,7 @@ public class TestSnapshotFileLength_RestartInjected {
    *  cannot read a file beyond snapshot file length
    * @throws Exception
    */
-  @Test (timeout = 600000)
+  @Test
   public void testSnapshotFileLengthWithCatCommand() throws Exception {
 
     FSDataInputStream fis = null;

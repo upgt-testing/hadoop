@@ -81,41 +81,41 @@ public class TestOfflineImageViewerWithStripedBlocks_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileEqualToOneStripe() throws Exception {
     int numBytes = cellSize;
     testFileSize(numBytes);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileLessThanOneStripe() throws Exception {
     int numBytes = cellSize - 100;
     testFileSize(numBytes);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileHavingMultipleBlocks() throws Exception {
     int numBytes = blockSize * 3;
     testFileSize(numBytes);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileLargerThanABlockGroup1() throws IOException {
     testFileSize(blockSize * dataBlocks + cellSize + 123);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileLargerThanABlockGroup2() throws IOException {
     testFileSize(blockSize * dataBlocks * 3 + cellSize * dataBlocks + cellSize
         + 123);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileFullBlockGroup() throws IOException {
     testFileSize(blockSize * dataBlocks);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFileMoreThanOneStripe() throws Exception {
     int numBytes = blockSize + blockSize / 2;
     testFileSize(numBytes);

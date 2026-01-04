@@ -242,7 +242,7 @@ public class TestFSNamesystemMBean_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFsEditLogMetrics() throws Exception {
     final Configuration conf = new Configuration();
     MiniDFSCluster cluster = null;

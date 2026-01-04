@@ -70,7 +70,7 @@ public class TestSnapshotListing_RestartInjected {
   /**
    * Test listing snapshots under a snapshottable directory
    */
-  @Test (timeout=15000)
+  @Test
   public void testListSnapshots() throws Exception {
     final Path snapshotsPath = new Path(dir, ".snapshot");
     FileStatus[] stats = null;

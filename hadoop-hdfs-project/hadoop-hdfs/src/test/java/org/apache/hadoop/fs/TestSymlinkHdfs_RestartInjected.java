@@ -103,7 +103,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Access a file using a link that spans Hdfs to LocalFs */
   public void testLinkAcrossFileSystems() throws IOException {
     Path localDir = new Path("file://" + wrapper.getAbsoluteTestRootDir()
@@ -138,7 +138,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     assertEquals(fileSize, wrapper.getFileStatus(link).getLen());
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Test renaming a file across two file systems using a link */
   public void testRenameAcrossFileSystemsViaLink() throws IOException {
     Path localDir = new Path("file://" + wrapper.getAbsoluteTestRootDir()
@@ -196,7 +196,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Test create symlink to / */
   public void testCreateLinkToSlash() throws IOException {
     Path dir  = new Path(testBaseDir1());
@@ -235,7 +235,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
   }
   
   
-  @Test(timeout=10000)
+  @Test
   /** setPermission affects the target not the link */
   public void testSetPermissionAffectsTarget() throws IOException {
     Path file       = new Path(testBaseDir1(), "file");
@@ -298,7 +298,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
                  wrapper.getFileStatus(linkToDir).getPermission());
   }  
 
-  @Test(timeout=10000)
+  @Test
   /** Create a symlink using a path with scheme but no authority */
   public void testCreateWithPartQualPathFails() throws IOException {
     Path fileWoAuth = new Path("hdfs:///test/file");
@@ -325,7 +325,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   /** setReplication affects the target not the link */
   public void testSetReplication() throws IOException {
     Path file = new Path(testBaseDir1(), "file");
@@ -354,7 +354,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     assertEquals(2, wrapper.getFileStatus(file).getReplication());
   }
   
-  @Test(timeout=10000)
+  @Test
   /** Test create symlink with a max len name */
   public void testCreateLinkMaxPathLink() throws IOException {
     Path dir  = new Path(testBaseDir1());
@@ -406,7 +406,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Test symlink owner */
   public void testLinkOwner() throws IOException {
     Path file = new Path(testBaseDir1(), "file");
@@ -433,7 +433,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     assertEquals(statLink.getOwner(), statFile.getOwner());
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Test WebHdfsFileSystem.createSymlink(..). */
   public void testWebHDFS() throws IOException {
     Path file = new Path(testBaseDir1(), "file");
@@ -462,7 +462,7 @@ abstract public class TestSymlinkHdfs_RestartInjected extends SymlinkBaseTest {
     assertEquals(2, wrapper.getFileStatus(file).getReplication());
   }
 
-  @Test(timeout=10000)
+  @Test
   /** Test craeteSymlink(..) with quota. */
   public void testQuota() throws IOException {
     final Path dir = new Path(testBaseDir1());

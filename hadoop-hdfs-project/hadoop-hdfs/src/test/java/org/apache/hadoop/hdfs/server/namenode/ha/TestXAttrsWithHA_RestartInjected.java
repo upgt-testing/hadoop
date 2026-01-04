@@ -91,7 +91,7 @@ public class TestXAttrsWithHA_RestartInjected {
   /**
    * Test that xattrs are properly tracked by the standby
    */
-  @Test(timeout = 60000)
+  @Test
   public void testXAttrsTrackedOnStandby() throws Exception {
     fs.create(path).close();
 

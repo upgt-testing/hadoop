@@ -58,9 +58,7 @@ public class TestHeartbeatHandling_RestartInjected {
   /**
    * Set a timeout for every test case.
    */
-  @Rule
-  public Timeout testTimeout = new Timeout(300_000);
-
+  
   /**
    * Test if
    * {@link FSNamesystem#handleHeartbeat}

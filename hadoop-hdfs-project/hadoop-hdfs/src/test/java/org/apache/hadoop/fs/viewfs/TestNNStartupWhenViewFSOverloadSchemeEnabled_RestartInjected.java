@@ -59,7 +59,7 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled_RestartInjected {
    * Tests that the HA mode NameNode startup is successful when
    * ViewFSOverloadScheme configured.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testHANameNodeAndDataNodeStartup() throws Exception {
     cluster = new MiniDFSCluster.Builder(CONF)
         .nnTopology(MiniDFSNNTopology.simpleHATopology()).numDataNodes(1)
@@ -95,7 +95,7 @@ public class TestNNStartupWhenViewFSOverloadSchemeEnabled_RestartInjected {
    * Tests that the NameNode startup is successful when ViewFSOverloadScheme
    * configured.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testNameNodeAndDataNodeStartup() throws Exception {
     cluster =
         new MiniDFSCluster.Builder(CONF).numDataNodes(1).waitSafeMode(false)

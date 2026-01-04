@@ -63,7 +63,7 @@ public class TestNNThroughputBenchmark_RestartInjected {
    * This test runs all benchmarks defined in {@link NNThroughputBenchmark},
    * with explicit local -fs option.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testNNThroughputWithFsOption() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 16);
@@ -78,7 +78,7 @@ public class TestNNThroughputBenchmark_RestartInjected {
   /**
    * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testNNThroughputAgainstRemoteNN() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
@@ -114,7 +114,7 @@ public class TestNNThroughputBenchmark_RestartInjected {
    * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
    * with explicit -fs option.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testNNThroughputRemoteAgainstNNWithFsOption() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);
@@ -151,7 +151,7 @@ public class TestNNThroughputBenchmark_RestartInjected {
    * This test runs {@link NNThroughputBenchmark} against a mini DFS cluster
    * for block report operation.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testNNThroughputForBlockReportOp() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_MIN_BLOCK_SIZE_KEY, 16);

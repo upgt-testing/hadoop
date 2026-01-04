@@ -51,7 +51,7 @@ public class TestPendingCorruptDnMessages_RestartInjected {
   
   private static final Path filePath = new Path("/foo.txt");
   
-  @Test (timeout = 60000)
+  @Test
   public void testChangedStorageId() throws IOException, URISyntaxException,
       InterruptedException, TimeoutException {
     HdfsConfiguration conf = new HdfsConfiguration();

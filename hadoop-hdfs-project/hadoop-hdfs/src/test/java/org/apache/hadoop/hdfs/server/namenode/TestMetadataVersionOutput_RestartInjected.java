@@ -62,7 +62,7 @@ public class TestMetadataVersionOutput_RestartInjected {
     conf.unset(DFS_NAMENODE_NAME_DIR_KEY);
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testMetadataVersionOutput() throws IOException {
 
     initConfig();

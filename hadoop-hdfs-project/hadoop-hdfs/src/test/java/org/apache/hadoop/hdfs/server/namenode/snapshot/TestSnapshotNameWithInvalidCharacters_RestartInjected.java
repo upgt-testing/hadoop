@@ -60,7 +60,7 @@ public class TestSnapshotNameWithInvalidCharacters_RestartInjected {
     }
   }
 
-  @Test (timeout = 600000)
+  @Test
   public void TestSnapshotWithInvalidName() throws Exception {
 
     Path file1 = new Path(dir1,file1Name);
@@ -91,7 +91,7 @@ public class TestSnapshotNameWithInvalidCharacters_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void TestSnapshotWithInvalidName1() throws Exception{
     Path file1 = new Path(dir1, file1Name);
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, SEED);

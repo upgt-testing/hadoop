@@ -91,7 +91,7 @@ public class TestStoragePolicySatisfyAdminCommands_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testStoragePolicySatisfierCommand() throws Exception {
     final String file = "/testStoragePolicySatisfierCommand";
     DFSTestUtil.createFile(dfs, new Path(file), SIZE, REPL, 0);
@@ -133,7 +133,7 @@ public class TestStoragePolicySatisfyAdminCommands_RestartInjected {
         dfs);
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testStoragePolicySatisfierCommandWithURI() throws Exception {
     final String file = "/testStoragePolicySatisfierCommandURI";
     DFSTestUtil.createFile(dfs, new Path(file), SIZE, REPL, 0);

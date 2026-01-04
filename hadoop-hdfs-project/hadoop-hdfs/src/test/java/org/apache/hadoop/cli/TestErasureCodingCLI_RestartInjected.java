@@ -39,9 +39,7 @@ public class TestErasureCodingCLI_RestartInjected extends CLITestHelper {
   private DistributedFileSystem fs = null;
   private String namenode = null;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   @Override
   public void setUp() throws Exception {

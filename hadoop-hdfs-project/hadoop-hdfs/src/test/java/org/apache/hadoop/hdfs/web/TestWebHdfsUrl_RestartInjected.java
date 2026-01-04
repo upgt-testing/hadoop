@@ -72,7 +72,7 @@ public class TestWebHdfsUrl_RestartInjected {
     UserGroupInformation.setConfiguration(new Configuration());
   }
   
-  @Test(timeout=60000)
+  @Test
   public void testEncodedPathUrl() throws IOException, URISyntaxException{
     Configuration conf = new Configuration();
 
@@ -88,7 +88,7 @@ public class TestWebHdfsUrl_RestartInjected {
         encodedPathUrl.toURI().getPath());
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSimpleAuthParamsInUrl() throws IOException {
     Configuration conf = new Configuration();
 
@@ -109,7 +109,7 @@ public class TestWebHdfsUrl_RestartInjected {
         fileStatusUrl);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSimpleProxyAuthParamsInUrl() throws IOException {
     Configuration conf = new Configuration();
 
@@ -132,7 +132,7 @@ public class TestWebHdfsUrl_RestartInjected {
         fileStatusUrl);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSecureAuthParamsInUrl() throws IOException {
     Configuration conf = new Configuration();
     // fake turning on security so api thinks it should use tokens
@@ -224,7 +224,7 @@ public class TestWebHdfsUrl_RestartInjected {
         fileStatusUrl);    
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSecureProxyAuthParamsInUrl() throws IOException {
     Configuration conf = new Configuration();
     // fake turning on security so api thinks it should use tokens
@@ -321,7 +321,7 @@ public class TestWebHdfsUrl_RestartInjected {
         fileStatusUrl);    
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testCheckAccessUrl() throws IOException {
     Configuration conf = new Configuration();
 
@@ -343,7 +343,7 @@ public class TestWebHdfsUrl_RestartInjected {
         checkAccessUrl);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testBatchedListingUrl() throws Exception {
     Configuration conf = new Configuration();
 

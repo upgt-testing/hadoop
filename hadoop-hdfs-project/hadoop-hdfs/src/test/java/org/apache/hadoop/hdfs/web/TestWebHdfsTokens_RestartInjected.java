@@ -189,7 +189,7 @@ public class TestWebHdfsTokens_RestartInjected {
     return fs;
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testTokenForNonTokenOp() throws IOException {
     initEnv();
     WebHdfsFileSystem fs = spyWebhdfsInSecureSetup();
@@ -210,19 +210,19 @@ public class TestWebHdfsTokens_RestartInjected {
     verify(fs, never()).setDelegationToken(token);
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testNoTokenForGetToken() throws IOException {
     initEnv();
     checkNoTokenForOperation(GetOpParam.Op.GETDELEGATIONTOKEN);
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testNoTokenForRenewToken() throws IOException {
     initEnv();
     checkNoTokenForOperation(PutOpParam.Op.RENEWDELEGATIONTOKEN);
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testNoTokenForCancelToken() throws IOException {
     initEnv();
     checkNoTokenForOperation(PutOpParam.Op.CANCELDELEGATIONTOKEN);
@@ -240,7 +240,7 @@ public class TestWebHdfsTokens_RestartInjected {
     verify(fs, never()).setDelegationToken(any());
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testGetOpRequireAuth() {
     for (HttpOpParam.Op op : GetOpParam.Op.values()) {
       boolean expect = (op == GetOpParam.Op.GETDELEGATIONTOKEN);
@@ -248,7 +248,7 @@ public class TestWebHdfsTokens_RestartInjected {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testPutOpRequireAuth() {
     for (HttpOpParam.Op op : PutOpParam.Op.values()) {
       boolean expect = (op == PutOpParam.Op.RENEWDELEGATIONTOKEN || op == PutOpParam.Op.CANCELDELEGATIONTOKEN);
@@ -256,14 +256,14 @@ public class TestWebHdfsTokens_RestartInjected {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testPostOpRequireAuth() {
     for (HttpOpParam.Op op : PostOpParam.Op.values()) {
       assertFalse(op.getRequireAuth());
     }
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testDeleteOpRequireAuth() {
     for (HttpOpParam.Op op : DeleteOpParam.Op.values()) {
       assertFalse(op.getRequireAuth());

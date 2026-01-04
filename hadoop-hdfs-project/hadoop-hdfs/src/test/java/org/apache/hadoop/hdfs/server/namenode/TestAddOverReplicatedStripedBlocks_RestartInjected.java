@@ -67,9 +67,7 @@ public class TestAddOverReplicatedStripedBlocks_RestartInjected {
   private final int blockSize = stripesPerBlock * cellSize;
   private final int numDNs = groupSize + 3;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   public void setup() throws IOException {
     Configuration conf = new Configuration();

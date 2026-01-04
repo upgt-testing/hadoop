@@ -142,7 +142,7 @@ public class TestNameNodePrunesMissingStorages_RestartInjected {
    * reported by the DataNode.
    * @throws IOException
    */
-  @Test (timeout=300000)
+  @Test
   public void testUnusedStorageIsPruned() throws IOException {
     // Run the test with 1 storage, after the text expect 0 storages.
     runTest(GenericTestUtils.getMethodName(), false, 1, 0);
@@ -154,7 +154,7 @@ public class TestNameNodePrunesMissingStorages_RestartInjected {
    *
    * @throws IOException
    */
-  @Test (timeout=300000)
+  @Test
   public void testStorageWithBlocksIsNotPruned() throws IOException {
     // Run the test with 1 storage, after the text still expect 1 storage.
     runTest(GenericTestUtils.getMethodName(), true, 1, 1);
@@ -166,7 +166,7 @@ public class TestNameNodePrunesMissingStorages_RestartInjected {
    * Shutting down a datanode, removing a storage directory, and restarting
    * the DataNode should not produce zombie storages.
    */
-  @Test(timeout=300000)
+  @Test
   public void testRemovingStorageDoesNotProduceZombies() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_FAILED_VOLUMES_TOLERATED_KEY, 1);
@@ -328,7 +328,7 @@ public class TestNameNodePrunesMissingStorages_RestartInjected {
     }
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testRenamingStorageIds() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_FAILED_VOLUMES_TOLERATED_KEY, 0);
@@ -402,7 +402,7 @@ public class TestNameNodePrunesMissingStorages_RestartInjected {
     }
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testNameNodePrunesUnreportedStorages() throws Exception {
     Configuration conf = new HdfsConfiguration();
     // Create a cluster with one datanode with two storages

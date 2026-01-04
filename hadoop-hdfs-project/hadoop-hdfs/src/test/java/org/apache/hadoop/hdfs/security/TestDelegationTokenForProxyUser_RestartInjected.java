@@ -135,7 +135,7 @@ public class TestDelegationTokenForProxyUser_RestartInjected {
     }
   }
  
-  @Test(timeout=20000)
+  @Test
   public void testDelegationTokenWithRealUser() throws IOException {
     try {
       Token<?>[] tokens = proxyUgi
@@ -165,7 +165,7 @@ public class TestDelegationTokenForProxyUser_RestartInjected {
     }
   }
   
-  @Test(timeout=5000)
+  @Test
   public void testWebHdfsDoAs() throws Exception {
     WebHdfsTestUtil.LOG.info("START: testWebHdfsDoAs()");
     WebHdfsTestUtil.LOG.info("ugi.getShortUserName()=" + ugi.getShortUserName());

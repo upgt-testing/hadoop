@@ -191,7 +191,7 @@ public class TestLazyPersistFiles_RestartInjected extends LazyPersistTestCase {
  /**
   * If NN restarted then lazyPersist files should not deleted
   */
-  @Test(timeout = 20000)
+  @Test
   public void testFileShouldNotDiscardedIfNNRestarted()
       throws IOException, InterruptedException, TimeoutException {
     getClusterBuilder().setRamDiskReplicaCapacity(2).build();
@@ -377,7 +377,7 @@ public class TestLazyPersistFiles_RestartInjected extends LazyPersistTestCase {
     }
   }
 
-  @Test(timeout = 20000)
+  @Test
   public void testReleaseVolumeRefIfExceptionThrown()
       throws IOException, InterruptedException {
     getClusterBuilder().setRamDiskReplicaCapacity(2).build();

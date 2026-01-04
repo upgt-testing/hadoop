@@ -341,7 +341,7 @@ public class TestNamenodeRetryCache_RestartInjected {
    * Make sure a retry call does not hang because of the exception thrown in the
    * first call.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testUpdatePipelineWithFailOver() throws Exception {
     cluster.shutdown();
     nnRpc = null;

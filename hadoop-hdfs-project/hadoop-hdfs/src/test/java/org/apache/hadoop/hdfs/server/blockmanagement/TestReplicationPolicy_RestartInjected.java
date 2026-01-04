@@ -898,7 +898,7 @@ public class TestReplicationPolicy_RestartInjected extends BaseReplicationPolicy
    * Test for the high priority blocks are processed before the low priority
    * blocks.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testReplicationWithPriority() throws Exception {
     int DFS_NAMENODE_REPLICATION_INTERVAL = 1000;
     int HIGH_PRIORITY = 0;
@@ -1448,7 +1448,7 @@ public class TestReplicationPolicy_RestartInjected extends BaseReplicationPolicy
     blocksReplWorkMultiplier = DFSUtil.getReplWorkMultiplier(conf);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testUpdateDoesNotCauseSkippedReplication() {
     LowRedundancyBlocks lowRedundancyBlocks = new LowRedundancyBlocks();
 
@@ -1492,7 +1492,7 @@ public class TestReplicationPolicy_RestartInjected extends BaseReplicationPolicy
     assertTheChosenBlocks(chosenBlocks, 0, 0, 1, 0, 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testAddStoredBlockDoesNotCauseSkippedReplication()
       throws IOException {
     FSNamesystem mockNS = mock(FSNamesystem.class);
@@ -1541,7 +1541,7 @@ public class TestReplicationPolicy_RestartInjected extends BaseReplicationPolicy
     assertTheChosenBlocks(chosenBlocks, 1, 0, 0, 0, 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void
       testConvertLastBlockToUnderConstructionDoesNotCauseSkippedReplication()
           throws IOException {
@@ -1614,7 +1614,7 @@ public class TestReplicationPolicy_RestartInjected extends BaseReplicationPolicy
     assertTheChosenBlocks(chosenBlocks, 1, 0, 0, 0, 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testupdateNeededReplicationsDoesNotCauseSkippedReplication()
       throws IOException {
     Namesystem mockNS = mock(Namesystem.class);

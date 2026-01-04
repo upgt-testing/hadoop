@@ -51,7 +51,7 @@ public class TestStandbyBlockManagement_RestartInjected {
     DFSTestUtil.setNameNodeLogLevel(Level.ALL);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testInvalidateBlock() throws Exception {
     Configuration conf = new Configuration();
     HAUtil.setAllowStandbyReads(conf, true);

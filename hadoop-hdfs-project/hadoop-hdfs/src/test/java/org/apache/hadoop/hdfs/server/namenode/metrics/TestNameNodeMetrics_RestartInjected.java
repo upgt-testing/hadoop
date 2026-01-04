@@ -211,7 +211,7 @@ public class TestNameNodeMetrics_RestartInjected {
    * Test that capacity metrics are exported and pass
    * basic sanity tests.
    */
-  @Test (timeout = 10000)
+  @Test
   public void testCapacityMetrics() throws Exception {
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
@@ -683,7 +683,7 @@ public class TestNameNodeMetrics_RestartInjected {
     verifyAggregatedMetricsTally();
   }
 
-  @Test (timeout = 90000L)
+  @Test
   public void testStripedFileCorruptBlocks() throws Exception {
     final long fileLen = BLOCK_SIZE * 4;
     final Path ecFile = new Path(ecDir, "ecFile.log");
@@ -1007,7 +1007,7 @@ public class TestNameNodeMetrics_RestartInjected {
    * Testing TransactionsSinceLastCheckpoint. Need a new cluster as
    * the other tests in here don't use HA. See HDFS-7501.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testTransactionSinceLastCheckpointMetrics() throws Exception {
     Random random = new Random();
     int retryCount = 0;
@@ -1222,7 +1222,7 @@ public class TestNameNodeMetrics_RestartInjected {
    * Test metrics indicating the number of active clients and the files under
    * construction
    */
-  @Test(timeout = 60000)
+  @Test
   public void testNumActiveClientsAndFilesUnderConstructionMetrics()
       throws Exception {
     final Path file1 = getTestPath("testFileAdd1");

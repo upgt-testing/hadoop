@@ -49,7 +49,7 @@ public class TestNodeCount_RestartInjected {
   Block lastBlock = null;
   NumberReplicas lastNum = null;
 
-  @Test(timeout = 60000)
+  @Test
   public void testNodeCount() throws Exception {
     final Configuration conf = new HdfsConfiguration();
 

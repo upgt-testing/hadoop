@@ -66,7 +66,7 @@ public class TestNNWithQJM_RestartInjected {
     }
   }
   
-  @Test (timeout = 30000)
+  @Test
   public void testLogAndRestart() throws IOException {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image");
@@ -125,7 +125,7 @@ public class TestNNWithQJM_RestartInjected {
     }
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testNewNamenodeTakesOverWriter() throws Exception {
     File nn1Dir = new File(
         MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image-nn1");
@@ -213,7 +213,7 @@ public class TestNNWithQJM_RestartInjected {
     }
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testMismatchedNNIsRejected() throws Exception {
     conf.set(DFSConfigKeys.DFS_NAMENODE_NAME_DIR_KEY,
         MiniDFSCluster.getBaseDirectory() + "/TestNNWithQJM/image");

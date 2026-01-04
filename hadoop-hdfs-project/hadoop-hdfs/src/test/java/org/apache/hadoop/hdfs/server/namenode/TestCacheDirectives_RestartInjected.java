@@ -182,7 +182,7 @@ public class TestCacheDirectives_RestartInjected {
     NativeIO.POSIX.setCacheManipulator(prevCacheManipulator);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testBasicPoolOperations() throws Exception {
     final String poolName = "pool1";
     CachePoolInfo info = new CachePoolInfo(poolName).
@@ -349,7 +349,7 @@ public class TestCacheDirectives_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testCreateAndModifyPools() throws Exception {
     String poolName = "pool1";
     String ownerName = "abc";
@@ -436,7 +436,7 @@ public class TestCacheDirectives_RestartInjected {
         });
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAddRemoveDirectives() throws Exception {
     proto.addCachePool(new CachePoolInfo("pool1").
         setMode(new FsPermission((short)0777)));
@@ -642,7 +642,7 @@ public class TestCacheDirectives_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testCacheManagerRestart() throws Exception {
     SecondaryNameNode secondary = null;
     try {
@@ -951,7 +951,7 @@ public class TestCacheDirectives_RestartInjected {
         numCachedReplicas);
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testWaitForCachedReplicas() throws Exception {
     FileSystemTestHelper helper = new FileSystemTestHelper();
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
@@ -1034,7 +1034,7 @@ public class TestCacheDirectives_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testWaitForCachedReplicasInDirectory() throws Exception {
     // Create the pool
     final String pool = "friendlyPool";
@@ -1130,7 +1130,7 @@ public class TestCacheDirectives_RestartInjected {
    * number of cached replicas and blocks as well as the advertised locations.
    * @throws Exception
    */
-  @Test(timeout=120000)
+  @Test
   public void testReplicationFactor() throws Exception {
     // Create the pool
     final String pool = "friendlyPool";
@@ -1187,7 +1187,7 @@ public class TestCacheDirectives_RestartInjected {
     checkNumCachedReplicas(dfs, paths, 0, 0);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testListCachePoolPermissions() throws Exception {
     final UserGroupInformation myUser = UserGroupInformation
         .createRemoteUser("myuser");
@@ -1224,7 +1224,7 @@ public class TestCacheDirectives_RestartInjected {
     assertEquals("Mismatched limit", limit, (long)info.getLimit());
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testExpiry() throws Exception {
     String pool = "pool1";
     dfs.addCachePool(new CachePoolInfo(pool));
@@ -1272,7 +1272,7 @@ public class TestCacheDirectives_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testLimit() throws Exception {
     try {
       dfs.addCachePool(new CachePoolInfo("poolofnegativity").setLimit(-99l));
@@ -1348,7 +1348,7 @@ public class TestCacheDirectives_RestartInjected {
             .setPath(path1).build(), EnumSet.of(CacheFlag.FORCE));
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testMaxRelativeExpiry() throws Exception {
     // Test that negative and really big max expirations can't be set during add
     try {
@@ -1553,7 +1553,7 @@ public class TestCacheDirectives_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testExceedsCapacity() throws Exception {
     // Create a giant file
     final Path fileName = new Path("/exceeds");
@@ -1578,7 +1578,7 @@ public class TestCacheDirectives_RestartInjected {
     checkPendingCachedEmpty(cluster);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testNoBackingReplica() throws Exception {
     // Cache all three replicas for a file.
     final Path filename = new Path("/noback");
@@ -1611,7 +1611,7 @@ public class TestCacheDirectives_RestartInjected {
     Mockito.verifyZeroInteractions(locations);
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testAddingCacheDirectiveInfosWhenCachingIsDisabled()
           throws Exception {
     cluster.shutdown();
@@ -1668,7 +1668,7 @@ public class TestCacheDirectives_RestartInjected {
     return cluster.getFileSystem(0);
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testExpiryTimeConsistency() throws Exception {
     conf.setInt(DFSConfigKeys.DFS_HA_LOGROLL_PERIOD_KEY, 1);
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_PERIOD_KEY, 1);

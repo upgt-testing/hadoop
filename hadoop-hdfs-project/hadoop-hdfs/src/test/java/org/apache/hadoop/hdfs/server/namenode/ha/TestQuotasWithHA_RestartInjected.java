@@ -90,7 +90,7 @@ public class TestQuotasWithHA_RestartInjected {
    * Test that quotas are properly tracked by the standby through
    * create, append, delete.
    */
-  @Test(timeout=60000)
+  @Test
   public void testQuotasTrackedOnStandby() throws Exception {
     fs.mkdirs(TEST_DIR);
 

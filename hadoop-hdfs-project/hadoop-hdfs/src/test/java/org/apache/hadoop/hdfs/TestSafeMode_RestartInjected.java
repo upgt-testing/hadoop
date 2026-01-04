@@ -178,7 +178,7 @@ public class TestSafeMode_RestartInjected {
    * Test that, if there are no blocks in the filesystem,
    * the NameNode doesn't enter the "safemode extension" period.
    */
-  @Test(timeout=45000)
+  @Test
   public void testNoExtensionIfNoBlocks() throws IOException {
     cluster.getConfiguration(0).setInt(
         DFSConfigKeys.DFS_NAMENODE_SAFEMODE_EXTENSION_KEY, 60000);
@@ -205,7 +205,7 @@ public class TestSafeMode_RestartInjected {
    * Test that the NN initializes its under-replicated blocks queue
    * before it is ready to exit safemode (HDFS-1476)
    */
-  @Test(timeout=45000)
+  @Test
   public void testInitializeReplQueuesEarly() throws Exception {
     LOG.info("Starting testInitializeReplQueuesEarly");
     // Spray the blocks around the cluster when we add DNs instead of

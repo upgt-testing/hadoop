@@ -90,7 +90,7 @@ public class TestNestedSnapshots_RestartInjected {
    * snapshots and the files created after the snapshots should not appear in
    * any of the snapshots.  
    */
-  @Test (timeout=300000)
+  @Test
   public void testNestedSnapshots() throws Exception {
     cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
 
@@ -299,7 +299,7 @@ public class TestNestedSnapshots_RestartInjected {
    * Test the snapshot limit of a single snapshottable directory.
    * @throws Exception
    */
-  @Test (timeout=300000)
+  @Test
   public void testSnapshotLimit() throws Exception {
     final int step = 1000;
     final String dirStr = "/testSnapshotLimit/dir";
@@ -366,7 +366,7 @@ public class TestNestedSnapshots_RestartInjected {
     }
   }
 
-  @Test (timeout=300000)
+  @Test
   public void testSnapshotName() throws Exception {
     final String dirStr = "/testSnapshotWithQuota/dir";
     final Path dir = new Path(dirStr);
@@ -436,7 +436,7 @@ public class TestNestedSnapshots_RestartInjected {
   /**
    * Test {@link Snapshot#ID_COMPARATOR}.
    */
-  @Test (timeout=300000)
+  @Test
   public void testIdCmp() {
     final PermissionStatus perm = PermissionStatus.createImmutable(
         "user", "group", FsPermission.createImmutable((short)0));

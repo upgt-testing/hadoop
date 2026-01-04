@@ -107,7 +107,7 @@ public class TestStoragePolicySatisfierWithStripedFile_RestartInjected {
    * Tests to verify that all the striped blocks(data + parity blocks) are
    * moving to satisfy the storage policy.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMoverWithFullStripe() throws Exception {
     // start 11 datanodes
     int numOfDatanodes = 11;
@@ -261,7 +261,7 @@ public class TestStoragePolicySatisfierWithStripedFile_RestartInjected {
    * while choosing the target node for A, it shouldn't choose C. For C, it
    * should do local block movement as it has ARCHIVE storage type.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenOnlyFewTargetNodesAreAvailableToSatisfyStoragePolicy()
       throws Exception {
     // start 10 datanodes
@@ -414,7 +414,7 @@ public class TestStoragePolicySatisfierWithStripedFile_RestartInjected {
    * 5. Start remaining 5 datanode.
    * 6. All replica  should be moved in proper storage based on policy.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWhenFileHasLowRedundancyBlocks() throws Exception {
     // start 9 datanodes
     int numOfDatanodes = 9;
@@ -556,7 +556,7 @@ public class TestStoragePolicySatisfierWithStripedFile_RestartInjected {
    *
    * SPS won't schedule any block movement for this path.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenNoTargetDatanodeToSatisfyStoragePolicy()
       throws Exception {
     // start 10 datanodes

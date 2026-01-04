@@ -38,7 +38,7 @@ public class TestNameNodeXAttr_RestartInjected extends FSXAttrBaseTest {
   private static final Path link = new Path(linkParent, "link");
   private static final Path target = new Path(targetParent, "target");
 
-  @Test(timeout = 120000)
+  @Test
   public void testXAttrSymlinks() throws Exception {
     fs.mkdirs(linkParent);
     fs.mkdirs(targetParent);

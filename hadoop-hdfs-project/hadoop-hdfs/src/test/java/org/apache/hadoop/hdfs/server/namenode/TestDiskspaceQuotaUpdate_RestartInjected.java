@@ -114,7 +114,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
   /**
    * Test if the quota can be correctly updated for create file
    */
-  @Test (timeout=60000)
+  @Test
   public void testQuotaUpdateWithFileCreate() throws Exception  {
     final Path foo =
         new Path(getParent(GenericTestUtils.getMethodName()), "foo");
@@ -159,7 +159,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
   /**
    * Test if the quota can be correctly updated for append
    */
-  @Test (timeout=60000)
+  @Test
   public void testUpdateQuotaForAppend() throws Exception {
     final Path foo =
         new Path(getParent(GenericTestUtils.getMethodName()), "foo");
@@ -250,7 +250,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
    * Test if the quota can be correctly updated when file length is updated
    * through fsync
    */
-  @Test (timeout=60000)
+  @Test
   public void testUpdateQuotaForFSync() throws Exception {
     final Path foo =
         new Path(getParent(GenericTestUtils.getMethodName()), "foo");
@@ -346,7 +346,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
   /**
    * Test append over storage quota does not mark file as UC or create lease
    */
-  @Test (timeout=60000)
+  @Test
   public void testAppendOverStorageQuota() throws Exception {
     final Path dir = getParent(GenericTestUtils.getMethodName());
     final Path file = new Path(dir, "file");
@@ -425,7 +425,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
    * Test append over a specific type of storage quota does not mark file as
    * UC or create a lease
    */
-  @Test (timeout=60000)
+  @Test
   public void testAppendOverTypeQuota() throws Exception {
     final Path dir = getParent(GenericTestUtils.getMethodName());
     final Path file = new Path(dir, "file");
@@ -513,7 +513,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
   /**
    * Test truncate over quota does not mark file as UC or create a lease
    */
-  @Test (timeout=60000)
+  @Test
   public void testTruncateOverQuota() throws Exception {
     final Path dir = getParent(GenericTestUtils.getMethodName());
     final Path file = new Path(dir, "file");
@@ -709,7 +709,7 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
    * and COMPLETE block steps, even if the replication factor is
    * changed during this time.
    */
-  @Test (timeout=60000)
+  @Test
   public void testQuotaIssuesWhileCommitting() throws Exception {
     // We want a one-DN cluster so that we can force a lack of
     // commit by only instrumenting a single DN; we kill the other 3
@@ -882,19 +882,19 @@ public class TestDiskspaceQuotaUpdate_RestartInjected {
     assertFalse(logs.getOutput().contains(logStmt));
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testCachedComputedSizesAgreeBeforeCommitting() throws Exception {
     // Don't actually change replication; just check that the sizes
     // agree before the commit period
     testQuotaIssuesBeforeCommitting((short)1, (short)1);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testDecreaseReplicationBeforeCommitting() throws Exception {
     testQuotaIssuesBeforeCommitting((short)4, (short)1);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testIncreaseReplicationBeforeCommitting() throws Exception {
     testQuotaIssuesBeforeCommitting((short)1, (short)4);
   }

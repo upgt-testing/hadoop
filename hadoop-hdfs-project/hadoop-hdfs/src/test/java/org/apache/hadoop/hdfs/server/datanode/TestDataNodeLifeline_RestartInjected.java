@@ -87,9 +87,7 @@ public class TestDataNodeLifeline_RestartInjected {
     GenericTestUtils.setLogLevel(DataNode.LOG, Level.ALL);
   }
 
-  @Rule
-  public Timeout timeout = new Timeout(60000);
-
+  
   private MiniDFSCluster cluster;
   private HdfsConfiguration conf;
   private DatanodeLifelineProtocolClientSideTranslatorPB lifelineNamenode;

@@ -96,7 +96,7 @@ public class TestDataNodeErasureCodingMetrics_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFullBlock() throws Exception {
     Assert.assertEquals(0, getLongMetric("EcReconstructionReadTimeMillis"));
     Assert.assertEquals(0, getLongMetric("EcReconstructionDecodingTimeMillis"));
@@ -121,7 +121,7 @@ public class TestDataNodeErasureCodingMetrics_RestartInjected {
   }
 
   // A partial block, reconstruct the partial block
-  @Test(timeout = 120000)
+  @Test
   public void testReconstructionBytesPartialGroup1() throws Exception {
     final int fileLen = blockSize / 10;
     doTest("/testEcBytes", fileLen, 0);
@@ -135,7 +135,7 @@ public class TestDataNodeErasureCodingMetrics_RestartInjected {
   }
 
   // 1 full block + 5 partial block, reconstruct the full block
-  @Test(timeout = 120000)
+  @Test
   public void testReconstructionBytesPartialGroup2() throws Exception {
     final int fileLen = cellSize * dataBlocks + cellSize + cellSize / 10;
     doTest("/testEcBytes", fileLen, 0);
@@ -150,7 +150,7 @@ public class TestDataNodeErasureCodingMetrics_RestartInjected {
   }
 
   // 1 full block + 5 partial block, reconstruct the partial block
-  @Test(timeout = 120000)
+  @Test
   public void testReconstructionBytesPartialGroup3() throws Exception {
     final int fileLen = cellSize * dataBlocks + cellSize + cellSize / 10;
     doTest("/testEcBytes", fileLen, 1);

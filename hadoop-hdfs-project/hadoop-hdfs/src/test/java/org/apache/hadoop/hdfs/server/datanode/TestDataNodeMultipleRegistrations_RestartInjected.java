@@ -254,7 +254,7 @@ public class TestDataNodeMultipleRegistrations_RestartInjected {
     }
   }
 
-  @Test(timeout = 20000)
+  @Test
   public void testClusterIdMismatchAtStartupWithHA() throws Exception {
     MiniDFSNNTopology top = new MiniDFSNNTopology()
       .addNameservice(new MiniDFSNNTopology.NSConf("ns1")

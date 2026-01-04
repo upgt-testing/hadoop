@@ -410,7 +410,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
   /**
    * Test adding one volume on a running MiniDFSCluster with only one NameNode.
    */
-  @Test(timeout=60000)
+  @Test
   public void testAddOneNewVolume()
       throws IOException, ReconfigurationException,
       InterruptedException, TimeoutException {
@@ -450,7 +450,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
    * Test re-adding one volume with some blocks on a running MiniDFSCluster
    * with only one NameNode to reproduce HDFS-13677.
    */
-  @Test(timeout=60000)
+  @Test
   public void testReAddVolumeWithBlocks()
       throws IOException, ReconfigurationException,
       InterruptedException, TimeoutException {
@@ -520,7 +520,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     assertEquals(15, maxNumBlocks);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAddVolumesDuringWrite()
       throws IOException, InterruptedException, TimeoutException,
       ReconfigurationException {
@@ -569,7 +569,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     assertEquals(expectedNumBlocks, actualNumBlocks);
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testAddVolumesConcurrently()
       throws IOException, InterruptedException, TimeoutException,
       ReconfigurationException {
@@ -680,7 +680,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     assertEquals(numVolumes, blockReports.get(0).size());
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAddVolumesToFederationNN()
       throws IOException, TimeoutException, InterruptedException,
       ReconfigurationException {
@@ -721,7 +721,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
         Collections.frequency(actualNumBlocks.get(0), 0));
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testRemoveOneVolume()
       throws ReconfigurationException, InterruptedException, TimeoutException,
       IOException {
@@ -769,7 +769,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     assertEquals(10 / 2 + 6, blocksForVolume1.getNumberOfBlocks());
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testReplicatingAfterRemoveVolume()
       throws InterruptedException, TimeoutException, IOException,
       ReconfigurationException {
@@ -898,7 +898,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     }
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testRemoveVolumeBeingWritten()
       throws InterruptedException, TimeoutException, ReconfigurationException,
       IOException, BrokenBarrierException {
@@ -1068,7 +1068,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testAddBackRemovedVolume()
       throws IOException, TimeoutException, InterruptedException,
       ReconfigurationException {
@@ -1119,7 +1119,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
    * DataNode upon a volume failure. Thus we can run reconfig on the same
    * configuration to reload the new volume on the same directory as the failed one.
    */
-  @Test(timeout=60000)
+  @Test
   public void testDirectlyReloadAfterCheckDiskError()
       throws Exception {
     // The test uses DataNodeTestUtils#injectDataDirFailure() to simulate
@@ -1167,7 +1167,7 @@ public class TestDataNodeHotSwapVolumes_RestartInjected {
   }
 
   /** Test that a full block report is sent after hot swapping volumes */
-  @Test(timeout=100000)
+  @Test
   public void testFullBlockReportAfterRemovingVolumes()
       throws IOException, ReconfigurationException {
 

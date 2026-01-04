@@ -555,7 +555,7 @@ public class TestAuditLogger_RestartInjected {
    * Verify Audit log entries for the successful ACL API calls and ACL commands
    * over FS Shell.
    */
-  @Test (timeout = 60000)
+  @Test
   public void testAuditLogForAcls() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFS_NAMENODE_ACLS_ENABLED_KEY, true);

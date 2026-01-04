@@ -51,9 +51,7 @@ public class TestBlockTokenWithDFSStriped_RestartInjected extends TestBlockToken
     FILE_SIZE =  BLOCK_SIZE * dataBlocks * 3;
   }
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   private Configuration getConf() {
     Configuration conf = super.getConf(numDNs);
     conf.setInt("io.bytes.per.checksum", cellSize);

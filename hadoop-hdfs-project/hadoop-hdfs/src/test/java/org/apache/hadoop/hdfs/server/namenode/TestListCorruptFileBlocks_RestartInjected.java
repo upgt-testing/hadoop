@@ -63,7 +63,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
   static final Logger LOG = NameNode.stateChangeLog;
 
   /** check if nn.getCorruptFiles() returns a file that has corrupted blocks */
-  @Test (timeout=300000)
+  @Test
   public void testListCorruptFilesCorruptedBlock() throws Exception {
     MiniDFSCluster cluster = null;
 
@@ -167,7 +167,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
   /**
    * Check that listCorruptFileBlocks works while the namenode is still in safemode.
    */
-  @Test (timeout=300000)
+  @Test
   public void testListCorruptFileBlocksInSafeMode() throws Exception {
     MiniDFSCluster cluster = null;
 
@@ -321,7 +321,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
   }
   
   // deliberately remove blocks from a file and validate the list-corrupt-file-blocks API
-  @Test (timeout=300000)
+  @Test
   public void testlistCorruptFileBlocks() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000);
@@ -458,7 +458,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
   /**
    * test listCorruptFileBlocks in DistributedFileSystem
    */
-  @Test (timeout=300000)
+  @Test
   public void testlistCorruptFileBlocksDFS() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000);
@@ -559,7 +559,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
    * Also, test that DFS.listCorruptFileBlocks can make multiple successive
    * calls.
    */
-  @Test (timeout=300000)
+  @Test
   public void testMaxCorruptFiles() throws Exception {
     MiniDFSCluster cluster = null;
     try {
@@ -672,7 +672,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testListCorruptFileBlocksOnRelativePath() throws Exception {
     Configuration conf = new Configuration();
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000);

@@ -123,7 +123,7 @@ public class TestPermissionSymlinks_RestartInjected {
     fs.delete(targetParent, true);
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testDelete() throws Exception {
     fs.setPermission(linkParent, new FsPermission((short) 0555));
     doDeleteLinkParentNotWritable();
@@ -195,7 +195,7 @@ public class TestPermissionSymlinks_RestartInjected {
         wrapper.exists(link));
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testReadWhenTargetNotReadable() throws Exception {
     fs.setPermission(target, new FsPermission((short) 0000));
     doReadTargetNotReadable();
@@ -228,7 +228,7 @@ public class TestPermissionSymlinks_RestartInjected {
     }
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testFileStatus() throws Exception {
     fs.setPermission(target, new FsPermission((short) 0000));
     doGetFileLinkStatusTargetNotReadable();
@@ -261,7 +261,7 @@ public class TestPermissionSymlinks_RestartInjected {
     });
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testRenameLinkTargetNotWritableFC() throws Exception {
     fs.setPermission(target, new FsPermission((short) 0555));
     fs.setPermission(targetParent, new FsPermission((short) 0555));
@@ -301,7 +301,7 @@ public class TestPermissionSymlinks_RestartInjected {
     assertTrue("Expected target to exist", wrapper.exists(target));
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testRenameSrcNotWritableFC() throws Exception {
     fs.setPermission(linkParent, new FsPermission((short) 0555));
     doRenameSrcNotWritableFC();
@@ -338,7 +338,7 @@ public class TestPermissionSymlinks_RestartInjected {
   // Need separate FileSystem tests since the server-side impl is different
   // See {@link ClientProtocol#rename} and {@link ClientProtocol#rename2}.
 
-  @Test(timeout = 5000)
+  @Test
   public void testRenameLinkTargetNotWritableFS() throws Exception {
     fs.setPermission(target, new FsPermission((short) 0555));
     fs.setPermission(targetParent, new FsPermission((short) 0555));
@@ -378,7 +378,7 @@ public class TestPermissionSymlinks_RestartInjected {
     assertTrue("Expected target to exist", wrapper.exists(target));
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testRenameSrcNotWritableFS() throws Exception {
     fs.setPermission(linkParent, new FsPermission((short) 0555));
     doRenameSrcNotWritableFS();

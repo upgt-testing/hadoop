@@ -181,38 +181,38 @@ public class TestDecommissionWithStriped_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFileFullBlockGroup() throws Exception {
     LOG.info("Starting test testFileFullBlockGroup");
     testDecommission(blockSize * dataBlocks, 9, 1, "testFileFullBlockGroup");
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFileMultipleBlockGroups() throws Exception {
     LOG.info("Starting test testFileMultipleBlockGroups");
     int writeBytes = 2 * blockSize * dataBlocks;
     testDecommission(writeBytes, 9, 1, "testFileMultipleBlockGroups");
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFileSmallerThanOneCell() throws Exception {
     LOG.info("Starting test testFileSmallerThanOneCell");
     testDecommission(cellSize - 1, 4, 1, "testFileSmallerThanOneCell");
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testFileSmallerThanOneStripe() throws Exception {
     LOG.info("Starting test testFileSmallerThanOneStripe");
     testDecommission(cellSize * 2, 5, 1, "testFileSmallerThanOneStripe");
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testDecommissionTwoNodes() throws Exception {
     LOG.info("Starting test testDecommissionTwoNodes");
     testDecommission(blockSize * dataBlocks, 9, 2, "testDecommissionTwoNodes");
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testDecommissionWithURBlockForSameBlockGroup() throws Exception {
     LOG.info("Starting test testDecommissionWithURBlocksForSameBlockGroup");
 
@@ -311,7 +311,7 @@ public class TestDecommissionWithStriped_RestartInjected {
    * DN decommission shouldn't reconstruction busy DN block.
    * @throws Exception
    */
-  @Test(timeout = 120000)
+  @Test
   public void testDecommissionWithBusyNode() throws Exception {
     byte busyDNIndex = 1;
     byte decommisionDNIndex = 0;
@@ -379,7 +379,7 @@ public class TestDecommissionWithStriped_RestartInjected {
    * in some case.
    * @throws Exception
    */
-  @Test(timeout = 120000)
+  @Test
   public void testDecommission2NodeWithBusyNode() throws Exception {
     byte busyDNIndex = 6;
     byte decommissionDNIndex = 6;
@@ -456,7 +456,7 @@ public class TestDecommissionWithStriped_RestartInjected {
    * Here, this list contains duplicated blocks and does not maintaining any
    * order.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testFileChecksumAfterDecommission() throws Exception {
     LOG.info("Starting test testFileChecksumAfterDecommission");
 
@@ -783,7 +783,7 @@ public class TestDecommissionWithStriped_RestartInjected {
    * Simulate that There are 2 nodes(dn0,dn1) in decommission. Firstly dn0
    * replicates in success, dn1 replicates in failure. Decommissions go on.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDecommissionWithFailedReplicating() throws Exception {
 
     // Write ec file.
@@ -899,7 +899,7 @@ public class TestDecommissionWithStriped_RestartInjected {
     return null;
   }
 
-  @Test (timeout = 120000)
+  @Test
   public void testDecommissionWithMissingBlock() throws Exception {
     // Write ec file.
     Path ecFile = new Path(ecDir, "missingOneInternalBLockFile");
@@ -1020,7 +1020,7 @@ public class TestDecommissionWithStriped_RestartInjected {
     cleanupFile(dfs, ecFile);
   }
 
-  @Test (timeout = 120000)
+  @Test
   public void testCountNodes() throws Exception{
     // Write ec file.
     Path ecFile = new Path(ecDir, "testCountNodes");
@@ -1108,7 +1108,7 @@ public class TestDecommissionWithStriped_RestartInjected {
    * in decommissioned. array[4] is null, array[5-12]{b[5-8],b[0-3]} are
    * in live.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testRecoveryWithDecommission() throws Exception {
     final Path ecFile = new Path(ecDir, "testRecoveryWithDecommission");
     int writeBytes = cellSize * dataBlocks;

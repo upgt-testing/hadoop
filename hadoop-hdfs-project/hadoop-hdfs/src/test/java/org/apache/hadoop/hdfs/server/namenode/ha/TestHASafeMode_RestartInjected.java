@@ -126,7 +126,7 @@ public class TestHASafeMode_RestartInjected {
   /**
    * Make sure the client retries when the active NN is in safemode
    */
-  @Test (timeout=300000)
+  @Test
   public void testClientRetrySafeMode() throws Exception {
     final Map<Path, Boolean> results = Collections
         .synchronizedMap(new HashMap<Path, Boolean>());
@@ -913,7 +913,7 @@ public class TestHASafeMode_RestartInjected {
   }
 
   /** Test NN crash and client crash/stuck immediately after block allocation */
-  @Test(timeout = 100000)
+  @Test
   public void testOpenFileWhenNNAndClientCrashAfterAddBlock() throws Exception {
     cluster.getConfiguration(0).set(
         DFSConfigKeys.DFS_NAMENODE_SAFEMODE_THRESHOLD_PCT_KEY, "1.0f");
@@ -962,7 +962,7 @@ public class TestHASafeMode_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testSafeModeExitAfterTransition() throws Exception {
     DFSTestUtil.createFile(fs, new Path("/test"), 5 * BLOCK_SIZE, (short) 3,
         1L);

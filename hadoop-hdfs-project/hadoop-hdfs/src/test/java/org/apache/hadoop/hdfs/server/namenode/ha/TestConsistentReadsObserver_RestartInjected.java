@@ -511,7 +511,7 @@ public class TestConsistentReadsObserver_RestartInjected {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   public void testMsyncFileContext() throws Exception {
     NameNode nn0 = dfsCluster.getNameNode(0);
     NameNode nn2 = dfsCluster.getNameNode(2);

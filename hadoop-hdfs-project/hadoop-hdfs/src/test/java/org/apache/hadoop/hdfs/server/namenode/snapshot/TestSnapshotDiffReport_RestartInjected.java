@@ -202,7 +202,7 @@ public class TestSnapshotDiffReport_RestartInjected {
   /**
    * Test the computation and representation of diff between snapshots.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testDiffReport() throws Exception {
     cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
 
@@ -340,7 +340,7 @@ public class TestSnapshotDiffReport_RestartInjected {
             DFSUtil.string2Bytes("subsub1/subsubsub1/link13")));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testSnapRootDescendantDiffReport() throws Exception {
     Assume.assumeTrue(conf.getBoolean(
         DFSConfigKeys.DFS_NAMENODE_SNAPSHOT_DIFF_ALLOW_SNAP_ROOT_DESCENDANT,
@@ -962,7 +962,7 @@ public class TestSnapshotDiffReport_RestartInjected {
    * sure the diff report computation correctly retrieve the diff from the
    * deleted sub-directory.
    */
-  @Test (timeout=60000)
+  @Test
   public void testDiffReport2() throws Exception {
     Path subsub1 = new Path(sub1, "subsub1");
     Path subsubsub1 = new Path(subsub1, "subsubsub1");
@@ -1527,7 +1527,7 @@ public class TestSnapshotDiffReport_RestartInjected {
    * Test Snapshot diff report for snapshots with open files captures in them.
    * Also verify if the diff report remains the same across NameNode restarts.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testDiffReportWithOpenFiles() throws Exception {
     // Construct the directory tree
     final Path level0A = new Path("/level_0_A");

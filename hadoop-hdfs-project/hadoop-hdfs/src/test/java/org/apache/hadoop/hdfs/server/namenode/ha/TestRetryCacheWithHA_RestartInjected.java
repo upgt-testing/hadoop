@@ -169,7 +169,7 @@ public class TestRetryCacheWithHA_RestartInjected {
    * 2. Trigger the NN failover
    * 3. Check the retry cache on the original standby NN
    */
-  @Test (timeout=60000)
+  @Test
   public void testRetryCacheOnStandbyNN() throws Exception {
     // 1. run operations
     DFSTestUtil.runOperations(cluster, dfs, conf, BlockSize, 0);
@@ -1178,84 +1178,84 @@ public class TestRetryCacheWithHA_RestartInjected {
     }
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testCreateSnapshot() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new CreateSnapshotOp(client, "/test", "s1");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testDeleteSnapshot() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new DeleteSnapshotOp(client, "/test", "s1");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testRenameSnapshot() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new RenameSnapshotOp(client, "/test", "s1", "s2");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testCreate() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new CreateOp(client, "/testfile");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testAppend() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new AppendOp(client, "/testfile");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testRename() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new RenameOp(client, "/file1", "/file2");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testRename2() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new Rename2Op(client, "/file1", "/file2");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testConcat() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new ConcatOp(client, new Path("/test/file"), 5);
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testDelete() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new DeleteOp(client, "/testfile");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testCreateSymlink() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new CreateSymlinkOp(client, "/testfile", "/testlink");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testUpdatePipeline() throws Exception {
     final DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new UpdatePipelineOp(client, "/testfile");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testAddCacheDirectiveInfo() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new AddCacheDirectiveInfoOp(client, 
@@ -1266,7 +1266,7 @@ public class TestRetryCacheWithHA_RestartInjected {
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testModifyCacheDirectiveInfo() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new ModifyCacheDirectiveInfoOp(client, 
@@ -1278,7 +1278,7 @@ public class TestRetryCacheWithHA_RestartInjected {
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testRemoveCacheDescriptor() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new RemoveCacheDirectiveInfoOp(client, "pool",
@@ -1286,35 +1286,35 @@ public class TestRetryCacheWithHA_RestartInjected {
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testAddCachePool() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new AddCachePoolOp(client, "pool");
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testModifyCachePool() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new ModifyCachePoolOp(client, "pool");
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testRemoveCachePool() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new RemoveCachePoolOp(client, "pool");
     testClientRetryWithFailover(op);
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testSetXAttr() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new SetXAttrOp(client, "/setxattr");
     testClientRetryWithFailover(op);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testRemoveXAttr() throws Exception {
     DFSClient client = genClientWithDummyHandler();
     AtMostOnceOp op = new RemoveXAttrOp(client, "/removexattr");
@@ -1440,7 +1440,7 @@ public class TestRetryCacheWithHA_RestartInjected {
    * Add a list of cache pools, list cache pools,
    * switch active NN, and list cache pools again.
    */
-  @Test (timeout=60000)
+  @Test
   public void testListCachePools() throws Exception {
     final int poolCount = 7;
     HashSet<String> poolNames = new HashSet<String>(poolCount);
@@ -1491,7 +1491,7 @@ public class TestRetryCacheWithHA_RestartInjected {
    * Add a list of cache directives, list cache directives,
    * switch active NN, and list cache directives again.
    */
-  @Test (timeout=60000)
+  @Test
   public void testListCacheDirectives() throws Exception {
     final int poolCount = 7;
     HashSet<String> poolNames = new HashSet<String>(poolCount);

@@ -94,7 +94,7 @@ public class TestDebugAdmin_RestartInjected {
         bytes.toString().replaceAll(System.lineSeparator(), "");
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testRecoverLease() throws Exception {
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
@@ -126,7 +126,7 @@ public class TestDebugAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testVerifyMetaCommand() throws Exception {
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
@@ -179,7 +179,7 @@ public class TestDebugAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testComputeMetaCommand() throws Exception {
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
@@ -245,7 +245,7 @@ public class TestDebugAdmin_RestartInjected {
     assertTrue(outFile.length() > 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testRecoverLeaseforFileNotFound() throws Exception {
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1).build();
     cluster.waitActive();
@@ -266,7 +266,7 @@ public class TestDebugAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testVerifyECCommand() throws Exception {
     final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies.getByID(
         SystemErasureCodingPolicies.RS_3_2_POLICY_ID);

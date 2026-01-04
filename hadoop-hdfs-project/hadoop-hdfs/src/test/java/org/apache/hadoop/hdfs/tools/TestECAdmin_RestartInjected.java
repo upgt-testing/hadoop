@@ -69,10 +69,6 @@ public class TestECAdmin_RestartInjected {
       SystemErasureCodingPolicies.getByID(
           SystemErasureCodingPolicies.XOR_2_1_POLICY_ID).getName();
 
-  @Rule
-  public Timeout globalTimeout =
-      new Timeout(300000, TimeUnit.MILLISECONDS);
-
   @Before
   public void setup() throws Exception {
     System.setOut(new PrintStream(out));

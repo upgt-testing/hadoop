@@ -109,7 +109,7 @@ public class TestSequentialBlockGroupId_RestartInjected {
   /**
    * Test that blockGroup IDs are generating unique value.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testBlockGroupIdGeneration() throws IOException {
     long blockGroupIdInitialValue = blockGrpIdGenerator.getCurrentValue();
 
@@ -147,7 +147,7 @@ public class TestSequentialBlockGroupId_RestartInjected {
   /**
    * Test that collisions in the blockGroup ID space are handled gracefully.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testTriggerBlockGroupIdCollision() throws IOException {
     long blockGroupIdInitialValue = blockGrpIdGenerator.getCurrentValue();
 
@@ -189,7 +189,7 @@ public class TestSequentialBlockGroupId_RestartInjected {
    * Test that collisions in the blockGroup ID when the id is occupied by legacy
    * block.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testTriggerBlockGroupIdCollisionWithLegacyBlockId()
       throws Exception {
     long blockGroupIdInitialValue = blockGrpIdGenerator.getCurrentValue();

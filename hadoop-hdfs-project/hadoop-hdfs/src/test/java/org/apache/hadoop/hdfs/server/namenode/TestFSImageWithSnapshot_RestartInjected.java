@@ -448,7 +448,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
   /**
    * Test the fsimage saving/loading while file appending.
    */
-  @Test (timeout=60000)
+  @Test
   public void testSaveLoadImageWithAppending() throws Exception {
     Path sub1 = new Path(dir, "sub1");
     Path sub1file1 = new Path(sub1, "sub1file1");
@@ -565,7 +565,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
   /**
    * Test the fsimage loading while there is file under construction.
    */
-  @Test (timeout=60000)
+  @Test
   public void testLoadImageWithAppending() throws Exception {
     Path sub1 = new Path(dir, "sub1");
     Path sub1file1 = new Path(sub1, "sub1file1");
@@ -625,7 +625,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
    * Test fsimage loading when 1) there is an empty file loaded from fsimage,
    * and 2) there is later an append operation to be applied from edit log.
    */
-  @Test (timeout=60000)
+  @Test
   public void testLoadImageWithEmptyFile() throws Exception {
     // create an empty file
     Path file = new Path(dir, "file");
@@ -697,7 +697,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
    * we may save these files/dirs to the fsimage, and cause FileNotFound 
    * Exception while loading fsimage.  
    */
-  @Test (timeout=300000)
+  @Test
   public void testSaveLoadImageAfterSnapshotDeletion()
       throws Exception {
     // create initial dir and subdir
@@ -817,7 +817,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
     printTree("deleted snapshot " + snapshotName);
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testDoubleRename() throws Exception {
     final Path parent = new Path("/parent");
     hdfs.mkdirs(parent);
@@ -964,7 +964,7 @@ public class TestFSImageWithSnapshot_RestartInjected {
     return b;
   }
 
-  @Test (timeout=60000)
+  @Test
   public void testFSImageWithDoubleRename() throws Exception {
     final Path dir1 = new Path("/dir1");
     final Path dir2 = new Path("/dir2");

@@ -117,7 +117,7 @@ public class TestSnapshotRename_RestartInjected {
    * Rename snapshot(s), and check the correctness of the snapshot list within
    * {@link INodeDirectorySnapshottable}
    */
-  @Test (timeout=60000)
+  @Test
   public void testSnapshotList() throws Exception {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
     RestartFramework.at("after_file_creation")
@@ -176,7 +176,7 @@ public class TestSnapshotRename_RestartInjected {
   /**
    * Test FileStatus of snapshot file before/after rename
    */
-  @Test (timeout=60000)
+  @Test
   public void testSnapshotRename() throws Exception {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
     RestartFramework.at("after_file_creation")
@@ -223,7 +223,7 @@ public class TestSnapshotRename_RestartInjected {
   /**
    * Test rename a non-existing snapshot
    */
-  @Test (timeout=60000)
+  @Test
   public void testRenameNonExistingSnapshot() throws Exception {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
     RestartFramework.at("after_file_creation")
@@ -251,7 +251,7 @@ public class TestSnapshotRename_RestartInjected {
   /**
    * Test rename a non-existing snapshot to itself.
    */
-  @Test (timeout=60000)
+  @Test
   public void testRenameNonExistingSnapshotToItself() throws Exception {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
     RestartFramework.at("after_file_creation")
@@ -279,7 +279,7 @@ public class TestSnapshotRename_RestartInjected {
   /**
    * Test rename a snapshot to another existing snapshot 
    */
-  @Test (timeout=60000)
+  @Test
   public void testRenameToExistingSnapshot() throws Exception {
     DFSTestUtil.createFile(hdfs, file1, BLOCKSIZE, REPLICATION, seed);
     RestartFramework.at("after_file_creation")

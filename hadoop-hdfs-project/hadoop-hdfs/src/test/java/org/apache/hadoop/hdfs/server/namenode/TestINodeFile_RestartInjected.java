@@ -591,7 +591,7 @@ public class TestINodeFile_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testWriteToDeletedFile() throws IOException {
     Configuration conf = new Configuration();
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)

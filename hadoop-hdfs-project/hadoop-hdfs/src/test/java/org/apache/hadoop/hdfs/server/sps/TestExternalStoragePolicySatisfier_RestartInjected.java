@@ -313,7 +313,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Test SPS runs fine when logging in with a keytab in kerberized env. Reusing
    * testWhenStoragePolicySetToALLSSD here for basic functionality testing.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWithKeytabs() throws Exception {
     try {
       initSecureConf(getConf());
@@ -343,7 +343,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testOutstandingQueueLimitExceeds() throws Exception {
     try {
       getConf().setInt(DFS_SPS_MAX_OUTSTANDING_PATHS_KEY, 3);
@@ -389,7 +389,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * is not being hold by a Mover. This can be the case when Mover exits
    * ungracefully without deleting the ID file from HDFS.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenMoverExitsWithoutDeleteMoverIDFile()
       throws IOException {
     try {
@@ -444,7 +444,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   }
 
 
-  @Test(timeout = 300000)
+  @Test
   public void testWhenStoragePolicySetToCOLD()
       throws Exception {
 
@@ -480,7 +480,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
         dfs);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testWhenStoragePolicySetToALLSSD()
       throws Exception {
     try {
@@ -513,7 +513,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testWhenStoragePolicySetToONESSD()
       throws Exception {
     try {
@@ -550,7 +550,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests to verify that the block storage movement report will be propagated
    * to Namenode via datanode heartbeat.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBlksStorageMovementAttemptFinishedReport() throws Exception {
     try {
       createCluster();
@@ -588,7 +588,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests to verify that multiple files are giving to satisfy storage policy
    * and should work well altogether.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMultipleFilesForSatisfyStoragePolicy() throws Exception {
     try {
       createCluster();
@@ -641,7 +641,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests to verify hdfsAdmin.satisfyStoragePolicy works well for file.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSatisfyFileWithHdfsAdmin() throws Exception {
     try {
       createCluster();
@@ -678,7 +678,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests to verify hdfsAdmin.satisfyStoragePolicy works well for dir.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSatisfyDirWithHdfsAdmin() throws Exception {
     try {
       createCluster();
@@ -731,7 +731,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests to verify hdfsAdmin.satisfyStoragePolicy exceptions.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSatisfyWithExceptions() throws Exception {
     try {
       createCluster();
@@ -800,7 +800,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * SPS will schedule block movement to the coordinator node with the details,
    * blk_1[move A(DISK) -> D(ARCHIVE)], blk_2[move A(DISK) -> D(ARCHIVE)].
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenOnlyFewTargetDatanodeAreAvailableToSatisfyStoragePolicy()
       throws Exception {
     try {
@@ -849,7 +849,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    *
    * SPS won't schedule any block movement for this path.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenNoTargetDatanodeToSatisfyStoragePolicy()
       throws Exception {
     try {
@@ -889,7 +889,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Test to verify that satisfy worker can't move blocks. If the given block is
    * pinned it shouldn't be considered for retries.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testMoveWithBlockPinning() throws Exception {
     try{
       config.setBoolean(DFSConfigKeys.DFS_DATANODE_BLOCK_PINNING_ENABLED, true);
@@ -947,7 +947,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * blk_1[move A(DISK) -> A(ARCHIVE), move E(DISK) -> E(ARCHIVE)],
    * blk_2[move A(DISK) -> A(ARCHIVE), move E(DISK) -> E(ARCHIVE)].
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWhenOnlyFewSourceNodesHaveMatchingTargetNodes()
       throws Exception {
     try {
@@ -988,7 +988,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * storagepolicy set to ONE_SSD and request satisfyStoragePolicy, then block
    * should move to DN2[SSD] successfully.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBlockMoveInSameDatanodeWithONESSD() throws Exception {
     StorageType[][] diskTypes =
         new StorageType[][]{{StorageType.DISK, StorageType.ARCHIVE},
@@ -1022,7 +1022,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * satisfyStoragePolicy, then block should move to DN1[ARCHIVE] and
    * DN2[ARCHIVE] successfully.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBlockMoveInSameAndRemoteDatanodesWithWARM() throws Exception {
     StorageType[][] diskTypes =
         new StorageType[][]{{StorageType.DISK, StorageType.ARCHIVE},
@@ -1055,7 +1055,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * If replica with expected storage type already exist in source DN then that
    * DN should be skipped.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWhenReplicaWithExpectedStorageAlreadyAvailableInSource()
       throws Exception {
     StorageType[][] diskTypes = new StorageType[][] {
@@ -1099,7 +1099,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * Tests that movements should not be assigned when there is no space in
    * target DN.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testChooseInSameDatanodeWithONESSDShouldNotChooseIfNoSpace()
       throws Exception {
     StorageType[][] diskTypes =
@@ -1165,7 +1165,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSShouldNotLeakXattrIfSatisfyStoragePolicyCallOnECFiles()
       throws Exception {
     StorageType[][] diskTypes =
@@ -1238,7 +1238,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * 2. Call satisfyStoragePolicy for empty file.
    * 3. SPS should skip this file and xattr should not be added for empty file.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWhenFileLengthIsZero() throws Exception {
     try {
       hdfsCluster = startCluster(config, allDiskTypes, NUM_OF_DATANODES,
@@ -1273,7 +1273,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * 6. Third Datanode replica also should be moved in proper
    * sorage based on policy.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWhenFileHasLowRedundancyBlocks() throws Exception {
     try {
       config.set(DFSConfigKeys
@@ -1319,7 +1319,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * 4. Set policy and call satisfyStoragePolicy for file.
    * 5. Block should be moved successfully.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWhenFileHasExcessRedundancyBlocks() throws Exception {
     try {
       config.set(DFSConfigKeys
@@ -1356,7 +1356,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   /**
    * Test SPS for empty directory, xAttr should be removed.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSForEmptyDirectory() throws IOException, TimeoutException,
       InterruptedException {
     try {
@@ -1378,7 +1378,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   /**
    * Test SPS for not exist directory.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSForNonExistDirectory() throws Exception {
     try {
       hdfsCluster = startCluster(config, allDiskTypes, NUM_OF_DATANODES,
@@ -1400,7 +1400,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   /**
    * Test SPS for directory tree which doesn't have files.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSWithDirectoryTreeWithoutFile() throws Exception {
     try {
       hdfsCluster = startCluster(config, allDiskTypes, NUM_OF_DATANODES,
@@ -1434,7 +1434,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   /**
    * Test SPS that satisfy the files and then delete the files before start SPS.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSSatisfyAndThenDeleteFileBeforeStartSPS() throws Exception {
     try {
       createCluster();
@@ -1479,7 +1479,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
   /**
    * Test SPS for directory which has multilevel directories.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMultipleLevelDirectoryForSatisfyStoragePolicy()
       throws Exception {
     try {
@@ -1518,7 +1518,7 @@ public class TestExternalStoragePolicySatisfier_RestartInjected {
    * 6. Call SPS for 11-20 files to trigger move block tasks to new DNs
    * 7. Wait for the under replica and SPS tasks completion
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMoveBlocksWithUnderReplicatedBlocks() throws Exception {
     try {
       config.setInt(DFSConfigKeys.DFS_NAMENODE_REPLICATION_MAX_STREAMS_KEY, 3);

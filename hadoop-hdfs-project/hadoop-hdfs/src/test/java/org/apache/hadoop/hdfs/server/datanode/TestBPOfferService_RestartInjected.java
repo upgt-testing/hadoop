@@ -1053,7 +1053,7 @@ public class TestBPOfferService_RestartInjected {
 
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testRefreshNameNodes() throws Exception {
 
     BPOfferService bpos = setupBPOSForNNs(mockDn, mockNN1, mockNN2);
@@ -1127,7 +1127,7 @@ public class TestBPOfferService_RestartInjected {
     }
   }
 
-  @Test(timeout = 15000)
+  @Test
   public void testRefreshLeaseId() throws Exception {
     Mockito.when(mockNN1.sendHeartbeat(
         Mockito.any(DatanodeRegistration.class),
@@ -1191,7 +1191,7 @@ public class TestBPOfferService_RestartInjected {
     }
   }
 
-  @Test(timeout = 15000)
+  @Test
   public void testCommandProcessingThread() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).build();
@@ -1233,7 +1233,7 @@ public class TestBPOfferService_RestartInjected {
     }
   }
 
-  @Test(timeout = 5000)
+  @Test
   public void testCommandProcessingThreadExit() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).

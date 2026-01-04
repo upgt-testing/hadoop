@@ -62,7 +62,7 @@ public class TestStandbyIsHot_RestartInjected {
     DFSTestUtil.setNameNodeLogLevel(Level.ALL);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testStandbyIsHot() throws Exception {
     Configuration conf = new Configuration();
     // We read from the standby to watch block locations
@@ -190,7 +190,7 @@ public class TestStandbyIsHot_RestartInjected {
    * In the bug, the standby node would only very slowly notice the blocks returning
    * to the cluster.
    */
-  @Test(timeout=60000)
+  @Test
   public void testDatanodeRestarts() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);

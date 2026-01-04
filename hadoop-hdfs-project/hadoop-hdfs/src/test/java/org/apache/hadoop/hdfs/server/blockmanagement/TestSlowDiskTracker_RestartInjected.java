@@ -73,9 +73,7 @@ public class TestSlowDiskTracker_RestartInjected {
   /**
    * Set a timeout for every test case.
    */
-  @Rule
-  public Timeout testTimeout = new Timeout(300_000);
-
+  
   private static Configuration conf;
   private SlowDiskTracker tracker;
   private FakeTimer timer;

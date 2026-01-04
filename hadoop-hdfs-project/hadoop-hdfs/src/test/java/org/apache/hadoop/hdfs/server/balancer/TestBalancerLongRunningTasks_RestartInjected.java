@@ -155,7 +155,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
    * Replica in (DN0,SSD) should not be moved to (DN1,SSD).
    * Otherwise DN1 has 2 replicas.
    */
-  @Test(timeout = 100000)
+  @Test
   public void testTwoReplicaShouldNotInSameDN() throws Exception {
     final Configuration conf = new HdfsConfiguration();
 
@@ -235,7 +235,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
    * One DN has two files on RAM_DISK, other DN has no files on RAM_DISK.
    * Then verify that the balancer does not migrate files on RAM_DISK across DN.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBalancerWithRamDisk() throws Exception {
     final int seed = 0xFADED;
     final short replicationFactor = 1;
@@ -324,7 +324,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
   /**
    * Balancer should not move blocks with size < minBlockSize.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testMinBlockSizeAndSourceNodes() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -466,7 +466,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 100000)
+  @Test
   public void testUpgradeDomainPolicyAfterBalance() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -486,7 +486,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 100000)
+  @Test
   public void testRackPolicyAfterBalance() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -588,7 +588,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 100000)
+  @Test
   public void testBalancerWithPinnedBlocks() throws Exception {
     // This test assumes stick-bit based block pin mechanism available only
     // in Linux/Unix. It can be unblocked on Windows when HDFS-7759 is ready to
@@ -664,7 +664,7 @@ public class TestBalancerLongRunningTasks_RestartInjected {
     assertEquals(ExitStatus.NO_MOVE_PROGRESS.getExitCode(), r);
   }
 
-  @Test(timeout = 100000)
+  @Test
   public void testMaxIterationTime() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);

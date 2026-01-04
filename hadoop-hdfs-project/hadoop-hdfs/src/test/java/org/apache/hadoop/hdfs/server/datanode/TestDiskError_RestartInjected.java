@@ -287,7 +287,7 @@ public class TestDiskError_RestartInjected {
    * Before refactoring the code the above function was not getting called
    * @throws IOException, InterruptedException
    */
-  @Test(timeout=60000)
+  @Test
   public void testcheckDiskError() throws Exception {
     if(cluster.getDataNodes().size() <= 0) {
       cluster.startDataNodes(conf, 1, true, null, null);

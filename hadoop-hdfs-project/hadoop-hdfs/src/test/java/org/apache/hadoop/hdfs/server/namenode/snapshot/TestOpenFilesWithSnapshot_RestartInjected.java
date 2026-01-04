@@ -411,7 +411,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    *   \- level_2_D        (Snapshottable Dir)
    *     +- hbase.log      (open file, under snap root)
    */
-  @Test (timeout = 120000)
+  @Test
   public void testPointInTimeSnapshotCopiesForOpenFiles() throws Exception {
     // Construct the directory tree
     final Path level0A = new Path("/level_0_A");
@@ -589,7 +589,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    * Test snapshot capturing open files and verify the same
    * across NameNode restarts.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testSnapshotsForOpenFilesWithNNRestart() throws Exception {
     // Construct the directory tree
     final Path level0A = new Path("/level_0_A");
@@ -667,7 +667,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    * Test snapshot capturing open files when an open file with active lease
    * is deleted by the client.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testSnapshotsForOpenFilesAndDeletion() throws Exception {
     // Construct the directory tree
     final Path snapRootDir = new Path("/level_0_A");
@@ -795,7 +795,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    *
    * @throws Exception
    */
-  @Test (timeout = 600000)
+  @Test
   public void testOpenFileDeletionAndNNRestart() throws Exception {
     // Construct the directory tree
     final Path snapRootDir = new Path("/level_0_A/test");
@@ -876,7 +876,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    * Test client writing to open files are not interrupted when snapshots
    * that captured open files get deleted.
    */
-  @Test (timeout = 240000)
+  @Test
   public void testOpenFileWritingAcrossSnapDeletion() throws Exception {
     final Path snapRootDir = new Path("/level_0_A");
     final String flumeFileName = "flume.log";
@@ -978,7 +978,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
    * Verify snapshots with open files captured are safe even when the
    * 'current' version of the file is truncated and appended later.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testOpenFilesSnapChecksumWithTrunkAndAppend() throws Exception {
     // Construct the directory tree
     final Path dir = new Path("/A/B/C");

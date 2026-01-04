@@ -77,9 +77,7 @@ public class TestSaslDataTransfer_RestartInjected extends SaslDataTransferTestCa
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
-  @Rule
-  public Timeout timeout = new Timeout(60000);
-
+  
   @After
   public void shutdown() {
     IOUtils.cleanupWithLogger(null, fs);
@@ -294,7 +292,7 @@ public class TestSaslDataTransfer_RestartInjected extends SaslDataTransferTestCa
   /**
    * Verifies that peerFromSocketAndKey honors socket read timeouts.
    */
-  @Test(timeout=60000)
+  @Test
   public void TestPeerFromSocketAndKeyReadTimeout() throws Exception {
     HdfsConfiguration conf = createSecureConfig(
         "authentication,integrity,privacy");

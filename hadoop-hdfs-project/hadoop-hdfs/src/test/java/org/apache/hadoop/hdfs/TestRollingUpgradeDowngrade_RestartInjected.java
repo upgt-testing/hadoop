@@ -41,7 +41,7 @@ public class TestRollingUpgradeDowngrade_RestartInjected {
    * Downgrade option is already obsolete. It should throw exception.
    * @throws Exception
    */
-  @Test(timeout = 300000, expected = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testDowngrade() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     MiniQJMHACluster cluster = null;

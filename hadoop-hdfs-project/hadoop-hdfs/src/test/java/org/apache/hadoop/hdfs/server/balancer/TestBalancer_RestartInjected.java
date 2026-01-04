@@ -1019,7 +1019,7 @@ public class TestBalancer_RestartInjected {
     oneNodeTest(conf, false);
   }
 
-  @Test(timeout = 100000)
+  @Test
   public void testUnknownDatanodeSimple() throws Exception {
     Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1111,7 +1111,7 @@ public class TestBalancer_RestartInjected {
    * Test parse method in Balancer#Cli class with threshold value out of
    * boundaries.
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliParseWithThresholdOutOfBoundaries() {
     String parameters[] = new String[] { "-threshold", "0" };
     String reason = "IllegalArgumentException is expected when threshold value"
@@ -1133,7 +1133,7 @@ public class TestBalancer_RestartInjected {
 
   /** Test a cluster with even distribution,
    * then a new empty node is added to the cluster*/
-  @Test(timeout=100000)
+  @Test
   public void testBalancer0() throws Exception {
     testBalancer0Internal(new HdfsConfiguration());
   }
@@ -1145,7 +1145,7 @@ public class TestBalancer_RestartInjected {
   }
 
   /** Test unevenly distributed cluster */
-  @Test(timeout=100000)
+  @Test
   public void testBalancer1() throws Exception {
     testBalancer1Internal(new HdfsConfiguration());
   }
@@ -1165,14 +1165,14 @@ public class TestBalancer_RestartInjected {
     testBalancer1Internal (conf);
   }
 
-  @Test(timeout=100000)
+  @Test
   public void testBalancerWithNonZeroThreadsForMove() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_DATANODE_BALANCE_MAX_NUM_CONCURRENT_MOVES_KEY, 8);
     testBalancer1Internal(conf);
   }
 
-  @Test(timeout=100000)
+  @Test
   public void testBalancer2() throws Exception {
     testBalancer2Internal(new HdfsConfiguration());
   }
@@ -1243,7 +1243,7 @@ public class TestBalancer_RestartInjected {
   /**
    * Test parse method in Balancer#Cli class with wrong number of params
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliParseWithWrongParams() {
     String parameters[] = new String[] { "-threshold" };
     String reason =
@@ -1345,7 +1345,7 @@ public class TestBalancer_RestartInjected {
   /**
    * Verify balancer exits 0 on success.
    */
-  @Test(timeout=100000)
+  @Test
   public void testExitZeroOnSuccess() throws Exception {
     final Configuration conf = new HdfsConfiguration();
 
@@ -1359,7 +1359,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerWithExcludeList() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1377,7 +1377,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerWithExcludeListWithPorts() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1390,7 +1390,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithExcludeList() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1409,7 +1409,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithExcludeListWithPorts() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1422,7 +1422,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list in a file
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithExcludeListInAFile() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1440,7 +1440,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the exclude list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithExcludeListWithPortsInAFile() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1453,7 +1453,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerWithIncludeList() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1470,7 +1470,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerWithIncludeListWithPorts() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1483,7 +1483,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithIncludeList() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1500,7 +1500,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithIncludeListWithPorts() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1513,7 +1513,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithIncludeListInAFile() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1530,7 +1530,7 @@ public class TestBalancer_RestartInjected {
    * then three nodes are added to the cluster,
    * runs balancer with two of the nodes in the include list
    */
-  @Test(timeout=100000)
+  @Test
   public void testBalancerCliWithIncludeListWithPortsInAFile() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1541,7 +1541,7 @@ public class TestBalancer_RestartInjected {
   /**
    * Check that the balancer exits when there is an unfinalized upgrade.
    */
-  @Test(timeout=300000)
+  @Test
   public void testBalancerDuringUpgrade() throws Exception {
     final int SEED = 0xFADED;
     Configuration conf = new HdfsConfiguration();
@@ -1631,7 +1631,7 @@ public class TestBalancer_RestartInjected {
    * Case-2: When running second balancer 'balancer.id' file exists but the
    * lease doesn't exists. Now, the second balancer should run successfully.
    */
-  @Test(timeout = 100000)
+  @Test
   public void testManyBalancerSimultaneously() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1721,7 +1721,7 @@ public class TestBalancer_RestartInjected {
     doTestBalancerWithStripedFile(conf);
   }
 
-  @Test(timeout = 200000)
+  @Test
   public void testBalancerWithStripedFile() throws Exception {
     Configuration conf = new Configuration();
     initConfWithStripe(conf);
@@ -1967,7 +1967,7 @@ public class TestBalancer_RestartInjected {
    * Test Balancer runs fine when logging in with a keytab in kerberized env.
    * Reusing testUnknownDatanode here for basic functionality testing.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBalancerWithKeytabs() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     try {

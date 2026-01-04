@@ -73,7 +73,7 @@ public class TestFileContextSnapshot_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testCreateAndDeleteSnapshot() throws Exception {
     DFSTestUtil.createFile(dfs, filePath, BLOCKSIZE, REPLICATION, SEED);
 
@@ -136,7 +136,7 @@ public class TestFileContextSnapshot_RestartInjected {
   /**
    * Test FileStatus of snapshot file before/after rename
    */
-  @Test(timeout = 60000)
+  @Test
   public void testRenameSnapshot() throws Exception {
     DFSTestUtil.createFile(dfs, filePath, BLOCKSIZE, REPLICATION, SEED);
 

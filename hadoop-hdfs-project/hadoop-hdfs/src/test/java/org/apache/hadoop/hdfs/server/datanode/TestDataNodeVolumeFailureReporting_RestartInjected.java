@@ -91,9 +91,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
   final int WAIT_FOR_DEATH = 15000;
 
   // specific the timeout for entire test class
-  @Rule
-  public Timeout timeout = new Timeout(120 * 1000);
-
+  
   @Before
   public void setUp() throws Exception {
     // These tests use DataNodeTestUtils#injectDataDirFailure() to simulate

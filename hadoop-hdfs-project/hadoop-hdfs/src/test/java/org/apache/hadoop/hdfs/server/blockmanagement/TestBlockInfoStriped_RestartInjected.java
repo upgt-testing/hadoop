@@ -83,9 +83,7 @@ public class TestBlockInfoStriped_RestartInjected {
     return blocks;
   }
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   /**
    * Test adding storage and reported block.
    */

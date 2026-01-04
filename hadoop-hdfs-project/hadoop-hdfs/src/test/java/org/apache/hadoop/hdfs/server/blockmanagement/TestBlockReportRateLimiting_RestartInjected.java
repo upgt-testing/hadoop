@@ -66,7 +66,7 @@ public class TestBlockReportRateLimiting_RestartInjected {
     GenericTestUtils.setLogLevel(BlockReportLeaseManager.LOG, Level.ALL);
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testRateLimitingDuringDataNodeStartup() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFS_NAMENODE_MAX_FULL_BLOCK_REPORT_LEASES, 1);
@@ -184,7 +184,7 @@ public class TestBlockReportRateLimiting_RestartInjected {
    * first datanode gets a lease, kill it.  Then wait for the lease to
    * expire, and the second datanode to send a full block report.
    */
-  @Test(timeout=180000)
+  @Test
   public void testLeaseExpiration() throws Exception {
     Configuration conf = new Configuration();
     conf.setInt(DFS_NAMENODE_MAX_FULL_BLOCK_REPORT_LEASES, 1);

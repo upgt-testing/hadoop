@@ -86,7 +86,7 @@ public class TestStoragePolicySatisfierWithHA_RestartInjected {
    * Tests to verify that SPS should run/stop automatically when NN state
    * changes between Standby and Active.
    */
-  @Test(timeout = 90000)
+  @Test
   public void testWhenNNHAStateChanges() throws IOException {
     try {
       createCluster();

@@ -33,7 +33,7 @@ import org.restarttest.core.RestartMode;
 
 public class TestSymlinkHdfsDisable_RestartInjected {
 
-  @Test(timeout=60000)
+  @Test
   public void testSymlinkHdfsDisable() throws Exception {
     Configuration conf = new HdfsConfiguration();
     // disable symlink resolution

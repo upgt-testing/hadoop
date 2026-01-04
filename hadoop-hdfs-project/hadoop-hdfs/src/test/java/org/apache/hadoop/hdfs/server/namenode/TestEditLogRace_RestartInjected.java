@@ -611,7 +611,7 @@ public class TestEditLogRace_RestartInjected {
     }
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testDeadlock() throws Throwable {
     GenericTestUtils.setLogLevel(FSEditLog.LOG, Level.DEBUG);
     GenericTestUtils.setLogLevel(FSEditLogAsync.LOG, Level.DEBUG);

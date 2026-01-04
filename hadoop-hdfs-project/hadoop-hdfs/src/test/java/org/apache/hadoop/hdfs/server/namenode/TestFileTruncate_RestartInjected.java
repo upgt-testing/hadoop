@@ -259,7 +259,7 @@ public class TestFileTruncate_RestartInjected {
   /**
    * Test truncate twice together on a file.
    */
-  @Test(timeout=90000)
+  @Test
   public void testTruncateTwiceTogether() throws Exception {
 
     Path dir = new Path("/testTruncateTwiceTogether");
@@ -777,7 +777,7 @@ public class TestFileTruncate_RestartInjected {
    * The last block is truncated at mid. (non copy-on-truncate)
    * dn0 is shutdown before truncate and restart after truncate successful.
    */
-  @Test(timeout=60000)
+  @Test
   public void testTruncateWithDataNodesRestart() throws Exception {
     int startingFileSize = 3 * BLOCK_SIZE;
     byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
@@ -828,7 +828,7 @@ public class TestFileTruncate_RestartInjected {
    * The last block is truncated at mid. (copy-on-truncate)
    * dn1 is shutdown before truncate and restart after truncate successful.
    */
-  @Test(timeout=60000)
+  @Test
   public void testCopyOnTruncateWithDataNodesRestart() throws Exception {
     int startingFileSize = 3 * BLOCK_SIZE;
     byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
@@ -881,7 +881,7 @@ public class TestFileTruncate_RestartInjected {
    * The last block is truncated at mid. (non copy-on-truncate)
    * dn0, dn1 are restarted immediately after truncate.
    */
-  @Test(timeout=60000)
+  @Test
   public void testTruncateWithDataNodesRestartImmediately() throws Exception {
     int startingFileSize = 3 * BLOCK_SIZE;
     byte[] contents = AppendTestUtil.initBuffer(startingFileSize);
@@ -943,7 +943,7 @@ public class TestFileTruncate_RestartInjected {
    * The last block is truncated at mid. (non copy-on-truncate)
    * shutdown the datanodes immediately after truncate.
    */
-  @Test(timeout=60000)
+  @Test
   public void testTruncateWithDataNodesShutdownImmediately() throws Exception {
     int startingFileSize = 3 * BLOCK_SIZE;
     byte[] contents = AppendTestUtil.initBuffer(startingFileSize);

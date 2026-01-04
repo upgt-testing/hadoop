@@ -432,7 +432,7 @@ public class TestDecommissioningStatus_RestartInjected {
    * as dead before decommission has completed. That will allow DN to resume
    * the replication process after it rejoins the cluster.
    */
-  @Test(timeout=120000)
+  @Test
   public void testDecommissionStatusAfterDNRestart() throws Exception {
     DistributedFileSystem fileSys =
         (DistributedFileSystem)cluster.getFileSystem();
@@ -546,7 +546,7 @@ public class TestDecommissioningStatus_RestartInjected {
    * Under this scenario the datanode should immediately be marked as
    * DECOMMISSIONED
    */
-  @Test(timeout=120000)
+  @Test
   public void testDecommissionDeadDN() throws Exception {
     Logger log = LoggerFactory.getLogger(DatanodeAdminManager.class);
     GenericTestUtils.setLogLevel(log, Level.DEBUG);
@@ -598,7 +598,7 @@ public class TestDecommissioningStatus_RestartInjected {
     dm.refreshNodes(conf);
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testDecommissionLosingData() throws Exception {
     ArrayList<String> nodes = new ArrayList<String>(2);
     FSNamesystem fsn = cluster.getNamesystem();

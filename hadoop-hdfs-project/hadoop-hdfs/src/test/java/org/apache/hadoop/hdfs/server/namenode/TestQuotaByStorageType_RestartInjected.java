@@ -101,7 +101,7 @@ public class TestQuotaByStorageType_RestartInjected {
     fsn = cluster.getNamesystem();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateOneSSD() throws Exception {
     testQuotaByStorageTypeWithFileCreateCase(
         HdfsConstants.ONESSD_STORAGE_POLICY_NAME,
@@ -109,7 +109,7 @@ public class TestQuotaByStorageType_RestartInjected {
         (short)1);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateAllSSD() throws Exception {
     testQuotaByStorageTypeWithFileCreateCase(
         HdfsConstants.ALLSSD_STORAGE_POLICY_NAME,
@@ -144,7 +144,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(file1Len * replication, storageTypeConsumed);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateAppend() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -184,7 +184,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(cs.getTypeConsumed(StorageType.DISK), file1Len * 2);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateDelete() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -225,7 +225,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(cs.getTypeConsumed(StorageType.DISK), 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateRename() throws Exception {
     final Path foo = new Path(dir, "foo");
     dfs.mkdirs(foo);
@@ -275,7 +275,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * Test if the quota can be correctly updated for create file even
    * QuotaByStorageTypeExceededException is thrown
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeExceptionWithFileCreate() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -321,7 +321,7 @@ public class TestQuotaByStorageType_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeParentOffChildOff() throws Exception {
     final Path parent = new Path(dir, "parent");
     final Path child = new Path(parent, "child");
@@ -347,7 +347,7 @@ public class TestQuotaByStorageType_RestartInjected {
 
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeParentOffChildOn() throws Exception {
     final Path parent = new Path(dir, "parent");
     final Path child = new Path(parent, "child");
@@ -372,7 +372,7 @@ public class TestQuotaByStorageType_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeParentOnChildOff() throws Exception {
     short replication = 1;
     final Path parent = new Path(dir, "parent");
@@ -413,7 +413,7 @@ public class TestQuotaByStorageType_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeParentOnChildOn() throws Exception {
     final Path parent = new Path(dir, "parent");
     final Path child = new Path(parent, "child");
@@ -442,7 +442,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * Both traditional space quota and the storage type quota for SSD are set and
    * not exceeded.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithTraditionalQuota() throws Exception {
     final Path foo = new Path(dir, "foo");
     dfs.mkdirs(foo);
@@ -486,7 +486,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * exceeded. expect DSQuotaExceededException is thrown as we check traditional
    * space quota first and then storage type quota.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeAndTraditionalQuotaException1()
       throws Exception {
     testQuotaByStorageTypeOrTraditionalQuotaExceededCase(
@@ -497,7 +497,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * Both traditional space quota and the storage type quota for SSD are set and
    * SSD quota is exceeded but traditional space quota is not exceeded.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeAndTraditionalQuotaException2()
       throws Exception {
     testQuotaByStorageTypeOrTraditionalQuotaExceededCase(
@@ -508,7 +508,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * Both traditional space quota and the storage type quota for SSD are set and
    * traditional space quota is exceeded but SSD quota is not exceeded.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeAndTraditionalQuotaException3()
       throws Exception {
     testQuotaByStorageTypeOrTraditionalQuotaExceededCase(
@@ -551,7 +551,7 @@ public class TestQuotaByStorageType_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithSnapshot() throws Exception {
     final Path sub1 = new Path(dir, "Sub1");
     dfs.mkdirs(sub1);
@@ -614,7 +614,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(cs2.getTypeConsumed(StorageType.DISK), 0);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testQuotaByStorageTypeWithFileCreateTruncate() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -756,7 +756,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(file1Len, ssdConsumedAfterNNRestart);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testContentSummaryWithoutQuotaByStorageType() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -781,7 +781,7 @@ public class TestQuotaByStorageType_RestartInjected {
     assertEquals(cs.getTypeConsumed(StorageType.DISK), file1Len * 2);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testContentSummaryWithoutStoragePolicy() throws Exception {
     final Path foo = new Path(dir, "foo");
     Path createdFile1 = new Path(foo, "created_file1.data");
@@ -870,7 +870,7 @@ public class TestQuotaByStorageType_RestartInjected {
    * Tests if changing replication factor results in copying file as quota
    * doesn't exceed.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testStorageSpaceQuotaWithRepFactor() throws IOException {
     final Path testDir = new Path(dir,
         GenericTestUtils.getMethodName());
@@ -915,7 +915,7 @@ public class TestQuotaByStorageType_RestartInjected {
    *
    * @throws IOException
    */
-  @Test(timeout = 30000)
+  @Test
   public void testStorageSpaceQuotaPerQuotaClear() throws IOException {
     final Path testDir = new Path(dir,
         GenericTestUtils.getMethodName());

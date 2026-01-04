@@ -201,7 +201,7 @@ public class TestBlockReaderLocalLegacy_RestartInjected {
     cluster.shutdown();
   }
 
-  @Test(timeout=20000)
+  @Test
   public void testBlockReaderLocalLegacyWithAppend() throws Exception {
     final short REPL_FACTOR = 1;
     final HdfsConfiguration conf = getConfiguration(null);

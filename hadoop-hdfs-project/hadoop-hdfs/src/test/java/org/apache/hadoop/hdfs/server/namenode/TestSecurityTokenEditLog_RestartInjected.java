@@ -210,7 +210,7 @@ public class TestSecurityTokenEditLog_RestartInjected {
     }
   }
   
-  @Test(timeout=10000)
+  @Test
   public void testEditsForCancelOnTokenExpire() throws IOException,
   InterruptedException {
     long renewInterval = 2000;

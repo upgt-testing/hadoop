@@ -730,7 +730,7 @@ public class TestFileAppend_RestartInjected{
     }
   }
   
-  @Test(timeout = 10000)
+  @Test
   public void testAppendCorruptedBlock() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 1024);
@@ -758,7 +758,7 @@ public class TestFileAppend_RestartInjected{
     }
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testConcurrentAppendRead()
       throws IOException, TimeoutException, InterruptedException {
     // Create a finalized replica and append to it

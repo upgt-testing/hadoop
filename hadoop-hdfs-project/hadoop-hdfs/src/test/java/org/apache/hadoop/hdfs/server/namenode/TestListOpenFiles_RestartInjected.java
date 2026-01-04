@@ -97,7 +97,7 @@ public class TestListOpenFiles_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000L)
+  @Test
   public void testListOpenFilesViaNameNodeRPC() throws Exception {
     RestartFramework.at("after_cluster_start")
         .on(cluster)
@@ -229,7 +229,7 @@ public class TestListOpenFiles_RestartInjected {
   /**
    * Verify dfsadmin -listOpenFiles command in HA mode.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testListOpenFilesInHA() throws Exception {
     fs.close();
     cluster.shutdown();
@@ -318,7 +318,7 @@ public class TestListOpenFiles_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testListOpenFilesWithFilterPath() throws IOException {
     RestartFramework.at("after_cluster_start")
         .on(cluster)

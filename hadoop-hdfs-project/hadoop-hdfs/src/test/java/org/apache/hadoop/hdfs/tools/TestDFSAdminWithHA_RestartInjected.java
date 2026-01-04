@@ -132,7 +132,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     err.reset();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testSetSafeMode() throws Exception {
     setUpHaCluster(false);
     RestartFramework.at("after_ha_cluster_setup")
@@ -178,7 +178,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSaveNamespace() throws Exception {
     setUpHaCluster(false);
     // Safe mode should be turned ON in order to create namespace image.
@@ -205,7 +205,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSaveNamespaceNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     // Safe mode should be turned ON in order to create namespace image.
@@ -223,7 +223,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSaveNamespaceNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     // Safe mode should be turned ON in order to create namespace image.
@@ -241,7 +241,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSaveNamespaceNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     // Safe mode should be turned ON in order to create namespace image.
@@ -259,7 +259,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRestoreFailedStorage() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-restoreFailedStorage", "check"});
@@ -285,7 +285,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRestoreFailedStorageNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -309,7 +309,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRestoreFailedStorageNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -333,7 +333,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRestoreFailedStorageNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -355,7 +355,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshNodes() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-refreshNodes"});
@@ -370,7 +370,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshNodesNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -381,7 +381,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshNodesNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -392,7 +392,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshNodesNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -403,7 +403,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSetBalancerBandwidth() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().transitionToActive(0);
@@ -426,7 +426,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSetBalancerBandwidthNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -437,7 +437,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSetBalancerBandwidthNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -460,14 +460,14 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testSetNegativeBalancerBandwidth() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-setBalancerBandwidth", "-10"});
     assertEquals("Negative bandwidth value must fail the command", -1, exitCode);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testMetaSave() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().transitionToActive(0);
@@ -493,7 +493,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testMetaSaveNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().transitionToActive(0);
@@ -507,7 +507,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testMetaSaveNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().transitionToActive(1);
@@ -521,7 +521,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testMetaSaveNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -533,7 +533,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshServiceAcl() throws Exception {
     setUpHaCluster(true);
     int exitCode = admin.run(new String[] {"-refreshServiceAcl"});
@@ -548,7 +548,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshServiceAclNN1UpNN2Down() throws Exception {
     setUpHaCluster(true);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -559,7 +559,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshServiceAclNN1DownNN2Up() throws Exception {
     setUpHaCluster(true);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -570,7 +570,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshServiceAclNN1DownNN2Down() throws Exception {
     setUpHaCluster(true);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -582,7 +582,7 @@ public class TestDFSAdminWithHA_RestartInjected {
   }
 
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshUserToGroupsMappings() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-refreshUserToGroupsMappings"});
@@ -597,7 +597,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshUserToGroupsMappingsNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -610,7 +610,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshUserToGroupsMappingsNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -623,7 +623,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshUserToGroupsMappingsNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -634,7 +634,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshSuperUserGroupsConfiguration() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(
@@ -650,7 +650,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshSuperUserGroupsConfigurationNN1UpNN2Down()
       throws Exception {
     setUpHaCluster(false);
@@ -665,7 +665,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshSuperUserGroupsConfigurationNN1DownNN2Up()
       throws Exception {
     setUpHaCluster(false);
@@ -680,7 +680,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshSuperUserGroupsConfigurationNN1DownNN2Down()
       throws Exception {
     setUpHaCluster(false);
@@ -693,7 +693,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshCallQueue() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-refreshCallQueue"});
@@ -708,7 +708,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshCallQueueNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -719,7 +719,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshCallQueueNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -730,7 +730,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testRefreshCallQueueNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -741,7 +741,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine + message + newLine);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testFinalizeUpgrade() throws Exception {
     setUpHaCluster(false);
     int exitCode = admin.run(new String[] {"-finalizeUpgrade"});
@@ -768,7 +768,7 @@ public class TestDFSAdminWithHA_RestartInjected {
         .execute();
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testFinalizeUpgradeNN1UpNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -780,7 +780,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testFinalizeUpgradeNN1DownNN2Up() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -792,7 +792,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testFinalizeUpgradeNN1DownNN2Down() throws Exception {
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);
@@ -803,7 +803,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message + newLine);
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testUpgradeCommand() throws Exception {
     final String finalizedMsg = "Upgrade finalized for.*";
     final String notFinalizedMsg = "Upgrade not finalized for.*";
@@ -891,7 +891,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertOutputMatches(message);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testListOpenFilesNN1UpNN2Down() throws Exception{
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(1);
@@ -900,7 +900,7 @@ public class TestDFSAdminWithHA_RestartInjected {
     assertEquals(err.toString().trim(), 0, exitCode);
   }
 
-  @Test (timeout = 30000)
+  @Test
   public void testListOpenFilesNN1DownNN2Up() throws Exception{
     setUpHaCluster(false);
     cluster.getDfsCluster().shutdownNameNode(0);

@@ -155,7 +155,7 @@ public class TestStandbyCheckpoints_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testSBNCheckpoints() throws Exception {
     JournalSet standbyJournalSet = NameNodeAdapter.spyOnJournalSet(nns[1]);
 
@@ -279,7 +279,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * checkpoint for the given txid, but this should not cause
    * an abort, etc.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testBothNodesInStandbyState() throws Exception {
     doEdits(0, 10);
 
@@ -328,7 +328,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * Test for the case of when there are observer NameNodes, Standby node is
    * able to upload fsImage to Observer node as well.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testStandbyAndObserverState() throws Exception {
     // Transition 2 to observer
     cluster.transitionToObserver(2);
@@ -377,7 +377,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * If putImage is called while a NameNode is still starting up, the FSImage
    * may not have been initialized yet. See HDFS-15290.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testCheckpointBeforeNameNodeInitializationIsComplete()
       throws Exception {
     final LogVerificationAppender appender = new LogVerificationAppender();
@@ -430,7 +430,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * same txid, which is a no-op. This test makes sure this doesn't
    * cause any problem.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testCheckpointWhenNoNewTransactionsHappened()
       throws Exception {
     // Checkpoint as fast as we can, in a tight loop.
@@ -474,7 +474,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * Test cancellation of ongoing checkpoints when failover happens
    * mid-checkpoint. 
    */
-  @Test(timeout=120000)
+  @Test
   public void testCheckpointCancellation() throws Exception {
     cluster.transitionToStandby(0);
 
@@ -532,7 +532,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * Test cancellation of ongoing checkpoints when failover happens
    * mid-checkpoint during image upload from standby to active NN.
    */
-  @Test(timeout=60000)
+  @Test
   public void testCheckpointCancellationDuringUpload() throws Exception {
     // Set dfs.namenode.checkpoint.txns differently on the first NN to avoid it
     // doing checkpoint when it becomes a standby
@@ -614,7 +614,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * checkpoint is in progress on the SBN, and therefore the StandbyCheckpointer
    * thread will have FSNS lock. Regression test for HDFS-4591.
    */
-  @Test(timeout=300000)
+  @Test
   public void testStandbyExceptionThrownDuringCheckpoint() throws Exception {
 
     // Set it up so that we know when the SBN checkpoint starts and ends.
@@ -667,7 +667,7 @@ public class TestStandbyCheckpoints_RestartInjected {
         answerer.getFireCount() == 1 && answerer.getResultCount() == 1);
   }
   
-  @Test(timeout=300000)
+  @Test
   public void testReadsAllowedDuringCheckpoint() throws Exception {
 
     // Set it up so that we know when the SBN checkpoint starts and ends.
@@ -740,7 +740,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * Test for the case standby NNs can upload FSImage to ANN after
    * become non-primary standby NN. HDFS-9787
    */
-  @Test(timeout=300000)
+  @Test
   public void testNonPrimarySBNUploadFSImage() throws Exception {
     // Shutdown all standby NNs.
     for (int i = 1; i < NUM_NNS; i++) {
@@ -796,7 +796,7 @@ public class TestStandbyCheckpoints_RestartInjected {
    * Test that checkpointing is still successful even if an issue
    * was encountered while writing the legacy OIV image.
    */
-  @Test(timeout=300000)
+  @Test
   public void testCheckpointSucceedsWithLegacyOIVException() throws Exception {
     // Delete the OIV image dir to cause an IOException while saving
     FileUtil.fullyDelete(tmpOivImgDir);

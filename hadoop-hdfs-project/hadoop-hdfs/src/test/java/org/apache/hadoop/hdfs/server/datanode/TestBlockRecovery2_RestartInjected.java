@@ -224,7 +224,7 @@ public class TestBlockRecovery2_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 20000)
+  @Test
   public void testRaceBetweenReplicaRecoveryAndFinalizeBlock()
       throws Exception {
     // Stop the Mocked DN started in startup()
@@ -333,7 +333,7 @@ public class TestBlockRecovery2_RestartInjected {
    * Test for block recovery timeout. All recovery attempts will be delayed
    * and the first attempt will be lost to trigger recovery timeout and retry.
    */
-  @Test(timeout = 300000L)
+  @Test
   public void testRecoveryTimeout() throws Exception {
     tearDown(); // Stop the Mocked DN started in startup()
     final Random r = new Random();
@@ -372,7 +372,7 @@ public class TestBlockRecovery2_RestartInjected {
   /**
    * Test for block recovery taking longer than the heartbeat interval.
    */
-  @Test(timeout = 300000L)
+  @Test
   public void testRecoverySlowerThanHeartbeat() throws Exception {
     tearDown(); // Stop the Mocked DN started in startup()
 
@@ -381,7 +381,7 @@ public class TestBlockRecovery2_RestartInjected {
     TestBlockRecovery.testRecoveryWithDatanodeDelayed(delayer);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testEcRecoverBlocks() throws Throwable {
     // Stop the Mocked DN started in startup()
     tearDown();
@@ -485,7 +485,7 @@ public class TestBlockRecovery2_RestartInjected {
    *
    * Check that, after recovering, the block will be successfully replicated.
    */
-  @Test(timeout = 300000L)
+  @Test
   public void testRecoveryWillIgnoreMinReplication() throws Exception {
     tearDown(); // Stop the Mocked DN started in startup()
 

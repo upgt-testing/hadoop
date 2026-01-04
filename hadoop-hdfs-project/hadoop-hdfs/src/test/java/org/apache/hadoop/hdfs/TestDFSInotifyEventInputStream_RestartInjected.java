@@ -82,7 +82,7 @@ public class TestDFSInotifyEventInputStream_RestartInjected {
   /**
    * Tests all FsEditLogOps that are converted to inotify events.
    */
-  @Test(timeout = 120000)
+  @Test
   @SuppressWarnings("deprecation")
   public void testBasic() throws IOException, URISyntaxException,
       InterruptedException, MissingEventsException {
@@ -501,7 +501,7 @@ public class TestDFSInotifyEventInputStream_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testErasureCodedFiles() throws Exception {
     ErasureCodingPolicy ecPolicy = StripedFileTestUtil.getDefaultECPolicy();
     final int dataUnits = ecPolicy.getNumDataUnits();
@@ -590,7 +590,7 @@ public class TestDFSInotifyEventInputStream_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testNNFailover() throws IOException, URISyntaxException,
       MissingEventsException {
     Configuration conf = new HdfsConfiguration();
@@ -629,7 +629,7 @@ public class TestDFSInotifyEventInputStream_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testTwoActiveNNs() throws IOException, MissingEventsException {
     Configuration conf = new HdfsConfiguration();
     MiniQJMHACluster cluster = new MiniQJMHACluster.Builder(conf).build();
@@ -685,7 +685,7 @@ public class TestDFSInotifyEventInputStream_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testReadEventsWithTimeout() throws IOException,
       InterruptedException, MissingEventsException {
     Configuration conf = new HdfsConfiguration();

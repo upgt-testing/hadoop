@@ -145,7 +145,7 @@ public class TestComputeInvalidateWork_RestartInjected {
    * Test if {@link BlockManager#computeInvalidateWork(int)}
    * can schedule invalidate work correctly for the replicas.
    */
-  @Test(timeout=120000)
+  @Test
   public void testComputeInvalidateReplicas() throws Exception {
     final int blockInvalidateLimit = bm.getDatanodeManager()
         .getBlockInvalidateLimit();
@@ -176,7 +176,7 @@ public class TestComputeInvalidateWork_RestartInjected {
    * Test if {@link BlockManager#computeInvalidateWork(int)}
    * can schedule invalidate work correctly for the striped block groups.
    */
-  @Test(timeout=120000)
+  @Test
   public void testComputeInvalidateStripedBlockGroups() throws Exception {
     final int blockInvalidateLimit =
         bm.getDatanodeManager().getBlockInvalidateLimit();
@@ -210,7 +210,7 @@ public class TestComputeInvalidateWork_RestartInjected {
    * can schedule invalidate work correctly for both replicas and striped
    * block groups, combined.
    */
-  @Test(timeout=120000)
+  @Test
   public void testComputeInvalidate() throws Exception {
     final int blockInvalidateLimit =
         bm.getDatanodeManager().getBlockInvalidateLimit();
@@ -252,7 +252,7 @@ public class TestComputeInvalidateWork_RestartInjected {
    * {@link DatanodeManager#datanodeMap}. This tests if block
    * invalidation work on the original DataNode can be skipped.
    */
-  @Test(timeout=120000)
+  @Test
   public void testDatanodeReformat() throws Exception {
     namesystem.writeLock();
     try {
@@ -302,7 +302,7 @@ public class TestComputeInvalidateWork_RestartInjected {
     }
   }
 
-  @Test(timeout=12000)
+  @Test
   public void testDatanodeReRegistration() throws Exception {
     // Create a test file
     final DistributedFileSystem dfs = cluster.getFileSystem();

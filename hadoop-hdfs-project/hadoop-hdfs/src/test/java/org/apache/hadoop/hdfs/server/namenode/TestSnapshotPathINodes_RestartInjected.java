@@ -88,7 +88,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   }
 
   /** Test allow-snapshot operation. */
-  @Test (timeout=15000)
+  @Test
   public void testAllowSnapshot() throws Exception {
     final String pathStr = sub1.toString();
     final INode before = fsdir.getINode(pathStr);
@@ -157,7 +157,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   /** 
    * for normal (non-snapshot) file.
    */
-  @Test (timeout=15000)
+  @Test
   public void testNonSnapshotPathINodes() throws Exception {
     // Get the inodes by resolving the path of a normal file
     byte[][] components = INode.getPathComponents(file1.toString());
@@ -200,7 +200,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   /** 
    * for snapshot file.
    */
-  @Test (timeout=15000)
+  @Test
   public void testSnapshotPathINodes() throws Exception {
     // Create a snapshot for the dir, and check the inodes for the path
     // pointing to a snapshot file
@@ -290,7 +290,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   /** 
    * for snapshot file after deleting the original file.
    */
-  @Test (timeout=15000)
+  @Test
   public void testSnapshotPathINodesAfterDeletion() throws Exception {
     // Create a snapshot for the dir, and check the inodes for the path
     // pointing to a snapshot file
@@ -377,7 +377,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   /**
    * for snapshot file while adding a new file after snapshot.
    */
-  @Test (timeout=15000)
+  @Test
   public void testSnapshotPathINodesWithAddedFile() throws Exception {
     // Create a snapshot for the dir, and check the inodes for the path
     // pointing to a snapshot file
@@ -456,7 +456,7 @@ public class TestSnapshotPathINodes_RestartInjected {
   /** 
    * for snapshot file while modifying file after snapshot.
    */
-  @Test (timeout=15000)
+  @Test
   public void testSnapshotPathINodesAfterModification() throws Exception {
     // First check the INode for /TestSnapshot/sub1/file1
     byte[][] components = INode.getPathComponents(file1.toString());

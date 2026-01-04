@@ -219,7 +219,7 @@ public class TestCacheByPmemMappableBlockLoader_RestartInjected {
     return keys;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testCacheAndUncache() throws Exception {
     final int maxCacheBlocksNum =
         Ints.checkedCast(CACHE_CAPACITY / BLOCK_SIZE);

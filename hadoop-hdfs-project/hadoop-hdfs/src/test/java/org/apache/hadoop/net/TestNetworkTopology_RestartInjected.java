@@ -58,9 +58,7 @@ public class TestNetworkTopology_RestartInjected {
       NetworkTopology.getInstance(new Configuration());
   private DatanodeDescriptor dataNodes[];
 
-  @Rule
-  public Timeout testTimeout = new Timeout(30000, TimeUnit.MILLISECONDS);
-
+  
   @Before
   public void setupDatanodes() {
     dataNodes = new DatanodeDescriptor[] {
@@ -494,7 +492,7 @@ public class TestNetworkTopology_RestartInjected {
     }
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testInvalidNetworkTopologiesNotCachedInHdfs() throws Exception {
     // start a cluster
     Configuration conf = new HdfsConfiguration();

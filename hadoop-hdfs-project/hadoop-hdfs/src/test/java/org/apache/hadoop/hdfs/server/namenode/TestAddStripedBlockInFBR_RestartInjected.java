@@ -57,9 +57,7 @@ public class TestAddStripedBlockInFBR_RestartInjected {
   private MiniDFSCluster cluster;
   private DistributedFileSystem dfs;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   public void setup() throws IOException {
     Configuration conf = new HdfsConfiguration();

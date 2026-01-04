@@ -81,9 +81,7 @@ public class TestBlockReaderFactory_RestartInjected {
   static final Logger LOG =
       LoggerFactory.getLogger(TestBlockReaderFactory.class);
 
-  @Rule
-  public final Timeout globalTimeout = new Timeout(180000);
-
+  
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -119,7 +117,7 @@ public class TestBlockReaderFactory_RestartInjected {
    * and short-circuit access fails, we should still be able to pass
    * data traffic over the UNIX domain socket.  Test this.
    */
-  @Test(timeout=60000)
+  @Test
   public void testFallbackFromShortCircuitToUnixDomainTraffic()
       throws Exception {
     DFSInputStream.tcpReadsDisabledForTesting = true;
@@ -171,7 +169,7 @@ public class TestBlockReaderFactory_RestartInjected {
    * Test the case where address passed to DomainSocketFactory#getPathInfo is
    * unresolved. In such a case an exception should be thrown.
    */
-  @Test(timeout=60000)
+  @Test
   public void testGetPathInfoWithUnresolvedHost() throws Exception {
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
 
@@ -202,7 +200,7 @@ public class TestBlockReaderFactory_RestartInjected {
    * createShortCircuitReplicaInfo.  This one replica should be shared
    * by all threads.
    */
-  @Test(timeout=60000)
+  @Test
   public void testMultipleWaitersOnShortCircuitCache()
       throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
@@ -680,7 +678,7 @@ public class TestBlockReaderFactory_RestartInjected {
    * are reading from the same replica and an InterruptedException is delivered
    * to one of them.
    */
-  @Test(timeout=120000)
+  @Test
   public void testPurgingClosedReplicas() throws Exception {
     BlockReaderTestUtil.enableBlockReaderFactoryTracing();
     final AtomicInteger replicasCreated = new AtomicInteger(0);

@@ -208,7 +208,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
     LOG.info("The cluster is active after rollback");
   }
 
-  @Test (timeout=600000)
+  @Test
   public void testDatanodeRollingUpgradeWithFinalize() throws Exception {
     try {
       startCluster();
@@ -232,7 +232,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
     }
   }
 
-  @Test(timeout = 600000)
+  @Test
   public void testDatanodeRUwithRegularUpgrade() throws Exception {
     try {
       startCluster();
@@ -289,7 +289,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
     assert(fs.exists(testFile1));
   }
 
-  @Test (timeout=600000)
+  @Test
   public void testDatanodeRollingUpgradeWithRollback() throws Exception {
     try {
       startCluster();
@@ -344,7 +344,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
     }
   }
   
-  @Test (timeout=600000)
+  @Test
   // Test DatanodeXceiver has correct peer-dataxceiver pairs for sending OOB message
   public void testDatanodePeersXceiver() throws Exception {
     try {
@@ -410,7 +410,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
    * Support for layout version change with rolling upgrade was
    * added by HDFS-6800 and HDFS-6981.
    */
-  @Test(timeout=300000)
+  @Test
   public void testWithLayoutChangeAndFinalize() throws Exception {
     final long seed = 0x600DF00D;
     try {
@@ -507,7 +507,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
    * Support for layout version change with rolling upgrade was
    * added by HDFS-6800 and HDFS-6981.
    */
-  @Test(timeout=300000)
+  @Test
   public void testWithLayoutChangeAndRollback() throws Exception {
     final long seed = 0x600DF00D;
     try {

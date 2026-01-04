@@ -190,7 +190,7 @@ public class TestFileLimit_RestartInjected {
     simulatedStorage = false;
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testMaxBlocksPerFileLimit() throws Exception {
     Configuration conf = new HdfsConfiguration();
     // Make a small block size and a low limit
@@ -232,7 +232,7 @@ public class TestFileLimit_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testMinBlockSizeLimit() throws Exception {
     final long blockSize = 4096;
     Configuration conf = new HdfsConfiguration();

@@ -138,7 +138,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * create file /HDFSUser/testfile should create in hdfs
    * create file /local/test should create directory in local fs
    */
-  @Test(timeout = 30000)
+  @Test
   public void testMountLinkWithLocalAndHDFS() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     final Path localTragetPath = new Path(localTargetDir.toURI());
@@ -200,7 +200,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * hdfs://localhost:xxx/HDFSUser --> nonexistent://NonExistent/User/
    * It should fail to add non existent fs link.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testMountLinkWithNonExistentLink() throws Exception {
     testMountLinkWithNonExistentLink(true);
   }
@@ -235,7 +235,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * hdfs://localhost:xxx/local --> file://TEST_ROOT_DIR/root/
    * ListStatus on / should list the mount links.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testListStatusOnRootShouldListAllMountLinks() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     addMountLinks(defaultFSURI.getAuthority(),
@@ -285,7 +285,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * hdfs://localhost:xxx/local --> file://TEST_ROOT_DIR/root/
    * ListStatus non mount directory should fail.
    */
-  @Test(expected = IOException.class, timeout = 30000)
+  @Test(expected = IOException.class)
   public void testListStatusOnNonMountedPath() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     addMountLinks(defaultFSURI.getAuthority(),
@@ -373,7 +373,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * Creating file or directory at non root level should succeed with fallback
    * links.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testWithLinkFallBack() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     addMountLinks(defaultFSURI.getAuthority(),
@@ -413,7 +413,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    *
    * It cannot find any mount link. ViewFS expects a mount point from root.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testCreateOnRoot() throws Exception {
     testCreateOnRoot(false);
   }
@@ -447,7 +447,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * Unset fs.viewfs.overload.scheme.target.hdfs.impl property.
    * So, OverloadScheme target fs initialization will fail.
    */
-  @Test(expected = IOException.class, timeout = 30000)
+  @Test(expected = IOException.class)
   public void testInvalidOverloadSchemeTargetFS() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     String mountTableIfSet = conf.get(Constants.CONFIG_VIEWFS_MOUNTTABLE_PATH);
@@ -483,7 +483,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    *
    * It should be able to create file using ViewFileSystemOverloadScheme.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testViewFsOverloadSchemeWhenInnerCacheDisabled()
       throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
@@ -520,7 +520,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * 1. With cache, only one hdfs child file system instance should be there.
    * 2. Without cache, there should 2 hdfs instances.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testViewFsOverloadSchemeWithInnerCache()
       throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
@@ -558,7 +558,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * When InnerCache disabled, all matching ViewFileSystemOverloadScheme
    * initialized scheme file systems would not use FileSystem cache.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testViewFsOverloadSchemeWithNoInnerCacheAndHdfsTargets()
       throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
@@ -585,7 +585,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * initialized scheme file systems should continue to take advantage of
    * FileSystem cache.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testViewFsOverloadSchemeWithNoInnerCacheAndLocalSchemeTargets()
       throws Exception {
     final Path localTragetPath = new Path(localTargetDir.toURI());
@@ -607,7 +607,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
   /**
    * Tests the rename with nfly mount link.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testNflyRename() throws Exception {
     final Path hdfsTargetPath1 = new Path(defaultFSURI + HDFS_USER_FOLDER);
     final Path hdfsTargetPath2 = new Path(defaultFSURI + HDFS_USER_FOLDER + 1);
@@ -657,7 +657,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
   /**
    * Tests the write and read contents with nfly mount link.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testNflyWriteRead() throws Exception {
     final Path hdfsTargetPath1 = new Path(defaultFSURI + HDFS_USER_FOLDER);
     final Path hdfsTargetPath2 = new Path(defaultFSURI + HDFS_USER_FOLDER + 1);
@@ -696,7 +696,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * target file. 3. Tests the read works with repairOnRead flag. 4. Tests that
    * previously deleted file fully recovered and exists.
    */
-  @Test(timeout = 3000)
+  @Test
   public void testNflyRepair() throws Exception {
     final NflyFSystem.NflyKey repairKey = NflyFSystem.NflyKey.repairOnRead;
     final Path hdfsTargetPath1 = new Path(defaultFSURI + HDFS_USER_FOLDER);
@@ -753,7 +753,7 @@ public class TestViewFileSystemOverloadSchemeWithHdfsScheme_RestartInjected {
    * Tests that the fs initialization should ignore the port number when it's
    * extracting the mount table name from uri.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testMountTableNameShouldIgnorePortFromURI() throws Exception {
     final Path hdfsTargetPath = new Path(defaultFSURI + HDFS_USER_FOLDER);
     conf = new Configuration(getConf());

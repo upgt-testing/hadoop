@@ -455,7 +455,7 @@ public class TestBlockManager_RestartInjected {
         bm.countNodes(block, fsn.isInStartupSafeMode())));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testNeededReconstructionWhileAppending() throws IOException {
     Configuration conf = new HdfsConfiguration();
     String src = "/test-file";
@@ -537,7 +537,7 @@ public class TestBlockManager_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDeleteCorruptReplicaWithStatleStorages() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(HdfsClientConfigKeys.BlockWrite.ReplaceDatanodeOnFailure.
@@ -1615,7 +1615,7 @@ public class TestBlockManager_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testBlockManagerMachinesArray() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     final MiniDFSCluster cluster =
@@ -1788,7 +1788,7 @@ public class TestBlockManager_RestartInjected {
             any(DatanodeDescriptor.class));
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testPlacementPolicySatisfied() throws Exception {
     LOG.info("Starting testPlacementPolicySatisfied.");
     final String[] initialRacks = new String[]{

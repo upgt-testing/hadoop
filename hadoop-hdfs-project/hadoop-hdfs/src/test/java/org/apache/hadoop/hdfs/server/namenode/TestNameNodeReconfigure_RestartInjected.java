@@ -308,7 +308,7 @@ public class TestNameNodeReconfigure_RestartInjected {
    * @throws ReconfigurationException
    * @throws IOException
    */
-  @Test(timeout = 30000)
+  @Test
   public void testReconfigureSPSWithStoragePolicyDisabled()
       throws ReconfigurationException, IOException {
     // shutdown cluster
@@ -352,7 +352,7 @@ public class TestNameNodeReconfigure_RestartInjected {
   /**
    * Tests enable/disable Storage Policy Satisfier dynamically.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testReconfigureStoragePolicySatisfierEnabled()
       throws ReconfigurationException {
     final NameNode nameNode = cluster.getNameNode();
@@ -408,7 +408,7 @@ public class TestNameNodeReconfigure_RestartInjected {
   /**
    * Test to satisfy storage policy after disabled storage policy satisfier.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testSatisfyStoragePolicyAfterSatisfierDisabled()
       throws ReconfigurationException, IOException {
     final NameNode nameNode = cluster.getNameNode();

@@ -327,17 +327,17 @@ public class TestShortCircuitLocalRead_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testFileLocalReadNoChecksum() throws Exception {
     doTestShortCircuitRead(true, 3*blockSize+100, 0);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testFileLocalReadChecksum() throws Exception {
     doTestShortCircuitRead(false, 3*blockSize+100, 0);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSmallFileLocalRead() throws Exception {
     doTestShortCircuitRead(false, 13, 0);
     doTestShortCircuitRead(false, 13, 5);
@@ -345,7 +345,7 @@ public class TestShortCircuitLocalRead_RestartInjected {
     doTestShortCircuitRead(true, 13, 5);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testLocalReadLegacy() throws Exception {
     doTestShortCircuitReadLegacy(true, 13, 0, getCurrentUser(),
         getCurrentUser(), false);
@@ -356,19 +356,19 @@ public class TestShortCircuitLocalRead_RestartInjected {
    * to use short circuit. The test ensures reader falls back to non
    * shortcircuit reads when shortcircuit is disallowed.
    */
-  @Test(timeout=60000)
+  @Test
   public void testLocalReadFallback() throws Exception {
     doTestShortCircuitReadLegacy(
         true, 13, 0, getCurrentUser(), "notallowed", true);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testReadFromAnOffset() throws Exception {
     doTestShortCircuitRead(false, 3*blockSize+100, 777);
     doTestShortCircuitRead(true, 3*blockSize+100, 777);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testLongFile() throws Exception {
     doTestShortCircuitRead(false, 10*blockSize+100, 777);
     doTestShortCircuitRead(true, 10*blockSize+100, 777);
@@ -385,7 +385,7 @@ public class TestShortCircuitLocalRead_RestartInjected {
     });
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testDeprecatedGetBlockLocalPathInfoRpc() throws IOException {
     final Configuration conf = new Configuration();
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(1)
@@ -435,7 +435,7 @@ public class TestShortCircuitLocalRead_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testSkipWithVerifyChecksum() throws IOException {
     int size = blockSize;
     Configuration conf = new Configuration();
@@ -494,7 +494,7 @@ public class TestShortCircuitLocalRead_RestartInjected {
     }
   }
 
-  @Test(timeout=120000)
+  @Test
   public void testHandleTruncatedBlockFile() throws IOException {
     MiniDFSCluster cluster = null;
     HdfsConfiguration conf = new HdfsConfiguration();
@@ -670,7 +670,7 @@ public class TestShortCircuitLocalRead_RestartInjected {
     fs.delete(file1, false);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testReadWithRemoteBlockReader2()
       throws IOException, InterruptedException {
     doTestShortCircuitReadWithRemoteBlockReader2(3 * blockSize + 100,

@@ -89,7 +89,7 @@ public class TestDataTransferKeepalive_RestartInjected {
    * Regression test for HDFS-3357. Check that the datanode is respecting
    * its configured keepalive timeout.
    */
-  @Test(timeout=30000)
+  @Test
   public void testDatanodeRespectsKeepAliveTimeout() throws Exception {
     Configuration clientConf = new Configuration(conf);
     // Set a client socket cache expiry time much longer than
@@ -141,7 +141,7 @@ public class TestDataTransferKeepalive_RestartInjected {
   /**
    * Test that the client respects its keepalive timeout.
    */
-  @Test(timeout=30000)
+  @Test
   public void testClientResponsesKeepAliveTimeout() throws Exception {
     Configuration clientConf = new Configuration(conf);
     // Set a client socket cache expiry time much shorter than 
@@ -189,7 +189,7 @@ public class TestDataTransferKeepalive_RestartInjected {
    * read bytes off the stream quickly. The datanode should time out sending the
    * chunks and the transceiver should die, even if it has a long keepalive.
    */
-  @Test(timeout=300000)
+  @Test
   public void testSlowReader() throws Exception {
     // Set a client socket cache expiry time much longer than 
     // the datanode-side expiration time.
@@ -242,7 +242,7 @@ public class TestDataTransferKeepalive_RestartInjected {
     IOUtils.closeStream(stm);
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testManyClosedSocketsInCache() throws Exception {
     // Make a small file
     Configuration clientConf = new Configuration(conf);

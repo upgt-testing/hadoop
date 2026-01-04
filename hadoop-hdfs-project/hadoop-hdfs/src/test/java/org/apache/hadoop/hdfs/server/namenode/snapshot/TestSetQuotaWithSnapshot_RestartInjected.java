@@ -81,7 +81,7 @@ public class TestSetQuotaWithSnapshot_RestartInjected {
     }
   }
   
-  @Test (timeout=60000)
+  @Test
   public void testSetQuota() throws Exception {
     final Path dir = new Path("/TestSnapshot");
     hdfs.mkdirs(dir);

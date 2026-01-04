@@ -120,7 +120,7 @@ public class TestSnapshotDeletion_RestartInjected {
   /**
    * Deleting snapshottable directory with snapshots must fail.
    */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteDirectoryWithSnapshot() throws Exception {
     Path file0 = new Path(sub, "file0");
     Path file1 = new Path(sub, "file1");
@@ -159,7 +159,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * without snapshots. The snapshottable dir list in snapshot manager should be
    * updated.
    */
-  @Test (timeout=300000)
+  @Test
   public void testApplyEditLogForDeletion() throws Exception {
     final Path foo = new Path("/foo");
     final Path bar1 = new Path(foo, "bar1");
@@ -222,7 +222,7 @@ public class TestSnapshotDeletion_RestartInjected {
   /**
    * Deleting directory with snapshottable descendant with snapshots must fail.
    */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteDirectoryWithSnapshot2() throws Exception {
     Path file0 = new Path(sub, "file0");
     Path file1 = new Path(sub, "file1");
@@ -294,7 +294,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * 4. Delete current INodeDirectoryWithSnapshot.
    * </pre>
    */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteCurrentFileDirectory() throws Exception {
     // create a folder which will be deleted before taking snapshots
     Path deleteDir = new Path(subsub, "deleteDir");
@@ -511,7 +511,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * snapshots are taken on the same directory, and we do not need to combine
    * snapshot diffs.
    */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteEarliestSnapshot1() throws Exception {
     // create files under sub
     Path file0 = new Path(sub, "file0");
@@ -615,7 +615,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * Also, the recursive cleanTree process should cover both INodeFile and 
    * INodeDirectory.
    */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteEarliestSnapshot2() throws Exception {
     Path noChangeDir = new Path(sub, "noChangeDir");
     Path noChangeFile = new Path(noChangeDir, "noChangeFile");
@@ -748,7 +748,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * Delete a snapshot that is taken before a directory deletion,
    * directory diff list should be combined correctly.
    */
-  @Test (timeout=60000)
+  @Test
   public void testDeleteSnapshot1() throws Exception {
     final Path root = new Path("/");
 
@@ -820,7 +820,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * Delete a snapshot that is taken before a directory deletion (recursively),
    * directory diff list should be combined correctly.
    */
-  @Test (timeout=60000)
+  @Test
   public void testDeleteSnapshot2() throws Exception {
     final Path root = new Path("/");
 
@@ -892,7 +892,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * Test deleting snapshots in a more complicated scenario: need to combine
    * snapshot diffs, but no need to handle diffs distributed in a dir tree
    */
-  @Test (timeout=300000)
+  @Test
   public void testCombineSnapshotDiff1() throws Exception {
     testCombineSnapshotDiffImpl(sub, "", 1);
   }
@@ -901,7 +901,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * Test deleting snapshots in more complicated scenarios (snapshot diffs are
    * distributed in the directory sub-tree)
    */
-  @Test (timeout=300000)
+  @Test
   public void testCombineSnapshotDiff2() throws Exception {
     testCombineSnapshotDiffImpl(sub, "subsub1/subsubsub1/", 3);
   }
@@ -910,7 +910,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * When combine two snapshots, make sure files/directories created after the
    * prior snapshot get destroyed.
    */
-  @Test (timeout=300000)
+  @Test
   public void testCombineSnapshotDiff3() throws Exception {
     // create initial dir and subdir
     Path dir = new Path("/dir");
@@ -1220,7 +1220,7 @@ public class TestSnapshotDeletion_RestartInjected {
   }
   
   /** Test deleting snapshots with modification on the metadata of directory */
-  @Test (timeout=300000)
+  @Test
   public void testDeleteSnapshotWithDirModification() throws Exception {
     Path file = new Path(sub, "file");
     DFSTestUtil.createFile(hdfs, file, BLOCKSIZE, REPLICATION, seed);
@@ -1342,7 +1342,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * A test covering the case where the snapshot diff to be deleted is renamed
    * to its previous snapshot.
    */
-  @Test (timeout=300000)
+  @Test
   public void testRenameSnapshotDiff() throws Exception {
     cluster.getNamesystem().getSnapshotManager().setAllowNestedSnapshots(true);
 
@@ -1538,7 +1538,7 @@ public class TestSnapshotDeletion_RestartInjected {
    * OP_DELETE_SNAPSHOT edits op was not decrementing the safemode threshold on
    * restart in HA mode. HDFS-5504
    */
-  @Test(timeout = 60000)
+  @Test
   public void testHANNRestartAfterSnapshotDeletion() throws Exception {
     hdfs.close();
     cluster.shutdown();

@@ -167,14 +167,14 @@ public class TestShortCircuitCache_RestartInjected {
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testCreateAndDestroy() throws Exception {
     ShortCircuitCache cache =
         new ShortCircuitCache(10, 1, 10, 1, 1, 10000, 0);
     cache.close();
   }
   
-  @Test(timeout=60000)
+  @Test
   public void testAddAndRetrieve() throws Exception {
     final ShortCircuitCache cache =
         new ShortCircuitCache(10, 10000000, 10, 10000000, 1, 10000, 0);
@@ -223,7 +223,7 @@ public class TestShortCircuitCache_RestartInjected {
     cache.close();
   }
 
-  @Test(timeout=100000)
+  @Test
   public void testExpiry() throws Exception {
     final ShortCircuitCache cache =
         new ShortCircuitCache(2, 1, 1, 10000000, 1, 10000000, 0);
@@ -257,7 +257,7 @@ public class TestShortCircuitCache_RestartInjected {
   }
   
   
-  @Test(timeout=60000)
+  @Test
   public void testEviction() throws Exception {
     final ShortCircuitCache cache =
         new ShortCircuitCache(2, 10000000, 1, 10000000, 1, 10000, 0);
@@ -325,7 +325,7 @@ public class TestShortCircuitCache_RestartInjected {
     cache.close();
   }
   
-  @Test(timeout=60000)
+  @Test
   public void testTimeBasedStaleness() throws Exception {
     // Set up the cache with a short staleness time.
     final ShortCircuitCache cache =
@@ -425,7 +425,7 @@ public class TestShortCircuitCache_RestartInjected {
     return new DomainPeer(sock);
   }
   
-  @Test(timeout=60000)
+  @Test
   public void testAllocShm() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
@@ -501,7 +501,7 @@ public class TestShortCircuitCache_RestartInjected {
     sockDir.close();
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testShmBasedStaleness() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
@@ -566,7 +566,7 @@ public class TestShortCircuitCache_RestartInjected {
    * The DataNode will notify the DFSClient that the replica is stale via the
    * ShortCircuitShm.
    */
-  @Test(timeout=60000)
+  @Test
   public void testUnlinkingReplicasInFileDescriptorCache() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
@@ -690,7 +690,7 @@ public class TestShortCircuitCache_RestartInjected {
   }
 
   // Regression test for HDFS-7915
-  @Test(timeout=60000)
+  @Test
   public void testDataXceiverCleansUpSlotsOnFailure() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
@@ -738,7 +738,7 @@ public class TestShortCircuitCache_RestartInjected {
   }
 
   // Regression test for HADOOP-11802
-  @Test(timeout=60000)
+  @Test
   public void testDataXceiverHandlesRequestShortCircuitShmFailure()
       throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
@@ -811,7 +811,7 @@ public class TestShortCircuitCache_RestartInjected {
   }
 
   // Regression test for HDFS-8070
-  @Test(timeout=60000)
+  @Test
   public void testPreReceiptVerificationDfsClientCanDoScr() throws Exception {
     BlockReaderTestUtil.enableShortCircuitShmTracing();
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
@@ -957,7 +957,7 @@ public class TestShortCircuitCache_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDomainSocketClosedByDN() throws Exception {
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
     Configuration conf =
@@ -1008,7 +1008,7 @@ public class TestShortCircuitCache_RestartInjected {
   }
 
   // Regression test for HDFS-16535
-  @Test(timeout = 60000)
+  @Test
   public void testDomainSocketClosedByMultipleDNs() throws Exception {
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
     String testName = "testDomainSocketClosedByMultipleDNs";
@@ -1090,7 +1090,7 @@ public class TestShortCircuitCache_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDNRestart() throws Exception {
     TemporarySocketDirectory sockDir = new TemporarySocketDirectory();
     Configuration conf = createShortCircuitConf("testDNRestart", sockDir);

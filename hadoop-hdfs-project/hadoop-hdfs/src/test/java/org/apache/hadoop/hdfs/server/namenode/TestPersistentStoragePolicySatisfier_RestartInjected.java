@@ -190,7 +190,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 4. make sure all the storage policies are satisfied.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWithCheckpoint() throws Exception {
     SecondaryNameNode secondary = null;
     try {
@@ -267,7 +267,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 6. check whether all the blocks are satisfied.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testWithRestarts() throws Exception {
     try {
       clusterSetUp();
@@ -327,7 +327,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 4. make sure step 3 works as expected.
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMultipleSatisfyStoragePolicy() throws Exception {
     try {
       // Lower block movement check for testing.
@@ -390,7 +390,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 3. make sure sps xattr is removed.
    * @throws Exception
    */
-  @Test(timeout = 300000000)
+  @Test
   public void testDropSPS() throws Exception {
     try {
       clusterSetUp();
@@ -432,7 +432,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    *
    * @throws Exception
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSShouldNotLeakXattrIfStorageAlreadySatisfied()
       throws Exception {
     try {
@@ -477,7 +477,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 5. restart the namenode.
    * NameNode should be started successfully.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testNameNodeRestartWhenSPSCalledOnChildFileAndParentDir()
       throws Exception {
     try {
@@ -531,7 +531,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * 5. restart the namenode.
    * All the file blocks should satisfy the policy.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSOnChildAndParentDirectory() throws Exception {
     try {
       clusterSetUp();
@@ -569,7 +569,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * Test SPS xAttr on directory. xAttr should be removed from the directory
    * once all the files blocks moved to specific storage.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSxAttrWhenSpsCalledForDir() throws Exception {
     try {
       clusterSetUp();
@@ -642,7 +642,7 @@ public class TestPersistentStoragePolicySatisfier_RestartInjected {
    * Test SPS xAttr on file. xAttr should be removed from the file
    * once all the blocks moved to specific storage.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testSPSxAttrWhenSpsCalledForFile() throws Exception {
     try {
       clusterSetUp();

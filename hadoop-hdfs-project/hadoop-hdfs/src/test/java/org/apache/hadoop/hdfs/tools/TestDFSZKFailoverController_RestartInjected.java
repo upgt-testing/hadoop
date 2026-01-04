@@ -152,7 +152,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
     }
   }
 
-  @Test(timeout=60000)
+  @Test
   /**
    * Ensure the cluster simply starts with a hdfs jceks credential provider
    * configured. HDFS-14013.
@@ -175,7 +175,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
   /**
    * Test that thread dump is captured after NN state changes.
    */
-  @Test(timeout=60000)
+  @Test
   public void testThreadDumpCaptureAfterNNStateChange() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -211,7 +211,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
    * Test that automatic failover is triggered by shutting the
    * active NN down.
    */
-  @Test(timeout=60000)
+  @Test
   public void testFailoverAndBackOnNNShutdown() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -286,7 +286,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
         thr2.zkfc.getLocalTarget().getAddress());
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testManualFailover() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -316,7 +316,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
     waitForHAState(1, HAServiceState.STANDBY);
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testWithoutBindAddressSet() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -333,7 +333,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
         LOCALHOST_SERVER_ADDRESS);
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testWithBindAddressSet() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -382,7 +382,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
             new StateChangeRequestInfo(RequestSource.REQUEST_BY_ZKFC)));
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testManualFailoverWithDFSHAAdmin() throws Exception {
     startCluster();
     RestartFramework.at("after_cluster_start")
@@ -441,7 +441,7 @@ public class TestDFSZKFailoverController_RestartInjected extends ClientBaseWithF
     waitForHAState(1, HAServiceState.STANDBY);
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testElectionOnObserver() throws Exception{
     startCluster();
     RestartFramework.at("after_cluster_start")

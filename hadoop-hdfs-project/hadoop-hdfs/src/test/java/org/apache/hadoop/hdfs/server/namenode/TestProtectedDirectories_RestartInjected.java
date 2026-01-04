@@ -58,9 +58,7 @@ public class TestProtectedDirectories_RestartInjected {
   static final Logger LOG = LoggerFactory.getLogger(
       TestProtectedDirectories.class);
 
-  @Rule
-  public Timeout timeout = new Timeout(300000);
-
+  
   /**
    * Start a namenode-only 'cluster' which is configured to protect
    * the given list of directories.

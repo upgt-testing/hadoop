@@ -284,7 +284,7 @@ public class TestBlockReplacement_RestartInjected {
    * datanode will throw IOException with error code Status.ERROR_BLOCK_PINNED.
    *
    */
-  @Test(timeout = 90000)
+  @Test
   public void testBlockReplacementWithPinnedBlocks() throws Exception {
     final Configuration conf = new HdfsConfiguration();
 

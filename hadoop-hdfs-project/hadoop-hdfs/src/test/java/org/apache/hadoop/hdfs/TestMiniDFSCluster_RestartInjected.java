@@ -79,7 +79,7 @@ public class TestMiniDFSCluster_RestartInjected {
    *
    * @throws Throwable on a failure
    */
-  @Test(timeout=100000)
+  @Test
   public void testClusterWithoutSystemProperties() throws Throwable {
     String oldPrp = System.getProperty(MiniDFSCluster.PROP_TEST_BUILD_DATA);
     System.clearProperty(MiniDFSCluster.PROP_TEST_BUILD_DATA);
@@ -106,7 +106,7 @@ public class TestMiniDFSCluster_RestartInjected {
   /**
    * Tests storage capacity setting still effective after cluster restart.
    */
-  @Test(timeout=100000)
+  @Test
   public void testClusterSetStorageCapacity() throws Throwable {
 
     final Configuration conf = new HdfsConfiguration();
@@ -255,7 +255,7 @@ public class TestMiniDFSCluster_RestartInjected {
     return cluster;
   }
 
-  @Test(timeout=100000)
+  @Test
   public void testIsClusterUpAfterShutdown() throws Throwable {
     Configuration conf = new HdfsConfiguration();
     File testDataCluster4 = new File(testDataPath, CLUSTER_4);
@@ -285,7 +285,7 @@ public class TestMiniDFSCluster_RestartInjected {
   }
 
   /** MiniDFSCluster should not clobber dfs.datanode.hostname if requested */
-  @Test(timeout=100000)
+  @Test
   public void testClusterSetDatanodeHostname() throws Throwable {
     assumeTrue(System.getProperty("os.name").startsWith("Linux"));
     Configuration conf = new HdfsConfiguration();

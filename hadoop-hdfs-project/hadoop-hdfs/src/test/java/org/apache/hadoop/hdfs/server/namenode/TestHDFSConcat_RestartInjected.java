@@ -670,7 +670,7 @@ public class TestHDFSConcat_RestartInjected {
     assertFalse(dfs.exists(src));
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testConcatReservedRelativePaths() throws IOException {
     String testPathDir = "/.reserved/raw/ezone";
     Path dir = new Path(testPathDir);

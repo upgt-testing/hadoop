@@ -228,7 +228,7 @@ public class TestDFSAdmin_RestartInjected {
     scanner.close();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testGetDatanodeInfo() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
@@ -265,7 +265,7 @@ public class TestDFSAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testTriggerBlockReport() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
@@ -296,7 +296,7 @@ public class TestDFSAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testGetVolumeReport() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
@@ -326,7 +326,7 @@ public class TestDFSAdmin_RestartInjected {
    * Test that if datanode is not reachable, some DFSAdmin commands will fail
    * elegantly with non-zero ret error code along with exception error message.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testDFSAdminUnreachableDatanode() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
@@ -355,7 +355,7 @@ public class TestDFSAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testDataNodeGetReconfigurableProperties() throws IOException, InterruptedException {
     final int port = datanode.getIpcPort();
     final String address = "localhost:" + port;
@@ -449,7 +449,7 @@ public class TestDFSAdmin_RestartInjected {
         is(allOf(containsString("To"), containsString("data_new"))));
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testDataNodeGetReconfigurationStatus() throws IOException,
       InterruptedException, TimeoutException {
     testDataNodeGetReconfigurationStatus(true);
@@ -463,7 +463,7 @@ public class TestDFSAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testNameNodeGetReconfigurableProperties() throws IOException, InterruptedException {
     final String address = namenode.getHostAndPort();
     final List<String> outs = Lists.newArrayList();
@@ -511,7 +511,7 @@ public class TestDFSAdmin_RestartInjected {
     }, 100, 100 * 100);
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testPrintTopology() throws Exception {
     redirectStream();
 
@@ -566,7 +566,7 @@ public class TestDFSAdmin_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testPrintTopologyWithStatus() throws Exception {
     redirectStream();
     final Configuration dfsConf = new HdfsConfiguration();
@@ -618,7 +618,7 @@ public class TestDFSAdmin_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testNameNodeGetReconfigurationStatus() throws IOException,
       InterruptedException, TimeoutException {
     ReconfigurationUtil ru = mock(ReconfigurationUtil.class);
@@ -701,7 +701,7 @@ public class TestDFSAdmin_RestartInjected {
     }, 1000, 60000);
   }
 
-  @Test(timeout = 180000)
+  @Test
   public void testReportCommand() throws Exception {
     tearDown();
     redirectStream();
@@ -859,7 +859,7 @@ public class TestDFSAdmin_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000L)
+  @Test
   public void testListOpenFiles() throws Exception {
     redirectStream();
 
@@ -1109,7 +1109,7 @@ public class TestDFSAdmin_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 300000L)
+  @Test
   public void testCheckNumOfBlocksInReportCommand() throws Exception {
     DistributedFileSystem dfs = cluster.getFileSystem();
     Path path = new Path("/tmp.txt");

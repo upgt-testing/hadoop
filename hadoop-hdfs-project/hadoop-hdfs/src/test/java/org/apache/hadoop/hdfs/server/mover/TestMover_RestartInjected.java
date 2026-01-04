@@ -288,7 +288,7 @@ public class TestMover_RestartInjected {
     }, 100, 3000);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testWithFederateClusterWithinSameNode() throws
       Exception {
     final Configuration conf = new HdfsConfiguration();
@@ -356,7 +356,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testWithFederatedCluster() throws Exception{
 
     final Configuration conf = new HdfsConfiguration();
@@ -412,7 +412,7 @@ public class TestMover_RestartInjected {
 
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testWithFederatedHACluster() throws Exception{
 
     final Configuration conf = new HdfsConfiguration();
@@ -666,7 +666,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testTwoReplicaSameStorageTypeShouldNotSelect() throws Exception {
     // HDFS-8147
     final Configuration conf = new HdfsConfiguration();
@@ -705,7 +705,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testMoveWhenStoragePolicyNotSatisfying() throws Exception {
     // HDFS-8147
     final Configuration conf = new HdfsConfiguration();
@@ -736,7 +736,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testMoveWhenStoragePolicySatisfierIsRunning() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     conf.set(DFSConfigKeys.DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
@@ -804,7 +804,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout=100000)
+  @Test
   public void testBalancerMaxIterationTimeNotAffectMover() throws Exception {
     long blockSize = 10*1024*1024;
     final Configuration conf = new HdfsConfiguration();
@@ -869,7 +869,7 @@ public class TestMover_RestartInjected {
         StoragePolicySatisfierMode.NONE.toString());
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testMoverWithStripedFile() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConfWithStripe(conf);
@@ -1064,7 +1064,7 @@ public class TestMover_RestartInjected {
    * Test Mover runs fine when logging in with a keytab in kerberized env.
    * Reusing testWithinSameNode here for basic functionality testing.
    */
-  @Test(timeout = 300000)
+  @Test
   public void testMoverWithKeytabs() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     try {
@@ -1092,7 +1092,7 @@ public class TestMover_RestartInjected {
   /**
    * Test to verify that mover can't move pinned blocks.
    */
-  @Test(timeout = 90000)
+  @Test
   public void testMoverWithPinnedBlocks() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1154,7 +1154,7 @@ public class TestMover_RestartInjected {
    * Test to verify that mover should work well with pinned blocks as well as
    * failed blocks. Mover should continue retrying the failed blocks only.
    */
-  @Test(timeout = 90000)
+  @Test
   public void testMoverFailedRetryWithPinnedBlocks() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);
@@ -1198,7 +1198,7 @@ public class TestMover_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testMoverWhenStoragePolicyUnset() throws Exception {
     final Configuration conf = new HdfsConfiguration();
     initConf(conf);

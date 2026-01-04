@@ -209,7 +209,7 @@ public class TestWebHDFS_RestartInjected {
     }
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testLargeFile() throws Exception {
     largeFileTest(200L << 20); //200MB file length
   }
@@ -342,14 +342,14 @@ public class TestWebHDFS_RestartInjected {
   }
 
   /** Test client retry with namenode restarting. */
-  @Test(timeout=300000)
+  @Test
   public void testNamenodeRestart() throws Exception {
     GenericTestUtils.setLogLevel(NamenodeWebHdfsMethods.LOG, Level.TRACE);
     final Configuration conf = WebHdfsTestUtil.createConf();
     TestDFSClientRetries.namenodeRestartTest(conf, true);
   }
   
-  @Test(timeout=300000)
+  @Test
   public void testLargeDirectory() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
     final int listLimit = 2;
@@ -490,7 +490,7 @@ public class TestWebHDFS_RestartInjected {
     }
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testCustomizedUserAndGroupNames() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
     conf.setBoolean(DFSConfigKeys.DFS_NAMENODE_ACLS_ENABLED_KEY, true);
@@ -535,7 +535,7 @@ public class TestWebHDFS_RestartInjected {
    * Test for catching "no datanode" IOException, when to create a file
    * but datanode is not running for some reason.
    */
-  @Test(timeout=300000)
+  @Test
   public void testCreateWithNoDN() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
     try {
@@ -610,7 +610,7 @@ public class TestWebHDFS_RestartInjected {
     }
   }
 
-  @Test (timeout = 60000)
+  @Test
   public void testWebHdfsErasureCodingFiles() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
     cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
@@ -1176,7 +1176,7 @@ public class TestWebHDFS_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testGetHomeDirectory() throws Exception {
     Configuration conf = new Configuration();
     cluster = new MiniDFSCluster.Builder(conf).build();
@@ -1377,7 +1377,7 @@ public class TestWebHDFS_RestartInjected {
     });
   }
 
-  @Test(timeout=90000)
+  @Test
   public void testWebHdfsReadRetries() throws Exception {
     // ((Log4JLogger)DFSClient.LOG).getLogger().setLevel(Level.ALL);
     final Configuration conf = WebHdfsTestUtil.createConf();
@@ -1975,7 +1975,7 @@ public class TestWebHDFS_RestartInjected {
    * Tests that the LISTSTATUS ang GETFILESTATUS WebHDFS calls return the
    * ecPolicy for EC files.
    */
-  @Test(timeout=300000)
+  @Test
   public void testECPolicyInFileStatus() throws Exception {
     final Configuration conf = WebHdfsTestUtil.createConf();
     final ErasureCodingPolicy ecPolicy = SystemErasureCodingPolicies

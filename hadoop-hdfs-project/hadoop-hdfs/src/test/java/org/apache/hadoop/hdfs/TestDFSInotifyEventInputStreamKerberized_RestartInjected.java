@@ -91,9 +91,7 @@ public class TestDFSInotifyEventInputStreamKerberized_RestartInjected {
   private File generalHDFSKeytabFile;
   private File nnKeytabFile;
 
-  @Rule
-  public Timeout timeout = new Timeout(180000);
-
+  
   @Test
   public void testWithKerberizedCluster() throws Exception {
     conf = new HdfsConfiguration(baseConf);

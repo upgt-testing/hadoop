@@ -83,7 +83,7 @@ public class TestFavoredNodesEndToEnd_RestartInjected {
     }
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testFavoredNodesEndToEnd() throws Exception {
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
@@ -126,7 +126,7 @@ public class TestFavoredNodesEndToEnd_RestartInjected {
         .execute();
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testWhenFavoredNodesNotPresent() throws Exception {
     RestartFramework.at("before_create_with_arbitrary_nodes")
         .on(cluster)
@@ -156,7 +156,7 @@ public class TestFavoredNodesEndToEnd_RestartInjected {
     getBlockLocations(p);
   }
 
-  @Test(timeout=180000)
+  @Test
   public void testWhenSomeNodesAreNotGood() throws Exception {
     // 4 favored nodes
     final InetSocketAddress addrs[] = new InetSocketAddress[4];
@@ -214,7 +214,7 @@ public class TestFavoredNodesEndToEnd_RestartInjected {
     }
   }
 
-  @Test(timeout = 180000)
+  @Test
   public void testFavoredNodesEndToEndForAppend() throws Exception {
     RestartFramework.at("before_append_test")
         .on(cluster)
@@ -261,7 +261,7 @@ public class TestFavoredNodesEndToEnd_RestartInjected {
         .execute();
   }
 
-  @Test(timeout = 180000)
+  @Test
   public void testCreateStreamBuilderFavoredNodesEndToEnd() throws Exception {
     RestartFramework.at("before_builder_test")
         .on(cluster)

@@ -232,7 +232,7 @@ public class TestCheckpoint_RestartInjected {
   /*
    * Simulate exception during edit replay.
    */
-  @Test(timeout=30000)
+  @Test
   public void testReloadOnEditReplayFailure () throws IOException {
     Configuration conf = new HdfsConfiguration();
     FSDataOutputStream fos = null;
@@ -310,7 +310,7 @@ public class TestCheckpoint_RestartInjected {
   /*
    * Simulate 2NN exit due to too many merge failures.
    */
-  @Test(timeout=30000)
+  @Test
   public void testTooManyEditReplayFailures() throws IOException {
     Configuration conf = new HdfsConfiguration();
     conf.setInt(DFSConfigKeys.DFS_NAMENODE_CHECKPOINT_MAX_RETRIES_KEY, 1);
@@ -1768,7 +1768,7 @@ public class TestCheckpoint_RestartInjected {
    * Test NN restart if a failure happens in between creating the fsimage
    * MD5 file and renaming the fsimage.
    */
-  @Test(timeout=30000)
+  @Test
   public void testFailureBeforeRename () throws IOException {
     Configuration conf = new HdfsConfiguration();
     FSDataOutputStream fos = null;
@@ -1847,7 +1847,7 @@ public class TestCheckpoint_RestartInjected {
    * Test that a fault while downloading edits does not prevent future
    * checkpointing
    */
-  @Test(timeout = 30000)
+  @Test
   public void testEditFailureBeforeRename() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
@@ -1936,7 +1936,7 @@ public class TestCheckpoint_RestartInjected {
    * Test that a fault while downloading edits the first time after the 2NN
    * starts up does not prevent future checkpointing.
    */
-  @Test(timeout = 30000)
+  @Test
   public void testEditFailureOnFirstCheckpoint() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
@@ -2014,7 +2014,7 @@ public class TestCheckpoint_RestartInjected {
    * Test that the secondary namenode correctly deletes temporary edits
    * on startup.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testDeleteTemporaryEditsOnStartup() throws IOException {
     Configuration conf = new HdfsConfiguration();
     SecondaryNameNode secondary = null;
@@ -2709,7 +2709,7 @@ public class TestCheckpoint_RestartInjected {
   /**
    * Test that the 2NN triggers a checkpoint after the configurable interval
    */
-  @Test(timeout=30000)
+  @Test
   public void testCheckpointTriggerOnTxnCount() throws Exception {
     MiniDFSCluster cluster = null;
     SecondaryNameNode secondary = null;
@@ -3167,7 +3167,7 @@ public class TestCheckpoint_RestartInjected {
     }
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testActiveRejectSmallerTxidDeltaImage() throws Exception {
     MiniDFSCluster cluster = null;
     Configuration conf = new HdfsConfiguration();

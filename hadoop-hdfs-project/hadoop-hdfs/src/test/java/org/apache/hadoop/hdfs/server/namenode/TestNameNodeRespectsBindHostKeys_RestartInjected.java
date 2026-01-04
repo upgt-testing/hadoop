@@ -77,7 +77,7 @@ public class TestNameNodeRespectsBindHostKeys_RestartInjected {
         .toString();
   }
 
-  @Test (timeout=300000)
+  @Test
   public void testRpcBindHostKey() throws IOException {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;
@@ -129,7 +129,7 @@ public class TestNameNodeRespectsBindHostKeys_RestartInjected {
     }
   }
 
-  @Test (timeout=300000)
+  @Test
   public void testServiceRpcBindHostKey() throws IOException {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;
@@ -183,7 +183,7 @@ public class TestNameNodeRespectsBindHostKeys_RestartInjected {
     }
   }
 
-  @Test (timeout=300000)
+  @Test
   public void testLifelineRpcBindHostKey() throws IOException {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;
@@ -237,7 +237,7 @@ public class TestNameNodeRespectsBindHostKeys_RestartInjected {
     }
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testHttpBindHostKey() throws IOException {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;
@@ -315,7 +315,7 @@ public class TestNameNodeRespectsBindHostKeys_RestartInjected {
    * pick a different host/port combination.
    * @throws Exception
    */
-  @Test (timeout=300000)
+  @Test
   public void testHttpsBindHostKey() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;

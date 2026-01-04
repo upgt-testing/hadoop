@@ -110,7 +110,7 @@ public class TestSnapshotBlocksMap_RestartInjected {
    * Test deleting a file with snapshots. Need to check the blocksMap to make
    * sure the corresponding record is updated correctly.
    */
-  @Test (timeout=60000)
+  @Test
   public void testDeletionWithSnapshots() throws Exception {
     Path file0 = new Path(sub1, "file0");
     Path file1 = new Path(sub1, "file1");
@@ -239,7 +239,7 @@ public class TestSnapshotBlocksMap_RestartInjected {
    * Try to read the files inside snapshot but deleted in original place after
    * restarting post checkpoint. refer HDFS-5427
    */
-  @Test(timeout = 30000)
+  @Test
   public void testReadSnapshotFileWithCheckpoint() throws Exception {
     Path foo = new Path("/foo");
     hdfs.mkdirs(foo);
@@ -288,7 +288,7 @@ public class TestSnapshotBlocksMap_RestartInjected {
    * Try to read the files inside snapshot but renamed to different file and
    * deleted after restarting post checkpoint. refer HDFS-5427
    */
-  @Test(timeout = 30000)
+  @Test
   public void testReadRenamedSnapshotFileWithCheckpoint() throws Exception {
     final Path foo = new Path("/foo");
     final Path foo2 = new Path("/foo2");

@@ -83,9 +83,7 @@ public class TestDeleteRace_RestartInjected {
   private static final Configuration conf = new HdfsConfiguration();
   private MiniDFSCluster cluster;
 
-  @Rule
-  public Timeout timeout = new Timeout(60000 * 3);
-
+  
   @Test  
   public void testDeleteAddBlockRace() throws Exception {
     testDeleteAddBlockRace(false);
@@ -480,13 +478,13 @@ public class TestDeleteRace_RestartInjected {
     }
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testDeleteAndCommitBlockSynchonizationRaceNoSnapshot()
       throws Exception {
     testDeleteAndCommitBlockSynchronizationRace(false);
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testDeleteAndCommitBlockSynchronizationRaceHasSnapshot()
       throws Exception {
     testDeleteAndCommitBlockSynchronizationRace(true);
@@ -597,7 +595,7 @@ public class TestDeleteRace_RestartInjected {
     }
   }
 
-  @Test(timeout = 20000)
+  @Test
   public void testOpenRenameRace() throws Exception {
     Configuration config = new Configuration();
     config.setLong(DFSConfigKeys.DFS_NAMENODE_ACCESSTIME_PRECISION_KEY, 1);

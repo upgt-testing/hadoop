@@ -141,7 +141,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * 3. Create multiple xattrs.
    * 4. Restart NN and save checkpoint scenarios.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testCreateXAttr() throws Exception {
     Map<String, byte[]> expectedXAttrs = Maps.newHashMap();
     expectedXAttrs.put(name1, value1);
@@ -242,7 +242,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * 3. Create multiple xattrs and replace some.
    * 4. Restart NN and save checkpoint scenarios.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testReplaceXAttr() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     fs.setXAttr(path, name1, value1, EnumSet.of(XAttrSetFlag.CREATE));
@@ -297,7 +297,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * 5. Set xattr and name is too long.
    * 6. Set xattr and value is too long.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testSetXAttr() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     RestartFramework.at("after_mkdir")
@@ -432,7 +432,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * the caller does not have search access to the owning directory and read
    * access to the actual entity
    */
-  @Test(timeout = 120000)
+  @Test
   public void testGetXAttrs() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     fs.setXAttr(path, name1, value1, EnumSet.of(XAttrSetFlag.CREATE));
@@ -602,7 +602,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * 1. Remove xattr.
    * 2. Restart NN and save checkpoint scenarios.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testRemoveXAttr() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     RestartFramework.at("after_mkdir")
@@ -663,7 +663,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * the caller does not have execute access to the owning directory and write
    * access to the actual entity
    */
-  @Test(timeout = 120000)
+  @Test
   public void testRemoveXAttrPermissions() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     fs.setXAttr(path, name1, value1, EnumSet.of(XAttrSetFlag.CREATE));
@@ -809,7 +809,7 @@ public class FSXAttrBaseTest_RestartInjected {
       });
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testRenameFileWithXAttr() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     RestartFramework.at("after_mkdir")
@@ -852,7 +852,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * Check that execute/scan access to the parent dir is sufficient to get
    *  xattr names.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testListXAttrs() throws Exception {
     final UserGroupInformation user = UserGroupInformation.
       createUserForTesting("user", new String[] {"mygroup"});
@@ -978,7 +978,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * 6) Restart NN without saving a checkpoint.
    * 7) Set xattrs again on the same file.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testCleanupXAttrs() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short)0750));
     fs.setXAttr(path, name1, value1, EnumSet.of(XAttrSetFlag.CREATE));
@@ -1011,7 +1011,7 @@ public class FSXAttrBaseTest_RestartInjected {
     Assert.assertArrayEquals(value2, xattrs.get(name2));
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testXAttrAcl() throws Exception {
     FileSystem.mkdirs(fs, path, FsPermission.createImmutable((short) 0750));
     fs.setOwner(path, BRUCE.getUserName(), null);
@@ -1055,7 +1055,7 @@ public class FSXAttrBaseTest_RestartInjected {
     fsAsDiana.removeXAttr(path, name2);
   }
   
-  @Test(timeout = 120000)
+  @Test
   public void testRawXAttrs() throws Exception {
     final UserGroupInformation user = UserGroupInformation.
       createUserForTesting("user", new String[] {"mygroup"});
@@ -1309,7 +1309,7 @@ public class FSXAttrBaseTest_RestartInjected {
    * This tests the "unreadable by superuser" xattr which denies access to a
    * file for the superuser. See HDFS-6705 for details.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testUnreadableBySuperuserXAttr() throws Exception {
     // Run tests as superuser...
     doTestUnreadableBySuperuserXAttr(fs, true);

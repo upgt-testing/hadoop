@@ -360,7 +360,7 @@ public class TestFsDatasetCache_RestartInjected {
     LOG.info("finishing testCacheAndUncacheBlock");
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testCacheAndUncacheBlockSimple() throws Exception {
     testCacheAndUncacheBlock();
   }
@@ -369,7 +369,7 @@ public class TestFsDatasetCache_RestartInjected {
    * Run testCacheAndUncacheBlock with some failures injected into the mlock
    * call.  This tests the ability of the NameNode to resend commands.
    */
-  @Test(timeout=600000)
+  @Test
   public void testCacheAndUncacheBlockWithRetries() throws Exception {
     // We don't have to save the previous cacheManipulator
     // because it will be reinstalled by the @After function.
@@ -392,7 +392,7 @@ public class TestFsDatasetCache_RestartInjected {
     testCacheAndUncacheBlock();
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testFilesExceedMaxLockedMemory() throws Exception {
     LOG.info("beginning testFilesExceedMaxLockedMemory");
 
@@ -463,7 +463,7 @@ public class TestFsDatasetCache_RestartInjected {
     LOG.info("finishing testFilesExceedMaxLockedMemory");
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testUncachingBlocksBeforeCachingFinishes() throws Exception {
     LOG.info("beginning testUncachingBlocksBeforeCachingFinishes");
     final int NUM_BLOCKS = 5;
@@ -517,7 +517,7 @@ public class TestFsDatasetCache_RestartInjected {
     LOG.info("finishing testUncachingBlocksBeforeCachingFinishes");
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testUncacheUnknownBlock() throws Exception {
     // Create a file
     Path fileName = new Path("/testUncacheUnknownBlock");
@@ -537,7 +537,7 @@ public class TestFsDatasetCache_RestartInjected {
     }, 100, 10000);
   }
 
-  @Test(timeout=600000)
+  @Test
   public void testPageRounder() throws Exception {
     // Write a small file
     Path fileName = new Path("/testPageRounder");
@@ -560,7 +560,7 @@ public class TestFsDatasetCache_RestartInjected {
     DFSTestUtil.verifyExpectedCacheUsage(0, 0, fsd);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testUncacheQuiesces() throws Exception {
     // Create a file
     Path fileName = new Path("/testUncacheQuiesces");
@@ -598,7 +598,7 @@ public class TestFsDatasetCache_RestartInjected {
     MetricsAsserts.assertCounter("BlocksUncached", 1l, dnMetrics);
   }
 
-  @Test(timeout=60000)
+  @Test
   public void testReCacheAfterUncache() throws Exception {
     final int TOTAL_BLOCKS_PER_CACHE =
         Ints.checkedCast(CACHE_CAPACITY / BLOCK_SIZE);

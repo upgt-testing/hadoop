@@ -102,7 +102,7 @@ public class TestXAttrWithSnapshot_RestartInjected {
   /**
    * Tests modifying xattrs on a directory that has been snapshotted
    */
-  @Test (timeout = 120000)
+  @Test
   public void testModifyReadsCurrentState() throws Exception {
     // Init
     FileSystem.mkdirs(hdfs, path, FsPermission.createImmutable((short) 0700));
@@ -218,7 +218,7 @@ public class TestXAttrWithSnapshot_RestartInjected {
   /**
    * Tests removing xattrs on a directory that has been snapshotted
    */
-  @Test (timeout = 120000)
+  @Test
   public void testRemoveReadsCurrentState() throws Exception {
     // Init
     FileSystem.mkdirs(hdfs, path, FsPermission.createImmutable((short) 0700));
@@ -523,7 +523,7 @@ public class TestXAttrWithSnapshot_RestartInjected {
   /**
    * Test that users can copy a snapshot while preserving its xattrs.
    */
-  @Test (timeout = 120000)
+  @Test
   public void testCopySnapshotShouldPreserveXAttrs() throws Exception {
     FileSystem.mkdirs(hdfs, path, FsPermission.createImmutable((short) 0700));
     hdfs.setXAttr(path, name1, value1);

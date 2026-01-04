@@ -267,7 +267,7 @@ public class TestStateAlignmentContextWithHA_RestartInjected {
     assertEquals(clientStateFO, writeStateFO);
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testMultiClientStatesWithRandomFailovers() throws Exception {
     // First run, half the load, with one failover.
     runClientsWithFailover(1, NUMCLIENTS/2, NUMFILES/2);

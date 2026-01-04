@@ -211,7 +211,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws java.io.IOException on an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_01() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -285,7 +285,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of errors
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_02() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     LOG.info("Running test " + METHOD_NAME);
@@ -376,7 +376,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_03() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -419,7 +419,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_04() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -470,7 +470,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_06() throws Exception {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -520,7 +520,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_07() throws Exception {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -596,7 +596,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    *
    * @throws IOException in case of an error
    */
-  @Test(timeout=300000)
+  @Test
   public void blockReport_08() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -654,7 +654,7 @@ public abstract class BlockReportTestBase_RestartInjected {
   // Similar to BlockReport_08 but corrupts GS and len of the TEMPORARY's
   // replica block. Expect the same behaviour: NN should simply ignore this
   // block
-  @Test(timeout=300000)
+  @Test
   public void blockReport_09() throws IOException {
     final String METHOD_NAME = GenericTestUtils.getMethodName();
     Path filePath = new Path("/" + METHOD_NAME + ".dat");
@@ -718,7 +718,7 @@ public abstract class BlockReportTestBase_RestartInjected {
    * corrupt.
    * This is a regression test for HDFS-2791.
    */
-  @Test(timeout=300000)
+  @Test
   public void testOneReplicaRbwReportArrivesAfterBlockCompleted() throws Exception {
     final CountDownLatch brFinished = new CountDownLatch(1);
     DelayAnswer delayer = new GenericTestUtils.DelayAnswer(LOG) {
@@ -803,7 +803,7 @@ public abstract class BlockReportTestBase_RestartInjected {
   }
 
   // See HDFS-10301
-  @Test(timeout = 300000)
+  @Test
   public void testInterleavedBlockReports()
       throws IOException, ExecutionException, InterruptedException {
     int numConcurrentBlockReports = 3;

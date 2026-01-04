@@ -124,7 +124,7 @@ public class TestDiskBalancerCommand_RestartInjected {
    * Tests if it's allowed to submit and execute plan when Datanode is in status
    * other than REGULAR.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testSubmitPlanInNonRegularStatus() throws Exception {
     final int numDatanodes = 1;
     MiniDFSCluster miniCluster = null;
@@ -175,7 +175,7 @@ public class TestDiskBalancerCommand_RestartInjected {
    * Tests running multiple commands under on setup. This mainly covers
    * {@link org.apache.hadoop.hdfs.server.diskbalancer.command.Command#close}
    */
-  @Test(timeout = 60000)
+  @Test
   public void testRunMultipleCommandsUnderOneSetup() throws Exception {
 
     final int numDatanodes = 1;
@@ -216,7 +216,7 @@ public class TestDiskBalancerCommand_RestartInjected {
 
 
 
-  @Test(timeout = 600000)
+  @Test
   public void testDiskBalancerExecuteOptionPlanValidityWithException() throws
       Exception {
     final int numDatanodes = 1;
@@ -265,7 +265,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     }
   }
 
-  @Test(timeout = 600000)
+  @Test
   public void testDiskBalancerExecutePlanValidityWithOutUnitException()
       throws
       Exception {
@@ -315,7 +315,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     }
   }
 
-  @Test(timeout = 600000)
+  @Test
   public void testDiskBalancerForceExecute() throws
       Exception {
     final int numDatanodes = 1;
@@ -362,7 +362,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
 
-  @Test(timeout = 600000)
+  @Test
   public void testDiskBalancerExecuteOptionPlanValidity() throws Exception {
     final int numDatanodes = 1;
 
@@ -437,7 +437,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test exception on invalid arguments */
-  @Test(timeout = 60000)
+  @Test
   public void testExceptionOnInvalidArguments() throws Exception {
     final String cmdLine = "hdfs diskbalancer random1 -report random2 random3";
     thrown.expect(HadoopIllegalArgumentException.class);
@@ -447,7 +447,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test basic report */
-  @Test(timeout = 60000)
+  @Test
   public void testReportSimple() throws Exception {
     final String cmdLine = "hdfs diskbalancer -report";
     final List<String> outputs = runCommand(cmdLine);
@@ -475,7 +475,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test basic report with negative top limit */
-  @Test(timeout = 60000)
+  @Test
   public void testReportWithNegativeTopLimit()
       throws Exception {
     final String cmdLine = "hdfs diskbalancer -report -top -32";
@@ -484,7 +484,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     runCommand(cmdLine);
   }
   /* test less than 64 DataNode(s) as total, e.g., -report -top 32 */
-  @Test(timeout = 60000)
+  @Test
   public void testReportLessThanTotal() throws Exception {
     final String cmdLine = "hdfs diskbalancer -report -top 32";
     final List<String> outputs = runCommand(cmdLine);
@@ -511,7 +511,7 @@ public class TestDiskBalancerCommand_RestartInjected {
    * with a generic option 'fs'.
    * @throws Exception
    */
-  @Test(timeout = 60000)
+  @Test
   public void testReportWithGenericOptionFS() throws Exception {
     final String topReportArg = "5";
     final String reportArgs = String.format("-%s file:%s -%s -%s %s",
@@ -528,7 +528,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test more than 64 DataNode(s) as total, e.g., -report -top 128 */
-  @Test(timeout = 60000)
+  @Test
   public void testReportMoreThanTotal() throws Exception {
     final String cmdLine = "hdfs diskbalancer -report -top 128";
     final List<String> outputs = runCommand(cmdLine);
@@ -552,7 +552,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test invalid top limit, e.g., -report -top xx */
-  @Test(timeout = 60000)
+  @Test
   public void testReportInvalidTopLimit() throws Exception {
     final String cmdLine = "hdfs diskbalancer -report -top xx";
     final List<String> outputs = runCommand(cmdLine);
@@ -578,7 +578,7 @@ public class TestDiskBalancerCommand_RestartInjected {
             containsString("9 volumes with node data density 1.97"))));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportNode() throws Exception {
     final String cmdLine =
         "hdfs diskbalancer -report -node " +
@@ -653,7 +653,7 @@ public class TestDiskBalancerCommand_RestartInjected {
             containsString("0.25 free: 490407853993/2000000000000"))));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportNodeWithoutJson() throws Exception {
     String dataNodeUuid = cluster.getDataNodes().get(0).getDatanodeUuid();
     final String planArg = String.format("-%s -%s %s",
@@ -690,7 +690,7 @@ public class TestDiskBalancerCommand_RestartInjected {
             containsString("1.00"))));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReadClusterFromJson() throws Exception {
     ClusterConnector jsonConnector = ConnectorFactory.getCluster(clusterJson,
         conf);
@@ -701,7 +701,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test -plan  DataNodeID */
-  @Test(timeout = 60000)
+  @Test
   public void testPlanNode() throws Exception {
     final String planArg = String.format("-%s %s", PLAN,
         cluster.getDataNodes().get(0).getDatanodeUuid());
@@ -713,7 +713,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* test -plan  DataNodeID */
-  @Test(timeout = 60000)
+  @Test
   public void testPlanJsonNode() throws Exception {
     final String planArg = String.format("-%s %s", PLAN,
         "a87654a9-54c7-4693-8dd9-c9c7021dc340");
@@ -727,7 +727,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   }
 
   /* Test that illegal arguments are handled correctly*/
-  @Test(timeout = 60000)
+  @Test
   public void testIllegalArgument() throws Exception {
     final String planArg = String.format("-%s %s", PLAN,
         "a87654a9-54c7-4693-8dd9-c9c7021dc340");
@@ -741,7 +741,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     runCommand(cmdLine);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testCancelCommand() throws Exception {
     final String cancelArg = String.format("-%s %s", CANCEL, "nosuchplan");
     final String nodeArg = String.format("-%s %s", NODE,
@@ -758,7 +758,7 @@ public class TestDiskBalancerCommand_RestartInjected {
   /*
    Makes an invalid query attempt to non-existent Datanode.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testQueryCommand() throws Exception {
     final String queryArg = String.format("-%s %s", QUERY,
         cluster.getDataNodes().get(0).getDatanodeUuid());
@@ -769,7 +769,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     runCommand(cmdLine);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testHelpCommand() throws Exception {
     final String helpArg = String.format("-%s", HELP);
     final String cmdLine = String
@@ -898,7 +898,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testGetNodeList() throws Exception {
     ClusterConnector jsonConnector =
         ConnectorFactory.getCluster(clusterJson, conf);
@@ -919,7 +919,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     assertEquals(nodeNum, nodeList.size());
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportCommandWithMultipleNodes() throws Exception {
     String dataNodeUuid1 = cluster.getDataNodes().get(0).getDatanodeUuid();
     String dataNodeUuid2 = cluster.getDataNodes().get(1).getDatanodeUuid();
@@ -947,7 +947,7 @@ public class TestDiskBalancerCommand_RestartInjected {
         || outputs.get(6).contains(dataNodeUuid2));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportCommandWithInvalidNode() throws Exception {
     String dataNodeUuid1 = cluster.getDataNodes().get(0).getDatanodeUuid();
     String invalidNode = "invalidNode";
@@ -971,7 +971,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     assertTrue(outputs.get(2).contains(invalidNodeInfo));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportCommandWithNullNodes() throws Exception {
     // don't input nodes
     final String planArg = String.format("-%s -%s ,", REPORT, NODE);
@@ -983,7 +983,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     assertTrue(outputs.get(2).contains(invalidNodeInfo));
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportCommandWithReadingHostFile() throws Exception {
     final String testDir = GenericTestUtils.getTestDir().getAbsolutePath();
     File includeFile = new File(testDir, "diskbalancer.include");
@@ -1007,7 +1007,7 @@ public class TestDiskBalancerCommand_RestartInjected {
     includeFile.delete();
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testReportCommandWithInvalidHostFilePath() throws Exception {
     final String testDir = GenericTestUtils.getTestDir().getAbsolutePath();
     String invalidFilePath = testDir + "/diskbalancer-invalid.include";

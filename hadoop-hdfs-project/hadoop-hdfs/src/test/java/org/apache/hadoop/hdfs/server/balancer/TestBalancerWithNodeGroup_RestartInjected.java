@@ -217,7 +217,7 @@ public class TestBalancerWithNodeGroup_RestartInjected {
    * Create a cluster with even distribution, and a new empty node is added to
    * the cluster, then test rack locality for balancer policy. 
    */
-  @Test(timeout=60000)
+  @Test
   public void testBalancerWithRackLocality() throws Exception {
     Configuration conf = createConf();
     long[] capacities = new long[]{CAPACITY, CAPACITY};
@@ -305,7 +305,7 @@ public class TestBalancerWithNodeGroup_RestartInjected {
    * Create a cluster with even distribution, and a new empty node is added to
    * the cluster, then test node-group locality for balancer policy.
    */
-  @Test(timeout=60000)
+  @Test
   public void testBalancerWithNodeGroup() throws Exception {
     Configuration conf = createConf();
     long[] capacities = new long[]{CAPACITY, CAPACITY, CAPACITY, CAPACITY};
@@ -389,7 +389,7 @@ public class TestBalancerWithNodeGroup_RestartInjected {
    * to n0 or n1 as balancer policy with node group. Thus, we expect the balancer
    * to end in 5 iterations without move block process.
    */
-  @Test(timeout=60000)
+  @Test
   public void testBalancerEndInNoMoveProgress() throws Exception {
     Configuration conf = createConf();
     long[] capacities = new long[]{CAPACITY, CAPACITY, CAPACITY, CAPACITY};

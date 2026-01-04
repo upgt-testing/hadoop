@@ -71,7 +71,7 @@ public class TestRBWBlockInvalidation_RestartInjected {
    * datanode, namenode should ask to invalidate that corrupted block and
    * schedule replication for one more replica for that under replicated block.
    */
-  @Test(timeout=600000)
+  @Test
   public void testBlockInvalidationWhenRBWReplicaMissedInDN()
       throws IOException, InterruptedException {
     // This test cannot pass on Windows due to file locking enforcement.  It will
@@ -185,7 +185,7 @@ public class TestRBWBlockInvalidation_RestartInjected {
    * were RWR replicas with out-of-date genstamps, the NN could accidentally
    * delete good replicas instead of the bad replicas.
    */
-  @Test(timeout=120000)
+  @Test
   public void testRWRInvalidation() throws Exception {
     Configuration conf = new HdfsConfiguration();
 

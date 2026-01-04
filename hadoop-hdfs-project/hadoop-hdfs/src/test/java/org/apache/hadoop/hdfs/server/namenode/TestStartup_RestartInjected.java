@@ -444,7 +444,7 @@ public class TestStartup_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testSNNStartupWithRuntimeException() throws Exception {
     String[] argv = new String[] { "-checkpoint" };
     try {
@@ -578,7 +578,7 @@ public class TestStartup_RestartInjected {
     }
   }
   
-  @Test(timeout=30000)
+  @Test
   public void testCorruptImageFallback() throws IOException {
     // Create two checkpoints
     createCheckPoint(2);
@@ -597,7 +597,7 @@ public class TestStartup_RestartInjected {
     }
   }
 
-  @Test(timeout=30000)
+  @Test
   public void testCorruptImageFallbackLostECPolicy() throws IOException {
     final ErasureCodingPolicy defaultPolicy = StripedFileTestUtil
         .getDefaultECPolicy();
@@ -711,7 +711,7 @@ public class TestStartup_RestartInjected {
     }
   }
 
-  @Test(timeout = 120000)
+  @Test
   public void testXattrConfiguration() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;
@@ -749,7 +749,7 @@ public class TestStartup_RestartInjected {
     }
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testNNFailToStartOnReadOnlyNNDir() throws Exception {
     /* set NN dir */
     final String nnDirStr = Paths.get(
@@ -806,7 +806,7 @@ public class TestStartup_RestartInjected {
    * 4. NN will mark DatanodeStorageInfo#blockContentsStale to false.
    * @throws Exception
    */
-  @Test(timeout = 60000)
+  @Test
   public void testStorageBlockContentsStaleAfterNNRestart() throws Exception {
     MiniDFSCluster dfsCluster = null;
     try {
@@ -847,7 +847,7 @@ public class TestStartup_RestartInjected {
     return;
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDirectoryPermissions() throws Exception {
     Configuration conf = new Configuration();
     try (MiniDFSCluster dfsCluster

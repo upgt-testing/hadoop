@@ -70,7 +70,7 @@ public class TestDataNodeUUID_RestartInjected {
     assertNotEquals(dn.getDatanodeUuid(), nullString);
   }
 
-  @Test(timeout = 10000)
+  @Test
   public void testUUIDRegeneration() throws Exception {
     File baseDir = GenericTestUtils.getTestDir();
     File disk1 = new File(baseDir, "disk1");

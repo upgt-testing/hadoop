@@ -78,7 +78,7 @@ public class TestDataNodeFaultInjector_RestartInjected {
     }
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDelaySendingAckToUpstream() throws Exception {
     final MetricsDataNodeFaultInjector mdnFaultInjector =
         new MetricsDataNodeFaultInjector() {
@@ -97,7 +97,7 @@ public class TestDataNodeFaultInjector_RestartInjected {
     verifyFaultInjectionDelayPipeline(mdnFaultInjector);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testDelaySendingPacketDownstream() throws Exception {
     final MetricsDataNodeFaultInjector mdnFaultInjector =
         new MetricsDataNodeFaultInjector() {

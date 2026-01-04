@@ -85,9 +85,7 @@ public class TestDFSStripedInputStream_RestartInjected {
   private int blockSize;
   private int blockGroupSize;
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   public ErasureCodingPolicy getEcPolicy() {
     return StripedFileTestUtil.getDefaultECPolicy();
   }

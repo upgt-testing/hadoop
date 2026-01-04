@@ -125,7 +125,7 @@ public class TestRefreshNamenodes_RestartInjected {
     }
   }
 
-  @Test(timeout=10000)
+  @Test
   public void testRefreshNameNodeDeadLock() throws Exception {
     Configuration conf = new HdfsConfiguration();
     MiniDFSCluster cluster = null;

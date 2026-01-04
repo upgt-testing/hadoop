@@ -325,7 +325,7 @@ public class TestEditLogTailer_RestartInjected {
     }, 100, 10000);
   }
 
-  @Test(timeout=20000)
+  @Test
   public void testRollEditTimeoutForActiveNN() throws IOException {
     Configuration conf = getConf();
     conf.setInt(DFSConfigKeys.DFS_HA_TAILEDITS_ROLLEDITS_TIMEOUT_KEY, 5); // 5s

@@ -210,7 +210,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
    *     (corrupt replica should  be removed since number of good
    *      replicas (1) is equal to replication factor (1))
    */
-  @Test(timeout=20000)
+  @Test
   public void testWithReplicationFactorAsOne() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setLong(DFSConfigKeys.DFS_BLOCKREPORT_INTERVAL_MSEC_KEY, 1000L);

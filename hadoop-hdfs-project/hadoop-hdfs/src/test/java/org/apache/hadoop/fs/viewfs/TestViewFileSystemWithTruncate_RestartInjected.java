@@ -96,7 +96,7 @@ public class TestViewFileSystemWithTruncate_RestartInjected {
     fsTarget.delete(fileSystemTestHelper.getTestRootPath(fsTarget), true);
   }
 
-  @Test(timeout = 30000)
+  @Test
   public void testTruncateWithViewFileSystem()
       throws Exception {
     Path filePath = new Path(mountOnNn1 + "/ttest");

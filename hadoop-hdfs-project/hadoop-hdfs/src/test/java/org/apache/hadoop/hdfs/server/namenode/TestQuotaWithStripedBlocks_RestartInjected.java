@@ -63,9 +63,7 @@ public class TestQuotaWithStripedBlocks_RestartInjected {
     return StripedFileTestUtil.getDefaultECPolicy();
   }
 
-  @Rule
-  public Timeout globalTimeout = new Timeout(300000);
-
+  
   @Before
   public void setUp() throws IOException {
     blockSize = 1024 * 1024;

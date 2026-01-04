@@ -39,7 +39,7 @@ import java.util.Iterator;
 
 
 public class TestUnderReplicatedBlocks_RestartInjected {
-  @Test(timeout=120000) // 1 min timeout
+  @Test // 1 min timeout
   public void testSetRepIncWithUnderReplicatedBlocks() throws Exception {
     Configuration conf = new HdfsConfiguration();
     final short REPLICATION_FACTOR = 2;
@@ -135,7 +135,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
    *    exceed the limit.
    * @throws Exception
    */
-  @Test(timeout=60000) // 1 min timeout
+  @Test // 1 min timeout
   public void testNumberOfBlocksToBeReplicated() throws Exception {
     Configuration conf = new HdfsConfiguration();
 

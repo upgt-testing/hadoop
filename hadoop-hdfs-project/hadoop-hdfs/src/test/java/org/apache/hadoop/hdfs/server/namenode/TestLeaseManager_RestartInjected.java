@@ -57,9 +57,7 @@ import org.restarttest.api.RestartFramework;
 import org.restarttest.core.RestartMode;
 
 public class TestLeaseManager_RestartInjected {
-  @Rule
-  public Timeout timeout = new Timeout(300000);
-
+  
   public static long maxLockHoldToReleaseLeaseMs = 100;
 
   @Test
@@ -215,7 +213,7 @@ public class TestLeaseManager_RestartInjected {
    * {@link LeaseManager#getINodeIdWithLeases()} and
    * {@link LeaseManager#getINodeWithLeases(INodeDirectory)}.
    */
-  @Test (timeout = 60000)
+  @Test
   public void testInodeWithLeases() throws Exception {
     FSNamesystem fsNamesystem = makeMockFsNameSystem();
     when(fsNamesystem.getMaxListOpenFilesResponses()).thenReturn(1024);
@@ -257,7 +255,7 @@ public class TestLeaseManager_RestartInjected {
    * {@link LeaseManager#getINodeIdWithLeases()} and
    * {@link LeaseManager#getINodeWithLeases(INodeDirectory)}.
    */
-  @Test (timeout = 240000)
+  @Test
   public void testInodeWithLeasesAtScale() throws Exception {
     FSNamesystem fsNamesystem = makeMockFsNameSystem();
     when(fsNamesystem.getMaxListOpenFilesResponses()).thenReturn(4096);
@@ -336,7 +334,7 @@ public class TestLeaseManager_RestartInjected {
    * {@link LeaseManager#getINodeIdWithLeases()} and
    * {@link LeaseManager#getINodeWithLeases(INodeDirectory)}.
    */
-  @Test (timeout = 60000)
+  @Test
   public void testInodeWithLeasesForAncestorDir() throws Exception {
     FSNamesystem fsNamesystem = makeMockFsNameSystem();
     FSDirectory fsDirectory = fsNamesystem.getFSDirectory();

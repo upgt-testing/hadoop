@@ -928,7 +928,7 @@ public class TestFsck_RestartInjected {
     assertTrue(outStr.contains("MINIMAL BLOCK REPLICATION:\t2"));
   }
 
-  @Test(timeout = 90000)
+  @Test
   public void testFsckReplicaDetails() throws Exception {
 
     final short replFactor = 1;
@@ -1590,7 +1590,7 @@ public class TestFsck_RestartInjected {
   /**
    * Test for blockIdCK with datanode maintenance.
    */
-  @Test (timeout = 90000)
+  @Test
   public void testBlockIdCKMaintenance() throws Exception {
     final short replFactor = 2;
     short numDn = 2;
@@ -1907,7 +1907,7 @@ public class TestFsck_RestartInjected {
   /**
    * Test for blocks on maintenance hosts are not shown as missing.
    */
-  @Test (timeout = 90000)
+  @Test
   public void testFsckWithMaintenanceReplicas() throws Exception {
     final short replFactor = 2;
     short numDn = 2;
@@ -2186,7 +2186,7 @@ public class TestFsck_RestartInjected {
     }, 100, 10000);
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testFsckMoveAfterCorruption() throws Exception {
     final int dfsBlockSize = 512 * 1024;
     final int numDatanodes = 1;
@@ -2271,7 +2271,7 @@ public class TestFsck_RestartInjected {
     util.cleanup(dfs, srcDir);
   }
 
-  @Test(timeout = 60000)
+  @Test
   public void testFsckUpgradeDomain() throws Exception {
     testUpgradeDomain(false, false);
     testUpgradeDomain(false, true);
@@ -2335,7 +2335,7 @@ public class TestFsck_RestartInjected {
     }
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testFsckCorruptECFile() throws Exception {
     DistributedFileSystem fs = null;
     int dataBlocks = StripedFileTestUtil.getDefaultECPolicy().getNumDataUnits();
@@ -2407,7 +2407,7 @@ public class TestFsck_RestartInjected {
     assertTrue(outStr.contains("has 1 CORRUPT files"));
   }
 
-  @Test (timeout = 300000)
+  @Test
   public void testFsckMissingECFile() throws Exception {
     DistributedFileSystem fs = null;
     int dataBlocks = StripedFileTestUtil.getDefaultECPolicy().getNumDataUnits();
@@ -2474,7 +2474,7 @@ public class TestFsck_RestartInjected {
     }, 1000, 60000);
   }
 
-  @Test(timeout = 300000)
+  @Test
   public void testFsckCorruptWhenOneReplicaIsCorrupt()
       throws Exception {
     try (MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf,

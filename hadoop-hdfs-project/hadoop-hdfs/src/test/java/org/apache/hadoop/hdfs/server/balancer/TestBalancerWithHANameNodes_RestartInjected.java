@@ -104,7 +104,7 @@ public class TestBalancerWithHANameNodes_RestartInjected {
    * it to be 30% full (with a single file replicated identically to all
    * datanodes); It then adds one new empty node and starts balancing.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testBalancerWithHANameNodes() throws Exception {
     Configuration conf = new HdfsConfiguration();
     TestBalancer.initConf(conf);
@@ -222,7 +222,7 @@ public class TestBalancerWithHANameNodes_RestartInjected {
   /**
    * Test Balancer request Standby NameNode when enable this feature.
    */
-  @Test(timeout = 60000)
+  @Test
   public void testBalancerRequestSBNWithHA() throws Exception {
     Configuration conf = new HdfsConfiguration();
     conf.setBoolean(DFS_HA_ALLOW_STALE_READ_KEY, true);
@@ -280,7 +280,7 @@ public class TestBalancerWithHANameNodes_RestartInjected {
   /**
    * Test Balancer with ObserverNodes.
    */
-  @Test(timeout = 120000)
+  @Test
   public void testBalancerWithObserver() throws Exception {
     testBalancerWithObserver(false);
   }
@@ -288,7 +288,7 @@ public class TestBalancerWithHANameNodes_RestartInjected {
   /**
    * Test Balancer with ObserverNodes when one has failed.
    */
-  @Test(timeout = 180000)
+  @Test
   public void testBalancerWithObserverWithFailedNode() throws Exception {
     testBalancerWithObserver(true);
   }

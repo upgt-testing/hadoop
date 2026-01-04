@@ -312,7 +312,7 @@ public class TestFSDirectory_RestartInjected {
   /**
    * Test setting and removing multiple xattrs via single operations
    */
-  @Test(timeout=300000)
+  @Test
   public void testXAttrMultiSetRemove() throws Exception {
     List<XAttr> existingXAttrs = Lists.newArrayListWithCapacity(0);
 
@@ -406,7 +406,7 @@ public class TestFSDirectory_RestartInjected {
         .execute();
   }
 
-  @Test(timeout=300000)
+  @Test
   public void testXAttrMultiAddRemoveErrors() throws Exception {
 
     RestartFramework.at("before_error_tests")

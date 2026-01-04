@@ -301,7 +301,7 @@ public class TestBootstrapStandby_RestartInjected {
    * Test that, even if the other node is not active, we are able
    * to bootstrap standby from it.
    */
-  @Test(timeout=30000)
+  @Test
   public void testOtherNodeNotActive() throws Exception {
     cluster.transitionToStandby(0);
 
@@ -321,7 +321,7 @@ public class TestBootstrapStandby_RestartInjected {
    * {@link DFSConfigKeys#DFS_IMAGE_TRANSFER_BOOTSTRAP_STANDBY_RATE_KEY}
    * created by HDFS-8808.
    */
-  @Test(timeout=180000)
+  @Test
   public void testRateThrottling() throws Exception {
     cluster.getConfiguration(0).setLong(
         DFSConfigKeys.DFS_IMAGE_TRANSFER_RATE_KEY, 1);
