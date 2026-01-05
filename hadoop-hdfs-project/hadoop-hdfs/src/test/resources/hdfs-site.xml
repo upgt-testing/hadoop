@@ -30,5 +30,11 @@
     <name>dfs.namenode.fs-limits.min-block-size</name>
     <value>0</value>
   </property>
+  <!-- Enable client retry policy to handle NameNode restarts gracefully -->
+  <!-- This helps tests survive node restarts during restart injection testing -->
+  <property>
+    <name>dfs.client.retry.policy.enabled</name>
+    <value>true</value>
+  </property>
 
 </configuration>

@@ -13,7 +13,7 @@ This document tracks failure groups from HDFS restart testing, organized by prio
 
 **Total Groups: 10**
 
-### [ ] Group 4
+### [TEST-BUG] Group 4
 
 **Test Executions:** 39
 
@@ -49,9 +49,15 @@ java.lang.NullPointerException
 3. **org.apache.hadoop.hdfs.server.namenode.TestProcessCorruptBlocks_RestartInjected.testWhenDecreasingReplication**
    - Position: after_cluster_setup, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Tests store references to NameNode components (via `cluster.getNameNodeRpc()`, etc.) before namenode restart. After restart, `BlocksMap.close()` sets `blocks = null`. The test uses stale references to the old namenode, causing NPE when accessing the closed BlocksMap.
+- **Classification:** TEST-BUG - The restart-injected tests need to re-fetch namenode references after restart. The original tests weren't designed for restart scenarios.
+- **Fix:** After any namenode restart, re-fetch all direct references: `namenode = cluster.getNameNodeRpc()`, `bm = cluster.getNamesystem().getBlockManager()`, etc.
+- **Bug Report:** See [HDFS-BUG-GROUP-4.md](bugs/HDFS-BUG-GROUP-4.md)
+
 ---
 
-### [ ] Group 19
+### [TEST-BUG] Group 19
 
 **Test Executions:** 8
 
@@ -86,9 +92,15 @@ java.lang.NullPointerException
 3. **org.apache.hadoop.hdfs.server.namenode.TestHDFSConcat_RestartInjected.testConcat**
    - Position: after_source_files_creation, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `nn = cluster.getNameNodeRpc()` in `@Before` setup. After namenode restart, `BlocksMap.close()` sets `blocks = null`. The test uses stale `nn` reference to call `getBlockLocations()`, which accesses the closed BlocksMap, causing NPE at `blocks.get(b)` in `numNodes()`.
+- **Classification:** TEST-BUG - Same pattern as Group 4. The restart-injected tests need to re-fetch `nn` reference after namenode restart.
+- **Fix:** After any namenode restart, re-fetch: `nn = cluster.getNameNodeRpc()`.
+- **Bug Report:** See [HDFS-BUG-GROUP-19.md](bugs/HDFS-BUG-GROUP-19.md)
+
 ---
 
-### [ ] Group 26
+### [TEST-BUG] Group 26
 
 **Test Executions:** 6
 
@@ -122,9 +134,15 @@ java.lang.NullPointerException
 3. **org.apache.hadoop.hdfs.server.namenode.TestFSImageWithSnapshot_RestartInjected.testSaveLoadImage**
    - Position: after_third_rename, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `fsn = cluster.getNamesystem()` in `@Before` setup. After namenode restart, `cluster.getNamesystem()` returns the NEW FSNamesystem, but the test's `fsn` field still points to the OLD (closed) FSNamesystem. When `saveFSImageToTempFile()` and `dumpTree2File()` use the stale `fsn` reference, they operate on a closed FSNamesystem, producing inconsistent FSImage data. When this corrupted FSImage is loaded into the fresh cluster, `loadSnapshotSection()` fails to find INodes by ID, causing the NPE at `fsDir.getInode(sdirId).asDirectory()`.
+- **Classification:** TEST-BUG - Same pattern as Group 4 and Group 19. The restart-injected tests need to re-fetch FSNamesystem reference after namenode restart.
+- **Fix:** After any namenode restart, re-fetch: `fsn = cluster.getNamesystem()`.
+- **Bug Report:** See [HDFS-BUG-GROUP-26.md](bugs/HDFS-BUG-GROUP-26.md)
+
 ---
 
-### [ ] Group 44
+### [TEST-BUG] Group 44
 
 **Test Executions:** 2
 
@@ -156,9 +174,15 @@ java.lang.NullPointerException
 2. **org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyIsHot_RestartInjected.testDatanodeRestarts**
    - Position: after_file_creation_and_standby_catchup, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `FSNamesystem fsn = cluster.getNamesystem()` and `DatanodeManager dm = fsn.getBlockManager().getDatanodeManager()` at line 458-459 before namenode restart. After restart at lines 485-490, `BlocksMap.close()` sets `blocks = null`. The test uses stale `fsn` reference at line 493: `BlockManagerTestUtil.checkHeartbeat(fsn.getBlockManager())`, which accesses the closed BlocksMap, causing NPE at `blocks.get(b)` in `removeNode()`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4 and 19. The restart-injected tests need to re-fetch FSNamesystem and related references after namenode restart.
+- **Fix:** After any namenode restart, re-fetch all direct references: `fsn = cluster.getNamesystem()`, `dm = fsn.getBlockManager().getDatanodeManager()`, etc.
+- **Bug Report:** See [HDFS-BUG-GROUP-44.md](bugs/HDFS-BUG-GROUP-44.md)
+
 ---
 
-### [ ] Group 48
+### [TEST-BUG] Group 48
 
 **Test Executions:** 2
 
@@ -192,9 +216,16 @@ java.lang.NullPointerException
 2. **org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandby_RestartInjected.testDownloadingLaterCheckpoint**
    - Position: after_bootstrap_nns, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `nn0 = cluster.getNameNode(0)` in `@Before` setup. After namenode restart at `after_create_test_file`, `cluster.getNameNode(0)` returns a NEW NameNode instance, but `nn0` still points to the OLD (closed) NameNode. When `FSImageTestUtil.getStorageTxId(nn0, editsUri)` is called with the stale `nn0`, `getStorageDirectory(storageUri)` returns `null` for the old NameNode. `NNStorage.readTransactionIdFile(null)` then calls `getStorageFile(null, ...)`, causing NPE at `sd.getCurrentDir()`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 26, and 44. The restart-injected tests need to re-fetch `nn0` reference after namenode restart.
+- **Fix:** After any namenode restart, re-fetch: `nn0 = cluster.getNameNode(0)`.
+- **Production Code Improvement:** Added defensive null checks in `NNStorage.java` to throw meaningful error messages instead of NPE. See [HDFS-XXXXX-improve-nnstorage-error-messages.patch](patches/HDFS-XXXXX-improve-nnstorage-error-messages.patch).
+- **Bug Report:** See [HDFS-BUG-GROUP-48.md](bugs/HDFS-BUG-GROUP-48.md)
+
 ---
 
-### [ ] Group 53
+### [TEST-BUG] Group 53
 
 **Test Executions:** 2
 
@@ -227,9 +258,16 @@ java.lang.NullPointerException
 2. **org.apache.hadoop.hdfs.server.namenode.ha.TestDNFencing_RestartInjected.testNNClearsCommandsOnFailoverAfterStartup**
    - Position: after_create_file_failover, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `nn1 = cluster.getNameNode(0)` in `@Before` setup. After namenode restart at `after_create_file`, the test uses stale `nn1` reference at line 152: `nn1.getRpcServer().setReplication()`. This is a direct method call (not RPC) on the OLD NameNode's components. The OLD FSNamesystem's `getBlockCollection(storedBlock)` returns `null` because the FSDirectory is closed/empty, causing NPE at `bc.getStoragePolicyID()` in `chooseExcessRedundancies()`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 26, 44, and 48. The restart-injected tests need to re-fetch namenode references after restart.
+- **Fix:** After any namenode restart, re-fetch: `nn1 = cluster.getNameNode(0)`.
+- **Production Code Improvement:** Added defensive null checks in `BlockManager.chooseExcessRedundancies()` and `chooseExcessRedundancyStriped()` to throw meaningful error messages instead of NPE. See [HDFS-XXXXX-improve-blockmanager-excess-redundancy-error-messages.patch](patches/HDFS-XXXXX-improve-blockmanager-excess-redundancy-error-messages.patch).
+- **Bug Report:** See [HDFS-BUG-GROUP-53.md](bugs/HDFS-BUG-GROUP-53.md)
+
 ---
 
-### [ ] Group 58
+### [TEST-BUG] Group 58
 
 **Test Executions:** 2
 
@@ -263,9 +301,16 @@ java.lang.NullPointerException
 2. **org.apache.hadoop.hdfs.server.namenode.TestCommitBlockWithInvalidGenStamp_RestartInjected.testCommitWithInvalidGenStamp**
    - Position: after_inode_get, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `dir = cluster.getNamesystem().getFSDirectory()` in `@Before` setup. After namenode restart at `after_file_create`, `cluster.getNamesystem().getFSDirectory()` returns the NEW FSDirectory, but the test's `dir` field still points to the OLD (closed) FSDirectory. When `fileNode = dir.getINode4Write(file.toString()).asFile()` is called with the stale `dir`, the returned `fileNode` has an empty blocks array. When `DFSTestUtil.addBlockToFile()` is called, `fileNode.getLastBlock()` returns `null`, causing NPE at `lastBlock.getBlockId()`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 26, 44, 48, and 53. The restart-injected tests need to re-fetch FSDirectory and INode references after namenode restart.
+- **Fix:** After any namenode restart, re-fetch: `dir = cluster.getNamesystem().getFSDirectory()`.
+- **Test Utility Code Improvement:** Added defensive null check in `DFSTestUtil.addBlockToFile()` to throw meaningful error messages instead of NPE. See [HDFS-XXXXX-improve-dfstestutil-addblocktofile-error-messages.patch](patches/HDFS-XXXXX-improve-dfstestutil-addblocktofile-error-messages.patch).
+- **Bug Report:** See [HDFS-BUG-GROUP-58.md](bugs/HDFS-BUG-GROUP-58.md)
+
 ---
 
-### [ ] Group 90
+### [TEST-BUG] Group 90
 
 **Test Executions:** 1
 
@@ -297,9 +342,15 @@ java.lang.NullPointerException
 1. **org.apache.hadoop.hdfs.server.namenode.TestDeadDatanode_RestartInjected.testDeadNodeAsBlockTarget**
    - Position: after_datanode_shutdown_test2, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `reg = InternalDataNodeTestUtils.getDNRegistrationForBP(...)` at line 212-213 before namenode restart. After datanode shutdown (line 229) and namenode restart at `after_datanode_shutdown_test2`, the new NameNode's DatanodeManager has an empty `datanodeMap`. The datanode was shut down before restart, so it won't re-register. When `DFSTestUtil.waitForDatanodeState(cluster, reg.getDatanodeUuid(), false, 20000)` is called at line 237, `BlockManagerTestUtil.getDatanode(namesystem, nodeID)` returns `null` because the UUID doesn't exist in the new NameNode. `dd.isAlive()` is then called on `null`, causing NPE.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 26, etc. The test uses stale datanode registration info (UUID) after NameNode restart. Additionally, `DFSTestUtil.waitForDatanodeState` doesn't handle the case where the datanode doesn't exist.
+- **Fix:** Add null check in `DFSTestUtil.waitForDatanodeState()`: if `dd == null` and waiting for dead state (`!alive`), return `true` (non-existent = effectively dead).
+- **Bug Report:** See [HDFS-BUG-GROUP-90.md](bugs/HDFS-BUG-GROUP-90.md)
+
 ---
 
-### [ ] Group 93
+### [TEST-BUG] Group 93
 
 **Test Executions:** 1
 
@@ -331,9 +382,16 @@ java.lang.NullPointerException
 1. **org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected.testRefreshBlock**
    - Position: after_striped_file_creation, Target: datanode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test calls `refreshLocatedBlock(blks[j])` without checking if `blks[j]` is null. After datanode restart at `after_striped_file_creation`, the restarted datanode (index 0) hasn't re-registered its blocks with the NameNode yet. When `StripedBlockUtil.parseStripedBlockGroup()` is called, it returns an array with null entries for blocks whose datanodes haven't registered. The test then iterates through all `dataBlocks` indices and calls `refreshLocatedBlock(blks[0])` on the null entry, causing NPE at `block.getBlock().getLocalBlock()` in line 456.
+- **Evidence:** Debug logging showed `LocatedStripedBlock indices: [1, 2, 3, 4, 5, 6, 7, 8]` (index 0 missing) and `blks[0] = null` for all block groups.
+- **Classification:** TEST-BUG - The test code doesn't account for the fact that after datanode restart, some block locations may be temporarily unavailable. The production code `refreshLocatedBlock()` correctly expects a non-null block parameter.
+- **Fix:** The test should either: (1) Wait for the restarted datanode to fully re-register its blocks before getting block locations, or (2) Skip null blocks when testing `refreshLocatedBlock()`.
+- **Bug Report:** See [HDFS-BUG-GROUP-93.md](bugs/HDFS-BUG-GROUP-93.md)
+
 ---
 
-### [ ] Group 95
+### [TEST-BUG] Group 95
 
 **Test Executions:** 1
 
@@ -364,13 +422,20 @@ java.lang.NullPointerException
 1. **org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestFsDatasetImpl_RestartInjected.testTransferAndNativeCopyMetrics**
    - Position: before_finalize_replica, Target: datanode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** Test stores `dataNode = cluster.getDataNodes().get(0)` and `fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset()` at lines 1472 and 1488 before the datanode restart. After restart at lines 1491-1496, the MiniDFSCluster creates a NEW DataNode instance with a NEW FsDatasetImpl. The test uses the stale `fsDataSetImpl` reference at line 1498: `fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block)`. The OLD FsDatasetImpl's `volumeMap` no longer contains the block, so `volumeMap.get(bpid, replicaInfo.getBlockId())` returns null, causing NPE when calling `getGenerationStamp()`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 44. The restart-injected tests need to re-fetch DataNode and FsDatasetImpl references after datanode restart. Additionally, `newReplicaInfo` was created using the old FsDatasetImpl's volumes and cannot be directly used with the new FsDatasetImpl.
+- **Fix:** After any datanode restart, re-fetch all direct references: `dataNode = cluster.getDataNodes().get(0)`, `fsDataSetImpl = (FsDatasetImpl) dataNode.getFSDataset()`. The test may also need to be restructured since the replica was created on the old FsDatasetImpl.
+- **Production Code Improvement:** Added null check in `FsDatasetImpl.finalizeReplica()` to throw descriptive IOException instead of NPE. See patch: `patches/HDFS-XXXXX-improve-fsdatasetimpl-finalizereplica-error-handling.patch`
+- **Bug Report:** See [HDFS-BUG-GROUP-95.md](bugs/HDFS-BUG-GROUP-95.md)
+
 ---
 
 ## HIGH PRIORITY - Production Code Exceptions
 
 **Total Groups: 73**
 
-### [ ] Group 2
+### [FP] Group 2
 
 **Test Executions:** 91
 
@@ -404,9 +469,17 @@ org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.ipc.StandbyException): O
 3. **org.apache.hadoop.hdfs.TestRollingUpgrade_RestartInjected.testQueryWithMultipleNN**
    - Position: after_other_namenodes_restart, Target: namenode, Mode: GRACEFUL
 
+**Debug Analysis:**
+- **Root Cause:** The restart injection restarts namenode 0 (the active) in an HA cluster with manual failover. After restart, NN[0] comes back as **standby** (not active), leaving the cluster with no active namenode (NN[0]=standby, NN[1]=standby, NN[2]=observer). The test's `@After cleanUp()` method calls `dfs.delete()`, which is a write operation that requires an active namenode. Since there is no active namenode, the client gets `StandbyException`.
+- **Evidence:** Debug logging confirmed the HA state change:
+  - Before restart: NN[0]=active, NN[1]=standby, NN[2]=observer
+  - After restart: NN[0]=standby, NN[1]=standby, NN[2]=observer
+- **Classification:** FP (False Positive) - This is expected HA behavior, not a bug in HDFS source code. When a namenode is gracefully restarted in an HA cluster with manual failover, it comes back as standby and requires manual promotion to active. The restart adapter does not restore HA state after restart, which is an improper restart position for HA tests that depend on a specific topology.
+- **Why this is NOT a bug:** The HDFS HA system is working correctly. The issue is that the restart injection fundamentally breaks the test's assumption that NN[0] will remain active throughout the test lifecycle.
+
 ---
 
-### [ ] Group 3
+### [FP] Group 3
 
 **Test Executions:** 65
 
@@ -442,6 +515,36 @@ java.io.EOFException: End of File Exception between local host is: "df03dece6374
 
 3. **org.apache.hadoop.fs.TestGlobPaths_RestartInjected.testGlobRootOnFS**
    - Position: before_test_glob_root_on_fs, Target: namenode, Mode: GRACEFUL
+
+**Debug Analysis:**
+- **Root Cause:** The test uses statically initialized FileContext objects in `@BeforeClass`. After NameNode restart, the FileContext's DFSClient holds a stale IPC connection. When the client tries to read the RPC response, it receives EOF because the server closed the connection during restart.
+- **Key Investigation Findings:**
+  1. Manual retry after 1-second delay **succeeds** - proving the client CAN reconnect
+  2. The client's retry policy (`dfs.client.retry.policy.enabled`) is **disabled by default**
+  3. `ipc.client.connect.max.retries=10` only applies to **new connection establishment**, not to reading responses on existing connections
+  4. EOFException during response read is not automatically retried when the retry policy is disabled
+- **Why this fails:** When NameNode restarts:
+  1. Existing IPC connections become stale (server-side sockets closed)
+  2. Client sends RPC on stale connection
+  3. Client gets EOF when reading response (connection severed)
+  4. With retry policy disabled (default), the call fails immediately instead of retrying
+- **Production Impact:** This failure mode **CAN occur in production** if:
+  1. Application uses FileContext API with default configuration (retry disabled)
+  2. Holds long-running client objects
+  3. NameNode restarts (maintenance, failover, crash recovery)
+  - Applications would experience EOFException until they manually retry or recreate connections
+- **Classification:** FP (False Positive for bug hunting) - This is **expected behavior** per HDFS design:
+  1. Retry policy is opt-in, disabled by default (`dfs.client.retry.policy.enabled=false`)
+  2. Production deployments typically use HA configurations with automatic failover
+  3. Users who need retry resilience should enable `dfs.client.retry.policy.enabled=true`
+  4. The retry policy spec `"10000,6,60000,10"` would retry with exponential backoff if enabled
+- **Recommendation for users:** Enable client retry policy in hdfs-site.xml:
+  ```xml
+  <property>
+    <name>dfs.client.retry.policy.enabled</name>
+    <value>true</value>
+  </property>
+  ```
 
 ---
 
