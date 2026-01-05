@@ -158,6 +158,7 @@ public final class TestTriggerBlockReport_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     // Manually trigger a block report.
     // Only trigger block report to NN1 when testing triggering block report on specific namenode.
@@ -175,6 +176,7 @@ public final class TestTriggerBlockReport_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     // triggerBlockReport returns before the block report is
     // actually sent.  Wait for it to be sent here.

@@ -677,6 +677,7 @@ public class TestLeaseRecovery_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       assertNotNull(NameNodeAdapter.getLeaseHolderForPath(
           cluster.getNameNode(), file));

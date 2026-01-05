@@ -501,7 +501,7 @@ public class TestAuditLogger_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      final FSDirectory dir = cluster.getNamesystem().getFSDirectory();
+      FSDirectory dir = cluster.getNamesystem().getFSDirectory();
 
       final FSDirectory mockedDir = Mockito.spy(dir);
       AccessControlException ex = new AccessControlException();
@@ -531,6 +531,7 @@ public class TestAuditLogger_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dir = cluster.getNamesystem().getFSDirectory();
 
       try {
         fs.removeDefaultAcl(p);

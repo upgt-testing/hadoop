@@ -144,6 +144,7 @@ public class TestDataNodeVolumeFailureToleration_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdownDataNodes();
       FileUtil.chmod(dataDir2.toString(), "755");

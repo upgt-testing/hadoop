@@ -75,6 +75,7 @@ public class TestDataTransferKeepalive_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
   }
   
   @After
@@ -218,6 +219,7 @@ public class TestDataTransferKeepalive_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     DFSTestUtil.createFile(fs, TEST_FILE, 1024*1024*8L, (short)1, 0L);
 
@@ -227,6 +229,7 @@ public class TestDataTransferKeepalive_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     FSDataInputStream stm = fs.open(TEST_FILE);
     stm.read();
     assertXceiverCount(1);

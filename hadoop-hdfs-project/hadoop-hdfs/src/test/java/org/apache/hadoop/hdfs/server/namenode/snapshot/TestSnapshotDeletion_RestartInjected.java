@@ -1578,6 +1578,7 @@ public class TestSnapshotDeletion_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    snn = cluster.getNameNode(1);
 
     // delete the subdir
     hdfs.delete(subDir, true);
@@ -1588,6 +1589,7 @@ public class TestSnapshotDeletion_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    snn = cluster.getNameNode(1);
 
     // roll the edit log
     NameNode ann = cluster.getNameNode(0);
@@ -1603,6 +1605,8 @@ public class TestSnapshotDeletion_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    snn = cluster.getNameNode(1);
+    ann = cluster.getNameNode(0);
 
     NameNodeAdapter.abortEditLogs(ann);
     cluster.restartNameNode(0, false);

@@ -545,6 +545,7 @@ public class TestNetworkTopology_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
       // Restart the DN with the invalid topology and wait for it to register.
       cluster.restartDataNode(invalidIdx);
@@ -575,6 +576,7 @@ public class TestNetworkTopology_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
       Assert.assertEquals(info[0].getNetworkLocation(),
                           info[1].getNetworkLocation());

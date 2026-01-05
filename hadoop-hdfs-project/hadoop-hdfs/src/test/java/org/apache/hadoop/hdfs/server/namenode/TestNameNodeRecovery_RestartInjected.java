@@ -575,7 +575,7 @@ public class TestNameNodeRecovery_RestartInjected {
         DFSTestUtil.setEditLogForTesting(cluster.getNamesystem(), spyLog);
       }
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       FSImage fsimage = namesystem.getFSImage();
       fileSys.mkdirs(new Path(TEST_PATH));
       fileSys.mkdirs(new Path(TEST_PATH2));
@@ -585,6 +585,8 @@ public class TestNameNodeRecovery_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
       sd = fsimage.getStorage().dirIterator(NameNodeDirType.EDITS).next();
     } finally {
       if (cluster != null) {

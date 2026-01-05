@@ -311,6 +311,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     for (int iteration = 0; iteration < numDatanodes; iteration++) {
       String downnode = decommissionNode(client, iteration);
@@ -322,6 +323,7 @@ public class TestDecommissioningStatus_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       decommissionedNodes.add(downnode);
       BlockManagerTestUtil.recheckDecommissionState(dm);
@@ -466,6 +468,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     // Stop the DN when decommission is in progress.
     // Given DFS_DATANODE_BALANCE_BANDWIDTHPERSEC_KEY is to 1 and the size of
@@ -488,6 +491,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     // Force removal of the dead node's blocks.
     BlockManagerTestUtil.checkHeartbeat(fsn.getBlockManager());
@@ -514,6 +518,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     BlockManagerTestUtil.waitForMarkedDeleteQueueIsEmpty(
         cluster.getNamesystem(0).getBlockManager());
@@ -533,6 +538,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     // Call refreshNodes on FSNamesystem with empty exclude file.
     // This will remove the datanodes from decommissioning list and
@@ -575,6 +581,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     BlockManagerTestUtil.recheckDecommissionState(dm);
     // Block until the admin's monitor updates the number of tracked nodes.
@@ -591,6 +598,7 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     // Call refreshNodes on FSNamesystem with empty exclude file to remove the
     // datanode from decommissioning list and make it available again.
@@ -632,6 +640,9 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Shutdown dn0
     LOG.info("Shutdown dn0");
@@ -649,6 +660,9 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Decommission the nodes.
     LOG.info("Decommissioning nodes");
@@ -661,6 +675,9 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     BlockManagerTestUtil.recheckDecommissionState(dm);
     // Block until the admin's monitor updates the number of tracked nodes.
@@ -692,6 +709,9 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Bring back dn1
     LOG.info("Bring back dn1");
@@ -711,6 +731,9 @@ public class TestDecommissioningStatus_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Blocks should be still be under-replicated
     Thread.sleep(2000);  // Let replication monitor run

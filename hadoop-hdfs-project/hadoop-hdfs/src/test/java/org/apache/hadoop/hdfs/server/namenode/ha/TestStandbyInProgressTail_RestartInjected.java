@@ -686,6 +686,8 @@ public class TestStandbyInProgressTail_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
+    nn1 = cluster.getNameNode(1);
 
     mkdirs(nn0, "/test", "/test2");
     nn0.getRpcServer().rollEditLog();
@@ -696,6 +698,8 @@ public class TestStandbyInProgressTail_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
+    nn1 = cluster.getNameNode(1);
 
     mkdirs(nn0, "/test3", "/test4");
 
@@ -705,6 +709,8 @@ public class TestStandbyInProgressTail_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
+    nn1 = cluster.getNameNode(1);
 
     // Skip the last directory; the JournalNodes' idea of the committed
     // txn ID may not have been updated to include it yet

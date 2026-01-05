@@ -287,7 +287,7 @@ public class TestLazyWriter_RestartInjected extends LazyPersistTestCase {
         .withMode(RestartMode.GRACEFUL)
         .execute();
     final String METHOD_NAME = GenericTestUtils.getMethodName();
-    final DataNode dn = cluster.getDataNodes().get(0);
+    DataNode dn = cluster.getDataNodes().get(0);
     FsDatasetTestUtil.stopLazyWriter(dn);
     RestartFramework.at("after_lazy_writer_stopped")
         .on(cluster)
@@ -295,6 +295,7 @@ public class TestLazyWriter_RestartInjected extends LazyPersistTestCase {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     Path path = new Path("/" + METHOD_NAME + ".dat");
     makeTestFile(path, BLOCK_SIZE, true);
@@ -304,6 +305,7 @@ public class TestLazyWriter_RestartInjected extends LazyPersistTestCase {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     LocatedBlocks locatedBlocks =
         ensureFileReplicasOnStorageType(path, RAM_DISK);
     // Delete before persist
@@ -314,6 +316,7 @@ public class TestLazyWriter_RestartInjected extends LazyPersistTestCase {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     Assert.assertFalse(fs.exists(path));
 
     assertThat(verifyDeletedBlocks(locatedBlocks), is(true));

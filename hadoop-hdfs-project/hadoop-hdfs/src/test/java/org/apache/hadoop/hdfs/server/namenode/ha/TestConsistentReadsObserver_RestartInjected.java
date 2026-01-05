@@ -530,6 +530,8 @@ public class TestConsistentReadsObserver_RestartInjected {
         .withIndex(2)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = dfsCluster.getNameNode(0);
+    nn2 = dfsCluster.getNameNode(2);
 
     Path p = new Path(testPath, "testMsyncFileContext");
     fc.mkdir(p, FsPermission.getDefault(), true);
@@ -541,6 +543,8 @@ public class TestConsistentReadsObserver_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = dfsCluster.getNameNode(0);
+    nn2 = dfsCluster.getNameNode(2);
 
     dfsCluster.rollEditLogAndTail(0);
 
@@ -550,6 +554,8 @@ public class TestConsistentReadsObserver_RestartInjected {
         .withIndex(2)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = dfsCluster.getNameNode(0);
+    nn2 = dfsCluster.getNameNode(2);
     LOG.info("State id active = {}, Stat id observer = {}",
         nn0.getNamesystem().getFSImage().getLastAppliedOrWrittenTxId(),
         nn2.getNamesystem().getFSImage().getLastAppliedOrWrittenTxId());

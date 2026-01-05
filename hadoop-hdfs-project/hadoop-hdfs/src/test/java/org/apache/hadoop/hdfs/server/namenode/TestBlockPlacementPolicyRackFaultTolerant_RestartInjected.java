@@ -257,9 +257,11 @@ public class TestBlockPlacementPolicyRackFaultTolerant_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
+    namesystem = cluster.getNamesystem();
 
-    final BlockManager bm = cluster.getNamesystem().getBlockManager();
-    final DatanodeManager dm = bm.getDatanodeManager();
+    BlockManager bm = cluster.getNamesystem().getBlockManager();
+    DatanodeManager dm = bm.getDatanodeManager();
     assertTrue(dm.getNetworkTopology() instanceof DFSNetworkTopology);
 
     String clientMachine = "/host4";
@@ -276,6 +278,10 @@ public class TestBlockPlacementPolicyRackFaultTolerant_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
+    namesystem = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     short replication = 5;
     short additionalReplication = 1;
 
@@ -290,6 +296,10 @@ public class TestBlockPlacementPolicyRackFaultTolerant_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nameNodeRpc = cluster.getNameNodeRpc();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
+      dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
       //test chooseTarget for new file
       LocatedBlock locatedBlock = nameNodeRpc.addBlock(src, clientMachine,
@@ -329,6 +339,10 @@ public class TestBlockPlacementPolicyRackFaultTolerant_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nameNodeRpc = cluster.getNameNodeRpc();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
+      dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     }
 
     //test if decommission succeeded
@@ -342,6 +356,10 @@ public class TestBlockPlacementPolicyRackFaultTolerant_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nameNodeRpc = cluster.getNameNodeRpc();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
+      dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     } finally {
       cluster.getNamesystem().writeUnlock();
     }

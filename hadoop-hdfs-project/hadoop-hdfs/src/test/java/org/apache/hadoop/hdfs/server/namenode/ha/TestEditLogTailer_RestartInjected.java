@@ -145,6 +145,8 @@ public class TestEditLogTailer_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       HATestUtil.waitForStandbyToCatchUp(nn1, nn2);
       assertEquals("Inconsistent number of applied txns on Standby",

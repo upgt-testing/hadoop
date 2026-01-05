@@ -248,6 +248,7 @@ public class TestProtectedDirectories_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
 
     FSDirectory fsDirectory = nn.getNamesystem().getFSDirectory();
     // verify change
@@ -265,6 +266,8 @@ public class TestProtectedDirectories_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
+    fsDirectory = cluster.getNamesystem().getFSDirectory();
 
     // verify default
     assertEquals(String.format("%s has wrong value", FS_PROTECTED_DIRECTORIES),

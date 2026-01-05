@@ -495,6 +495,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn0 = cluster.getDataNodes().get(0);
       assertFalse(isTrashRootPresent());
       assertFalse(isBlockFileInPrevious(blockFiles[0]));
       assertFalse(isBlockFileInPrevious(blockFiles[1]));
@@ -601,6 +602,7 @@ public class TestDataNodeRollingUpgrade_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn0 = cluster.getDataNodes().get(0);
       for (int i = 0; i < 2; ++i) {
         byte[] actual = DFSTestUtil.readFileBuffer(fs, paths[i]);
         byte[] calculated = DFSTestUtil.calculateFileContentsFromSeed(seed, BLOCK_SIZE);

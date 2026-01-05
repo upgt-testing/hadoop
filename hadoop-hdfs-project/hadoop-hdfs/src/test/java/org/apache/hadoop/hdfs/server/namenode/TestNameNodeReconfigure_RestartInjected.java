@@ -81,14 +81,16 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testReconfigureCallerContextEnabled()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
-    final FSNamesystem nameSystem = nameNode.getNamesystem();
+    NameNode nameNode = cluster.getNameNode();
+    FSNamesystem nameSystem = nameNode.getNamesystem();
     RestartFramework.at("after_cluster_start")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    nameSystem = cluster.getNamesystem();
     // try invalid values
     nameNode.reconfigureProperty(HADOOP_CALLER_CONTEXT_ENABLED_KEY, "text");
     verifyReconfigureCallerContextEnabled(nameNode, nameSystem, false);
@@ -98,6 +100,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    nameSystem = cluster.getNamesystem();
     // enable CallerContext
     nameNode.reconfigureProperty(HADOOP_CALLER_CONTEXT_ENABLED_KEY, "true");
     verifyReconfigureCallerContextEnabled(nameNode, nameSystem, true);
@@ -107,6 +111,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    nameSystem = cluster.getNamesystem();
     // disable CallerContext
     nameNode.reconfigureProperty(HADOOP_CALLER_CONTEXT_ENABLED_KEY, "false");
     verifyReconfigureCallerContextEnabled(nameNode, nameSystem, false);
@@ -116,6 +122,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    nameSystem = cluster.getNamesystem();
     // revert to default
     nameNode.reconfigureProperty(HADOOP_CALLER_CONTEXT_ENABLED_KEY, null);
     RestartFramework.at("after_revert_to_default")
@@ -124,6 +132,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    nameSystem = cluster.getNamesystem();
     // verify default
     assertEquals(HADOOP_CALLER_CONTEXT_ENABLED_KEY + " has wrong value", false,
         nameSystem.getCallerContextEnabled());
@@ -147,7 +157,7 @@ public class TestNameNodeReconfigure_RestartInjected {
    */
   @Test
   public void testReconfigureIPCBackoff() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     NameNodeRpcServer nnrs = (NameNodeRpcServer) nameNode.getRpcServer();
 
     String ipcClientRPCBackoffEnable = NameNode.buildBackoffEnableKey(nnrs
@@ -158,6 +168,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // try invalid values
     verifyReconfigureIPCBackoff(nameNode, nnrs, ipcClientRPCBackoffEnable,
         false);
@@ -172,6 +183,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // disable IPC_CLIENT_RPC_BACKOFF
     nameNode.reconfigureProperty(ipcClientRPCBackoffEnable, "false");
     verifyReconfigureIPCBackoff(nameNode, nnrs, ipcClientRPCBackoffEnable,
@@ -182,6 +194,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // revert to default
     nameNode.reconfigureProperty(ipcClientRPCBackoffEnable, null);
     RestartFramework.at("after_revert_to_default")
@@ -190,6 +203,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(ipcClientRPCBackoffEnable + " has wrong value", false,
         nnrs.getClientRpcServer().isClientBackoffEnabled());
     assertEquals(ipcClientRPCBackoffEnable + " has wrong value", null,
@@ -209,7 +223,7 @@ public class TestNameNodeReconfigure_RestartInjected {
    */
   @Test
   public void testReconfigureHearbeatCheck() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem
         .getBlockManager().getDatanodeManager();
     RestartFramework.at("after_cluster_start")
@@ -218,6 +232,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // change properties
     nameNode.reconfigureProperty(DFS_HEARTBEAT_INTERVAL_KEY, "" + 6);
     nameNode.reconfigureProperty(DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY,
@@ -228,6 +243,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // try invalid values
     try {
       nameNode.reconfigureProperty(DFS_HEARTBEAT_INTERVAL_KEY, "text");
@@ -269,6 +285,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(
         DFS_HEARTBEAT_INTERVAL_KEY + " has wrong value",
         60,
@@ -287,6 +304,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // verify defaults
     assertEquals(DFS_HEARTBEAT_INTERVAL_KEY + " has wrong value", null,
         nameNode.getConf().get(DFS_HEARTBEAT_INTERVAL_KEY));
@@ -323,7 +341,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     verifySPSEnabled(nameNode, DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
         StoragePolicySatisfierMode.NONE, false);
 
@@ -336,6 +354,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // Since DFS_STORAGE_POLICY_ENABLED_KEY is disabled, SPS can't be enabled.
     assertNull("SPS shouldn't start as "
         + DFSConfigKeys.DFS_STORAGE_POLICY_ENABLED_KEY + " is disabled",
@@ -355,13 +374,14 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testReconfigureStoragePolicySatisfierEnabled()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     RestartFramework.at("after_cluster_start")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     verifySPSEnabled(nameNode, DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
         StoragePolicySatisfierMode.NONE, false);
     // try invalid values
@@ -387,6 +407,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // enable external SPS
     nameNode.reconfigureProperty(DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
         StoragePolicySatisfierMode.EXTERNAL.toString());
@@ -396,6 +417,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(DFS_STORAGE_POLICY_SATISFIER_MODE_KEY + " has wrong value",
         false, nameNode.getNamesystem().getBlockManager().getSPSManager()
             .isSatisfierRunning());
@@ -411,13 +433,14 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testSatisfyStoragePolicyAfterSatisfierDisabled()
       throws ReconfigurationException, IOException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     RestartFramework.at("after_cluster_start")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // disable SPS
     nameNode.reconfigureProperty(DFS_STORAGE_POLICY_SATISFIER_MODE_KEY,
         StoragePolicySatisfierMode.NONE.toString());
@@ -429,6 +452,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     Path filePath = new Path("/testSPS");
     DistributedFileSystem fileSystem = cluster.getFileSystem();
     fileSystem.create(filePath);
@@ -445,6 +469,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     try {
       fileSystem.satisfyStoragePolicy(filePath);
       fail("Expected to fail, as storage policy feature has disabled.");
@@ -473,7 +498,7 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testBlockInvalidateLimitAfterReconfigured()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem
         .getBlockManager().getDatanodeManager();
     RestartFramework.at("after_cluster_start")
@@ -482,6 +507,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not correctly set",
         customizedBlockInvalidateLimit,
         datanodeManager.getBlockInvalidateLimit());
@@ -494,6 +520,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // 20 * 6 = 120 < 500
     // Invalid block limit should stay same as before after reconfiguration.
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY
@@ -509,6 +536,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // 20 * 50 = 1000 > 500
     // Invalid block limit should be reset to 1000
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY
@@ -520,13 +548,14 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testEnableParallelLoadAfterReconfigured()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     RestartFramework.at("after_cluster_start")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // By default, enableParallelLoad is false
     assertEquals(false, FSImageFormatProtobuf.getEnableParallelLoad());
 
@@ -538,6 +567,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // After reconfigured, enableParallelLoad is true
     assertEquals(true, FSImageFormatProtobuf.getEnableParallelLoad());
   }
@@ -545,15 +575,17 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testEnableSlowNodesParametersAfterReconfigured()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final BlockManager blockManager = nameNode.namesystem.getBlockManager();
-    final DatanodeManager datanodeManager = blockManager.getDatanodeManager();
+    DatanodeManager datanodeManager = blockManager.getDatanodeManager();
     RestartFramework.at("after_cluster_start")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     // By default, avoidSlowDataNodesForRead is false.
     assertEquals(false, datanodeManager.getEnableAvoidSlowDataNodesForRead());
 
@@ -565,6 +597,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     // After reconfigured, avoidSlowDataNodesForRead is true.
     assertEquals(true, datanodeManager.getEnableAvoidSlowDataNodesForRead());
 
@@ -582,6 +616,8 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
+    datanodeManager = cluster.getNamesystem().getBlockManager().getDatanodeManager();
     // After reconfigured, excludeSlowNodesEnabled is true.
     assertEquals(true, blockManager.
         getExcludeSlowNodesEnabled(BlockType.CONTIGUOUS));
@@ -592,7 +628,7 @@ public class TestNameNodeReconfigure_RestartInjected {
   @Test
   public void testReconfigureMaxSlowpeerCollectNodes()
       throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem
         .getBlockManager().getDatanodeManager();
     RestartFramework.at("after_cluster_start")
@@ -601,6 +637,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // By default, DFS_NAMENODE_MAX_SLOWPEER_COLLECT_NODES_KEY is 5.
     assertEquals(5, datanodeManager.getMaxSlowpeerCollectNodes());
 
@@ -613,13 +650,14 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // Assert DFS_NAMENODE_MAX_SLOWPEER_COLLECT_NODES_KEY is 10.
     assertEquals(10, datanodeManager.getMaxSlowpeerCollectNodes());
   }
 
   @Test
   public void testBlockInvalidateLimit() throws ReconfigurationException {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem
         .getBlockManager().getDatanodeManager();
     RestartFramework.at("after_cluster_start")
@@ -628,6 +666,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not correctly set",
         customizedBlockInvalidateLimit, datanodeManager.getBlockInvalidateLimit());
 
@@ -647,6 +686,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not honored after reconfiguration", 2500,
         datanodeManager.getBlockInvalidateLimit());
 
@@ -657,6 +697,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     // 20 * 500 (10000) > 2500
     // Hence, invalid block limit should be reset to 10000
     assertEquals(DFS_BLOCK_INVALIDATE_LIMIT_KEY + " is not reconfigured correctly", 10000,
@@ -665,7 +706,7 @@ public class TestNameNodeReconfigure_RestartInjected {
 
   @Test
   public void testSlowPeerTrackerEnabled() throws Exception {
-    final NameNode nameNode = cluster.getNameNode();
+    NameNode nameNode = cluster.getNameNode();
     final DatanodeManager datanodeManager = nameNode.namesystem.getBlockManager()
         .getDatanodeManager();
     RestartFramework.at("after_cluster_start")
@@ -674,6 +715,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertFalse("SlowNode tracker is already enabled. It should be disabled by default",
         datanodeManager.getSlowPeerTracker().isSlowPeerTrackerEnabled());
 
@@ -693,6 +735,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertTrue("SlowNode tracker is still disabled. Reconfiguration could not be successful",
         datanodeManager.getSlowPeerTracker().isSlowPeerTrackerEnabled());
 
@@ -703,6 +746,7 @@ public class TestNameNodeReconfigure_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNode = cluster.getNameNode();
     assertFalse("SlowNode tracker is still enabled. Reconfiguration could not be successful",
         datanodeManager.getSlowPeerTracker().isSlowPeerTrackerEnabled());
 

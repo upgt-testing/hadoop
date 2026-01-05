@@ -85,6 +85,8 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNamesystem(0);
+      nn1 = cluster.getNamesystem(1);
       final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       final ObjectName mxbeanName =
           new ObjectName("Hadoop:service=NameNode,name=NameNodeStatus");
@@ -105,6 +107,8 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNamesystem(0);
+      nn1 = cluster.getNamesystem(1);
 
       final Long ltt2 =
           (Long) mbs.getAttribute(mxbeanName, "LastHATransitionTime");
@@ -117,6 +121,8 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNamesystem(0);
+      nn1 = cluster.getNamesystem(1);
 
       assertEquals("standby", nn0.getHAState());
       assertTrue(0 < nn0.getMillisSinceLastLoadedEdits());
@@ -153,6 +159,8 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNamesystem(0);
+      nn1 = cluster.getNamesystem(1);
 
       assertEquals(0, nn0.getPendingDataNodeMessageCount());
       assertEquals(0, nn1.getPendingDataNodeMessageCount());
@@ -225,6 +233,7 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNamesystem(1);
 
       // Flip the two namenodes and restart the standby, which will load
       // the fsimage.
@@ -238,6 +247,7 @@ public class TestHAMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNamesystem(1);
 
       assertEquals(nn0.getHAState(), "standby");
 

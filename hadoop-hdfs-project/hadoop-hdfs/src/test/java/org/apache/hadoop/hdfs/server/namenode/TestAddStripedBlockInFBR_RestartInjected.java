@@ -87,7 +87,7 @@ public class TestAddStripedBlockInFBR_RestartInjected {
 
     BlockManager spy = Mockito.spy(cluster.getNamesystem().getBlockManager());
     // let NN ignore one DataNode's IBR
-    final DataNode dn = cluster.getDataNodes().get(0);
+    DataNode dn = cluster.getDataNodes().get(0);
     final DatanodeID datanodeID = dn.getDatanodeId();
     Mockito.doNothing().when(spy)
         .processIncrementalBlockReport(Mockito.eq(datanodeID), Mockito.any());
@@ -128,6 +128,7 @@ public class TestAddStripedBlockInFBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     final Path ecFile = new Path(ecDir, "f");
     DFSTestUtil.createFile(dfs, ecFile,
@@ -139,6 +140,7 @@ public class TestAddStripedBlockInFBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
 

@@ -269,7 +269,7 @@ public class TestDFSAdmin_RestartInjected {
   public void testTriggerBlockReport() throws Exception {
     redirectStream();
     final DFSAdmin dfsAdmin = new DFSAdmin(conf);
-    final DataNode dn = cluster.getDataNodes().get(0);
+    DataNode dn = cluster.getDataNodes().get(0);
     final NameNode nn = cluster.getNameNode();
 
     final String dnAddr = String.format(
@@ -294,6 +294,7 @@ public class TestDFSAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
   }
 
   @Test

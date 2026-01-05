@@ -326,6 +326,7 @@ public class TestNameNodeMetrics_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     DataNodeTestUtils.triggerHeartbeat(dn);
     BlockManagerTestUtil.checkHeartbeat(bm);
@@ -1044,6 +1045,8 @@ public class TestNameNodeMetrics_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        nn0 = cluster2.getNameNode(0);
+        nn1 = cluster2.getNameNode(1);
 
         fs2.mkdirs(new Path("/tmp-t1"));
         fs2.mkdirs(new Path("/tmp-t2"));
@@ -1070,6 +1073,8 @@ public class TestNameNodeMetrics_RestartInjected {
             .withIndex(1)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        nn0 = cluster2.getNameNode(0);
+        nn1 = cluster2.getNameNode(1);
 
         // Test to ensure number tracks the right state of
         // uncheckpointed edits, and does not go negative

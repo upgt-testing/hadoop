@@ -163,12 +163,14 @@ public class TestBlockUnderConstruction_RestartInjected {
    */
   @Test
   public void testGetBlockLocations() throws IOException {
-    final NamenodeProtocols namenode = cluster.getNameNodeRpc();
-    final BlockManager blockManager = cluster.getNamesystem().getBlockManager();
+    NamenodeProtocols namenode = cluster.getNameNodeRpc();
+    BlockManager blockManager = cluster.getNamesystem().getBlockManager();
     final Path p = new Path(BASE_DIR, "file2.dat");
     final String src = p.toString();
     final FSDataOutputStream out = TestFileCreation.createFile(hdfs, p, 3);
     RestartFramework.at("after_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    blockManager = cluster.getNamesystem().getBlockManager();
 
     // write a half block
     int len = BLOCK_SIZE >>> 1;
@@ -179,6 +181,8 @@ public class TestBlockUnderConstruction_RestartInjected {
       // verify consistency
       final LocatedBlocks lb = namenode.getBlockLocations(src, 0, len);
       RestartFramework.at("after_get_block_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      namenode = cluster.getNameNodeRpc();
+      blockManager = cluster.getNamesystem().getBlockManager();
       final List<LocatedBlock> blocks = lb.getLocatedBlocks();
       assertEquals(i, blocks.size());
       final Block b = blocks.get(blocks.size() - 1).getBlock().getLocalBlock();
@@ -194,6 +198,8 @@ public class TestBlockUnderConstruction_RestartInjected {
     // close file
     out.close();
     RestartFramework.at("after_file_close").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    blockManager = cluster.getNamesystem().getBlockManager();
   }
 
   /**
@@ -204,13 +210,16 @@ public class TestBlockUnderConstruction_RestartInjected {
    */
   @Test
   public void testEmptyExpectedLocations() throws Exception {
-    final NamenodeProtocols namenode = cluster.getNameNodeRpc();
-    final FSNamesystem fsn = cluster.getNamesystem();
-    final BlockManager bm = fsn.getBlockManager();
+    NamenodeProtocols namenode = cluster.getNameNodeRpc();
+    FSNamesystem fsn = cluster.getNamesystem();
+    BlockManager bm = fsn.getBlockManager();
     final Path p = new Path(BASE_DIR, "file2.dat");
     final String src = p.toString();
     final FSDataOutputStream out = TestFileCreation.createFile(hdfs, p, 1);
     RestartFramework.at("after_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
     writeFile(p, out, 256);
     RestartFramework.at("after_write_file").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
     out.hflush();
@@ -219,6 +228,9 @@ public class TestBlockUnderConstruction_RestartInjected {
     // make sure the block is readable
     LocatedBlocks lbs = namenode.getBlockLocations(src, 0, 256);
     RestartFramework.at("after_get_block_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
     LocatedBlock lastLB = lbs.getLocatedBlocks().get(0);
     final Block b = lastLB.getBlock().getLocalBlock();
 
@@ -228,6 +240,9 @@ public class TestBlockUnderConstruction_RestartInjected {
         getUnderConstructionFeature();
     uc.initializeBlockRecovery(null, blockRecoveryId, false);
     RestartFramework.at("after_block_recovery_init").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
 
     try {
       String[] storages = { "invalid-storage-id1" };
@@ -238,9 +253,15 @@ public class TestBlockUnderConstruction_RestartInjected {
        // changes may make it not fail. This is not critical to the test.
     }
     RestartFramework.at("after_block_sync").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
 
     // Invalid storage should not trigger an exception.
     lbs = namenode.getBlockLocations(src, 0, 256);
     RestartFramework.at("after_final_get_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+    namenode = cluster.getNameNodeRpc();
+    fsn = cluster.getNamesystem();
+    bm = cluster.getNamesystem().getBlockManager();
   }
 }

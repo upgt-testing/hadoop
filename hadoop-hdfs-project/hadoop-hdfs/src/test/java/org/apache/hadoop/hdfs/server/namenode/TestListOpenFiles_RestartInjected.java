@@ -451,6 +451,8 @@ public class TestListOpenFiles_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsNamesystem = cluster.getNamesystem();
+      dir = cluster.getNamesystem().getFSDirectory();
       openFileEntryBatchedEntries = nnRpc
           .listOpenFiles(0, EnumSet.of(OpenFilesType.ALL_OPEN_FILES),
           OpenFilesIterator.FILTER_PATH_DEFAULT);

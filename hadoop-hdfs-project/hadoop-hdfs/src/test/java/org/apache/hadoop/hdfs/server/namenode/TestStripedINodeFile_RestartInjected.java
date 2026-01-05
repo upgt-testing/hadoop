@@ -341,6 +341,7 @@ public class TestStripedINodeFile_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       dfs.mkdirs(ecDir);
 
@@ -354,6 +355,7 @@ public class TestStripedINodeFile_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       DFSTestUtil.createFile(dfs, ecFile, len, (short) 1, 0xFEED);
       DFSTestUtil.createFile(dfs, contiguousFile, len, (short) 1, 0xFEED);
@@ -364,8 +366,9 @@ public class TestStripedINodeFile_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
-      final FSDirectory fsd = fsn.getFSDirectory();
+      FSDirectory fsd = fsn.getFSDirectory();
 
       // Case-1: Verify the behavior of striped blocks
       // Get blocks of striped file
@@ -388,6 +391,8 @@ public class TestStripedINodeFile_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      fsd = cluster.getNamesystem().getFSDirectory();
 
       for (BlockInfo blockInfo : stripedBlks) {
         assertTrue("Didn't mark the block as deleted!", blockInfo.isDeleted());

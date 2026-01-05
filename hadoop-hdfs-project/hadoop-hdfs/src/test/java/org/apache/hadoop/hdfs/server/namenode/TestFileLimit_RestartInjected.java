@@ -87,6 +87,7 @@ public class TestFileLimit_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesys = cluster.getNamesystem();
 
       //
       // check that / exists
@@ -107,6 +108,7 @@ public class TestFileLimit_RestartInjected {
               .withIndex(0)
               .withMode(RestartMode.GRACEFUL)
               .execute();
+          namesys = cluster.getNamesystem();
         }
         Path file = new Path("/filestatus" + i);
         DFSTestUtil.createFile(fs, file, 1024, 1024, blockSize, (short) 1, seed);
@@ -136,6 +138,7 @@ public class TestFileLimit_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesys = cluster.getNamesystem();
 
       // wait for number of blocks to decrease
       waitForLimit(namesys, currentNodes);
@@ -165,6 +168,7 @@ public class TestFileLimit_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesys = cluster.getNamesystem();
       waitForLimit(namesys, currentNodes);
 
       // verify that creating another directory fails

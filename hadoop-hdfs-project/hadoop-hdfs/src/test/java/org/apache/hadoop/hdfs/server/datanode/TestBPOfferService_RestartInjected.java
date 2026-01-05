@@ -1218,6 +1218,7 @@ public class TestBPOfferService_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
 
       MetricsRecordBuilder mrb = getMetrics(datanode.getMetrics().name());
       assertTrue("Process command nums is not expected.",
@@ -1258,6 +1259,7 @@ public class TestBPOfferService_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
 
       BPServiceActor actor = bpos.getBPServiceActors().get(0);
       // Stop and wait util actor exit.

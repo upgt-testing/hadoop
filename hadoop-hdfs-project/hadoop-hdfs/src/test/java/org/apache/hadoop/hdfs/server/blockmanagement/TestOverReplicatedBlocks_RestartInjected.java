@@ -115,8 +115,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
         InternalDataNodeTestUtils.getDNRegistrationForBP(
             cluster.getDataNodes().get(2), blockPoolId);
          
-      final FSNamesystem namesystem = cluster.getNamesystem();
-      final BlockManager bm = namesystem.getBlockManager();
+      FSNamesystem namesystem = cluster.getNamesystem();
+      BlockManager bm = namesystem.getBlockManager();
       final HeartbeatManager hm = bm.getDatanodeManager().getHeartbeatManager();
       try {
         namesystem.writeLock();
@@ -142,6 +142,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
               .withIndex(0)
               .withMode(RestartMode.GRACEFUL)
               .execute();
+          namesystem = cluster.getNamesystem();
+          bm = cluster.getNamesystem().getBlockManager();
 
           // corrupt one won't be chosen to be excess one
           // without 4910 the number of live replicas would be 0: block gets lost
@@ -182,8 +184,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
       conf.setLong(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, SMALL_BLOCK_SIZE);
       cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
       fs = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
-      final BlockManager bm = namesystem.getBlockManager();
+      FSNamesystem namesystem = cluster.getNamesystem();
+      BlockManager bm = namesystem.getBlockManager();
 
       RestartFramework.at("after_cluster_start")
           .on(cluster)
@@ -205,6 +207,7 @@ public class TestOverReplicatedBlocks_RestartInjected {
           .withIndex(3)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      lastDN = cluster.getDataNodes().get(3);
 
       final Path fileName = new Path("/foo2");
       DFSTestUtil.createFile(fs, fileName, SMALL_FILE_LENGTH, (short)4, 0L);
@@ -216,6 +219,7 @@ public class TestOverReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      lastDN = cluster.getDataNodes().get(3);
 
       // Wait for tolerable number of heartbeats plus one
       DatanodeDescriptor nodeInfo = null;
@@ -233,6 +237,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
 
       fs.setReplication(fileName, (short)3);
 
@@ -242,6 +248,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
 
       BlockLocation locs[] = fs.getFileBlockLocations(
           fs.getFileStatus(fileName), 0, Long.MAX_VALUE);
@@ -272,8 +280,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3)
         .build();
     try {
-      final FSNamesystem namesystem = cluster.getNamesystem();
-      final BlockManager bm = namesystem.getBlockManager();
+      FSNamesystem namesystem = cluster.getNamesystem();
+      BlockManager bm = namesystem.getBlockManager();
       FileSystem fs = cluster.getFileSystem();
 
       RestartFramework.at("after_cluster_start")
@@ -303,6 +311,8 @@ public class TestOverReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
 
       out.close();
       ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, p);

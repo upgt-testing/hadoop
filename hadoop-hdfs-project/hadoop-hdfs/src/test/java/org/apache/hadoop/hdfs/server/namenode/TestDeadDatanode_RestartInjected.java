@@ -153,6 +153,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dnp = cluster.getNameNodeRpc();
+    bm = cluster.getNamesystem().getBlockManager();
 
     // Ensure blockReport from dead datanode is rejected with IOException
     StorageBlockReport[] report = { new StorageBlockReport(
@@ -171,6 +173,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dnp = cluster.getNameNodeRpc();
+    bm = cluster.getNamesystem().getBlockManager();
 
     // Ensure heartbeat from dead datanode is rejected with a command
     // that asks datanode to register again
@@ -190,6 +194,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dnp = cluster.getNameNodeRpc();
+    bm = cluster.getNamesystem().getBlockManager();
   }
 
   @Test
@@ -224,6 +230,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Shutdown and wait for datanode to be marked dead
     dn.shutdown();
@@ -233,6 +241,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     DFSTestUtil.waitForDatanodeState(cluster, reg.getDatanodeUuid(), false,
         20000);
@@ -242,6 +252,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
 
     // Get the updated datanode descriptor available in DNM
     // choose the targets, but local node should not get selected as this is not
@@ -259,6 +271,8 @@ public class TestDeadDatanode_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm = cluster.getNamesystem().getBlockManager();
+    dm = cluster.getNamesystem().getBlockManager().getDatanodeManager();
   }
 
   @Test

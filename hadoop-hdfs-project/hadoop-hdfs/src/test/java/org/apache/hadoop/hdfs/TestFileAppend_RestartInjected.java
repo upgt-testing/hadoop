@@ -788,6 +788,7 @@ public class TestFileAppend_RestartInjected{
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       // Call FsDatasetImpl#append to append the block file,
       // which converts it to a rbw replica.

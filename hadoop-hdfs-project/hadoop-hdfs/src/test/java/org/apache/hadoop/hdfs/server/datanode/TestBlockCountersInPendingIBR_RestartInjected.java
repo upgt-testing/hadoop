@@ -64,7 +64,7 @@ public class TestBlockCountersInPendingIBR_RestartInjected {
     final DatanodeProtocolClientSideTranslatorPB spy =
         InternalDataNodeTestUtils.spyOnBposToNN(
             cluster.getDataNodes().get(0), cluster.getNameNode());
-    final DataNode datanode = cluster.getDataNodes().get(0);
+    DataNode datanode = cluster.getDataNodes().get(0);
 
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
@@ -72,6 +72,7 @@ public class TestBlockCountersInPendingIBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     /* We should get 0 incremental block report. */
     Mockito.verify(spy, timeout(60000).times(0)).blockReceivedAndDeleted(
@@ -114,6 +115,7 @@ public class TestBlockCountersInPendingIBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     /* verify counters before sending IBR */
     verifyBlockCounters(datanode, 3, 1, 1, 1);
@@ -141,6 +143,7 @@ public class TestBlockCountersInPendingIBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     /* verify counters after sending IBR */
     verifyBlockCounters(datanode, 0, 0, 0, 0);
@@ -151,6 +154,7 @@ public class TestBlockCountersInPendingIBR_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     cluster.shutdown();
   }

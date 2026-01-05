@@ -119,7 +119,7 @@ public class TestSecurityTokenEditLog_RestartInjected {
       cluster = new MiniDFSCluster.Builder(conf).numDataNodes(NUM_DATA_NODES).build();
       cluster.waitActive();
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
 
       RestartFramework.at("after_cluster_start")
           .on(cluster)
@@ -127,7 +127,8 @@ public class TestSecurityTokenEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-  
+      namesystem = cluster.getNamesystem();
+
       for (Iterator<URI> it = cluster.getNameDirs(0).iterator(); it.hasNext(); ) {
         File dir = new File(it.next().getPath());
         System.out.println(dir);
@@ -145,6 +146,9 @@ public class TestSecurityTokenEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // Create threads and make them run transactions concurrently.
       Thread threadId[] = new Thread[NUM_THREADS];
@@ -160,6 +164,9 @@ public class TestSecurityTokenEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // wait for all transactions to get over
       for (int i = 0; i < NUM_THREADS; i++) {
@@ -176,6 +183,9 @@ public class TestSecurityTokenEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       editLog.close();
         
@@ -194,6 +204,9 @@ public class TestSecurityTokenEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       for (StorageDirectory sd : fsimage.getStorage().dirIterable(NameNodeDirType.EDITS)) {
         File editFile = NNStorage.getFinalizedEditsFile(sd, 1, 1 + expectedTransactions - 1);

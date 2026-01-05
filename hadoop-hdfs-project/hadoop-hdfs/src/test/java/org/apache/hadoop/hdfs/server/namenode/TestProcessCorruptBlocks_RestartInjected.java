@@ -63,13 +63,14 @@ public class TestProcessCorruptBlocks_RestartInjected {
     conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
     FileSystem fs = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     try {
       final Path fileName = new Path("/foo1");
@@ -90,6 +91,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       DFSTestUtil.waitReplication(fs, fileName, (short) 2);
 
@@ -103,6 +105,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // wait for 3 seconds so that all block reports are processed.
       try {
@@ -142,7 +145,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
     conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(4).build();
     FileSystem fs = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
     DataNodeProperties dnPropsFourth = cluster.stopDataNode(3);
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
@@ -150,6 +153,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     try {
       final Path fileName = new Path("/foo1");
@@ -170,6 +174,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       DFSTestUtil.waitReplication(fs, fileName, (short) 2);
 
@@ -183,6 +188,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       DFSTestUtil.waitReplication(fs, fileName, (short) 3);
 
@@ -217,13 +223,14 @@ public class TestProcessCorruptBlocks_RestartInjected {
     conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(2).build();
     FileSystem fs = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     try {
       final Path fileName = new Path("/foo1");
@@ -244,6 +251,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       DFSTestUtil.waitReplication(fs, fileName, (short) 1);
 
@@ -257,6 +265,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // wait for 3 seconds so that all block reports are processed.
       for (int i = 0; i < 10; i++) {
@@ -295,13 +304,14 @@ public class TestProcessCorruptBlocks_RestartInjected {
     conf.set(DFSConfigKeys.DFS_NAMENODE_RECONSTRUCTION_PENDING_TIMEOUT_SEC_KEY, Integer.toString(2));
     MiniDFSCluster cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
     FileSystem fs = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
     RestartFramework.at("after_cluster_setup")
         .on(cluster)
         .restart("namenode")
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     try {
       final Path fileName = new Path("/foo1");
@@ -326,6 +336,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // wait for 3 seconds so that all block reports are processed.
       try {
@@ -343,6 +354,7 @@ public class TestProcessCorruptBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // wait for 3 seconds so that all block reports are processed.
       try {

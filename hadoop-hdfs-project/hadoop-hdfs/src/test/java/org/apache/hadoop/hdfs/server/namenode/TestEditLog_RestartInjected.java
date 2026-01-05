@@ -301,7 +301,7 @@ public class TestEditLog_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
 
       long numEdits = testLoad(HADOOP20_SOME_EDITS, namesystem);
 
@@ -311,6 +311,7 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       assertEquals(3, numEdits);
       // Sanity check the edit
@@ -350,7 +351,7 @@ public class TestEditLog_RestartInjected {
           .execute();
 
       fileSystem = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       writeFsImage = namesystem.getFSImage();
       for (Iterator<URI> it = cluster.getNameDirs(0)
               .iterator(); it.hasNext();) {
@@ -371,6 +372,8 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      writeFsImage = cluster.getNameNode().getFSImage();
 
       // Roll another time to finalize edits_inprogress_3
       writeFsImage.rollEditLog(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
@@ -381,6 +384,8 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      writeFsImage = cluster.getNameNode().getFSImage();
 
       Transactions trans1 = new Transactions(
               namesystem, NUM_TRANSACTIONS, NUM_TRANSACTIONS / 2);
@@ -392,6 +397,8 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      writeFsImage = cluster.getNameNode().getFSImage();
 
       writeFsImage.rollEditLog(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
 
@@ -401,6 +408,8 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      writeFsImage = cluster.getNameNode().getFSImage();
       namesystem.dir.resetLastInodeIdWithoutChecking(originalLastInodeId);
       for(Iterator<StorageDirectory> it = writeFsImage.getStorage().
               dirIterator(NameNodeDirType.EDITS); it.hasNext();){
@@ -469,9 +478,9 @@ public class TestEditLog_RestartInjected {
           .execute();
 
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       FSImage fsimage = namesystem.getFSImage();
-      final FSEditLog editLog = fsimage.getEditLog();
+      FSEditLog editLog = fsimage.getEditLog();
 
       assertExistsInStorageDirs(
           cluster, NameNodeDirType.EDITS,
@@ -487,6 +496,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       editLog.rollEditLog(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
 
@@ -496,6 +508,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       assertExistsInStorageDirs(
           cluster, NameNodeDirType.EDITS,
@@ -514,6 +529,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       editLog.close();
     } finally {
@@ -568,7 +586,7 @@ public class TestEditLog_RestartInjected {
           .execute();
 
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
 
       for (Iterator<URI> it = cluster.getNameDirs(0).iterator(); it.hasNext(); ) {
         File dir = new File(it.next().getPath());
@@ -591,6 +609,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // Remember the current lastInodeId and will reset it back to test
       // loading editlog segments.The transactions in the following allocate new
@@ -621,6 +642,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // Reopen some files as for append
       Transactions trans =
@@ -633,6 +657,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // Roll another time to finalize edits_inprogress_3
       fsimage.rollEditLog(NameNodeLayoutVersion.CURRENT_LAYOUT_VERSION);
@@ -643,7 +670,10 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
+
       long expectedTxns = ((NUM_THREADS+1) * 2 * NUM_TRANSACTIONS) + 2; // +2 for start/end txns
    
       // Verify that we can read in all the transactions that we have written.
@@ -812,10 +842,10 @@ public class TestEditLog_RestartInjected {
           .execute();
 
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
 
       FSImage fsimage = namesystem.getFSImage();
-      final FSEditLog editLog = fsimage.getEditLog();
+      FSEditLog editLog = fsimage.getEditLog();
 
       // Log an edit from thread A
       doLogEdit(threadA, editLog, "thread-a 1");
@@ -826,6 +856,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // async log is doing batched syncs in background.  logSync just ensures
       // the edit is durable, so the txid may increase prior to sync
@@ -844,6 +877,9 @@ public class TestEditLog_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
 
       // Close edit log
       editLog.close();
@@ -875,10 +911,10 @@ public class TestEditLog_RestartInjected {
         .execute();
 
     fileSys = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
 
     FSImage fsimage = namesystem.getFSImage();
-    final FSEditLog editLog = fsimage.getEditLog();
+    FSEditLog editLog = fsimage.getEditLog();
     fileSys.mkdirs(new Path("/tmp"));
 
     RestartFramework.at("after_mkdir")
@@ -887,6 +923,9 @@ public class TestEditLog_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
+    fsimage = cluster.getNameNode().getFSImage();
+    editLog = cluster.getNamesystem().getEditLog();
 
     Iterator<StorageDirectory> iter = fsimage.getStorage().
       dirIterator(NameNodeDirType.EDITS);

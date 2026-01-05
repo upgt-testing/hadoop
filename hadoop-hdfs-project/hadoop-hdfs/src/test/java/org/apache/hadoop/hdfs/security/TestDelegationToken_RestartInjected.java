@@ -214,6 +214,7 @@ public class TestDelegationToken_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     // Renew token shouldn't change the count of tokens
     dtSecretManager.renewToken(token, "JobTracker");
@@ -228,6 +229,7 @@ public class TestDelegationToken_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
 
     assertEquals(0, namesystem.getCurrentTokensCount());
   }

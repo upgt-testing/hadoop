@@ -127,6 +127,8 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
+      dn2 = cluster.getDataNodes().get(1);
 
       cluster.getFsDatasetTestUtils(0).verifyBlockPoolMissing(bpid1);
 
@@ -155,6 +157,8 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
+      dn2 = cluster.getDataNodes().get(1);
 
       // Although namenode is shutdown, the bp offerservice is still running
       // on dn2
@@ -187,6 +191,8 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
+      dn2 = cluster.getDataNodes().get(1);
 
       cluster.getFsDatasetTestUtils(1).verifyBlockPoolMissing(bpid1);
 
@@ -203,6 +209,8 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
+      dn2 = cluster.getDataNodes().get(1);
 
       fs2.setReplication(gammaFile, (short)2);
 
@@ -294,6 +302,7 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
 
       assertFalse(0 == ret);
 
@@ -308,6 +317,7 @@ public class TestDeleteBlockPool_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn1 = cluster.getDataNodes().get(0);
 
       assertEquals(0, ret);
 

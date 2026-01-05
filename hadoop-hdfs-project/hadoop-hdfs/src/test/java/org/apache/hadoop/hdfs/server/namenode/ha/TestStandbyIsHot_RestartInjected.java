@@ -101,6 +101,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       // Block locations should show up on standby.
       LOG.info("Waiting for block locations to appear on standby node");
@@ -112,6 +114,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       // Trigger immediate heartbeats and block reports so
       // that the active "trusts" all of the DNs
@@ -140,6 +144,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       LOG.info("Waiting for lowered replication to show up on standby");
       waitForBlockLocations(cluster, nn2, TEST_FILE, 1);
@@ -150,7 +156,9 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
+
       // Change back to 3
       LOG.info("Changing replication to 3");
       fs.setReplication(TEST_FILE_PATH, (short)3);
@@ -164,6 +172,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       LOG.info("Waiting for higher replication to show up on standby");
       waitForBlockLocations(cluster, nn2, TEST_FILE, 3);
@@ -174,7 +184,9 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
+
     } finally {
       cluster.shutdown();
     }
@@ -214,6 +226,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNameNode(0);
+      nn1 = cluster.getNameNode(1);
 
       // Create 5 blocks.
       DFSTestUtil.createFile(cluster.getFileSystem(0),
@@ -227,7 +241,9 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn0 = cluster.getNameNode(0);
+      nn1 = cluster.getNameNode(1);
+
       // Stop the DN.
       DataNode dn = cluster.getDataNodes().get(0);
       String dnName = dn.getDatanodeId().getXferAddr();
@@ -256,7 +272,9 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn0 = cluster.getNameNode(0);
+      nn1 = cluster.getNameNode(1);
+
       cluster.restartDataNode(dnProps);
       // Wait for both NNs to re-register the DN.
       cluster.waitActive(0);
@@ -270,6 +288,7 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       BlockManagerTestUtil.updateState(nn0.getNamesystem().getBlockManager());
       BlockManagerTestUtil.updateState(nn1.getNamesystem().getBlockManager());
@@ -287,6 +306,8 @@ public class TestStandbyIsHot_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNameNode(0);
+      nn1 = cluster.getNameNode(1);
     } finally {
       cluster.shutdown();
     }

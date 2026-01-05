@@ -84,6 +84,7 @@ public class TestDisallowModifyROSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     SnapshotTestHelper.createSnapshot(fs, sub1, "testSnapshot");
 
@@ -93,6 +94,7 @@ public class TestDisallowModifyROSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
 
     objInSnapshot = SnapshotTestHelper.getSnapshotPath(sub1, "testSnapshot",
         "dir1");

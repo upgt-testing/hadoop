@@ -256,6 +256,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       //
       // Wait for everything to timeout.
@@ -273,6 +275,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       //
       // Verify that block moves to neededReconstruction
@@ -306,6 +310,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       // Pick a real node
       DatanodeDescriptor desc[] = { blkManager.getDatanodeManager().
@@ -334,6 +340,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       // The block should still be pending
       assertEquals("Size of pendingReconstructions ", 1,
@@ -414,6 +422,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       assertEquals(1, blkManager.pendingReconstruction.size());
       INodeFile fileNode = fsn.getFSDirectory().getINode4Write(file).asFile();
@@ -452,6 +462,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       // let the same datanodes report again
       for (int i = 0; i < DATANODE_COUNT && reportDnNum < 2; i++) {
@@ -479,6 +491,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
+      blkManager = cluster.getNamesystem().getBlockManager();
 
       // re-enable heartbeat for the datanode that has data
       for (int i = 0; i < DATANODE_COUNT; i++) {
@@ -567,6 +581,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
 
       // 4. delete the file
       fs.delete(filePath, true);
@@ -577,6 +593,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      bm = cluster.getNamesystem().getBlockManager();
 
       // retry at most 10 times, each time sleep for 1s. Note that 10s is much
       // less than the default pending record timeout (5~10min)
@@ -647,6 +665,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = tmpCluster.getNamesystem(0);
+      bm = tmpCluster.getNamesystem().getBlockManager();
 
       PendingReconstructionBlocks pending = bm.pendingReconstruction;
 
@@ -665,6 +685,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = tmpCluster.getNamesystem(0);
+      bm = tmpCluster.getNamesystem().getBlockManager();
 
       // call addBlock on block0 will make it successfully replicated.
       // not calling addBlock on block1 will make it timeout later.
@@ -678,6 +700,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = tmpCluster.getNamesystem(0);
+      bm = tmpCluster.getNamesystem().getBlockManager();
 
       // call schedule replication on blockInfo2 will fail the re-replication.
       // because there is no source data to replicate from.
@@ -689,6 +713,8 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = tmpCluster.getNamesystem(0);
+      bm = tmpCluster.getNamesystem().getBlockManager();
 
       GenericTestUtils.waitFor(new Supplier<Boolean>() {
         @Override
@@ -768,6 +794,7 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       // 4 compute replication work twice to make sure the same DN is not adding
       // twice
@@ -781,6 +808,7 @@ public class TestPendingReconstruction_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       // 5 capture the logs and verify the reconstruction work for block for
       // same DN

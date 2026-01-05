@@ -247,9 +247,9 @@ public class TestBlockTokenWithDFS_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final NameNode nn = cluster.getNameNode();
-      final BlockManager bm = nn.getNamesystem().getBlockManager();
-      final BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
+      NameNode nn = cluster.getNameNode();
+      BlockManager bm = nn.getNamesystem().getBlockManager();
+      BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
 
       // set a short token lifetime (1 second)
       SecurityTestUtil.setBlockTokenLifetime(sm, 1000L);
@@ -317,6 +317,9 @@ public class TestBlockTokenWithDFS_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      bm = cluster.getNamesystem().getBlockManager();
+      sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
       // append the rest of the file
       stm.write(expected, mid, expected.length - mid);
@@ -361,9 +364,9 @@ public class TestBlockTokenWithDFS_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final NameNode nn = cluster.getNameNode();
-      final BlockManager bm = nn.getNamesystem().getBlockManager();
-      final BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
+      NameNode nn = cluster.getNameNode();
+      BlockManager bm = nn.getNamesystem().getBlockManager();
+      BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
 
       // set a short token lifetime (1 second)
       SecurityTestUtil.setBlockTokenLifetime(sm, 1000L);
@@ -420,6 +423,9 @@ public class TestBlockTokenWithDFS_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      bm = cluster.getNamesystem().getBlockManager();
+      sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
       // write the rest of the file
       stm.write(expected, mid, expected.length - mid);
@@ -476,10 +482,10 @@ public class TestBlockTokenWithDFS_RestartInjected {
   protected void doTestRead(Configuration conf, MiniDFSCluster cluster,
       boolean isStriped) throws Exception {
     final int numDataNodes = cluster.getDataNodes().size();
-    final NameNode nn = cluster.getNameNode();
-    final NamenodeProtocols nnProto = nn.getRpcServer();
-    final BlockManager bm = nn.getNamesystem().getBlockManager();
-    final BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
+    NameNode nn = cluster.getNameNode();
+    NamenodeProtocols nnProto = nn.getRpcServer();
+    BlockManager bm = nn.getNamesystem().getBlockManager();
+    BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
 
     // set a short token lifetime (1 second) initially
     SecurityTestUtil.setBlockTokenLifetime(sm, 1000L);
@@ -600,6 +606,10 @@ public class TestBlockTokenWithDFS_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
+    nnProto = cluster.getNameNode().getRpcServer();
+    bm = cluster.getNamesystem().getBlockManager();
+    sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
     // set a long token lifetime for future tokens
     SecurityTestUtil.setBlockTokenLifetime(sm, 600 * 1000L);
@@ -666,6 +676,10 @@ public class TestBlockTokenWithDFS_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
+    nnProto = cluster.getNameNode().getRpcServer();
+    bm = cluster.getNamesystem().getBlockManager();
+    sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
     cluster.shutdownNameNode(0);
 
@@ -816,6 +830,10 @@ public class TestBlockTokenWithDFS_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
+    nnProto = cluster.getNameNode().getRpcServer();
+    bm = cluster.getNamesystem().getBlockManager();
+    sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
     // verify blockSeekTo() is able to re-fetch token transparently
     in1.seek(0);

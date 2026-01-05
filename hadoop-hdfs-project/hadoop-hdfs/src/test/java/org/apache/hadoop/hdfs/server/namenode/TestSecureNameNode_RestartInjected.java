@@ -208,6 +208,7 @@ public class TestSecureNameNode_RestartInjected extends SaslDataTransferTestCase
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
 
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
       ObjectName mxbeanName = new ObjectName(
@@ -224,6 +225,7 @@ public class TestSecureNameNode_RestartInjected extends SaslDataTransferTestCase
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
     }
   }
 

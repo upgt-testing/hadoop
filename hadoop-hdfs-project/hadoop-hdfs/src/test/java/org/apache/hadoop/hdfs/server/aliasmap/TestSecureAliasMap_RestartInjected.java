@@ -157,6 +157,8 @@ public class TestSecureAliasMap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
+    blockManager = cluster.getNamesystem().getBlockManager();
 
     DataNode dn = cluster.getDataNodes().get(0);
 
@@ -166,6 +168,7 @@ public class TestSecureAliasMap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     FsDatasetSpi.FsVolumeReferences volumes =
         dn.getFSDataset().getFsVolumeReferences();
@@ -183,6 +186,7 @@ public class TestSecureAliasMap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     String[] bps = providedVolume.getBlockPoolList();
     assertEquals("Missing provided volume", 1, bps.length);
@@ -195,6 +199,8 @@ public class TestSecureAliasMap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
+    blockManager = cluster.getNamesystem().getBlockManager();
 
     BlockAliasMap.Reader reader = aliasMap.getReader(null, bps[0]);
 
@@ -204,6 +210,7 @@ public class TestSecureAliasMap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     assertNotNull("Failed to create blockAliasMap reader", reader);
   }

@@ -89,6 +89,8 @@ public class TestRedundancyMonitor_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = miniCluster.getNamesystem();
+      blockManager = miniCluster.getNamesystem().getBlockManager();
 
       ExecutorService pool = Executors.newFixedThreadPool(2);
 
@@ -118,6 +120,8 @@ public class TestRedundancyMonitor_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = miniCluster.getNamesystem();
+      blockManager = miniCluster.getNamesystem().getBlockManager();
 
       // Allow chooseTarget to proceed
       delayer.proceed();

@@ -148,7 +148,7 @@ public class TestReconstructStripedBlocks_RestartInjected {
         assertEquals(groupSize, sb.numNodes());
       }
 
-      final BlockManager bm = cluster.getNamesystem().getBlockManager();
+      BlockManager bm = cluster.getNamesystem().getBlockManager();
       BlockInfo firstBlock = fileNode.getBlocks()[0];
       DatanodeStorageInfo[] storageInfos = bm.getStorages(firstBlock);
 
@@ -184,6 +184,7 @@ public class TestReconstructStripedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       BlockManagerTestUtil.getComputedDatanodeWork(bm);
 
@@ -303,6 +304,7 @@ public class TestReconstructStripedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
     } finally {
       cluster.shutdown();
     }
@@ -490,7 +492,7 @@ public class TestReconstructStripedBlocks_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final BlockManager bm = dfsCluster.getNamesystem().getBlockManager();
+      BlockManager bm = dfsCluster.getNamesystem().getBlockManager();
       LocatedBlocks lbs = fs.getClient().getNamenode().getBlockLocations(
           ecFilePath.toString(), 0, blockGroups);
       assert lbs.get(0) instanceof LocatedStripedBlock;
@@ -512,6 +514,7 @@ public class TestReconstructStripedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = dfsCluster.getNamesystem().getBlockManager();
 
       // Verify low redundancy count matching EC block groups count
       BlockManagerTestUtil.updateState(bm);

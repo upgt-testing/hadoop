@@ -88,6 +88,7 @@ public class TestNameNodeStatusMXBean_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // Get attribute "LastHATransitionTime"
       long lastHATransitionTime = (long)mbs.getAttribute(mxbeanName,
@@ -105,6 +106,7 @@ public class TestNameNodeStatusMXBean_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // Get attribute "SlowPeersReport"
       String slowPeersReport = (String)mbs.getAttribute(mxbeanName,
@@ -151,6 +153,7 @@ public class TestNameNodeStatusMXBean_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
 
       NameNode nn = cluster.getNameNode();
       DatanodeManager datanodeManager = nn.getNamesystem().getBlockManager()
@@ -165,6 +168,7 @@ public class TestNameNodeStatusMXBean_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       GenericTestUtils.waitFor(new Supplier<Boolean>() {
         @Override

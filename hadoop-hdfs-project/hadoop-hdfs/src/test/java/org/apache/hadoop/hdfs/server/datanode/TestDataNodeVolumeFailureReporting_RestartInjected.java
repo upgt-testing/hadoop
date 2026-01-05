@@ -360,6 +360,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dns = cluster.getDataNodes();
 
     // After restarting the NN it still see the two failures
     cluster.restartNameNode(0);
@@ -524,6 +525,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dns = cluster.getDataNodes();
 
     // Reconfigure again to try to add back the failed volumes.
     DataNodeTestUtils.reconfigureDataNode(dns.get(0), dn1Vol1, dn1Vol2);
@@ -579,6 +581,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dns = cluster.getDataNodes();
 
     // Replace failed volume with healthy volume and run reconfigure DataNode.
     // The failed volume information should be cleared.
@@ -655,6 +658,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dns = cluster.getDataNodes();
   }
 
   @Test
@@ -689,6 +693,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
   }
 
   /**
@@ -700,7 +705,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
           throws Exception {
     final File dn0Vol1 = cluster.getInstanceStorageDir(0, 0);
     final File dn0Vol2 = cluster.getInstanceStorageDir(0, 1);
-    final DataNode dn0 = cluster.getDataNodes().get(0);
+    DataNode dn0 = cluster.getDataNodes().get(0);
     final String oldDataDirs = dn0.getConf().get(
             DFSConfigKeys.DFS_DATANODE_DATA_DIR_KEY);
 
@@ -738,6 +743,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn0 = cluster.getDataNodes().get(0);
 
     // Reconfigure disks without fixing the failed disk.
     // Verify NumFailedVolumes and FailedStorageLocations haven't changed.
@@ -780,6 +786,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn0 = cluster.getDataNodes().get(0);
 
     // Fix failure volume dn0Vol1 and remount it back.
     // Verify NumFailedVolumes and FailedStorageLocations are empty.
@@ -817,6 +824,7 @@ public class TestDataNodeVolumeFailureReporting_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn0 = cluster.getDataNodes().get(0);
 
     // Verify DataNode tolerating one disk failure.
     assertTrue(dn0.shouldRun());

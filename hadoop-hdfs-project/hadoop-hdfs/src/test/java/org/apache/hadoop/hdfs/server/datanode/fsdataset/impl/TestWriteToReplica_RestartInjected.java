@@ -94,6 +94,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       // test close
       testClose(dataSet, blocks);
@@ -104,6 +105,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdown();
     }
@@ -137,6 +139,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       // test append
       testAppend(bpid, dataSet, blocks);
@@ -147,6 +150,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdown();
     }
@@ -180,6 +184,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       // test writeToRbw
       testWriteToRbw(dataSet, blocks);
@@ -190,6 +195,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdown();
     }
@@ -223,6 +229,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       // test writeToTemporary
       testWriteToTemporary(dataSet, blocks);
@@ -233,6 +240,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdown();
     }
@@ -669,6 +677,7 @@ public class TestWriteToReplica_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
     } finally {
       cluster.shutdown();
     }
@@ -707,6 +716,7 @@ public class TestWriteToReplica_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     ReplicaBeingWritten rbw = (ReplicaBeingWritten)fsDataset.
         getReplicaInfo(bpid, blocks[RBW].getBlockId());
@@ -725,6 +735,7 @@ public class TestWriteToReplica_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     // reduce on disk length again; this time actually truncate the file to
     // simulate the data not being present
@@ -747,6 +758,7 @@ public class TestWriteToReplica_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
   }
 
   /**

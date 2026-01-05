@@ -51,7 +51,7 @@ public class TestLazyPersistReplicaRecovery_RestartInjected extends LazyPersistT
         .withMode(RestartMode.GRACEFUL)
         .execute();
     FSNamesystem fsn = cluster.getNamesystem();
-    final DataNode dn = cluster.getDataNodes().get(0);
+    DataNode dn = cluster.getDataNodes().get(0);
     DatanodeDescriptor dnd =
         NameNodeAdapter.getDatanode(fsn, dn.getDatanodeId());
     final String METHOD_NAME = GenericTestUtils.getMethodName();
@@ -64,6 +64,7 @@ public class TestLazyPersistReplicaRecovery_RestartInjected extends LazyPersistT
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     ensureFileReplicasOnStorageType(path1, RAM_DISK);
 
     FsDatasetImpl fsDImpl = (FsDatasetImpl) DataNodeTestUtils.getFSDataset(dn);
@@ -76,6 +77,7 @@ public class TestLazyPersistReplicaRecovery_RestartInjected extends LazyPersistT
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     ensureFileReplicasOnStorageType(path1, RAM_DISK);
 
     LOG.info("Restarting the DataNode");
@@ -87,6 +89,7 @@ public class TestLazyPersistReplicaRecovery_RestartInjected extends LazyPersistT
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem();
     waitForBlockReport(dn, dnd);
     ensureFileReplicasOnStorageType(path1, DEFAULT);
   }

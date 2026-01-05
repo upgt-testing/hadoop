@@ -410,6 +410,7 @@ public class TestLazyPersistFiles_RestartInjected extends LazyPersistTestCase {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     Thread.sleep(3 * LAZY_WRITER_INTERVAL_SEC * 1000);
 
     for (int i = 0; i < volumes.size(); ++i) {

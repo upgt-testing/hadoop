@@ -511,6 +511,7 @@ public class TestStandbyCheckpoints_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn = cluster.getNamesystem(0);
 
     cluster.transitionToActive(0);    
     

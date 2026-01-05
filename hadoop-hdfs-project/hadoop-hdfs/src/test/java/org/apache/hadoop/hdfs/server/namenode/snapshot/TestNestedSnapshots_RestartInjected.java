@@ -517,6 +517,7 @@ public class TestNestedSnapshots_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsdir = cluster.getNamesystem().getFSDirectory();
 
     subNode = fsdir.getINode(sub.toString());
     assertTrue(subNode.isDirectory() && subNode.asDirectory().isSnapshottable());
@@ -529,6 +530,7 @@ public class TestNestedSnapshots_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsdir = cluster.getNamesystem().getFSDirectory();
 
     subNode = fsdir.getINode(sub.toString());
     assertTrue(subNode.asDirectory().isWithSnapshot());

@@ -88,8 +88,8 @@ public class TestAddBlockRetry_RestartInjected {
         .withMode(RestartMode.GRACEFUL)
         .execute();
 
-    final FSNamesystem ns = cluster.getNamesystem();
-    final NamenodeProtocols nn = cluster.getNameNodeRpc();
+    FSNamesystem ns = cluster.getNamesystem();
+    NamenodeProtocols nn = cluster.getNameNodeRpc();
 
     // create file
     nn.create(src, FsPermission.getFileDefault(),
@@ -127,6 +127,8 @@ public class TestAddBlockRetry_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    ns = cluster.getNamesystem();
+    nn = cluster.getNameNodeRpc();
 
     // run second addBlock()
     LOG.info("Starting second addBlock for " + src);

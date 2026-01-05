@@ -510,6 +510,8 @@ public class TestBlockManager_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        bm = cluster.getNamesystem().getBlockManager();
+        namenode = cluster.getNameNodeRpc();
         LocatedBlock newLocatedBlock =
             namenode.updateBlockForPipeline(oldBlock, clientName);
         ExtendedBlock newBlock =
@@ -592,6 +594,7 @@ public class TestBlockManager_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      blockManager = cluster.getNamesystem().getBlockManager();
       DataNodeTestUtils.triggerBlockReport(datanode.getDatanode());
       assertEquals(0, blockManager.getCorruptBlocks());
     } finally {
@@ -1352,7 +1355,7 @@ public class TestBlockManager_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       final String poolId = namesystem.getBlockPoolId();
       final DatanodeRegistration nodeReg =
         InternalDataNodeTestUtils.getDNRegistrationForBP(cluster.getDataNodes().
@@ -1373,6 +1376,7 @@ public class TestBlockManager_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
       file1 = new Path("testRemainingStorage.dat");
       try {
         DFSTestUtil.createFile(fs, file1, 102400, 102400, 102400, (short)1,
@@ -1686,6 +1690,8 @@ public class TestBlockManager_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      blockManager = cluster.getNamesystem().getBlockManager();
+      ns = cluster.getNamesystem();
       ns.writeLock();
       DatanodeStorageInfo corruptStorageInfo= null;
       for(int i=0; i<corruptStorageDataNode.getStorageInfos().length; i++) {
@@ -1707,6 +1713,7 @@ public class TestBlockManager_RestartInjected {
           .withIndex(2)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
       BlockInfo[] blockInfos = new BlockInfo[] {blockInfo};
       ns.readLock();
       LocatedBlocks locatedBlocks =
@@ -1722,6 +1729,8 @@ public class TestBlockManager_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      blockManager = cluster.getNamesystem().getBlockManager();
+      ns = cluster.getNamesystem();
     } finally {
       if (cluster != null) {
         cluster.shutdown();

@@ -250,6 +250,7 @@ public class TestMultipleNNPortQOP_RestartInjected extends SaslDataTransferTestC
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNodes = cluster.getDataNodes();
 
       clientConf.set(HADOOP_RPC_PROTECTION, "authentication");
       FileSystem fsAuth = FileSystem.get(uriAuthPort, clientConf);
@@ -342,6 +343,7 @@ public class TestMultipleNNPortQOP_RestartInjected extends SaslDataTransferTestC
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNodes = cluster.getDataNodes();
 
       clientConf.set(HADOOP_RPC_PROTECTION, "authentication");
       FileSystem fsAuth = FileSystem.get(uriAuthPort, clientConf);

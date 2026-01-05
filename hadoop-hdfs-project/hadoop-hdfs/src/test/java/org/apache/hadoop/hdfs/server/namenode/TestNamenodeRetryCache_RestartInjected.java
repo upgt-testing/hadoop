@@ -378,6 +378,7 @@ public class TestNamenodeRetryCache_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    ns0 = cluster.getNameNodeRpc(0);
     try {
       ns0.updatePipeline("testClient", oldBlock, newBlock, newNodes, newStorages);
     } catch (IOException e) {

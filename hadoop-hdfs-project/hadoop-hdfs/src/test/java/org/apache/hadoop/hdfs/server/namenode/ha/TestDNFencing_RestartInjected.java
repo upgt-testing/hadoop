@@ -118,6 +118,8 @@ public class TestDNFencing_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
   }
 
   @After
@@ -385,6 +387,7 @@ public class TestDNFencing_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm1 = cluster.getNamesystem().getBlockManager();
 
     // Check that the standby picked up the replication change.
     assertEquals(1,

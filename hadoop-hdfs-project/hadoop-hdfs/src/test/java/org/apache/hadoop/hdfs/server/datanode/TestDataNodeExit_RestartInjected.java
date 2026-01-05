@@ -96,6 +96,7 @@ public class TestDataNodeExit_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     stopBPServiceThreads(1, dn);
     RestartFramework.at("after_stop_first_bpservice")
         .on(cluster)
@@ -103,6 +104,7 @@ public class TestDataNodeExit_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     assertTrue("DataNode should not exit", dn.isDatanodeUp());
     stopBPServiceThreads(2, dn);
     RestartFramework.at("after_stop_remaining_bpservices")
@@ -123,6 +125,7 @@ public class TestDataNodeExit_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     DataXceiverServer spyXserver = Mockito.spy(dn.getXferServer());
     NullPointerException npe = new NullPointerException();
     Mockito.doThrow(npe).when(spyXserver).sendOOBToPeers();
@@ -133,6 +136,7 @@ public class TestDataNodeExit_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
     try {
       dn.shutdown();
     } catch (Exception e) {

@@ -112,6 +112,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // skip the first NN, its up
     for (int index = 1; index < maxNNCount; index++) {
@@ -141,6 +142,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // We should now be able to start the standbys successfully.
     restartNameNodesFromIndex(1);
@@ -169,6 +171,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // advance the current txid
     cluster.getFileSystem(0).create(new Path("/test_txid"), (short)1).close();
@@ -179,6 +182,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // obtain the content of seen_txid
     URI editsUri = cluster.getSharedEditsDir(0, maxNNCount - 1);
@@ -200,6 +204,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // Make sure the seen_txid was not modified by the standby
     assertEquals(seen_txid_shared,
@@ -223,6 +228,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     CheckpointSignature sig = nn0.getRpcServer().rollEditLog();
     assertEquals(3, sig.getCurSegmentTxId());
@@ -233,6 +239,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // Should have created edits_1-2 in shared edits dir
     URI editsUri = cluster.getSharedEditsDir(0, maxNNCount - 1);
@@ -252,6 +259,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // Trying to bootstrap standby should now fail since the edit
     // logs aren't available in the shared dir.
@@ -285,6 +293,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // Should pass with -force
     assertEquals(0, forceBootstrap(1));
@@ -295,6 +304,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
   }
 
   /**
@@ -311,6 +321,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     assertSuccessfulBootstrapFromIndex(1);
   }
@@ -336,6 +347,8 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
+    nn0 = cluster.getNameNode(0);
 
     // Any reasonable test machine should be able to transfer 1 byte per MS
     // (which is ~1K/s)
@@ -362,6 +375,8 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
+    nn0 = cluster.getNameNode(0);
 
     final int timeOut = (int)(imageFile.length() / minXferRatePerMS) + 1;
     // A very low DFS_IMAGE_TRANSFER_RATE_KEY value won't affect bootstrapping
@@ -400,6 +415,7 @@ public class TestBootstrapStandby_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn0 = cluster.getNameNode(0);
 
     // A very low DFS_IMAGE_TRANSFER_BOOTSTRAP_STANDBY_RATE_KEY value should
     // cause timeout

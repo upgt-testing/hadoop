@@ -87,6 +87,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       doSaveNamespace(nn);
       RestartFramework.at("after_first_savenamespace")
@@ -95,6 +96,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       LOG.info("After first save, images 0 and 2 should exist in both dirs");
       assertGlobEquals(cd0, "fsimage_\\d*", 
           getImageFileName(0), getImageFileName(2));
@@ -114,6 +116,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       LOG.info("After second save, image 0 should be purged, " +
           "and image 4 should exist in both.");
       assertGlobEquals(cd0, "fsimage_\\d*",
@@ -135,6 +138,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       doSaveNamespace(nn);
       RestartFramework.at("after_third_savenamespace")
           .on(cluster)
@@ -142,6 +146,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       LOG.info("Restoring accessibility of first storage dir");
       assertEquals(0, FileUtil.chmod(cd0.getAbsolutePath(), "755"));
       RestartFramework.at("after_chmod_restore")
@@ -150,6 +155,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       LOG.info("nothing should have been purged in first storage dir");
       assertGlobEquals(cd0, "fsimage_\\d*",
@@ -174,6 +180,7 @@ public class TestNNStorageRetentionFunctional_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       assertGlobEquals(cd1, "fsimage_\\d*",
           getImageFileName(6), getImageFileName(8));
       assertGlobEquals(cd1, "edits_.*",

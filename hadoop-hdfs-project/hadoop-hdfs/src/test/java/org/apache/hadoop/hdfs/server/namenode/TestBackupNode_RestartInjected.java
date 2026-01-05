@@ -259,6 +259,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
       assertEquals(bnImage.getEditLog().getCurSegmentTxId(),
           nn.getFSImage().getEditLog().getCurSegmentTxId());
 
@@ -270,7 +272,9 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
+
       long nnImageBefore =
         nn.getFSImage().getStorage().getMostRecentCheckpointTxId();
       // BN checkpoint
@@ -281,6 +285,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       // NN should have received a new image
       long nnImageAfter =
@@ -298,6 +304,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       // Stop BN
       StorageDirectory sd = bnImage.getStorage().getStorageDir(0);
@@ -309,6 +317,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       // When shutting down the BN, it shouldn't finalize logs that are
       // still open on the NN
@@ -326,6 +336,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       // start a new backup node
       backup = startBackupNode(conf, StartupOption.BACKUP, 1);
@@ -335,6 +347,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       testBNInSync(cluster, backup, 4);
       RestartFramework.at("after_fourth_sync")
@@ -343,6 +357,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
       assertNotNull(backup.getNamesystem()
           .getFileInfo("/edit-while-bn-down", false, false, false));
       
@@ -355,6 +371,8 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
 
       // do some edits on the active. This should go through without failing.
       // This will verify that active is still up and can add entries to
@@ -366,7 +384,9 @@ public class TestBackupNode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
-      
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
+
     } finally {
       LOG.info("Shutting down...");
       if (backup != null) backup.stop();

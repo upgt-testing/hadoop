@@ -108,6 +108,7 @@ public class TestStorageReport_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
 
     DataNodeTestUtils.triggerHeartbeat(dn);
 
@@ -117,6 +118,7 @@ public class TestStorageReport_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dn = cluster.getDataNodes().get(0);
 
     ArgumentCaptor<StorageReport[]> captor =
         ArgumentCaptor.forClass(StorageReport[].class);

@@ -89,6 +89,8 @@ public class TestStandbyBlockManagement_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       // delete the file
       fs.delete(TEST_FILE_PATH, false);
@@ -101,6 +103,8 @@ public class TestStandbyBlockManagement_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       nn1.getRpcServer().rollEditLog();
 
@@ -110,6 +114,8 @@ public class TestStandbyBlockManagement_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn1 = cluster.getNameNode(0);
+      nn2 = cluster.getNameNode(1);
 
       // standby nn doesn't need to invalidate blocks.
       assertEquals(0,

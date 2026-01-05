@@ -107,6 +107,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // Saving image in safe mode should succeed
       fs.setSafeMode(SafeModeAction.SAFEMODE_ENTER);
@@ -116,6 +117,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
       try {
         admin.run(args);
       } catch(Exception e) {
@@ -127,6 +129,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // verify that the edits file is empty except for the START txn
       for (StorageDirectory sd : nn.getFSImage().getStorage().dirIterable(null)) {
@@ -143,6 +146,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // restart cluster
       cluster.shutdown();
@@ -156,6 +160,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       //Should be able to renew & cancel the delegation token after cluster restart
       try {
@@ -170,6 +175,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       namesystem = cluster.getNamesystem();
       Token<DelegationTokenIdentifier> token3 = namesystem
@@ -182,6 +188,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // restart cluster again
       cluster.shutdown();
@@ -195,6 +202,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       namesystem = cluster.getNamesystem();
       Token<DelegationTokenIdentifier> token5 = namesystem
@@ -205,6 +213,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       try {
         renewToken(token1);
@@ -222,6 +231,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       // restart cluster again
       cluster.shutdown();
@@ -235,6 +245,7 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
 
       namesystem = cluster.getNamesystem();
       try {
@@ -257,6 +268,8 @@ public class TestCheckPointForSecurityTokens_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      namesystem = cluster.getNamesystem();
 
     } finally {
       if(fs != null) fs.close();

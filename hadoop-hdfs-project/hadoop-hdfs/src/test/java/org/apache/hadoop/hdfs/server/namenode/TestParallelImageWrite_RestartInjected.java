@@ -115,6 +115,7 @@ public class TestParallelImageWrite_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       final FileStatus newrootstatus = fs.getFileStatus(rootpath);
       assertEquals(rootmtime, newrootstatus.getModificationTime());
@@ -133,6 +134,7 @@ public class TestParallelImageWrite_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       // Modify the system and then perform saveNamespace
       files.cleanup(fs, dir);
@@ -151,6 +153,7 @@ public class TestParallelImageWrite_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
       final String checkAfterModify = checkImages(fsn, numNamenodeDirs);
       assertFalse("Modified namespace should change fsimage contents. " +
           "was: " + checkAfterRestart + " now: " + checkAfterModify,

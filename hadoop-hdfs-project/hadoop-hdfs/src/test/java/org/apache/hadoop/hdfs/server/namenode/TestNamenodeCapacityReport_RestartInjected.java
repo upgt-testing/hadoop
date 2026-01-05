@@ -237,7 +237,7 @@ public class TestNamenodeCapacityReport_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       final DatanodeManager dnm = namesystem.getBlockManager().getDatanodeManager();
       List<DataNode> datanodes = cluster.getDataNodes();
       final DistributedFileSystem fs = cluster.getFileSystem();
@@ -257,6 +257,7 @@ public class TestNamenodeCapacityReport_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // Shutdown half the nodes followed by admin operations on those nodes.
       // Ensure counts are accurate.
@@ -285,6 +286,7 @@ public class TestNamenodeCapacityReport_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
       datanodes = cluster.getDataNodes();
       expectedInServiceNodes = nodes;
       assertEquals(nodes, datanodes.size());
@@ -309,6 +311,7 @@ public class TestNamenodeCapacityReport_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
       // force nodes to send load update
       triggerHeartbeats(datanodes);
       checkClusterHealth(nodes, namesystem, expectedTotalLoad,
@@ -333,6 +336,7 @@ public class TestNamenodeCapacityReport_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       // check expected load while closing each stream.  recalc expected
       // load based on whether the nodes in the pipeline are decomm

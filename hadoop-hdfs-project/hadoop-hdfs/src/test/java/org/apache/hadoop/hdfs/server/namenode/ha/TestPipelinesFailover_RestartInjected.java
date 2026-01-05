@@ -604,6 +604,7 @@ public class TestPipelinesFailover_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNameNode(0);
 
       // Let the commitBlockSynchronization call go through, and check that
       // it failed with the correct exception.
@@ -627,6 +628,7 @@ public class TestPipelinesFailover_RestartInjected {
           .withIndex(1)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn0 = cluster.getNameNode(0);
 
       AppendTestUtil.check(fs, TEST_PATH, BLOCK_SIZE/2);
     } finally {

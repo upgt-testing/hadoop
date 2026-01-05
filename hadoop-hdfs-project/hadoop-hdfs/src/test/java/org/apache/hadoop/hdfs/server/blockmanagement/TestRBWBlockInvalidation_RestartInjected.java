@@ -87,7 +87,7 @@ public class TestRBWBlockInvalidation_RestartInjected {
         .build();
     FSDataOutputStream out = null;
     try {
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       FileSystem fs = cluster.getFileSystem();
       Path testPath = new Path("/tmp/TestRBWBlockInvalidation", "foo1");
       out = fs.create(testPath, (short) 2);
@@ -146,6 +146,7 @@ public class TestRBWBlockInvalidation_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
 
       while (true) {
         if ((liveReplicas =

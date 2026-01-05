@@ -206,6 +206,7 @@ public class TestEditLogsDuringFailover_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem(0);
 
       assertEditFiles(Collections.singletonList(sharedUri),
           NNStorage.getInProgressEditsFileName(1));
@@ -231,6 +232,7 @@ public class TestEditLogsDuringFailover_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem(0);
 
       // In the transition to active, it should have read the log -- and
       // hence see one of the dirs we made in the fake log.

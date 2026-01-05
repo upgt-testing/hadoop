@@ -123,7 +123,7 @@ public class TestFSEditLogLoader_RestartInjected {
         .enableManagedDfsDirsRedundancy(false).build();
     cluster.waitActive();
     fileSys = cluster.getFileSystem();
-    final FSNamesystem namesystem = cluster.getNamesystem();
+    FSNamesystem namesystem = cluster.getNamesystem();
 
     FSImage fsimage = namesystem.getFSImage();
     for (int i = 0; i < 20; i++) {
@@ -136,6 +136,8 @@ public class TestFSEditLogLoader_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    namesystem = cluster.getNamesystem();
+    fsimage = cluster.getNameNode().getFSImage();
 
     StorageDirectory sd = fsimage.getStorage().dirIterator(NameNodeDirType.EDITS).next();
     cluster.shutdown();

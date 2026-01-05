@@ -651,6 +651,8 @@ public class TestBlockReplacement_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn0 = cluster.getDataNodes().get(0);
+      dn1 = cluster.getDataNodes().get(1);
 
       cluster.transitionToStandby(0);
       cluster.transitionToActive(1);

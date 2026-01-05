@@ -591,18 +591,21 @@ public class TestFsVolumeList_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dataNodes = cluster.getDataNodes();
     RestartFramework.at("after_slow_disk_config")
         .on(cluster)
         .restart("datanode")
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dataNodes = cluster.getDataNodes();
     RestartFramework.at("after_slow_disk_config")
         .on(cluster)
         .restart("datanode")
         .withIndex(2)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dataNodes = cluster.getDataNodes();
     // Wait until the data on the slow disk is collected successfully.
     GenericTestUtils.waitFor(new Supplier<Boolean>() {
       @Override public Boolean get() {

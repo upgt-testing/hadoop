@@ -214,6 +214,7 @@ public class TestAddOverReplicatedStripedBlocks_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    dataNodeList = cluster.getDataNodes();
 
     // update blocksMap
     cluster.triggerBlockReports();
@@ -286,6 +287,7 @@ public class TestAddOverReplicatedStripedBlocks_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    bm = cluster.getNamesystem().getBlockManager();
 
     // let a internal block be over replicated with 2 redundant block.
     blk.setBlockId(groupId + 2);

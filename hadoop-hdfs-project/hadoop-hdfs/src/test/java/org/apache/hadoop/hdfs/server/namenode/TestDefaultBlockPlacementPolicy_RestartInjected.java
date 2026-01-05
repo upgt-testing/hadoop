@@ -186,6 +186,8 @@ public class TestDefaultBlockPlacementPolicy_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
+    namesystem = cluster.getNamesystem();
 
     LocatedBlock locatedBlock = nameNodeRpc.addBlock(src, clientMachine, null,
         null, fileStatus.getFileId(), null, null);

@@ -201,6 +201,7 @@ public class TestRetryCacheWithHA_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn0 = cluster.getNamesystem(0);
 
     // 2. Failover the current standby to active.
     cluster.getNameNode(0).getRpcServer().rollEditLog();
@@ -233,6 +234,8 @@ public class TestRetryCacheWithHA_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    fsn0 = cluster.getNamesystem(0);
+    fsn1 = cluster.getNamesystem(1);
   }
   
   private DFSClient genClientWithDummyHandler() throws IOException {

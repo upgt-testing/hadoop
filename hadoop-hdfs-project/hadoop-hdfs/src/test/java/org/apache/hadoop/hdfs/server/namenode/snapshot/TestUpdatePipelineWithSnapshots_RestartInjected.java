@@ -72,6 +72,7 @@ public class TestUpdatePipelineWithSnapshots_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        namenode = cluster.getNameNodeRpc();
 
         // Grab the block info of this file for later use.
         FSDataInputStream in = null;
@@ -109,6 +110,7 @@ public class TestUpdatePipelineWithSnapshots_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        namenode = cluster.getNameNodeRpc();
 
         // Simulate a pipeline recovery, wherein a new block is allocated
         // for the existing block, resulting in an OP_UPDATE_BLOCKS being
@@ -127,6 +129,7 @@ public class TestUpdatePipelineWithSnapshots_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        namenode = cluster.getNameNodeRpc();
 
         // Make sure the NN can restart with the edit logs as we have them now.
         cluster.restartNameNode(true);

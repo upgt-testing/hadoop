@@ -120,8 +120,10 @@ public class TestSequentialBlockId_RestartInjected {
           fs, path1, IO_SIZE, BLOCK_SIZE * blockCount,
           BLOCK_SIZE, REPLICATION, SEED);
       RestartFramework.at("after_first_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      fsn = cluster.getNamesystem();
       List<LocatedBlock> blocks1 = DFSTestUtil.getAllBlocks(fs, path1);
       RestartFramework.at("after_first_file_blocks_retrieved").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      fsn = cluster.getNamesystem();
 
 
       // Rewind the block ID counter in the name system object. This will result
@@ -130,6 +132,7 @@ public class TestSequentialBlockId_RestartInjected {
           .getBlockIdManager().getBlockIdGenerator();
       blockIdGenerator.setCurrentValue(blockIdGenerator.getCurrentValue() - 5);
       RestartFramework.at("after_counter_rewind").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      fsn = cluster.getNamesystem();
 
       // Trigger collisions by creating a new file.
       Path path2 = new Path("testBlockIdCollisionDetection_file2.dat");
@@ -137,8 +140,10 @@ public class TestSequentialBlockId_RestartInjected {
           fs, path2, IO_SIZE, BLOCK_SIZE * blockCount,
           BLOCK_SIZE, REPLICATION, SEED);
       RestartFramework.at("after_second_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      fsn = cluster.getNamesystem();
       List<LocatedBlock> blocks2 = DFSTestUtil.getAllBlocks(fs, path2);
       RestartFramework.at("after_second_file_blocks_retrieved").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      fsn = cluster.getNamesystem();
       assertThat(blocks2.size(), is(blockCount));
 
       // Make sure that file2 block IDs start immediately after file1

@@ -120,6 +120,8 @@ public class TestSlowDiskTracker_RestartInjected {
       dn2.getDiskMetrics().addSlowDiskForTesting("disk2", ImmutableMap.of(
           DiskOp.WRITE, 1.3));
       RestartFramework.at("after_slow_disk_metrics_added").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      dn1 = cluster.getDataNodes().get(0);
+      dn2 = cluster.getDataNodes().get(1);
 
       String dn1ID = dn1.getDatanodeId().getIpcAddr(false);
       String dn2ID = dn2.getDatanodeId().getIpcAddr(false);
@@ -428,6 +430,7 @@ public class TestSlowDiskTracker_RestartInjected {
           generateSlowDiskReport("disk2",
               Collections.singletonMap(DiskOp.WRITE, 1.1)));
       RestartFramework.at("after_slow_disk_reports_added").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      nn = cluster.getNameNode(0);
 
       // wait for slow disk report
       GenericTestUtils.waitFor(() -> !slowDiskTracker.getSlowDisksReport()
@@ -436,6 +439,7 @@ public class TestSlowDiskTracker_RestartInjected {
           getSlowDisksReportForTesting(slowDiskTracker);
       assertEquals(2, slowDisksReport.size());
       RestartFramework.at("after_reports_validated").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+      nn = cluster.getNameNode(0);
 
       // wait for invalid report to be removed
       Thread.sleep(OUTLIERS_REPORT_INTERVAL * 3);

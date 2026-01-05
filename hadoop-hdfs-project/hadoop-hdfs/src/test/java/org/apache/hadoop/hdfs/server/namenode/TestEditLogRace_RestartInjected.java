@@ -334,7 +334,7 @@ public class TestEditLogRace_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
       fileSys = cluster.getFileSystem();
-      final FSNamesystem namesystem = cluster.getNamesystem();
+      FSNamesystem namesystem = cluster.getNamesystem();
       FSImage fsimage = namesystem.getFSImage();
       FSEditLog editLog = fsimage.getEditLog();
       startTransactionWorkers(cluster, caughtErr);
@@ -344,6 +344,9 @@ public class TestEditLogRace_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namesystem = cluster.getNamesystem();
+      fsimage = cluster.getNameNode().getFSImage();
+      editLog = cluster.getNamesystem().getEditLog();
       for (int i = 0; i < NUM_SAVE_IMAGE && caughtErr.get() == null; i++) {
         try {
           Thread.sleep(20);
@@ -372,6 +375,9 @@ public class TestEditLogRace_RestartInjected {
               .withIndex(0)
               .withMode(RestartMode.GRACEFUL)
               .execute();
+          namesystem = cluster.getNamesystem();
+          fsimage = cluster.getNameNode().getFSImage();
+          editLog = cluster.getNamesystem().getEditLog();
         }
       }
     } finally {

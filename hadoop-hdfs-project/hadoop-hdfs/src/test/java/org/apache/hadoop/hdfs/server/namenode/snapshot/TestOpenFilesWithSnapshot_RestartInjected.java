@@ -351,6 +351,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
 
     fs.createSnapshot(path, "s2");
 
@@ -360,6 +361,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
 
     fs.rename(new Path("/test/test"), new Path("/test/test-renamed"));
 
@@ -369,6 +371,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
 
     fs.delete(new Path("/test/test-renamed"), true);
 
@@ -378,6 +381,7 @@ public class TestOpenFilesWithSnapshot_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nameNodeRpc = cluster.getNameNodeRpc();
 
     restartNameNode();
   }

@@ -104,6 +104,7 @@ public class TestBootstrapAliasmap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
 
     // create config for new aliasmap server at the new location.
     Configuration newConfig = new Configuration();
@@ -123,6 +124,7 @@ public class TestBootstrapAliasmap_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn = cluster.getNameNode();
 
     // the server should have only 2 blocks.
     assertEquals(2, newServer.list(Optional.empty()).getFileRegions().size());

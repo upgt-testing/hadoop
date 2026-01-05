@@ -120,7 +120,7 @@ public class TestTransferRbw_RestartInjected {
       final DatanodeInfo newnodeinfo;
       final String bpid = cluster.getNamesystem().getBlockPoolId();
       {
-        final DataNode oldnode = cluster.getDataNodes().get(0);
+        DataNode oldnode = cluster.getDataNodes().get(0);
         // DataXceiverServer#writeThrottler is null if
         // dfs.datanode.data.write.bandwidthPerSec default value is 0.
         Assert.assertNull(oldnode.xserver.getWriteThrottler());
@@ -133,6 +133,7 @@ public class TestTransferRbw_RestartInjected {
             .withIndex(0)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        oldnode = cluster.getDataNodes().get(0);
 
         //add a datanode
         conf.setLong(DFS_DATANODE_DATA_WRITE_BANDWIDTHPERSEC_KEY,
@@ -178,6 +179,7 @@ public class TestTransferRbw_RestartInjected {
             .withIndex(1)
             .withMode(RestartMode.GRACEFUL)
             .execute();
+        oldnode = cluster.getDataNodes().get(0);
       }
 
       //check new rbw

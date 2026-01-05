@@ -145,6 +145,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
     FsDatasetSpi<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     RestartFramework.at("after_block_retrieval")
@@ -153,6 +154,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
     assertEquals("ret: 1, You must specify a meta file with -meta", runCmd(
@@ -177,6 +179,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
   }
 
   @Test
@@ -198,6 +201,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
     FsDatasetSpi<?> fsd = datanode.getFSDataset();
     ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, new Path("/bar"));
     RestartFramework.at("after_block_retrieval")
@@ -206,6 +210,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
     File blockFile = getBlockFile(fsd,
         block.getBlockPoolId(), block.getLocalBlock());
 
@@ -240,6 +245,7 @@ public class TestDebugAdmin_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    datanode = cluster.getDataNodes().get(0);
 
     assertTrue(outFile.exists());
     assertTrue(outFile.length() > 0);

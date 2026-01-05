@@ -104,7 +104,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .execute();
 
       // fetch bad file list from namenode. There should be none.
-      final NameNode namenode = cluster.getNameNode();
+      NameNode namenode = cluster.getNameNode();
       Collection<FSNamesystem.CorruptFileBlockInfo> badFiles = namenode.
         getNamesystem().listCorruptFileBlocks("/", null);
       assertEquals("Namenode has " + badFiles.size()
@@ -151,6 +151,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
 
       // fetch bad file list from namenode. There should be one file.
       badFiles = namenode.getNamesystem().listCorruptFileBlocks("/", null);
@@ -351,7 +352,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final NameNode namenode = cluster.getNameNode();
+      NameNode namenode = cluster.getNameNode();
       Collection<FSNamesystem.CorruptFileBlockInfo> corruptFileBlocks = 
         namenode.getNamesystem().listCorruptFileBlocks("/corruptData", null);
       int numCorrupt = corruptFileBlocks.size();
@@ -405,6 +406,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
       // Validate we get all the corrupt files
       LOG.info("Namenode has bad files. " + numCorrupt);
       assertEquals(3, numCorrupt);
@@ -590,7 +592,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .execute();
 
       // verify that there are no bad blocks.
-      final NameNode namenode = cluster.getNameNode();
+      NameNode namenode = cluster.getNameNode();
       Collection<FSNamesystem.CorruptFileBlockInfo> badFiles = namenode.
         getNamesystem().listCorruptFileBlocks("/srcdat2", null);
       assertEquals(
@@ -651,6 +653,7 @@ public class TestListCorruptFileBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
       LOG.info("Namenode has bad files. " + badFiles.size());
       assertEquals("Namenode has " + badFiles.size() + " bad files. " +
           "Expecting " + maxCorruptFileBlocks + ".", maxCorruptFileBlocks,

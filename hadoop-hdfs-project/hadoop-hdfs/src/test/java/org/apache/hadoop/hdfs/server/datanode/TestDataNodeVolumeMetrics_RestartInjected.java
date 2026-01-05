@@ -143,6 +143,7 @@ public class TestDataNodeVolumeMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dns = cluster.getDataNodes();
 
       DataNodeTestUtils.restoreDataDirFromFailure(dn1Vol2);
       DataNodeTestUtils.reconfigureDataNode(dns.get(0), dn1Vol2);
@@ -294,6 +295,7 @@ public class TestDataNodeVolumeMetrics_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      datanodes = cluster.getDataNodes();
 
       assertEquals(0, metrics.getSyncIoSampleCount());
       assertTrue(metrics.getWriteIoSampleCount() > lastWriteIoSampleCount);

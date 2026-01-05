@@ -50,7 +50,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
     try {
       // create a file with one block with a replication factor of 2
       final FileSystem fs = cluster.getFileSystem();
-      final BlockManager bm = cluster.getNamesystem().getBlockManager();
+      BlockManager bm = cluster.getNamesystem().getBlockManager();
       DFSTestUtil.createFile(fs, FILE_PATH, 1L, REPLICATION_FACTOR, 1L);
       DFSTestUtil.waitReplication(fs, FILE_PATH, REPLICATION_FACTOR);
       BlockManagerTestUtil.updateState(bm);
@@ -97,6 +97,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       // increment this file's replication factor
       FsShell shell = new FsShell(conf);
@@ -112,6 +113,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
     } finally {
       cluster.shutdown();
     }
@@ -180,7 +182,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final BlockManager bm = cluster.getNamesystem().getBlockManager();
+      BlockManager bm = cluster.getNamesystem().getBlockManager();
       ExtendedBlock b = DFSTestUtil.getFirstBlock(fs, FILE_PATH);
       Iterator<DatanodeStorageInfo> storageInfos =
           bm.blocksMap.getStorages(b.getLocalBlock()).iterator();
@@ -201,6 +203,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       bm.computeDatanodeWork();
       assertTrue("The number of replication work pending before targets are " +
@@ -214,6 +217,7 @@ public class TestUnderReplicatedBlocks_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      bm = cluster.getNamesystem().getBlockManager();
 
       BlockManagerTestUtil.updateState(bm);
       assertTrue("The number of blocks to be replicated should be less than "

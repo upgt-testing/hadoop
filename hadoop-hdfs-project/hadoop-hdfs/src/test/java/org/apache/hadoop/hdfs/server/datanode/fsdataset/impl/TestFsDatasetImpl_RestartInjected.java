@@ -653,6 +653,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       ds.invalidate(BLOCKPOOL, blockList.toArray(new Block[0]));
 
@@ -662,6 +663,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dn = cluster.getDataNodes().get(0);
 
       try {
         Thread.sleep(1000);
@@ -945,6 +947,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       out.write(1);
       out.hflush();
@@ -955,6 +958,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
       final FsVolumeImpl volume = (FsVolumeImpl) dataNode.getFSDataset().
@@ -1036,6 +1040,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       block = DFSTestUtil.getFirstBlock(fs, filePath);
 
@@ -1045,6 +1050,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       // Test for the overloaded method reportBadBlocks
       dataNode.reportBadBlocks(block, dataNode.getFSDataset()
@@ -1088,6 +1094,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
 
@@ -1105,6 +1112,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       // Call finalizeNewReplica
       LOG.info("GenerationStamp of old replica: {}",
@@ -1154,6 +1162,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
 
@@ -1166,6 +1175,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block);
 
@@ -1253,6 +1263,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       assertEquals(blockData, DFSTestUtil.readFile(fs, filePath));
 
@@ -1276,6 +1287,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       assertEquals(blockData.substring(0, 512), new String(buf,
           StandardCharsets.US_ASCII).substring(0, 512));
@@ -1293,6 +1305,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       // Trigger block report to update block info in NN
       cluster.triggerBlockReports();
@@ -1481,6 +1494,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       ExtendedBlock block = DFSTestUtil.getFirstBlock(fs, filePath);
 
@@ -1494,6 +1508,7 @@ public class TestFsDatasetImpl_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      dataNode = cluster.getDataNodes().get(0);
 
       fsDataSetImpl.finalizeNewReplica(newReplicaInfo, block);
 

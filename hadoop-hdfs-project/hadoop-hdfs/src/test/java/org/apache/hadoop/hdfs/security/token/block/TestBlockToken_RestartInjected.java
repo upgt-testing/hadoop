@@ -992,9 +992,9 @@ public class TestBlockToken_RestartInjected {
           .withMode(RestartMode.GRACEFUL)
           .execute();
 
-      final NameNode nn = cluster.getNameNode();
-      final BlockManager bm = nn.getNamesystem().getBlockManager();
-      final BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
+      NameNode nn = cluster.getNameNode();
+      BlockManager bm = nn.getNamesystem().getBlockManager();
+      BlockTokenSecretManager sm = bm.getBlockTokenSecretManager();
 
       // set a short token lifetime (1 second)
       SecurityTestUtil.setBlockTokenLifetime(sm, 1000L);
@@ -1056,6 +1056,9 @@ public class TestBlockToken_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      bm = cluster.getNamesystem().getBlockManager();
+      sm = cluster.getNamesystem().getBlockManager().getBlockTokenSecretManager();
 
       byte[] readData = new byte[data.length];
       long startTime = System.currentTimeMillis();

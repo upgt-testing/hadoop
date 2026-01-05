@@ -748,6 +748,7 @@ public class TestSafeMode_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      namenode = cluster.getNameNode();
       assertFalse("Should not be in safemode", namenode.isInSafeMode());
       checkGetBlockLocationsWorks(fs, file1);
 

@@ -165,6 +165,7 @@ public class TestFSImage_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       RestartFramework.at("before_namenode_restart")
           .on(cluster)
@@ -941,6 +942,7 @@ public class TestFSImage_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsn = cluster.getNamesystem();
 
       RestartFramework.at("before_namenode_restart")
           .on(cluster)

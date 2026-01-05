@@ -1494,6 +1494,8 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNode();
+      nnRpc = cluster.getNameNode().getRpcServer();
       CheckpointSignature sig = nnRpc.rollEditLog();
       // manipulate the CheckpointSignature fields
       sig.setBlockpoolID("somerandomebpid");
@@ -1971,6 +1973,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsns = cluster.getNamesystem();
       fsns.leaveSafeMode(false);
       
       secondary = startSecondaryNameNode(conf);
@@ -1996,6 +1999,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      fsns = cluster.getNamesystem();
     } finally {
       if (secondary != null) {
         secondary.shutdown();
@@ -2578,6 +2582,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
       GenericTestUtils.assertExists(
           new File(sd1.getCurrentDir(), NNStorage.getImageFileName(2)));
@@ -2595,6 +2600,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
       assertNNHasCheckpoints(cluster, ImmutableList.of(8));
       assertParallelFilesInvariant(cluster, ImmutableList.of(secondary));
@@ -2692,6 +2698,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
       assertNNHasCheckpoints(cluster, ImmutableList.of(8));
       assertParallelFilesInvariant(cluster, ImmutableList.of(secondary));
@@ -2820,6 +2827,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
       nn.setSafeMode(SafeModeAction.SAFEMODE_LEAVE, false);
 
       // Now the secondary tries to checkpoint again with its
@@ -2831,6 +2839,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      nn = cluster.getNameNodeRpc();
 
     } finally {
       cleanup(secondary);
@@ -3200,6 +3209,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
 
       FileSystem fs = cluster.getFileSystem();
       assertEquals(0, active.getNamesystem().getFSImage()
@@ -3215,6 +3225,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
 
       // Checkpoint 1st
       secondary.doCheckpoint();
@@ -3224,6 +3235,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
       // at this point, the txid delta is smaller than threshold 10.
       // active does not accept this image.
       assertEquals(0, active.getNamesystem().getFSImage()
@@ -3239,6 +3251,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
 
       // Checkpoint 2nd
       secondary.doCheckpoint();
@@ -3248,6 +3261,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
       // here the delta is large enough and active accepts this image.
       assertEquals(21, active.getNamesystem().getFSImage()
           .getMostRecentCheckpointTxId());
@@ -3298,6 +3312,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
 
       FileSystem fs = cluster.getFileSystem();
       assertEquals(0, active.getNamesystem().getFSImage()
@@ -3313,6 +3328,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
 
       // Checkpoint 1st
       secondary.doCheckpoint();
@@ -3322,6 +3338,7 @@ public class TestCheckpoint_RestartInjected {
           .withIndex(0)
           .withMode(RestartMode.GRACEFUL)
           .execute();
+      active = cluster.getNameNode();
       // at this point, despite this is a small delta change, w.r.t both
       // txid and time delta, due to we set relaxation to 0, this image
       // still gets accepted

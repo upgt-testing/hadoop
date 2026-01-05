@@ -132,6 +132,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertFalse(nnode1.isStandbyState());
     assertEquals(0, runTool("-transitionToStandby", "nn1"));
     RestartFramework.at("after_transition_nn1_standby")
@@ -140,6 +141,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
 
     NameNode nnode2 = cluster.getNameNode(1);
@@ -151,6 +153,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
+    nnode2 = cluster.getNameNode(1);
     assertFalse(nnode2.isStandbyState());
     assertEquals(0, runTool("-transitionToStandby", "nn2"));
     RestartFramework.at("after_transition_nn2_standby")
@@ -159,6 +163,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
+    nnode2 = cluster.getNameNode(1);
     assertTrue(nnode2.isStandbyState());
     assertEquals(0, runTool("-transitionToObserver", "nn2"));
     RestartFramework.at("after_transition_nn2_observer")
@@ -167,6 +173,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
+    nnode2 = cluster.getNameNode(1);
     assertFalse(nnode2.isStandbyState());
     assertTrue(nnode2.isObserverState());
   }
@@ -184,6 +192,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertFalse(nnode1.isStandbyState());
     assertTrue(nnode1.isObserverState());
 
@@ -195,6 +204,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isObserverState());
 
     // Should also be able to transition back from OBSERVER to STANDBY
@@ -205,6 +215,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
     assertFalse(nnode1.isObserverState());
   }
@@ -220,6 +231,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertFalse(nnode1.isStandbyState());
     assertTrue(nnode1.isActiveState());
 
@@ -231,6 +243,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isActiveState());
 
     // Should NOT be able to transition from OBSERVER to ACTIVE
@@ -241,6 +254,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isStandbyState());
     assertEquals(0, runTool("-transitionToObserver", "nn1"));
     RestartFramework.at("after_transition_to_observer")
@@ -249,6 +263,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertTrue(nnode1.isObserverState());
     assertEquals(-1, runTool("-transitionToActive", "nn1"));
     RestartFramework.at("after_failed_observer_to_active")
@@ -257,6 +272,7 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nnode1 = cluster.getNameNode(0);
     assertFalse(nnode1.isActiveState());
   }
   
@@ -479,6 +495,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
     // Triggering the transition for both namenode to Active
     runTool("-transitionToActive", "nn1");
     runTool("-transitionToActive", "nn2");
@@ -488,6 +506,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(0)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
 
     assertFalse("Both namenodes cannot be active", nn1.isActiveState()
         && nn2.isActiveState());
@@ -503,6 +523,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
     if(nn2.getState() != null && !nn2.getState().
         equals(HAServiceState.STANDBY.name()) ) {
       cluster.transitionToStandby(1);
@@ -516,6 +538,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
 
     runTool("-transitionToActive", "nn2", "--forceactive");
     RestartFramework.at("after_forceactive_nn2")
@@ -524,6 +548,8 @@ public class TestDFSHAAdminMiniCluster_RestartInjected {
         .withIndex(1)
         .withMode(RestartMode.GRACEFUL)
         .execute();
+    nn1 = cluster.getNameNode(0);
+    nn2 = cluster.getNameNode(1);
     assertTrue("Namenode nn2 should be active", nn2.isActiveState());
   }
   
