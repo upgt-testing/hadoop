@@ -548,7 +548,7 @@ java.io.EOFException: End of File Exception between local host is: "df03dece6374
 
 ---
 
-### [ ] Group 8
+### [TEST-BUG] Group 8
 
 **Test Executions:** 28
 
@@ -584,6 +584,66 @@ java.lang.IllegalStateException: Bad state: CLOSED
 
 3. **org.apache.hadoop.hdfs.server.namenode.TestBackupNode_RestartInjected.testBackupNodeTailsEdits**
    - Position: after_bn_stop, Target: namenode, Mode: GRACEFUL
+
+**Debug Analysis:**
+- **Root Cause:** Test stores `NameNode nn = cluster.getNameNode()` at line 253 before namenode restart. After restart at "after_edit_log_roll" position (lines 256-261), the old NameNode's FSEditLog is closed (state becomes `CLOSED`). The test uses stale `nn` reference at line 263: `nn.getFSImage().getEditLog().getCurSegmentTxId()`, which accesses the closed FSEditLog. `getCurSegmentTxId()` calls `Preconditions.checkState(isSegmentOpen())` at FSEditLog.java:578, which fails with `IllegalStateException: Bad state: CLOSED`.
+- **Classification:** TEST-BUG - Same pattern as Groups 4, 19, 26, 44, etc. The restart-injected tests need to re-fetch NameNode reference after namenode restart. The original tests weren't designed for restart scenarios.
+- **Fix:** After any namenode restart, re-fetch: `nn = cluster.getNameNode()`.
+- **Bug Report:** See [HDFS-BUG-GROUP-8.md](bugs/HDFS-BUG-GROUP-8.md)
+
+---
+
+### [BUG] Group 28
+
+**Test Executions:** 5
+
+**Generalized Stacktrace:**
+```
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException
+	at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
+```
+
+**Raw Stacktrace Sample:**
+```
+org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-866522546-172.17.0.2-1767512653092:blk_1073741825_1001; getBlockSize()=4; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[127.0.0.1:33257,DS-680f2e4b-ad2d-4870-ad77-cdf162777964,DISK]]; cachedLocs=[]} of /test
+	at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java:414)
+	at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java:323)
+	at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java:243)
+	at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java:213)
+	at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java:1084)
+	at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java:1047)
+	at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java:340)
+	at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java:336)
+	at org.apache.hadoop.fs.FileSystemLinkResolve
+```
+
+**Sample Test Executions:**
+
+1. **org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock**
+   - Position: after_file_creation_hsync, Target: datanode, Mode: GRACEFUL
+
+2. **org.apache.hadoop.hdfs.TestFileAppend_RestartInjected.testSimpleFlush**
+   - Position: after_second_flush, Target: datanode, Mode: GRACEFUL
+
+3. **org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsedByRBWReplica**
+   - Position: after_rbw_replica_created, Target: datanode, Mode: GRACEFUL
+
+**Debug Analysis:**
+- **Root Cause:** When a file is being written and `hsync()` is called, the block is in RBW (Replica Being Written) state. After datanode restart, RBW replicas are converted to RWR (Replica Waiting to be Recovered) state. The bug is that `ReplicaWaitingToBeRecovered.getVisibleLength()` unconditionally returns `-1`, even though the data IS on disk (as shown by `getBytesOnDisk()` returning the actual byte count). This violates the `hflush()`/`hsync()` contract which guarantees that "new readers will see all data written to that point".
+- **Evidence:** Debug logging confirmed: `replica state=RWR, replica class=ReplicaWaitingToBeRecovered` and `getReplicaVisibleLength returned -1`. Meanwhile, `getBytesOnDisk()` returns the actual data size.
+- **Classification:** BUG - This violates the HDFS durability contract:
+  1. **Before restart:** `ReplicaBeingWritten.getVisibleLength()` returns `bytesAcked` - data is visible to readers
+  2. **After restart:** `ReplicaWaitingToBeRecovered.getVisibleLength()` returns `-1` - data becomes INVISIBLE
+  3. This is a **visibility regression** - data that was successfully `hsync()`'d becomes unreadable after datanode restart
+  4. The `hsync()` contract states data should be durable and visible to new readers, but this contract is broken
+- **Buggy Code Location:** `ReplicaWaitingToBeRecovered.java:75-77`
+  ```java
+  public long getVisibleLength() {
+    return -1;  //no bytes are visible  <-- BUG: should return getBytesOnDisk()
+  }
+  ```
+- **Potential Fix:** `ReplicaWaitingToBeRecovered.getVisibleLength()` should return `getBytesOnDisk()` (or at least the bytes that were successfully synced) instead of unconditionally returning `-1`. The data was durably written and should remain visible after restart.
+- **Bug Report:** See [HDFS-BUG-GROUP-28.md](bugs/HDFS-BUG-GROUP-28.md)
 
 ---
 
@@ -1048,43 +1108,6 @@ org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.ipc.ObserverRetryOnActiv
 
 3. **org.apache.hadoop.hdfs.server.namenode.ha.TestMultiObserverNode_RestartInjected.testMultiObserver**
    - Position: after_both_observers_restored, Target: namenode, Mode: GRACEFUL
-
----
-
-### [ ] Group 28
-
-**Test Executions:** 5
-
-**Generalized Stacktrace:**
-```
-org.apache.hadoop.hdfs.CannotObtainBlockLengthException
-	at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java)
-```
-
-**Raw Stacktrace Sample:**
-```
-org.apache.hadoop.hdfs.CannotObtainBlockLengthException: Cannot obtain block length for LocatedBlock{BP-866522546-172.17.0.2-1767512653092:blk_1073741825_1001; getBlockSize()=4; corrupt=false; offset=0; locs=[DatanodeInfoWithStorage[127.0.0.1:33257,DS-680f2e4b-ad2d-4870-ad77-cdf162777964,DISK]]; cachedLocs=[]} of /test
-	at org.apache.hadoop.hdfs.DFSInputStream.readBlockLength(DFSInputStream.java:414)
-	at org.apache.hadoop.hdfs.DFSInputStream.getLastBlockLength(DFSInputStream.java:323)
-	at org.apache.hadoop.hdfs.DFSInputStream.openInfo(DFSInputStream.java:243)
-	at org.apache.hadoop.hdfs.DFSInputStream.<init>(DFSInputStream.java:213)
-	at org.apache.hadoop.hdfs.DFSClient.openInternal(DFSClient.java:1084)
-	at org.apache.hadoop.hdfs.DFSClient.open(DFSClient.java:1047)
-	at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java:340)
-	at org.apache.hadoop.hdfs.DistributedFileSystem$4.doCall(DistributedFileSystem.java:336)
-	at org.apache.hadoop.fs.FileSystemLinkResolve
-```
-
-**Sample Test Executions:**
-
-1. **org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock**
-   - Position: after_file_creation_hsync, Target: datanode, Mode: GRACEFUL
-
-2. **org.apache.hadoop.hdfs.TestFileAppend_RestartInjected.testSimpleFlush**
-   - Position: after_second_flush, Target: datanode, Mode: GRACEFUL
-
-3. **org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestReplicaCachingGetSpaceUsed_RestartInjected.testReplicaCachingGetSpaceUsedByRBWReplica**
-   - Position: after_rbw_replica_created, Target: datanode, Mode: GRACEFUL
 
 ---
 
