@@ -61,6 +61,13 @@ public class TestUnmanagedAMLauncher_RestartInjected {
   public static void setup() throws InterruptedException, IOException {
     LOG.info("Starting up YARN cluster");
     conf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:19032");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:19030");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:19031");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:19033");
     if (yarnCluster == null) {
       yarnCluster = new MiniYARNCluster(
           TestUnmanagedAMLauncher_RestartInjected.class.getSimpleName(), 1, 1, 1);

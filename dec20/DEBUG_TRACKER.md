@@ -7,9 +7,11 @@
 
 ## HIGHEST PRIORITY - Likely Actual Bugs
 
-### [ ] Group 6 - NullPointerException in Test Code
+### [FP] Group 6 - NullPointerException in Test Code
 **Priority:** HIGHEST - NPE thrown directly from test code (not from restarttest adapter)
 **Execution Count:** 1
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-6.md)
+**Root Cause:** Test's createAMRMProtocol() creates a new token during key rolling window, causing keyIds to match and preventing token renewal. This is non-production behavior - in production, AMs use tokens from initializePipeline(), not test-created tokens.
 
 **Generalized Stacktrace:**
 ```
@@ -61,9 +63,11 @@ java.lang.NullPointerException
 
 ---
 
-### [ ] Group 2 - InvalidToken Exception in Production Code
+### [FP] Group 2 - InvalidToken Exception in Production Code
 **Priority:** HIGH - InvalidToken exception thrown from production code (org.apache.hadoop.ipc.Client)
 **Execution Count:** 6
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-2.md)
+**Root Cause:** Test lacks RM recovery configuration. Without recovery enabled, RM loses all in-memory state (including appAttemptSet in AMRMTokenSecretManager) on restart, causing token validation to fail. This is expected behavior - recovery must be enabled for RM restart to preserve state.
 
 **Generalized Stacktrace:**
 ```
@@ -129,9 +133,11 @@ Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.toke
 
 ---
 
-### [ ] Group 5 - ApplicationNotFoundException in Production Code
+### [FP] Group 5 - ApplicationNotFoundException in Production Code
 **Priority:** MEDIUM-HIGH - Exception thrown from production code (ClientRMService)
 **Execution Count:** 2
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-5.md)
+**Root Cause:** Test lacks RM recovery configuration. Without recovery enabled, RM loses all in-memory state (including registered applications) on restart, causing getApplicationReport() to fail. This is the same root cause as Group 2.
 
 **Generalized Stacktrace:**
 ```
@@ -188,9 +194,11 @@ Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.yarn.exceptio
 
 ## LOWER PRIORITY - Likely False Positives
 
-### [ ] Group 3 - TimeoutException
+### [FP] Group 3 - TimeoutException
 **Priority:** LOW - Timeout exception (per guidelines)
 **Execution Count:** 2
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-3.md)
+**Root Cause:** Test lacks RM recovery configuration. Without recovery enabled, RM loses all in-memory state on restart, including application lifetime tracking in RMAppLifetimeMonitor. The app is never killed based on lifetime expiration because the lifetime is not re-registered after restart. This is the same root cause as Groups 2 and 5.
 
 **Generalized Stacktrace:**
 ```
@@ -233,9 +241,11 @@ java.lang.Thread.State: TIMED_WAITING
 
 ---
 
-### [ ] Group 1 - RestartTest Adapter Exception (NodeManagers Failed to Connect)
+### [FP] Group 1 - RestartTest Adapter Exception (NodeManagers Failed to Connect)
 **Priority:** VERY LOW - Exception directly thrown from restarttest adapter module
 **Execution Count:** 22
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-1.md)
+**Root Cause:** Tests lack `YARN_MINICLUSTER_FIXED_PORTS = true` configuration. Without fixed ports, when RM restarts, it gets new ephemeral ports and NodeManagers cannot reconnect since they are configured with old addresses. This is a test configuration issue, not a production code bug.
 
 **Generalized Stacktrace:**
 ```
@@ -280,9 +290,11 @@ Caused by: java.lang.Exception: NodeManagers failed to connect after restart
 
 ---
 
-### [ ] Group 4 - RestartTest Adapter Exception (HA State Restore Failed)
+### [FP] Group 4 - RestartTest Adapter Exception (HA State Restore Failed)
 **Priority:** VERY LOW - Exception directly thrown from restarttest adapter module
 **Execution Count:** 2
+**Status:** ANALYZED - FALSE POSITIVE (see FPs/FP-GROUP-4.md)
+**Root Cause:** Restart adapter limitation - attempts manual HA state transition when automatic failover is enabled. YARN correctly rejects manual `transitionToActive()` calls when automatic failover is enabled (via ZooKeeper). The restart adapter should not attempt to manually restore HA state in auto-failover clusters; instead, ZKFC should handle leader election after restart.
 
 **Generalized Stacktrace:**
 ```
@@ -332,11 +344,16 @@ Caused by: org.apache.hadoop.security.AccessControlException: Manual failover fo
 ## Summary
 
 **Total Groups Analyzed:** 6
+**All Groups Classified as:** FALSE POSITIVE
 
 **Priority Distribution:**
-- **HIGHEST Priority (NPE in non-restarttest code):** 1 group
-- **HIGH Priority (Exceptions in production code):** 2 groups
-- **LOW Priority (Timeouts):** 1 group
-- **VERY LOW Priority (RestartTest adapter failures):** 2 groups
+- **HIGHEST Priority (NPE in non-restarttest code):** 1 group (FP - Group 6)
+- **HIGH Priority (Exceptions in production code):** 2 groups (FP - Groups 2, 5)
+- **LOW Priority (Timeouts):** 1 group (FP - Group 3)
+- **VERY LOW Priority (RestartTest adapter failures):** 2 groups (FP - Groups 1, 4)
 
-**Recommendation:** Start debugging with Group 6, then Group 2, then Group 5. These are the most likely to represent actual bugs in the YARN codebase that are exposed by restart testing.
+**Final Analysis:** All 6 groups have been analyzed and classified as FALSE POSITIVES:
+- **Groups 2, 3, 5:** Missing RM recovery configuration - RM loses in-memory state on restart
+- **Group 6:** Test-specific token creation behavior during key rolling window
+- **Group 1:** Missing YARN_MINICLUSTER_FIXED_PORTS configuration - NMs cannot reconnect
+- **Group 4:** Restart adapter limitation - manual HA state transition rejected when auto-failover enabled

@@ -136,6 +136,13 @@ public class TestOpportunisticContainerAllocationE2E_RestartInjected {
     conf.setInt(
         YarnConfiguration.NM_OPPORTUNISTIC_CONTAINERS_MAX_QUEUE_LENGTH, 10);
     conf.setLong(YarnConfiguration.NM_LOG_RETAIN_SECONDS, 1);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:19132");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:19130");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:19131");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:19133");
     yarnCluster =
         new MiniYARNCluster(TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);

@@ -3,6 +3,7 @@ package org.restarttest.adapter.yarn;
 import org.apache.hadoop.ha.HAServiceProtocol;
 import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.service.Service;
+import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.server.MiniYARNCluster;
 import org.apache.hadoop.yarn.server.nodemanager.NodeManager;
 import org.apache.hadoop.yarn.server.nodemanager.Context;
@@ -259,33 +260,45 @@ public class YarnClusterAdapter implements ClusterAdapter<MiniYARNCluster> {
 
         // STEP 4: Restore HA state if it was ACTIVE before restart
         if (previousHAState == HAServiceState.ACTIVE) {
-            LOG.info("Restoring RM {} to ACTIVE state after restart", index);
             ResourceManager rmAfterRestart = cluster.getResourceManager(index);
             if (rmAfterRestart != null && rmAfterRestart.getRMContext() != null) {
-                try {
-                    // Transition back to ACTIVE
-                    rmAfterRestart.getRMContext().getRMAdminService()
-                        .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
-                            HAServiceProtocol.RequestSource.REQUEST_BY_USER));
+                // Check if automatic failover is enabled
+                boolean autoFailoverEnabled = rmAfterRestart.getConfig()
+                    .getBoolean(YarnConfiguration.AUTO_FAILOVER_ENABLED,
+                        YarnConfiguration.DEFAULT_AUTO_FAILOVER_ENABLED);
 
-                    // Wait a bit for transition to complete and services to stabilize
-                    Thread.sleep(2000);
+                if (autoFailoverEnabled) {
+                    LOG.info("Auto-failover is enabled for RM {}. " +
+                        "Skipping manual HA state restoration - ZKFC will handle leader election.", index);
+                    // Wait for ZKFC to elect a leader
+                    Thread.sleep(5000);
+                } else {
+                    LOG.info("Restoring RM {} to ACTIVE state after restart", index);
+                    try {
+                        // Transition back to ACTIVE
+                        rmAfterRestart.getRMContext().getRMAdminService()
+                            .transitionToActive(new HAServiceProtocol.StateChangeRequestInfo(
+                                HAServiceProtocol.RequestSource.REQUEST_BY_USER));
 
-                    // Verify the transition succeeded
-                    HAServiceState currentState = rmAfterRestart.getRMContext()
-                        .getRMAdminService()
-                        .getServiceStatus()
-                        .getState();
+                        // Wait a bit for transition to complete and services to stabilize
+                        Thread.sleep(2000);
 
-                    if (currentState == HAServiceState.ACTIVE) {
-                        LOG.info("Successfully restored RM {} to ACTIVE state", index);
-                    } else {
-                        LOG.warn("RM {} is in {} state after transition attempt, expected ACTIVE",
-                                index, currentState);
+                        // Verify the transition succeeded
+                        HAServiceState currentState = rmAfterRestart.getRMContext()
+                            .getRMAdminService()
+                            .getServiceStatus()
+                            .getState();
+
+                        if (currentState == HAServiceState.ACTIVE) {
+                            LOG.info("Successfully restored RM {} to ACTIVE state", index);
+                        } else {
+                            LOG.warn("RM {} is in {} state after transition attempt, expected ACTIVE",
+                                    index, currentState);
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Failed to restore RM {} to ACTIVE state: {}", index, e.getMessage(), e);
+                        throw new Exception("Failed to restore RM HA state after restart", e);
                     }
-                } catch (Exception e) {
-                    LOG.error("Failed to restore RM {} to ACTIVE state: {}", index, e.getMessage(), e);
-                    throw new Exception("Failed to restore RM HA state after restart", e);
                 }
             }
         } else if (previousHAState != null) {

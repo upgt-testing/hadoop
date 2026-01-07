@@ -256,6 +256,10 @@ public class ServiceTestUtils {
     // Disable vmem check to disallow NM killing the container
     conf.setBoolean(NM_VMEM_CHECK_ENABLED, false);
     conf.setBoolean(NM_PMEM_CHECK_ENABLED, false);
+    // Enable RM recovery for restart testing
+    conf.set(YarnConfiguration.RECOVERY_ENABLED, "true");
+    conf.set(YarnConfiguration.RM_STORE, "org.apache.hadoop.yarn.server.resourcemanager.recovery.MemoryRMStateStore");
+    conf.setBoolean(YarnConfiguration.RM_WORK_PRESERVING_RECOVERY_ENABLED, true);
     // set auth filters
     conf.set(HttpServer2.FILTER_INITIALIZER_PROPERTY,
         "org.apache.hadoop.security.AuthenticationFilterInitializer,"

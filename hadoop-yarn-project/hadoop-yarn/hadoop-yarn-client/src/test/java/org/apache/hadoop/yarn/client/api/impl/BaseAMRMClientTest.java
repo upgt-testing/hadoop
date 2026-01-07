@@ -109,6 +109,13 @@ public class BaseAMRMClientTest {
         YarnConfiguration.OPPORTUNISTIC_CONTAINER_ALLOCATION_ENABLED, true);
     conf.setInt(
         YarnConfiguration.NM_OPPORTUNISTIC_CONTAINERS_MAX_QUEUE_LENGTH, 10);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:19232");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:19230");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:19231");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:19233");
     yarnCluster = new MiniYARNCluster(
         TestAMRMClient.class.getName(), nodeCount, 1, 1);
     yarnCluster.init(conf);

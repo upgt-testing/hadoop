@@ -79,6 +79,13 @@ public class TestMiniYarnClusterNodeUtilization_RestartInjected {
     conf = new YarnConfiguration();
     conf.set(YarnConfiguration.RM_WEBAPP_ADDRESS, "localhost:0");
     conf.setInt(YarnConfiguration.RM_NM_HEARTBEAT_INTERVAL_MS, 100);
+    // Enable RPC mode with fixed ports for restart testing
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_FIXED_PORTS, true);
+    conf.setBoolean(YarnConfiguration.YARN_MINICLUSTER_USE_RPC, true);
+    conf.set(YarnConfiguration.RM_ADDRESS, "localhost:19332");
+    conf.set(YarnConfiguration.RM_SCHEDULER_ADDRESS, "localhost:19330");
+    conf.set(YarnConfiguration.RM_RESOURCE_TRACKER_ADDRESS, "localhost:19331");
+    conf.set(YarnConfiguration.RM_ADMIN_ADDRESS, "localhost:19333");
     String name = TestMiniYarnClusterNodeUtilization.class.getName();
     cluster = new MiniYARNCluster(name, NUM_RM, NUM_NM, 1, 1);
     cluster.init(conf);
