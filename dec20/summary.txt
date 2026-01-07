@@ -1,0 +1,42 @@
+======================================================================
+Test Result Analysis Summary
+======================================================================
+Generated: 2026-01-04 21:09:10
+
+Step 1: Execution Parsing
+----------------------------------------------------------------------
+Total baseline executions: 160
+Total restart executions: 248
+
+Step 2: Failure Analysis
+----------------------------------------------------------------------
+Baseline failures: 1
+Restart failures (baseline passed): 43
+Ignored restart executions (baseline failed): 2
+
+Step 3: Failure Grouping
+----------------------------------------------------------------------
+Unique failure groups: 6
+Total restart failures analyzed: 0
+
+Group Distribution:
+----------------------------------------------------------------------
+Group   1:   22 executions (  0.0%) - Example: org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected.testUMALauncher @ after_launcher_init/resourcemanager
+Group   2:    6 executions (  0.0%) - Example: org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClientNoCleanupOnStop @ after_am_register/resourcemanager
+Group   3:    2 executions (  0.0%) - Example: org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected.testRegistryCleanedOnLifetimeExceeded @ after_app_create/resourcemanager
+Group   4:    2 executions (  0.0%) - Example: org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected.testAutomaticFailover @ after_cluster_start/resourcemanager
+Group   5:    2 executions (  0.0%) - Example: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testE2ETokenSwap @ after_app_submit/resourcemanager
+Group   6:    1 executions (  0.0%) - Example: org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testAMRMProxyTokenRenewal @ after_cluster_start/resourcemanager
+
+Baseline Failures Details:
+----------------------------------------------------------------------
+  1. org.apache.hadoop.yarn.server.TestMiniYarnCluster_RestartInjected.testTimelineServiceStartInMiniCluster (ignored 2 restart executions)
+
+Output Files:
+----------------------------------------------------------------------
+Step 1 results: results-dec20/yarn/dec20/step1_execution_summary.json
+Step 2 results: results-dec20/yarn/dec20/step2_failures.json
+Step 3 results: results-dec20/yarn/dec20/step3_grouped_failures.json
+This summary:   results-dec20/yarn/dec20/summary.txt
+
+======================================================================
