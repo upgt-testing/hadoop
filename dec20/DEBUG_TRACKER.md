@@ -52,8 +52,12 @@ java.lang.NullPointerException
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testAMRMProxyTokenRenewal`
-   - position=after_cluster_start, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testAMRMProxyTokenRenewal`
+   - "position": "after_cluster_start"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-1c9a6681"
 
 ---
 
@@ -104,12 +108,24 @@ Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.toke
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClientNoCleanupOnStop`
-   - position=after_am_register, target=resourcemanager, mode=GRACEFUL
-2. `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClientNoCleanupOnStop`
-   - position=after_container_allocate, target=resourcemanager, mode=GRACEFUL
-3. `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClient`
-   - position=after_am_register, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClientNoCleanupOnStop`
+   - "position": "after_am_register"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-69c87beb"
+2. Test: `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClientNoCleanupOnStop`
+   - "position": "after_container_allocate"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-00f4984d"
+3. Test: `org.apache.hadoop.yarn.client.api.impl.TestNMClient_RestartInjected.testNMClient`
+   - "position": "after_am_register"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-3d37282c"
 
 ---
 
@@ -155,10 +171,18 @@ Caused by: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.yarn.exceptio
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testE2ETokenSwap`
-   - position=after_app_submit, target=resourcemanager, mode=GRACEFUL
-2. `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testE2ETokenSwap`
-   - position=after_app_submit, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testE2ETokenSwap`
+   - "position": "after_app_submit"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-2cbb8a40"
+2. Test: `org.apache.hadoop.yarn.client.api.impl.TestAMRMProxy_RestartInjected.testE2ETokenSwap`
+   - "position": "after_app_submit"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-2cbb8a40"
 
 ---
 
@@ -194,10 +218,18 @@ java.lang.Thread.State: TIMED_WAITING
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected.testRegistryCleanedOnLifetimeExceeded`
-   - position=after_app_create, target=resourcemanager, mode=GRACEFUL
-2. `org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected.testRegistryCleanedOnLifetimeExceeded`
-   - position=after_app_create, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected.testRegistryCleanedOnLifetimeExceeded`
+   - "position": "after_app_create"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-3ef3f233"
+2. Test: `org.apache.hadoop.yarn.service.TestCleanupAfterKill_RestartInjected.testRegistryCleanedOnLifetimeExceeded`
+   - "position": "after_app_create"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-3ef3f233"
 
 ---
 
@@ -227,12 +259,24 @@ Caused by: java.lang.Exception: NodeManagers failed to connect after restart
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected.testUMALauncher`
-   - position=after_launcher_init, target=resourcemanager, mode=GRACEFUL
-2. `org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected.testUMALauncher`
-   - position=after_launcher_run, target=resourcemanager, mode=GRACEFUL
-3. `org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected.testMixedAllocationAndRelease`
-   - position=after_container_allocate, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected.testUMALauncher`
+   - "position": "after_launcher_init"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-91c9f515"
+2. Test: `org.apache.hadoop.yarn.applications.unmanagedamlauncher.TestUnmanagedAMLauncher_RestartInjected.testUMALauncher`
+   - "position": "after_launcher_run"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "003-113ed99d"
+3. Test: `org.apache.hadoop.yarn.client.api.impl.TestOpportunisticContainerAllocationE2E_RestartInjected.testMixedAllocationAndRelease`
+   - "position": "after_container_allocate"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "006-69167a8b"
 
 ---
 
@@ -270,10 +314,18 @@ Caused by: org.apache.hadoop.security.AccessControlException: Manual failover fo
 ```
 
 **Test Executions (Examples):**
-1. `org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected.testAutomaticFailover`
-   - position=after_cluster_start, target=resourcemanager, mode=GRACEFUL
-2. `org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected.testAutomaticFailover`
-   - position=after_cluster_start, target=resourcemanager, mode=GRACEFUL
+1. Test: `org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected.testAutomaticFailover`
+   - "position": "after_cluster_start"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-e18afe6c"
+2. Test: `org.apache.hadoop.yarn.client.TestRMFailover_RestartInjected.testAutomaticFailover`
+   - "position": "after_cluster_start"
+   - "target": "resourcemanager"
+   - "mode": "GRACEFUL"
+   - "index": "0"
+   - "executionDir": "002-e18afe6c"
 
 ---
 
