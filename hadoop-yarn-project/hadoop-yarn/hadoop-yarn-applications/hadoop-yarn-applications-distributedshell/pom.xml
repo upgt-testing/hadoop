@@ -31,6 +31,7 @@
     <yarn.basedir>${project.parent.parent.basedir}</yarn.basedir>
     <!-- Restart test configuration - can be overridden with -Drestart.config -->
     <restart.config>${project.basedir}/restarts-config/restart-config.json</restart.config>
+      <restart.tracking.agent>/workspace/RestartTestingFramework/restart-tracking-agent/target/restart-tracking-agent-1.0.0-SNAPSHOT.jar</restart.tracking.agent>
   </properties>
 
   <dependencies>
@@ -200,6 +201,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <argLine>-javaagent:${restart.tracking.agent}</argLine>
           <forkedProcessTimeoutInSeconds>1800</forkedProcessTimeoutInSeconds>
           <environmentVariables>
             <JAVA_HOME>${java.home}</JAVA_HOME>
