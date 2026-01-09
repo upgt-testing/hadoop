@@ -39,6 +39,7 @@
     <httpfs.build.timestamp>${maven.build.timestamp}</httpfs.build.timestamp>
     <kerberos.realm>LOCALHOST</kerberos.realm>
     <test.exclude.kerberos.test>**/TestHttpFSWithKerberos.java</test.exclude.kerberos.test>
+      <restart.tracking.agent>/workspace/RestartTestingFramework/restart-tracking-agent/target/restart-tracking-agent-1.0.0-SNAPSHOT.jar</restart.tracking.agent>
   </properties>
 
   <dependencies>
@@ -247,6 +248,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <argLine>-javaagent:${restart.tracking.agent}</argLine>
           <threadCount>1</threadCount>
           <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
           <systemPropertyVariables>
@@ -258,7 +260,8 @@
               <name>listener</name>
               <value>org.apache.hadoop.test.TimedOutTestsListener</value>
             </property>
-          </properties>
+              <restart.tracking.agent>/workspace/RestartTestingFramework/restart-tracking-agent/target/restart-tracking-agent-1.0.0-SNAPSHOT.jar</restart.tracking.agent>
+  </properties>
           <excludes>
             <exclude>**/${test.exclude}.java</exclude>
             <exclude>${test.exclude.pattern}</exclude>
@@ -353,7 +356,8 @@
       </activation>
       <properties>
         <test.exclude.kerberos.test>_</test.exclude.kerberos.test>
-      </properties>
+          <restart.tracking.agent>/workspace/RestartTestingFramework/restart-tracking-agent/target/restart-tracking-agent-1.0.0-SNAPSHOT.jar</restart.tracking.agent>
+  </properties>
       <build>
         <plugins>
           <plugin>

@@ -33,6 +33,8 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <hadoop.component>hdfs</hadoop.component>
     <is.hadoop.component>true</is.hadoop.component>
     <restart.config>${project.basedir}/restart-config.json</restart.config>
+    <!-- Restart tracking agent path - default for Docker, override with -Drestart.tracking.agent=... for local -->
+    <restart.tracking.agent>/workspace/RestartTestingFramework/restart-tracking-agent/target/restart-tracking-agent-1.0.0-SNAPSHOT.jar</restart.tracking.agent>
   </properties>
 
   <dependencies>
@@ -236,6 +238,7 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <argLine>-javaagent:${restart.tracking.agent}</argLine>
           <systemPropertyVariables>
             <runningWithNative>${runningWithNative}</runningWithNative>
           </systemPropertyVariables>
