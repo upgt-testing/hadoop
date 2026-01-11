@@ -1,0 +1,136 @@
+======================================================================
+Test Result Analysis Summary
+======================================================================
+Generated: 2026-01-10 18:22:24
+
+Step 1: Execution Parsing
+----------------------------------------------------------------------
+Total baseline executions: 1759
+Total restart executions: 5420
+
+Step 2: Failure Analysis
+----------------------------------------------------------------------
+Baseline failures: 113
+Restart failures (baseline passed): 845
+Ignored restart executions (baseline failed): 438
+
+Step 3: Failure Grouping
+----------------------------------------------------------------------
+Unique failure groups: 80
+Total restart failures analyzed: 0
+
+Group Distribution:
+----------------------------------------------------------------------
+Group   1:   97 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistLockedMemory_RestartInjected.testReservation @ after_file_creation/datanode
+Group   2:   84 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestObserverNode_RestartInjected.testGetGroups @ before_get_groups/namenode
+Group   3:   33 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyInProgressTail_RestartInjected.testNonUniformConfig @ after_nn0_restart_and_active/namenode
+Group   4:   31 executions (  0.0%) - Example: org.apache.hadoop.fs.TestGlobPaths_RestartInjected.testGlobAccessDeniedOnFC @ after_test_glob_access_denied_on_fc/datanode
+Group   5:   29 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestRollingUpgrade_RestartInjected.testQueryWithMultipleNN @ after_cluster_creation/datanode
+Group   6:   19 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFS_RestartInjected.testRead @ after_namenode_shutdown_test/datanode
+Group   7:   19 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDiffReport_RestartInjected.testDiffReport @ after_mkdir_subsubsub1/namenode
+Group   8:   14 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestHSync_RestartInjected.testHSyncWithAppend @ after_first_hsync/datanode
+Group   9:   11 executions (  0.0%) - Example: org.apache.hadoop.hdfs.tools.TestDFSHAAdminMiniCluster_RestartInjected.testFencer @ after_failover_nn1_to_nn2/namenode
+Group  10:   11 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestPipelinesFailover_RestartInjected.testWriteOverCrashFailoverWithDnFail @ after_third_hflush_dnfail/datanode
+Group  11:    8 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestFSImage_RestartInjected.testSaveAndLoadErasureCodingPolicies @ after_second_save_namespace/namenode
+Group  12:    8 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestBackupNode_RestartInjected.testBackupNodeTailsEdits @ after_mkdir_bn_down/namenode
+Group  13:    8 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.diskbalancer.TestDiskBalancerRPC_RestartInjected.testCancelPlan @ after_helper_setup/datanode
+Group  14:    8 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestCacheDirectives_RestartInjected.testExpiryTimeConsistency @ after_add_directive/namenode
+Group  15:    7 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestListOpenFiles_RestartInjected.testListOpenFilesWithDeletedPath @ after_file_deletion/namenode
+Group  16:    7 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestFSImageWithSnapshot_RestartInjected.testSaveLoadImage @ after_snapshot_s2/namenode
+Group  17:    5 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestStandbyCheckpoints_RestartInjected.testCheckpointWhenNoNewTransactionsHappened @ after_namenode_restart/namenode
+Group  18:    5 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestDecommissionWithStriped_RestartInjected.testFileSmallerThanOneStripe @ before_decommission/namenode
+Group  19:    5 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock @ after_file_creation_hsync/datanode
+Group  20:    5 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestBlocksWithNotEnoughRacks_RestartInjected.testReplDueToNodeFailRespectsRackPolicy @ after_cluster_build/datanode
+Group  21:    5 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestMultiObserverNode_RestartInjected.testObserverFallBehind @ after_verification/namenode
+Group  22:    4 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestTriggerBlockReport_RestartInjected.testTriggerFullBlockReport @ after_file_creation/datanode
+Group  23:    4 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestTriggerBlockReport_RestartInjected.testTriggerIncrementalBlockReport @ after_file_creation/datanode
+Group  24:    4 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestDFSUpgradeWithHA_RestartInjected.testUpgradeWithJournalNodes @ after_upgrade_restart_qjm/namenode
+Group  25:    4 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestSecurityTokenEditLog_RestartInjected.testEditLog @ after_cluster_start/namenode
+Group  26:    3 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.snapshot.TestNestedSnapshots_RestartInjected.testNestedSnapshots @ after_create_snapshot_root/namenode
+Group  27:    3 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestBlockScanner_RestartInjected.testVolumeIteratorWithoutCaching @ after_iterator_created/datanode
+Group  28:    3 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestRBWBlockInvalidation_RestartInjected.testRWRInvalidation @ after_initial_write_flush/datanode
+Group  29:    3 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestReconstructStripedBlocksWithRackAwareness_RestartInjected.testReconstructionWithDecommission @ test3_after_stop_h11/datanode
+Group  30:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestGenericJournalConf_RestartInjected.testDummyJournalManager @ after_cluster_start/namenode
+Group  31:    2 executions (  0.0%) - Example: org.apache.hadoop.fs.TestGlobPaths_RestartInjected.testGlobRootOnFS @ before_test_glob_root_on_fs/namenode
+Group  32:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestDeleteBlockPool_RestartInjected.testDfsAdminDeleteBlockPool @ after_admin_delete_with_force/datanode
+Group  33:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestLeaseRecovery_RestartInjected.testBlockRecoveryRetryAfterFailedRecovery @ after_hsync/datanode
+Group  34:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.security.TestDelegationToken_RestartInjected.testDelegationTokenMetrics @ after_token_generation/namenode
+Group  35:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestBlocksWithNotEnoughRacks_RestartInjected.testCorruptBlockRereplicatedAcrossRacks @ after_cluster_build/datanode
+Group  36:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetricsWithVolumeDepartureArrival @ after_file_creation/datanode
+Group  37:    2 executions (  0.0%) - Example: org.apache.hadoop.hdfs.tools.TestViewFileSystemOverloadSchemeWithDFSAdmin_RestartInjected.testSaveNamespaceWithoutSpecifyingFS @ after_safemode_enter/namenode
+Group  38:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.web.TestWebHdfsFileSystemContract_RestartInjected.testResponseCode @ after_mkdir/namenode
+Group  39:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected.testSaveNamespaceBeforeShutdown @ after_first_savenamespace_check/namenode
+Group  40:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestBlockManager_RestartInjected.testNeededReconstructionWhileAppending @ after_hflush/datanode
+Group  41:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestLazyPersistLockedMemory_RestartInjected.testWritePipelineFailure @ after_write_hsync/datanode
+Group  42:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestWriteToReplica_RestartInjected.testClose @ after_replica_setup/datanode
+Group  43:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestWriteToReplica_RestartInjected.testAppend @ after_replica_setup/datanode
+Group  44:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestBlockRecovery2_RestartInjected.testRaceBetweenReplicaRecoveryAndFinalizeBlock @ after_recovery_thread_start/datanode
+Group  45:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestFileAppend_RestartInjected.testConcurrentAppendRead @ after_file_creation_concurrent_append/datanode
+Group  46:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestSaveNamespace_RestartInjected.testSkipSnapshotSection @ after_bogus_snapshot_feature_added/namenode
+Group  47:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.security.TestDelegationToken_RestartInjected.testDelegationTokenSecretManager @ after_token_renewal/namenode
+Group  48:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestFSDirectory_RestartInjected.testSkipQuotaCheck @ after_disable_quota/namenode
+Group  49:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.security.TestDelegationToken_RestartInjected.testCancelDelegationToken @ after_token_generation/namenode
+Group  50:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestFSImageWithSnapshot_RestartInjected.testSaveLoadImage @ after_third_rename/namenode
+Group  51:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestBlockScanner_RestartInjected.testScanAllBlocksNoRescan @ after_scanner_started/datanode
+Group  52:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestDiskError_RestartInjected.testDataTransferWhenBytesPerChecksumIsZero @ after_file_creation/datanode
+Group  53:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestBlockTokenWithDFS_RestartInjected.testWrite @ after_hflush/datanode
+Group  54:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestBootstrapStandby_RestartInjected.testSharedEditsMissingLogs @ after_delete_segment/namenode
+Group  55:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestFSImage_RestartInjected.testHasNonEcBlockUsingStripedIDForLoadSnapshot @ after_truncate/namenode
+Group  56:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.tools.TestDFSZKFailoverController_RestartInjected.testFailoverAndBackOnNNShutdown @ after_cluster_start/namenode
+Group  57:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeMetrics_RestartInjected.testVolumeMetricsWithVolumeDepartureArrival @ after_volume_failure/datanode
+Group  58:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestConsistentReadsObserver_RestartInjected.testRequeueCall @ after_create_file/namenode
+Group  59:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.web.TestHttpsFileSystem_RestartInjected.testSWebHdfsFileSystem @ after_write/datanode
+Group  60:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.web.TestWebHDFSForHA_RestartInjected.testFailoverAfterOpen @ after_create/datanode
+Group  61:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestRefreshNamenodes_RestartInjected.testRefreshNamenodes @ after_add_namenode_4/namenode
+Group  62:    1 executions (  0.0%) - Example: org.apache.hadoop.TestRefreshCallQueue_RestartInjected.testRefreshCallQueueWithFairCallQueue @ after_fair_queue_refresh/namenode
+Group  63:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestLargeBlockReport_RestartInjected.testBlockReportSucceedsWithLargerLengthLimit @ after_cluster_init/datanode
+Group  64:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestRollingUpgradeDowngrade_RestartInjected.testRejectNewFsImage @ after_storage_modification/namenode
+Group  65:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestStorageReport_RestartInjected.testStorageReportHasStorageTypeAndState @ after_spy_setup/namenode
+Group  66:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestDeadDatanode_RestartInjected.testDeadNodeAsBlockTarget @ after_datanode_shutdown_test2/namenode
+Group  67:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestDataNodeReconfiguration_RestartInjected.testSlowDiskParameters @ after_reconfigure_slow_disk/datanode
+Group  68:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.blockmanagement.TestRBWBlockInvalidation_RestartInjected.testRWRInvalidation @ after_namenode_restart/namenode
+Group  69:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.TestDFSStripedInputStream_RestartInjected.testRefreshBlock @ after_striped_file_creation/datanode
+Group  70:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestBlockUnderConstruction_RestartInjected.testEmptyExpectedLocations @ after_block_recovery_init/namenode
+Group  71:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestConsistentReadsObserver_RestartInjected.testAutoMsyncLongPeriod @ after_mkdir_testpath/namenode
+Group  72:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestCheckpoint_RestartInjected.testImportCheckpoint @ after_import_checkpoint/namenode
+Group  73:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestReadOnlySharedStorage_RestartInjected.testReadOnlyReplicaCorrupt @ after_setup_complete/datanode
+Group  74:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.balancer.TestBalancer_RestartInjected.testBalancerDuringUpgrade @ after_add_datanode/datanode
+Group  75:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestStorageRestore_RestartInjected.testStorageRestore @ after_third_dir_create/namenode
+Group  76:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestBlockCountersInPendingIBR_RestartInjected.testBlockCounters @ after_blocks_added/datanode
+Group  77:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.ha.TestObserverNode_RestartInjected.testFsckWithObserver @ after_create_file/namenode
+Group  78:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.TestTransferRbw_RestartInjected.testTransferRbw @ after_get_old_rbw/datanode
+Group  79:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.namenode.TestSecurityTokenEditLog_RestartInjected.testEditLog @ before_editlog_verification/namenode
+Group  80:    1 executions (  0.0%) - Example: org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.TestWriteToReplica_RestartInjected.testRecoverInconsistentRbw @ after_replica_setup/datanode
+
+Baseline Failures Details:
+----------------------------------------------------------------------
+  1. org.apache.hadoop.hdfs.server.namenode.snapshot.TestAclWithSnapshot_RestartInjected.testDeDuplication (ignored 31 restart executions)
+  2. org.apache.hadoop.hdfs.tools.TestDFSAdminWithHA_RestartInjected.testSetSafeMode (ignored 3 restart executions)
+  3. org.apache.hadoop.hdfs.server.namenode.ha.TestFailureOfSharedDir_RestartInjected.testFailureOfSharedDir (ignored 5 restart executions)
+  4. org.apache.hadoop.hdfs.server.blockmanagement.TestComputeInvalidateWork_RestartInjected.testDatanodeReformat (ignored 3 restart executions)
+  5. org.apache.hadoop.hdfs.server.namenode.TestHDFSConcat_RestartInjected.testConcatNotCompleteBlock (ignored 2 restart executions)
+  6. org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailure_RestartInjected.testVolumeFailure (ignored 6 restart executions)
+  7. org.apache.hadoop.hdfs.server.balancer.TestBalancerService_RestartInjected.testBalancerServiceOnError (ignored 5 restart executions)
+  8. org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDeletion_RestartInjected.testDeleteEarliestSnapshot1 (ignored 4 restart executions)
+  9. org.apache.hadoop.hdfs.server.namenode.TestDiskspaceQuotaUpdate_RestartInjected.testTruncateOverQuota (ignored 5 restart executions)
+ 10. org.apache.hadoop.hdfs.server.namenode.TestDiskspaceQuotaUpdate_RestartInjected.testAppendOverStorageQuota (ignored 5 restart executions)
+ 11. org.apache.hadoop.hdfs.TestRollingUpgradeRollback_RestartInjected.testRollbackCommand (ignored 5 restart executions)
+ 12. org.apache.hadoop.hdfs.server.namenode.TestDiskspaceQuotaUpdate_RestartInjected.testUpdateQuotaForAppend (ignored 5 restart executions)
+ 13. org.apache.hadoop.hdfs.server.namenode.TestAddBlockRetry_RestartInjected.testAddBlockRetryShouldReturnBlockWithLocations (ignored 3 restart executions)
+ 14. org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList_RestartInjected.testRemoveFromUpperLevel (ignored 1 restart executions)
+ 15. org.apache.hadoop.hdfs.server.datanode.TestDataNodeVolumeFailureReporting_RestartInjected.testDataNodeReconfigureWithVolumeFailures (ignored 6 restart executions)
+ 16. org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList_RestartInjected.testRemoveRandom (ignored 1 restart executions)
+ 17. org.apache.hadoop.fs.permission.TestStickyBit_RestartInjected.testAclGeneralSBBehavior (ignored 1 restart executions)
+ 18. org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList_RestartInjected.testRemoveFromTail (ignored 1 restart executions)
+ 19. org.apache.hadoop.hdfs.server.namenode.snapshot.TestDiffListBySkipList_RestartInjected.testReomveFromHead (ignored 1 restart executions)
+ 20. org.apache.hadoop.fs.permission.TestStickyBit_RestartInjected.testGeneralSBBehavior (ignored 1 restart executions)
+... and 93 more baseline failures
+
+Output Files:
+----------------------------------------------------------------------
+Step 1 results: results-jan10/hdfs/jan10/step1_execution_summary.json
+Step 2 results: results-jan10/hdfs/jan10/step2_failures.json
+Step 3 results: results-jan10/hdfs/jan10/step3_grouped_failures.json
+This summary:   results-jan10/hdfs/jan10/summary.txt
+
+======================================================================
