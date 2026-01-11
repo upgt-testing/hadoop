@@ -17,9 +17,11 @@ Total Failure Groups: 95
 
 ### Group 12: NullPointerException in BlocksMap.getStoredBlock
 
-[ ] Not started
+[x] TEST-BUG - See bugs/TEST-BUG-GROUP-12.md
 
 **Priority Reason**: NullPointerException from production HDFS code (org.apache.hadoop.hdfs.server.blockmanagement.BlocksMap). This indicates a potential race condition or state issue in block management during restart.
+
+**Resolution**: TEST-BUG - The test code does not refresh `fsn`, `fsdir`, and `blockmanager` references after NameNode restart. After restart, the old BlockManager's `BlocksMap.blocks` field is null (set by `close()` during shutdown), causing NPE when the test uses stale references.
 
 **Test Executions**: 13 failures
 
