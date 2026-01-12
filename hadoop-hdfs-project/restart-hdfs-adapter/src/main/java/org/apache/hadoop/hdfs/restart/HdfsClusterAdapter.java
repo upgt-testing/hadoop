@@ -17,8 +17,10 @@
  */
 package org.apache.hadoop.hdfs.restart;
 
+import org.apache.hadoop.ha.HAServiceProtocol.HAServiceState;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hdfs.MiniDFSCluster.DataNodeProperties;
+import org.apache.hadoop.hdfs.server.namenode.NameNode;
 import org.restarttest.core.ClusterAdapter;
 import org.restarttest.core.RestartMode;
 import org.restarttest.health.HealthCheck;
@@ -172,9 +174,15 @@ public class HdfsClusterAdapter implements ClusterAdapter<MiniDFSCluster> {
     /**
      * Restart a NameNode with the specified mode.
      * <p>
-     * This method preserves the original StartupOption from NameNodeInfo.
+     * This method preserves both the original StartupOption from NameNodeInfo
+     * and the HA state (Active/Standby/Observer) of the NameNode.
+     * <p>
      * The StartupOption (e.g., REGULAR, UPGRADE, ROLLBACK) affects how the NameNode
      * initializes its state and is preserved across restarts by MiniDFSCluster.
+     * <p>
+     * In HA mode, a restarted NameNode comes up as Standby by default. This method
+     * captures the HA state before restart and restores it afterward to maintain
+     * cluster topology.
      *
      * @param cluster the MiniDFSCluster instance
      * @param nnIndex the index of the NameNode to restart
@@ -184,6 +192,19 @@ public class HdfsClusterAdapter implements ClusterAdapter<MiniDFSCluster> {
     private void restartNameNode(MiniDFSCluster cluster, int nnIndex, RestartMode mode)
             throws Exception {
         LOG.info("Restarting NameNode {} with mode {}", nnIndex, mode);
+
+        // Capture the HA state before restart (for HA clusters)
+        HAServiceState previousState = null;
+        NameNode nn = cluster.getNameNode(nnIndex);
+        if (nn != null && nn.getRpcServer() != null) {
+            try {
+                previousState = nn.getRpcServer().getServiceStatus().getState();
+                LOG.info("NameNode {} HA state before restart: {}", nnIndex, previousState);
+            } catch (Exception e) {
+                LOG.debug("Could not get HA state for NameNode {} (may be non-HA cluster): {}",
+                        nnIndex, e.getMessage());
+            }
+        }
 
         switch (mode) {
             case GRACEFUL:
@@ -210,7 +231,71 @@ public class HdfsClusterAdapter implements ClusterAdapter<MiniDFSCluster> {
                 throw new IllegalArgumentException("Unknown restart mode: " + mode);
         }
 
+        // Restore HA state if the NameNode was Active or Observer before restart
+        if (previousState != null) {
+            restoreHAState(cluster, nnIndex, previousState);
+        }
+
         LOG.info("NameNode {} restarted successfully", nnIndex);
+    }
+
+    /**
+     * Restore the HA state of a NameNode after restart.
+     * <p>
+     * In HA mode, a restarted NameNode comes up as Standby by default.
+     * This method transitions the NameNode back to its previous state
+     * (Active or Observer) to maintain the cluster topology.
+     *
+     * @param cluster the MiniDFSCluster instance
+     * @param nnIndex the index of the NameNode
+     * @param targetState the desired HA state
+     */
+    private void restoreHAState(MiniDFSCluster cluster, int nnIndex, HAServiceState targetState) {
+        try {
+            NameNode nn = cluster.getNameNode(nnIndex);
+            if (nn == null || nn.getRpcServer() == null) {
+                LOG.warn("NameNode {} is null or not ready after restart, cannot restore HA state", nnIndex);
+                return;
+            }
+
+            HAServiceState currentState = nn.getRpcServer().getServiceStatus().getState();
+            LOG.info("NameNode {} current HA state: {}, target state: {}",
+                    nnIndex, currentState, targetState);
+
+            if (currentState == targetState) {
+                LOG.debug("NameNode {} already in target state {}", nnIndex, targetState);
+                return;
+            }
+
+            switch (targetState) {
+                case ACTIVE:
+                    LOG.info("Transitioning NameNode {} to ACTIVE", nnIndex);
+                    cluster.transitionToActive(nnIndex);
+                    cluster.waitActive(nnIndex);
+                    break;
+
+                case OBSERVER:
+                    LOG.info("Transitioning NameNode {} to OBSERVER", nnIndex);
+                    cluster.transitionToObserver(nnIndex);
+                    break;
+
+                case STANDBY:
+                    // NameNode comes up as Standby by default, no action needed
+                    LOG.debug("NameNode {} target state is STANDBY, no transition needed", nnIndex);
+                    break;
+
+                default:
+                    LOG.warn("Unknown or unsupported HA state {} for NameNode {}, skipping transition",
+                            targetState, nnIndex);
+            }
+
+            LOG.info("NameNode {} HA state restored to {}", nnIndex, targetState);
+        } catch (Exception e) {
+            LOG.warn("Failed to restore HA state {} for NameNode {}: {}",
+                    targetState, nnIndex, e.getMessage());
+            // Log the full stack trace at debug level
+            LOG.debug("HA state restoration failure details:", e);
+        }
     }
 
     /**
