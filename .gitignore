@@ -60,3 +60,6 @@ report.html
 
 
 .mvn
+
+# API keys
+**/api_keys.json
