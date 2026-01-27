@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "testClass": "org.apache.hadoop.hdfs.server.namenode.snapshot.TestSnapshotDeletion_RestartInjected",
+      "testMethod": "testDeleteEarliestSnapshot2",
+      "restartPoints": [
+        {
+          "position": "after_snapshot_s0_deletion",
+          "targets": ["namenode"],
+          "modes": ["GRACEFUL"],
+          "indices": ["0"]
+        }
+      ]
+    }
+  ]
+}

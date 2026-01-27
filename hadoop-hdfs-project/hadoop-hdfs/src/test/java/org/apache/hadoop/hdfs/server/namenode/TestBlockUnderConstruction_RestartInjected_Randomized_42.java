@@ -1,0 +1,242 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.hadoop.hdfs.server.namenode;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import java.io.IOException;
+import java.util.List;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DFSClientAdapter;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.TestFileCreation;
+import org.apache.hadoop.hdfs.protocol.Block;
+import org.apache.hadoop.hdfs.protocol.LocatedBlock;
+import org.apache.hadoop.hdfs.protocol.LocatedBlocks;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockInfo;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockManager;
+import org.apache.hadoop.hdfs.server.blockmanagement.BlockUnderConstructionFeature;
+import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.BlockUCState;
+import org.apache.hadoop.hdfs.server.protocol.NamenodeProtocols;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
+
+public class TestBlockUnderConstruction_RestartInjected_Randomized_42 {
+
+    static final String BASE_DIR = "/test/TestBlockUnderConstruction";
+
+    // same as TestFileCreation.blocksize
+    static final int BLOCK_SIZE = 8192;
+
+    // number of blocks to write
+    static final int NUM_BLOCKS = 5;
+
+    private static MiniDFSCluster cluster;
+
+    private static DistributedFileSystem hdfs;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        RestartFramework.at("after_cluster_start").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        Configuration conf = new HdfsConfiguration();
+        cluster = new MiniDFSCluster.Builder(conf).numDataNodes(3).build();
+        cluster.waitActive();
+        hdfs = cluster.getFileSystem();
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        if (hdfs != null)
+            hdfs.close();
+        if (cluster != null)
+            cluster.shutdown();
+    }
+
+    void writeFile(Path file, FSDataOutputStream stm, int size) throws IOException {
+        long blocksBefore = stm.getPos() / BLOCK_SIZE;
+        TestFileCreation.writeFile(stm, BLOCK_SIZE);
+        // need to make sure the full block is completely flushed to the DataNodes
+        // (see FSOutputSummer#flush)
+        stm.flush();
+        int blocksAfter = 0;
+        // wait until the block is allocated by DataStreamer
+        BlockLocation[] locatedBlocks;
+        while (blocksAfter <= blocksBefore) {
+            locatedBlocks = DFSClientAdapter.getDFSClient(hdfs).getBlockLocations(file.toString(), 0L, BLOCK_SIZE * NUM_BLOCKS);
+            blocksAfter = locatedBlocks == null ? 0 : locatedBlocks.length;
+        }
+    }
+
+    private void verifyFileBlocks(String file, boolean isFileOpen) throws IOException {
+        FSNamesystem ns = cluster.getNamesystem();
+        final INodeFile inode = INodeFile.valueOf(ns.dir.getINode(file), file);
+        assertTrue("File " + inode.toString() + " isUnderConstruction = " + inode.isUnderConstruction() + " expected to be " + isFileOpen, inode.isUnderConstruction() == isFileOpen);
+        BlockInfo[] blocks = inode.getBlocks();
+        assertTrue("File does not have blocks: " + inode.toString(), blocks != null && blocks.length > 0);
+        int idx = 0;
+        BlockInfo curBlock;
+        // all blocks but the last two should be regular blocks
+        for (; idx < blocks.length - 2; idx++) {
+            curBlock = blocks[idx];
+            assertTrue("Block is not complete: " + curBlock, curBlock.isComplete());
+            assertTrue("Block is not in BlocksMap: " + curBlock, ns.getBlockManager().getStoredBlock(curBlock) == curBlock);
+        }
+        // the penultimate block is either complete or
+        // committed if the file is not closed
+        if (idx > 0) {
+            // penultimate block
+            curBlock = blocks[idx - 1];
+            assertTrue("Block " + curBlock + " isUnderConstruction = " + inode.isUnderConstruction() + " expected to be " + isFileOpen, (isFileOpen && curBlock.isComplete()) || (!isFileOpen && !curBlock.isComplete() == (curBlock.getBlockUCState() == BlockUCState.COMMITTED)));
+            assertTrue("Block is not in BlocksMap: " + curBlock, ns.getBlockManager().getStoredBlock(curBlock) == curBlock);
+        }
+        // The last block is complete if the file is closed.
+        // If the file is open, the last block may be complete or not.
+        // last block
+        curBlock = blocks[idx];
+        if (!isFileOpen) {
+            assertTrue("Block " + curBlock + ", isFileOpen = " + isFileOpen, curBlock.isComplete());
+        }
+        assertTrue("Block is not in BlocksMap: " + curBlock, ns.getBlockManager().getStoredBlock(curBlock) == curBlock);
+    }
+
+    @Test
+    public void testBlockCreation() throws IOException {
+        Path file1 = new Path(BASE_DIR, "file1.dat");
+        FSDataOutputStream out = TestFileCreation.createFile(hdfs, file1, 3);
+        for (int idx = 0; idx < NUM_BLOCKS; idx++) {
+            // write one block
+            writeFile(file1, out, BLOCK_SIZE);
+            RestartFramework.at("after_write_block").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+            // verify consistency
+            verifyFileBlocks(file1.toString(), true);
+        }
+        // close file
+        out.close();
+        RestartFramework.at("after_file_close").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        RestartFramework.at("after_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        // verify consistency
+        verifyFileBlocks(file1.toString(), false);
+    }
+
+    /**
+     * Test NameNode.getBlockLocations(..) on reading un-closed files.
+     */
+    @Test
+    public void testGetBlockLocations() throws IOException {
+        RestartFramework.at("after_file_close").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        NamenodeProtocols namenode = cluster.getNameNodeRpc();
+        BlockManager blockManager = cluster.getNamesystem().getBlockManager();
+        final Path p = new Path(BASE_DIR, "file2.dat");
+        RestartFramework.at("after_initial_write").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        final String src = p.toString();
+        final FSDataOutputStream out = TestFileCreation.createFile(hdfs, p, 3);
+        namenode = cluster.getNameNodeRpc();
+        blockManager = cluster.getNamesystem().getBlockManager();
+        // write a half block
+        int len = BLOCK_SIZE >>> 1;
+        writeFile(p, out, len);
+        for (int i = 1; i < NUM_BLOCKS; ) {
+            // verify consistency
+            final LocatedBlocks lb = namenode.getBlockLocations(src, 0, len);
+            RestartFramework.at("after_get_block_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+            namenode = cluster.getNameNodeRpc();
+            blockManager = cluster.getNamesystem().getBlockManager();
+            final List<LocatedBlock> blocks = lb.getLocatedBlocks();
+            assertEquals(i, blocks.size());
+            final Block b = blocks.get(blocks.size() - 1).getBlock().getLocalBlock();
+            assertFalse(blockManager.getStoredBlock(b).isComplete());
+            if (++i < NUM_BLOCKS) {
+                // write one more block
+                writeFile(p, out, BLOCK_SIZE);
+                RestartFramework.at("after_write_block").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+                len += BLOCK_SIZE;
+            }
+        }
+        // close file
+        out.close();
+        namenode = cluster.getNameNodeRpc();
+        RestartFramework.at("after_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        blockManager = cluster.getNamesystem().getBlockManager();
+    }
+
+    /**
+     * A storage ID can be invalid if the storage failed or the node
+     * reregisters. When the node heart-beats, the storage report in it
+     * causes storage volumes to be added back. An invalid storage ID
+     * should not cause an NPE.
+     */
+    @Test
+    public void testEmptyExpectedLocations() throws Exception {
+        NamenodeProtocols namenode = cluster.getNameNodeRpc();
+        FSNamesystem fsn = cluster.getNamesystem();
+        BlockManager bm = fsn.getBlockManager();
+        final Path p = new Path(BASE_DIR, "file2.dat");
+        RestartFramework.at("after_hflush").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        final String src = p.toString();
+        final FSDataOutputStream out = TestFileCreation.createFile(hdfs, p, 1);
+        namenode = cluster.getNameNodeRpc();
+        fsn = cluster.getNamesystem();
+        bm = cluster.getNamesystem().getBlockManager();
+        writeFile(p, out, 256);
+        RestartFramework.at("after_file_creation").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        out.hflush();
+        RestartFramework.at("after_write_file").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        RestartFramework.at("after_block_recovery_init").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        // make sure the block is readable
+        LocatedBlocks lbs = namenode.getBlockLocations(src, 0, 256);
+        RestartFramework.at("after_get_block_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        namenode = cluster.getNameNodeRpc();
+        fsn = cluster.getNamesystem();
+        bm = cluster.getNamesystem().getBlockManager();
+        LocatedBlock lastLB = lbs.getLocatedBlocks().get(0);
+        final Block b = lastLB.getBlock().getLocalBlock();
+        // fake a block recovery
+        long blockRecoveryId = bm.nextGenerationStamp(false);
+        BlockUnderConstructionFeature uc = bm.getStoredBlock(b).getUnderConstructionFeature();
+        uc.initializeBlockRecovery(null, blockRecoveryId, false);
+        RestartFramework.at("after_final_get_locations").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        namenode = cluster.getNameNodeRpc();
+        fsn = cluster.getNamesystem();
+        RestartFramework.at("after_block_sync").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        bm = cluster.getNamesystem().getBlockManager();
+        try {
+            String[] storages = { "invalid-storage-id1" };
+            fsn.commitBlockSynchronization(lastLB.getBlock(), blockRecoveryId, 256L, true, false, lastLB.getLocations(), storages);
+        } catch (java.lang.IllegalStateException ise) {
+            // Although a failure is expected as of now, future commit policy
+            // changes may make it not fail. This is not critical to the test.
+        }
+        namenode = cluster.getNameNodeRpc();
+        fsn = cluster.getNamesystem();
+        bm = cluster.getNamesystem().getBlockManager();
+        // Invalid storage should not trigger an exception.
+        lbs = namenode.getBlockLocations(src, 0, 256);
+        namenode = cluster.getNameNodeRpc();
+        fsn = cluster.getNamesystem();
+        bm = cluster.getNamesystem().getBlockManager();
+    }
+}

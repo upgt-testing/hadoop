@@ -1,0 +1,13 @@
+[
+  {
+    "model": "Gemini 3 Pro",
+    "test_file": "TestWebHdfsTokens.java",
+    "response": "ERROR: 429 Client Error: Too Many Requests for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=AIzaSyBh8EpTYPQB6opKysIWBTTLiWDd-JSch58",
+    "metrics": {
+      "response_time": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost": 0
+    }
+  }
+]

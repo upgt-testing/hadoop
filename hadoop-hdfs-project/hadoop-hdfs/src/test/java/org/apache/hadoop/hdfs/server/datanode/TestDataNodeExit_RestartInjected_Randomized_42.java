@@ -1,0 +1,118 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.hadoop.hdfs.server.datanode;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import java.io.IOException;
+import java.util.List;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.DFSConfigKeys;
+import org.apache.hadoop.hdfs.HdfsConfiguration;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.hdfs.MiniDFSNNTopology;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.restarttest.api.RestartFramework;
+import org.restarttest.core.RestartMode;
+
+/**
+ * Tests if DataNode process exits if all Block Pool services exit.
+ */
+public class TestDataNodeExit_RestartInjected_Randomized_42 {
+
+    private static final long WAIT_TIME_IN_MILLIS = 10;
+
+    Configuration conf;
+
+    MiniDFSCluster cluster = null;
+
+    @Before
+    public void setUp() throws IOException {
+        conf = new HdfsConfiguration();
+        conf.setInt(DFSConfigKeys.DFS_BLOCK_SIZE_KEY, 100);
+        conf.setInt(DFSConfigKeys.DFS_BYTES_PER_CHECKSUM_KEY, 100);
+        cluster = new MiniDFSCluster.Builder(conf).nnTopology(MiniDFSNNTopology.simpleFederatedTopology(3)).build();
+        for (int i = 0; i < 3; i++) {
+            cluster.waitActive(i);
+        }
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        if (cluster != null) {
+            cluster.shutdown();
+            cluster = null;
+        }
+    }
+
+    private void stopBPServiceThreads(int numStopThreads, DataNode dn) throws Exception {
+        List<BPOfferService> bpoList = dn.getAllBpOs();
+        int expected = dn.getBpOsCount() - numStopThreads;
+        int index = numStopThreads - 1;
+        while (index >= 0) {
+            bpoList.get(index--).stop();
+        }
+        // Total 30 seconds MAX wait time
+        int iterations = 3000;
+        while (dn.getBpOsCount() != expected && iterations > 0) {
+            Thread.sleep(WAIT_TIME_IN_MILLIS);
+            iterations--;
+        }
+        assertEquals("Mismatch in number of BPServices running", expected, dn.getBpOsCount());
+    }
+
+    /**
+     * Test BPService Thread Exit
+     */
+    @Test
+    public void testBPServiceExit() throws Exception {
+        RestartFramework.at("after_stop_remaining_bpservices").on(cluster).restart("namenode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        DataNode dn = cluster.getDataNodes().get(0);
+        RestartFramework.at("after_stop_first_bpservice").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        dn = cluster.getDataNodes().get(0);
+        stopBPServiceThreads(1, dn);
+        dn = cluster.getDataNodes().get(0);
+        assertTrue("DataNode should not exit", dn.isDatanodeUp());
+        RestartFramework.at("after_get_datanode").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        stopBPServiceThreads(2, dn);
+        assertFalse("DataNode should exit", dn.isDatanodeUp());
+    }
+
+    @Test
+    public void testSendOOBToPeers() throws Exception {
+        RestartFramework.at("after_get_datanode").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        DataNode dn = cluster.getDataNodes().get(0);
+        dn = cluster.getDataNodes().get(0);
+        DataXceiverServer spyXserver = Mockito.spy(dn.getXferServer());
+        RestartFramework.at("after_spy_setup").on(cluster).restart("datanode").withIndex(0).withMode(RestartMode.GRACEFUL).execute();
+        NullPointerException npe = new NullPointerException();
+        Mockito.doThrow(npe).when(spyXserver).sendOOBToPeers();
+        dn.xserver = spyXserver;
+        dn = cluster.getDataNodes().get(0);
+        try {
+            dn.shutdown();
+        } catch (Exception e) {
+            fail("DataNode shutdown should not have thrown exception " + e);
+        }
+    }
+}
